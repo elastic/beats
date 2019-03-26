@@ -146,6 +146,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
 - Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 - Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
+- decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
+- Report faulting file when config reload fails. {pull}[11304]11304
+- Remove IP fields from default_field in Elasticsearch template.
 
 *Auditbeat*
 
@@ -180,6 +183,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
 - Add fix to parse syslog message with priority value 0. {issue}11010[11010]
 - Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
+- Fix coredns image in docs.asciidoc for docs build. {pull}11460[11460] {pull}11461[11461]
 
 *Heartbeat*
 
@@ -257,7 +261,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add output test to kafka output {pull}10834[10834]
 - Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
 - Gracefully shut down on SIGHUP {pull}10704[10704]
-- Add `script` processor that supports using Javascript to process events. {pull}10850[10850] {pull}11260[11260]
+- New processor: `copy_fields`. {pull}11303[11303]
+- Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
 
 *Auditbeat*
 
@@ -270,6 +275,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `entity_id` fields. {pull}10500[10500]
 - Add seven dashboards for the system module. {pull}10511[10511]
 - Move System module to beta. {pull}10800[10800]
+- Login dataset: Add event category and type. {pull}11339[11339]
 
 *Filebeat*
 
@@ -304,6 +310,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945]
 - Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
+- Add support for MySQL 8.0 slow logs and tests also for Percona 8.0 and MariaDB 10.3. {pull}11417[11417]
+- New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
 
 *Heartbeat*
 
