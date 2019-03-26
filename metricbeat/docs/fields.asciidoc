@@ -20040,7 +20040,7 @@ Stats scraped from a Prometheus endpoint.
 
 
 
-*`prometheus.labels`*::
+*`prometheus.labels.*`*::
 +
 --
 type: object
@@ -20050,7 +20050,7 @@ Prometheus metric labels
 
 --
 
-*`prometheus.metrics`*::
+*`prometheus.metrics.*`*::
 +
 --
 type: object
