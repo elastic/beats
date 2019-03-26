@@ -815,11 +815,11 @@ func (b *Beat) registerClusterUUIDFetching() error {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
-	var response struct {
-		ClusterUUID string `json:"cluster_uuid"`
-	}
-
 	callback := func(esClient *elasticsearch.Client) error {
+		var response struct {
+			ClusterUUID string `json:"cluster_uuid"`
+		}
+
 		status, body, err := esClient.Request("GET", "/", "", nil, nil)
 		if err != nil {
 			return errw.Wrap(err, "error querying /")
