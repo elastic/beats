@@ -75,6 +75,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/envoyproxy/server"
 	_ "github.com/elastic/beats/metricbeat/module/etcd"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/leader"
+	_ "github.com/elastic/beats/metricbeat/module/etcd/metrics"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/self"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/store"
 	_ "github.com/elastic/beats/metricbeat/module/golang"

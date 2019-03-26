@@ -1,0 +1,12 @@
+2019-03-24T13:44:25.484123Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.15) initializing of server in progress as process 1640
+2019-03-24T13:44:27.924508Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2019-03-24T13:44:29.065309Z 0 [System] [MY-013170] [Server] /usr/sbin/mysqld (mysqld 8.0.15) initializing of server has completed
+2019-03-24T13:44:31.085670Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.15) starting as process 1688
+2019-03-24T13:44:31.533096Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2019-03-24T13:44:31.534587Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/tmp' in the path is accessible to all OS users. Consider choosing a different directory.
+2019-03-24T13:44:31.555406Z 6 [System] [MY-013172] [Server] Received SHUTDOWN from user boot. Shutting down mysqld (Version: 8.0.15).
+2019-03-24T13:44:33.236624Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.15)  MySQL Community Server - GPL.
+2019-03-24T13:44:34.072713Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.15) starting as process 1834
+2019-03-24T13:44:34.406962Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2019-03-24T13:44:34.420123Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.15'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2019-03-24T13:44:34.572158Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: '/var/run/mysqld/mysqlx.sock' bind-address: '::' port: 33060
