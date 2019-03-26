@@ -38,6 +38,7 @@ func init() {
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	dockerClient *client.Client
@@ -75,4 +76,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 	eventsMapping(r, containers, m.dedot)
+}
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
 }

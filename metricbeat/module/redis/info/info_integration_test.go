@@ -40,6 +40,9 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
+	if len(events) == 0 {
+		t.Fatal("no events")
+	}
 	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event)

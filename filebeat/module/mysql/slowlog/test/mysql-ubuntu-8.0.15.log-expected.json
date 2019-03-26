@@ -1,0 +1,25 @@
+[
+    {
+        "@timestamp": "2019-03-24T14:01:45.000Z",
+        "ecs.version": "1.0.0",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 2475469000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 217,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 0.000287,
+        "mysql.slowlog.query": "SELECT last_name, MAX(salary) AS salary FROM employees INNER JOIN salaries ON employees.emp_no = salaries.emp_no GROUP BY last_name ORDER BY salary DESC LIMIT 10;",
+        "mysql.slowlog.rows_examined": 3145718,
+        "mysql.slowlog.rows_sent": 10,
+        "mysql.slowlog.schema": "employees",
+        "mysql.thread_id": 14,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "root"
+    }
+]

@@ -16,7 +16,7 @@ See the following topics for a description of breaking changes:
 * <<breaking-changes-6.2>>
 * <<breaking-changes-6.1>>
 * <<breaking-changes-6.0>>
-* {auditbeat}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
+* {auditbeat-ref}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
 
 [[breaking-changes-7.0]]
 
@@ -299,7 +299,7 @@ templates will not be applied.
 
 The `document_type` setting, from the prospector configuration, was removed
 because the `_type` concept is being
-{elasticsearch}/removal-of-types.html[removed from Elasticsearch]. Instead of
+{ref}/removal-of-types.html[removed from Elasticsearch]. Instead of
 the `document_type` setting, you can use a custom field.
 
 This has led also to the rename of the `input_type` configuration setting to

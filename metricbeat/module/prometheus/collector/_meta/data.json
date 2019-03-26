@@ -1,9 +1,5 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
         "dataset": "prometheus.collector",
         "duration": 115000,
@@ -14,15 +10,15 @@
     },
     "prometheus": {
         "labels": {
-            "interval": "15s"
+            "listener_name": "http"
         },
         "metrics": {
-            "prometheus_target_interval_length_seconds_count": 1,
-            "prometheus_target_interval_length_seconds_sum": 15.000226176
+            "net_conntrack_listener_conn_accepted_total": 3,
+            "net_conntrack_listener_conn_closed_total": 0
         }
     },
     "service": {
-        "address": "172.29.0.2:9090",
+        "address": "127.0.0.1:55555",
         "type": "prometheus"
     }
 }

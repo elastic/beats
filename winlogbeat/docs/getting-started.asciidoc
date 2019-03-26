@@ -56,7 +56,7 @@ shows all non-deprecated options. For more information about these options, see
 === Step 2: Configure Winlogbeat
 
 To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. See the
-{libbeat}/config-file-format.html[Config File Format] section of the
+{beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 Here is a sample of the `winlogbeat.yml` file:
@@ -74,7 +74,7 @@ output.elasticsearch:
 
 logging.to_files: true
 logging.files:
-  path: C:/ProgramData/winlogbeat/Logs
+  path: C:\ProgramData\winlogbeat\Logs
 logging.level: info
 --------------------------------------------------------------------------------
 

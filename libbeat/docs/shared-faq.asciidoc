@@ -18,7 +18,7 @@ You may encounter errors loading the config file on POSIX operating systems if:
 * an unauthorized user tries to load the config file, or
 * the config file has the wrong permissions.
 
-See {libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+See {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 for more about resolving these errors.
 
 [float]

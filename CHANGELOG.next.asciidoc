@@ -13,11 +13,15 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
   info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
 - Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
+- Empty `meta.json` file will be treated as a missing meta file. {issue}8558[8558]
 - Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
+- Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
+- Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
 
 *Auditbeat*
 
 - Process dataset: Only report processes with executable. {pull}11232[11232]
+- Shorten entity IDs. {pull}11405[11405]
 
 *Filebeat*
 
@@ -61,6 +65,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 - Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 - Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
+- Remove IP fields from default_field in Elasticsearch template. {pull}11400[11400]
 
 *Auditbeat*
 
@@ -77,6 +82,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
 - Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 
 *Heartbeat*
 
@@ -93,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
 - Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
 - Fix ec2 metricset to collect metrics from Cloudwatch with the same timestamp. {pull}11142[11142]
+- Fix potential memory leak in stopped docker metricsets {pull}11294[11294]
 
 *Packetbeat*
 
@@ -101,6 +108,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Winlogbeat*
 
 - Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
+- Fix Winlogbeat escaping CR, LF and TAB characters. {issue}11328[11328] {pull}11357[11357]
 
 *Functionbeat*
 
@@ -113,11 +121,14 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Auditbeat*
 
 - Move System module to beta. {pull}10800[10800]
+- Login dataset: Add event category and type. {pull}11339[11339]
 
 *Filebeat*
 
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945] {pull}11223[11223]
+- Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
+- Add support for MySQL 8.0, Percona 8.0 and MariaDB 10.3. {pull}11417[11417]
 
 *Heartbeat*
 

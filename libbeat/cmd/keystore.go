@@ -104,7 +104,7 @@ func genAddKeystoreCmd(settings instance.Settings) *cobra.Command {
 func genRemoveKeystoreCmd(settings instance.Settings) *cobra.Command {
 	return &cobra.Command{
 		Use:   "remove",
-		Short: "remove secret",
+		Short: "Remove secret",
 		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
 			store, err := getKeystore(settings)
 			if err != nil {
@@ -136,7 +136,7 @@ func createKeystore(settings instance.Settings, force bool) error {
 	}
 
 	if store.IsPersisted() == true && force == false {
-		response := terminal.PromptYesNo("A keystore already exists, Overwrite?", true)
+		response := terminal.PromptYesNo("A keystore already exists, Overwrite?", false)
 		if response == true {
 			err := store.Create(true)
 			if err != nil {

@@ -20,7 +20,7 @@ The +{modulename}+ module has two filesets:
 
 
 For the `slowlog` fileset, make sure to configure the
-{logstashdoc}/logging.html#_slowlog[Logstash slowlog option].
+{logstash-ref}/logging.html#_slowlog[Logstash slowlog option].
 
 [float]
 === Compatibility

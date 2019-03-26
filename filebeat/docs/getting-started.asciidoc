@@ -231,10 +231,7 @@ sudo service {beatname_lc} start
 
 *docker:*
 
-["source", "shell", subs="attributes"]
-----------------------------------------------------------------------
-docker run {dockerimage}
-----------------------------------------------------------------------
+See <<running-on-docker>>.
 
 *mac and linux:*
 
@@ -246,7 +243,7 @@ sudo ./filebeat -e
 <1> You'll be running Filebeat as root, so you need to change ownership
 of the configuration file, or run Filebeat with `--strict.perms=false`
 specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
 *win:*
@@ -279,7 +276,7 @@ To populate the example dashboards with data, you need to either
 <<configuring-ingest-node,define ingest node pipelines>> or use Logstash to
 parse the data into the fields expected by the dashboards. If you are using
 Logstash, see the
-{logstashdoc}/logstash-config-for-filebeat-modules.html[configuration examples]
+{logstash-ref}/logstash-config-for-filebeat-modules.html[configuration examples]
 in the Logstash documentation for help parsing the log formats supported
 by the dashboards.
 
