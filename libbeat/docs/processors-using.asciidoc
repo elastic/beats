@@ -632,17 +632,16 @@ _Openstack Nova_
 
 The `add_fields` processor adds additional fields to the event.  Fields can be
 scalar values, arrays, dictionaries, or any nested combination of these.  By
-default the fields that you specifiy will be grouped under the `fields`
-sub-dictionary in the event.  The `target` setting can be used to change the
-sub-dictionary used for grouping the new fields under.  To store the fields as
+default the fields that you specify will be grouped under the `fields`
+sub-dictionary in the event. To group the fields under a different
+sub-dictionary, use the `target` setting. To store the fields as
 top-level fields, set `target: ''`. 
 
-``target``:: (Optional) Sub-dictionary to put all fields in to. Defaults to `fields`.
-``fields``:: Fields to be added:
+`target`:: (Optional) Sub-dictionary to put all fields into. Defaults to `fields`.
+`fields`:: Fields to be added.
 
-Example:
 
-This configuration:
+For example, this configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -678,7 +677,7 @@ under the ECS compliant `labels` sub-dictionary.
 
 `labels`:: dictionaries of labels to be added.
 
-Example:
+For example, this configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -746,10 +745,10 @@ regular time.
 [[add-tags]]
 === Add tags
 
-The `add_tags` processor adds tags to an list of tags. The tags will be
-appended to the existing list of tags, if the target field already exists.
+The `add_tags` processor adds tags to a list of tags. If the target field already exists,
+the tags are appended to the existing list of tags.
 
-`tags`:: List of tags to add
+`tags`:: List of tags to add.
 `target`:: (Optional) Field the tags will be added to. Defaults to `tags`.
 
 [[decode-json-fields]]
