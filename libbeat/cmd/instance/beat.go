@@ -815,6 +815,10 @@ func (b *Beat) registerClusterUUIDFetching() error {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
+	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
+
 	callback := func(esClient *elasticsearch.Client) error {
 		var response struct {
 			ClusterUUID string `json:"cluster_uuid"`
@@ -832,11 +836,7 @@ func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, err
 			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
 		}
 
-		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-		outputsRegistry := stateRegistry.NewRegistry("outputs")
-		elasticsearchRegistry := outputsRegistry.NewRegistry("elasticsearch")
-		monitoring.NewString(elasticsearchRegistry, "cluster_uuid").Set(response.ClusterUUID)
-
+		clusterUUIDRegVar.Set(response.ClusterUUID)
 		return nil
 	}
 
