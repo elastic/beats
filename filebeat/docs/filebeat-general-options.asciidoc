@@ -76,13 +76,11 @@ helping Filebeat process more events.
 [float]
 ==== `registry.migrate_file`
 
-Prior to Filebeat 7.0 the registry is stored in one file only. On startup
-Filebeat will automatically migrate the old Filebeat 6.x registry file to the 
-new directory based registry.
-
-By default the file location to migrate from is
-assumed to be given by `filebeat.registry.path`, but in case the path has been
-changed when upgrading one can use `filebeat.registry.migrate_file`.
+Prior to Filebeat 7.0 the registry is stored in a singe file. When you upgrade
+to 7.0, Filebeat will automatically migrate the old Filebeat 6.x registry file
+to use the new directory format. Filebeat looks for the file in the location
+specified by `filebeat.registry.path`. If you changed the path while upgrading,
+set `filebeat.registry.migrate_file` to point to the old registry file.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
