@@ -673,7 +673,7 @@ The `add_labels` processors adds a set of key-value pairs to an event.
 The processor will flatten nested configuration objects like arrays or
 dictionaries into a fully qualified name by merging nested names with a `.`.
 Array entries create numeric names starting with 0.  Labels are always stored
-under the ECS compliant `labels` sub-dictionary.
+under the Elastic Common Schema compliant `labels` sub-dictionary.
 
 `labels`:: dictionaries of labels to be added.
 
@@ -685,9 +685,9 @@ processors:
 - add_labels:
     labels:
       number: 1
-      label.with.dots: test
+      with.dots: test
       nested:
-        label.with.dots: nested
+        with.dots: nested
       array:
         - do
 	- re
@@ -701,8 +701,8 @@ Adds these fields to every event:
 {
   "labels": {
     "number": 1,
-    "label.with.dots": "test",
-    "nested.label.with.dots": "nested",
+    "with.dots": "test",
+    "nested.with.dots": "nested",
     "array.0": "do",
     "array.1": "re",
     "array.2.with.field": "mi"
@@ -750,6 +750,27 @@ the tags are appended to the existing list of tags.
 
 `tags`:: List of tags to add.
 `target`:: (Optional) Field the tags will be added to. Defaults to `tags`.
+
+For example, this configuration:
+
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_tags:
+    tags: [web, production]
+    target: "environment"
+------------------------------------------------------------------------------
+
+Adds the environment field to every event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "environment": ["web", "production"]
+}
+-------------------------------------------------------------------------------
+
 
 [[decode-json-fields]]
 === Decode JSON fields
