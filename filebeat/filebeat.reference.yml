@@ -801,11 +801,11 @@ filebeat.inputs:
 #filebeat.registry.flush: 0s
 
 
-# The new registry format uses a directory to store the filebeat state.
-# Filebeat will automatically migrate a 6.x registry file to the new format on startup.
-# The filebeat.registry.migrate_file setting can be used to point filebeat to the
-# location of the old registry file, in case filebeat.registry.path has been
-# changed when upgrading filebeat.
+# Starting with Filebeat 7.0, the registry uses a new directory format to store
+# Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
+# registry file to use the new directory format. If you changed
+# filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
+# point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
