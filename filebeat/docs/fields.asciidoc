@@ -25,7 +25,7 @@ grouped in the following categories:
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
 * <<exported-fields-iptables>>
-* <<exported-fields-jolokia>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -6503,7 +6503,7 @@ The rule set name.
 
 --
 
-[[exported-fields-jolokia]]
+[[exported-fields-jolokia-autodiscover]]
 == Jolokia Discovery autodiscover provider fields
 
 Metadata from Jolokia Discovery added by the jolokia provider.

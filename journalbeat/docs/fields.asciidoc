@@ -18,7 +18,7 @@ grouped in the following categories:
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
 * <<exported-fields-host-processor>>
-* <<exported-fields-jolokia>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 
@@ -4114,7 +4114,7 @@ OS build information.
 
 --
 
-[[exported-fields-jolokia]]
+[[exported-fields-jolokia-autodiscover]]
 == Jolokia Discovery autodiscover provider fields
 
 Metadata from Jolokia Discovery added by the jolokia provider.

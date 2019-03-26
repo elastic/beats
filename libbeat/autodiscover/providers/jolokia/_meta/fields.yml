@@ -1,4 +1,4 @@
-- key: jolokia
+- key: jolokia-autodiscover
   title: Jolokia Discovery autodiscover provider
   description: >
     Metadata from Jolokia Discovery added by the jolokia provider.
