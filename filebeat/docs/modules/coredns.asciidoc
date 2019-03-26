@@ -26,7 +26,7 @@ with other versions of Kubernetes.
 This module comes with a sample dashboard.
 
 [role="screenshot"]
-image::./images/Coredns_Overview_Dashboard.jpg[]
+image::./images/kibana-coredns.jpg[]
 
 
 [float]
