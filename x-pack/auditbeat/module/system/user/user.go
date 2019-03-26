@@ -466,10 +466,12 @@ func userMessage(user *User, action eventAction) string {
 func fmtGroups(groups []*user.Group) string {
 	var b strings.Builder
 
-	b.WriteString(groups[0].Name)
-	for _, group := range groups[1:] {
-		b.WriteString(",")
-		b.WriteString(group.Name)
+	if len(groups) > 0 {
+		b.WriteString(groups[0].Name)
+		for _, group := range groups[1:] {
+			b.WriteString(",")
+			b.WriteString(group.Name)
+		}
 	}
 
 	return b.String()

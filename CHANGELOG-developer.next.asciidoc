@@ -39,3 +39,4 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 - Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
 - Added support for using PYTHON_EXE to control what Python interpreter is used
   by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
+- Prometheus helper for metricbeat contains now `Namespace` field for `prometheus.MetricsMappings` {pull}11424[11424]
