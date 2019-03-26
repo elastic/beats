@@ -24,6 +24,11 @@ services:
     volumes:
       - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
       - ./docker/logstash/pki:/etc/pki:ro
+      - ./docker/logstash/healthcheck:/tmp/healthcheck:ro
+    healthcheck:
+      test: ["CMD", "sh", "/tmp/healthcheck/healthcheck.sh"]
+      retries: 300
+      interval: 1s
 
   kibana:
     image: docker.elastic.co/kibana/kibana:6.6.0
