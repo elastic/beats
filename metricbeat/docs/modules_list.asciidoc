@@ -58,7 +58,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-envoyproxy,envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>>   
+.4+| .4+|  |<<metricbeat-metricset-etcd-leader,leader>>   
+|<<metricbeat-metricset-etcd-metrics,metrics>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>>   
 |<<metricbeat-metricset-etcd-store,store>>   
 |<<metricbeat-module-golang,Golang>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
