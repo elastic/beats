@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Auditbeat*
 
 - Process dataset: Only report processes with executable. {pull}11232[11232]
+- Shorten entity IDs. {pull}11405[11405]
 
 *Filebeat*
 
