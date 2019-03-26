@@ -1,10 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "etcd": {
+        "api_version": "2",
         "store": {
             "compareanddelete": {
                 "fail": 0,
@@ -26,12 +23,12 @@
                 "count": 0
             },
             "gets": {
-                "fail": 3,
-                "success": 0
+                "fail": 4,
+                "success": 2
             },
             "sets": {
                 "fail": 0,
-                "success": 4
+                "success": 12
             },
             "update": {
                 "fail": 0,
