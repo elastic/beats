@@ -46,7 +46,7 @@ type BaseResponse struct {
 	Error   ErrorResponse `json:"error,omitempty"`
 }
 
-// ErrorResponse contains human reable and machine readable information when an error happen.
+// ErrorResponse contains human readable and machine readable information when an error happens.
 type ErrorResponse struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
