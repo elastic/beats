@@ -78,12 +78,17 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 			return nil, err
 		}
 		files = append(files, ymls...)
-		libbeatModulesPath := filepath.Join(esBeatsPath, "libbeat/processors")
-		libbeatFieldFiles, err := CollectModuleFiles(libbeatModulesPath)
-		if err != nil {
-			return nil, err
+		libbeatModulesPaths := []string{
+			filepath.Join(esBeatsPath, "libbeat/processors"),
+			filepath.Join(esBeatsPath, "libbeat/autodiscover/providers"),
 		}
-		files = append(files, libbeatFieldFiles...)
+		for _, libbeatModulesPath := range libbeatModulesPaths {
+			libbeatFieldFiles, err := CollectModuleFiles(libbeatModulesPath)
+			if err != nil {
+				return nil, err
+			}
+			files = append(files, libbeatFieldFiles...)
+		}
 	}
 
 	// Fields for custom beats last, to enable overriding more generically defined fields
