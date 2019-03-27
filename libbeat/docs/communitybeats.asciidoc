@@ -112,3 +112,4 @@ https://github.com/phenomenes/varnishlogbeat[varnishlogbeat]:: Reads log data fr
 https://github.com/phenomenes/varnishstatbeat[varnishstatbeat]:: Reads stats data from a Varnish instance and ships it to Elasticsearch.
 https://gitlab.com/msvechla/vaultbeat[vaultbeat]:: Collects performance metrics and statistics from Hashicorp's Vault.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
+https://github.com/IBM/yarnbeat[yarnbeat]:: Polls YARN and MapReduce APIs for cluster and application metrics.
