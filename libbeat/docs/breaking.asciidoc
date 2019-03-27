@@ -11,11 +11,20 @@ changes, but there are breaking changes between major versions (e.g. 5.x to
 
 See the following topics for a description of breaking changes:
 
+* <<breaking-changes-6.7>>
 * <<breaking-changes-6.3>>
 * <<breaking-changes-6.2>>
 * <<breaking-changes-6.1>>
 * <<breaking-changes-6.0>>
 * {auditbeat-ref}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
+
+[[breaking-changes-6.7]]
+=== Breaking changes in 6.7
+
+The data structure used to store Beats central management data in Kibana has changed. As a result of the
+template changes, enrolled Beats and configuration tags created prior to 6.7 will not work until you migrate them to the new format.
+To migrate to the new format, use the https://github.com/elastic/migrate-management-beats/releases[migration tool] we've created.
+For more information, see the https://github.com/elastic/migrate-management-beats/blob/master/README.md[documentation] about the tool. {see-relnotes}
 
 [[breaking-changes-6.3]]
 === Breaking changes in 6.3
