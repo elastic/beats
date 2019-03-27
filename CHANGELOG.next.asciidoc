@@ -23,6 +23,8 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...master[Check the HEAD diff
 
 *Metricbeat*
 
+- Add connection and request timeouts for HTTP helper. {pull}11032[11032]
+
 *Packetbeat*
 
 *Winlogbeat*
