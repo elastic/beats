@@ -1,7 +1,7 @@
-- name: system
+- name: website
   type: group
   description: >
-    system
+    website
   fields:
     - name: example
       type: keyword

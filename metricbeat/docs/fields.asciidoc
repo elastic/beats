@@ -8882,13 +8882,30 @@ iis module
 
 
 [float]
-== system fields
+== webserver fields
 
-system
+webserver
 
 
 
-*`iis.system.example`*::
+*`iis.webserver.example`*::
++
+--
+type: keyword
+
+Example field
+
+
+--
+
+[float]
+== website fields
+
+website
+
+
+
+*`iis.website.example`*::
 +
 --
 type: keyword

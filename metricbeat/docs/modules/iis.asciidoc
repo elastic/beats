@@ -21,10 +21,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: iis
-  metricsets: ["system"]
-  enabled: false
+  metricsets:
+    - webserver
+    - website
+  enabled: true
   period: 10s
-  hosts: ["localhost"]
 
 ----
 
@@ -33,7 +34,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-iis-system,system>>
+* <<metricbeat-metricset-iis-webserver,webserver>>
 
-include::iis/system.asciidoc[]
+* <<metricbeat-metricset-iis-website,website>>
+
+include::iis/webserver.asciidoc[]
+
+include::iis/website.asciidoc[]
 

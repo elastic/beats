@@ -1,0 +1,9 @@
+- name: webserver
+  type: group
+  description: >
+    webserver
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

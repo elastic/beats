@@ -1,4 +1,4 @@
-package system
+package webserver
 
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -13,7 +13,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("iis", "system", New, mb.DefaultMetricSet())
+	mb.Registry.MustAddMetricSet("iis", "webserver", New, mb.DefaultMetricSet())
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -28,12 +28,8 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The iis system metricset is experimental.")
-
-	config := iis.Config
-	//if err := base.Module().UnpackConfig(&config); err != nil {
-	//	return nil, err
-	//}
+	cfgwarn.Experimental("The iis webserver metricset is experimental.")
+	config := iis.InitConfig("webserver")
 
 	reader, err := perfmon.NewPerfmonReader(config)
 	if err != nil {

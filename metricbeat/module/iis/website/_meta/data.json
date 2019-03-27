@@ -7,12 +7,12 @@
     "metricset":{
         "host":"localhost",
         "module":"iis",
-        "name":"system",
+        "name":"website",
         "rtt":44269
     },
     "iis":{
-        "system":{
-            "example": "system"
+        "website":{
+            "example": "website"
         }
     },
     "type":"metricsets"

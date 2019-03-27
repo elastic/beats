@@ -1,6 +1,7 @@
 - module: iis
-  metricsets: ["system"]
+  metricsets:
+    - webserver
+    - website
   enabled: true
   period: 10s
-  hosts: ["localhost"]
 
