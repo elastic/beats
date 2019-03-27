@@ -98,6 +98,11 @@ func (c *ConfigBlacklist) isBlacklisted(blockType string, block *api.ConfigBlock
 			if c.isBlacklistedBlock(pattern, segments, cfg.Config) {
 				return true
 			}
+		} else if strings.HasPrefix(field, ".") {
+			segments := strings.Split(field[1:], ".")
+			if c.isBlacklistedBlock(pattern, segments, cfg.Config) {
+				return true
+			}
 		}
 	}
 

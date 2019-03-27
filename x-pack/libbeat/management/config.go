@@ -98,8 +98,8 @@ func defaultConfig() *Config {
 		},
 		Blacklist: ConfigBlacklistSettings{
 			Patterns: map[string]string{
-				"output":     "console|file",
-				"processors": "script",
+				"output":      "console|file",
+				".processors": "script",
 			},
 		},
 	}

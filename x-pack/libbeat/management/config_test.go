@@ -17,6 +17,6 @@ func EnsureBlacklistItems(t *testing.T) {
 	assert.Equal(t, "console|file", v)
 
 	// NOTE: We do not permit to configure the script processor with CM for security reason.
-	v, _ = c.Blacklist.Patterns["processors"]
+	v, _ = c.Blacklist.Patterns[".processors"]
 	assert.Equal(t, "script", v)
 }
