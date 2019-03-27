@@ -1,6 +1,7 @@
 import re
 from packetbeat import BaseTest
 
+
 class Test(BaseTest):
     """
     Basic MongoDB tests
@@ -247,8 +248,10 @@ class Test(BaseTest):
         self.run_packetbeat(pcap="mongodb_invalid_opcode_2269.pcap",
                             debug_selectors=["mongodb"])
 
-        unknown_counts = self.log_contains_countmap(re.compile(r'Unknown operation code: (\d+)'), 1)
+        unknown_counts = self.log_contains_countmap(
+            re.compile(r'Unknown operation code: (\d+)'), 1)
 
         assert len(unknown_counts) > 0
         for k, v in unknown_counts.items():
-            assert v == 1, "Unknown opcode reported more than once: opcode={0}, count={1}".format(k, v)
+            assert v == 1, "Unknown opcode reported more than once: opcode={0}, count={1}".format(
+                k, v)
