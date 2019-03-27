@@ -18,7 +18,6 @@ See the following topics for a description of breaking changes:
 * <<breaking-changes-6.0>>
 * {auditbeat-ref}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
 
-=======
 [[breaking-changes-6.7]]
 === Breaking changes in 6.7
 
