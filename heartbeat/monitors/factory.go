@@ -44,5 +44,17 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config, meta *common.M
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *common.Config) error {
-	return checkMonitorConfig(config, globalPluginsReg, f.allowWatches)
+	m, err := newMonitor(config, globalPluginsReg, nil, nil, f.allowWatches, nil)
+	// We need to free up any resources like unique ID checks
+	defer func() {
+		if m != nil {
+			m.Stop()
+		}
+	}()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

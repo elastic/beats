@@ -135,6 +135,14 @@ func mockPluginBuilder() pluginBuilder {
 	reg := monitoring.NewRegistry()
 
 	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]jobs.Job, int, error) {
+		// Declare a real config block with a required attr so we can see what happens when it doesn't work
+		unpacked := struct {
+			URLs []string `config:"urls" validate:"required"`
+		}{}
+		err := config.Unpack(&unpacked)
+		if err != nil {
+			return nil, 0, err
+		}
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
 		return j, 1, err
@@ -152,6 +160,25 @@ func mockPluginConf(t *testing.T, id string, schedule string, url string) *commo
 		"type":     "test",
 		"urls":     []string{url},
 		"schedule": schedule,
+	}
+
+	if id != "" {
+		confMap["id"] = id
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}
+
+// Plugin conf with an invalid plugin config
+// This should fail after the generic plugin checks fail since the HTTP plugin requires 'urls' to be set
+func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config {
+	confMap := map[string]interface{}{
+		"type":        "test",
+		"notanoption": []string{"foo"},
+		"schedule":    schedule,
 	}
 
 	if id != "" {
