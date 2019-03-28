@@ -48,6 +48,18 @@ type PipelineState struct {
 	ClusterIDs     []string               `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
 }
 
+// PipelineStats represents the stats of a Logstash pipeline
+type PipelineStats struct {
+	ID          string                   `json:"id"`
+	Hash        string                   `json:"hash"`
+	EphemeralID string                   `json:"ephemeral_id"`
+	Events      map[string]interface{}   `json:"events"`
+	Reloads     map[string]interface{}   `json:"reloads"`
+	Queue       map[string]interface{}   `json:"queue"`
+	Vertices    []map[string]interface{} `json:"vertices"`
+	ClusterIDs  []string                 `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
+}
+
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Logstash module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
@@ -83,6 +95,31 @@ func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
 	}
 
 	var pipelines []PipelineState
+	for pipelineID, pipeline := range pipelinesResponse.Pipelines {
+		pipeline.ID = pipelineID
+		pipelines = append(pipelines, pipeline)
+	}
+
+	return pipelines, nil
+}
+
+// GetPipelinesStats returns the list of pipelines (and their stats) running on a Logstash node
+func GetPipelinesStats(http *helper.HTTP, resetURI string) ([]PipelineStats, error) {
+	content, err := fetchPath(http, resetURI, "_node/stats/pipelines", "")
+	if err != nil {
+		return nil, errors.Wrap(err, "could not fetch node pipeline stats")
+	}
+
+	pipelinesResponse := struct {
+		Pipelines map[string]PipelineStats `json:"pipelines"`
+	}{}
+
+	err = json.Unmarshal(content, &pipelinesResponse)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not parse node pipeline stats response")
+	}
+
+	var pipelines []PipelineStats
 	for pipelineID, pipeline := range pipelinesResponse.Pipelines {
 		pipeline.ID = pipelineID
 		pipelines = append(pipelines, pipeline)
