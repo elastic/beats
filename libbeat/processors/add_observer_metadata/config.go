@@ -25,6 +25,7 @@ import (
 
 // Config for add_host_metadata processor.
 type Config struct {
+	Overwrite      bool            `config:"overwrite"`       // Overwrite if observer fields already exist
 	NetInfoEnabled bool            `config:"netinfo.enabled"` // Add IP and MAC to event
 	CacheTTL       time.Duration   `config:"cache.ttl"`
 	Geo            *util.GeoConfig `config:"geo"`

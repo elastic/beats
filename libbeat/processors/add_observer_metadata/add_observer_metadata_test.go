@@ -58,6 +58,42 @@ func TestConfigDefault(t *testing.T) {
 	assert.Nil(t, v)
 }
 
+func TestOverwriteFalse(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{"observer": common.MapStr{"foo": "bar"}},
+		Timestamp: time.Now(),
+	}
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	require.NoError(t, err)
+
+	p, err := New(testConfig)
+
+	newEvent, err := p.Run(event)
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("observer")
+	require.NoError(t, err)
+	assert.Equal(t, common.MapStr{"foo": "bar"}, v)
+}
+
+func TestOverwriteTrue(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{"observer": common.MapStr{"foo": "bar"}},
+		Timestamp: time.Now(),
+	}
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{"overwrite": true})
+	require.NoError(t, err)
+
+	p, err := New(testConfig)
+
+	newEvent, err := p.Run(event)
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("observer.vendor")
+	require.NoError(t, err)
+	assert.Equal(t, "elastic", v)
+}
+
 func TestConfigNetInfoEnabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    common.MapStr{},
