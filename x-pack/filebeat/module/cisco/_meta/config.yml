@@ -1,0 +1,15 @@
+- module: cisco
+  asa:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
