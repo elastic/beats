@@ -16,7 +16,7 @@
       migration: true
     - name: remote_ip
       type: alias
-      path: source.ip
+      path: source.address
       migration: true
     - name: user_name
       type: alias
