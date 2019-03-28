@@ -28,6 +28,12 @@ import (
 
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState) error {
 	for _, pipeline := range pipelines {
+		// Exclude internal pipelines
+		if pipeline.ID[0] == '.' {
+			continue
+		}
+
+		// Rename key: graph -> representation
 		pipeline.Representation = pipeline.Graph
 		pipeline.Graph = nil
 
