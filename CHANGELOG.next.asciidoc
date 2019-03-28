@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 - Relax validation of the X-Pack license UID value. {issue}11640[11640]
 - Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Fixed OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
 
 *Auditbeat*
 
