@@ -48,7 +48,7 @@ func TestFetch(t *testing.T) {
 
 	makeBadRequest(config)
 
-	ms := mbtest.NewReportingMetricSetV2(t, config)
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
 	reporter := &mbtest.CapturingReporterV2{}
 
 	ms.Fetch(reporter)
