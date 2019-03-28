@@ -348,6 +348,7 @@ func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 			document, err := d.readDocument()
 			if err != nil {
 				logp.Err("An error occurred while parsing OP_MSG message: %s", err)
+				return false, false
 			}
 			documents = append(documents, document)
 		}
