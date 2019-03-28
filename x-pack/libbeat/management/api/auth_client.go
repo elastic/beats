@@ -13,6 +13,8 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // EventType is the type of event that the events endpoint can understand.
@@ -50,6 +52,9 @@ type AuthClienter interface {
 
 	// Configuration retrieves the list of configuration blocks from Kibana
 	Configuration() (ConfigBlocks, error)
+
+	// UpdateMetadata sends the metadata assigned to the beat
+	UpdateMetadata(meta common.MapStr) error
 }
 
 // AuthClient is a authenticated client to the CM endpoint and exposes the calls that require

@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
@@ -24,6 +25,7 @@ const accessTokenKey = "management.accesstoken"
 func Enroll(
 	beat *instance.Beat,
 	kibanaConfig *kibana.ClientConfig,
+	metadata *common.Config,
 	enrollmentToken string,
 ) error {
 	// Ignore kibana version to avoid permission errors
@@ -49,6 +51,16 @@ func Enroll(
 	config.Enabled = true
 	config.AccessToken = "${" + accessTokenKey + "}"
 	config.Kibana = kibanaConfig
+
+	// Unpack metadata, persist so they can be sent on each start
+	metadata.Unpack(&config.Metadata)
+
+	// Update config with metadata
+	authClient := &api.AuthClient{Client: client, AccessToken: config.AccessToken, BeatUUID: beat.Info.ID}
+	err = authClient.UpdateMetadata(config.Metadata)
+	if err != nil {
+		return errors.Wrap(err, "updating metadata")
+	}
 
 	configFile := cfgfile.GetDefaultCfgfile()
 

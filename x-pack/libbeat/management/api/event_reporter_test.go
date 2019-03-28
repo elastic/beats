@@ -11,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -34,6 +35,10 @@ func (m *memoryAuthClient) Close() {
 
 func (m *memoryAuthClient) Configuration() (ConfigBlocks, error) {
 	return ConfigBlocks{}, nil
+}
+
+func (m *memoryAuthClient) UpdateMetadata(meta common.MapStr) error {
+	return nil
 }
 
 func newMemoryAuthClient() *memoryAuthClient {
@@ -64,7 +69,7 @@ func testBatch(numberOfEvents, maxBatchSize int) func(*testing.T) {
 		var receivedEvents int
 		expectedbatch := int(math.Ceil(float64(numberOfEvents) / float64(maxBatchSize)))
 
-		for receivedBatchs := 0; receivedBatchs < expectedbatch; receivedBatchs++ {
+		for receivedBatches := 0; receivedBatches < expectedbatch; receivedBatches++ {
 			requests := <-client.Requests
 			receivedEvents += len(requests)
 		}

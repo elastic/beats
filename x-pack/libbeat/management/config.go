@@ -11,6 +11,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/kibana"
 )
 
@@ -81,6 +82,8 @@ type Config struct {
 	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
 
 	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
+
+	Metadata common.MapStr `config:"meta" yaml:"meta"`
 }
 
 // EventReporterConfig configuration of the events reporter.
@@ -101,6 +104,7 @@ func defaultConfig() *Config {
 				"output": "console|file",
 			},
 		},
+		Metadata: make(map[string]interface{}),
 	}
 }
 

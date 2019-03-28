@@ -9,19 +9,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/feature"
-
 	"github.com/gofrs/uuid"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/libbeat/management/api"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/management"
+	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
 
 var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
@@ -195,6 +192,9 @@ func (cm *ConfigManager) worker() {
 		}
 
 		if firstRun {
+			// Send metadata
+			cm.client.UpdateMetadata(cm.config.Metadata)
+
 			period = cm.config.Period
 			firstRun = false
 		}
