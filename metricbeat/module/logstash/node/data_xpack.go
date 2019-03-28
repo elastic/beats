@@ -50,6 +50,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 			"logstash_state": logstashState,
 		}
 
+		event.ID = pipeline.EphemeralID
 		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
 		r.Event(event)
 	}
