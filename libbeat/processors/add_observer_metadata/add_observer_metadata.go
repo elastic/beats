@@ -124,8 +124,6 @@ func (p *observerMetadata) loadData() error {
 	data := common.MapStr{
 		"observer": common.MapStr{
 			"hostname": hostInfo.Hostname,
-			"type":     "heartbeat",
-			"vendor":   "elastic",
 		},
 	}
 	if p.config.NetInfoEnabled {

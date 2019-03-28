@@ -41,15 +41,7 @@ func TestConfigDefault(t *testing.T) {
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
-	v, err := newEvent.GetValue("observer.type")
-	assert.NoError(t, err)
-	assert.Equal(t, "heartbeat", v)
-
-	v, err = newEvent.GetValue("observer.vendor")
-	assert.NoError(t, err)
-	assert.Equal(t, "elastic", v)
-
-	v, err = newEvent.GetValue("observer.ip")
+	v, err := newEvent.GetValue("observer.ip")
 	assert.Error(t, err)
 	assert.Nil(t, v)
 
@@ -89,9 +81,9 @@ func TestOverwriteTrue(t *testing.T) {
 	newEvent, err := p.Run(event)
 	require.NoError(t, err)
 
-	v, err := newEvent.GetValue("observer.vendor")
+	v, err := newEvent.GetValue("observer.hostname")
 	require.NoError(t, err)
-	assert.Equal(t, "elastic", v)
+	assert.NotNil(t, v)
 }
 
 func TestConfigNetInfoEnabled(t *testing.T) {
@@ -109,15 +101,7 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
-	v, err := newEvent.GetValue("observer.type")
-	assert.NoError(t, err)
-	assert.Equal(t, "heartbeat", v)
-
-	v, err = newEvent.GetValue("observer.vendor")
-	assert.NoError(t, err)
-	assert.Equal(t, "elastic", v)
-
-	v, err = newEvent.GetValue("observer.ip")
+	v, err := newEvent.GetValue("observer.ip")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
