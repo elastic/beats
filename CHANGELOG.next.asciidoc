@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `event.type` to `auditd.message_type` in auditd module because event.type is reserved for future use by ECS. {pull}10536[10536]
 - Rename `auditd.messages` to `event.original` and `auditd.warnings` to `error.message`. {pull}10577[10577]
 - Process dataset: Only report processes with executable. {pull}11232[11232]
+- Shorten entity IDs. {pull}11405[11405]
 
 *Filebeat*
 
@@ -146,9 +147,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
 - Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 - Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
+- decode_json_field: process objects and arrays only {pull}11312[11312]
 - decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
 - Report faulting file when config reload fails. {pull}[11304]11304
 - Remove IP fields from default_field in Elasticsearch template.
+- Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
 
 *Auditbeat*
 
