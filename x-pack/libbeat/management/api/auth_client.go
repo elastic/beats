@@ -33,13 +33,13 @@ type EventRequest struct {
 
 // EventAPIResponse is the top level response for the events endpoints.
 type EventAPIResponse struct {
-	Response []EventResponse `json:"response"`
+	BaseResponse
+	Response []EventResponse `json:"results"`
 }
 
 // EventResponse is the indiviual response for each event request.
 type EventResponse struct {
-	Success bool   `json:"success"`
-	Reason  string `json:"reason"`
+	BaseResponse
 }
 
 // AuthClienter is the interface exposed by the auth client and is useful for testing without calling
@@ -102,7 +102,7 @@ func (c *AuthClient) SendEvents(requests []EventRequest) error {
 	var errors multierror.Errors
 	for _, response := range resp.Response {
 		if !response.Success {
-			errors = append(errors, fmt.Errorf("error sending event, reason: %+v", response.Reason))
+			errors = append(errors, fmt.Errorf("error sending event, reason: %+v", response.Error.Message))
 		}
 	}
 
