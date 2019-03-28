@@ -111,8 +111,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 				NumCPUs:     nodeStats.Process.CPU.NumCPUs,
 			},
 		}
-		logstash := map[string]interface{}{} // TODO
-		queue := map[string]interface{}{}    // TODO
+		logstash := map[string]interface{}{} // TODO; see https://github.com/elastic/logstash/issues/10121
+		queue := map[string]interface{}{}    // TODO: see https://github.com/elastic/logstash/issues/10610
 
 		logstashStats := LogstashStats{
 			nodeStats.commonStats,
