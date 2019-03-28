@@ -19,7 +19,6 @@ package logstash
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 
 	"github.com/pkg/errors"
@@ -82,8 +81,6 @@ func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "could not parse node pipelines response")
 	}
-
-	fmt.Println(pipelinesResponse)
 
 	var pipelines []PipelineState
 	for pipelineID, pipeline := range pipelinesResponse.Pipelines {
