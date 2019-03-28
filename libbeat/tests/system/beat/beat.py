@@ -131,7 +131,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Path to test binary
         if not hasattr(self, 'test_binary'):
-            self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
+            self.test_binary = os.path.abspath(
+                self.beat_path + "/" + self.beat_name + ".test")
 
         template_paths = [
             self.beat_path,
@@ -282,7 +283,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     # hit EOF
                     break
 
-                event = json.loads(line, object_pairs_hook=self.json_raise_on_duplicates)
+                event = json.loads(
+                    line, object_pairs_hook=self.json_raise_on_duplicates)
                 del event['@metadata']
                 jsons.append(event)
         return jsons
@@ -319,7 +321,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
         fields_yml = os.path.join(self.beat_path, "fields.yml")
         # Only add it if it exists
         if os.path.isfile(fields_yml):
-            shutil.copyfile(fields_yml, os.path.join(self.working_dir, "fields.yml"))
+            shutil.copyfile(fields_yml, os.path.join(
+                self.working_dir, "fields.yml"))
 
         try:
             # update the last_run link
@@ -365,7 +368,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                           name="log_contains",
                           ignore_case=False):
         self.wait_until(
-            cond=lambda: self.log_contains(msg, logfile, ignore_case=ignore_case),
+            cond=lambda: self.log_contains(
+                msg, logfile, ignore_case=ignore_case),
             max_timeout=max_timeout,
             poll_interval=poll_interval,
             name=name)
@@ -407,6 +411,30 @@ class TestCase(unittest.TestCase, ComposeMixin):
             counter = -1
 
         return counter
+
+    def log_contains_countmap(self, pattern, capture_group, logfile=None):
+        """
+        Returns a map of the number of appearances of each captured group in the log file
+        """
+        counts = {}
+
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        try:
+            with open(os.path.join(self.working_dir, logfile), "r") as f:
+                for line in f:
+                    res = pattern.search(line)
+                    if res is not None:
+                        capt = res.group(capture_group)
+                        if capt in counts:
+                            counts[capt] += 1
+                        else:
+                            counts[capt] = 1
+        except IOError:
+            pass
+
+        return counts
 
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
@@ -511,7 +539,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     newName = field["name"]
 
                 if field.get("type") == "group":
-                    subfields, subdictfields, subaliases = extract_fields(field["fields"], newName)
+                    subfields, subdictfields, subaliases = extract_fields(
+                        field["fields"], newName)
                     fields.extend(subfields)
                     dictfields.extend(subdictfields)
                     aliases.extend(subaliases)
@@ -530,9 +559,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
         # TODO: Make fields_doc path more generic to work with beat-generator. If it can't find file
         # "fields.yml" you should run "make update" on metricbeat folder
         with open(fields_doc, "r") as f:
-            path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
+            path = os.path.abspath(os.path.dirname(
+                __file__) + "../../../../fields.yml")
             if not os.path.isfile(path):
-                path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
+                path = os.path.abspath(os.path.dirname(
+                    __file__) + "../../../../_meta/fields.common.yml")
             with open(path) as f2:
                 content = f2.read()
 
@@ -551,7 +582,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
             aliases = []
 
             for item in doc:
-                subfields, subdictfields, subaliases = extract_fields(item["fields"], "")
+                subfields, subdictfields, subaliases = extract_fields(
+                    item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)
                 aliases.extend(subaliases)
@@ -644,6 +676,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
         for key in flat.keys():
             metaKey = key.startswith('@metadata.')
             if not(is_documented(key, expected_fields) or metaKey):
-                raise Exception("Key '{}' found in event is not documented!".format(key))
+                raise Exception(
+                    "Key '{}' found in event is not documented!".format(key))
             if is_documented(key, aliases):
-                raise Exception("Key '{}' found in event is documented as an alias!".format(key))
+                raise Exception(
+                    "Key '{}' found in event is documented as an alias!".format(key))

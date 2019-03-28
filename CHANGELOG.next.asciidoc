@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   - `http.response.body` moves to `http.response.body.content`
 - Changed Packetbeat fields to align with ECS. {issue}7968[7968]
 - Removed trailing dot from domain names reported by the DNS protocol. {pull}9941[9941]
+- Add support for mongodb opcode 2013 (OP_MSG). {issue}6191[6191] {pull}8594[8594]
 
 *Winlogbeat*
 
