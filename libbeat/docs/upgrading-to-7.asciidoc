@@ -1,7 +1,7 @@
 [[upgrading]]
 == Upgrading
 
-This section gives general recommendations for upgrading Beats shippers:
+This section gives general recommendations for upgrading {beats} shippers:
 
 * <<upgrading-minor-versions>>
 * <<upgrading-6-to-7>>
@@ -13,116 +13,190 @@ If you're upgrading other products in the stack, also read the
 [[upgrading-minor-versions]]
 === Upgrade between minor versions
 
-As a general rule, upgrading between minor versions (e.g. 7.x to 7.y, where x <
-y) can be done by simply installing the new release and restarting the Beat
-process, because the Beats keep backwards compatibility when it comes to
-configuration and exported fields. Please review the <<release-notes,release
-notes>> for potential exceptions.
+As a general rule, you can upgrade between minor versions (for example, 7.x to
+7.y, where x < y) by simply installing the new release and restarting the Beat
+process. {beats} typically maintain backwards compatibility for configuration
+settings and exported fields. Please review the
+<<release-notes,release notes>> for potential exceptions.
 
 Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
-supported. If you are on version 1.x of the Beats, we recommend first upgrading
-to ?.?.
-
-// REVIEWERS: Any specific recommendations for upgrading to a specific version
-// before upgrading to 7.x? I'm not sure we want to even talk about 1.x at this
-// point because it's been EOL for so long. 
+supported.
 
 [[upgrading-6-to-7]]
 === Upgrade from 6.x to 7.x
 
-Before upgrading your Beats, review the <<breaking-changes, breaking changes>>
-doc.
+Before upgrading your {beats}, review <<breaking-changes,breaking changes>>.
 
-If you are planning an upgrade of the full stack ({es}, {kib}, or
-{ls}, in addition to Beats), read the
-{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide].
+If you're upgrading other products in the stack, also read the
+{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. 
 
 We recommend that you fully upgrade {es} and {kib} to version 7.0
-before upgrading Beats.
+before upgrading {beats}. If you're on Beats 6.0 through 6.6,
+<<upgrading-to-6.7,upgrade to Beats 6.7>> *before* doing the {es} upgrade.
 
-// REVIEWERS: Is there a min 6.x version that users need to upgrade to *before*
-// upgrading to 7.0?
-//
-// If so, I'll add this:
-//
-// If you are on a Beats 6.x version lower than 6.?, 
-// follow the <<upgrading-to-6.?>> section *before* doing the {es} upgrade.
+Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
+supported.
 
+// REVIEWERS: I think it's worth begin redundant here ^^ because users often
+// don't read topics in the order we expect.
 
-// REVIEWERS: What is the minimum version of 6.x that still runs with 7.0 stack?
+[[upgrading-to-6.7]]
+==== Upgrade to Beats 6.7 before upgrading to 7.0
 
-If you're not ready to upgrade {es} and {kib} to 7.0, that's alright.
-Beats version 7.0 works with {es} and {kib} version 6.?, so you can
-upgrade Beats now and the rest of the stack later.
+The upgrade procedure assumes that you have {beats} 6.7 installed. If you're on
+a previous 6.x version of {beats}, upgrade to version 6.7 first. This is
+required because the {es} mapping template in 6.7 was modified to be compatible
+with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
 
-[[upgrading-to-6.?]]
-==== Upgrade to 6.?
+After upgrading to 6.7, make sure the 6.7 template gets loaded. You can do this
+by temporarily enabling the `output.elasticsearch.template.overwrite` setting,
+for example with Metricbeat:
 
-// REVIEWERS: Do users need to upgrade to a specific version of Beats before
-// upgrading to 7.0? If so, why? I'm assuming the ECS field migration will have
-// some affect, but not sure how having aliases affects our recommendations.
+[source,shell]
+----
+metricbeat -e -E output.elasticsearch.template.overwrite=true
+----
 
-The upgrade procedure assumes that you have Beats version 6.? installed. If you
-are on a previous 6.x version of Beats, upgrade to version 6.? first.
+Or you can manually force loading the template:
 
-// TODO: If there is a requirement to upgrade to 6.? here, add reason and any
-// specific steps users need to perform. For example, does the user need to
-// set template.overwrite=true so the template gets upgraded?
+[source,shell]
+----
+curl -XPUT -H'Content-Type: application/json'  http://localhost:9200/_template/metricbeat -d @metricbeat.template.json
+----
 
+To check the template version, open the {kib} Console and run:
+
+[source,js]
+----
+GET /_template/metricbeat
+----
+// CONSOLE
+
+Look for the version string in the response. Repeat this step for every Beat
+running in your environment.
+
+*Metricbeat and Filebeat users:* If you use {beats} central management,
+make sure you migrate the {beats} central management index to 6.7 before you
+upgrade to 7.0. 
+
+// REVIEWERS: Not sure I should mention this here ^^. I didn't link directly
+// to the 6.7 breaking changes docs here because I'm concerned about users
+// getting into the wrong upgrade docs and being confused.
+
+[[migrate-config-files]]
 ==== Migrate configuration files
 
 // REVIEWERS: What changes do users need to make to their config files? Will we
-// offer any kidn of migration tool?
+// offer any kind of migration tooling to make this easier?
 
-Beats 7.0 comes with several backwards incompatible configuration changes.
+{beats} 7.0 comes with several backwards incompatible configuration changes.
 Before upgrading, review the <<breaking-changes-7.0>> document. Where possible,
-we kept the old configuration options working, but deprecated them.  However,
+we kept the old configuration options working, but deprecated them. However,
 deprecation was not always possible, so if you use any of the settings mentioned
 in the Breaking Changes section of the release notes, make sure you understand
 the alternatives that we provide.
 
-===== Registry format change
+[[enable-ecs-compatibility]]
+==== Enable compatibility layer for Elastic Common Schema (ECS) fields
 
-Starting with the 7.0 version, {filebeat} stores its registry in a directory
-structure. 
+Starting with 7.0, the fields exported by {beats} conform to the
+{ecs-ref}/index.html[Elastic Common Schema (ECS)]. Many of the exported fields
+have been renamed. See {beats-ref}/breaking-changes-7.0.html[Breaking
+changes in 7.0] for the full list of changed names.
 
-// TODO: Describe how to use filebeat.registry.migrate_file to point to the old
-// registry file if filebeat.registry.path has changed.
+To help you transition to the new fields, we provide a compatibility layer in
+the form of ECS-compatible field aliases. To use the aliases, set
+`migration.6_to_7.enabled: true` in the Beat's configuration file *before* you
+run Beats 7.0 to ingest data for the first time.
 
-==== Dashboard upgrades
+The compatibility layer enables you to use 6.x dashboards and visualizations
+with indices created by {beats} 7.0 or later.
 
-We recommend re-importing the {kib} dashboards after the Beats and {kib}
-upgrades are complete. This way, you will take advantage of the new Beats
-dashboards created for the 7.0 release.
+// TODO: Describe how to wipe out old data and overwrite the template for
+// situations where users ingest data before realizing they need to set the
+// migration flag.
+//
+// I do wonder why this flag is not the default, but maybe it creates a lot of
+// extra noise for users who don't want compatibility?
 
-See <<breaking-changes-import-dashboards>> in the Breaking Changes
-documentation.
+==== Upgrade dashboards
 
-NOTE: If you've modified the Beats dashboards manually, reimporting them will
-overwrite your changes. Consider saving your dashboards under new IDs, so
-that the reimport doesn't overwrite them.
+We recommend that you re-load the {kib} dashboards after upgrading {kib} and
+{beats}. This way, you can take advantage of the new {beats} dashboards created for
+the 7.0 release. To re-load the dashboards, run `setup --dashboards`.
 
-//REVIEWERS: Is still an issue? I thought dashboards were versioned.
+Reloading the dashboards will overwrite any manual changes that you've
+made. To avoid overwriting existing dashboards, save them under a new ID.
+
+Also, if you plan to run {beats} 6.7 and 7.0 in parallel, set
+`migration.6_to_7.enabled: true` to make 6.x dashboards compatible with 7.0
+{beats} indices. For more information, see <<enable-ecs-compatibility>>.
+
+==== Configure {ls} to use versioned templates and indices
+
+Before upgrading to 7.0, make sure {ls} uses versioned templates and indices. 
+Otherwise, after you upgrade, {ls} will stop ingesting data because of field
+conflicts.
+
+For the recommended {ls} configuration, see the
+{logstash-ref}/plugins-inputs-beats.html[{beats} input plugin] documentation.
+
+[[migrate-filebeat-registry]]
+==== Migrate Filebeat registry to use new format
+
+Starting with the 7.0 version, {filebeat} stores the registry in a directory
+structure. If Filebeat finds an old registry file at the path set by
+`filebeat.registry.path`, it will automatically migrate the registry file to the
+new format. If the registry file is at a different location, set
+`filebeat.registry.migrate_file` to point to the file.
+
+[role="xpack"]
+[[ilm-on]]
+==== Check privileges for index lifecycle management (on by default in 7.0)
+
+// REVIEWERS: not sure if this is worth pointing out in the upgrade docs but
+// I think the default changing is going to confuse some users.
+
+Staring with {beats} 7.0, index lifecycle management is on by default when
+sending data to {beats} clusters that support it. Make sure {beats} users have
+the privileges needed to use index lifecycle management, or disable index
+lifecycle management. The following privileges are required:
+
+* To set up index lifecycle policies: `manage_ilm` and `monitor` on cluster
+* To send data to a secured cluster when index lifecycle management is enabled:
+`manage_index_templates` and `monitor` on cluster, and `index` and `manage` on
+{beats} indices.
+
+// REVIEWERS: The privileges shown here are based on testing I did for
+// https://github.com/elastic/beats/pull/11329, but I am still waiting for
+// more review comments on that PR. 
+
+To disable index lifecycle management, set `setup.ilm.enabled: false` in the
+{beats} configuration file.
+
+// TODO: Add a section that describes what to do if you've configured an output
+// other than Elasticsearch. 
 
 [[upgrade-mapping-template]]
 === Upgrade the {es} mapping template
 
+// REVIEWERS: Does this topic really belong on its own rather than as a
+// sub-topic? Do we want to tell users to set 
+
 Mapping templates and the default index names are versioned. For example,
-Metricbeat 7.0.0 typically creates indices like this:
+Metricbeat {stack-version} typically creates indices like this:
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
-metricbeat-7.0.0-{localdate}
+metricbeat-{stack-version}-{localdate}
 ------------------------------------------------------------------------------
 
-And the corresponding {es} template is named `metricbeat-7.0.0`.
+And the corresponding {es} template is named +metricbeat-{stack-version}+.
 
 This means that each version of the Beat creates a new index, and it is
-guaranteed that the correct template for that version is applied.  With these
+guaranteed that the correct template for that version is applied. With these
 changes in place, you generally don't have to do anything to upgrade the mapping
 template when you move to a new version.
-
-// REVIEWERS: Are there any exceptions that require extra steps here
 
 // REVIEWERS: I'm not sure what the following paragraph means. Why would this
 // result in downtime?
