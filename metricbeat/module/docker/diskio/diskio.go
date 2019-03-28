@@ -21,12 +21,9 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
-
-var logger = logp.NewLogger("docker.diskio")
 
 func init() {
 	mb.Registry.MustAddMetricSet("docker", "diskio", New,
@@ -63,17 +60,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch creates list of events with diskio stats for all containers.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
-		err = errors.Wrap(err, "failed to get docker stats")
-		logger.Error(err)
-		r.Error(err)
-		return
+		return errors.Wrap(err, "failed to get docker stats")
 	}
 
 	formattedStats := m.blkioService.getBlkioStatsList(stats, m.dedot)
 	eventsMapping(r, formattedStats)
+
+	return nil
 }
 
 //Close stops the metricset
