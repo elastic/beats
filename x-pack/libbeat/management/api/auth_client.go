@@ -38,7 +38,7 @@ type EventAPIResponse struct {
 	Response []EventResponse `json:"response"`
 }
 
-// EventResponse is the indiviual response for each event request.
+// EventResponse is the individual response for each event request.
 type EventResponse struct {
 	Success bool   `json:"success"`
 	Reason  string `json:"reason"`

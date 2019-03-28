@@ -17,8 +17,9 @@ func (c *AuthClient) UpdateMetadata(meta common.MapStr) error {
 		"metadata": meta,
 	}
 
-	url := fmt.Sprintf("/api/beats/agent/%s/configuration", c.BeatUUID)
-	statusCode, err := c.Client.request("PUT", url, params, c.headers(), nil)
+	url := fmt.Sprintf("/api/beats/agent/%s", c.BeatUUID)
+	resp := make(map[string]interface{})
+	statusCode, err := c.Client.request("PUT", url, params, c.headers(), &resp)
 	if statusCode == http.StatusNotFound {
 		return errConfigurationNotFound
 	}
