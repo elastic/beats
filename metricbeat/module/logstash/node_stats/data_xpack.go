@@ -31,21 +31,38 @@ import (
 type commonStats struct {
 	Events  map[string]interface{} `json:"events"`
 	JVM     map[string]interface{} `json:"jvm"`
-	OS      map[string]interface{} `json:"os"`
-	Process map[string]interface{} `json:"process"`
 	Reloads map[string]interface{} `json:"reloads"`
+}
+
+type cpu struct {
+	Percent     int                    `json:"percent,omitempty"`
+	LoadAverage map[string]interface{} `json:"load_average,omitempty"`
+	NumCPUs     int                    `json:"num_cpus,omitempty"`
+}
+
+type process struct {
+	OpenFileDescriptors int `json:"open_file_descriptors"`
+	MaxFileDescriptors  int `json:"max_file_descriptors"`
+	CPU                 cpu `json:"cpu"`
+}
+
+type os struct {
+	CPU cpu `json:"cpu"`
 }
 
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
 	commonStats
+	Process   process                  `json:"process"`
 	Pipelines map[string]PipelineStats `json:"pipelines"`
 }
 
 // LogstashStats represents the logstash_stats sub-document indexed into .monitoring-logstash-*
 type LogstashStats struct {
 	commonStats
-	Pipelines []PipelineStats        `json:"pipelines`
+	Process   process                `json:"process"`
+	OS        os                     `json:"os"`
+	Pipelines []PipelineStats        `json:"pipelines"`
 	Logstash  map[string]interface{} `json:"logstash"`
 	Queue     map[string]interface{} `json:"queue"`
 	Timestamp common.Time            `json:"timestamp"`
@@ -81,13 +98,31 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 	for clusterUUID, clusterPipelines := range clusterToPipelinesMap {
 		timestamp := common.Time(time.Now())
+		proc := process{
+			nodeStats.Process.OpenFileDescriptors,
+			nodeStats.Process.MaxFileDescriptors,
+			cpu{
+				Percent: nodeStats.Process.CPU.Percent,
+			},
+		}
+		o := os{
+			cpu{
+				LoadAverage: nodeStats.Process.CPU.LoadAverage,
+				NumCPUs:     nodeStats.Process.CPU.NumCPUs,
+			},
+		}
 		logstash := map[string]interface{}{} // TODO
 		queue := map[string]interface{}{}    // TODO
 
-		logstashStats := LogstashStats{nodeStats.commonStats, clusterPipelines, logstash, queue, timestamp}
-
-		// TODO: massage logstashStats.Process
-		// TODO: massage logstashStats.OS
+		logstashStats := LogstashStats{
+			nodeStats.commonStats,
+			proc,
+			o,
+			clusterPipelines,
+			logstash,
+			queue,
+			timestamp,
+		}
 
 		event := mb.Event{}
 		event.RootFields = common.MapStr{
