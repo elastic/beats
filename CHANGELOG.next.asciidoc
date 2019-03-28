@@ -317,6 +317,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for MySQL 8.0 slow logs and tests also for Percona 8.0 and MariaDB 10.3. {pull}11417[11417]
 - New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
 - New module for Cisco ASA logs. {issue}9200[9200] {pull}11171[11171]
+- Added support for Cisco ASA fields to the netflow input. {pull}11201[11201]
 
 *Heartbeat*
 
