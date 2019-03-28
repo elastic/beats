@@ -41,18 +41,28 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 			"pipeline": pipeline,
 		}
 
-		event := mb.Event{}
-		event.RootFields = common.MapStr{
-			"cluster_uuid":   pipeline.ClusterID,
-			"timestamp":      common.Time(time.Now()),
-			"interval_ms":    m.Module().Config().Period / time.Millisecond,
-			"type":           "logstash_state",
-			"logstash_state": logstashState,
+		if pipeline.ClusterIDs == nil {
+			pipeline.ClusterIDs = []string{""}
 		}
 
-		event.ID = pipeline.EphemeralID
-		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
-		r.Event(event)
+		for _, clusterUUID := range pipeline.ClusterIDs {
+			event := mb.Event{}
+			event.RootFields = common.MapStr{
+				"timestamp":      common.Time(time.Now()),
+				"interval_ms":    m.Module().Config().Period / time.Millisecond,
+				"type":           "logstash_state",
+				"logstash_state": logstashState,
+			}
+
+			if clusterUUID != "" {
+				event.RootFields["cluster_uuid"] = clusterUUID
+			}
+
+			event.ID = pipeline.EphemeralID
+			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
+			r.Event(event)
+
+		}
 	}
 
 	return nil

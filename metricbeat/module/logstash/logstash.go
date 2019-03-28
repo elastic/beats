@@ -45,7 +45,7 @@ type PipelineState struct {
 	Representation map[string]interface{} `json:"representation"`
 	BatchSize      int                    `json:"batch_size"`
 	Workers        int                    `json:"workers"`
-	ClusterID      string                 `json:"cluster_uuid,omitempty"`
+	ClusterIDs     []string               `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
