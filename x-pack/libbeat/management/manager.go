@@ -33,18 +33,18 @@ func init() {
 // ConfigManager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat
 type ConfigManager struct {
-	config    *Config
-	cache     *Cache
-	logger    *logp.Logger
-	client    api.AuthClienter
-	beatUUID  uuid.UUID
-	done      chan struct{}
-	registry  *reload.Registry
-	wg        sync.WaitGroup
-	blacklist *ConfigBlacklist
-	reporter  *api.EventReporter
-	state     *State
-	mux       sync.RWMutex
+	config     *Config
+	cache      *Cache
+	logger     *logp.Logger
+	client     api.AuthClienter
+	beatUUID   uuid.UUID
+	done       chan struct{}
+	registry   *reload.Registry
+	wg         sync.WaitGroup
+	rejectlist *ConfigRejectlist
+	reporter   *api.EventReporter
+	state      *State
+	mux        sync.RWMutex
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
@@ -62,7 +62,7 @@ func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID
 func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	var client *api.Client
 	var cache *Cache
-	var blacklist *ConfigBlacklist
+	var rejectlist *ConfigRejectlist
 
 	if c.Enabled {
 		var err error
@@ -71,10 +71,10 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 			return nil, errors.Wrap(err, "wrong settings for configurations")
 		}
 
-		// Initialize configs blacklist
-		blacklist, err = NewConfigBlacklist(c.Blacklist)
+		// Initialize configurations reject list
+		rejectlist, err = NewConfigRejectlist(c.Rejectlist)
 		if err != nil {
-			return nil, errors.Wrap(err, "wrong settings for configurations blacklist")
+			return nil, errors.Wrap(err, "wrong settings for configurations reject list")
 		}
 
 		// Initialize central management settings cache
@@ -96,14 +96,14 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	log := logp.NewLogger(management.DebugK)
 
 	return &ConfigManager{
-		config:    c,
-		cache:     cache,
-		blacklist: blacklist,
-		logger:    log,
-		client:    authClient,
-		done:      make(chan struct{}),
-		beatUUID:  beatUUID,
-		registry:  registry,
+		config:     c,
+		cache:      cache,
+		rejectlist: rejectlist,
+		logger:     log,
+		client:     authClient,
+		done:       make(chan struct{}),
+		beatUUID:   beatUUID,
+		registry:   registry,
 		reporter: api.NewEventReporter(
 			log,
 			authClient,
@@ -250,7 +250,7 @@ func (cm *ConfigManager) apply() Errors {
 	}
 
 	// Detect unwanted configs from the list
-	if errs := cm.blacklist.Detect(cm.cache.Configs); !errs.IsEmpty() {
+	if errs := cm.rejectlist.Detect(cm.cache.Configs); !errs.IsEmpty() {
 		errors = append(errors, errs...)
 		return errors
 	}

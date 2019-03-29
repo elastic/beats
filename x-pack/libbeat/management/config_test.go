@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func EnsureBlacklistItems(t *testing.T) {
+func EnsureRejectlistItems(t *testing.T) {
 	// NOTE: We do not permit to configure the console or the file output with CM for security reason.
 	c := defaultConfig()
-	v, _ := c.Blacklist.Patterns["output"]
+	v, _ := c.Rejectlist.Patterns["output"]
 	assert.Equal(t, "console|file", v)
 }
