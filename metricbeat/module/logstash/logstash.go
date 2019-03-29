@@ -23,6 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -58,6 +59,20 @@ type PipelineStats struct {
 	Queue       map[string]interface{}   `json:"queue"`
 	Vertices    []map[string]interface{} `json:"vertices"`
 	ClusterIDs  []string                 `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
+}
+
+// Info represents the basic info of a Logstash node
+type Info struct {
+	ID          string                 `json:"id,omitempty"`
+	UUID        string                 `json:"uuid"`
+	EphemeralID string                 `json:"ephemeral_id"`
+	Name        string                 `json:"name"`
+	Host        string                 `json:"host"`
+	Version     *common.Version        `json:"version"`
+	Snapshot    bool                   `json:"snapshot"`
+	Status      string                 `json:"status"`
+	HTTPAddress string                 `json:"http_address"`
+	Pipeline    map[string]interface{} `json:"pipeline"` // TODO: https://github.com/elastic/logstash/issues/10121#issuecomment-477960900
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -126,6 +141,22 @@ func GetPipelinesStats(http *helper.HTTP, resetURI string) ([]PipelineStats, err
 	}
 
 	return pipelines, nil
+}
+
+// GetInfo returns the basic info for a Logstash node
+func GetInfo(http *helper.HTTP, resetURI string) (*Info, error) {
+	content, err := fetchPath(http, resetURI, "/", "")
+	if err != nil {
+		return nil, errors.Wrap(err, "could not fetch node basic info")
+	}
+
+	info := &Info{}
+	err = json.Unmarshal(content, info)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not parse node basic info response")
+	}
+
+	return info, nil
 }
 
 func fetchPath(http *helper.HTTP, resetURI, path string, query string) ([]byte, error) {

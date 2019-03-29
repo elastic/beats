@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/elastic/beats/metricbeat/module/logstash"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -80,12 +82,38 @@ type PipelineStats struct {
 	ClusterIDs  []string                 `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte, info *logstash.Info) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
 		return errors.Wrap(err, "could not parse node stats response")
 	}
+
+	timestamp := common.Time(time.Now())
+
+	// Massage Logstash node basic info
+	info.UUID = info.ID
+	info.ID = ""
+	logstash := map[string]interface{}{
+		"logstash": info,
+	}
+
+	proc := process{
+		nodeStats.Process.OpenFileDescriptors,
+		nodeStats.Process.MaxFileDescriptors,
+		cpu{
+			Percent: nodeStats.Process.CPU.Percent,
+		},
+	}
+
+	o := os{
+		cpu{
+			LoadAverage: nodeStats.Process.CPU.LoadAverage,
+			NumCPUs:     nodeStats.Process.CPU.NumCPUs,
+		},
+	}
+
+	queue := map[string]interface{}{} // TODO: see https://github.com/elastic/logstash/issues/10610
 
 	var pipelines []PipelineStats
 	for pipelineID, pipeline := range nodeStats.Pipelines {
@@ -97,23 +125,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
 
 	for clusterUUID, clusterPipelines := range clusterToPipelinesMap {
-		timestamp := common.Time(time.Now())
-		proc := process{
-			nodeStats.Process.OpenFileDescriptors,
-			nodeStats.Process.MaxFileDescriptors,
-			cpu{
-				Percent: nodeStats.Process.CPU.Percent,
-			},
-		}
-		o := os{
-			cpu{
-				LoadAverage: nodeStats.Process.CPU.LoadAverage,
-				NumCPUs:     nodeStats.Process.CPU.NumCPUs,
-			},
-		}
-		logstash := map[string]interface{}{} // TODO; see https://github.com/elastic/logstash/issues/10121
-		queue := map[string]interface{}{}    // TODO: see https://github.com/elastic/logstash/issues/10610
-
 		logstashStats := LogstashStats{
 			nodeStats.commonStats,
 			proc,
