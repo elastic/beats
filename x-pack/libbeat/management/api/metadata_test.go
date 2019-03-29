@@ -93,18 +93,22 @@ func TestBadMetadataUpdateRequest(t *testing.T) {
 				defer r.Body.Close()
 
 				w.WriteHeader(useCase.statusCode)
-				response := struct {
-					Success bool   `json:"success"`
-					Message string `json:"message,omitempty"`
-				}{useCase.success, useCase.message}
+
+				var response BaseResponse
+				response.Success = useCase.success
+				if !useCase.success {
+					response.Error = ErrorResponse{
+						Message: useCase.message,
+						Code:    useCase.statusCode,
+					}
+				}
 
 				responseString, err := json.Marshal(response)
 				if err != nil {
 					t.Fatal(err)
 				}
-				rs := string(responseString)
-				fmt.Println(rs)
-				fmt.Fprintf(w, rs)
+
+				w.Write(responseString)
 			}))
 			defer server.Close()
 

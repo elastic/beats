@@ -10,13 +10,14 @@ import "fmt"
 type Action int
 
 // List of the valid Actions executed by the API.
-//go:generate stringer -type=LicenseType -linecomment=true
 const (
 	Created Action = iota + 1 // created
+	Updated
 )
 
 var mapStringToAction = map[string]Action{
 	"created": Created,
+	"updated": Updated,
 }
 
 // UnmarshalJSON unmarshal an action string into a constant.
@@ -31,7 +32,7 @@ func (a *Action) UnmarshalJSON(b []byte) error {
 	v, found := mapStringToAction[k[1:len(k)-1]]
 	if !found {
 		return fmt.Errorf(
-			"unknown action '%s' returned from the API, valid actions are: 'created'",
+			"unknown action '%s' returned from the API, valid actions are: 'created, updated'",
 			k,
 		)
 	}

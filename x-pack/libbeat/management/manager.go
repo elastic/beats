@@ -193,7 +193,9 @@ func (cm *ConfigManager) worker() {
 
 		if firstRun {
 			// Send metadata
-			cm.client.UpdateMetadata(cm.config.Metadata)
+			if err := cm.client.UpdateMetadata(cm.config.Metadata); err != nil {
+				cm.logger.Errorf("Could not update metadata, error: %v", err)
+			}
 
 			period = cm.config.Period
 			firstRun = false

@@ -21,6 +21,9 @@ type ErrorType string
 // ConfigError is the type of error send when an unpack or a blacklist happen.
 var ConfigError = ErrorType("CONFIG")
 
+// UpdateError is the type of error send when an update of metadata happens.
+var UpdateError = ErrorType("UPDATE")
+
 // ErrorEvent is the event type when an error happen.
 var ErrorEvent = api.EventType("ERROR")
 
