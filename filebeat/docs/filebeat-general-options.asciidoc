@@ -88,8 +88,8 @@ filebeat.registry.path: ${path.data}/registry
 filebeat.registry.migrate_file: /path/to/old/registry_file
 -------------------------------------------------------------------------------------
 
-Filebeat will use `filebeat.registry.migrate_file` only if the regisry does not
-exist yet.
+The file will be moved to it's new location only if the new registry using the
+directory format does not exist.
 
 
 [float]
