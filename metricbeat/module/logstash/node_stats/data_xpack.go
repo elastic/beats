@@ -21,8 +21,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/elastic/beats/metricbeat/module/logstash"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -52,8 +50,22 @@ type os struct {
 	CPU cpu `json:"cpu"`
 }
 
+type nodeInfo struct {
+	ID          string                 `json:"id,omitempty"`
+	UUID        string                 `json:"uuid"`
+	EphemeralID string                 `json:"ephemeral_id"`
+	Name        string                 `json:"name"`
+	Host        string                 `json:"host"`
+	Version     *common.Version        `json:"version"`
+	Snapshot    bool                   `json:"snapshot"`
+	Status      string                 `json:"status"`
+	HTTPAddress string                 `json:"http_address"`
+	Pipeline    map[string]interface{} `json:"pipeline"` // TODO: https://github.com/elastic/logstash/issues/10121#issuecomment-477960900
+}
+
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
+	nodeInfo
 	commonStats
 	Process   process                  `json:"process"`
 	Pipelines map[string]PipelineStats `json:"pipelines"`
@@ -82,7 +94,7 @@ type PipelineStats struct {
 	ClusterIDs  []string                 `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte, info *logstash.Info) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -92,10 +104,10 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte, info *logs
 	timestamp := common.Time(time.Now())
 
 	// Massage Logstash node basic info
-	info.UUID = info.ID
-	info.ID = ""
+	nodeStats.nodeInfo.UUID = nodeStats.nodeInfo.ID
+	nodeStats.nodeInfo.ID = ""
 	logstash := map[string]interface{}{
-		"logstash": info,
+		"logstash": nodeStats.nodeInfo,
 	}
 
 	proc := process{
