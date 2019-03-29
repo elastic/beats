@@ -95,7 +95,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte, info *logstash.Info) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
