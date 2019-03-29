@@ -231,6 +231,7 @@
 |`nginx.access.http_version`            |`http.version`
 |`nginx.access.method`            |`http.request.method`
 |`nginx.access.referrer`            |`http.request.referrer`
+|`nginx.access.remote_ip`            |`source.address`
 |`nginx.access.response_code`            |`http.response.status_code`
 |`nginx.access.url`            |`url.original`
 |`nginx.access.user_agent.device`            |`user_agent.device.name`
@@ -295,7 +296,6 @@
 |`system.auth.hostname`            |`host.hostname`
 |`system.auth.pid`            |`process.pid`
 |`system.auth.program`            |`process.name`
-|`system.auth.ssh.event`            |`event.action`
 |`system.auth.ssh.geoip.city_name`            |`source.geo.city_name`
 |`system.auth.ssh.geoip.continent_name`            |`source.geo.continent_name`
 |`system.auth.ssh.geoip.country_iso_code`            |`source.geo.country_iso_code`
