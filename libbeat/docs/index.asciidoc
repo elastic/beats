@@ -23,7 +23,7 @@ include::./gettingstarted.asciidoc[]
 
 include::./breaking.asciidoc[]
 
-include::./upgrading-to-7.asciidoc[]
+include::./upgrading.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 
