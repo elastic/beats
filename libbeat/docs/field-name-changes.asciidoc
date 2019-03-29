@@ -116,7 +116,6 @@
 |`docker.container.image`            |`container.image.name`
 |`docker.container.labels`            |`container.labels`
 |`docker.container.name`            |`container.name`
-|`elasticsearch.audit.event_type`            |`event.type`
 |`elasticsearch.audit.origin_address`            |`source.ip`
 |`elasticsearch.audit.principal`            |`user.name`
 |`elasticsearch.audit.request_body`            |`http.request.body.content`
