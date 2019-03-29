@@ -386,7 +386,7 @@ func (r *Rotator) rotateByInterval(reason rotateReason) error {
 		return errors.Wrap(err, "failed to rotate backups")
 	}
 
-	logPrefix := r.intervalRotator.LogPrefix(r.filename, time.Now())
+	logPrefix := r.intervalRotator.LogPrefix(r.filename, fi.ModTime())
 	files, err := filepath.Glob(logPrefix + "*")
 	if err != nil {
 		return errors.Wrap(err, "failed to list logs during rotation")
