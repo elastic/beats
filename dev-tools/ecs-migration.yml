@@ -466,6 +466,11 @@
   copy_to: false
   beat: filebeat
 
+- from: system.auth.user
+  to: user.name
+  alias: true
+  beat: filebeat
+
 - from: system.auth.pid
   to: process.pid
   alias: true
@@ -476,12 +481,22 @@
   alias: true
   beat: filebeat
 
+- from: system.auth.groupadd.name
+  to: group.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.useradd.gid
+  to: group.id
+  alias: true
+  beat: filebeat
+
 - from: system.auth.useradd.uid
   to: user.id
   alias: true
   beat: filebeat
 
-- from: system.auth.useradd.user
+- from: system.auth.useradd.name
   to: user.name
   alias: true
   beat: filebeat
