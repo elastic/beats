@@ -107,15 +107,9 @@
                             "enabled": true,
                             "id": "3",
                             "params": {
-<<<<<<< HEAD
-                                "field": "nginx.access.user_agent.os_major",
-                                "order": "desc",
-                                "orderBy": "1",
-=======
                                 "field": "user_agent.os.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
->>>>>>> 32e6378fa... Fixed Filebeat ECS dashboards (#11520)
                                 "size": 5
                             },
                             "schema": "segment",
