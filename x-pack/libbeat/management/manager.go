@@ -50,11 +50,17 @@ type ConfigManager struct {
 // NewConfigManager returns a X-Pack Beats Central Management manager
 func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
+
+	if config.HasField("blacklist") {
+		logp.Warn("Blacklist configuration section is obsolete. Please use 'Rejectlist' instead.")
+	}
+
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, errors.Wrap(err, "parsing central management settings")
 		}
 	}
+
 	return NewConfigManagerWithConfig(c, registry, beatUUID)
 }
 

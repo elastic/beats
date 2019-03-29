@@ -65,14 +65,14 @@ func TestConfigRejectlistSettingsUnpack(t *testing.T) {
 
 func TestConfigRejectlist(t *testing.T) {
 	tests := []struct {
-		name         string
-		patterns     map[string]string
-		blocks       api.ConfigBlocks
-		Rejectlisted bool
+		name     string
+		patterns map[string]string
+		blocks   api.ConfigBlocks
+		Rejected bool
 	}{
 		{
-			name:         "No patterns",
-			Rejectlisted: false,
+			name:     "No patterns",
+			Rejected: false,
 			blocks: api.ConfigBlocks{
 				api.ConfigBlocksWithType{
 					Type: "output",
@@ -87,8 +87,8 @@ func TestConfigRejectlist(t *testing.T) {
 			},
 		},
 		{
-			name:         "Rejectlisted dict key",
-			Rejectlisted: true,
+			name:     "Rejected dict key",
+			Rejected: true,
 			patterns: map[string]string{
 				"output": "^console$",
 			},
@@ -115,8 +115,8 @@ func TestConfigRejectlist(t *testing.T) {
 			},
 		},
 		{
-			name:         "Rejectlisted value key",
-			Rejectlisted: true,
+			name:     "Rejected value key",
+			Rejected: true,
 			patterns: map[string]string{
 				"metricbeat.modules.module": "k.{8}s",
 			},
@@ -135,8 +135,8 @@ func TestConfigRejectlist(t *testing.T) {
 			},
 		},
 		{
-			name:         "Rejectlisted value in a list",
-			Rejectlisted: true,
+			name:     "Rejected value in a list",
+			Rejected: true,
 			patterns: map[string]string{
 				"metricbeat.modules.metricsets": "event",
 			},
@@ -166,8 +166,8 @@ func TestConfigRejectlist(t *testing.T) {
 			},
 		},
 		{
-			name:         "Rejectlisted value in a deep list",
-			Rejectlisted: true,
+			name:     "Rejected value in a deep list",
+			Rejected: true,
 			patterns: map[string]string{
 				"filebeat.inputs.containers.ids": "1ffeb0dbd13",
 			},
@@ -214,8 +214,8 @@ func TestConfigRejectlist(t *testing.T) {
 			},
 		},
 		{
-			name:         "Rejectlisted dict key in a list",
-			Rejectlisted: true,
+			name:     "Rejected dict key in a list",
+			Rejected: true,
 			patterns: map[string]string{
 				"list.of.elements":            "forbidden",
 				"list.of.elements.disallowed": "yes",
@@ -274,7 +274,7 @@ func TestConfigRejectlist(t *testing.T) {
 			}
 
 			errs := bl.Detect(test.blocks)
-			assert.Equal(t, test.Rejectlisted, !errs.IsEmpty())
+			assert.Equal(t, test.Rejected, !errs.IsEmpty())
 		})
 	}
 }
