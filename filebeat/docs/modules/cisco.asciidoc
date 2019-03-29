@@ -1,0 +1,103 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-cisco]]
+[role="xpack"]
+
+:modulename: cisco
+:has-dashboards: true
+
+== Cisco module
+
+This is a module for Cisco network device's logs. Currently supports the `asa`
+fileset for Cisco ASA firewall logs received over syslog or read from a file.
+
+Cisco ASA devices also support exporting flow records using NetFlow, which is
+supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
+{beatname_uc}.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
+Elasticsearch plugin.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard:
+
+[role="screenshot"]
+image::./images/kibana-cisco-asa.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to run via syslog on port 9001. However
+it can also be configured to read from a file path. See the following example.
+
+["source","yaml",subs="attributes"]
+-----
+- module: cisco
+  asa:
+    enabled: true
+    var.paths: ["/var/log/cisco-asa.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: asa
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `asa` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+  asa:
+    var.log_level: 5
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.log_level`*::
+
+An integer between 1 and 7 that allows to filter messages based on the
+severity level. The different severity levels supported by the Cisco ASA are:
+
+[width="30%",cols="^1,2",options="header"]
+|===========================
+| log_level | severity
+|     1     | Alert
+|     2     | Critical
+|     3     | Error
+|     4     | Warning
+|     5     | Notification
+|     6     | Informational
+|     7     | Debugging
+|===========================
+
+A value of 7 (default) will not filter any messages. A lower value will drop
+any messages with a severity level higher than the specified value. For
+example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
+and 3 (Error). All other messages will be dropped.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-cisco,exported fields>> section.
+
