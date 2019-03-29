@@ -24,6 +24,8 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"os"
+	"runtime"
 	"sync"
 	"time"
 
@@ -92,12 +94,27 @@ func newICMPLoop() (*icmpLoop, error) {
 	// IPv4/IPv6 checking
 	conn4 := createListener("IPv4", "ip4:icmp")
 	conn6 := createListener("IPv6", "ip6:ipv6-icmp")
-
+	unprivilegedpossible := false
 	l := &icmpLoop{
 		conn4:    conn4,
 		conn6:    conn6,
 		recv:     make(chan packet, 16),
 		requests: map[requestID]*requestContext{},
+	}
+	if conn4 == nil && conn6 == nil {
+
+		switch runtime.GOOS {
+		case "darwin":
+		case "linux":
+			unprivilegedpossible = true
+			conn4 = createListener("Unprivileged IPv4", "udp4")
+			conn6 = createListener("Unprivileged IPv6", "udp6")
+			l.conn4 = conn4
+			l.conn6 = conn6
+		default:
+			//return nil, errors.New("You don't have permission to run icmp")
+		}
+
 	}
 
 	if conn4 != nil {
@@ -107,6 +124,18 @@ func newICMPLoop() (*icmpLoop, error) {
 		go l.runICMPRecv(conn6, protocolIPv6ICMP)
 	}
 
+	if conn4 == nil && conn6 == nil {
+		if unprivilegedpossible {
+			path, _ := os.Executable()
+			logp.Info("You dont have root permission to run ping. You can run without root by setting cap_net_raw:")
+			logp.Info("sudo setcap cap_net_raw+eip %s", path)
+			logp.Info("Your system allows the use of unprivileged ping by setting net.ipv4.ping_group_range")
+			logp.Info("sysctl -w net.ipv4.ping_group_range='<min-uid> <max-uid>' ")
+
+		} else {
+			logp.Info("You don't have permission to run ping")
+		}
+	}
 	return l, nil
 }
 
@@ -124,10 +153,10 @@ func (l *icmpLoop) checkNetworkMode(mode string) error {
 	}
 
 	if ip4 && l.conn4 == nil {
-		return errors.New("failed to initiate IPv4 support")
+		return errors.New("failed to initiate IPv4 support. Check log details for permission configuration")
 	}
 	if ip6 && l.conn6 == nil {
-		return errors.New("failed to initiate IPv6 support")
+		return errors.New("failed to initiate IPv6 support. Check log details for permission configuration")
 	}
 
 	return nil
@@ -344,7 +373,7 @@ func createListener(name, network string) *icmp.PacketConn {
 	//      true, even if error value itself is `nil`. Checking for conn suppresses
 	//      misleading log message.
 	if conn == nil && err != nil {
-		logp.Info("%v ICMP not supported: %v", name, err)
+		//logp.Info("%v ICMP not supported: %v", name, err)
 		return nil
 	}
 	return conn
