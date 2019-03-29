@@ -4456,6 +4456,17 @@ The layer from which this event originated: rest, transport or ip_filter
 
 --
 
+*`elasticsearch.audit.event_type`*::
++
+--
+type: keyword
+
+example: access_granted
+
+The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
+
+--
+
 *`elasticsearch.audit.origin.type`*::
 +
 --
@@ -4555,15 +4566,6 @@ The type of request that was executed
 type: alias
 
 alias to: http.request.body.content
-
---
-
-*`elasticsearch.audit.event_type`*::
-+
---
-type: alias
-
-alias to: event.type
 
 --
 

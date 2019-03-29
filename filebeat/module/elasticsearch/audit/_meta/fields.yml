@@ -6,6 +6,10 @@
       description: "The layer from which this event originated: rest, transport or ip_filter"
       example: "rest"
       type: keyword
+    - name: event_type
+      description: "The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied"
+      example: "access_granted"
+      type: keyword
     - name: origin.type
       description: "Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)"
       example: "local_node"
@@ -44,10 +48,6 @@
     - name: request_body
       type: alias
       path: http.request.body.content
-      migration: true
-    - name: event_type
-      type: alias
-      path: event.type
       migration: true
     - name: origin_address
       type: alias
