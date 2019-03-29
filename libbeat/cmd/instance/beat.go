@@ -106,7 +106,7 @@ type beatConfig struct {
 	Pipeline pipeline.Config `config:",inline"`
 
 	// monitoring settings
-	monitoring.MonitoringBeatConfig `config:",inline"`
+	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
 
 	// central management settings
 	Management *common.Config `config:"management"`

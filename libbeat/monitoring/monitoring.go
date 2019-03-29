@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring/report"
 )
 
-// MonitoringBeatConfig represents the part of the $BEAT.yml to do with monitoring settings
-type MonitoringBeatConfig struct {
+// BeatConfig represents the part of the $BEAT.yml to do with monitoring settings
+type BeatConfig struct {
 	XPackMonitoring *common.Config `config:"xpack.monitoring"`
 	Monitoring      *common.Config `config:"monitoring"`
 }
@@ -82,7 +82,7 @@ func Clear() error {
 
 // SelectConfig selects the appropriate monitoring configuration based on the user's settings in $BEAT.yml. Users may either
 // use xpack.monitoring.* settings OR monitoring.* settings but not both.
-func SelectConfig(beatCfg MonitoringBeatConfig) (*common.Config, error) {
+func SelectConfig(beatCfg BeatConfig) (*common.Config, error) {
 	switch {
 	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
 		errMonitoringBothConfigEnabled := errors.New("both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.elasticsearch.hosts to monitoring cluster hosts")
