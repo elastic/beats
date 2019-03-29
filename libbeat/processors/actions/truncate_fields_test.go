@@ -30,7 +30,7 @@ func TestTruncateFields(t *testing.T) {
 
 	var tests = map[string]struct {
 		MaxBytes     int
-		MaxCount     int
+		MaxChars     int
 		Input        common.MapStr
 		Output       common.MapStr
 		ShouldError  bool
@@ -43,6 +43,9 @@ func TestTruncateFields(t *testing.T) {
 			},
 			Output: common.MapStr{
 				"message": "too",
+				"log": common.MapStr{
+					"flags": []string{"truncated"},
+				},
 			},
 			ShouldError:  false,
 			TruncateFunc: (*truncateFields).truncateBytes,
@@ -54,6 +57,9 @@ func TestTruncateFields(t *testing.T) {
 			},
 			Output: common.MapStr{
 				"message": []byte("too"),
+				"log": common.MapStr{
+					"flags": []string{"truncated"},
+				},
 			},
 			ShouldError:  false,
 			TruncateFunc: (*truncateFields).truncateBytes,
@@ -92,7 +98,7 @@ func TestTruncateFields(t *testing.T) {
 			TruncateFunc: (*truncateFields).truncateBytes,
 		},
 		"do not truncate characters of short byte line": {
-			MaxCount: 6,
+			MaxChars: 6,
 			Input: common.MapStr{
 				"message": []byte("ez jó"), // this is good (hungarian)
 			},
@@ -114,12 +120,15 @@ func TestTruncateFields(t *testing.T) {
 			TruncateFunc: (*truncateFields).truncateBytes,
 		},
 		"truncate characters of too long byte line": {
-			MaxCount: 10,
+			MaxChars: 10,
 			Input: common.MapStr{
 				"message": []byte("ez egy túl hosszú sor"), // this is a too long line (hungarian)
 			},
 			Output: common.MapStr{
 				"message": []byte("ez egy túl"), // this is a too (hungarian)
+				"log": common.MapStr{
+					"flags": []string{"truncated"},
+				},
 			},
 			ShouldError:  false,
 			TruncateFunc: (*truncateFields).truncateCharacters,
@@ -131,6 +140,9 @@ func TestTruncateFields(t *testing.T) {
 			},
 			Output: common.MapStr{
 				"message": []byte("ez egy tú"), // this is a "to" (hungarian)
+				"log": common.MapStr{
+					"flags": []string{"truncated"},
+				},
 			},
 			ShouldError:  false,
 			TruncateFunc: (*truncateFields).truncateBytes,
@@ -143,7 +155,7 @@ func TestTruncateFields(t *testing.T) {
 				config: truncateFieldsConfig{
 					Fields:      []string{"message"},
 					MaxBytes:    test.MaxBytes,
-					MaxCount:    test.MaxCount,
+					MaxChars:    test.MaxChars,
 					FailOnError: true,
 				},
 				truncate: test.TruncateFunc,
