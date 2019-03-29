@@ -682,11 +682,6 @@
 
 ## Elasticsearch module
 
-- from: elasticsearch.audit.event_type
-  to: event.type
-  alias: true
-  beat: filebeat
-
 - from: elasticsearch.audit.origin_address
   to: source.ip
   alias: true
