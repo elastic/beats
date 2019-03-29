@@ -92,12 +92,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return eventMapping(r, content)
 	}
 
-	info, err := logstash.GetInfo(m.http, m.HostData().SanitizedURI+nodeStatsPath)
-	if err != nil {
-		m.Logger().Error(err)
-	}
-
-	err = eventMappingXPack(r, m, content, info)
+	err = eventMappingXPack(r, m, content)
 	if err != nil {
 		m.Logger().Error(err)
 	}
