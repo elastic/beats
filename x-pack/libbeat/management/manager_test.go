@@ -200,9 +200,9 @@ func TestAddScriptProcessor(t *testing.T) {
 	mux := http.NewServeMux()
 	var i int
 	responses := []http.HandlerFunc{ // Initial load
-		responseText(`{"configuration_blocks":[{"type":"filebeat.inputs","config":{"processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`),
+		responseText(`{"success": true, "list":[{"type":"filebeat.inputs","config":{"processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`),
 		// will not resend new events
-		responseText(`{"configuration_blocks":[{"type":"filebeat.inputs","config":{"processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`),
+		responseText(`{"success": true, "list":[{"type":"filebeat.inputs","config":{"processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`),
 		// recover on call
 		http.NotFound,
 	}
