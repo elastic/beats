@@ -2,6 +2,7 @@
 [frame="topbot",options="header"]
 |======================
 |Old Field|New Field
+|`auditd.message_type`            |`event.type`
 |`auditd.messages`            |`event.original`
 |`auditd.warnings`            |`error.message`
 |`beat.hostname`            |`agent.hostname`
@@ -12,7 +13,6 @@
 |`docker.container.image`            |`container.image.name`
 |`docker.container.labels`            |`container.labels`
 |`docker.container.name`            |`container.name`
-|`event.type`            |`auditd.message_type`
 |`meta.cloud.availability_zone`            |`cloud.availability_zone`
 |`meta.cloud.instance_id`            |`cloud.instance.id`
 |`meta.cloud.instance_name`            |`cloud.instance.name`
