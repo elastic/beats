@@ -51,11 +51,11 @@ type ConfigManager struct {
 func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
 
-	if config.HasField("blacklist") {
-		logp.Warn("Blacklist configuration section is obsolete. Please use 'Rejectlist' instead.")
-	}
-
 	if config.Enabled() {
+		if config.HasField("blacklist") {
+			logp.Warn("Blacklist configuration section is obsolete. Please use 'Rejectlist' instead.")
+		}
+
 		if err := config.Unpack(&c); err != nil {
 			return nil, errors.Wrap(err, "parsing central management settings")
 		}
