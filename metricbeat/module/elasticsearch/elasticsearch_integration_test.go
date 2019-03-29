@@ -144,9 +144,9 @@ func getEnvPort() string {
 // GetConfig returns config for elasticsearch module
 func getConfig(metricset string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":                     elasticsearch.ModuleName,
-		"metricsets":                 []string{metricset},
-		"hosts":                      []string{getEnvHost() + ":" + getEnvPort()},
+		"module":     elasticsearch.ModuleName,
+		"metricsets": []string{metricset},
+		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
 		"index_recovery.active_only": false,
 	}
 }
