@@ -20,6 +20,7 @@ package auditd
 import (
 	"fmt"
 	"os"
+	"os/user"
 	"runtime"
 	"strconv"
 	"strings"
@@ -489,9 +490,6 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		},
 	}
 
-	// Customize event.type / event.category to match unified values.
-	normalizeEventFields(out.RootFields)
-
 	// Add root level fields.
 	addUser(auditEvent.User, out.RootFields)
 	addProcess(auditEvent.Process, out.RootFields)
@@ -536,6 +534,21 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	}
 	if len(auditEvent.Paths) > 0 {
 		m.Put("paths", auditEvent.Paths)
+	}
+
+	switch auditEvent.Category {
+	case aucoalesce.EventTypeUserLogin:
+		// Customize event.type / event.category to match unified values.
+		normalizeEventFields(out.RootFields)
+		// Set ECS user fields from the attempted login account.
+		if loginUserName := auditEvent.Summary.Actor.Secondary; loginUserName != "" {
+			out.RootFields.Put("user.name", loginUserName)
+			if usr, err := user.Lookup(loginUserName); err == nil {
+				out.RootFields.Put("user.id", usr.Uid)
+			} else {
+				out.RootFields.Delete("user.id")
+			}
+		}
 	}
 
 	return out
