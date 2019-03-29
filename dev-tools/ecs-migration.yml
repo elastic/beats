@@ -1151,6 +1151,11 @@
 
 ## NGINX module
 
+- from: nginx.access.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
 - from: nginx.access.user_name
   to: user.name
   alias: true
