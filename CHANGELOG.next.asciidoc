@@ -147,10 +147,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
 - Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 - Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
+- decode_json_field: process objects and arrays only {pull}11312[11312]
 - decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
 - Report faulting file when config reload fails. {pull}[11304]11304
 - Remove IP fields from default_field in Elasticsearch template.
 - Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
+- Management configuration backup file will now have a timestamps in their name. {pull}11034[11034]
+- Fixed OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
 
 *Auditbeat*
 
@@ -314,6 +317,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
 - Add support for MySQL 8.0 slow logs and tests also for Percona 8.0 and MariaDB 10.3. {pull}11417[11417]
 - New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
+- New module for Cisco ASA logs. {issue}9200[9200] {pull}11171[11171]
 
 *Heartbeat*
 

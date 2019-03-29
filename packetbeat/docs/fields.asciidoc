@@ -25,6 +25,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-memcache>>
 * <<exported-fields-mongodb>>
@@ -5682,6 +5683,83 @@ The response type.
 type: long
 
 The response code.
+
+--
+
+[[exported-fields-jolokia-autodiscover]]
+== Jolokia Discovery autodiscover provider fields
+
+Metadata from Jolokia Discovery added by the jolokia provider.
+
+
+
+*`jolokia.agent.version`*::
++
+--
+type: keyword
+
+Version number of jolokia agent.
+
+
+--
+
+*`jolokia.agent.id`*::
++
+--
+type: keyword
+
+Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+
+
+--
+
+*`jolokia.server.product`*::
++
+--
+type: keyword
+
+The container product if detected.
+
+
+--
+
+*`jolokia.server.version`*::
++
+--
+type: keyword
+
+The container's version (if detected).
+
+
+--
+
+*`jolokia.server.vendor`*::
++
+--
+type: keyword
+
+The vendor of the container the agent is running in.
+
+
+--
+
+*`jolokia.url`*::
++
+--
+type: keyword
+
+The URL how this agent can be contacted.
+
+
+--
+
+*`jolokia.secured`*::
++
+--
+type: boolean
+
+Whether the agent was configured for authentication or not.
+
 
 --
 

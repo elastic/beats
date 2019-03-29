@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
+* <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
 * <<exported-fields-coredns>>
 * <<exported-fields-docker-processor>>
@@ -25,6 +26,7 @@ grouped in the following categories:
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
 * <<exported-fields-iptables>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -1045,6 +1047,189 @@ alias to: host.name
 type: alias
 
 alias to: agent.hostname
+
+--
+
+[[exported-fields-cisco]]
+== Cisco fields
+
+Module for handling Cisco network device logs.
+
+
+
+[float]
+== cisco fields
+
+Fields from Cisco logs.
+
+
+
+[float]
+== asa fields
+
+Fields for Cisco ASA Firewall.
+
+
+
+*`cisco.asa.message_id`*::
++
+--
+type: keyword
+
+The Cisco ASA message identifier.
+
+
+--
+
+*`cisco.asa.suffix`*::
++
+--
+type: keyword
+
+example: session
+
+Optional suffix after %ASA identifier.
+
+
+--
+
+*`cisco.asa.source_interface`*::
++
+--
+type: keyword
+
+Source interface for the flow or event.
+
+
+--
+
+*`cisco.asa.destination_interface`*::
++
+--
+type: keyword
+
+Destination interface for the flow or event.
+
+
+--
+
+*`cisco.asa.list_id`*::
++
+--
+type: keyword
+
+Name of the Access Control List that matched this event.
+
+
+--
+
+*`cisco.asa.source_username`*::
++
+--
+type: keyword
+
+Name of the user that is the source for this event.
+
+
+--
+
+*`cisco.asa.destination_username`*::
++
+--
+type: keyword
+
+Name of the user that is the destination for this event.
+
+
+--
+
+*`cisco.asa.mapped_source_ip`*::
++
+--
+type: ip
+
+The translated source IP address.
+
+
+--
+
+*`cisco.asa.mapped_source_port`*::
++
+--
+type: long
+
+The translated source port.
+
+
+--
+
+*`cisco.asa.mapped_destination_ip`*::
++
+--
+type: ip
+
+The translated destination IP address.
+
+
+--
+
+*`cisco.asa.mapped_destination_port`*::
++
+--
+type: long
+
+The translated destination port.
+
+
+--
+
+*`cisco.asa.threat_level`*::
++
+--
+type: keyword
+
+Threat level for malware / botnet traffic. One of very-low, low, moderate, high or very-high.
+
+
+--
+
+*`cisco.asa.threat_category`*::
++
+--
+type: keyword
+
+Category for the malware / botnet traffic. For example: virus, botnet, trojan, etc.
+
+
+--
+
+*`cisco.asa.connection_id`*::
++
+--
+type: keyword
+
+Unique identifier for a flow.
+
+
+--
+
+*`cisco.asa.icmp_type`*::
++
+--
+type: short
+
+ICMP type.
+
+
+--
+
+*`cisco.asa.icmp_code`*::
++
+--
+type: short
+
+ICMP code.
+
 
 --
 
@@ -6502,6 +6687,83 @@ The rule set name.
 
 --
 
+[[exported-fields-jolokia-autodiscover]]
+== Jolokia Discovery autodiscover provider fields
+
+Metadata from Jolokia Discovery added by the jolokia provider.
+
+
+
+*`jolokia.agent.version`*::
++
+--
+type: keyword
+
+Version number of jolokia agent.
+
+
+--
+
+*`jolokia.agent.id`*::
++
+--
+type: keyword
+
+Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+
+
+--
+
+*`jolokia.server.product`*::
++
+--
+type: keyword
+
+The container product if detected.
+
+
+--
+
+*`jolokia.server.version`*::
++
+--
+type: keyword
+
+The container's version (if detected).
+
+
+--
+
+*`jolokia.server.vendor`*::
++
+--
+type: keyword
+
+The vendor of the container the agent is running in.
+
+
+--
+
+*`jolokia.url`*::
++
+--
+type: keyword
+
+The URL how this agent can be contacted.
+
+
+--
+
+*`jolokia.secured`*::
++
+--
+type: boolean
+
+Whether the agent was configured for authentication or not.
+
+
+--
+
 [[exported-fields-kafka]]
 == Kafka fields
 
@@ -11194,7 +11456,7 @@ alias to: http.response.body.bytes
 --
 type: alias
 
-alias to: source.ip
+alias to: source.address
 
 --
 

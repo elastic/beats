@@ -49,7 +49,7 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	fetcher := mbtest.NewReportingMetricSetV2(t, config)
+	fetcher := mbtest.NewReportingMetricSetV2Error(t, config)
 	reporter := &mbtest.CapturingReporterV2{}
 
 	fetcher.Fetch(reporter)

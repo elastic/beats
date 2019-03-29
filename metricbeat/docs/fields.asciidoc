@@ -36,6 +36,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -11706,6 +11707,13 @@ Jolokia module
 == jolokia fields
 
 jolokia contains metrics exposed via jolokia agent
+
+
+
+[[exported-fields-jolokia-autodiscover]]
+== Jolokia Discovery autodiscover provider fields
+
+Metadata from Jolokia Discovery added by the jolokia provider.
 
 
 
