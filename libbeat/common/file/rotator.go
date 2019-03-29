@@ -378,7 +378,7 @@ func (r *Rotator) rotate(reason rotateReason) error {
 }
 
 func (r *Rotator) rotateByInterval(reason rotateReason) error {
-	_, err := os.Stat(r.filename)
+	fi, err := os.Stat(r.filename)
 
 	if os.IsNotExist(err) {
 		return nil
