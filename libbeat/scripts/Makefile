@@ -101,6 +101,7 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 
 ### BUILDING ###
 
+.DEFAULT_GOAL := ${BEAT_NAME}
 
 ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 	go build $(GOBUILD_FLAGS)
