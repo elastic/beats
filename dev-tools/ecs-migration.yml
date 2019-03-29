@@ -463,7 +463,21 @@
 - from: system.auth.hostname
   to: host.hostname
   alias: true
-  copy_to: false
+  beat: filebeat
+
+- from: system.auth.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: system.auth.program
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.timestamp
+  to: '@timestamp'
+  alias: true
   beat: filebeat
 
 - from: system.auth.user
