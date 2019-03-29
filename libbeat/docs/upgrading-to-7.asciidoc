@@ -25,7 +25,7 @@ supported.
 [[upgrading-6-to-7]]
 === Upgrade from 6.x to 7.x
 
-Before upgrading your {beats}, review <<breaking-changes,breaking changes>>.
+Before upgrading your {beats}, review the <<breaking-changes,breaking changes>>.
 
 If you're upgrading other products in the stack, also read the
 {stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. 
@@ -121,16 +121,26 @@ with indices created by {beats} 7.0 or later.
 
 ==== Upgrade dashboards
 
-We recommend that you re-load the {kib} dashboards after upgrading {kib} and
-{beats}. This way, you can take advantage of the new {beats} dashboards created for
-the 7.0 release. To re-load the dashboards, run `setup --dashboards`.
+We recommend that you reload the {kib} dashboards after upgrading {kib} and
+{beats}. This way, you can take advantage of the new {beats} dashboards created
+for the 7.0 release. 
 
 Reloading the dashboards will overwrite any manual changes that you've
-made. To avoid overwriting existing dashboards, save them under a new ID.
+made. To avoid overwriting existing dashboards, save them under a new ID before
+proceeding.
+
+To reload the dashboards, run the `setup` command with the `--dashboards`
+option specified. For example:
+
+[source,shell]
+----
+metricbeat setup --dashboards
+----
 
 Also, if you plan to run {beats} 6.7 and 7.0 in parallel, set
 `migration.6_to_7.enabled: true` to make 6.x dashboards compatible with 7.0
-{beats} indices. For more information, see <<enable-ecs-compatibility>>.
+{beats} indices *before* you start ingesting data. For more information, see
+<<enable-ecs-compatibility>>.
 
 ==== Configure {ls} to use versioned templates and indices
 
