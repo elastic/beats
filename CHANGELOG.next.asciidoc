@@ -36,7 +36,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Empty `meta.json` file will be treated as a missing meta file. {issue}8558[8558]
 - Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
 - Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
-- [CM] Rename blacklist to non-offensive form {pull}11523[11523]
+- Central Management: Rename blacklist to non-offensive form {pull}11523[11523]
 
 *Auditbeat*
 
