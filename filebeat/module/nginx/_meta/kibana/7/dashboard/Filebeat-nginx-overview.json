@@ -43,7 +43,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "nginx.access.user_agent.major", 
+                                "field": "user_agent.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -111,7 +111,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "nginx.access.user_agent.os_major", 
+                                "field": "user_agent.os.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5

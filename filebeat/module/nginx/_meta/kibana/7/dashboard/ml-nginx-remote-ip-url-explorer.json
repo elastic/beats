@@ -230,7 +230,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "nginx.access.remote_ip", 
+                                "field": "source.address", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
