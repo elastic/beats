@@ -369,7 +369,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	monitoringCfg, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
 	if err != nil {
 		return err
 	}
@@ -377,6 +377,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	if monitoringCfg.Enabled() {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
+			Format:          reporterSettings.Format,
 		}
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {

@@ -105,6 +105,10 @@ func defaultConfig(settings report.Settings) config {
 		c.Username = settings.DefaultUsername
 	}
 
+	if settings.Format != report.ReportingFormatUnknown {
+		c.Format = settings.Format
+	}
+
 	return c
 }
 

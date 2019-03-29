@@ -25,10 +25,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// ReportingFormat encodes the type of format to report monitoring data in
+// ReportingFormat encodes the type of format to report monitoring data in.
 type ReportingFormat int
 
-// Enumerations of various ReportingFormats
+// Enumerations of various ReportingFormats. A reporter can choose whether to
+// interpret this setting or not, and if so, how to interpret it.
 const (
 	ReportingFormatUnknown ReportingFormat = iota // to protect against zero-value errors
 	ReportingFormatXPackMonitoringBulk
@@ -42,6 +43,7 @@ type config struct {
 
 type Settings struct {
 	DefaultUsername string
+	Format          ReportingFormat
 }
 
 type Reporter interface {
@@ -69,7 +71,7 @@ func New(
 	cfg *common.Config,
 	outputs common.ConfigNamespace,
 ) (Reporter, error) {
-	name, cfg, err := getReporterConfig(cfg, outputs)
+	name, cfg, err := getReporterConfig(cfg, settings, outputs)
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +86,7 @@ func New(
 
 func getReporterConfig(
 	monitoringConfig *common.Config,
+	settings Settings,
 	outputs common.ConfigNamespace,
 ) (string, *common.Config, error) {
 	cfg := collectSubObject(monitoringConfig)
@@ -91,12 +94,6 @@ func getReporterConfig(
 	if err := cfg.Unpack(&config); err != nil {
 		return "", nil, err
 	}
-
-	f, err := monitoringConfig.Int("_format", -1)
-	if err != nil {
-		return "", nil, err
-	}
-	format := ReportingFormat(f)
 
 	// load reporter from `monitoring` section and optionally
 	// merge with output settings
@@ -112,7 +109,7 @@ func getReporterConfig(
 			}{}
 			rc.Unpack(&hosts)
 
-			if format == ReportingFormatBulk && len(hosts.Hosts) > 0 {
+			if settings.Format == ReportingFormatBulk && len(hosts.Hosts) > 0 {
 				pathMonHosts := rc.PathOf("hosts")
 				pathOutHost := outCfg.PathOf("hosts")
 				err := fmt.Errorf("'%v' and '%v' are configured", pathMonHosts, pathOutHost)
@@ -126,7 +123,6 @@ func getReporterConfig(
 			rc = merged
 		}
 
-		rc.SetInt("_format", -1, int64(format))
 		return name, rc, nil
 	}
 
@@ -134,8 +130,6 @@ func getReporterConfig(
 	if outputs.IsSet() {
 		name := outputs.Name()
 		if reportFactories[name] != nil {
-			outCfg := outputs.Config()
-			outCfg.SetInt("_format", -1, int64(format))
 			return name, outputs.Config(), nil
 		}
 	}
