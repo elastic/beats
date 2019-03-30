@@ -42,7 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...master[Check the HEAD diff
 *Filebeat*
 
 - Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
-- Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543]
+- Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543] {pull}11550[11550]
 
 *Heartbeat*
 
