@@ -168,7 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
 - Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test 
   case. {issue}11004[11004] {pull}11105[11105]
-- Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543]
+- Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543] {pull}11551[11551]
 
 *Heartbeat*
 
