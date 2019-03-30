@@ -189,7 +189,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add fix to parse syslog message with priority value 0. {issue}11010[11010]
 - Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 - Fix coredns image in docs.asciidoc for docs build. {pull}11460[11460] {pull}11461[11461]
-- Fix issue 11543 when key `log` does not exist. {pull}11549[11549]
+- Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543] {pull}11549[11549]
 
 *Heartbeat*
 
