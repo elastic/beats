@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
+* <<exported-fields-coredns>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-couchdb>>
 * <<exported-fields-docker-processor>>
@@ -35,6 +36,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -2564,6 +2566,229 @@ Garbage collector pause time in nanoseconds
 type: long
 
 Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
+
+--
+
+[[exported-fields-coredns]]
+== coredns fields
+
+coredns Module
+
+
+
+[float]
+== coredns fields
+
+`coredns` contains statistics that were read from coreDNS
+
+
+
+[float]
+== stats fields
+
+Contains statistics related to the coreDNS service
+
+
+
+*`coredns.stats.panic.count.total`*::
++
+--
+type: long
+
+Total number of panics
+
+
+--
+
+*`coredns.stats.dns.request.count.total`*::
++
+--
+type: long
+
+Total query count
+
+
+--
+
+*`coredns.stats.dns.request.duration.ns.bucket.*`*::
++
+--
+type: object
+
+Request duration histogram buckets in nanoseconds
+
+
+--
+
+*`coredns.stats.dns.request.duration.ns.sum`*::
++
+--
+type: long
+
+format: duration
+
+Requests duration, sum of durations in nanoseconds
+
+
+--
+
+*`coredns.stats.dns.request.duration.ns.count`*::
++
+--
+type: long
+
+Requests duration, number of requests
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.bucket.*`*::
++
+--
+type: object
+
+Request Size histogram buckets
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.sum`*::
++
+--
+type: long
+
+Request Size histogram sum
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.count`*::
++
+--
+type: long
+
+Request Size histogram count
+
+
+--
+
+*`coredns.stats.dns.request.do.count.total`*::
++
+--
+type: long
+
+Number of queries that have the DO bit set
+
+
+--
+
+*`coredns.stats.dns.request.type.count.total`*::
++
+--
+type: long
+
+Counter of queries per zone and type
+
+
+--
+
+*`coredns.stats.type`*::
++
+--
+type: keyword
+
+Holds the query type of the request
+
+
+--
+
+*`coredns.stats.dns.response.rcode.count.total`*::
++
+--
+type: long
+
+Counter of responses per zone and rcode
+
+
+--
+
+*`coredns.stats.rcode`*::
++
+--
+type: keyword
+
+Holds the rcode of the response
+
+
+--
+
+*`coredns.stats.family`*::
++
+--
+type: keyword
+
+The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.bucket.*`*::
++
+--
+type: object
+
+Response Size histogram buckets
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.sum`*::
++
+--
+type: long
+
+Response Size histogram sum
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.count`*::
++
+--
+type: long
+
+Response Size histogram count
+
+
+--
+
+*`coredns.stats.server`*::
++
+--
+type: keyword
+
+The server responsible for the request
+
+
+--
+
+*`coredns.stats.zone`*::
++
+--
+type: keyword
+
+The zonename used for the request/response
+
+
+--
+
+*`coredns.stats.proto`*::
++
+--
+type: keyword
+
+The transport of the response ("udp" or "tcp")
+
 
 --
 
@@ -9277,6 +9502,16 @@ etcd Module
 
 
 
+*`etcd.api_version`*::
++
+--
+type: keyword
+
+Etcd API version for metrics retrieval
+
+
+--
+
 [float]
 == leader fields
 
@@ -9357,6 +9592,212 @@ type: scaled_float
 type: keyword
 
 ID of actual leader
+
+--
+
+[float]
+== server fields
+
+Server metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.server.has_leader`*::
++
+--
+type: byte
+
+Whether a leader exists in the cluster
+
+
+--
+
+*`etcd.server.leader_changes.count`*::
++
+--
+type: long
+
+Number of leader changes seen at the cluster
+
+
+--
+
+*`etcd.server.proposals_committed.count`*::
++
+--
+type: long
+
+Number of consensus proposals commited
+
+
+--
+
+*`etcd.server.proposals_pending.count`*::
++
+--
+type: long
+
+Number of consensus proposals pending
+
+
+--
+
+*`etcd.server.proposals_failed.count`*::
++
+--
+type: long
+
+Number of consensus proposals failed
+
+
+--
+
+*`etcd.server.grpc_started.count`*::
++
+--
+type: long
+
+Number of sent gRPC requests
+
+
+--
+
+*`etcd.server.grpc_handled.count`*::
++
+--
+type: long
+
+Number of received gRPC requests
+
+
+--
+
+[float]
+== disk fields
+
+Disk metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.disk.mvcc_db_total_size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Size of stored data at MVCC
+
+
+--
+
+*`etcd.disk.wal_fsync_duration.ns.bucket.*`*::
++
+--
+type: object
+
+Latency for writing ahead logs to disk
+
+
+--
+
+*`etcd.disk.wal_fsync_duration.ns.count`*::
++
+--
+type: long
+
+Write ahead logs count
+
+
+--
+
+*`etcd.disk.wal_fsync_duration.ns.sum`*::
++
+--
+type: long
+
+Write ahead logs latency sum
+
+
+--
+
+*`etcd.disk.backend_commit_duration.ns.bucket.*`*::
++
+--
+type: object
+
+Latency for writing backend changes to disk
+
+
+--
+
+*`etcd.disk.backend_commit_duration.ns.count`*::
++
+--
+type: long
+
+Backend commits count
+
+
+--
+
+*`etcd.disk.backend_commit_duration.ns.sum`*::
++
+--
+type: long
+
+Backend commits latency sum
+
+
+--
+
+[float]
+== memory fields
+
+Memory metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.memory.go_memstats_alloc.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Memory allocated bytes as of MemStats Go
+
+
+--
+
+[float]
+== network fields
+
+Network metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.network.client_grpc_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+gRPC sent bytes total
+
+
+--
+
+*`etcd.network.client_grpc_received.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+gRPC received bytes total
+
 
 --
 
@@ -11269,6 +11710,13 @@ jolokia contains metrics exposed via jolokia agent
 
 
 
+[[exported-fields-jolokia-autodiscover]]
+== Jolokia Discovery autodiscover provider fields
+
+Metadata from Jolokia Discovery added by the jolokia provider.
+
+
+
 *`jolokia.agent.version`*::
 +
 --
@@ -12276,7 +12724,7 @@ Request latency, number of requests
 
 --
 
-*`kubernetes.apiserver.request.latency.bucket`*::
+*`kubernetes.apiserver.request.latency.bucket.*`*::
 +
 --
 type: object
@@ -20483,7 +20931,7 @@ Stats scraped from a Prometheus endpoint.
 
 
 
-*`prometheus.labels`*::
+*`prometheus.labels.*`*::
 +
 --
 type: object
@@ -20493,7 +20941,7 @@ Prometheus metric labels
 
 --
 
-*`prometheus.metrics`*::
+*`prometheus.metrics.*`*::
 +
 --
 type: object
@@ -20516,16 +20964,6 @@ RabbitMQ module
 
 
 
-*`rabbitmq.node.name`*::
-+
---
-type: keyword
-
-Node name
-
-
---
-
 *`rabbitmq.vhost`*::
 +
 --
@@ -20546,9 +20984,7 @@ connection
 *`rabbitmq.connection.name`*::
 +
 --
-type: alias
-
-alias to: rabbitmq.name
+type: keyword
 
 The name of the connection with non-ASCII characters escaped as in C.
 
@@ -21106,12 +21542,9 @@ Number of messages which have been written to the message store.
 *`rabbitmq.node.name`*::
 +
 --
-type: alias
-
-alias to: rabbitmq.node.name
+type: keyword
 
 Node name
-
 
 --
 

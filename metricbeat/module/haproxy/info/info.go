@@ -52,19 +52,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches info stats from the haproxy service.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	hapc, err := haproxy.NewHaproxyClient(m.HostData().URI)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed creating haproxy client"))
-		return
+		return errors.Wrap(err, "failed creating haproxy client")
 	}
 
 	res, err := hapc.GetInfo()
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed fetching haproxy info"))
-		return
+		return errors.Wrap(err, "failed fetching haproxy info")
 	}
 
-	eventMapping(res, r)
+	eventMapping(res, reporter)
+	return nil
 }

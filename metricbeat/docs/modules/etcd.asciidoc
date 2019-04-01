@@ -5,9 +5,13 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-etcd]]
 == Etcd module
 
-This is the Etcd Module. The Etcd module uses https://coreos.com/etcd/docs/latest/v2/api.html [Etcd v2 API] to collect metrics.
+This module targets Etcd V2 and V3.
 
-The default metricsets are `leader`, `self` and `store`.
+When using V2, metrics are collected using https://coreos.com/etcd/docs/latest/v2/api.html[Etcd v2 API].
+When using V3, metrics are retrieved from the `/metrics` endpoint as intended for https://coreos.com/etcd/docs/latest/metrics.html[Etcd v3]
+
+When using V3, metricsest are bundled into `metrics`
+When using V2, metricsets available are `leader`, `self` and `store`.
 
 [float]
 === Compatibility
@@ -40,11 +44,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-etcd-leader,leader>>
 
+* <<metricbeat-metricset-etcd-metrics,metrics>>
+
 * <<metricbeat-metricset-etcd-self,self>>
 
 * <<metricbeat-metricset-etcd-store,store>>
 
 include::etcd/leader.asciidoc[]
+
+include::etcd/metrics.asciidoc[]
 
 include::etcd/self.asciidoc[]
 

@@ -36,7 +36,7 @@ import (
 )
 
 func init() {
-	processors.RegisterPlugin("add_host_metadata", newHostMetadataProcessor)
+	processors.RegisterPlugin("add_host_metadata", New)
 }
 
 type addHostMetadata struct {
@@ -53,7 +53,8 @@ const (
 	processorName = "add_host_metadata"
 )
 
-func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_host_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)

@@ -77,7 +77,8 @@ const containerIdLen = 64
 const podUIDPos = 5
 
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
-	if value, ok := event["log"].(common.MapStr)["file"].(common.MapStr)["path"]; ok {
+	value, err := event.GetValue("log.file.path")
+	if err == nil {
 		source := value.(string)
 		logp.Debug("kubernetes", "Incoming log.file.path value: %s", source)
 

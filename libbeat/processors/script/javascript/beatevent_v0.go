@@ -90,7 +90,9 @@ func (e *beatEventV0) init() {
 func (e *beatEventV0) reset(b *beat.Event) error {
 	e.inner = b
 	e.cancelled = false
-	return e.obj.Set("fields", e.vm.ToValue(e.inner.Fields))
+	e.obj.Set("_private", e)
+	e.obj.Set("fields", e.vm.ToValue(e.inner.Fields))
+	return nil
 }
 
 // Wrapped returns the wrapped beat.Event.
