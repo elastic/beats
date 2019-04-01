@@ -463,7 +463,26 @@
 - from: system.auth.hostname
   to: host.hostname
   alias: true
-  copy_to: false
+  beat: filebeat
+
+- from: system.auth.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: system.auth.program
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.timestamp
+  to: '@timestamp'
+  alias: true
+  beat: filebeat
+
+- from: system.auth.user
+  to: user.name
+  alias: true
   beat: filebeat
 
 - from: system.auth.pid
@@ -476,12 +495,22 @@
   alias: true
   beat: filebeat
 
+- from: system.auth.groupadd.name
+  to: group.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.useradd.gid
+  to: group.id
+  alias: true
+  beat: filebeat
+
 - from: system.auth.useradd.uid
   to: user.id
   alias: true
   beat: filebeat
 
-- from: system.auth.useradd.user
+- from: system.auth.useradd.name
   to: user.name
   alias: true
   beat: filebeat
@@ -681,11 +710,6 @@
   beat: filebeat
 
 ## Elasticsearch module
-
-- from: elasticsearch.audit.event_type
-  to: event.type
-  alias: true
-  beat: filebeat
 
 - from: elasticsearch.audit.origin_address
   to: source.ip
