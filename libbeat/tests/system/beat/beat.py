@@ -408,6 +408,30 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         return counter
 
+    def log_contains_countmap(self, pattern, capture_group, logfile=None):
+        """
+        Returns a map of the number of appearances of each captured group in the log file
+        """
+        counts = {}
+
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        try:
+            with open(os.path.join(self.working_dir, logfile), "r") as f:
+                for line in f:
+                    res = pattern.search(line)
+                    if res is not None:
+                        capt = res.group(capture_group)
+                        if capt in counts:
+                            counts[capt] += 1
+                        else:
+                            counts[capt] = 1
+        except IOError:
+            pass
+
+        return counts
+
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
         if output_file is None:
