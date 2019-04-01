@@ -18,10 +18,6 @@ You can view and edit the policy in the *Index lifecycle policies* UI in {kib}.
 For more information about working with the UI, see
 {kibana-ref}/index-lifecycle-policies.html[Index lifecyle policies].
 
-// REVIEWERS: I'm not going to describe the default policy as requested in the
-// GitHub issue because the settings might change. If users want to know what
-// the policy settings are, they should view the policy in Kibana. Sound fair?
-
 Example configuration:
 
 ["source","yaml",subs="attributes"]
@@ -33,14 +29,6 @@ setup.ilm.pattern: "{now/d}-000001" <1>
 <1> Date math is supported here. For more information, see
 {ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
 date math with the rollover API].
-
-// REVIEWERS: Rather than showing the default for setup.ilm.pattern, let's show
-// something different than the default. What would you suggest here?
-
-// TODO: The reference.yml is missing some of these options and incorrectly
-// refers to the "elasticsearch.output.index" (it should be output.elasticsearch.index)
-//
-// Should I also update the reference.yml, or is it too late for 7.0?
 
 [float]
 === Configuration options
@@ -54,9 +42,9 @@ You can specify the following settings in the `setup.ilm` section of the
 
 Enables or disables index lifecycle management on any new indices created by
 {beatname_uc}. Valid values are `true`, `false`, and `auto`. When `auto` (the
-default) is specified, {beatname_uc} automatically uses index lifecycle
-management if the feature is enabled in {es} and has the required license;
-otherwise, {beatname_uc} creates daily indices.
+default) is specified on version 7.0 and later, {beatname_uc} automatically uses
+index lifecycle management if the feature is enabled in {es} and has the
+required license; otherwise, {beatname_uc} creates daily indices.
 
 [float]
 [[setup-ilm-rollover_alias-option]]
@@ -92,6 +80,10 @@ The name to use for the lifecycle policy. The default is
 The path to a JSON file that contains a lifecycle policy configuration. Use this
 setting to load your own lifecycle policy.
 
+For more information about lifecycle policies, see
+{ref}/set-up-lifecycle-policy.html[Set up index lifecycle management policy] in
+the _{es} Reference_.
+
 [float]
 [[setup-ilm-check_exists-option]]
 ==== `setup.ilm.check_exists`
@@ -109,6 +101,3 @@ lifecycle policy can be installed.
 
 When set to `true`, the lifecycle policy is overwritten at startup. The default
 is `false`.
-
-// REVIEWERS: I think the section about "advanced" settings is no longer required
-// now that we use the alias to override the index setting, so I am deleting it.
