@@ -7,7 +7,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -153,7 +153,7 @@
               }
             ],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -216,7 +216,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -298,7 +298,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -410,7 +410,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -522,7 +522,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -733,7 +733,7 @@
             "highlightAll": true,
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -759,7 +759,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }

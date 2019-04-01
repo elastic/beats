@@ -48,7 +48,7 @@ const (
 var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
-	processors.RegisterPlugin(processorName, newDockerMetadataProcessor)
+	processors.RegisterPlugin(processorName, New)
 }
 
 type addDockerMetadata struct {
@@ -63,7 +63,8 @@ type addDockerMetadata struct {
 	dedot     bool          // If set to true, replace dots in labels with `_`.
 }
 
-func newDockerMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_docker_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
 }
 

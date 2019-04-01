@@ -27,7 +27,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/vmware/govmomi"
@@ -38,20 +37,20 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
-var logger = logp.NewLogger("vsphere")
-
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "host", New,
 		mb.DefaultMetricSet(),
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	HostURL  *url.URL
 	Insecure bool
 }
 
+// New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The vsphere host metricset is beta")
 
@@ -79,16 +78,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	var events []common.MapStr
-
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in NewClient")
 	}
 
 	defer client.Logout(ctx)
@@ -100,7 +100,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"HostSystem"}, true)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in CreateContainerView")
 	}
 
 	defer v.Destroy(ctx)
@@ -109,7 +109,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	var hst []mo.HostSystem
 	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary"}, &hst)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in Retrieve")
 	}
 
 	for _, hs := range hst {
@@ -127,24 +127,25 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 			event.Put("memory.free.bytes", int64(hs.Summary.Hardware.MemorySize)-(int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024))
 			event.Put("memory.total.bytes", hs.Summary.Hardware.MemorySize)
 		} else {
-			logger.Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
+			m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 		}
 
 		if hs.Summary.Host != nil {
 			networkNames, err := getNetworkNames(ctx, c, hs.Summary.Host.Reference())
 			if err != nil {
-				logger.Debugf("error trying to get network names: %s", err.Error())
+				m.Logger().Debugf("error trying to get network names: %s", err.Error())
 			} else {
 				if len(networkNames) > 0 {
 					event["network_names"] = networkNames
 				}
 			}
 		}
-
-		events = append(events, event)
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+		})
 	}
 
-	return events, nil
+	return nil
 }
 
 func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) ([]string, error) {

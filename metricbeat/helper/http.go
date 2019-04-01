@@ -25,7 +25,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -35,26 +34,27 @@ import (
 )
 
 type HTTP struct {
-	base    mb.BaseMetricSet
-	client  *http.Client // HTTP client that is reused across requests.
-	headers map[string]string
-	uri     string
-	method  string
-	body    []byte
+	hostData mb.HostData
+	client   *http.Client // HTTP client that is reused across requests.
+	headers  map[string]string
+	name     string
+	uri      string
+	method   string
+	body     []byte
 }
 
 // NewHTTP creates new http helper
 func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
-	config := struct {
-		TLS             *tlscommon.Config `config:"ssl"`
-		Timeout         time.Duration     `config:"timeout"`
-		Headers         map[string]string `config:"headers"`
-		BearerTokenFile string            `config:"bearer_token_file"`
-	}{}
+	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
+	return newHTTPFromConfig(config, base.Name(), base.HostData())
+}
+
+// newHTTPWithConfig creates a new http helper from some configuration
+func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP, error) {
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
 	}
@@ -74,14 +74,14 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 
 	var dialer, tlsDialer transport.Dialer
 
-	dialer = transport.NetDialer(config.Timeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
+	dialer = transport.NetDialer(config.ConnectTimeout)
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
 	if err != nil {
 		return nil, err
 	}
 
 	return &HTTP{
-		base: base,
+		hostData: hostData,
 		client: &http.Client{
 			Transport: &http.Transport{
 				Dial:    dialer.Dial,
@@ -91,7 +91,7 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		},
 		headers: config.Headers,
 		method:  "GET",
-		uri:     base.HostData().SanitizedURI,
+		uri:     hostData.SanitizedURI,
 		body:    nil,
 	}, nil
 }
@@ -107,8 +107,11 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 	}
 
 	req, err := http.NewRequest(h.method, h.uri, reader)
-	if h.base.HostData().User != "" || h.base.HostData().Password != "" {
-		req.SetBasicAuth(h.base.HostData().User, h.base.HostData().Password)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create HTTP request")
+	}
+	if h.hostData.User != "" || h.hostData.Password != "" {
+		req.SetBasicAuth(h.hostData.User, h.hostData.Password)
 	}
 
 	for k, v := range h.headers {
@@ -157,7 +160,7 @@ func (h *HTTP) FetchContent() ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.base.Name(), resp.Status)
+		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.name, resp.Status)
 	}
 
 	return ioutil.ReadAll(resp.Body)

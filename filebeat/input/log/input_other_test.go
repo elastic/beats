@@ -169,3 +169,4 @@ type TestOutlet struct{}
 
 func (o TestOutlet) OnEvent(event *util.Data) bool { return true }
 func (o TestOutlet) Close() error                  { return nil }
+func (o TestOutlet) Done() <-chan struct{}         { return nil }

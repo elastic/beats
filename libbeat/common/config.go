@@ -432,7 +432,7 @@ func OwnerHasExclusiveWritePerms(name string) error {
 	perm := info.Mode().Perm()
 
 	if fileUID != 0 && euid != fileUID {
-		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
+		return fmt.Errorf(`config file ("%v") must be owned by the user identifier `+
 			`(uid=%v) or root`, name, euid)
 	}
 

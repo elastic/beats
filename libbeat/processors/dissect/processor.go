@@ -34,10 +34,11 @@ type processor struct {
 }
 
 func init() {
-	processors.RegisterPlugin("dissect", newProcessor)
+	processors.RegisterPlugin("dissect", NewProcessor)
 }
 
-func newProcessor(c *common.Config) (processors.Processor, error) {
+// NewProcessor constructs a new dissect processor.
+func NewProcessor(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {
