@@ -67,7 +67,7 @@ To use the setup command, run:
 
 After loading the default policy, you can edit it in the *Index lifecycle policies*
 UI in {kib}. For more information about working with the UI, see
-{kibana-ref}/index-lifecycle-policies.html[Index lifecyle policies]. 
+{kibana-ref}/index-lifecycle-policies.html[Index lifecycle policies]. 
 
 To modify the default policy before loading it, run +{beatname_lc} export
 ilm-policy+ to print the policy to stdout. Modify the policy then use the

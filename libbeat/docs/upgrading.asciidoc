@@ -5,7 +5,6 @@ This section gives general recommendations for upgrading {beats} shippers:
 
 * <<upgrading-minor-versions>>
 * <<upgrading-6-to-7>>
-* <<upgrade-mapping-template>>
 * <<troubleshooting-upgrade>>
 
 If you're upgrading other products in the stack, also read the
@@ -41,14 +40,9 @@ supported.
 IMPORTANT: Please read through all upgrade steps before proceeding. Some of the
 steps are required before running the upgraded software for the first time.
 
-// REVIEWERS: Historically our docs have not described how to actually upgrade.
-// We just cover the things users need to be aware of. However, to have parity
-// with the install docs for other stack components, I think we should add more
-// detail, similar to what Kibana does: https://www.elastic.co/guide/en/kibana/master/upgrade-standard.html
-// WDYT?
-//
-// Besides copying over the config file (for all beats), and pointing to the 
-// registry file for Filebeat, what else needs to be preserved.
+// TODO: Add step-by-step instructions to tell users to back up the registry,
+// copy over the config file, etc. Similar to what Kibana does:
+// https://www.elastic.co/guide/en/kibana/master/upgrade-standard.html
 
 [[upgrading-to-6.7]]
 ==== Upgrade to {beats} 6.7 before upgrading to 7.0
@@ -58,13 +52,13 @@ a previous 6.x version of {beats}, upgrade to version 6.7 first. This is
 required because the {es} mapping template in 6.7 was modified to be compatible
 with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
 
-After upgrading to 6.7, make sure the 6.7 template gets loaded. You can do this
-by temporarily enabling the `output.elasticsearch.template.overwrite` setting,
-for example with Metricbeat:
+After upgrading to 6.7, make sure the 6.7 template gets loaded. To load the
+template, run the `setup` command with the `--template` option specified. For
+example:
 
 [source,shell]
 ----
-metricbeat -e -E output.elasticsearch.template.overwrite=true
+metricbeat setup --template
 ----
 
 Or you can manually force loading the template:
@@ -87,24 +81,22 @@ running in your environment.
 
 *Metricbeat and Filebeat users:* If you use {beats} central management,
 make sure you migrate the {beats} central management index to 6.7 before you
-upgrade to 7.0. 
-
-// REVIEWERS: Not sure I should mention this here ^^. I didn't link directly
-// to the 6.7 breaking changes docs here because I'm concerned about users
-// getting into the wrong upgrade docs and being confused.
+upgrade to 7.0. Although central management is not a GA-level feature in 7.0.0,
+we've provided a migration tool to help you migrate your configurations. For
+more information, see the
+https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
 
 [[migrate-config-files]]
 ==== Migrate configuration files
 
-// REVIEWERS: What changes do users need to make to their config files? Will we
-// offer any kind of migration tooling to make this easier?
-
 {beats} 7.0 comes with several backwards incompatible configuration changes.
-Before upgrading, review the <<breaking-changes-7.0>> document. Where possible,
-we kept the old configuration options working, but deprecated them. However,
-deprecation was not always possible, so if you use any of the settings mentioned
-in the Breaking Changes section of the release notes, make sure you understand
-the alternatives that we provide.
+Before upgrading, review the <<breaking-changes-7.0>> document. Also review
+the full list of breaking changes in the <<release-notes>> for 7.0.
+
+Where possible, we kept the old configuration options working, but deprecated
+them. However, deprecation was not always possible, so if you use any of the
+settings described under breaking changes, make sure you understand the
+alternatives that we provide.
 
 [[enable-ecs-compatibility]]
 ==== Enable the compatibility layer for Elastic Common Schema (ECS) fields
@@ -119,10 +111,6 @@ the form of ECS-compatible field aliases. To use the aliases, set
 `migration.6_to_7.enabled: true` in the Beat's configuration file *before* you
 run {beats} 7.0 to ingest data for the first time.
 
-// REVIEWERS: I'm not sure the following statement is correct. I was not able
-// to use the dashboards I saved from 6.x with 7.0. I did a very quick and dirty
-// upgrade of the stack tho so might have missed something critical. 
-
 The compatibility layer enables you to use 6.x dashboards and visualizations
 with indices created by {beats} 7.0 or later.
 
@@ -136,8 +124,10 @@ We recommend that you re-import the {kib} dashboards after upgrading {kib} and
 for the 7.0 release. 
 
 Re-importing the dashboards will overwrite any manual changes that you've
-made. To avoid overwriting existing dashboards, save any modified dashboards
-under a new ID before proceeding.
+made. To avoid overwriting your changes, save any modified objects, such as
+dashboards, visualizations, and searches, under a new ID before proceeding. For
+more information about importing and exporting your modified objects, see
+{kibana-ref}/managing-saved-objects.html[Managing Saved Objects].
 
 To re-import the dashboards, run the `setup` command with the `--dashboards`
 option specified. For example:
@@ -151,35 +141,6 @@ Also, if you plan to run {beats} 6.7 and 7.0 in parallel,
 <<enable-ecs-compatibility,enable the compatibility layer>> *before* you start
 ingesting data. 
 
-[[upgrade-logstash-config]]
-==== Configure {ls} to use versioned templates and indices
-
-If you're using {ls} to ingest data, make sure {ls} uses versioned templates and
-indices. Otherwise, after you upgrade, {ls} will stop ingesting data because of
-field conflicts. To use versioned index templates and indices, configure the
-{ls} `index` setting as recommended in the
-{logstash-ref}/plugins-inputs-beats.html[{beats} input plugin] documentation and
-allow {beats} to manage the index template:
-
-[source,json]
-----
-    manage_template => false
-    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" 
-----
-
-When you use this configuration, the index name is set to match the index
-pattern in the {beats} index template.
-
-IMPORTANT: The index name must match the index pattern in the {beats} index
-template, or {beats} dashboards and visualizations will not work as expected.
-For example, if {ls} sends events to an index called +metricbeat-7-{localdate}+,
-but the index template expects indices to match +metricbeat-{stack-version}-*+,
-your {beats} dashboards and visualizations will not display the data sent by
-{ls}.
-
-// REVIEWERS: The review comment said "things will break in a very opaque
-// manner." I'm assuming we mean that the Beats dashboards will stop working,
-// but I haven't had time to test this. ^^
 
 [[load-index-template-manually]]
 ==== Load the 7.0 index template manually for outputs other than {es}
@@ -206,35 +167,38 @@ structure. If Filebeat finds an old registry file at the path set by
 new format. If the registry file is at a different location, set
 `filebeat.registry.migrate_file` to point to the file.
 
+The registry changes also require you to rename the following configuration
+settings:
+
+[options="header"]
+|====
+|Old config name | New config name
+|`filebeat.registry_file`    | `filebeat.registry.path`.
+|`registry_file_permissions` | `registry.file_permissions`
+|`registry_flush` | `registry.flush`
+|====
+
+Before proceeding with the upgrade, make sure you back up the registry file.
+
 [role="xpack"]
 [[ilm-on]]
 ==== Check privileges for index lifecycle management (on by default in 7.0)
 
-// REVIEWERS: not sure if this is worth pointing out in the upgrade docs but
-// I think the default changing is going to confuse some users.
-
 Staring with {beats} 7.0, index lifecycle management is on by default when
 sending data to {beats} clusters that support it. Make sure {beats} users have
 the privileges needed to use index lifecycle management, or disable index
-lifecycle management. The following privileges are required:
+lifecycle management. 
 
-* To set up index lifecycle policies: `manage_ilm` and `monitor` on cluster
-* To send data to a secured cluster when index lifecycle management is enabled:
-`manage_index_templates` and `monitor` on cluster, and `index` and `manage` on
-{beats} indices.
+For help troubleshooting authorization issues related to index lifecycle
+management, see <<user-unauthorized>>.
 
-// REVIEWERS: The privileges shown here are based on testing I did for
-// https://github.com/elastic/beats/pull/11329, but I am still waiting for
-// more review comments on that PR. 
-
-To disable index lifecycle management, set `setup.ilm.enabled: false` in the
-{beats} configuration file.
+If you want to disable index lifecycle management, set
+`setup.ilm.enabled: false` in the {beats} configuration file.
 
 [[upgrade-mapping-template]]
-=== Upgrade the {es} mapping template
+==== Upgrade the {es} mapping template
 
-// REVIEWERS: Does this topic really belong on its own rather than as a
-// sub-topic? Do we want to tell users to set 
+//TODO: possibly move this topic.
 
 Mapping templates and the default index names are versioned. For example,
 Metricbeat {stack-version} typically creates indices like this:
@@ -251,12 +215,33 @@ guaranteed that the correct template for that version is applied. With these
 changes in place, you generally don't have to do anything to upgrade the mapping
 template when you move to a new version.
 
-// REVIEWERS: I'm not sure what the following paragraph means. Why would this
-// result in downtime?
+[[non-es-outputs]]
+==== How to use versioned templates for outputs other than {es}
 
-If downtime is not acceptable, another possible approach is to configure a
-different index pattern in the new Beat version, but this will likely require
-adjustments to your {kib} dashboards.
+If you've configured {beats} to send events to a different output, such as {ls},
+make sure you use versioned templates and indices. Otherwise, after you
+upgrade, there will be field conflicts. To use versioned index templates and
+indices, use the metadata from {beats} to set the index and allow {beats} to
+manage the template.
+
+For example, for {ls}, set the {ls} `index` setting as recommended in the
+{logstash-ref}/plugins-inputs-beats.html[{beats} input plugin] documentation and
+allow {beats} to manage the index template:
+
+[source,json]
+----
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" 
+----
+
+When you use this configuration, the index name is set to match the index
+pattern in the {beats} index template.
+
+IMPORTANT: The index name must match the index pattern in the {beats} index
+template. For example, if {ls} sends events to an index called
++metricbeat-7-{localdate}+, but the index template expects indices to match
++metricbeat-{stack-version}-*+, you may encounter mapping errors and be unable
+to index {beats} events.
 
 [[troubleshooting-upgrade]]
 === Troubleshooting {beats} upgrade issues
@@ -266,10 +251,6 @@ This section describes common problems you might encounter when upgrading to
 
 You can avoid some of these problems by reading <<upgrading-6-to-7>> before
 upgrading {beats}.
-
-// REVIEWERS: I really need help fleshing out this section. This is all based
-// on speculation. Not sure I'm describing the symptoms correctly because this
-// content is based on input from reviewers, not my own testing.
 
 [[missing-fields]]
 ==== Missing fields or too many fields in the index
@@ -309,6 +290,37 @@ template manually. See <<load-index-template-manually>>.
 // some way to recover the previous cursor location to avoid dropped or
 // duplicate events?
 
+[[user-unauthorized]]
+==== User is not authorized
+
+//TODO: Test this again. 
+
+Because index lifecycle management is on by default in 7.0, you might encounter
+new errors related to user authorization when you run version 7.0 against an
+{es} cluster that supports index lifecycle management.
+
+*Error:* [cluster:monitor/main] is unauthorized for user
+*Problem*: The user is unable to send monitoring information.
+*Solution:* Grant the `monitor` cluster privilege.
+
+*Error:* [cluster:admin/ilm/put] is unauthorized for user 
+*Problem:*: The user is not authorized to load ILM policies. 
+*Solution:* Grant the `manage_ilm` cluster privilege.
+
+*Error:* [indices:admin/template/put] is unauthorized for user 
+*Problem:* Automatic template loading is required when ILM is enabled, but the
+user is not authorized to manage index templates.
+*Solution:* Grant the `manage_index_templates` cluster privilege.
+
+*Error:* [indices:admin/aliases] is unauthorized for user 
+*Problem:* The user is unable to set up aliases needed by the compatibility
+layer.
+*Solution:* Grant the `manage` privilege on the {beats} index`.
+
+[indices:data/write/bulk] is unauthorized for user 
+*Problem:*  The user is unable to write events to {es}.
+*Solution:* Grant `index` privileges on the Beats index.
+
 [[old-dashboards-failing]]
 ==== 6.x dashboards not showing data from 7.0 shippers
 
@@ -319,6 +331,6 @@ You might have run the Beat without turning on the compatibility layer. See
 ==== Data parsed by {ls} not appearing in 7.0 dashboards
 
 You might be writing to an index that doesn't match the index pattern used
-by {beats}. See <<upgrade-logstash-config>>.
+by {beats}. See <<non-es-outputs>>.
 
 
