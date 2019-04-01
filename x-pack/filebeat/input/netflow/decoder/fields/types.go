@@ -6,6 +6,7 @@ package fields
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -322,6 +323,34 @@ func (u UnsupportedDecoder) Decode(data []byte) (interface{}, error) {
 
 var _ Decoder = (*UnsupportedDecoder)(nil)
 
+type ACLIDDecoder struct{}
+
+const aclIDLength = 12
+
+func (u ACLIDDecoder) MinLength() uint16 {
+	return aclIDLength
+}
+
+func (u ACLIDDecoder) MaxLength() uint16 {
+	return aclIDLength
+}
+
+func (u ACLIDDecoder) Decode(data []byte) (interface{}, error) {
+	if len(data) != aclIDLength {
+		return nil, ErrOutOfBounds
+	}
+	// Encode a [12]byte to a hex string in the form:
+	// "11223344-55667788-99aabbcc"
+	var result [aclIDLength*2 + 2]byte
+	hex.Encode(result[:8], data[:4])
+	hex.Encode(result[9:17], data[4:8])
+	hex.Encode(result[18:], data[8:])
+	result[8], result[17] = '-', '-'
+	return string(result[:]), nil
+}
+
+var _ Decoder = (*OctetArrayDecoder)(nil)
+
 // RFC5610 fields
 var (
 	OctetArray           = OctetArrayDecoder{}
@@ -348,3 +377,6 @@ var (
 	SubTemplateList      = UnsupportedDecoder{}
 	SubTemplateMultiList = UnsupportedDecoder{}
 )
+
+// ACLID field added for Cisco ASA devices
+var ACLID = ACLIDDecoder{}
