@@ -155,6 +155,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
 - Management configuration backup file will now have a timestamps in their name. {pull}11034[11034]
 - Fixed OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
+- Improve container detection in `add_host_metadata`.
 
 *Auditbeat*
 
