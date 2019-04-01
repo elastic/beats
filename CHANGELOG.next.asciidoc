@@ -10,8 +10,6 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
-
 *Auditbeat*
 
 *Filebeat*
@@ -34,8 +32,6 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-
-- Remove IP fields from default_field in Elasticsearch template. {pull}11399[11399]
 
 *Auditbeat*
 
