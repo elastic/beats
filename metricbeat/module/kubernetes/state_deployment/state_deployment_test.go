@@ -70,16 +70,13 @@ func TestEventMapping(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := metricsetFields.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(eventKey, t, metricsetFields, k, v)
-					}
-					delete(testCases, eventKey)
+			eventKey := event.ModuleFields["namespace"].(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(eventKey, t, metricsetFields, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -100,8 +97,6 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"default@jumpy-owl-redis": {
-			"_module.namespace": "default",
-
 			"name":   "jumpy-owl-redis",
 			"paused": false,
 
@@ -111,8 +106,6 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.updated":     1,
 		},
 		"test@jumpy-owl-redis": {
-			"_module.namespace": "test",
-
 			"name":   "jumpy-owl-redis",
 			"paused": true,
 
@@ -122,8 +115,6 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.updated":     8,
 		},
 		"kube-system@tiller-deploy": {
-			"_module.namespace": "kube-system",
-
 			"name":   "tiller-deploy",
 			"paused": false,
 
@@ -131,6 +122,24 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.desired":     1,
 			"replicas.unavailable": 0,
 			"replicas.updated":     1,
+		},
+		"jenkins@wise-lynx-jenkins": {
+			"name":   "wise-lynx-jenkins",
+			"paused": false,
+
+			"replicas.available":   1,
+			"replicas.desired":     1,
+			"replicas.unavailable": 0,
+			"replicas.updated":     1,
+		},
+		"kube-system@kube-state-metrics": {
+			"name":   "kube-state-metrics",
+			"paused": false,
+
+			"replicas.available":   1,
+			"replicas.desired":     2,
+			"replicas.unavailable": 1,
+			"replicas.updated":     2,
 		},
 	}
 }
