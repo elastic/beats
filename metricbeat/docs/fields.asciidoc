@@ -36,6 +36,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-jolokia>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -9501,6 +9502,16 @@ etcd Module
 
 
 
+*`etcd.api_version`*::
++
+--
+type: keyword
+
+Etcd API version for metrics retrieval
+
+
+--
+
 [float]
 == leader fields
 
@@ -9581,6 +9592,212 @@ type: scaled_float
 type: keyword
 
 ID of actual leader
+
+--
+
+[float]
+== server fields
+
+Server metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.server.has_leader`*::
++
+--
+type: byte
+
+Whether a leader exists in the cluster
+
+
+--
+
+*`etcd.server.leader_changes.count`*::
++
+--
+type: long
+
+Number of leader changes seen at the cluster
+
+
+--
+
+*`etcd.server.proposals_committed.count`*::
++
+--
+type: long
+
+Number of consensus proposals commited
+
+
+--
+
+*`etcd.server.proposals_pending.count`*::
++
+--
+type: long
+
+Number of consensus proposals pending
+
+
+--
+
+*`etcd.server.proposals_failed.count`*::
++
+--
+type: long
+
+Number of consensus proposals failed
+
+
+--
+
+*`etcd.server.grpc_started.count`*::
++
+--
+type: long
+
+Number of sent gRPC requests
+
+
+--
+
+*`etcd.server.grpc_handled.count`*::
++
+--
+type: long
+
+Number of received gRPC requests
+
+
+--
+
+[float]
+== disk fields
+
+Disk metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.disk.mvcc_db_total_size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Size of stored data at MVCC
+
+
+--
+
+*`etcd.disk.wal_fsync_duration.ns.bucket.*`*::
++
+--
+type: object
+
+Latency for writing ahead logs to disk
+
+
+--
+
+*`etcd.disk.wal_fsync_duration.ns.count`*::
++
+--
+type: long
+
+Write ahead logs count
+
+
+--
+
+*`etcd.disk.wal_fsync_duration.ns.sum`*::
++
+--
+type: long
+
+Write ahead logs latency sum
+
+
+--
+
+*`etcd.disk.backend_commit_duration.ns.bucket.*`*::
++
+--
+type: object
+
+Latency for writing backend changes to disk
+
+
+--
+
+*`etcd.disk.backend_commit_duration.ns.count`*::
++
+--
+type: long
+
+Backend commits count
+
+
+--
+
+*`etcd.disk.backend_commit_duration.ns.sum`*::
++
+--
+type: long
+
+Backend commits latency sum
+
+
+--
+
+[float]
+== memory fields
+
+Memory metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.memory.go_memstats_alloc.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Memory allocated bytes as of MemStats Go
+
+
+--
+
+[float]
+== network fields
+
+Network metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.network.client_grpc_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+gRPC sent bytes total
+
+
+--
+
+*`etcd.network.client_grpc_received.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+gRPC received bytes total
+
 
 --
 
@@ -11490,6 +11707,13 @@ Jolokia module
 == jolokia fields
 
 jolokia contains metrics exposed via jolokia agent
+
+
+
+[[exported-fields-jolokia-autodiscover]]
+== Jolokia Discovery autodiscover provider fields
+
+Metadata from Jolokia Discovery added by the jolokia provider.
 
 
 
@@ -20707,7 +20931,7 @@ Stats scraped from a Prometheus endpoint.
 
 
 
-*`prometheus.labels`*::
+*`prometheus.labels.*`*::
 +
 --
 type: object
@@ -20717,7 +20941,7 @@ Prometheus metric labels
 
 --
 
-*`prometheus.metrics`*::
+*`prometheus.metrics.*`*::
 +
 --
 type: object

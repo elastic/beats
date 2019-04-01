@@ -24,12 +24,9 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
-
-var logger = logp.NewLogger("docker.container")
 
 func init() {
 	mb.Registry.MustAddMetricSet("docker", "container", New,
@@ -66,16 +63,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch returns a list of all containers as events.
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Fetch a list of all containers.
 	containers, err := m.dockerClient.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
-		err = errors.Wrap(err, "failed to get docker containers list")
-		logger.Error(err)
-		r.Error(err)
-		return
+		return errors.Wrap(err, "failed to get docker containers list")
 	}
 	eventsMapping(r, containers, m.dedot)
+
+	return nil
 }
 
 //Close stops the metricset

@@ -32,9 +32,9 @@ import (
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
-	err := mbtest.WriteEventsReporterV2(f, t, "")
+	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
@@ -43,9 +43,9 @@ func TestData(t *testing.T) {
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
-	events, errs := mbtest.ReportingFetchV2(f)
+	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}

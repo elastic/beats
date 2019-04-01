@@ -11,3 +11,4 @@
 :beat_monitoring_version: 6.2
 :beat_version_key: agent.version
 :access_role: {beat_default_index_prefix}_reader
+:repo: Beats

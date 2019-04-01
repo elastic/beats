@@ -8,14 +8,8 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -114,14 +108,8 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -253,14 +241,8 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -315,14 +297,8 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -377,15 +353,9 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
+                            "language": "kuery",
                                     "query": "event.action:updated OR event.action:attributes_modified"
                                 }
-                            }
-                        }
                     }
                 }, 
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
@@ -540,8 +510,8 @@
                         ], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -639,14 +609,8 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -744,14 +708,8 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -835,15 +793,9 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
+                            "language": "kuery",
                                     "query": "event.action:deleted"
                                 }
-                            }
-                        }
                     }
                 }, 
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
@@ -897,15 +849,9 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
+                            "language": "kuery",
                                     "query": "event.action:created"
                                 }
-                            }
-                        }
                     }
                 }, 
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
@@ -992,7 +938,7 @@
                         "highlightAll": true, 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -1019,13 +965,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
