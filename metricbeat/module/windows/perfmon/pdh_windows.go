@@ -399,8 +399,7 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 		case "long":
 			format = LongFormat
 		}
-
-		wildcard := wildcardRegexp.MatchString(counter.Query)
+		
 		values, err := PdhExpandWildCardPath(counter.Query)
 		if err != nil {
 			if config.IgnoreNECounters {
@@ -415,7 +414,8 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
 			}
 		}
-
+		
+		wildcard := wildcardRegexp.MatchString(counter.Query)
 		for _, v := range values {
 			if err := query.AddCounter(v, format, counter.InstanceName, wildcard); err != nil {
 				query.Close()
