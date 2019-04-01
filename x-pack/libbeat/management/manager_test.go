@@ -186,82 +186,94 @@ func TestRemoveItems(t *testing.T) {
 }
 
 func TestAddScriptProcessor(t *testing.T) {
-	registry := reload.NewRegistry()
-	id, err := uuid.NewV4()
-	if err != nil {
-		t.Fatalf("error while generating id: %v", err)
-	}
-	accessToken := "footoken"
-	reloadable := reloadable{
-		reloaded: make(chan *reload.ConfigWithMeta, 1),
-	}
-	registry.MustRegister("test.blocks", &reloadable)
 
-	mux := http.NewServeMux()
-	var i int
-	responses := []http.HandlerFunc{ // Initial load
-		responseText(`{"success": true, "list":[{"type":"filebeat.inputs","config":{"processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`),
-		// will not resend new events
-		responseText(`{"success": true, "list":[{"type":"filebeat.inputs","config":{"processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`),
-		// recover on call
-		http.NotFound,
+	useCases := []struct {
+		name         string
+		responseText string
+	}{
+		{"filebeat.inputs", `{"success": true, "list":[{"type":"filebeat.inputs" ,"config":{"processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`},
+		{"filebeat.modules", `{"success": true, "list":[{"type":"filebeat.modules","config":{"_sub_type": "elasticsearch", "processors":[{"script":{"lang":"javascript","source":"function process(event){\n    event.Tag(\"js\");\n}\n"}}],"paths":["log.json"]}}]}`},
 	}
 
-	mux.Handle(fmt.Sprintf("/api/beats/agent/%s/configuration", id), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		responses[i](w, r)
-		i++
-	}))
+	for _, useCase := range useCases {
+		t.Run(useCase.name, func(t *testing.T) {
+			registry := reload.NewRegistry()
+			id, err := uuid.NewV4()
+			if err != nil {
+				t.Fatalf("error while generating id: %v", err)
+			}
+			accessToken := "footoken"
+			reloadable := reloadable{
+				reloaded: make(chan *reload.ConfigWithMeta, 1),
+			}
+			registry.MustRegister("test.blocks", &reloadable)
 
-	reporter := addEventsReporterHandle(mux, id)
-	server := httptest.NewServer(mux)
+			mux := http.NewServeMux()
+			var i int
+			responses := []http.HandlerFunc{ // Initial load
+				responseText(useCase.responseText),
+				// will not resend new events
+				responseText(useCase.responseText),
+				// recover on call
+				http.NotFound,
+			}
 
-	c, err := api.ConfigFromURL(server.URL, common.NewConfig())
-	if err != nil {
-		t.Fatal(err)
+			mux.Handle(fmt.Sprintf("/api/beats/agent/%s/configuration", id), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				responses[i](w, r)
+				i++
+			}))
+
+			reporter := addEventsReporterHandle(mux, id)
+			server := httptest.NewServer(mux)
+
+			c, err := api.ConfigFromURL(server.URL, common.NewConfig())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			config := &Config{
+				Enabled:     true,
+				Period:      100 * time.Millisecond,
+				Kibana:      c,
+				AccessToken: accessToken,
+				EventsReporter: EventReporterConfig{
+					Period:       50 * time.Millisecond,
+					MaxBatchSize: 1,
+				},
+				Blacklist: ConfigBlacklistSettings{
+					Patterns: map[string]string{
+						".processors": "script",
+					},
+				},
+			}
+
+			manager, err := NewConfigManagerWithConfig(config, registry, id)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			manager.Start()
+
+			// On first reload we will get apache2 module
+			config1 := <-reloadable.reloaded
+			assert.Nil(t, config1)
+
+			// Cleanup
+			manager.Stop()
+			os.Remove(paths.Resolve(paths.Data, "management.yml"))
+
+			events := []api.Event{
+				&Starting,
+				&InProgress,
+				&Error{Type: ConfigError, Err: errors.New("Config for 'processors' is blacklisted")},
+				&Failed,
+				&InProgress, // recovering on NotFound, to get out of the blocking.
+				&Running,
+				&Stopped,
+			}
+			assertEvents(t, events, reporter)
+		})
 	}
-
-	config := &Config{
-		Enabled:     true,
-		Period:      100 * time.Millisecond,
-		Kibana:      c,
-		AccessToken: accessToken,
-		EventsReporter: EventReporterConfig{
-			Period:       50 * time.Millisecond,
-			MaxBatchSize: 1,
-		},
-		Blacklist: ConfigBlacklistSettings{
-			Patterns: map[string]string{
-				"output":      "console|file",
-				".processors": "script",
-			},
-		},
-	}
-
-	manager, err := NewConfigManagerWithConfig(config, registry, id)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	manager.Start()
-
-	// On first reload we will get apache2 module
-	config1 := <-reloadable.reloaded
-	assert.Nil(t, config1)
-
-	// Cleanup
-	manager.Stop()
-	os.Remove(paths.Resolve(paths.Data, "management.yml"))
-
-	events := []api.Event{
-		&Starting,
-		&InProgress,
-		&Error{Type: ConfigError, Err: errors.New("Config for 'processors' is blacklisted")},
-		&Failed,
-		&InProgress, // recovering on NotFound, to get out of the blocking.
-		&Running,
-		&Stopped,
-	}
-	assertEvents(t, events, reporter)
 }
 
 func responseText(s string) http.HandlerFunc {
