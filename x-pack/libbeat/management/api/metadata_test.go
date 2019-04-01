@@ -67,18 +67,18 @@ func TestSendMetadata(t *testing.T) {
 
 func TestBadMetadataUpdateRequest(t *testing.T) {
 	metadata := common.MapStr{"a": "b"}
-	useCases := []struct {
+	useCases := map[string]struct {
 		statusCode    int
 		success       bool
 		message       string
 		expectedError error
 		metadata      common.MapStr
 	}{
-		{401, false, "access-token is not a valid auth type to change beat status", fmt.Errorf("access-token is not a valid auth type to change beat status"), metadata},
-		{401, false, "Invalid access token", fmt.Errorf("Invalid access token"), metadata},
-		{404, false, "Beat not found", fmt.Errorf("no configuration found, you need to enroll your Beat"), metadata},
-		{200, true, "", nil, metadata},
-		{200, true, "", nil, nil},
+		"Invalid auth type":    {401, false, "access-token is not a valid auth type to change beat status", fmt.Errorf("access-token is not a valid auth type to change beat status"), metadata},
+		"Invalid access token": {401, false, "Invalid access token", fmt.Errorf("Invalid access token"), metadata},
+		"Beat not found":       {404, false, "Beat not found", fmt.Errorf("no configuration found, you need to enroll your Beat"), metadata},
+		"Ok with metadata":     {200, true, "", nil, metadata},
+		"Ok without metadata":  {200, true, "", nil, nil},
 	}
 
 	beatUUID, err := uuid.NewV4()
@@ -87,8 +87,8 @@ func TestBadMetadataUpdateRequest(t *testing.T) {
 		t.Fatalf("error while generating Beat ID: %v", err)
 	}
 
-	for _, useCase := range useCases {
-		t.Run(useCase.message, func(t *testing.T) {
+	for testCase, useCase := range useCases {
+		t.Run(testCase, func(t *testing.T) {
 			server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				defer r.Body.Close()
 

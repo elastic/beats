@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"flag"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -16,10 +15,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/x-pack/libbeat/management"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
-)
-
-var (
-	metadata = common.SettingFlag(nil, "meta", "Metadata configuration specified as K/V: K=V")
 )
 
 func getBeat(name, version string) (*instance.Beat, error) {
@@ -61,6 +56,15 @@ func genEnrollCmd(name, version string) *cobra.Command {
 
 				// Retrieve any available configuration available for Kibana, either
 				// from the configuration file or using `-E`.
+				if beat.Config.Management != nil {
+					for _, v := range beat.Config.Management.GetFields() {
+						fmt.Println(v)
+						mm, _ := beat.Config.Management.Child(v, -1)
+						for _, vv := range mm.GetFields() {
+							fmt.Println(v, vv)
+						}
+					}
+				}
 				kibanaRaw, err := kibanaConfig(beat.Config.Management)
 				if err != nil {
 					return err
@@ -105,6 +109,10 @@ func genEnrollCmd(name, version string) *cobra.Command {
 					}
 				}
 
+				var metadata *common.Config
+				if child, err := beat.Config.Management.Child("management", -1); err == nil && child != nil {
+					metadata = child
+				}
 				err = management.Enroll(beat, config, metadata, enrollmentToken)
 				if err != nil {
 					return errors.Wrap(err, "Error while enrolling")
@@ -118,7 +126,6 @@ func genEnrollCmd(name, version string) *cobra.Command {
 	enrollCmd.Flags().StringVar(&username, "username", "elastic", "Username to use when enrolling without token")
 	enrollCmd.Flags().StringVar(&password, "password", "stdin", "Method to read the password to use when enrolling without token (stdin or env:VAR_NAME)")
 	enrollCmd.Flags().BoolVar(&force, "force", false, "Force overwrite of current configuration, do not prompt for confirmation")
-	enrollCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("meta"))
 
 	return &enrollCmd
 }

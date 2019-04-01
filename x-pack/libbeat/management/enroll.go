@@ -53,8 +53,11 @@ func Enroll(
 	config.AccessToken = "${" + accessTokenKey + "}"
 	config.Kibana = kibanaConfig
 
-	// Unpack metadata, persist so they can be sent on each start
-	metadata.Unpack(&config.Metadata)
+	// Unpack metadata so they can be persisted
+	if metadata != nil {
+		metadata.Unpack(&config.Metadata)
+		config.Metadata = config.Metadata.Flatten()
+	}
 
 	// Update config with metadata
 	authClient := &api.AuthClient{Client: client, AccessToken: config.AccessToken, BeatUUID: beat.Info.ID}
