@@ -178,7 +178,17 @@ var cFun *cFunctions
 
 func dlopenCFunctions() (*cFunctions, error) {
 	var librpmNames = []string{
-		"/usr/lib64/librpm.so",
+		"librpm.so",   // with rpm-devel installed
+		"librpm.so.8", // Fedora 29
+		"librpm.so.3", // CentOS 7
+		"librpm.so.1", // CentOS 6
+
+		// Following for completeness, but not explicitly tested
+		"librpm.so.7",
+		"librpm.so.6",
+		"librpm.so.5",
+		"librpm.so.4",
+		"librpm.so.2",
 	}
 	var cFun cFunctions
 
