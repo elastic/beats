@@ -483,8 +483,10 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.18",
           "destination_transport_port": 80,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -499,6 +501,7 @@
           "fw_ext_event": 0,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "3edcde49-0aa62ac3-a8a2a76b",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2016-07-21T13:50:33.385Z",
           "post_napt_destination_transport_port": 80,
@@ -508,8 +511,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 56649,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:IZ8RrSqt8oeb2F2Rp9296zm54bc=",
@@ -680,8 +682,10 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.17",
           "destination_transport_port": 80,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -696,6 +700,7 @@
           "fw_ext_event": 0,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "3edcde49-0aa62ac3-56e8512e",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2016-07-21T13:50:35.035Z",
           "post_napt_destination_transport_port": 80,
@@ -705,8 +710,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.2",
           "source_transport_port": 61777,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:E1vNamQGw5X+X+vT1g7ui6Nc3O0=",
@@ -877,8 +881,10 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.17",
           "destination_transport_port": 80,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -893,6 +899,7 @@
           "fw_ext_event": 0,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "3edcde49-0aa62ac3-56e8512e",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2016-07-21T13:50:35.785Z",
           "post_napt_destination_transport_port": 80,
@@ -902,8 +909,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 56650,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:pkwcoe/zjCLerUgj+HGAwwt4wV8=",
@@ -1074,8 +1080,10 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.18",
           "destination_transport_port": 80,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 4,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -1090,6 +1098,7 @@
           "fw_ext_event": 0,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "3edcde49-0aa62ac3-a8a2a76b",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2016-07-21T13:50:36.395Z",
           "post_napt_destination_transport_port": 80,
@@ -1099,8 +1108,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 56651,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:35/w0D/WO1QvBp8O+Vd95Nb+tt4=",
