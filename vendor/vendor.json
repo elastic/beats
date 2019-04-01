@@ -1026,44 +1026,44 @@
 		{
 			"checksumSHA1": "QhFIpuHPaV6hKejKcc2wm6y4MSQ=",
 			"path": "github.com/elastic/go-sysinfo",
-			"revision": "ab4f04edfc3d6b3864f5f06a068ddab9ad79774f",
-			"revisionTime": "2019-03-27T18:53:17Z"
+			"revision": "77ef9c6e57ee101f346fbe70b5e9026ccf51f2fe",
+			"revisionTime": "2019-04-01T11:03:12Z"
 		},
 		{
 			"checksumSHA1": "GiZCjX17K265TtamGZZw4R2Jwbk=",
 			"path": "github.com/elastic/go-sysinfo/internal/registry",
-			"revision": "ab4f04edfc3d6b3864f5f06a068ddab9ad79774f",
-			"revisionTime": "2019-03-27T18:53:17Z"
+			"revision": "77ef9c6e57ee101f346fbe70b5e9026ccf51f2fe",
+			"revisionTime": "2019-04-01T11:03:12Z"
 		},
 		{
 			"checksumSHA1": "ovafihHzpBx9Y7+lZh9X5KwNCvE=",
 			"path": "github.com/elastic/go-sysinfo/providers/darwin",
-			"revision": "ab4f04edfc3d6b3864f5f06a068ddab9ad79774f",
-			"revisionTime": "2019-03-27T18:53:17Z"
+			"revision": "77ef9c6e57ee101f346fbe70b5e9026ccf51f2fe",
+			"revisionTime": "2019-04-01T11:03:12Z"
 		},
 		{
-			"checksumSHA1": "OyI+VwDiT4UZjncsDr1GYg1xcdw=",
+			"checksumSHA1": "1PtEeqqL+rCKmZ8vkrgg6FCzGE8=",
 			"path": "github.com/elastic/go-sysinfo/providers/linux",
-			"revision": "ab4f04edfc3d6b3864f5f06a068ddab9ad79774f",
-			"revisionTime": "2019-03-27T18:53:17Z"
+			"revision": "77ef9c6e57ee101f346fbe70b5e9026ccf51f2fe",
+			"revisionTime": "2019-04-01T11:03:12Z"
 		},
 		{
 			"checksumSHA1": "RWLvcP1w9ynKbuCqiW6prwd+EDU=",
 			"path": "github.com/elastic/go-sysinfo/providers/shared",
-			"revision": "ab4f04edfc3d6b3864f5f06a068ddab9ad79774f",
-			"revisionTime": "2019-03-27T18:53:17Z"
+			"revision": "77ef9c6e57ee101f346fbe70b5e9026ccf51f2fe",
+			"revisionTime": "2019-04-01T11:03:12Z"
 		},
 		{
 			"checksumSHA1": "aF05MEkMjbRekzHlwFxmd5WBpeY=",
 			"path": "github.com/elastic/go-sysinfo/providers/windows",
-			"revision": "ab4f04edfc3d6b3864f5f06a068ddab9ad79774f",
-			"revisionTime": "2019-03-27T18:53:17Z"
+			"revision": "77ef9c6e57ee101f346fbe70b5e9026ccf51f2fe",
+			"revisionTime": "2019-04-01T11:03:12Z"
 		},
 		{
 			"checksumSHA1": "MLQioPEjULYbNqqCjfB1/cux08E=",
 			"path": "github.com/elastic/go-sysinfo/types",
-			"revision": "ab4f04edfc3d6b3864f5f06a068ddab9ad79774f",
-			"revisionTime": "2019-03-27T18:53:17Z"
+			"revision": "77ef9c6e57ee101f346fbe70b5e9026ccf51f2fe",
+			"revisionTime": "2019-04-01T11:03:12Z"
 		},
 		{
 			"checksumSHA1": "bNf3GDGhZh86bfCIMM5c5AYfo3g=",
