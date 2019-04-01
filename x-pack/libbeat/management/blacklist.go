@@ -100,6 +100,7 @@ func (c *ConfigBlacklist) isBlacklisted(blockType string, block *api.ConfigBlock
 			}
 		} else if strings.HasPrefix(field, ".") {
 			segments := strings.Split(field[1:], ".")
+			segments[0] = "." + segments[0]
 			if c.isBlacklistedBlock(pattern, segments, cfg.Config) {
 				return true
 			}
@@ -120,17 +121,16 @@ func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []s
 			}
 
 		case 1:
-			// Check field in the dict
-			val, err := current.String(segments[0], -1)
-			if err == nil {
-				return pattern.MatchString(val)
+			if strings.HasPrefix(segments[0], ".") {
+				return c.handleLevelForWildcardKey(pattern, segments, current)
 			}
-			// not a string, traverse
-			child, _ := current.Child(segments[0], -1)
-			return child != nil && c.isBlacklistedBlock(pattern, segments[1:], child)
-
+			return c.checkFieldInTheDict(pattern, segments[0], segments[1:], current)
 		default:
 			// traverse the tree
+			if strings.HasPrefix(segments[0], ".") {
+				return c.handleLevelForWildcardKey(pattern, segments, current)
+			}
+
 			child, _ := current.Child(segments[0], -1)
 			return child != nil && c.isBlacklistedBlock(pattern, segments[1:], child)
 
@@ -159,10 +159,50 @@ func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []s
 		default:
 			// List of elements, explode traversal to all of them
 			for count, _ := current.CountField(""); count > 0; count-- {
+				// handle wildcard end node
+				if strings.HasPrefix(segments[0], ".") {
+					val, err := current.String("", count-1)
+					if err == nil && pattern.MatchString(val) {
+						// yield match only if array element is children of the segment path
+						segmentPath := strings.Join(segments, ".")
+						return strings.HasSuffix(current.Path(), segmentPath)
+					}
+				}
+
 				child, _ := current.Child("", count-1)
 				if child != nil && c.isBlacklistedBlock(pattern, segments, child) {
 					return true
 				}
+			}
+		}
+	}
+
+	return false
+}
+
+func (c *ConfigBlacklist) checkFieldInTheDict(pattern match.Matcher, key string, segments []string, current *common.Config) bool {
+	val, err := current.String(key, -1)
+	if err == nil {
+		return pattern.MatchString(val)
+	}
+	// not a string, traverse
+	child, _ := current.Child(key, -1)
+	return child != nil && c.isBlacklistedBlock(pattern, segments, child)
+}
+
+func (c *ConfigBlacklist) handleLevelForWildcardKey(pattern match.Matcher, segments []string, current *common.Config) bool {
+	// check if wildcard key is on current level
+	strippedKey := strings.TrimPrefix(segments[0], ".")
+	if isBlacklisted := c.checkFieldInTheDict(pattern, strippedKey, segments[1:], current); isBlacklisted {
+		return true
+	}
+
+	// check all children nodes
+	for _, field := range current.GetFields() {
+		child, _ := current.Child(field, -1)
+		if child != nil {
+			if isBlacklisted := c.isBlacklistedBlock(pattern, segments, child); isBlacklisted {
+				return true
 			}
 		}
 	}

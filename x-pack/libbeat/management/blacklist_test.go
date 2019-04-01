@@ -261,6 +261,191 @@ func TestConfigBlacklist(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:        "Blacklisted pattern in a nested structure - maps",
+			blacklisted: true,
+			patterns: map[string]string{
+				".forbidden":  "yes",
+				".disallowed": "yes",
+			},
+			blocks: api.ConfigBlocks{
+				api.ConfigBlocksWithType{
+					Type: "list",
+					Blocks: []*api.ConfigBlock{
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": map[string]interface{}{
+										"forbidden": "yes",
+									},
+								},
+							},
+						},
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"allowed": "yes",
+										},
+									},
+								},
+							},
+						},
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": map[string]interface{}{
+										"disallowed": "yes",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:        "Blacklisted pattern in a nested structure - arrays + maps",
+			blacklisted: true,
+			patterns: map[string]string{
+				".forbidden":  "yes",
+				".disallowed": "yes",
+			},
+			blocks: api.ConfigBlocks{
+				api.ConfigBlocksWithType{
+					Type: "list",
+					Blocks: []*api.ConfigBlock{
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"forbidden": "yes",
+										},
+									},
+								},
+							},
+						},
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"allowed": "yes",
+										},
+									},
+								},
+							},
+						},
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"disallowed": "yes",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:        "Blacklisted multiple level pattern in a nested structure",
+			blacklisted: true,
+			patterns: map[string]string{
+				".elements.forbidden": "yes",
+			},
+			blocks: api.ConfigBlocks{
+				api.ConfigBlocksWithType{
+					Type: "list",
+					Blocks: []*api.ConfigBlock{
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": map[string]interface{}{
+										"forbidden": "yes",
+									},
+								},
+							},
+						},
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"allowed": "yes",
+										},
+									},
+								},
+							},
+						},
+						// {
+						// 	Raw: map[string]interface{}{
+						// 		"of": map[string]interface{}{
+						// 			"elements": []interface{}{
+						// 				map[string]interface{}{
+						// 					"disallowed": "yes",
+						// 				},
+						// 			},
+						// 		},
+						// 	},
+						// },
+					},
+				},
+			},
+		},
+		{
+			name:        "Blacklisted key without . prefix in a nested structure",
+			blacklisted: false,
+			patterns: map[string]string{
+				"forbidden":  "yes",
+				"disallowed": "yes",
+			},
+			blocks: api.ConfigBlocks{
+				api.ConfigBlocksWithType{
+					Type: "list",
+					Blocks: []*api.ConfigBlock{
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"forbidden": "yes",
+										},
+									},
+								},
+							},
+						},
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"allowed": "yes",
+										},
+									},
+								},
+							},
+						},
+						{
+							Raw: map[string]interface{}{
+								"of": map[string]interface{}{
+									"elements": []interface{}{
+										map[string]interface{}{
+											"disallowed": "yes",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
