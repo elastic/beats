@@ -100,5 +100,4 @@ func mutuallyExclusiveRequiredFields(fields ...string) func(*common.Config) erro
 		}
 		return nil
 	}
-
 }

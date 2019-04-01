@@ -27,7 +27,6 @@ import (
 )
 
 func TestTruncateFields(t *testing.T) {
-
 	var tests = map[string]struct {
 		MaxBytes     int
 		MaxChars     int
