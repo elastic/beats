@@ -25,7 +25,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// Format encodes the type of format to report monitoring data in.
+// Format encodes the type of format to report monitoring data in. This
+// is currently only being used by the elaticsearch reporter.
 type Format int
 
 // Enumerations of various Formats. A reporter can choose whether to
