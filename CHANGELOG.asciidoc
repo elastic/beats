@@ -114,7 +114,6 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...v7.0.0-rc1[Check the HEA
 - Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
 - Fix ec2 metricset to collect metrics from Cloudwatch with the same timestamp. {pull}11142[11142]
 - Fix potential memory leak in stopped docker metricsets {pull}11294[11294]
-- Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
 
 *Packetbeat*
 
