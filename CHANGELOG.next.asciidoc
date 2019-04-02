@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...master[Check the HEAD diff
 - Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543] {pull}11549[11549]
+- Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
 
 *Heartbeat*
 
