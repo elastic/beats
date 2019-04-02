@@ -70,16 +70,13 @@ func TestEventMapping(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := metricsetFields.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(t, metricsetFields, k, v)
-					}
-					delete(testCases, eventKey)
+			eventKey := event.ModuleFields["namespace"].(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(t, metricsetFields, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -98,8 +95,7 @@ func testValue(t *testing.T, event common.MapStr, field string, expected interfa
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"default@elasticsearch": {
-			"_module.namespace": "default",
-			"name":              "elasticsearch",
+			"name": "elasticsearch",
 
 			"created":             1511973651,
 			"replicas.observed":   1,
@@ -108,8 +104,7 @@ func testCases() map[string]map[string]interface{} {
 			"generation.desired":  3,
 		},
 		"default@mysql": {
-			"_module.namespace": "default",
-			"name":              "mysql",
+			"name": "mysql",
 
 			"created":             1511989697,
 			"replicas.observed":   2,
@@ -118,8 +113,7 @@ func testCases() map[string]map[string]interface{} {
 			"generation.desired":  4,
 		},
 		"custom@mysql": {
-			"_module.namespace": "custom",
-			"name":              "mysql",
+			"name": "mysql",
 
 			"created":             1511999697,
 			"replicas.observed":   3,
