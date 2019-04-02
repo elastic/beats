@@ -27,6 +27,11 @@ import (
 
 // Format encodes the type of format to report monitoring data in. This
 // is currently only being used by the elaticsearch reporter.
+// This is a hack that is necessary so we can map certain monitoring
+// configuration options to certain behaviors in reporters. Depending on
+// the configuration option used, the correct format is set, and reporters
+// that know how to interpret the format use it to choose the appropriate
+// reporting behavior.
 type Format int
 
 // Enumerations of various Formats. A reporter can choose whether to
