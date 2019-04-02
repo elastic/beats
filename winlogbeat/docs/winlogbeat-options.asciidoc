@@ -193,7 +193,6 @@ event IDs.
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
   - name: Security
-    event_id: ...
     processors:
       - drop_event.when.not.or:
         - equals.event_id: 903
