@@ -98,14 +98,14 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format: report.ReportingFormatXPackMonitoringBulk,
+		Format: report.FormatXPackMonitoringBulk,
 	}
 
 	if settings.DefaultUsername != "" {
 		c.Username = settings.DefaultUsername
 	}
 
-	if settings.Format != report.ReportingFormatUnknown {
+	if settings.Format != report.FormatUnknown {
 		c.Format = settings.Format
 	}
 
@@ -347,7 +347,7 @@ func makeClient(
 		return nil, err
 	}
 
-	if config.Format != report.ReportingFormatXPackMonitoringBulk && config.Format != report.ReportingFormatBulk {
+	if config.Format != report.FormatXPackMonitoringBulk && config.Format != report.FormatBulk {
 		return nil, fmt.Errorf("unknown reporting format: %v", config.Format)
 	}
 

@@ -94,10 +94,10 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 	case beatCfg.XPackMonitoring.Enabled():
 		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
 		monitoringCfg := beatCfg.XPackMonitoring
-		return monitoringCfg, &report.Settings{Format: report.ReportingFormatXPackMonitoringBulk}, nil
+		return monitoringCfg, &report.Settings{Format: report.FormatXPackMonitoringBulk}, nil
 	case beatCfg.Monitoring.Enabled():
 		monitoringCfg := beatCfg.Monitoring
-		return monitoringCfg, &report.Settings{Format: report.ReportingFormatBulk}, nil
+		return monitoringCfg, &report.Settings{Format: report.FormatBulk}, nil
 	default:
 		return nil, nil, nil
 	}

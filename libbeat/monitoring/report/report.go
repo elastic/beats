@@ -25,15 +25,15 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// ReportingFormat encodes the type of format to report monitoring data in.
-type ReportingFormat int
+// Format encodes the type of format to report monitoring data in.
+type Format int
 
-// Enumerations of various ReportingFormats. A reporter can choose whether to
+// Enumerations of various Formats. A reporter can choose whether to
 // interpret this setting or not, and if so, how to interpret it.
 const (
-	ReportingFormatUnknown ReportingFormat = iota // to protect against zero-value errors
-	ReportingFormatXPackMonitoringBulk
-	ReportingFormatBulk
+	FormatUnknown Format = iota // to protect against zero-value errors
+	FormatXPackMonitoringBulk
+	FormatBulk
 )
 
 type config struct {
@@ -43,7 +43,7 @@ type config struct {
 
 type Settings struct {
 	DefaultUsername string
-	Format          ReportingFormat
+	Format          Format
 }
 
 type Reporter interface {
@@ -109,7 +109,7 @@ func getReporterConfig(
 			}{}
 			rc.Unpack(&hosts)
 
-			if settings.Format == ReportingFormatBulk && len(hosts.Hosts) > 0 {
+			if settings.Format == FormatBulk && len(hosts.Hosts) > 0 {
 				pathMonHosts := rc.PathOf("hosts")
 				pathOutHost := outCfg.PathOf("hosts")
 				err := fmt.Errorf("'%v' and '%v' are configured", pathMonHosts, pathOutHost)

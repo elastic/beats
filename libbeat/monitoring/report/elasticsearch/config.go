@@ -30,22 +30,22 @@ import (
 type config struct {
 	Hosts            []string
 	Protocol         string
-	Params           map[string]string      `config:"parameters"`
-	Headers          map[string]string      `config:"headers"`
-	Username         string                 `config:"username"`
-	Password         string                 `config:"password"`
-	ProxyURL         string                 `config:"proxy_url"`
-	CompressionLevel int                    `config:"compression_level" validate:"min=0, max=9"`
-	TLS              *tlscommon.Config      `config:"ssl"`
-	MaxRetries       int                    `config:"max_retries"`
-	Timeout          time.Duration          `config:"timeout"`
-	MetricsPeriod    time.Duration          `config:"metrics.period"`
-	StatePeriod      time.Duration          `config:"state.period"`
-	BulkMaxSize      int                    `config:"bulk_max_size" validate:"min=0"`
-	BufferSize       int                    `config:"buffer_size"`
-	Tags             []string               `config:"tags"`
-	Backoff          backoff                `config:"backoff"`
-	Format           report.ReportingFormat `config:"_format"`
+	Params           map[string]string `config:"parameters"`
+	Headers          map[string]string `config:"headers"`
+	Username         string            `config:"username"`
+	Password         string            `config:"password"`
+	ProxyURL         string            `config:"proxy_url"`
+	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
+	TLS              *tlscommon.Config `config:"ssl"`
+	MaxRetries       int               `config:"max_retries"`
+	Timeout          time.Duration     `config:"timeout"`
+	MetricsPeriod    time.Duration     `config:"metrics.period"`
+	StatePeriod      time.Duration     `config:"state.period"`
+	BulkMaxSize      int               `config:"bulk_max_size" validate:"min=0"`
+	BufferSize       int               `config:"buffer_size"`
+	Tags             []string          `config:"tags"`
+	Backoff          backoff           `config:"backoff"`
+	Format           report.Format     `config:"_format"`
 }
 
 type backoff struct {

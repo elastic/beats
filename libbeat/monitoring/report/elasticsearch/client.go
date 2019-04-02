@@ -35,13 +35,13 @@ import (
 type publishClient struct {
 	es     *esout.Client
 	params map[string]string
-	format report.ReportingFormat
+	format report.Format
 }
 
 func newPublishClient(
 	es *esout.Client,
 	params map[string]string,
-	format report.ReportingFormat,
+	format report.Format,
 ) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
@@ -131,9 +131,9 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		}
 
 		switch c.format {
-		case report.ReportingFormatXPackMonitoringBulk:
+		case report.FormatXPackMonitoringBulk:
 			err = c.publishXPackBulk(params, event, typ)
-		case report.ReportingFormatBulk:
+		case report.FormatBulk:
 			err = c.publishBulk(event, typ)
 		}
 
