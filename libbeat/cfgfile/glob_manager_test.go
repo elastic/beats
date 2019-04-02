@@ -47,7 +47,7 @@ func TestGlobManager(t *testing.T) {
 	assert.NoError(t, err)
 	err = ioutil.WriteFile(dir+"/config2.yml", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config2.alt.yml.disabled", content, 0644)
+	err = ioutil.WriteFile(dir+"/config2-alt.yml.disabled", content, 0644)
 	assert.NoError(t, err)
 	err = ioutil.WriteFile(dir+"/config3.yml.disabled", content, 0644)
 	assert.NoError(t, err)
@@ -61,13 +61,13 @@ func TestGlobManager(t *testing.T) {
 
 	assert.True(t, manager.Exists("config1"))
 	assert.True(t, manager.Exists("config2"))
-	assert.True(t, manager.Exists("config2:alt"))
+	assert.True(t, manager.Exists("config2-alt"))
 	assert.True(t, manager.Exists("config3"))
 	assert.False(t, manager.Exists("config4"))
 
 	assert.True(t, manager.Enabled("config1"))
 	assert.True(t, manager.Enabled("config2"))
-	assert.False(t, manager.Enabled("config2:alt"))
+	assert.False(t, manager.Enabled("config2-alt"))
 	assert.False(t, manager.Enabled("config3"))
 
 	assert.Equal(t, len(manager.ListEnabled()), 2)
@@ -96,8 +96,7 @@ func TestGlobManager(t *testing.T) {
 	disabled := manager.ListDisabled()
 	assert.Equal(t, disabled[0].Name, "config2")
 	assert.Equal(t, disabled[0].Enabled, false)
-	assert.Equal(t, disabled[1].Name, "config2.alt")
-	assert.Equal(t, disabled[1].String(), "config2:alt")
+	assert.Equal(t, disabled[1].Name, "config2-alt")
 	assert.Equal(t, disabled[1].Enabled, false)
 
 	// Check correct files layout:
@@ -108,7 +107,7 @@ func TestGlobManager(t *testing.T) {
 
 	assert.Equal(t, files, []string{
 		filepath.Join(dir, "config1.yml"),
-		filepath.Join(dir, "config2.alt.yml.disabled"),
+		filepath.Join(dir, "config2-alt.yml.disabled"),
 		filepath.Join(dir, "config2.yml.disabled"),
 		filepath.Join(dir, "config3.yml"),
 	})

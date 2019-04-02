@@ -122,9 +122,9 @@ one or more variant configuration files containing common alternative configurat
 for that module.
 
 When you see the list of enabled and disabled modules, those modules with configuration
-variants will be shown as `<module_name>:<variant_name>`. You can enable or disable
+variants will be shown as `<module_name>-<variant_name>`. You can enable or disable
 specific configuration variants of a module by specifying `metricbeat modules enable
-<module_name>:<variant_name>` and `metricbeat modules disable <module_name>:<variant_name>`
+<module_name>-<variant_name>` and `metricbeat modules disable <module_name>-<variant_name>`
 respectively.
 
 [float]

@@ -130,7 +130,6 @@ func (g *GlobManager) ListDisabled() []*CfgFile {
 
 // Enabled returns true if given conf file is enabled
 func (g *GlobManager) Enabled(name string) bool {
-	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			return file.Enabled
@@ -141,7 +140,6 @@ func (g *GlobManager) Enabled(name string) bool {
 
 // Exists return true if the given conf exists (enabled or disabled)
 func (g *GlobManager) Exists(name string) bool {
-	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			return true
@@ -152,7 +150,6 @@ func (g *GlobManager) Exists(name string) bool {
 
 // Enable given conf file, does nothing if it's enabled already
 func (g *GlobManager) Enable(name string) error {
-	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			if !file.Enabled {
@@ -172,7 +169,6 @@ func (g *GlobManager) Enable(name string) error {
 
 // Disable given conf file, does nothing if it's disabled already
 func (g *GlobManager) Disable(name string) error {
-	name = convertDisplayNameToFileName(name)
 	for _, file := range g.files {
 		if name == file.Name {
 			if file.Enabled {
@@ -190,17 +186,8 @@ func (g *GlobManager) Disable(name string) error {
 	return errors.Errorf("module %s not found", name)
 }
 
-// String returns the config file's display name
-func (f *CfgFile) String() string {
-	return strings.Replace(f.Name, ".", ":", -1)
-}
-
-func convertDisplayNameToFileName(displayName string) string {
-	return strings.Replace(displayName, ":", ".", -1)
-}
-
 // For sorting config files in the desired order, so variants will
-// show up after the default, e.g. elasticsearch:xpack will show up
+// show up after the default, e.g. elasticsearch-xpack will show up
 // after elasticsearch.
 type byCfgFileDisplayNames []*CfgFile
 
@@ -213,8 +200,8 @@ func (s byCfgFileDisplayNames) Swap(i, j int) {
 }
 
 func (s byCfgFileDisplayNames) Less(i, j int) bool {
-	namei := s[i].String()
-	namej := s[j].String()
+	namei := s[i].Name
+	namej := s[j].Name
 
 	if strings.HasPrefix(namei, namej) {
 		// namei starts with namej, so namei is longer and we want it to come after namej
