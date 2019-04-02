@@ -5,7 +5,9 @@
   release: ga
   fields:
     - name: uuid
-      type: keyword
+      type: alias
+      path: service.id
+      migration: true
       description: >
         Kibana instance UUID
     - name: name
@@ -21,13 +23,17 @@
       description: >
         Kibana instance hostname
     - name: transport_address
-      type: keyword
+      type: alias
+      path: service.address
+      migration: true
       description: >
         Kibana server's hostname and port
     - name: version
-      type: keyword
+      type: alias
       description: >
         Kibana version
+      path: service.version
+      migration: true
     - name: snapshot
       type: boolean
       description: >

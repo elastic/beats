@@ -1,28 +1,4 @@
 [[auditbeat-breaking-changes]]
-== Breaking changes in 7.0
-
-In version 7.0 the following fields were renamed.
-
-.Renamed Fields in 7.0
-[frame="topbot",options="header"]
-|======================
-|Old Field|New Field
-|`process.cwd`            |`process.working_directory`
-|`source.hostname`        |`source.domain`
-|======================
-
-The JSON data types produced by the output have been changed to align with
-the data types used in the Elasticsearch index template.
-
-.Type Changes in 7.0
-[frame="topbot",options="header"]
-|======================
-|Field|Old Type|New Type
-|`file.gid`     |number |string
-|`file.uid`     |number |string
-|`process.pid`  |string |number
-|`process.ppid` |string |number
-|======================
 
 == Breaking changes in 6.2
 
@@ -148,4 +124,3 @@ moved under the `file` namespace.]
 |`audit.file.hash`         |`hash`
 |`audit.file`              |`file`
 |======================
-

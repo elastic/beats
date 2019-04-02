@@ -8,15 +8,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra ResponseKeyspace [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra ResponseKeyspace [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -61,11 +59,11 @@
             "legendPosition": "right",
             "shareYAxis": true
           },
-          "title": "Cassandra ResponseKeyspace",
+          "title": "Cassandra ResponseKeyspace ECS",
           "type": "pie"
         }
       },
-      "id": "Cassandra-ResponseKeyspace",
+      "id": "Cassandra-ResponseKeyspace-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -78,15 +76,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra ResponseType [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra ResponseType [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -119,11 +115,11 @@
             "legendPosition": "right",
             "shareYAxis": true
           },
-          "title": "Cassandra ResponseType",
+          "title": "Cassandra ResponseType ECS",
           "type": "pie"
         }
       },
-      "id": "Cassandra-ResponseType",
+      "id": "Cassandra-ResponseType-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -136,15 +132,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra ResponseTime [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra ResponseTime [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -263,11 +257,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Cassandra ResponseTime [Packetbeat]",
+          "title": "Cassandra ResponseTime [Packetbeat] ECS",
           "type": "line"
         }
       },
-      "id": "Cassandra-ResponseTime",
+      "id": "Cassandra-ResponseTime-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -280,15 +274,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra RequestCount [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra RequestCount [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -332,11 +324,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra RequestCount",
+          "title": "Cassandra RequestCount ECS",
           "type": "line"
         }
       },
-      "id": "Cassandra-RequestCount",
+      "id": "Cassandra-RequestCount-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -349,15 +341,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra Ops [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra Ops [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -402,11 +392,11 @@
             "legendPosition": "right",
             "shareYAxis": true
           },
-          "title": "Cassandra Ops",
+          "title": "Cassandra Ops ECS",
           "type": "pie"
         }
       },
-      "id": "Cassandra-Ops",
+      "id": "Cassandra-Ops-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -419,15 +409,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra RequestCountStackByType [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra RequestCountStackByType [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -479,11 +467,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra RequestCountStackByType",
+          "title": "Cassandra RequestCountStackByType ECS",
           "type": "histogram"
         }
       },
-      "id": "Cassandra-RequestCountStackByType",
+      "id": "Cassandra-RequestCountStackByType-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -496,15 +484,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra ResponseCountStackByType [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra ResponseCountStackByType [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -556,11 +542,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra ResponseCountStackByType",
+          "title": "Cassandra ResponseCountStackByType ECS",
           "type": "histogram"
         }
       },
-      "id": "Cassandra-ResponseCountStackByType",
+      "id": "Cassandra-ResponseCountStackByType-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -573,15 +559,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra RequestCountByType [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra RequestCountByType [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -644,11 +628,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra RequestCountByType",
+          "title": "Cassandra RequestCountByType ECS",
           "type": "line"
         }
       },
-      "id": "Cassandra-RequestCountByType",
+      "id": "Cassandra-RequestCountByType-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -661,15 +645,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
-        "title": "Cassandra ResponseCountByType [Packetbeat]",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
+        "title": "Cassandra ResponseCountByType [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -727,11 +709,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra: ResponseCountByType",
+          "title": "Cassandra: ResponseCountByType ECS",
           "type": "line"
         }
       },
-      "id": "Cassandra-ResponseCountByType",
+      "id": "Cassandra-ResponseCountByType-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -743,31 +725,26 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Navigation [Packetbeat]",
+        "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat]",
+          "title": "Navigation [Packetbeat] ECS",
           "type": "markdown"
         }
       },
-      "id": "Navigation",
+      "id": "Navigation-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
       "version": 11
@@ -854,13 +831,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -869,10 +841,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Cassandra Query Search [Packetbeat]",
+        "title": "Cassandra Query Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "Cassandra-QueryView",
+      "id": "Cassandra-QueryView-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -927,10 +899,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Cassandra Search [Packetbeat]",
+        "title": "Cassandra Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "eaa83e60-190b-11e9-be0d-adde5066235e",
+      "id": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
@@ -944,13 +916,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -961,7 +928,7 @@
         "panelsJSON": [
           {
             "col": 10,
-            "id": "Cassandra-ResponseKeyspace",
+            "id": "Cassandra-ResponseKeyspace-ecs",
             "panelIndex": 3,
             "row": 3,
             "size_x": 3,
@@ -970,7 +937,7 @@
           },
           {
             "col": 7,
-            "id": "Cassandra-ResponseType",
+            "id": "Cassandra-ResponseType-ecs",
             "panelIndex": 4,
             "row": 3,
             "size_x": 3,
@@ -979,7 +946,7 @@
           },
           {
             "col": 1,
-            "id": "Cassandra-ResponseTime",
+            "id": "Cassandra-ResponseTime-ecs",
             "panelIndex": 9,
             "row": 5,
             "size_x": 12,
@@ -988,7 +955,7 @@
           },
           {
             "col": 4,
-            "id": "Cassandra-RequestCount",
+            "id": "Cassandra-RequestCount-ecs",
             "panelIndex": 10,
             "row": 1,
             "size_x": 9,
@@ -997,7 +964,7 @@
           },
           {
             "col": 4,
-            "id": "Cassandra-Ops",
+            "id": "Cassandra-Ops-ecs",
             "panelIndex": 11,
             "row": 3,
             "size_x": 3,
@@ -1006,7 +973,7 @@
           },
           {
             "col": 1,
-            "id": "Cassandra-RequestCountStackByType",
+            "id": "Cassandra-RequestCountStackByType-ecs",
             "panelIndex": 15,
             "row": 7,
             "size_x": 12,
@@ -1015,7 +982,7 @@
           },
           {
             "col": 1,
-            "id": "Cassandra-ResponseCountStackByType",
+            "id": "Cassandra-ResponseCountStackByType-ecs",
             "panelIndex": 16,
             "row": 9,
             "size_x": 12,
@@ -1024,7 +991,7 @@
           },
           {
             "col": 1,
-            "id": "Cassandra-RequestCountByType",
+            "id": "Cassandra-RequestCountByType-ecs",
             "panelIndex": 17,
             "row": 11,
             "size_x": 6,
@@ -1033,7 +1000,7 @@
           },
           {
             "col": 7,
-            "id": "Cassandra-ResponseCountByType",
+            "id": "Cassandra-ResponseCountByType-ecs",
             "panelIndex": 18,
             "row": 11,
             "size_x": 6,
@@ -1042,7 +1009,7 @@
           },
           {
             "col": 1,
-            "id": "Navigation",
+            "id": "Navigation-ecs",
             "panelIndex": 19,
             "row": 1,
             "size_x": 3,
@@ -1057,7 +1024,7 @@
               "cassandra.response.result.rows.meta.table",
               "cassandra.response.result.rows.num_rows"
             ],
-            "id": "Cassandra-QueryView",
+            "id": "Cassandra-QueryView-ecs",
             "panelIndex": 20,
             "row": 14,
             "size_x": 12,
@@ -1070,7 +1037,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] Cassandra",
+        "title": "[Packetbeat] Cassandra ECS",
         "uiStateJSON": {
           "P-10": {
             "vis": {
@@ -1090,7 +1057,7 @@
         },
         "version": 1
       },
-      "id": "Packetbeat-Cassandra",
+      "id": "Packetbeat-Cassandra-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1

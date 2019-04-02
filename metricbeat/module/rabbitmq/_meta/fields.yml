@@ -9,3 +9,7 @@
       type: group
       description: >
       fields:
+        - name: vhost
+          type: keyword
+          description: >
+            Virtual host name with non-ASCII characters escaped as in C.

@@ -8,9 +8,9 @@
         "destination.geo.location.lon": -97.822,
         "destination.ip": "17.253.5.203",
         "destination.port": 80,
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "zeek.http",
-        "event.id": "CCNp8v1SNzY7v9d1Ih-http",
+        "event.id": "CCNp8v1SNzY7v9d1Ih",
         "event.module": "zeek",
         "fileset.name": "http",
         "http.request.body.bytes": 0,
@@ -20,20 +20,21 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
+        "network.community_id": "1:dtBPRfpKEZyg1iOHss95buwv+cw=",
+        "network.transport": "tcp",
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
         "source.port": 62995,
         "tags": [
-            "zeek"
+            "zeek.http"
         ],
         "url.domain": "ocsp.apple.com",
         "url.original": "/ocsp04-aaica02/ME4wTKADAgEAMEUwQzBBMAkGBSsOAwIaBQAEFNqvF+Za6oA4ceFRLsAWwEInjUhJBBQx6napI3Sl39T97qDBpp7GEQ4R7AIIUP1IOZZ86ns=",
         "url.port": "80",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.os.full_name": "Other",
-        "user_agent.os.name": "Other",
+        "user_agent.original": "com.apple.trustd/2.0",
         "zeek.http.resp_fuids": [
             "F5zuip1tSwASjNAHy7"
         ],

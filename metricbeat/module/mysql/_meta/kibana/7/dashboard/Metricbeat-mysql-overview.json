@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Connections rate [Metricbeat MySQL]", 
+                "title": "Connections rate [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -52,11 +52,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Connections rate [Metricbeat MySQL]", 
+                    "title": "Connections rate [Metricbeat MySQL] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1", 
+            "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
             "version": 2
@@ -67,7 +67,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Command rates [Metricbeat MySQL]", 
+                "title": "Command rates [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -193,11 +193,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Command rates [Metricbeat MySQL]", 
+                    "title": "Command rates [Metricbeat MySQL] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1", 
+            "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
             "version": 2
@@ -208,7 +208,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Running threads [Metricbeat MySQL]", 
+                "title": "Running threads [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -248,11 +248,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Running threads [Metricbeat MySQL]", 
+                    "title": "Running threads [Metricbeat MySQL] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1", 
+            "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
             "version": 2
@@ -263,7 +263,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Opened tables rate [Metricbeat MySQL]", 
+                "title": "Opened tables rate [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -309,11 +309,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Opened tables rate [Metricbeat MySQL]", 
+                    "title": "Opened tables rate [Metricbeat MySQL] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1", 
+            "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
             "version": 3
@@ -324,7 +324,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Threads created rate [Metricbeat MySQL]", 
+                "title": "Threads created rate [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -370,11 +370,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Threads created rate [Metricbeat MySQL]", 
+                    "title": "Threads created rate [Metricbeat MySQL] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1", 
+            "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
             "version": 2
@@ -385,7 +385,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Open files [Metricbeat MySQL]", 
+                "title": "Open files [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -425,11 +425,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Open files [Metricbeat MySQL]", 
+                    "title": "Open files [Metricbeat MySQL] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1", 
+            "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
             "version": 2
@@ -440,7 +440,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Sent and received bytes rates [Metricbeat MySQL]", 
+                "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -513,11 +513,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Sent and received bytes rates [Metricbeat MySQL]", 
+                    "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1", 
+            "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-05T09:15:49.714Z", 
             "version": 3
@@ -531,13 +531,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -555,7 +550,7 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1", 
+                        "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "10", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -568,7 +563,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1", 
+                        "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "11", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -581,7 +576,7 @@
                             "x": 6, 
                             "y": 3
                         }, 
-                        "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1", 
+                        "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "13", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -594,7 +589,7 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1", 
+                        "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "14", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -607,7 +602,7 @@
                             "x": 6, 
                             "y": 6
                         }, 
-                        "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1", 
+                        "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "15", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -620,7 +615,7 @@
                             "x": 6, 
                             "y": 9
                         }, 
-                        "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1", 
+                        "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "16", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -633,17 +628,17 @@
                             "x": 0, 
                             "y": 9
                         }, 
-                        "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1", 
+                        "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "17", 
                         "type": "visualization", 
                         "version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat MySQL] Overview", 
+                "title": "[Metricbeat MySQL] Overview ECS", 
                 "version": 1
             }, 
-            "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306", 
+            "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
             "version": 3

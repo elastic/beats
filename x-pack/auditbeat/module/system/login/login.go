@@ -92,7 +92,7 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -166,7 +166,7 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 		Timestamp: loginRecord.Timestamp,
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"type":   eventTypeEvent,
+				"kind":   eventTypeEvent,
 				"action": loginRecord.Type.string(),
 				"origin": loginRecord.Origin,
 			},
@@ -202,9 +202,13 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	switch loginRecord.Type {
 	case userLoginRecord:
+		event.RootFields.Put("event.category", "authentication")
 		event.RootFields.Put("event.outcome", "success")
+		event.RootFields.Put("event.type", "authentication_success")
 	case userLoginFailedRecord:
+		event.RootFields.Put("event.category", "authentication")
 		event.RootFields.Put("event.outcome", "failure")
+		event.RootFields.Put("event.type", "authentication_failure")
 	}
 
 	return event

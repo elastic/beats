@@ -7,16 +7,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Available pods per deployment [Metricbeat Kubernetes]", 
+                "title": "Available pods per deployment [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -24,7 +20,7 @@
                     "params": {
                         "axis_formatter": "number", 
                         "axis_position": "left", 
-                        "filter": "metricset.module:kubernetes AND metricset.name:state_deployment", 
+                        "filter": "event.module:kubernetes AND metricset.name:state_deployment", 
                         "id": "117fadf0-30df-11e7-8df8-6d3604a72912", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -64,11 +60,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Available pods per deployment [Metricbeat Kubernetes]", 
+                    "title": "Available pods per deployment [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "022a54c0-2bf5-11e7-859b-f78b612cde28", 
+            "id": "022a54c0-2bf5-11e7-859b-f78b612cde28-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-11T20:59:01.845Z", 
             "version": 4
@@ -80,13 +76,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "CPU usage by node  [Metricbeat Kubernetes]", 
+                "title": "CPU usage by node  [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -105,7 +100,7 @@
                                 "id": "1373ddd0-2bf2-11e7-859b-f78b612cde28"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)", 
+                        "filter": "event.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)", 
                         "gauge_color_rules": [
                             {
                                 "id": "140e4910-2bf2-11e7-859b-f78b612cde28"
@@ -191,11 +186,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "CPU usage by node  [Metricbeat Kubernetes]", 
+                    "title": "CPU usage by node  [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "44f12b40-2bf4-11e7-859b-f78b612cde28", 
+            "id": "44f12b40-2bf4-11e7-859b-f78b612cde28-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -207,13 +202,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Kubernetes - Deployments", 
+                "title": "Kubernetes - Deployments ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -232,7 +226,7 @@
                                 "id": "68cdba10-30e0-11e7-8df8-6d3604a72912"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:state_deployment", 
+                        "filter": "event.module:kubernetes AND metricset.name:state_deployment", 
                         "gauge_color_rules": [
                             {
                                 "id": "69765620-30e0-11e7-8df8-6d3604a72912"
@@ -272,11 +266,11 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Kubernetes - Deployments", 
+                    "title": "Kubernetes - Deployments ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "cd059410-2bfb-11e7-859b-f78b612cde28", 
+            "id": "cd059410-2bfb-11e7-859b-f78b612cde28-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -288,13 +282,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Kubernetes - Desired pods", 
+                "title": "Kubernetes - Desired pods ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -313,7 +306,7 @@
                                 "id": "674d83b0-30d5-11e7-8df8-6d3604a72912"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:state_deployment", 
+                        "filter": "event.module:kubernetes AND metricset.name:state_deployment", 
                         "gauge_color_rules": [
                             {
                                 "id": "50f9b980-30d5-11e7-8df8-6d3604a72912"
@@ -356,11 +349,11 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Kubernetes - Desired pods", 
+                    "title": "Kubernetes - Desired pods ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "e1018b90-2bfb-11e7-859b-f78b612cde28", 
+            "id": "e1018b90-2bfb-11e7-859b-f78b612cde28-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -372,16 +365,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Memory usage by node  [Metricbeat Kubernetes]", 
+                "title": "Memory usage by node  [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -399,7 +388,7 @@
                                 "id": "1373ddd0-2bf2-11e7-859b-f78b612cde28"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)", 
+                        "filter": "event.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)", 
                         "gauge_color_rules": [
                             {
                                 "id": "140e4910-2bf2-11e7-859b-f78b612cde28"
@@ -488,11 +477,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Memory usage by node  [Metricbeat Kubernetes]", 
+                    "title": "Memory usage by node  [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "d6564360-2bfc-11e7-859b-f78b612cde28", 
+            "id": "d6564360-2bfc-11e7-859b-f78b612cde28-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-04T23:15:29.035Z", 
             "version": 4
@@ -504,13 +493,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Network in by node  [Metricbeat Kubernetes]", 
+                "title": "Network in by node  [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -529,7 +517,7 @@
                                 "id": "1373ddd0-2bf2-11e7-859b-f78b612cde28"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:pod", 
+                        "filter": "event.module:kubernetes AND metricset.name:pod", 
                         "gauge_color_rules": [
                             {
                                 "id": "140e4910-2bf2-11e7-859b-f78b612cde28"
@@ -583,11 +571,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Network in by node  [Metricbeat Kubernetes]", 
+                    "title": "Network in by node  [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "16fa4470-2bfd-11e7-859b-f78b612cde28", 
+            "id": "16fa4470-2bfd-11e7-859b-f78b612cde28-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -599,13 +587,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Network out by node  [Metricbeat Kubernetes]", 
+                "title": "Network out by node  [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -624,7 +611,7 @@
                                 "id": "1373ddd0-2bf2-11e7-859b-f78b612cde28"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:pod", 
+                        "filter": "event.module:kubernetes AND metricset.name:pod", 
                         "gauge_color_rules": [
                             {
                                 "id": "140e4910-2bf2-11e7-859b-f78b612cde28"
@@ -678,11 +665,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Network out by node  [Metricbeat Kubernetes]", 
+                    "title": "Network out by node  [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "294546b0-30d6-11e7-8df8-6d3604a72912", 
+            "id": "294546b0-30d6-11e7-8df8-6d3604a72912-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -694,13 +681,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Kubernetes - Nodes", 
+                "title": "Kubernetes - Nodes ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -719,7 +705,7 @@
                                 "id": "68cdba10-30e0-11e7-8df8-6d3604a72912"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:state_node", 
+                        "filter": "event.module:kubernetes AND metricset.name:state_node", 
                         "gauge_color_rules": [
                             {
                                 "id": "69765620-30e0-11e7-8df8-6d3604a72912"
@@ -759,11 +745,11 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Kubernetes - Nodes", 
+                    "title": "Kubernetes - Nodes ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "408fccf0-30d6-11e7-8df8-6d3604a72912", 
+            "id": "408fccf0-30d6-11e7-8df8-6d3604a72912-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -775,13 +761,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Top CPU intensive pods  [Metricbeat Kubernetes]", 
+                "title": "Top CPU intensive pods  [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -795,7 +780,7 @@
                                 "id": "802104d0-2bfc-11e7-859b-f78b612cde28"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:container", 
+                        "filter": "event.module:kubernetes AND metricset.name:container", 
                         "id": "5d3692a0-2bfc-11e7-859b-f78b612cde28", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -842,11 +827,11 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Top CPU intensive pods  [Metricbeat Kubernetes]", 
+                    "title": "Top CPU intensive pods  [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "58e644f0-30d6-11e7-8df8-6d3604a72912", 
+            "id": "58e644f0-30d6-11e7-8df8-6d3604a72912-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -858,16 +843,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Top memory intensive pods  [Metricbeat Kubernetes]", 
+                "title": "Top memory intensive pods  [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -880,7 +861,7 @@
                                 "id": "802104d0-2bfc-11e7-859b-f78b612cde28"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:container", 
+                        "filter": "event.module:kubernetes AND metricset.name:container", 
                         "id": "5d3692a0-2bfc-11e7-859b-f78b612cde28", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -928,11 +909,11 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Top memory intensive pods  [Metricbeat Kubernetes]", 
+                    "title": "Top memory intensive pods  [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "a4c9d360-30df-11e7-8df8-6d3604a72912", 
+            "id": "a4c9d360-30df-11e7-8df8-6d3604a72912-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-11T21:00:49.028Z", 
             "version": 4
@@ -944,13 +925,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Kubernetes - Unavailable pods", 
+                "title": "Kubernetes - Unavailable pods ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -969,7 +949,7 @@
                                 "id": "674d83b0-30d5-11e7-8df8-6d3604a72912"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:state_deployment", 
+                        "filter": "event.module:kubernetes AND metricset.name:state_deployment", 
                         "gauge_color_rules": [
                             {
                                 "id": "50f9b980-30d5-11e7-8df8-6d3604a72912"
@@ -1011,11 +991,11 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Kubernetes - Unavailable pods", 
+                    "title": "Kubernetes - Unavailable pods ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "174a6ad0-30e0-11e7-8df8-6d3604a72912", 
+            "id": "174a6ad0-30e0-11e7-8df8-6d3604a72912-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -1027,16 +1007,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Unavailable pods per deployment [Metricbeat Kubernetes]", 
+                "title": "Unavailable pods per deployment [Metricbeat Kubernetes] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1044,7 +1020,7 @@
                     "params": {
                         "axis_formatter": "number", 
                         "axis_position": "left", 
-                        "filter": "metricset.module:kubernetes AND metricset.name:state_deployment", 
+                        "filter": "event.module:kubernetes AND metricset.name:state_deployment", 
                         "id": "117fadf0-30df-11e7-8df8-6d3604a72912", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -1084,11 +1060,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Unavailable pods per deployment [Metricbeat Kubernetes]", 
+                    "title": "Unavailable pods per deployment [Metricbeat Kubernetes] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "7aac4fd0-30e0-11e7-8df8-6d3604a72912", 
+            "id": "7aac4fd0-30e0-11e7-8df8-6d3604a72912-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-11T20:59:18.668Z", 
             "version": 4
@@ -1100,13 +1076,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Kubernetes - Available pods", 
+                "title": "Kubernetes - Available pods ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -1125,7 +1100,7 @@
                                 "id": "674d83b0-30d5-11e7-8df8-6d3604a72912"
                             }
                         ], 
-                        "filter": "metricset.module:kubernetes AND metricset.name:state_deployment", 
+                        "filter": "event.module:kubernetes AND metricset.name:state_deployment", 
                         "gauge_color_rules": [
                             {
                                 "id": "50f9b980-30d5-11e7-8df8-6d3604a72912"
@@ -1169,11 +1144,11 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Kubernetes - Available pods", 
+                    "title": "Kubernetes - Available pods ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3", 
+            "id": "da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3-ecs", 
             "type": "visualization", 
             "updated_at": "2018-03-01T18:58:07.906Z", 
             "version": 3
@@ -1187,13 +1162,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -1211,7 +1181,7 @@
                             "x": 6, 
                             "y": 0
                         }, 
-                        "id": "022a54c0-2bf5-11e7-859b-f78b612cde28", 
+                        "id": "022a54c0-2bf5-11e7-859b-f78b612cde28-ecs", 
                         "panelIndex": "1", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1224,7 +1194,7 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "44f12b40-2bf4-11e7-859b-f78b612cde28", 
+                        "id": "44f12b40-2bf4-11e7-859b-f78b612cde28-ecs", 
                         "panelIndex": "2", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1237,7 +1207,7 @@
                             "x": 3, 
                             "y": 0
                         }, 
-                        "id": "cd059410-2bfb-11e7-859b-f78b612cde28", 
+                        "id": "cd059410-2bfb-11e7-859b-f78b612cde28-ecs", 
                         "panelIndex": "5", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1250,7 +1220,7 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "e1018b90-2bfb-11e7-859b-f78b612cde28", 
+                        "id": "e1018b90-2bfb-11e7-859b-f78b612cde28-ecs", 
                         "panelIndex": "6", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1263,7 +1233,7 @@
                             "x": 6, 
                             "y": 6
                         }, 
-                        "id": "d6564360-2bfc-11e7-859b-f78b612cde28", 
+                        "id": "d6564360-2bfc-11e7-859b-f78b612cde28-ecs", 
                         "panelIndex": "7", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1276,7 +1246,7 @@
                             "x": 6, 
                             "y": 9
                         }, 
-                        "id": "16fa4470-2bfd-11e7-859b-f78b612cde28", 
+                        "id": "16fa4470-2bfd-11e7-859b-f78b612cde28-ecs", 
                         "panelIndex": "8", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1289,7 +1259,7 @@
                             "x": 0, 
                             "y": 9
                         }, 
-                        "id": "294546b0-30d6-11e7-8df8-6d3604a72912", 
+                        "id": "294546b0-30d6-11e7-8df8-6d3604a72912-ecs", 
                         "panelIndex": "9", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1302,7 +1272,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "408fccf0-30d6-11e7-8df8-6d3604a72912", 
+                        "id": "408fccf0-30d6-11e7-8df8-6d3604a72912-ecs", 
                         "panelIndex": "10", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1315,7 +1285,7 @@
                             "x": 0, 
                             "y": 12
                         }, 
-                        "id": "58e644f0-30d6-11e7-8df8-6d3604a72912", 
+                        "id": "58e644f0-30d6-11e7-8df8-6d3604a72912-ecs", 
                         "panelIndex": "11", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1328,7 +1298,7 @@
                             "x": 6, 
                             "y": 12
                         }, 
-                        "id": "a4c9d360-30df-11e7-8df8-6d3604a72912", 
+                        "id": "a4c9d360-30df-11e7-8df8-6d3604a72912-ecs", 
                         "panelIndex": "12", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1341,7 +1311,7 @@
                             "x": 4, 
                             "y": 3
                         }, 
-                        "id": "174a6ad0-30e0-11e7-8df8-6d3604a72912", 
+                        "id": "174a6ad0-30e0-11e7-8df8-6d3604a72912-ecs", 
                         "panelIndex": "13", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1354,7 +1324,7 @@
                             "x": 6, 
                             "y": 3
                         }, 
-                        "id": "7aac4fd0-30e0-11e7-8df8-6d3604a72912", 
+                        "id": "7aac4fd0-30e0-11e7-8df8-6d3604a72912-ecs", 
                         "panelIndex": "14", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -1367,17 +1337,17 @@
                             "x": 2, 
                             "y": 3
                         }, 
-                        "id": "da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3", 
+                        "id": "da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3-ecs", 
                         "panelIndex": "15", 
                         "type": "visualization", 
                         "version": "6.2.2"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Kubernetes] Overview", 
+                "title": "[Metricbeat Kubernetes] Overview ECS", 
                 "version": 1
             }, 
-            "id": "AV4RGUqo5NkDleZmzKuZ", 
+            "id": "AV4RGUqo5NkDleZmzKuZ-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-03-11T21:00:58.354Z", 
             "version": 4

@@ -52,8 +52,14 @@ class Test(metricbeat.BaseTest):
                 os.getenv('ES_PORT', '9200')]
 
     def create_ml_job(self, es):
+        es_version = self.get_version(es)
+        if es_version["major"] < 7:
+            ml_anomaly_detectors_url = "/_xpack/ml/anomaly_detectors"
+        else:
+            ml_anomaly_detectors_url = "/_ml/anomaly_detectors"
+
         # Check if an ml job already exists
-        response = es.transport.perform_request('GET', "/_xpack/ml/anomaly_detectors/_all/")
+        response = es.transport.perform_request('GET', ml_anomaly_detectors_url + "/_all")
         if response["count"] > 0:
             return
 
@@ -63,7 +69,7 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             body = json.load(f)
 
-        path = "/_xpack/ml/anomaly_detectors/test"
+        path = ml_anomaly_detectors_url + "/test"
         es.transport.perform_request('PUT', path, body=body)
 
     def create_ccr_stats(self, es):
@@ -104,14 +110,20 @@ class Test(metricbeat.BaseTest):
         es.transport.perform_request('PUT', path, body=body)
 
     def start_trial(self, es):
+        es_version = self.get_version(es)
+        if es_version["major"] < 7:
+            license_url = "/_xpack/license"
+        else:
+            license_url = "/_license"
+
         # Check if trial is already enabled
-        response = es.transport.perform_request('GET', "/_xpack/license")
+        response = es.transport.perform_request('GET', license_url)
         if response["license"]["type"] == "trial":
             return
 
         # Enable xpack trial
         try:
-            es.transport.perform_request('POST', "/_xpack/license/start_trial?acknowledge=true")
+            es.transport.perform_request('POST', license_url + "/start_trial?acknowledge=true")
         except:
             e = sys.exc_info()[0]
             print "Trial already enabled. Error: {}".format(e)
@@ -120,12 +132,12 @@ class Test(metricbeat.BaseTest):
         if metricset != "ccr":
             return
 
-        version = self.get_version(es)
-        if semver.compare(version, "6.5.0") == -1:
+        es_version = self.get_version(es)
+        if es_version["major"] <= 6 and es_version["minor"] < 5:
             # Skip CCR metricset system test for Elasticsearch versions < 6.5.0 as CCR Stats
             # API endpoint is not available
             raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
 
     def get_version(self, es):
-        response = es.transport.perform_request('GET', "/")
-        return response["version"]["number"]
+        es_info = es.info()
+        return semver.parse(es_info["version"]["number"])

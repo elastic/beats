@@ -4,17 +4,14 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['http']['ts'] * params.multiplier; ctx.zeek.http.remove('ts');",
-        "params": {
-          "multiplier": 1000
-        }
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['http']['ts'] * 1000; ctx.zeek.http.remove('ts');"
       }
     },
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.id = ctx.zeek.session_id + \"-http\"",
-        "ignore_failure": true
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
       }
     },
     {
@@ -50,51 +47,14 @@
     {
       "user_agent": {
         "field": "user_agent.original",
-        "target_field": "user_agent",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "user_agent.os",
-        "target_field": "user_agent.temp_os",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "user_agent.temp_os",
-        "target_field": "user_agent.os.full_name",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "user_agent.os_name",
-        "target_field": "user_agent.os.name",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "user_agent.os_version",
-        "target_field": "user_agent.os.version",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "user_agent.os_major",
-        "target_field": "user_agent.os.major",
-        "ignore_missing": true
-      }
-    },
-    {
-      "rename": {
-        "field": "user_agent.os_minor",
-        "target_field": "user_agent.os.minor",
         "ignore_missing": true
       }
     }
-  ]
+  ],
+  "on_failure" : [{ 
+    "set" : { 
+      "field" : "error.message", 
+      "value" : "{{ _ingest.on_failure_message }}" 
+    } 
+  }]
 }

@@ -221,7 +221,11 @@ func TestMatchSource(t *testing.T) {
 		inputSource = "/var/lib/docker/containers/FABADA/foo.log"
 	}
 	input := common.MapStr{
-		"source": inputSource,
+		"log": common.MapStr{
+			"file": common.MapStr{
+				"path": inputSource,
+			},
+		},
 	}
 
 	result, err := p.Run(&beat.Event{Fields: input})
@@ -239,7 +243,11 @@ func TestMatchSource(t *testing.T) {
 			},
 			"name": "name",
 		},
-		"source": inputSource,
+		"log": common.MapStr{
+			"file": common.MapStr{
+				"path": inputSource,
+			},
+		},
 	}, result.Fields)
 }
 

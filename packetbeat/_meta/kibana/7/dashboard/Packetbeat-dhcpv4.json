@@ -6,7 +6,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {}
         },
-        "title": "Message Types over Time [Packetbeat DHCPv4]",
+        "title": "Message Types over Time [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -98,11 +98,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Message Types over Time [Packetbeat DHCPv4]",
+          "title": "Message Types over Time [Packetbeat DHCPv4] ECS",
           "type": "metrics"
         }
       },
-      "id": "8460fcd0-8baa-11e8-9676-ef67484126fb",
+      "id": "8460fcd0-8baa-11e8-9676-ef67484126fb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
@@ -119,8 +119,8 @@
             }
           }
         },
-        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb",
-        "title": "NAK and Decline Count [Packetbeat DHCPv4]",
+        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
+        "title": "NAK and Decline Count [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -161,11 +161,11 @@
             },
             "type": "metric"
           },
-          "title": "NAK and Decline Count [Packetbeat DHCPv4]",
+          "title": "NAK and Decline Count [Packetbeat DHCPv4] ECS",
           "type": "metric"
         }
       },
-      "id": "4ad9db20-8bab-11e8-9676-ef67484126fb",
+      "id": "4ad9db20-8bab-11e8-9676-ef67484126fb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
@@ -182,8 +182,8 @@
             }
           }
         },
-        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb",
-        "title": "Message Types [Packetbeat DHCPv4]",
+        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
+        "title": "Message Types [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -243,11 +243,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Message Types [Packetbeat DHCPv4]",
+          "title": "Message Types [Packetbeat DHCPv4] ECS",
           "type": "pie"
         }
       },
-      "id": "418dfbe0-8bac-11e8-9676-ef67484126fb",
+      "id": "418dfbe0-8bac-11e8-9676-ef67484126fb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
@@ -299,7 +299,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -309,10 +309,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "DHCPv4 [Packetbeat]",
+        "title": "DHCPv4 [Packetbeat] ECS",
         "version": 1
       },
-      "id": "b8992150-8ba8-11e8-9676-ef67484126fb",
+      "id": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
@@ -329,8 +329,8 @@
             }
           }
         },
-        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb",
-        "title": "Transaction Count [Packetbeat DHCPv4]",
+        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
+        "title": "Transaction Count [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -374,11 +374,11 @@
             },
             "type": "metric"
           },
-          "title": "Transaction Count [Packetbeat DHCPv4]",
+          "title": "Transaction Count [Packetbeat DHCPv4] ECS",
           "type": "metric"
         }
       },
-      "id": "d0120dc0-8bac-11e8-9676-ef67484126fb",
+      "id": "d0120dc0-8bac-11e8-9676-ef67484126fb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
@@ -395,8 +395,8 @@
             }
           }
         },
-        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb",
-        "title": "Client Count [Packetbeat DHCPv4]",
+        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
+        "title": "Client Count [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -440,11 +440,11 @@
             },
             "type": "metric"
           },
-          "title": "Client Count [Packetbeat DHCPv4]",
+          "title": "Client Count [Packetbeat DHCPv4] ECS",
           "type": "metric"
         }
       },
-      "id": "11d33ea0-8bad-11e8-9676-ef67484126fb",
+      "id": "11d33ea0-8bad-11e8-9676-ef67484126fb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
@@ -461,8 +461,8 @@
             }
           }
         },
-        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb",
-        "title": "Data Transfer [Packetbeat DHCPv4]",
+        "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
+        "title": "Data Transfer [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -516,11 +516,11 @@
             },
             "type": "metric"
           },
-          "title": "Data Transfer [Packetbeat DHCPv4]",
+          "title": "Data Transfer [Packetbeat DHCPv4] ECS",
           "type": "metric"
         }
       },
-      "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb",
+      "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
@@ -534,7 +534,7 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -555,7 +555,7 @@
               "x": 0,
               "y": 7
             },
-            "id": "8460fcd0-8baa-11e8-9676-ef67484126fb",
+            "id": "8460fcd0-8baa-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "6.3.0"
@@ -569,7 +569,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ad9db20-8bab-11e8-9676-ef67484126fb",
+            "id": "4ad9db20-8bab-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "6.3.0"
@@ -583,7 +583,7 @@
               "x": 37,
               "y": 0
             },
-            "id": "418dfbe0-8bac-11e8-9676-ef67484126fb",
+            "id": "418dfbe0-8bac-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "6.3.0"
@@ -597,7 +597,7 @@
               "x": 0,
               "y": 16
             },
-            "id": "b8992150-8ba8-11e8-9676-ef67484126fb",
+            "id": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "5",
             "type": "search",
             "version": "6.3.0"
@@ -611,7 +611,7 @@
               "x": 8,
               "y": 0
             },
-            "id": "d0120dc0-8bac-11e8-9676-ef67484126fb",
+            "id": "d0120dc0-8bac-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "6.3.0"
@@ -625,7 +625,7 @@
               "x": 16,
               "y": 0
             },
-            "id": "11d33ea0-8bad-11e8-9676-ef67484126fb",
+            "id": "11d33ea0-8bad-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "6.3.0"
@@ -639,17 +639,17 @@
               "x": 24,
               "y": 0
             },
-            "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb",
+            "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "6.3.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] DHCPv4",
+        "title": "[Packetbeat] DHCPv4 ECS",
         "version": 1
       },
-      "id": "a7b35890-8baa-11e8-9676-ef67484126fb",
+      "id": "a7b35890-8baa-11e8-9676-ef67484126fb-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1

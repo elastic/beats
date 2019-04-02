@@ -189,9 +189,15 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 		}
 
 		if m.isRequest {
-			m.notes = append(m.notes, "Packet loss while capturing the request")
+			if !m.packetLossReq {
+				m.packetLossReq = true
+				m.notes = append(m.notes, "Packet loss while capturing the request")
+			}
 		} else {
-			m.notes = append(m.notes, "Packet loss while capturing the response")
+			if !m.packetLossResp {
+				m.packetLossResp = true
+				m.notes = append(m.notes, "Packet loss while capturing the response")
+			}
 		}
 		if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 			(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
@@ -548,7 +554,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		httpFields.RequestHeaders = http.collectHeaders(requ)
 
 		// url
-		u := newURL(host, int32(pbf.Destination.Port), path, params)
+		u := newURL(host, int64(pbf.Destination.Port), path, params)
 		pb.MarshalStruct(evt.Fields, "url", u)
 
 		// user-agent

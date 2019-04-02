@@ -175,6 +175,7 @@ func UnitTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoUnitTest(ctx context.Context) error {
+	mg.Deps(Fields)
 	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
 }
 
@@ -182,6 +183,7 @@ func GoUnitTest(ctx context.Context) error {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
+	mg.Deps(Fields)
 	return mage.RunIntegTest("goIntegTest", func() error {
 		return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
 	})

@@ -35,13 +35,13 @@
                             }
                         ], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "b4c93470-c240-11e7-8692-232bd1143e8a", 
-                "title": "Bind (non-ephemeral) [Auditbeat Auditd]", 
+                "savedSearchId": "b4c93470-c240-11e7-8692-232bd1143e8a-ecs", 
+                "title": "Bind (non-ephemeral) [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -113,11 +113,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Bind (non-ephemeral) [Auditbeat Auditd]", 
+                    "title": "Bind (non-ephemeral) [Auditbeat Auditd] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "faf882f0-c242-11e7-8692-232bd1143e8a", 
+            "id": "faf882f0-c242-11e7-8692-232bd1143e8a-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-16T22:08:02.522Z", 
             "version": 3
@@ -129,13 +129,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "5438b030-c246-11e7-8692-232bd1143e8a", 
-                "title": "Connect [Auditbeat Auditd]", 
+                "savedSearchId": "5438b030-c246-11e7-8692-232bd1143e8a-ecs", 
+                "title": "Connect [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -161,7 +161,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Exe", 
-                                "field": "process.exe", 
+                                "field": "process.executable", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 50
@@ -207,11 +207,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Connect [Auditbeat Auditd]", 
+                    "title": "Connect [Auditbeat Auditd] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "ea483730-c246-11e7-8692-232bd1143e8a", 
+            "id": "ea483730-c246-11e7-8692-232bd1143e8a-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-16T23:24:16.851Z", 
             "version": 4
@@ -223,13 +223,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "e8734160-c24c-11e7-8692-232bd1143e8a", 
-                "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd]", 
+                "savedSearchId": "e8734160-c24c-11e7-8692-232bd1143e8a-ecs", 
+                "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {
                     "spy": {
                         "mode": {
@@ -264,7 +264,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Exe", 
-                                "field": "process.exe", 
+                                "field": "process.executable", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 50
@@ -297,11 +297,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd]", 
+                    "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "ceb91de0-c250-11e7-8692-232bd1143e8a", 
+            "id": "ceb91de0-c250-11e7-8692-232bd1143e8a-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-16T22:16:51.535Z", 
             "version": 5
@@ -312,7 +312,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Socket Syscalls Time Series [Auditbeat Auditd]", 
+                "title": "Socket Syscalls Time Series [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -371,11 +371,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Socket Syscalls Time Series [Auditbeat Auditd]", 
+                    "title": "Socket Syscalls Time Series [Auditbeat Auditd] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "b21e0c70-c252-11e7-8692-232bd1143e8a", 
+            "id": "b21e0c70-c252-11e7-8692-232bd1143e8a-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-16T22:13:38.857Z", 
             "version": 3
@@ -388,12 +388,12 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Socket Families [Auditbeat Auditd]", 
+                "title": "Socket Families [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -439,11 +439,11 @@
                         "legendPosition": "left", 
                         "type": "pie"
                     }, 
-                    "title": "Socket Families [Auditbeat Auditd]", 
+                    "title": "Socket Families [Auditbeat Auditd] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "a8e20450-c256-11e7-8692-232bd1143e8a", 
+            "id": "a8e20450-c256-11e7-8692-232bd1143e8a-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-16T22:12:51.655Z", 
             "version": 3
@@ -451,7 +451,7 @@
         {
             "attributes": {
                 "columns": [
-                    "beat.hostname", 
+                    "agent.hostname", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -545,7 +545,7 @@
                         "highlightAll": true, 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -555,10 +555,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Socket Binds [Auditbeat Auditd]", 
+                "title": "Socket Binds [Auditbeat Auditd] ECS", 
                 "version": 1
             }, 
-            "id": "b4c93470-c240-11e7-8692-232bd1143e8a", 
+            "id": "b4c93470-c240-11e7-8692-232bd1143e8a-ecs", 
             "type": "search", 
             "updated_at": "2018-01-16T23:05:58.935Z", 
             "version": 5
@@ -566,7 +566,7 @@
         {
             "attributes": {
                 "columns": [
-                    "beat.hostname", 
+                    "agent.hostname", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -652,7 +652,7 @@
                         "highlightAll": true, 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -662,10 +662,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Socket Connects [Auditbeat Auditd]", 
+                "title": "Socket Connects [Auditbeat Auditd] ECS", 
                 "version": 1
             }, 
-            "id": "5438b030-c246-11e7-8692-232bd1143e8a", 
+            "id": "5438b030-c246-11e7-8692-232bd1143e8a-ecs", 
             "type": "search", 
             "updated_at": "2018-01-16T23:09:43.937Z", 
             "version": 5
@@ -673,7 +673,7 @@
         {
             "attributes": {
                 "columns": [
-                    "beat.hostname", 
+                    "agent.hostname", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -782,7 +782,7 @@
                         "highlightAll": true, 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -792,10 +792,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Socket Accept / Recvfrom [Auditbeat Auditd]", 
+                "title": "Socket Accept / Recvfrom [Auditbeat Auditd] ECS", 
                 "version": 1
             }, 
-            "id": "e8734160-c24c-11e7-8692-232bd1143e8a", 
+            "id": "e8734160-c24c-11e7-8692-232bd1143e8a-ecs", 
             "type": "search", 
             "updated_at": "2018-01-16T23:20:51.403Z", 
             "version": 4
@@ -809,8 +809,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -838,7 +838,7 @@
                             "x": 6, 
                             "y": 3
                         }, 
-                        "id": "faf882f0-c242-11e7-8692-232bd1143e8a", 
+                        "id": "faf882f0-c242-11e7-8692-232bd1143e8a-ecs", 
                         "panelIndex": "1", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -861,7 +861,7 @@
                             "x": 0, 
                             "y": 7
                         }, 
-                        "id": "ea483730-c246-11e7-8692-232bd1143e8a", 
+                        "id": "ea483730-c246-11e7-8692-232bd1143e8a-ecs", 
                         "panelIndex": "2", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -884,7 +884,7 @@
                             "x": 6, 
                             "y": 7
                         }, 
-                        "id": "ceb91de0-c250-11e7-8692-232bd1143e8a", 
+                        "id": "ceb91de0-c250-11e7-8692-232bd1143e8a-ecs", 
                         "panelIndex": "3", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -897,7 +897,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "b21e0c70-c252-11e7-8692-232bd1143e8a", 
+                        "id": "b21e0c70-c252-11e7-8692-232bd1143e8a-ecs", 
                         "panelIndex": "4", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -910,17 +910,17 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "a8e20450-c256-11e7-8692-232bd1143e8a", 
+                        "id": "a8e20450-c256-11e7-8692-232bd1143e8a-ecs", 
                         "panelIndex": "5", 
                         "type": "visualization", 
                         "version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Auditbeat Auditd] Sockets", 
+                "title": "[Auditbeat Auditd] Sockets ECS", 
                 "version": 1
             }, 
-            "id": "693a5f40-c243-11e7-8692-232bd1143e8a", 
+            "id": "693a5f40-c243-11e7-8692-232bd1143e8a-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-01-16T23:24:37.521Z", 
             "version": 4

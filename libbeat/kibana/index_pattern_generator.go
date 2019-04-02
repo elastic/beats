@@ -25,48 +25,38 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/mapping"
 )
 
 type IndexPatternGenerator struct {
-	indexName      string
-	beatVersion    string
-	fieldsYaml     string
-	version        common.Version
-	targetDir      string
-	targetFilename string
+	indexName   string
+	beatVersion string
+	fields      []byte
+	version     common.Version
+	migration   bool
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName string, fields []byte, beatVersion string, version common.Version, migration bool) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
 
-	if _, err := os.Stat(fieldsYAMLFile); err != nil {
-		return nil, err
-	}
-
 	return &IndexPatternGenerator{
-		indexName:      indexName,
-		fieldsYaml:     fieldsYAMLFile,
-		beatVersion:    beatVersion,
-		version:        version,
-		targetDir:      createTargetDir(outputDir, version),
-		targetFilename: beatName + ".json",
+		indexName:   indexName + "-*",
+		fields:      fields,
+		beatVersion: beatVersion,
+		version:     version,
+		migration:   migration,
 	}, nil
 }
 
 // Generate creates the Index-Pattern for Kibana.
-func (i *IndexPatternGenerator) Generate() (string, error) {
+func (i *IndexPatternGenerator) Generate() (common.MapStr, error) {
 	idxPattern, err := i.generate()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	idxPattern = i.generatePattern(idxPattern)
-
-	file := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file, idxPattern)
-
-	return file, err
+	return i.generatePattern(idxPattern), nil
 }
 
 func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
@@ -95,7 +85,7 @@ func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapS
 			common.MapStr{
 				"type":       "index-pattern",
 				"id":         i.indexName,
-				"version":    1,
+				"version":    "1",
 				"attributes": attrs,
 			},
 		},
@@ -105,7 +95,7 @@ func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapS
 }
 
 func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
-	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fieldsYaml)
+	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fields)
 	if err != nil {
 		return err
 	}
@@ -121,11 +111,11 @@ func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
 }
 
 func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) error {
-	fields, err := common.LoadFieldsYaml(i.fieldsYaml)
+	fields, err := mapping.LoadFields(i.fields)
 	if err != nil {
 		return err
 	}
-	transformer, err := newFieldsTransformer(&i.version, fields)
+	transformer, err := newFieldsTransformer(&i.version, fields, i.migration)
 	if err != nil {
 		return err
 	}

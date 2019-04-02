@@ -2,10 +2,16 @@
     "description": "Pipeline for parsing Traefik access logs. Requires the geoip and user_agent plugins.",
     "processors": [
         {
+            "dissect": {
+                "field": "message",
+                "pattern": "%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}] \"%{http.request.method} %{url.original} HTTP/%{http.version}\" %{http.response.status_code} %{traefik.access.message}"
+            }
+        },
+        {
             "grok": {
                 "field": "traefik.access.message",
                 "patterns": [
-                    "(?:%{NUMBER:http.response.body.bytes:long}|-)( (?:\"%{DATA:http.request.referrer}\"|-)?( (?:\"%{DATA:traefik.access.agent}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:temp.duration:long}ms)?)?"
+                    "(?:%{NUMBER:http.response.body.bytes:long}|-)( (?:\"%{DATA:http.request.referrer}\"|-)?( (?:\"%{DATA:user_agent.original}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:temp.duration:long}ms)?)?"
                 ],
                 "ignore_missing": true
             }
@@ -76,52 +82,10 @@
 
         {
             "user_agent": {
-                "field": "traefik.access.agent",
+                "field": "user_agent.original",
                 "ignore_failure": true
             }
         },
-        {
-            "rename": {
-                "field": "traefik.access.agent",
-                "target_field": "user_agent.original",
-                "ignore_failure": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os",
-                "target_field": "user_agent.os.full_name",
-                "ignore_failure": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_name",
-                "target_field": "user_agent.os.name",
-                "ignore_failure": true
-            }
-        },
-        {
-            "set": {
-                "field": "user_agent.os.version",
-                "value": "{{user_agent.os_major}}.{{user_agent.os_minor}}.{{user_agent.os_patch}}",
-                "ignore_failure": true
-            }
-        },
-        { "remove": { "field": "user_agent.os_major", "ignore_missing": true } },
-        { "remove": { "field": "user_agent.os_minor", "ignore_missing": true } },
-        { "remove": { "field": "user_agent.os_patch", "ignore_missing": true } },
-
-        {
-            "set": {
-                "field": "user_agent.version",
-                "value": "{{user_agent.major}}.{{user_agent.minor}}.{{user_agent.patch}}",
-                "ignore_failure": true
-            }
-        },
-        { "remove": { "field": "user_agent.major", "ignore_missing": true } },
-        { "remove": { "field": "user_agent.minor", "ignore_missing": true } },
-        { "remove": { "field": "user_agent.patch", "ignore_missing": true } },
         {
             "geoip": {
                 "field": "source.ip",

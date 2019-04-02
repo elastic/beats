@@ -1,20 +1,18 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "action": "user_login",
+        "category": "authentication",
         "dataset": "login",
+        "kind": "event",
         "module": "system",
-        "origin": "/var/log/wtmp.1",
+        "origin": "/var/log/wtmp",
         "outcome": "success",
-        "type": "event"
+        "type": "authentication_success"
     },
-    "message": "Login by user vagrant (UID: 1000) on pts/1 (PID: 17559) from 10.0.2.2 (IP: 10.0.2.2)",
+    "message": "Login by user vagrant (UID: 1000) on pts/2 (PID: 14962) from 10.0.2.2 (IP: 10.0.2.2)",
     "process": {
-        "pid": 17559
+        "pid": 14962
     },
     "service": {
         "type": "system"
@@ -25,6 +23,6 @@
     "user": {
         "id": 1000,
         "name": "vagrant",
-        "terminal": "pts/1"
+        "terminal": "pts/2"
     }
 }

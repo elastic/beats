@@ -3,8 +3,8 @@
         {
             "attributes": {
                 "columns": [
-                    "nginx.error.level", 
-                    "nginx.error.message"
+                    "log.level", 
+                    "message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -27,8 +27,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "_exists_:nginx AND _exists_:nginx.error.message"
+                            "language": "kuery",
+                            "query": "event.module:nginx AND message:*"
                         }, 
                         "version": true
                     }
@@ -37,20 +37,20 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Nginx error logs [Filebeat Nginx]", 
+                "title": "Nginx error logs [Filebeat Nginx] ECS", 
                 "version": 1
             }, 
-            "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519", 
+            "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
             "type": "search", 
             "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "nginx.access.url", 
-                    "nginx.access.method", 
-                    "nginx.access.response_code", 
-                    "nginx.access.body_sent.bytes"
+                    "url.original", 
+                    "http.request.method", 
+                    "http.response.status_code", 
+                    "http.response.body.bytes"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -73,8 +73,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "_exists_:nginx AND _exists_:nginx.access.url"
+                            "language": "kuery",
+                            "query": "event.module:nginx AND url.original:*"
                         }, 
                         "version": true
                     }
@@ -83,10 +83,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Nginx access logs [Filebeat Nginx]", 
+                "title": "Nginx access logs [Filebeat Nginx] ECS", 
                 "version": 1
             }, 
-            "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519", 
+            "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
             "type": "search", 
             "version": 4
         }, 
@@ -96,7 +96,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Access logs over time [Filebeat Nginx]", 
+                "title": "Access logs over time [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -120,7 +120,7 @@
                                 "id": "3189aa80-a1f3-11e7-a062-a1c3587f4874"
                             }
                         ], 
-                        "filter": "fileset.module:nginx AND fileset.name:access", 
+                        "filter": "event.module:nginx AND fileset.name:access", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "filebeat-*", 
                         "interval": "auto", 
@@ -151,7 +151,7 @@
                                 ], 
                                 "split_mode": "everything", 
                                 "stacked": "none", 
-                                "terms_field": "nginx.access.url", 
+                                "terms_field": "url.original", 
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
                             }
                         ], 
@@ -160,11 +160,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Access logs over time [Filebeat Nginx]", 
+                    "title": "Access logs over time [Filebeat Nginx] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519", 
+            "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -174,20 +174,20 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat Nginx]", 
+                "title": "Dashboards [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Nginx logs overview](#/dashboard/55a9e6e0-a29e-11e7-928f-5dbe6f6f5519) | [Nginx access and error logs](#/dashboard/046212a0-a2a1-11e7-928f-5dbe6f6f5519)"
+                        "markdown": "[Nginx logs overview](#/dashboard/55a9e6e0-a29e-11e7-928f-5dbe6f6f5519-ecs) | [Nginx access and error logs](#/dashboard/046212a0-a2a1-11e7-928f-5dbe6f6f5519-ecs)"
                     }, 
-                    "title": "Dashboards [Filebeat Nginx]", 
+                    "title": "Dashboards [Filebeat Nginx] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519", 
+            "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -200,13 +200,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -218,10 +213,10 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "nginx.error.level", 
-                            "nginx.error.message"
+                            "log.level", 
+                            "message"
                         ], 
-                        "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519", 
+                        "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
                         "panelIndex": 11, 
                         "row": 5, 
                         "size_x": 12, 
@@ -235,12 +230,12 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "nginx.access.url", 
-                            "nginx.access.method", 
-                            "nginx.access.response_code", 
-                            "nginx.access.body_sent.bytes"
+                            "url.original", 
+                            "http.request.method", 
+                            "http.response.status_code", 
+                            "http.response.body.bytes"
                         ], 
-                        "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519", 
+                        "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
                         "panelIndex": 16, 
                         "row": 8, 
                         "size_x": 12, 
@@ -253,7 +248,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519", 
+                        "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519-ecs", 
                         "panelIndex": 18, 
                         "row": 2, 
                         "size_x": 12, 
@@ -262,7 +257,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519", 
+                        "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519-ecs", 
                         "panelIndex": 19, 
                         "row": 1, 
                         "size_x": 12, 
@@ -271,11 +266,11 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Nginx] Access and error logs", 
+                "title": "[Filebeat Nginx] Access and error logs ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 
-            "id": "046212a0-a2a1-11e7-928f-5dbe6f6f5519", 
+            "id": "046212a0-a2a1-11e7-928f-5dbe6f6f5519-ecs", 
             "type": "dashboard", 
             "version": 2
         }

@@ -5,7 +5,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:nginx.access.agent}\""
+                    "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\""
                 ],
                 "pattern_definitions": {
                     "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
@@ -85,48 +85,7 @@
         },
         {
             "user_agent": {
-                "field": "nginx.access.agent"
-            }
-        },
-        {
-            "rename": {
-                "field": "nginx.access.agent",
-                "target_field": "user_agent.original"
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os",
-                "target_field": "user_agent.os.full_name",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_name",
-                "target_field": "user_agent.os.name",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_major",
-                "target_field": "user_agent.os.major",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_minor",
-                "target_field": "user_agent.os.minor",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_patch",
-                "target_field": "user_agent.os.patch",
-                "ignore_missing": true
+                "field": "user_agent.original"
             }
         },
         {

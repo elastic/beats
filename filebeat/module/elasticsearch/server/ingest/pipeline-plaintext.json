@@ -1,0 +1,30 @@
+{
+    "description": "Pipeline for parsing the Elasticsearch server log file in plaintext format.",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "pattern_definitions": {
+                    "GREEDYMULTILINE": "(.|\n)*",
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*",
+                    "GC_ALL": "\\[gc\\]\\[%{NUMBER:elasticsearch.server.gc.overhead_seq}\\] overhead, spent \\[%{NUMBER:elasticsearch.server.gc.collection_duration.time:float}%{DATA:elasticsearch.server.gc.collection_duration.unit}\\] collecting in the last \\[%{NUMBER:elasticsearch.server.gc.observation_duration.time:float}%{DATA:elasticsearch.server.gc.observation_duration.unit}\\]",
+                    "GC_YOUNG": "\\[gc\\]\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]%{SPACE}%{GREEDYMULTILINE:message}",
+                    "LOG_HEADER": "\\[%{TIMESTAMP_ISO8601:elasticsearch.server.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}?\\]\\[%{DATA:elasticsearch.component}%{SPACE}\\](%{SPACE})?(\\[%{DATA:elasticsearch.node.name}\\])?(%{SPACE})?"
+                },
+                "patterns": [
+                    "%{LOG_HEADER}%{GC_ALL}",
+                    "%{LOG_HEADER}%{GC_YOUNG}",
+                    "%{LOG_HEADER}%{SPACE}((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}%{GREEDYMULTILINE:message}"
+                ]
+            }
+        }
+    ]
+}

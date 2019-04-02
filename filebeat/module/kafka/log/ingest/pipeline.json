@@ -46,6 +46,12 @@
       }
     },
     {
+      "remove": {
+        "field": "kafka.log.trace.full",
+        "ignore_missing": true
+      }
+    },
+    {
       "rename": {
         "field": "@timestamp",
         "target_field": "event.created"
@@ -56,7 +62,7 @@
         "field": "kafka.log.timestamp",
         "target_field": "@timestamp",
         "formats": ["yyyy-MM-dd HH:mm:ss,SSS"],
-        {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
+        {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
         "ignore_failure": true
       }
     },

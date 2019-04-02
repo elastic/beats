@@ -62,28 +62,13 @@
       fields:
         - name: device
           type: alias
-          path: user_agent.device
-        - name: major
-          type: alias
-          path: user_agent.major
-        - name: minor
-          type: alias
-          path: user_agent.minor
-        - name: patch
-          type: alias
-          path: user_agent.patch
+          path: user_agent.device.name
         - name: name
           type: alias
           path: user_agent.name
         - name: os
           type: alias
           path: user_agent.os.full_name
-        - name: os_major
-          type: alias
-          path: user_agent.os.major
-        - name: os_minor
-          type: alias
-          path: user_agent.os.minor
         - name: os_name
           type: alias
           path: user_agent.os.name

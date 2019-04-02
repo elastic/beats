@@ -15,10 +15,19 @@
       description: >
         The name of the metricset that generated the event.
 
+    - name: process.pgid
+      type: long
+      description: >
+        Process group id.
+
     - name: service.address
       description: >
-        Connection address of the machine from which the metricset was collected. This
+        Address of the machine where the service is running. This
         field may not be present when the data was collected locally.
+
+    - name: service.hostname
+      description: >
+        Host name of the machine where the service is running.
 
     - name: type
       required: true

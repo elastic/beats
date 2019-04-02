@@ -5,11 +5,15 @@
   release: ga
   fields:
     - name: host
-      type: keyword
+      type: alias
+      path: host.hostname
+      migration: true
       description: >
         Host name
     - name: version
-      type: keyword
+      type: alias
+      path: service.version
+      migration: true
       description: >
         Logstash Version
     - name: jvm
@@ -22,6 +26,8 @@
           description: >
             Version
         - name: pid
-          type: long
+          type: alias
+          path: process.pid
+          migration: true
           description: >
-            Pid
+            Process ID

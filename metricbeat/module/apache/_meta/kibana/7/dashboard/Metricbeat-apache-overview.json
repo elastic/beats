@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-HTTPD", 
-                "title": "CPU usage [Metricbeat Apache]", 
+                "savedSearchId": "Apache-HTTPD-ecs", 
+                "title": "CPU usage [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -101,11 +101,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache HTTPD - CPU", 
+                    "title": "Apache HTTPD - CPU ECS", 
                     "type": "line"
                 }
             }, 
-            "id": "Apache-HTTPD-CPU", 
+            "id": "Apache-HTTPD-CPU-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -117,8 +117,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-HTTPD", 
-                "title": "Hostname list [Metricbeat Apache]", 
+                "savedSearchId": "Apache-HTTPD-ecs", 
+                "title": "Hostname list [Metricbeat Apache] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -163,11 +163,11 @@
                             "direction": null
                         }
                     }, 
-                    "title": "Apache HTTPD - Hostname list", 
+                    "title": "Apache HTTPD - Hostname list ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "Apache-HTTPD-Hostname-list", 
+            "id": "Apache-HTTPD-Hostname-list-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -179,8 +179,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-HTTPD", 
-                "title": "Load1/5/15 [Metricbeat Apache]", 
+                "savedSearchId": "Apache-HTTPD-ecs", 
+                "title": "Load1/5/15 [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -255,11 +255,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache HTTPD - Load1/5/15", 
+                    "title": "Apache HTTPD - Load1/5/15 ECS", 
                     "type": "line"
                 }
             }, 
-            "id": "Apache-HTTPD-Load1-slash-5-slash-15", 
+            "id": "Apache-HTTPD-Load1-slash-5-slash-15-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -271,8 +271,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-HTTPD", 
-                "title": "Scoreboard [Metricbeat Apache]", 
+                "savedSearchId": "Apache-HTTPD-ecs", 
+                "title": "Scoreboard [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -428,11 +428,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache HTTPD - Scoreboard", 
+                    "title": "Apache HTTPD - Scoreboard ECS", 
                     "type": "line"
                 }
             }, 
-            "id": "Apache-HTTPD-Scoreboard", 
+            "id": "Apache-HTTPD-Scoreboard-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -444,8 +444,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-HTTPD", 
-                "title": "Total accesses and kbytes [Metricbeat Apache]", 
+                "savedSearchId": "Apache-HTTPD-ecs", 
+                "title": "Total accesses and kbytes [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -474,11 +474,11 @@
                         "fontSize": 60, 
                         "handleNoResults": true
                     }, 
-                    "title": "Apache HTTPD - Total accesses and kbytes", 
+                    "title": "Apache HTTPD - Total accesses and kbytes ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "Apache-HTTPD-Total-accesses-and-kbytes", 
+            "id": "Apache-HTTPD-Total-accesses-and-kbytes-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -490,8 +490,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-HTTPD", 
-                "title": "Uptime [Metricbeat Apache]", 
+                "savedSearchId": "Apache-HTTPD-ecs", 
+                "title": "Uptime [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -520,11 +520,11 @@
                         "fontSize": 60, 
                         "handleNoResults": true
                     }, 
-                    "title": "Apache HTTPD - Uptime", 
+                    "title": "Apache HTTPD - Uptime ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "Apache-HTTPD-Uptime", 
+            "id": "Apache-HTTPD-Uptime-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -536,8 +536,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-HTTPD", 
-                "title": "Workers [Metricbeat Apache]", 
+                "savedSearchId": "Apache-HTTPD-ecs", 
+                "title": "Workers [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -603,11 +603,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache HTTPD - Workers", 
+                    "title": "Apache HTTPD - Workers ECS", 
                     "type": "line"
                 }
             }, 
-            "id": "Apache-HTTPD-Workers", 
+            "id": "Apache-HTTPD-Workers-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -636,21 +636,19 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "metricset.module: apache"
+                            "language": "kuery",
+                                "query": "event.module: apache"
                             }
-                        }
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Apache HTTPD", 
+                "title": "Apache HTTPD ECS", 
                 "version": 1
             }, 
-            "id": "Apache-HTTPD", 
+            "id": "Apache-HTTPD-ecs", 
             "type": "search", 
             "version": 1
         }, 
@@ -663,13 +661,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -680,7 +673,7 @@
                 "panelsJSON": [
                     {
                         "col": 7, 
-                        "id": "Apache-HTTPD-CPU", 
+                        "id": "Apache-HTTPD-CPU-ecs", 
                         "panelIndex": 1, 
                         "row": 10, 
                         "size_x": 6, 
@@ -689,7 +682,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-HTTPD-Hostname-list", 
+                        "id": "Apache-HTTPD-Hostname-list-ecs", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 3, 
@@ -698,7 +691,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-HTTPD-Load1-slash-5-slash-15", 
+                        "id": "Apache-HTTPD-Load1-slash-5-slash-15-ecs", 
                         "panelIndex": 3, 
                         "row": 10, 
                         "size_x": 6, 
@@ -707,7 +700,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-HTTPD-Scoreboard", 
+                        "id": "Apache-HTTPD-Scoreboard-ecs", 
                         "panelIndex": 4, 
                         "row": 7, 
                         "size_x": 12, 
@@ -716,7 +709,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "Apache-HTTPD-Total-accesses-and-kbytes", 
+                        "id": "Apache-HTTPD-Total-accesses-and-kbytes-ecs", 
                         "panelIndex": 5, 
                         "row": 1, 
                         "size_x": 6, 
@@ -725,7 +718,7 @@
                     }, 
                     {
                         "col": 4, 
-                        "id": "Apache-HTTPD-Uptime", 
+                        "id": "Apache-HTTPD-Uptime-ecs", 
                         "panelIndex": 6, 
                         "row": 1, 
                         "size_x": 3, 
@@ -734,7 +727,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-HTTPD-Workers", 
+                        "id": "Apache-HTTPD-Workers-ecs", 
                         "panelIndex": 7, 
                         "row": 4, 
                         "size_x": 12, 
@@ -743,7 +736,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Apache] Overview", 
+                "title": "[Metricbeat Apache] Overview ECS", 
                 "uiStateJSON": {
                     "P-2": {
                         "vis": {
@@ -772,7 +765,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "Metricbeat-Apache-HTTPD-server-status", 
+            "id": "Metricbeat-Apache-HTTPD-server-status-ecs", 
             "type": "dashboard", 
             "version": 3
         }

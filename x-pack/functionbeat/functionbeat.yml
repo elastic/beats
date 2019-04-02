@@ -145,6 +145,13 @@ functionbeat.provider.aws.functions:
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
 
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  #index.codec: best_compression
+  #_source.enabled: false
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -212,9 +219,6 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
@@ -271,5 +275,5 @@ processors:
 
 #================================= Migration ==================================
 
-# This allows to enable migration aliases
-#migration.enabled: false
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: true

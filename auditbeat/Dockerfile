@@ -5,6 +5,7 @@ RUN \
       && apt-get install -y --no-install-recommends \
          python-pip \
          virtualenv \
+         librpm-dev \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip

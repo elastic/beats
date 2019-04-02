@@ -8,13 +8,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
+	"sort"
 
-	"errors"
+	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/reload"
-
-	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -79,15 +78,13 @@ func (c *configResponse) UnmarshalJSON(b []byte) error {
 }
 
 // Configuration retrieves the list of configuration blocks from Kibana
-func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID, configOK bool) (ConfigBlocks, error) {
-	headers := http.Header{}
-	headers.Set("kbn-beats-access-token", accessToken)
-
+func (c *AuthClient) Configuration() (ConfigBlocks, error) {
 	resp := struct {
-		ConfigBlocks []*configResponse `json:"configuration_blocks"`
+		BaseResponse
+		ConfigBlocks []*configResponse `json:"list"`
 	}{}
-	url := fmt.Sprintf("/api/beats/agent/%s/configuration?validSetting=%t", beatUUID, configOK)
-	statusCode, err := c.request("GET", url, nil, headers, &resp)
+	url := fmt.Sprintf("/api/beats/agent/%s/configuration", c.BeatUUID)
+	statusCode, err := c.Client.request("GET", url, nil, c.headers(), &resp)
 	if statusCode == http.StatusNotFound {
 		return nil, errConfigurationNotFound
 	}
@@ -101,8 +98,16 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID, configOK 
 		blocks[block.Type] = append(blocks[block.Type], &ConfigBlock{Raw: block.Raw})
 	}
 
+	// keep the ordering consistent while grouping the items.
+	keys := make([]string, 0, len(blocks))
+	for k := range blocks {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	res := ConfigBlocks{}
-	for t, b := range blocks {
+	for _, t := range keys {
+		b := blocks[t]
 		res = append(res, ConfigBlocksWithType{Type: t, Blocks: b})
 	}
 
@@ -110,16 +115,19 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID, configOK 
 }
 
 // ConfigBlocksEqual returns true if the given config blocks are equal, false if not
-func ConfigBlocksEqual(a, b ConfigBlocks) bool {
-	if len(a) != len(b) {
-		return false
+func ConfigBlocksEqual(a, b ConfigBlocks) (bool, error) {
+	// If there is an errors when hashing the config blocks its because the format changed.
+	aHash, err := hashstructure.Hash(a, nil)
+	if err != nil {
+		return false, errors.Wrap(err, "could not hash config blocks")
 	}
 
-	if len(a) == 0 {
-		return true
+	bHash, err := hashstructure.Hash(b, nil)
+	if err != nil {
+		return false, errors.Wrap(err, "could not hash config blocks")
 	}
 
-	return reflect.DeepEqual(a, b)
+	return aHash == bHash, nil
 }
 
 // IsConfigurationNotFound returns true if the configuration was not found.

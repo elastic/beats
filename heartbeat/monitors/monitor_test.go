@@ -21,11 +21,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/mapval"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/scheduler"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestMonitor(t *testing.T) {
@@ -58,7 +59,7 @@ func TestMonitor(t *testing.T) {
 			pcClient.Close()
 
 			for _, event := range pcClient.Publishes() {
-				mapvaltest.Test(t, mockEventMonitorValidator(""), event.Fields)
+				mapval.Test(t, mockEventMonitorValidator(""), event.Fields)
 			}
 		} else {
 			// Let's yield this goroutine so we don't spin

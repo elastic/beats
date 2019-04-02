@@ -12,8 +12,8 @@
             }
           }
         },
-        "savedSearchId": "nfs",
-        "title": "NFS clients pie chart [Packetbeat]",
+        "savedSearchId": "nfs-ecs",
+        "title": "NFS clients pie chart [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -56,11 +56,11 @@
             "shareYAxis": true,
             "type": "pie"
           },
-          "title": "NFS clients pie chart [Packetbeat]",
+          "title": "NFS clients pie chart [Packetbeat] ECS",
           "type": "pie"
         }
       },
-      "id": "NFS-clients-pie-chart",
+      "id": "NFS-clients-pie-chart-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -73,8 +73,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "nfs",
-        "title": "NFS operations area chart",
+        "savedSearchId": "nfs-ecs",
+        "title": "NFS operations area chart ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -124,11 +124,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "NFS operations area chart",
+          "title": "NFS operations area chart ECS",
           "type": "area"
         }
       },
-      "id": "NFS-operations-area-chart",
+      "id": "NFS-operations-area-chart-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -145,8 +145,8 @@
             }
           }
         },
-        "savedSearchId": "nfs",
-        "title": "NFS top group pie chart [Packetbeat]",
+        "savedSearchId": "nfs-ecs",
+        "title": "NFS top group pie chart [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -189,11 +189,11 @@
             "shareYAxis": true,
             "type": "pie"
           },
-          "title": "NFS top group pie chart [Packetbeat]",
+          "title": "NFS top group pie chart [Packetbeat] ECS",
           "type": "pie"
         }
       },
-      "id": "NFS-top-group-pie-chart",
+      "id": "NFS-top-group-pie-chart-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -210,8 +210,8 @@
             }
           }
         },
-        "savedSearchId": "nfs",
-        "title": "NFS top users pie chart [Packetbeat]",
+        "savedSearchId": "nfs-ecs",
+        "title": "NFS top users pie chart [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -254,11 +254,11 @@
             "shareYAxis": true,
             "type": "pie"
           },
-          "title": "NFS top users pie chart [Packetbeat]",
+          "title": "NFS top users pie chart [Packetbeat] ECS",
           "type": "pie"
         }
       },
-      "id": "NFS-top-users-pie-chart",
+      "id": "NFS-top-users-pie-chart-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -275,8 +275,8 @@
             }
           }
         },
-        "savedSearchId": "nfs",
-        "title": "NFS response times [Packetbeat]",
+        "savedSearchId": "nfs-ecs",
+        "title": "NFS response times [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -391,11 +391,11 @@
             ],
             "yAxis": {}
           },
-          "title": "NFS response times [Packetbeat]",
+          "title": "NFS response times [Packetbeat] ECS",
           "type": "line"
         }
       },
-      "id": "NFS-response-times",
+      "id": "NFS-response-times-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -412,8 +412,8 @@
             }
           }
         },
-        "savedSearchId": "NFS-errors-search",
-        "title": "NFS errors [Packetbeat]",
+        "savedSearchId": "NFS-errors-search-ecs",
+        "title": "NFS errors [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -534,11 +534,11 @@
             ],
             "yAxis": {}
           },
-          "title": "NFS errors [Packetbeat]",
+          "title": "NFS errors [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "NFS-errors",
+      "id": "NFS-errors-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -555,8 +555,8 @@
             }
           }
         },
-        "savedSearchId": "nfs",
-        "title": "NFS operation table [Packetbeat]",
+        "savedSearchId": "nfs-ecs",
+        "title": "NFS operation table [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -616,11 +616,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "NFS operation table [Packetbeat]",
+          "title": "NFS operation table [Packetbeat] ECS",
           "type": "table"
         }
       },
-      "id": "NFS-operation-table",
+      "id": "NFS-operation-table-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -637,8 +637,8 @@
             }
           }
         },
-        "savedSearchId": "nfs",
-        "title": "NFS Request / Response Sizes [Packetbeat]",
+        "savedSearchId": "nfs-ecs",
+        "title": "NFS Request / Response Sizes [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -780,11 +780,11 @@
             ],
             "yAxis": {}
           },
-          "title": "NFS Request / Response Sizes [Packetbeat]",
+          "title": "NFS Request / Response Sizes [Packetbeat] ECS",
           "type": "line"
         }
       },
-      "id": "NFS-bytes-in-slash-out",
+      "id": "NFS-bytes-in-slash-out-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -796,31 +796,26 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Navigation [Packetbeat]",
+        "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat]",
+          "title": "Navigation [Packetbeat] ECS",
           "type": "markdown"
         }
       },
-      "id": "Navigation",
+      "id": "Navigation-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
       "version": 11
@@ -846,16 +841,16 @@
                   "key": "event.dataset",
                   "negate": false,
                   "params": {
-                    "query": "nfs",
+                    "query": "nfs-ecs",
                     "type": "phrase"
                   },
                   "type": "phrase",
-                  "value": "nfs"
+                  "value": "nfs-ecs"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
-                      "query": "nfs",
+                      "query": "nfs-ecs",
                       "type": "phrase"
                     }
                   }
@@ -878,13 +873,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -893,10 +883,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "NFS Search [Packetbeat]",
+        "title": "NFS Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "nfs",
+      "id": "nfs-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -974,16 +964,16 @@
                   "key": "event.dataset",
                   "negate": false,
                   "params": {
-                    "query": "nfs",
+                    "query": "nfs-ecs",
                     "type": "phrase"
                   },
                   "type": "phrase",
-                  "value": "nfs"
+                  "value": "nfs-ecs"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
-                      "query": "nfs",
+                      "query": "nfs-ecs",
                       "type": "phrase"
                     }
                   }
@@ -1006,13 +996,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1021,10 +1006,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "NFS Error Search [Packetbeat]",
+        "title": "NFS Error Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "NFS-errors-search",
+      "id": "NFS-errors-search-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1
@@ -1038,8 +1023,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": "*"
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1061,7 +1046,7 @@
               "x": 16,
               "y": 0
             },
-            "id": "NFS-clients-pie-chart",
+            "id": "NFS-clients-pie-chart-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1074,7 +1059,7 @@
               "x": 0,
               "y": 55
             },
-            "id": "NFS-operations-area-chart",
+            "id": "NFS-operations-area-chart-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1098,7 +1083,7 @@
               "x": 32,
               "y": 0
             },
-            "id": "NFS-top-group-pie-chart",
+            "id": "NFS-top-group-pie-chart-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1116,7 +1101,7 @@
               "x": 32,
               "y": 10
             },
-            "id": "NFS-top-users-pie-chart",
+            "id": "NFS-top-users-pie-chart-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1134,7 +1119,7 @@
               "x": 24,
               "y": 25
             },
-            "id": "NFS-response-times",
+            "id": "NFS-response-times-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1147,7 +1132,7 @@
               "x": 24,
               "y": 40
             },
-            "id": "NFS-errors",
+            "id": "NFS-errors-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1170,7 +1155,7 @@
               "x": 24,
               "y": 55
             },
-            "id": "NFS-operation-table",
+            "id": "NFS-operation-table-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1188,7 +1173,7 @@
               "x": 0,
               "y": 25
             },
-            "id": "NFS-bytes-in-slash-out",
+            "id": "NFS-bytes-in-slash-out-ecs",
             "panelIndex": "9",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1201,17 +1186,17 @@
               "x": 0,
               "y": 0
             },
-            "id": "Navigation",
+            "id": "Navigation-ecs",
             "panelIndex": "10",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] NFS",
+        "title": "[Packetbeat] NFS ECS",
         "version": 1
       },
-      "id": "Packetbeat-NFS",
+      "id": "Packetbeat-NFS-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:29.316Z",
       "version": 1

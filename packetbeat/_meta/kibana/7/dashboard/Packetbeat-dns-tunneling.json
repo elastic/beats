@@ -8,8 +8,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "Unique FQDNs per eTLD+1",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "Unique FQDNs per eTLD+1 ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -59,11 +59,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Unique FQDNs per eTLD+1",
+          "title": "Unique FQDNs per eTLD+1 ECS",
           "type": "histogram"
         }
       },
-      "id": "Unique-FQDNs-per-eTLD 1",
+      "id": "Unique-FQDNs-per-eTLD 1-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
       "version": 1
@@ -76,8 +76,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "Unique FQDNs per eTLD+1 Table",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "Unique FQDNs per eTLD+1 Table ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -136,11 +136,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Unique FQDNs per eTLD+1 Table",
+          "title": "Unique FQDNs per eTLD+1 Table ECS",
           "type": "table"
         }
       },
-      "id": "Unique-FQDNs-per-eTLD 1-Table",
+      "id": "Unique-FQDNs-per-eTLD 1-Table-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
       "version": 1
@@ -152,13 +152,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "Bytes Transferred per Domain",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "Bytes Transferred per Domain ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -294,11 +294,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Bytes Transferred per Domain",
+          "title": "Bytes Transferred per Domain ECS",
           "type": "histogram"
         }
       },
-      "id": "Bytes-Transferred-per-Domain",
+      "id": "Bytes-Transferred-per-Domain-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
       "version": 1
@@ -311,17 +311,12 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
+              "language": "kuery",
                   "query": "type:dns"
                 }
-              }
-            }
           }
         },
-        "title": "Top Domains by Data Volume",
+        "title": "Top Domains by Data Volume ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -384,11 +379,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Domains by Data Volume",
+          "title": "Top Domains by Data Volume ECS",
           "type": "table"
         }
       },
-      "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d",
+      "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
       "version": 1
@@ -449,7 +444,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -459,10 +454,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "DNS Protocol [Packetbeat]",
+        "title": "DNS Protocol [Packetbeat] ECS",
         "version": 1
       },
-      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 2
@@ -476,7 +471,7 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "NOT dns.question.type:PTR"
             },
             "version": true
@@ -510,7 +505,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "Unique-FQDNs-per-eTLD 1",
+            "id": "Unique-FQDNs-per-eTLD 1-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -533,7 +528,7 @@
               "x": 0,
               "y": 35
             },
-            "id": "Unique-FQDNs-per-eTLD 1-Table",
+            "id": "Unique-FQDNs-per-eTLD 1-Table-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -551,7 +546,7 @@
               "x": 0,
               "y": 20
             },
-            "id": "Bytes-Transferred-per-Domain",
+            "id": "Bytes-Transferred-per-Domain-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -574,17 +569,17 @@
               "x": 24,
               "y": 35
             },
-            "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d",
+            "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] DNS Tunneling",
+        "title": "[Packetbeat] DNS Tunneling ECS",
         "version": 1
       },
-      "id": "DNS-Unique-Domains",
+      "id": "DNS-Unique-Domains-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:23.036Z",
       "version": 1

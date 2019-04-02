@@ -16,7 +16,7 @@ extracted.
 
 The Heartbeat configuration file uses http://yaml.org/[YAML] for its syntax.
 See the
-{libbeat}/config-file-format.html[Config File Format] section of the
+{beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Heartbeat:
@@ -29,6 +29,7 @@ The following topics describe how to configure Heartbeat:
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
@@ -58,6 +59,8 @@ include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 include::./heartbeat-filtering.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-geoip.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
 

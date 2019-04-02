@@ -47,6 +47,9 @@ type Reloadable interface {
 	Reload(config *ConfigWithMeta) error
 }
 
+// ReloadableFunc wraps a custom function in order to implement the Reloadable interface.
+type ReloadableFunc func(config *ConfigWithMeta) error
+
 // Registry of reloadable objects and lists
 type Registry struct {
 	sync.RWMutex
@@ -151,4 +154,9 @@ func (r *Registry) nameTaken(name string) bool {
 	}
 
 	return false
+}
+
+// Reload calls the underlying function.
+func (fn ReloadableFunc) Reload(config *ConfigWithMeta) error {
+	return fn(config)
 }

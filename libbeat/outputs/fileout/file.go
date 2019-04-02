@@ -44,6 +44,7 @@ type fileOutput struct {
 
 // makeFileout instantiates a new file output instance.
 func makeFileout(
+	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,

@@ -1,26 +1,23 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
-        "action": "process_started",
+        "action": "process_stopped",
         "dataset": "process",
         "kind": "event",
         "module": "system"
     },
-    "message": "Process zsh (PID: 12936) by user elastic STARTED",
+    "message": "Process zsh (PID: 9086) by user elastic STOPPED",
     "process": {
         "args": [
             "zsh"
         ],
+        "entity_id": "+fYshazplsMYlr0y",
         "executable": "/bin/zsh",
         "name": "zsh",
-        "pid": 12936,
-        "ppid": 3858,
-        "start": "2019-01-21T15:01:54.782288Z",
-        "working_directory": "/Users/elastic"
+        "pid": 9086,
+        "ppid": 9085,
+        "start": "2019-01-01T00:00:01Z",
+        "working_directory": "/home/elastic"
     },
     "service": {
         "type": "system"

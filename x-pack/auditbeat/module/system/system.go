@@ -5,7 +5,10 @@
 package system
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/go-sysinfo"
 )
 
 func init() {
@@ -28,6 +31,7 @@ type SystemModuleConfig struct {
 type SystemModule struct {
 	mb.BaseModule
 	config SystemModuleConfig
+	hostID string
 }
 
 // Config returns the ModuleConfig used to create the Module.
@@ -45,5 +49,33 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		return nil, err
 	}
 
-	return &SystemModule{BaseModule: base, config: config}, nil
+	hostInfo, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get host ID")
+	}
+
+	return &SystemModule{
+		BaseModule: base,
+		config:     config,
+		hostID:     hostInfo.Info().UniqueID,
+	}, nil
+}
+
+// SystemMetricSet extends the Metricbeat BaseMetricSet.
+type SystemMetricSet struct {
+	mb.BaseMetricSet
+	module *SystemModule
+}
+
+// NewSystemMetricSet creates a new SystemMetricSet.
+func NewSystemMetricSet(base mb.BaseMetricSet) SystemMetricSet {
+	return SystemMetricSet{
+		BaseMetricSet: base,
+		module:        base.Module().(*SystemModule),
+	}
+}
+
+// HostID returns the stored host ID.
+func (ms *SystemMetricSet) HostID() string {
+	return ms.module.hostID
 }

@@ -1,4 +1,5 @@
-version: '2'
+version: '2.3'
+
 services:
   beat:
     build: ${PWD}/.
@@ -14,12 +15,15 @@ services:
       - ./module/aerospike/_meta/env
       - ./module/apache/_meta/env
       - ./module/ceph/_meta/env
+      - ./module/consul/_meta/env
+      - ./module/coredns/_meta/env
       - ./module/couchbase/_meta/env
       - ./module/couchdb/_meta/env
       - ./module/dropwizard/_meta/env
       - ./module/elasticsearch/_meta/env
       - ./module/envoyproxy/_meta/env
       - ./module/etcd/_meta/env
+      - ./module/golang/_meta/env
       - ./module/haproxy/_meta/env
       - ./module/http/_meta/env
       - ./module/jolokia/_meta/env
@@ -57,11 +61,26 @@ services:
   ceph:
     build: ./module/ceph/_meta
 
+  consul:
+    build: ./module/consul/_meta
+
+  coredns:
+    build: ./module/coredns/_meta
+
   couchbase:
     build: ./module/couchbase/_meta
 
   couchdb:
     build: ./module/couchdb/_meta
+
+  # Dummy container for docker tests, so there is a container with
+  # healthcheck generating events
+  docker:
+    image: alpine
+    command: '/bin/sh -c "trap : TERM INT; sleep 15d"'
+    healthcheck:
+      interval: 1s
+      test: ["CMD", "true"]
 
   dropwizard:
     build: ./module/dropwizard/_meta
@@ -87,6 +106,9 @@ services:
       args:
         ETCD_VERSION: v3.2.25
 
+  golang:
+    build: ./module/golang/_meta
+
   haproxy:
     build: ./module/haproxy/_meta
 
@@ -110,7 +132,7 @@ services:
     build:
       context: ./module/kafka/_meta
       args:
-        KAFKA_VERSION: 2.0.0
+        KAFKA_VERSION: 2.1.1
 
   kafka_1_1_0:
     build:

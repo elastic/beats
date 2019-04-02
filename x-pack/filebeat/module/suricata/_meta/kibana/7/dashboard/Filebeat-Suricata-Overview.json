@@ -12,8 +12,8 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-        "title": "Activity Types over Time [Suricata]",
+        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "title": "Activity Types over Time [Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -42,7 +42,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "event.type",
+                "field": "suricata.eve.event_type",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -123,11 +123,11 @@
               }
             ]
           },
-          "title": "Activity Types over Time [Suricata]",
+          "title": "Activity Types over Time [Suricata] ECS",
           "type": "histogram"
         }
       },
-      "id": "c7d46c60-86da-11e8-b59d-21efb914e65c",
+      "id": "c7d46c60-86da-11e8-b59d-21efb914e65c-ecs",
       "type": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -144,8 +144,8 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-        "title": "Event Types [Suricata]",
+        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "title": "Event Types [Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -161,7 +161,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "event.type",
+                "field": "suricata.eve.event_type",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -187,11 +187,11 @@
             "legendPosition": "bottom",
             "type": "pie"
           },
-          "title": "Event Types [Suricata]",
+          "title": "Event Types [Suricata] ECS",
           "type": "pie"
         }
       },
-      "id": "0a0aa630-86db-11e8-b59d-21efb914e65c",
+      "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
       "type": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -208,8 +208,8 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-        "title": "Top Application Protocols [Suricata]",
+        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "title": "Top Application Protocols [Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -251,11 +251,11 @@
             "legendPosition": "bottom",
             "type": "pie"
           },
-          "title": "Top Application Protocols [Suricata]",
+          "title": "Top Application Protocols [Suricata] ECS",
           "type": "pie"
         }
       },
-      "id": "728f64c0-86db-11e8-b59d-21efb914e65c",
+      "id": "728f64c0-86db-11e8-b59d-21efb914e65c-ecs",
       "type": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -272,8 +272,8 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-        "title": "Top Hosts Generating Events [Suricata]",
+        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "title": "Top Hosts Generating Events [Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -383,11 +383,11 @@
               }
             ]
           },
-          "title": "Top Hosts Generating Events [Suricata]",
+          "title": "Top Hosts Generating Events [Suricata] ECS",
           "type": "histogram"
         }
       },
-      "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c",
+      "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c-ecs",
       "type": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -396,7 +396,7 @@
       "attributes": {
         "columns": [
           "host.name",
-          "event.type",
+          "suricata.eve.event_type",
           "suricata.eve.flow_id",
           "network.transport",
           "source.ip",
@@ -419,7 +419,7 @@
                   "alias": null,
                   "disabled": false,
                   "index": "filebeat-*",
-                  "key": "event.type",
+                  "key": "suricata.eve.event_type",
                   "negate": true,
                   "params": {
                     "query": "stats",
@@ -430,7 +430,7 @@
                 },
                 "query": {
                   "match": {
-                    "event.type": {
+                    "suricata.eve.event_type": {
                       "query": "stats",
                       "type": "phrase"
                     }
@@ -477,10 +477,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Events [Suricata]",
+        "title": "Events [Suricata] ECS",
         "version": 1
       },
-      "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
+      "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
       "type": "search",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -497,8 +497,8 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-        "title": "Top Connection Source Countries [Suricata]",
+        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "title": "Top Connection Source Countries [Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -535,11 +535,11 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Top Connection Source Countries [Suricata]",
+          "title": "Top Connection Source Countries [Suricata] ECS",
           "type": "tagcloud"
         }
       },
-      "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c",
+      "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c-ecs",
       "type": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -556,8 +556,8 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-        "title": "Top Connection Destination Countries [Suricata]",
+        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "title": "Top Connection Destination Countries [Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -594,11 +594,11 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Top Connection Destination Countries [Suricata]",
+          "title": "Top Connection Destination Countries [Suricata] ECS",
           "type": "tagcloud"
         }
       },
-      "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c",
+      "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c-ecs",
       "type": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -615,8 +615,8 @@
             }
           }
         },
-        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-        "title": "Top Network Protocols [Suricata]",
+        "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "title": "Top Network Protocols [Suricata] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -658,11 +658,11 @@
             "legendPosition": "bottom",
             "type": "pie"
           },
-          "title": "Top Network Protocols [Suricata]",
+          "title": "Top Network Protocols [Suricata] ECS",
           "type": "pie"
         }
       },
-      "id": "0a363820-86dd-11e8-b59d-21efb914e65c",
+      "id": "0a363820-86dd-11e8-b59d-21efb914e65c-ecs",
       "type": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -691,7 +691,7 @@
                   "alias": null,
                   "disabled": false,
                   "index": "filebeat-*",
-                  "key": "event.type",
+                  "key": "suricata.eve.event_type",
                   "negate": false,
                   "params": {
                     "query": "stats",
@@ -702,7 +702,7 @@
                 },
                 "query": {
                   "match": {
-                    "event.type": {
+                    "suricata.eve.event_type": {
                       "query": "stats",
                       "type": "phrase"
                     }
@@ -749,10 +749,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Host Stats [Suricata]",
+        "title": "Host Stats [Suricata] ECS",
         "version": 1
       },
-      "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c",
+      "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
       "type": "search",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1
@@ -787,7 +787,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "c7d46c60-86da-11e8-b59d-21efb914e65c",
+            "id": "c7d46c60-86da-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "6.3.0"
@@ -801,7 +801,7 @@
               "x": 0,
               "y": 20
             },
-            "id": "0a0aa630-86db-11e8-b59d-21efb914e65c",
+            "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "6.3.0"
@@ -815,7 +815,7 @@
               "x": 19,
               "y": 20
             },
-            "id": "728f64c0-86db-11e8-b59d-21efb914e65c",
+            "id": "728f64c0-86db-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "6.3.0"
@@ -829,7 +829,7 @@
               "x": 0,
               "y": 10
             },
-            "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c",
+            "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "6.3.0"
@@ -843,7 +843,7 @@
               "x": 0,
               "y": 34
             },
-            "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
+            "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "5",
             "type": "search",
             "version": "6.3.0"
@@ -857,7 +857,7 @@
               "x": 30,
               "y": 20
             },
-            "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c",
+            "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "6.3.0"
@@ -871,7 +871,7 @@
               "x": 39,
               "y": 20
             },
-            "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c",
+            "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "6.3.0"
@@ -885,7 +885,7 @@
               "x": 9,
               "y": 20
             },
-            "id": "0a363820-86dd-11e8-b59d-21efb914e65c",
+            "id": "0a363820-86dd-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "6.3.0"
@@ -899,17 +899,17 @@
               "x": 0,
               "y": 53
             },
-            "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c",
+            "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "9",
             "type": "search",
             "version": "6.3.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Suricata] Events Overview",
+        "title": "[Suricata] Events Overview ECS",
         "version": 1
       },
-      "id": "78289c40-86da-11e8-b59d-21efb914e65c",
+      "id": "78289c40-86da-11e8-b59d-21efb914e65c-ecs",
       "type": "dashboard",
       "updated_at": "2018-11-07T22:56:24.962Z",
       "version": 1

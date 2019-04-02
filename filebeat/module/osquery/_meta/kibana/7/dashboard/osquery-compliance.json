@@ -42,8 +42,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -52,10 +52,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Mounts [Osquery results]", 
+                "title": "Mounts [Osquery results] ECS", 
                 "version": 1
             }, 
-            "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05", 
+            "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs", 
             "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
             "version": 1
@@ -67,13 +67,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "7a9482d0-eb00-11e7-8f04-51231daa5b05", 
-                "title": "Mounts by type [Osquery Result]", 
+                "savedSearchId": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs", 
+                "title": "Mounts by type [Osquery Result] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -123,11 +123,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Mounts by type [Osquery Result]", 
+                    "title": "Mounts by type [Osquery Result] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05", 
+            "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
             "version": 1
@@ -174,8 +174,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -184,10 +184,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "DEB packages installed [Osquery results]", 
+                "title": "DEB packages installed [Osquery results] ECS", 
                 "version": 1
             }, 
-            "id": "3824b080-eb02-11e7-8f04-51231daa5b05", 
+            "id": "3824b080-eb02-11e7-8f04-51231daa5b05-ecs", 
             "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
             "version": 1
@@ -199,13 +199,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "b5d6baa0-eb02-11e7-8f04-51231daa5b05", 
-                "title": "OS versions [Osquery result]", 
+                "savedSearchId": "b5d6baa0-eb02-11e7-8f04-51231daa5b05-ecs", 
+                "title": "OS versions [Osquery result] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -269,11 +269,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "OS versions [Osquery result]", 
+                    "title": "OS versions [Osquery result] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05", 
+            "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
             "version": 1
@@ -312,13 +312,13 @@
                             }
                         ], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "f59e21e0-eb03-11e7-8f04-51231daa5b05", 
-                "title": "Number of Kernel modules [Osquery Result]", 
+                "savedSearchId": "f59e21e0-eb03-11e7-8f04-51231daa5b05-ecs", 
+                "title": "Number of Kernel modules [Osquery Result] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -386,11 +386,11 @@
                         "isDisplayWarning": false, 
                         "type": "gauge"
                     }, 
-                    "title": "Number of Kernel modules [Osquery Result]", 
+                    "title": "Number of Kernel modules [Osquery Result] ECS", 
                     "type": "gauge"
                 }
             }, 
-            "id": "240f3630-eb05-11e7-8f04-51231daa5b05", 
+            "id": "240f3630-eb05-11e7-8f04-51231daa5b05-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
             "version": 1
@@ -401,20 +401,20 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Navigation [Osquery Result]", 
+                "title": "Navigation [Osquery Result] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 10, 
-                        "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040)"
+                        "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs)"
                     }, 
-                    "title": "Navigation [Osquery Result]", 
+                    "title": "Navigation [Osquery Result] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040", 
+            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T19:41:10.264Z", 
             "version": 3
@@ -459,8 +459,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -469,10 +469,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "OS versions [Osquery results]", 
+                "title": "OS versions [Osquery results] ECS", 
                 "version": 1
             }, 
-            "id": "b5d6baa0-eb02-11e7-8f04-51231daa5b05", 
+            "id": "b5d6baa0-eb02-11e7-8f04-51231daa5b05-ecs", 
             "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
             "version": 1
@@ -519,7 +519,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -529,10 +529,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Kernel modules [Osquery results]", 
+                "title": "Kernel modules [Osquery results] ECS", 
                 "version": 1
             }, 
-            "id": "f59e21e0-eb03-11e7-8f04-51231daa5b05", 
+            "id": "f59e21e0-eb03-11e7-8f04-51231daa5b05-ecs", 
             "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
             "version": 1
@@ -546,7 +546,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -566,7 +566,7 @@
                             "x": 6, 
                             "y": 6
                         }, 
-                        "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05", 
+                        "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs", 
                         "panelIndex": "1", 
                         "type": "search", 
                         "version": "6.2.4"
@@ -579,7 +579,7 @@
                             "x": 5, 
                             "y": 1
                         }, 
-                        "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05", 
+                        "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05-ecs", 
                         "panelIndex": "2", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -592,7 +592,7 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "3824b080-eb02-11e7-8f04-51231daa5b05", 
+                        "id": "3824b080-eb02-11e7-8f04-51231daa5b05-ecs", 
                         "panelIndex": "3", 
                         "type": "search", 
                         "version": "6.2.4"
@@ -605,7 +605,7 @@
                             "x": 0, 
                             "y": 1
                         }, 
-                        "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05", 
+                        "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05-ecs", 
                         "panelIndex": "4", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -626,7 +626,7 @@
                             "x": 0, 
                             "y": 4
                         }, 
-                        "id": "240f3630-eb05-11e7-8f04-51231daa5b05", 
+                        "id": "240f3630-eb05-11e7-8f04-51231daa5b05-ecs", 
                         "panelIndex": "5", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -639,14 +639,14 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040", 
+                        "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
                         "panelIndex": "6", 
                         "type": "visualization", 
                         "version": "6.1.0-SNAPSHOT"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Osquery Result] Compliance pack", 
+                "title": "[Osquery Result] Compliance pack ECS", 
                 "uiStateJSON": {
                     "P-5": {
                         "vis": {
@@ -658,7 +658,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "69f5ae20-eb02-11e7-8f04-51231daa5b05", 
+            "id": "69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-01-08T19:42:15.406Z", 
             "version": 2

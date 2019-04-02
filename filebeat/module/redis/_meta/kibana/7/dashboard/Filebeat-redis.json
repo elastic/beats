@@ -9,18 +9,13 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "_exists_:redis.log"
-                                }
-                            }
+                            "language": "kuery",
+                                    "query": "event.dataset:redis.log"
                         }, 
                         "version": true
                     }
                 }, 
-                "title": "Log levels and roles breakdown [Filebeat Redis]", 
+                "title": "Log levels and roles breakdown [Filebeat Redis] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -49,7 +44,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Log level", 
-                                "field": "redis.log.level", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -65,11 +60,11 @@
                         "legendPosition": "bottom", 
                         "type": "pie"
                     }, 
-                    "title": "Log levels and roles breakdown [Filebeat Redis]", 
+                    "title": "Log levels and roles breakdown [Filebeat Redis] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b", 
+            "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -82,18 +77,13 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "_exists_:redis.log"
-                                }
-                            }
+                            "language": "kuery",
+                                    "query": "event.dataset:redis.log"
                         }, 
                         "version": true
                     }
                 }, 
-                "title": "Logs over time [Filebeat Redis]", 
+                "title": "Logs over time [Filebeat Redis] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -129,7 +119,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "redis.log.level", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -215,21 +205,21 @@
                             }
                         ]
                     }, 
-                    "title": "Logs over time [Filebeat Redis]", 
+                    "title": "Logs over time [Filebeat Redis] ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "d2864600-478f-11e7-be88-2ddb32f3df97", 
+            "id": "d2864600-478f-11e7-be88-2ddb32f3df97-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
-                    "beat.name", 
-                    "redis.log.level", 
+                    "host.name", 
+                    "log.level", 
                     "redis.log.role", 
-                    "redis.log.message"
+                    "message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -244,7 +234,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "fileset.module", 
+                                    "key": "event.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "redis", 
@@ -255,7 +245,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "fileset.module": {
+                                        "event.module": {
                                             "query": "redis", 
                                             "type": "phrase"
                                         }
@@ -292,8 +282,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -302,10 +292,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Logs [Filebeat Redis]", 
+                "title": "Logs [Filebeat Redis] ECS", 
                 "version": 1
             }, 
-            "id": "73613570-4791-11e7-be88-2ddb32f3df97", 
+            "id": "73613570-4791-11e7-be88-2ddb32f3df97-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -317,8 +307,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b", 
-                "title": "Top slowest commands [Filebeat Redis]", 
+                "savedSearchId": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
+                "title": "Top slowest commands [Filebeat Redis] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -426,18 +416,18 @@
                             }
                         ]
                     }, 
-                    "title": "Top slowest commands [Filebeat Redis]", 
+                    "title": "Top slowest commands [Filebeat Redis] ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97", 
+            "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
-                    "beat.name", 
+                    "host.name", 
                     "message", 
                     "redis.slowlog.duration.us", 
                     "redis.slowlog.key"
@@ -450,13 +440,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "_exists_:redis.slowlog"
-                                }
-                            }
+                            "language": "kuery",
+                                    "query": "event.dataset:redis.slowlog"
                         }, 
                         "version": true
                     }
@@ -465,10 +450,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Slow logs [Filebeat Redis]", 
+                "title": "Slow logs [Filebeat Redis] ECS", 
                 "version": 1
             }, 
-            "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b", 
+            "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -481,13 +466,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -498,7 +478,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b", 
+                        "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b-ecs", 
                         "panelIndex": 2, 
                         "row": 5, 
                         "size_x": 3, 
@@ -507,7 +487,7 @@
                     }, 
                     {
                         "col": 4, 
-                        "id": "d2864600-478f-11e7-be88-2ddb32f3df97", 
+                        "id": "d2864600-478f-11e7-be88-2ddb32f3df97-ecs", 
                         "panelIndex": 3, 
                         "row": 5, 
                         "size_x": 9, 
@@ -517,12 +497,12 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "beat.name", 
-                            "redis.log.level", 
+                            "host.name", 
+                            "log.level", 
                             "redis.log.role", 
-                            "redis.log.message"
+                            "message"
                         ], 
-                        "id": "73613570-4791-11e7-be88-2ddb32f3df97", 
+                        "id": "73613570-4791-11e7-be88-2ddb32f3df97-ecs", 
                         "panelIndex": 4, 
                         "row": 8, 
                         "size_x": 12, 
@@ -535,7 +515,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97", 
+                        "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97-ecs", 
                         "panelIndex": 5, 
                         "row": 1, 
                         "size_x": 6, 
@@ -545,12 +525,12 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "beat.name", 
+                            "host.name", 
                             "message", 
                             "redis.slowlog.duration.us", 
                             "redis.slowlog.key"
                         ], 
-                        "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b", 
+                        "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
                         "panelIndex": 6, 
                         "row": 1, 
                         "size_x": 6, 
@@ -563,7 +543,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Redis] Overview", 
+                "title": "[Filebeat Redis] Overview ECS", 
                 "uiStateJSON": {
                     "P-5": {
                         "vis": {
@@ -573,7 +553,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "7fea2930-478e-11e7-b1f0-cb29bac6bf8b", 
+            "id": "7fea2930-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
             "type": "dashboard", 
             "version": 4
         }

@@ -7,15 +7,13 @@
 package ec2
 
 import (
-	"fmt"
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -29,12 +27,27 @@ type MockEC2Client struct {
 	ec2iface.EC2API
 }
 
-// MockCloudWatchClient struct is used for unit tests.
-type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
-}
+var (
+	regionName = "us-west-1"
+	instanceID = "i-123"
+	namespace  = "AWS/EC2"
 
-var regionName = "us-west-1"
+	id1         = "cpu1"
+	metricName1 = "CPUUtilization"
+	label1      = instanceID + " " + metricName1
+
+	id2         = "status1"
+	metricName2 = "StatusCheckFailed"
+	label2      = instanceID + " " + metricName2
+
+	id3         = "status2"
+	metricName3 = "StatusCheckFailed_System"
+	label3      = instanceID + " " + metricName3
+
+	id4         = "status3"
+	metricName4 = "StatusCheckFailed_Instance"
+	label4      = instanceID + " " + metricName4
+)
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
 	return ec2.DescribeRegionsRequest{
@@ -51,13 +64,36 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 }
 
 func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInput) ec2.DescribeInstancesRequest {
+	runningCode := int64(16)
+	coreCount := int64(1)
+	threadsPerCore := int64(1)
+	publicDNSName := "ec2-1-2-3-4.us-west-1.compute.amazonaws.com"
+	publicIP := "1.2.3.4"
+	privateDNSName := "ip-5-6-7-8.us-west-1.compute.internal"
+	privateIP := "5.6.7.8"
+
 	instance := ec2.Instance{
-		InstanceId:   awssdk.String("i-123"),
+		InstanceId:   awssdk.String(instanceID),
 		InstanceType: ec2.InstanceTypeT2Medium,
 		Placement: &ec2.Placement{
 			AvailabilityZone: awssdk.String("us-west-1a"),
 		},
 		ImageId: awssdk.String("image-123"),
+		State: &ec2.InstanceState{
+			Name: ec2.InstanceStateNameRunning,
+			Code: &runningCode,
+		},
+		Monitoring: &ec2.Monitoring{
+			State: ec2.MonitoringStateDisabled,
+		},
+		CpuOptions: &ec2.CpuOptions{
+			CoreCount:      &coreCount,
+			ThreadsPerCore: &threadsPerCore,
+		},
+		PublicDnsName:    &publicDNSName,
+		PublicIpAddress:  &publicIP,
+		PrivateDnsName:   &privateDNSName,
+		PrivateIpAddress: &privateIP,
 	}
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
@@ -70,137 +106,20 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	}
 }
 
-func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
-	id1 := "cpu1"
-	label1 := "CPUUtilization"
-	value1 := 0.25
-
-	id2 := "status1"
-	label2 := "StatusCheckFailed"
-	value2 := 0.0
-
-	id3 := "status2"
-	label3 := "StatusCheckFailed_System"
-	value3 := 0.0
-
-	id4 := "status3"
-	label4 := "StatusCheckFailed_Instance"
-	value4 := 0.0
-
-	return cloudwatch.GetMetricDataRequest{
-		Request: &awssdk.Request{
-			Data: &cloudwatch.GetMetricDataOutput{
-				MetricDataResults: []cloudwatch.MetricDataResult{
-					{
-						Id:     &id1,
-						Label:  &label1,
-						Values: []float64{value1},
-					},
-					{
-						Id:     &id2,
-						Label:  &label2,
-						Values: []float64{value2},
-					},
-					{
-						Id:     &id3,
-						Label:  &label3,
-						Values: []float64{value3},
-					},
-					{
-						Id:     &id4,
-						Label:  &label4,
-						Values: []float64{value4},
-					},
-				},
-			},
-		},
-	}
-}
-
-func TestGetRegions(t *testing.T) {
-	mockSvc := &MockEC2Client{}
-	regionsList, err := getRegions(mockSvc)
-	if err != nil {
-		fmt.Println("failed getRegions: ", err)
-		t.FailNow()
-	}
-	assert.Equal(t, 1, len(regionsList))
-	assert.Equal(t, regionName, regionsList[0])
-}
-
 func TestGetInstanceIDs(t *testing.T) {
 	mockSvc := &MockEC2Client{}
 	instanceIDs, instancesOutputs, err := getInstancesPerRegion(mockSvc)
 	if err != nil {
-		fmt.Println("failed getInstancesPerRegion: ", err)
 		t.FailNow()
 	}
 
 	assert.Equal(t, 1, len(instanceIDs))
 	assert.Equal(t, 1, len(instancesOutputs))
 
-	assert.Equal(t, "i-123", instanceIDs[0])
-	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs["i-123"].InstanceType)
-	assert.Equal(t, awssdk.String("image-123"), instancesOutputs["i-123"].ImageId)
-	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs["i-123"].Placement.AvailabilityZone)
-}
-
-func TestGetMetricDataPerRegion(t *testing.T) {
-	mockSvc := &MockCloudWatchClient{}
-	getMetricDataOutput, err := getMetricDataPerRegion("-10m", 300, "i-123", nil, mockSvc)
-	if err != nil {
-		fmt.Println("failed getMetricDataPerRegion: ", err)
-		t.FailNow()
-	}
-	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
-	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
-	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
-	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
-
-	assert.Equal(t, "status1", *getMetricDataOutput.MetricDataResults[1].Id)
-	assert.Equal(t, "StatusCheckFailed", *getMetricDataOutput.MetricDataResults[1].Label)
-	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[1].Values[0])
-
-	assert.Equal(t, "status2", *getMetricDataOutput.MetricDataResults[2].Id)
-	assert.Equal(t, "StatusCheckFailed_System", *getMetricDataOutput.MetricDataResults[2].Label)
-	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[2].Values[0])
-
-	assert.Equal(t, "status3", *getMetricDataOutput.MetricDataResults[3].Id)
-	assert.Equal(t, "StatusCheckFailed_Instance", *getMetricDataOutput.MetricDataResults[3].Label)
-	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[3].Values[0])
-}
-
-func TestConvertPeriodToDuration(t *testing.T) {
-	period1 := "300s"
-	duration1, periodSec1, err := convertPeriodToDuration(period1)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-600s", duration1)
-	assert.Equal(t, 300, periodSec1)
-
-	period2 := "30ss"
-	duration2, periodSec2, err := convertPeriodToDuration(period2)
-	expectedErr := errors.New("Invaid period in config. Please reset period in config.")
-	assert.Error(t, expectedErr, err)
-	assert.Equal(t, "", duration2)
-	assert.Equal(t, 0, periodSec2)
-
-	period3 := "10m"
-	duration3, periodSec3, err := convertPeriodToDuration(period3)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-20m", duration3)
-	assert.Equal(t, 600, periodSec3)
-
-	period4 := "30s"
-	duration4, periodSec4, err := convertPeriodToDuration(period4)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-60s", duration4)
-	assert.Equal(t, 30, periodSec4)
-
-	period5 := "60s"
-	duration5, periodSec5, err := convertPeriodToDuration(period5)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-120s", duration5)
-	assert.Equal(t, 60, periodSec5)
+	assert.Equal(t, instanceID, instanceIDs[0])
+	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs[instanceID].InstanceType)
+	assert.Equal(t, awssdk.String("image-123"), instancesOutputs[instanceID].ImageId)
+	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs[instanceID].Placement.AvailabilityZone)
 }
 
 func TestCreateCloudWatchEvents(t *testing.T) {
@@ -213,9 +132,8 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		RootFields: common.MapStr{
 			"service": common.MapStr{"name": "ec2"},
 			"cloud": common.MapStr{
-				"image":             common.MapStr{"id": "image-123"},
 				"region":            regionName,
-				"provider":          "ec2",
+				"provider":          "aws",
 				"instance":          common.MapStr{"id": "i-123"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
@@ -225,6 +143,21 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 			"cpu": common.MapStr{
 				"total": common.MapStr{"pct": 0.25},
 			},
+			"instance": common.MapStr{
+				"image":            common.MapStr{"id": "image-123"},
+				"core":             common.MapStr{"count": int64(1)},
+				"threads_per_core": int64(1),
+				"state":            common.MapStr{"code": int64(16), "name": "running"},
+				"monitoring":       common.MapStr{"state": "disabled"},
+				"public": common.MapStr{
+					"dns_name": "ec2-1-2-3-4.us-west-1.compute.amazonaws.com",
+					"ip":       "1.2.3.4",
+				},
+				"private": common.MapStr{
+					"dns_name": "ip-5-6-7-8.us-west-1.compute.internal",
+					"ip":       "5.6.7.8",
+				},
+			},
 		},
 	}
 	svcEC2Mock := &MockEC2Client{}
@@ -232,25 +165,61 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(instanceIDs))
 	instanceID := instanceIDs[0]
-	assert.Equal(t, "i-123", instanceID)
+	assert.Equal(t, instanceID, instanceID)
+	timestamp := time.Now()
 
-	svcCloudwatchMock := &MockCloudWatchClient{}
-	//Calculate duration based on period
-	durationString, periodSec, err := convertPeriodToDuration(mockModuleConfig.Period)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-600s", durationString)
-	assert.Equal(t, 300, periodSec)
+	getMetricDataOutput := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			Values:     []float64{0.25},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id2,
+			Label:      &label2,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id3,
+			Label:      &label3,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+		{
+			Id:         &id4,
+			Label:      &label4,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
+		},
+	}
 
-	getMetricDataOutput, err := getMetricDataPerRegion(durationString, periodSec, instanceID, nil, svcCloudwatchMock)
+	event, _, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
 	assert.NoError(t, err)
-	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
-	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
-	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
-	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
-
-	event, info, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
-	assert.NoError(t, err)
-	assert.Equal(t, "", info)
 	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
+	assert.Equal(t, expectedEvent.MetricSetFields["instance"], event.MetricSetFields["instance"])
+}
+
+func TestConstructMetricQueries(t *testing.T) {
+	name := "InstanceId"
+	dim := cloudwatch.Dimension{
+		Name:  &name,
+		Value: &instanceID,
+	}
+
+	listMetric := cloudwatch.Metric{
+		Dimensions: []cloudwatch.Dimension{dim},
+		MetricName: &metricName1,
+		Namespace:  &namespace,
+	}
+
+	listMetricsOutput := []cloudwatch.Metric{listMetric}
+	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 300)
+	assert.Equal(t, 1, len(metricDataQuery))
+	assert.Equal(t, "i-123 CPUUtilization", *metricDataQuery[0].Label)
+	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)
+	assert.Equal(t, metricName1, *metricDataQuery[0].MetricStat.Metric.MetricName)
+	assert.Equal(t, namespace, *metricDataQuery[0].MetricStat.Metric.Namespace)
 }

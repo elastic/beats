@@ -8,19 +8,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Actions [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Actions [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -97,11 +91,11 @@
                         }, 
                         "type": "gauge"
                     }, 
-                    "title": "Actions [Auditbeat File Integrity]", 
+                    "title": "Actions [Auditbeat File Integrity] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "AV0tVcg6g1PYniApZa-v", 
+            "id": "AV0tVcg6g1PYniApZa-v-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -114,19 +108,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Events Over Time [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Events Over Time [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -236,11 +224,11 @@
                             }
                         ]
                     }, 
-                    "title": "Events Over Time [Auditbeat File Integrity]", 
+                    "title": "Events Over Time [Auditbeat File Integrity] ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "AV0tV05vg1PYniApZbA2", 
+            "id": "AV0tV05vg1PYniApZbA2-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -253,19 +241,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Top owners [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Top owners [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -298,11 +280,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Top owners [Auditbeat File Integrity]", 
+                    "title": "Top owners [Auditbeat File Integrity] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "AV0tWL-Yg1PYniApZbCs", 
+            "id": "AV0tWL-Yg1PYniApZbCs-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -315,19 +297,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Top groups [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Top groups [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -360,11 +336,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Top groups [Auditbeat File Integrity]", 
+                    "title": "Top groups [Auditbeat File Integrity] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "AV0tWSdXg1PYniApZbDU", 
+            "id": "AV0tWSdXg1PYniApZbDU-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -377,19 +353,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
+                            "language": "kuery",
                                     "query": "event.action:updated OR event.action:attributes_modified"
                                 }
-                            }
-                        }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Top updated [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Top updated [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -422,11 +392,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Top updated [Auditbeat File Integrity]", 
+                    "title": "Top updated [Auditbeat File Integrity] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "AV0tW0djg1PYniApZbGL", 
+            "id": "AV0tW0djg1PYniApZbGL-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -444,8 +414,8 @@
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "World Writable File Count [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "World Writable File Count [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -496,11 +466,11 @@
                         }, 
                         "type": "metric"
                     }, 
-                    "title": "World Writable File Count [Auditbeat File Integrity]", 
+                    "title": "World Writable File Count [Auditbeat File Integrity] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "AV0tY6jwg1PYniApZbRY", 
+            "id": "AV0tY6jwg1PYniApZbRY-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T17:48:29.232Z", 
             "version": 7
@@ -540,13 +510,13 @@
                         ], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Most changed file by count [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Most changed file by count [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -622,11 +592,11 @@
                         }, 
                         "type": "gauge"
                     }, 
-                    "title": "Most changed file by count [Auditbeat File Integrity]", 
+                    "title": "Most changed file by count [Auditbeat File Integrity] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "AV0tav8Ag1PYniApZbbK", 
+            "id": "AV0tav8Ag1PYniApZbbK-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -639,19 +609,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Most common mode by count [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Most common mode by count [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -727,11 +691,11 @@
                         }, 
                         "type": "gauge"
                     }, 
-                    "title": "Most common mode by count [Auditbeat File Integrity]", 
+                    "title": "Most common mode by count [Auditbeat File Integrity] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "AV0tbcUdg1PYniApZbe1", 
+            "id": "AV0tbcUdg1PYniApZbe1-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -744,19 +708,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "File Event Summary By Host [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "File Event Summary By Host [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -784,7 +742,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Host", 
-                                "field": "beat.name", 
+                                "field": "host.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 50
@@ -818,11 +776,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "File Event Summary By Host [Auditbeat File Integrity]", 
+                    "title": "File Event Summary By Host [Auditbeat File Integrity] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "AV0tc_xZg1PYniApZbnL", 
+            "id": "AV0tc_xZg1PYniApZbnL-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -835,19 +793,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
+                            "language": "kuery",
                                     "query": "event.action:deleted"
                                 }
-                            }
-                        }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Top deleted [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Top deleted [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -880,11 +832,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Top deleted [Auditbeat File Integrity]", 
+                    "title": "Top deleted [Auditbeat File Integrity] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "AV0tes4Eg1PYniApZbwV", 
+            "id": "AV0tes4Eg1PYniApZbwV-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -897,19 +849,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "default_field": "*", 
+                            "language": "kuery",
                                     "query": "event.action:created"
                                 }
-                            }
-                        }
                     }
                 }, 
-                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b", 
-                "title": "Top created [Auditbeat File Integrity]", 
+                "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Top created [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -942,11 +888,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Top created [Auditbeat File Integrity]", 
+                    "title": "Top created [Auditbeat File Integrity] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "AV0te0TCg1PYniApZbw9", 
+            "id": "AV0te0TCg1PYniApZbw9-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -992,7 +938,7 @@
                         "highlightAll": true, 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -1002,10 +948,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "File Integrity Events [Auditbeat File Integrity]", 
+                "title": "File Integrity Events [Auditbeat File Integrity] ECS", 
                 "version": 1
             }, 
-            "id": "a380a060-cb44-11e7-9835-2f31fe08873b", 
+            "id": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
             "type": "search", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6
@@ -1019,13 +965,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -1043,7 +984,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "AV0tVcg6g1PYniApZa-v", 
+                        "id": "AV0tVcg6g1PYniApZa-v-ecs", 
                         "panelIndex": "1", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1056,7 +997,7 @@
                             "x": 2, 
                             "y": 0
                         }, 
-                        "id": "AV0tV05vg1PYniApZbA2", 
+                        "id": "AV0tV05vg1PYniApZbA2-ecs", 
                         "panelIndex": "2", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1069,7 +1010,7 @@
                             "x": 9, 
                             "y": 0
                         }, 
-                        "id": "AV0tWL-Yg1PYniApZbCs", 
+                        "id": "AV0tWL-Yg1PYniApZbCs-ecs", 
                         "panelIndex": "3", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1082,7 +1023,7 @@
                             "x": 9, 
                             "y": 3
                         }, 
-                        "id": "AV0tWSdXg1PYniApZbDU", 
+                        "id": "AV0tWSdXg1PYniApZbDU-ecs", 
                         "panelIndex": "4", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1095,7 +1036,7 @@
                             "x": 4, 
                             "y": 8
                         }, 
-                        "id": "AV0tW0djg1PYniApZbGL", 
+                        "id": "AV0tW0djg1PYniApZbGL-ecs", 
                         "panelIndex": "5", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1108,7 +1049,7 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "AV0tY6jwg1PYniApZbRY", 
+                        "id": "AV0tY6jwg1PYniApZbRY-ecs", 
                         "panelIndex": "6", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1121,7 +1062,7 @@
                             "x": 4, 
                             "y": 6
                         }, 
-                        "id": "AV0tav8Ag1PYniApZbbK", 
+                        "id": "AV0tav8Ag1PYniApZbbK-ecs", 
                         "panelIndex": "7", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1134,7 +1075,7 @@
                             "x": 8, 
                             "y": 6
                         }, 
-                        "id": "AV0tbcUdg1PYniApZbe1", 
+                        "id": "AV0tbcUdg1PYniApZbe1-ecs", 
                         "panelIndex": "8", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1147,7 +1088,7 @@
                             "x": 0, 
                             "y": 11
                         }, 
-                        "id": "AV0tc_xZg1PYniApZbnL", 
+                        "id": "AV0tc_xZg1PYniApZbnL-ecs", 
                         "panelIndex": "9", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1160,7 +1101,7 @@
                             "x": 8, 
                             "y": 8
                         }, 
-                        "id": "AV0tes4Eg1PYniApZbwV", 
+                        "id": "AV0tes4Eg1PYniApZbwV-ecs", 
                         "panelIndex": "10", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1173,7 +1114,7 @@
                             "x": 0, 
                             "y": 8
                         }, 
-                        "id": "AV0te0TCg1PYniApZbw9", 
+                        "id": "AV0te0TCg1PYniApZbw9-ecs", 
                         "panelIndex": "11", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -1190,7 +1131,7 @@
                             "x": 6, 
                             "y": 11
                         }, 
-                        "id": "a380a060-cb44-11e7-9835-2f31fe08873b", 
+                        "id": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
                         "panelIndex": "12", 
                         "sort": [
                             "@timestamp", 
@@ -1201,10 +1142,10 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Auditbeat File Integrity] Overview", 
+                "title": "[Auditbeat File Integrity] Overview ECS", 
                 "version": 1
             }, 
-            "id": "AV0tXkjYg1PYniApZbKP", 
+            "id": "AV0tXkjYg1PYniApZbKP-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
             "version": 6

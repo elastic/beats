@@ -20,6 +20,7 @@ package stat
 import (
 	"reflect"
 
+	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -137,8 +138,17 @@ func eventMapping(info []*haproxy.Stat, r mb.ReporterV2) {
 			source[typeOfT.Field(i).Name] = f.Interface()
 		}
 
-		event := mb.Event{}
-		event.MetricSetFields, _ = schema.Apply(source)
+		fields, _ := schema.Apply(source)
+		event := mb.Event{
+			RootFields: common.MapStr{},
+		}
+
+		if processID, err := fields.GetValue("process_id"); err == nil {
+			event.RootFields.Put("process.pid", processID)
+			fields.Delete("process_id")
+		}
+
+		event.MetricSetFields = fields
 		r.Event(event)
 	}
 }

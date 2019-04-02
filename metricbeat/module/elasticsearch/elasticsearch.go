@@ -211,9 +211,20 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	// First, check the cache
 	license := licenseCache.get()
 
+	info, err := GetInfo(http, resetURI)
+	if err != nil {
+		return nil, err
+	}
+	var licensePath string
+	if info.Version.Number.Major < 7 {
+		licensePath = "_xpack/license"
+	} else {
+		licensePath = "_license"
+	}
+
 	// Not cached, fetch license from Elasticsearch
 	if license == nil {
-		content, err := fetchPath(http, resetURI, "_xpack/license", "")
+		content, err := fetchPath(http, resetURI, licensePath, "")
 		if err != nil {
 			return nil, err
 		}

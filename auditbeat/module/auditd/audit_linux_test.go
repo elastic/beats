@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 	"time"
 
@@ -33,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-libaudit"
@@ -76,7 +78,9 @@ func TestData(t *testing.T) {
 		// Send expected ACKs for initialization
 		returnACK().returnACK().returnACK().returnACK().returnACK().
 		// Send a single audit message from the kernel.
-		returnMessage(userLoginMsg)
+		returnMessage(userLoginMsg).
+		returnMessage(execveMsgs...).
+		returnMessage(acceptMsgs...)
 
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
@@ -84,21 +88,52 @@ func TestData(t *testing.T) {
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
-	if len(events) == 0 {
-		t.Fatal("received no events")
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	if len(events) != 3 {
+		t.Fatalf("expected 3 events, but received %d", len(events))
 	}
 	assertNoErrors(t, events)
+
+	assertFieldsAreDocumented(t, events)
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, beatEvent, "")
 }
 
+// assertFieldsAreDocumented mimics assert_fields_are_documented in Python system tests.
+func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
+	fieldsYml, err := mapping.LoadFieldsYaml("../../fields.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	documentedFields := fieldsYml.GetKeys()
+
+	for _, e := range events {
+		beatEvent := e.BeatEvent(moduleName, metricsetName, core.AddDatasetToEvent)
+		for eventFieldName := range beatEvent.Fields.Flatten() {
+			found := false
+			for _, documentedFieldName := range documentedFields {
+				// Have to use HasPrefix and not "==" since fields in auditd.paths.* get flattened
+				// to auditd.paths which does not exist in fields.yml.
+				if strings.HasPrefix(documentedFieldName, eventFieldName) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				assert.Fail(t, "Field not documented", "Key '%v' found in event is not documented.", eventFieldName)
+			}
+		}
+	}
+}
+
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":       "auditd",
-		"failure_mode": "log",
-		"socket_type":  "unicast",
+		"module":              "auditd",
+		"failure_mode":        "log",
+		"socket_type":         "unicast",
+		"include_warnings":    true,
+		"include_raw_message": true,
 	}
 }
 

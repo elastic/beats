@@ -1,0 +1,98 @@
+[
+    {
+        "event": {
+            "dataset": "php_fpm.process",
+            "duration": 115000,
+            "module": "php_fpm"
+        },
+        "http": {
+            "request": {
+                "method": "get"
+            },
+            "response": {
+                "body": {
+                    "bytes": 0
+                }
+            }
+        },
+        "metricset": {
+            "name": "process"
+        },
+        "php_fpm": {
+            "pool": {
+                "name": "www"
+            },
+            "process": {
+                "last_request_cpu": 0,
+                "last_request_memory": 0,
+                "request_duration": 135,
+                "requests": 9,
+                "script": "-",
+                "start_since": 3471,
+                "start_time": 1551792028,
+                "state": "Running"
+            }
+        },
+        "process": {
+            "pid": 24
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "php_fpm"
+        },
+        "url": {
+            "original": "/status?full\u0026json"
+        },
+        "user": {
+            "name": "-"
+        }
+    },
+    {
+        "event": {
+            "dataset": "php_fpm.process",
+            "duration": 115000,
+            "module": "php_fpm"
+        },
+        "http": {
+            "request": {
+                "method": "get"
+            },
+            "response": {
+                "body": {
+                    "bytes": 0
+                }
+            }
+        },
+        "metricset": {
+            "name": "process"
+        },
+        "php_fpm": {
+            "pool": {
+                "name": "www"
+            },
+            "process": {
+                "last_request_cpu": 0,
+                "last_request_memory": 2097152,
+                "request_duration": 811,
+                "requests": 8,
+                "script": "-",
+                "start_since": 3471,
+                "start_time": 1551792028,
+                "state": "Idle"
+            }
+        },
+        "process": {
+            "pid": 25
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "php_fpm"
+        },
+        "url": {
+            "original": "/status?full"
+        },
+        "user": {
+            "name": "-"
+        }
+    }
+]

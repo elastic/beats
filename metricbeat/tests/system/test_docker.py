@@ -7,6 +7,8 @@ from nose.plugins.attrib import attr
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['docker']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_container_fields(self):
         """
@@ -136,7 +138,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_network_fields(self):
         """
-        test info fields
+        test network fields
         """
         self.render_config_template(modules=[{
             "name": "docker",

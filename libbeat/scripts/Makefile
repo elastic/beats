@@ -83,6 +83,7 @@ INTEGRATION_TESTS?=
 FIND?=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
 XPACK_ONLY?=false
+XPACK_DIR=${ES_BEATS}/x-pack/${BEAT_NAME}
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
@@ -249,7 +250,7 @@ load-tests: ## @testing Runs load tests
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	@test -d ${PYTHON_ENV} || virtualenv ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
+	@test -d ${PYTHON_ENV} || virtualenv $(if ${PYTHON_EXE},-p ${PYTHON_EXE}) ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
 	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
@@ -327,6 +328,8 @@ update: python-env fields collect ## @build Update expects the most recent versi
 	@mkdir -p _meta
 	@# Update config files.
 	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
+	## The line below allows beats to add a post-processor script that alters the config in arbitrary ways
+	@if test -f scripts/post_process_config.py; then scripts/post_process_config.py ${BEAT_NAME}.yml; fi
 ifneq (,$(wildcard _meta/beat.docker.yml))
 	@cat _meta/beat.docker.yml ${ES_BEATS}/libbeat/_meta/config.docker.yml > ${BEAT_NAME}.docker.yml
 	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.docker.yml
@@ -360,14 +363,15 @@ endif
 	fi
 	@# Convert all dashboards to string
 	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
-	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go \
-	  -index '${BEAT_INDEX_PREFIX}-*' -beat ${BEAT_NAME} -fields $(PWD)/fields.yml \
-	  -version ${BEAT_VERSION} -out _meta/kibana.generated
 endif
 
 .PHONY: docs
 docs:  ## @build Builds the documents for the beat
-	sh ${ES_BEATS}/script/build_docs.sh ${BEAT_NAME} ${BEAT_PATH}/docs ${BUILD_DIR}
+	@if [ -d $(XPACK_DIR) ]; then \
+		sh ${ES_BEATS}/script/build_docs.sh ${BEAT_NAME} ${BEAT_PATH}/docs ${BUILD_DIR} ${XPACK_DIR}; \
+	else \
+		sh ${ES_BEATS}/script/build_docs.sh ${BEAT_NAME} ${BEAT_PATH}/docs ${BUILD_DIR}; \
+	fi
 
 .PHONY: docs-preview
 docs-preview:  ## @build Preview the documents for the beat in the browser

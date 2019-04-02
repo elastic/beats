@@ -43,9 +43,10 @@
           The client IP from SSH connections that are open and immediately dropped.
 
       - name: event
-        type: alias
-        path: event.action
-        migration: true
+        example: Accepted
+        description: >
+          The SSH event as found in the logs (Accepted, Invalid, Failed, etc.)
+
       - name: ip
         type: alias
         path: source.ip

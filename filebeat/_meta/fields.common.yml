@@ -35,6 +35,12 @@
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file.
 
+    - name: event.sequence
+      type: long
+      required: false
+      description: >
+        The sequence number of this event.
+
     - name: syslog.facility
       type: long
       required: false

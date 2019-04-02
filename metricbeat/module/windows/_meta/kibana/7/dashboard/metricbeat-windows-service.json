@@ -8,12 +8,12 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Service States [Metricbeat Windows]", 
+                "title": "Service States [Metricbeat Windows] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -59,7 +59,7 @@
                             "id": "5", 
                             "params": {
                                 "customLabel": "Host", 
-                                "field": "beat.name", 
+                                "field": "host.name", 
                                 "order": "desc", 
                                 "orderBy": "_term", 
                                 "size": 5
@@ -171,11 +171,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Service States [Metricbeat Windows]", 
+                    "title": "Service States [Metricbeat Windows] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "eb8277d0-c98c-11e7-9835-2f31fe08873b", 
+            "id": "eb8277d0-c98c-11e7-9835-2f31fe08873b-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -186,13 +186,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b", 
-                "title": "Hosts [Metricbeat Windows]", 
+                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Hosts [Metricbeat Windows] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -221,7 +221,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Host", 
-                                "field": "beat.name", 
+                                "field": "host.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 100
@@ -241,11 +241,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Hosts [Metricbeat Windows]", 
+                    "title": "Hosts [Metricbeat Windows] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "23a5fff0-c98e-11e7-9835-2f31fe08873b", 
+            "id": "23a5fff0-c98e-11e7-9835-2f31fe08873b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -256,13 +256,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b", 
-                "title": "Startup States [Metricbeat Windows]", 
+                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Startup States [Metricbeat Windows] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -311,11 +311,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Startup States [Metricbeat Windows]", 
+                    "title": "Startup States [Metricbeat Windows] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "830c45f0-c991-11e7-9835-2f31fe08873b", 
+            "id": "830c45f0-c991-11e7-9835-2f31fe08873b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -326,13 +326,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b", 
-                "title": "Unique Services [Metricbeat Windows]", 
+                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Unique Services [Metricbeat Windows] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -395,11 +395,11 @@
                         }, 
                         "type": "gauge"
                     }, 
-                    "title": "Unique Services [Metricbeat Windows]", 
+                    "title": "Unique Services [Metricbeat Windows] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "35f5ad60-c996-11e7-9835-2f31fe08873b", 
+            "id": "35f5ad60-c996-11e7-9835-2f31fe08873b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -480,13 +480,13 @@
                             }
                         ], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b", 
-                "title": "Non-zero Service Exit Codes [Metricbeat Windows]", 
+                "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs", 
+                "title": "Non-zero Service Exit Codes [Metricbeat Windows] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -549,18 +549,18 @@
                         }, 
                         "type": "gauge"
                     }, 
-                    "title": "Non-zero Service Exit Codes [Metricbeat Windows]", 
+                    "title": "Non-zero Service Exit Codes [Metricbeat Windows] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "c36b2ba0-ca29-11e7-9835-2f31fe08873b", 
+            "id": "c36b2ba0-ca29-11e7-9835-2f31fe08873b-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "beat.name", 
+                    "host.name", 
                     "windows.service.display_name", 
                     "windows.service.state", 
                     "windows.service.start_type", 
@@ -581,7 +581,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "metricbeat-*", 
-                                    "key": "metricset.module", 
+                                    "key": "event.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "windows", 
@@ -592,7 +592,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "metricset.module": {
+                                        "event.module": {
                                             "query": "windows", 
                                             "type": "phrase"
                                         }
@@ -629,7 +629,7 @@
                         "highlightAll": true, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -639,10 +639,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Services [Metricbeat Windows]", 
+                "title": "Services [Metricbeat Windows] ECS", 
                 "version": 1
             }, 
-            "id": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b", 
+            "id": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -655,7 +655,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -667,7 +667,7 @@
                 "panelsJSON": [
                     {
                         "col": 4, 
-                        "id": "eb8277d0-c98c-11e7-9835-2f31fe08873b", 
+                        "id": "eb8277d0-c98c-11e7-9835-2f31fe08873b-ecs", 
                         "panelIndex": 1, 
                         "row": 4, 
                         "size_x": 9, 
@@ -676,7 +676,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "23a5fff0-c98e-11e7-9835-2f31fe08873b", 
+                        "id": "23a5fff0-c98e-11e7-9835-2f31fe08873b-ecs", 
                         "panelIndex": 2, 
                         "row": 4, 
                         "size_x": 3, 
@@ -685,7 +685,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "830c45f0-c991-11e7-9835-2f31fe08873b", 
+                        "id": "830c45f0-c991-11e7-9835-2f31fe08873b-ecs", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 4, 
@@ -694,7 +694,7 @@
                     }, 
                     {
                         "col": 5, 
-                        "id": "35f5ad60-c996-11e7-9835-2f31fe08873b", 
+                        "id": "35f5ad60-c996-11e7-9835-2f31fe08873b-ecs", 
                         "panelIndex": 4, 
                         "row": 1, 
                         "size_x": 4, 
@@ -703,7 +703,7 @@
                     }, 
                     {
                         "col": 9, 
-                        "id": "c36b2ba0-ca29-11e7-9835-2f31fe08873b", 
+                        "id": "c36b2ba0-ca29-11e7-9835-2f31fe08873b-ecs", 
                         "panelIndex": 5, 
                         "row": 1, 
                         "size_x": 4, 
@@ -712,7 +712,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Windows] Services", 
+                "title": "[Metricbeat Windows] Services ECS", 
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
@@ -751,7 +751,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "d9eba730-c991-11e7-9835-2f31fe08873b", 
+            "id": "d9eba730-c991-11e7-9835-2f31fe08873b-ecs", 
             "type": "dashboard", 
             "version": 6
         }

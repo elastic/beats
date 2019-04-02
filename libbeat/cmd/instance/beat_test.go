@@ -20,7 +20,11 @@
 package instance
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/cfgfile"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -62,4 +66,52 @@ func TestNewInstanceUUID(t *testing.T) {
 		t.Fatalf("error while generating ID: %v", err)
 	}
 	assert.NotEqual(t, b.Info.ID, differentUUID)
+}
+
+func TestInitKibanaConfig(t *testing.T) {
+	b, err := NewBeat("filebeat", "testidx", "0.9")
+	if err != nil {
+		panic(err)
+	}
+
+	assert.Equal(t, "filebeat", b.Info.Beat)
+	assert.Equal(t, "testidx", b.Info.IndexPrefix)
+	assert.Equal(t, "0.9", b.Info.Version)
+
+	cfg, err := cfgfile.Load("../test/filebeat_test.yml", nil)
+	err = cfg.Unpack(&b.Config)
+	assert.NoError(t, err)
+
+	kibanaConfig, err := initKibanaConfig(b.Config)
+	assert.NoError(t, err)
+	username, err := kibanaConfig.String("username", -1)
+	password, err := kibanaConfig.String("password", -1)
+	protocol, err := kibanaConfig.String("protocol", -1)
+	host, err := kibanaConfig.String("host", -1)
+
+	assert.Equal(t, "elastic-test-username", username)
+	assert.Equal(t, "elastic-test-password", password)
+	assert.Equal(t, "https", protocol)
+	assert.Equal(t, "127.0.0.1:5601", host)
+}
+
+func TestEmptyMetaJson(t *testing.T) {
+	b, err := NewBeat("filebeat", "testidx", "0.9")
+	if err != nil {
+		panic(err)
+	}
+
+	// prepare empty meta file
+	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	assert.Equal(t, nil, err, "Unable to create temporary meta file")
+
+	metaPath := metaFile.Name()
+	metaFile.Close()
+	defer os.Remove(metaPath)
+
+	// load metadata
+	err = b.loadMeta(metaPath)
+
+	assert.Equal(t, nil, err, "Unable to load meta file properly")
+	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
 }

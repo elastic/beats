@@ -12,8 +12,8 @@
             }
           }
         },
-        "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3",
-        "title": "HTTP Transactions [Packetbeat]",
+        "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
+        "title": "HTTP Transactions [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -115,11 +115,11 @@
             ],
             "yAxis": {}
           },
-          "title": "HTTP Transactions [Packetbeat]",
+          "title": "HTTP Transactions [Packetbeat] ECS",
           "type": "histogram"
         }
       },
-      "id": "Web-transactions",
+      "id": "Web-transactions-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:21:31.922Z",
       "version": 3
@@ -159,12 +159,12 @@
             ],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Transaction Types [Packetbeat]",
+        "title": "Transaction Types [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -282,11 +282,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Transaction Types [Packetbeat]",
+          "title": "Transaction Types [Packetbeat] ECS",
           "type": "histogram"
         }
       },
-      "id": "DB-transactions",
+      "id": "DB-transactions-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:20:54.634Z",
       "version": 3
@@ -303,8 +303,8 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Search",
-        "title": "Response times percentiles [Packetbeat]",
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Response times percentiles [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -421,11 +421,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Response times percentiles [Packetbeat]",
+          "title": "Response times percentiles [Packetbeat] ECS",
           "type": "line"
         }
       },
-      "id": "Response-times-percentiles",
+      "id": "Response-times-percentiles-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:01:49.340Z",
       "version": 2
@@ -438,8 +438,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "Transactions-errors",
-        "title": "Errors count over time",
+        "savedSearchId": "Transactions-errors-ecs",
+        "title": "Errors count over time ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -487,11 +487,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "New Visualization",
+          "title": "New Visualization ECS",
           "type": "histogram"
         }
       },
-      "id": "Errors-count-over-time",
+      "id": "Errors-count-over-time-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:30.350Z",
       "version": 1
@@ -508,8 +508,8 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Search",
-        "title": "Errors vs successful transactions [Packetbeat]",
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Errors vs successful transactions [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -627,11 +627,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Errors vs successful transactions [Packetbeat]",
+          "title": "Errors vs successful transactions [Packetbeat] ECS",
           "type": "histogram"
         }
       },
-      "id": "Errors-vs-successful-transactions",
+      "id": "Errors-vs-successful-transactions-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:02:24.071Z",
       "version": 2
@@ -648,8 +648,8 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Search",
-        "title": "Latency Histogram [Packetbeat]",
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Latency Histogram [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -750,11 +750,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Latency Histogram [Packetbeat]",
+          "title": "Latency Histogram [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "Latency-histogram",
+      "id": "Latency-histogram-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:03:54.084Z",
       "version": 2
@@ -767,17 +767,12 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat]",
+        "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat] ECS",
         "uiStateJSON": {
           "mapCenter": [
             0,
@@ -860,11 +855,11 @@
               "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
-          "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat]",
+          "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat] ECS",
           "type": "tile_map"
         }
       },
-      "id": "Client-locations",
+      "id": "Client-locations-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:52:42.404Z",
       "version": 2
@@ -881,8 +876,8 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Search",
-        "title": "Response times repartition [Packetbeat]",
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Response times repartition [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -995,11 +990,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Response times repartition [Packetbeat]",
+          "title": "Response times repartition [Packetbeat] ECS",
           "type": "histogram"
         }
       },
-      "id": "Response-times-repartition",
+      "id": "Response-times-repartition-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:00:32.530Z",
       "version": 2
@@ -1011,31 +1006,26 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Navigation [Packetbeat]",
+        "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat]",
+          "title": "Navigation [Packetbeat] ECS",
           "type": "markdown"
         }
       },
-      "id": "Navigation",
+      "id": "Navigation-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
       "version": 11
@@ -1052,8 +1042,8 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Transactions [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Transactions [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1195,11 +1185,11 @@
               }
             ]
           },
-          "title": "DNS Transactions [Packetbeat]",
+          "title": "DNS Transactions [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "e3f09730-1b80-11e9-83df-75eebb35951e",
+      "id": "e3f09730-1b80-11e9-83df-75eebb35951e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:29:49.161Z",
       "version": 3
@@ -1211,13 +1201,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
-        "title": "TLS Sessions [Packetbeat]",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Sessions [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -1335,11 +1325,11 @@
               }
             ]
           },
-          "title": "TLS Sessions",
+          "title": "TLS Sessions ECS",
           "type": "histogram"
         }
       },
-      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
+      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1384,8 +1374,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": "*"
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1394,10 +1384,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "HTTP Transactions Search [Packetbeat]",
+        "title": "HTTP Transactions Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "71908f00-88ca-11e7-ad9c-db80de0bf8d3",
+      "id": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
       "type": "search",
       "updated_at": "2019-01-19T00:21:43.886Z",
       "version": 3
@@ -1463,7 +1453,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1473,10 +1463,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Packetbeat Search",
+        "title": "Packetbeat Search ECS",
         "version": 1
       },
-      "id": "Packetbeat-Search",
+      "id": "Packetbeat-Search-ecs",
       "type": "search",
       "updated_at": "2019-01-19T00:01:10.720Z",
       "version": 2
@@ -1568,7 +1558,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1578,10 +1568,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Transactions Errors Search [Packetbeat]",
+        "title": "Transactions Errors Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "Transactions-errors",
+      "id": "Transactions-errors-ecs",
       "type": "search",
       "updated_at": "2019-01-19T00:05:18.965Z",
       "version": 3
@@ -1642,7 +1632,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1652,10 +1642,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "DNS Protocol [Packetbeat]",
+        "title": "DNS Protocol [Packetbeat] ECS",
         "version": 1
       },
-      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 2
@@ -1691,13 +1681,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1706,10 +1691,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Sessions [Packetbeat]",
+        "title": "TLS Sessions [Packetbeat] ECS",
         "version": 1
       },
-      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1723,8 +1708,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": "*"
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1741,7 +1726,7 @@
               "x": 12,
               "y": 20
             },
-            "id": "Web-transactions",
+            "id": "Web-transactions-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1754,7 +1739,7 @@
               "x": 36,
               "y": 20
             },
-            "id": "DB-transactions",
+            "id": "DB-transactions-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1767,7 +1752,7 @@
               "x": 0,
               "y": 45
             },
-            "id": "Response-times-percentiles",
+            "id": "Response-times-percentiles-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1780,7 +1765,7 @@
               "x": 0,
               "y": 60
             },
-            "id": "Errors-count-over-time",
+            "id": "Errors-count-over-time-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1793,7 +1778,7 @@
               "x": 24,
               "y": 45
             },
-            "id": "Errors-vs-successful-transactions",
+            "id": "Errors-vs-successful-transactions-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1806,7 +1791,7 @@
               "x": 24,
               "y": 60
             },
-            "id": "Latency-histogram",
+            "id": "Latency-histogram-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1843,7 +1828,7 @@
               "x": 12,
               "y": 0
             },
-            "id": "Client-locations",
+            "id": "Client-locations-ecs",
             "panelIndex": "9",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1856,7 +1841,7 @@
               "x": 0,
               "y": 30
             },
-            "id": "Response-times-repartition",
+            "id": "Response-times-repartition-ecs",
             "panelIndex": "10",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1869,7 +1854,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "Navigation",
+            "id": "Navigation-ecs",
             "panelIndex": "11",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1883,7 +1868,7 @@
               "x": 0,
               "y": 20
             },
-            "id": "e3f09730-1b80-11e9-83df-75eebb35951e",
+            "id": "e3f09730-1b80-11e9-83df-75eebb35951e-ecs",
             "panelIndex": "12",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1897,17 +1882,17 @@
               "x": 24,
               "y": 20
             },
-            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
+            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
             "panelIndex": "13",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] Overview",
+        "title": "[Packetbeat] Overview ECS",
         "version": 1
       },
-      "id": "Packetbeat-Dashboard",
+      "id": "Packetbeat-Dashboard-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-19T00:31:53.357Z",
       "version": 5

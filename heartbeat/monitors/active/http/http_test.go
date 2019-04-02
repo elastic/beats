@@ -27,7 +27,9 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -38,7 +40,6 @@ import (
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	btesting "github.com/elastic/beats/libbeat/testing"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func testRequest(t *testing.T, testURL string) *beat.Event {
@@ -192,7 +193,7 @@ func TestUpStatuses(t *testing.T) {
 		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
 			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
 
-			mapvaltest.Test(
+			mapval.Test(
 				t,
 				mapval.Strict(mapval.Compose(
 					hbtest.BaseChecks("127.0.0.1", "up", "http"),
@@ -212,7 +213,7 @@ func TestDownStatuses(t *testing.T) {
 		t.Run(fmt.Sprintf("test down status %d", status), func(t *testing.T) {
 			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
 
-			mapvaltest.Test(
+			mapval.Test(
 				t,
 				mapval.Strict(mapval.Compose(
 					hbtest.BaseChecks("127.0.0.1", "down", "http"),
@@ -249,7 +250,7 @@ func TestLargeResponse(t *testing.T) {
 	_, err = job(event)
 	require.NoError(t, err)
 
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
@@ -280,9 +281,18 @@ func runHTTPSServerCheck(
 		mergedExtraConfig[k] = v
 	}
 
-	event := testTLSRequest(t, server.URL, mergedExtraConfig)
+	// Sometimes the test server can take a while to start. Since we're only using this to test up statuses,
+	// we give it a few attempts to see if the server can come up before we run the real assertions.
+	var event *beat.Event
+	for i := 0; i < 10; i++ {
+		event = testTLSRequest(t, server.URL, mergedExtraConfig)
+		if v, err := event.GetValue("monitor.status"); err == nil && reflect.DeepEqual(v, "up") {
+			break
+		}
+		time.Sleep(time.Millisecond * 500)
+	}
 
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
@@ -348,7 +358,7 @@ func TestConnRefusedJob(t *testing.T) {
 
 	event := testRequest(t, url)
 
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
@@ -370,7 +380,7 @@ func TestUnreachableJob(t *testing.T) {
 
 	event := testRequest(t, url)
 
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),

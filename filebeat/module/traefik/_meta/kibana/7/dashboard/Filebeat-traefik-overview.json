@@ -8,14 +8,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Browsers breakdown [Filebeat Traefik]", 
+                "title": "Browsers breakdown [Filebeat Traefik] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -31,7 +29,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "traefik.access.user_agent.name", 
+                                "field": "user_agent.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -43,7 +41,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "traefik.access.user_agent.major", 
+                                "field": "user_agent.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -60,11 +58,11 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Traefik Access Browsers", 
+                    "title": "Traefik Access Browsers ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "Traefik-Access-Browsers", 
+            "id": "Traefik-Access-Browsers-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -76,14 +74,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Operating systems breakdown [Filebeat Traefik]", 
+                "title": "Operating systems breakdown [Filebeat Traefik] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -99,7 +95,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "traefik.access.user_agent.os_name", 
+                                "field": "user_agent.os.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -111,7 +107,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "traefik.access.user_agent.os_major", 
+                                "field": "user_agent.os.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -128,11 +124,11 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Traefik Access OSes", 
+                    "title": "Traefik Access OSes ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "Traefik-Access-OSes", 
+            "id": "Traefik-Access-OSes-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -144,8 +140,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Filebeat-Traefik-module", 
-                "title": "Response codes over time [Filebeat Traefik]", 
+                "savedSearchId": "Filebeat-Traefik-module-ecs", 
+                "title": "Response codes over time [Filebeat Traefik] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -181,7 +177,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "traefik.access.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -204,11 +200,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "New Visualization", 
+                    "title": "New Visualization ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "New-Visualization", 
+            "id": "New-Visualization-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -220,14 +216,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Response codes by top URLs [Filebeat Traefik]", 
+                "title": "Response codes by top URLs [Filebeat Traefik] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -250,7 +244,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "traefik.access.url", 
+                                "field": "url.original", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "row": false, 
@@ -263,7 +257,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "traefik.access.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -280,11 +274,11 @@
                         "legendPosition": "right", 
                         "shareYAxis": true
                     }, 
-                    "title": "Traefik Access Response codes by top URLs", 
+                    "title": "Traefik Access Response codes by top URLs ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "Traefik-Access-Response-codes-by-top-URLs", 
+            "id": "Traefik-Access-Response-codes-by-top-URLs-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -309,14 +303,12 @@
                         }, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:traefik.access"
+                            "language": "kuery",
+                                "query": "event.dataset:traefik.access"
                             }
-                        }
                     }
                 }, 
-                "title": "Sent Byte Size [Filebeat Traefik]", 
+                "title": "Sent Byte Size [Filebeat Traefik] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -326,7 +318,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Data sent", 
-                                "field": "traefik.access.body_sent.bytes"
+                                "field": "http.response.body.bytes"
                             }, 
                             "schema": "metric", 
                             "type": "sum"
@@ -370,11 +362,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Sent sizes", 
+                    "title": "Sent sizes ECS", 
                     "type": "line"
                 }
             }, 
-            "id": "Sent-sizes", 
+            "id": "Sent-sizes-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -386,8 +378,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Filebeat-Traefik-module", 
-                "title": "Access Map [Filebeat Traefik]", 
+                "savedSearchId": "Filebeat-Traefik-module-ecs", 
+                "title": "Access Map [Filebeat Traefik] ECS", 
                 "uiStateJSON": {
                     "mapCenter": [
                         12.039320557540572, 
@@ -409,7 +401,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "traefik.access.geoip.location"
+                                "field": "source.geo.location"
                             }, 
                             "schema": "segment", 
                             "type": "geohash_grid"
@@ -444,11 +436,11 @@
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
-                    "title": "Traefik Access Map", 
+                    "title": "Traefik Access Map ECS", 
                     "type": "tile_map"
                 }
             }, 
-            "id": "Traefik-Access-Map", 
+            "id": "Traefik-Access-Map-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -477,21 +469,19 @@
                         }, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:traefik"
+                            "language": "kuery",
+                                "query": "event.module:traefik"
                             }
-                        }
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Traefik logs [Filebeat Traefik]", 
+                "title": "Traefik logs [Filebeat Traefik] ECS", 
                 "version": 1
             }, 
-            "id": "Filebeat-Traefik-module", 
+            "id": "Filebeat-Traefik-module-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -501,17 +491,12 @@
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [
-                            {
+                        "filter": [],
                                 "query": {
-                                    "query_string": {
-                                        "analyze_wildcard": true, 
-                                        "query": "*"
-                                    }
+                            "language": "kuery",
+                            "query": ""
                                 }
                             }
-                        ]
-                    }
                 }, 
                 "optionsJSON": {
                     "darkTheme": false
@@ -519,7 +504,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Traefik-Access-Browsers", 
+                        "id": "Traefik-Access-Browsers-ecs", 
                         "panelIndex": 3, 
                         "row": 10, 
                         "size_x": 4, 
@@ -528,7 +513,7 @@
                     }, 
                     {
                         "col": 5, 
-                        "id": "Traefik-Access-OSes", 
+                        "id": "Traefik-Access-OSes-ecs", 
                         "panelIndex": 4, 
                         "row": 10, 
                         "size_x": 4, 
@@ -537,7 +522,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "New-Visualization", 
+                        "id": "New-Visualization-ecs", 
                         "panelIndex": 5, 
                         "row": 4, 
                         "size_x": 12, 
@@ -546,7 +531,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Traefik-Access-Response-codes-by-top-URLs", 
+                        "id": "Traefik-Access-Response-codes-by-top-URLs-ecs", 
                         "panelIndex": 6, 
                         "row": 7, 
                         "size_x": 12, 
@@ -555,7 +540,7 @@
                     }, 
                     {
                         "col": 9, 
-                        "id": "Sent-sizes", 
+                        "id": "Sent-sizes-ecs", 
                         "panelIndex": 7, 
                         "row": 10, 
                         "size_x": 4, 
@@ -564,7 +549,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Traefik-Access-Map", 
+                        "id": "Traefik-Access-Map-ecs", 
                         "panelIndex": 8, 
                         "row": 1, 
                         "size_x": 12, 
@@ -573,7 +558,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Traefik] Access logs", 
+                "title": "[Filebeat Traefik] Access logs ECS", 
                 "uiStateJSON": {
                     "P-4": {
                         "vis": {
@@ -589,7 +574,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "Filebeat-Traefik-Dashboard", 
+            "id": "Filebeat-Traefik-Dashboard-ecs", 
             "type": "dashboard", 
             "version": 3
         }

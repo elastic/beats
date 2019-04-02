@@ -2,42 +2,96 @@
   "objects": [
     {
       "attributes": {
-        "columns": [
-          "@timestamp",
-          "host.name",
-          "message"
-        ],
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "highlightAll": true,
-            "index": "journalbeat-*",
             "query": {
-              "language": "lucene",
-              "query": "process.name:systemd"
-            },
-            "version": true
+              "language": "kuery",
+              "query": ""
+            }
           }
         },
-        "sort": [
-          "@timestamp",
-          "desc"
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "3",
+              "w": 48,
+              "x": 0,
+              "y": 15
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "version": "7.0.0"
+          }
         ],
-        "title": "[Journalbeat] Systemd messages",
+        "timeRestore": false,
+        "title": "[Journalbeat] Overview ECS",
         "version": 1
       },
-      "id": "aa003e90-e2b9-11e8-9f52-734e93de180d",
-      "type": "search",
-      "updated_at": "2018-11-07T18:19:28.377Z",
+      "id": "effdfcd0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "dashboard": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+          "name": "panel_0",
+          "type": "search"
+        },
+        {
+          "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+          "name": "panel_1",
+          "type": "search"
+        },
+        {
+          "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+          "name": "panel_2",
+          "type": "search"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-02-04T12:25:20.413Z",
       "version": 1
     },
     {
       "attributes": {
         "columns": [
           "@timestamp",
-          "host.name",
+          "host.hostname",
           "journald.kernel.subsystem",
           "message"
         ],
@@ -47,31 +101,41 @@
           "searchSourceJSON": {
             "filter": [],
             "highlightAll": true,
-            "index": "journalbeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
-              "query": "syslog.facility:0 AND syslog.priority:\u003c4"
+              "language": "kuery",
+              "query": "syslog.facility:0 AND syslog.priority<4"
             },
             "version": true
           }
         },
         "sort": [
-          "_score",
+          "@timestamp",
           "desc"
         ],
-        "title": "[Journalbeat] Kernel errors",
+        "title": "[Journalbeat] Kernel errors ECS",
         "version": 1
       },
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d",
+      "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "33c018b0-2876-11e9-bc7e-af96a8fe0ddd",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "search",
-      "updated_at": "2018-11-07T18:24:29.889Z",
+      "updated_at": "2019-02-04T12:19:40.092Z",
       "version": 1
     },
     {
       "attributes": {
         "columns": [
           "@timestamp",
-          "host.name",
+          "host.hostname",
           "process.name",
           "message"
         ],
@@ -81,33 +145,41 @@
           "searchSourceJSON": {
             "filter": [],
             "highlightAll": true,
-            "index": "journalbeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "syslog.facility:4"
             },
             "version": true
           }
         },
         "sort": [
-          "_score",
+          "@timestamp",
           "desc"
         ],
-        "title": "[Journalbeat] Login authorization",
+        "title": "[Journalbeat] Authorization ECS",
         "version": 1
       },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d",
+      "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "33c018b0-2876-11e9-bc7e-af96a8fe0ddd",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "search",
-      "updated_at": "2018-11-07T18:26:05.348Z",
-      "version": 2
+      "updated_at": "2019-02-04T12:20:56.412Z",
+      "version": 1
     },
     {
       "attributes": {
         "columns": [
           "@timestamp",
-          "host.name",
-          "journald.kernel.subsystem",
-          "journald.kernel.device_node_path",
+          "host.hostname",
           "message"
         ],
         "description": "",
@@ -116,54 +188,36 @@
           "searchSourceJSON": {
             "filter": [],
             "highlightAll": true,
-            "index": "journalbeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
-              "query": "journald.kernel.subsystem:usb OR journald.kernel.subsystem:hid"
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
         },
         "sort": [
-          "_score",
+          "@timestamp",
           "desc"
         ],
-        "title": "[Journalbeat] USB and HID messages",
+        "title": "[Journalbeat] Systemd messages ECS",
         "version": 1
       },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d",
+      "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "33c018b0-2876-11e9-bc7e-af96a8fe0ddd",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "search",
-      "updated_at": "2018-11-07T18:28:35.543Z",
+      "updated_at": "2019-02-04T12:22:19.508Z",
       "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": null,
-        "timeRestore": false,
-        "title": "[Journalbeat] Overview",
-        "version": 1
-      },
-      "id": "f2de4440-e2b9-11e8-9f52-734e93de180d",
-      "type": "dashboard",
-      "updated_at": "2018-11-07T18:30:18.083Z",
-      "version": 2
     }
   ],
-  "version": "7.0.0-alpha1-SNAPSHOT"
+  "version": "7.0.0"
 }

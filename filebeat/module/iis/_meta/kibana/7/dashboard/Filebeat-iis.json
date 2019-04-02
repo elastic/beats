@@ -8,12 +8,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Access map [Filebeat IIS]", 
+                "title": "Access map [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -30,7 +30,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "iis.access.geoip.location", 
+                                "field": "source.geo.location", 
                                 "isFilteredByCollar": true, 
                                 "precision": 2, 
                                 "useGeocentroid": true
@@ -58,11 +58,11 @@
                             }
                         }
                     }, 
-                    "title": "Access map [Filebeat IIS]", 
+                    "title": "Access map [Filebeat IIS] ECS", 
                     "type": "tile_map"
                 }
             }, 
-            "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f", 
+            "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-20T18:44:17.162Z", 
             "version": 1
@@ -75,12 +75,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Response codes over time [Filebeat IIS]", 
+                "title": "Response codes over time [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -109,7 +109,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "iis.access.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -186,11 +186,11 @@
                             }
                         ]
                     }, 
-                    "title": "Response codes over time [Filebeat IIS]", 
+                    "title": "Response codes over time [Filebeat IIS] ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "f31414b0-fe14-11e7-a3b0-d13028918f9f", 
+            "id": "f31414b0-fe14-11e7-a3b0-d13028918f9f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-20T19:05:58.905Z", 
             "version": 1
@@ -203,12 +203,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Browsers breakdown [Filebeat IIS]", 
+                "title": "Browsers breakdown [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -224,7 +224,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "iis.access.user_agent.name", 
+                                "field": "user_agent.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -236,7 +236,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "iis.access.user_agent.major", 
+                                "field": "user_agent.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -258,11 +258,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Browsers breakdown [Filebeat IIS]", 
+                    "title": "Browsers breakdown [Filebeat IIS] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "63129c80-fe12-11e7-a3b0-d13028918f9f", 
+            "id": "63129c80-fe12-11e7-a3b0-d13028918f9f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-20T18:47:38.312Z", 
             "version": 1
@@ -275,12 +275,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Operating systems breakdown [Filebeat IIS]", 
+                "title": "Operating systems breakdown [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -296,7 +296,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "iis.access.user_agent.os_name", 
+                                "field": "user_agent.os.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -308,7 +308,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "iis.access.user_agent.os_major", 
+                                "field": "user_agent.os.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -330,11 +330,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Operating systems breakdown [Filebeat IIS]", 
+                    "title": "Operating systems breakdown [Filebeat IIS] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "ccd3f9c0-fe12-11e7-a3b0-d13028918f9f", 
+            "id": "ccd3f9c0-fe12-11e7-a3b0-d13028918f9f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-20T18:51:54.619Z", 
             "version": 2
@@ -347,12 +347,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Error logs over time [Filebeat IIS]", 
+                "title": "Error logs over time [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -381,7 +381,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "iis.error.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -458,11 +458,11 @@
                             }
                         ]
                     }, 
-                    "title": "Error logs over time [Filebeat IIS]", 
+                    "title": "Error logs over time [Filebeat IIS] ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "41f38230-fe17-11e7-a3b0-d13028918f9f", 
+            "id": "41f38230-fe17-11e7-a3b0-d13028918f9f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-20T19:22:30.227Z", 
             "version": 1
@@ -475,12 +475,12 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Top URLs by response code [Filebeat IIS]", 
+                "title": "Top URLs by response code [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -497,7 +497,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "URL", 
-                                "field": "iis.access.url", 
+                                "field": "url.path", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "row": false, 
@@ -510,7 +510,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "iis.access.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -532,11 +532,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Top URLs by response code [Filebeat IIS]", 
+                    "title": "Top URLs by response code [Filebeat IIS] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f", 
+            "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-20T19:58:24.005Z", 
             "version": 2
@@ -550,7 +550,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -570,7 +570,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f", 
+                        "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "1", 
                         "type": "visualization", 
                         "version": "6.1.2"
@@ -583,7 +583,7 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "f31414b0-fe14-11e7-a3b0-d13028918f9f", 
+                        "id": "f31414b0-fe14-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "2", 
                         "type": "visualization", 
                         "version": "6.1.2"
@@ -596,7 +596,7 @@
                             "x": 0, 
                             "y": 9
                         }, 
-                        "id": "63129c80-fe12-11e7-a3b0-d13028918f9f", 
+                        "id": "63129c80-fe12-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "4", 
                         "type": "visualization", 
                         "version": "6.1.2"
@@ -609,7 +609,7 @@
                             "x": 6, 
                             "y": 9
                         }, 
-                        "id": "ccd3f9c0-fe12-11e7-a3b0-d13028918f9f", 
+                        "id": "ccd3f9c0-fe12-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "5", 
                         "type": "visualization", 
                         "version": "6.1.2"
@@ -622,7 +622,7 @@
                             "x": 7, 
                             "y": 3
                         }, 
-                        "id": "41f38230-fe17-11e7-a3b0-d13028918f9f", 
+                        "id": "41f38230-fe17-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "6", 
                         "type": "visualization", 
                         "version": "6.1.2"
@@ -635,18 +635,18 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f", 
+                        "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "7", 
                         "type": "visualization", 
                         "version": "6.1.2"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat IIS] Access and error logs", 
+                "title": "[Filebeat IIS] Access and error logs ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 
-            "id": "4278ad30-fe16-11e7-a3b0-d13028918f9f", 
+            "id": "4278ad30-fe16-11e7-a3b0-d13028918f9f-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-01-20T19:57:50.287Z", 
             "version": 4

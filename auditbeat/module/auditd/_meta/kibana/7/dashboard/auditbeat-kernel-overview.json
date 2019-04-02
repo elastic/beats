@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Event Actions [Auditbeat Auditd Overview]", 
+                "title": "Event Actions [Auditbeat Auditd Overview] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -65,11 +65,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Event Actions [Auditbeat Auditd Overview]", 
+                    "title": "Event Actions [Auditbeat Auditd Overview] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "97680df0-c1c0-11e7-8995-936807a28b16", 
+            "id": "97680df0-c1c0-11e7-8995-936807a28b16-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-16T22:11:01.438Z", 
             "version": 3
@@ -82,13 +82,13 @@
                         "filter": [], 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "0f10c430-c1c3-11e7-8995-936807a28b16", 
-                "title": "Event Categories [Auditbeat Auditd]", 
+                "savedSearchId": "0f10c430-c1c3-11e7-8995-936807a28b16-ecs", 
+                "title": "Event Categories [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -134,11 +134,11 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "Event Categories [Auditbeat Auditd]", 
+                    "title": "Event Categories [Auditbeat Auditd] ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "08679220-c25a-11e7-8692-232bd1143e8a", 
+            "id": "08679220-c25a-11e7-8692-232bd1143e8a-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-16T22:54:10.330Z", 
             "version": 4
@@ -146,7 +146,7 @@
         {
             "attributes": {
                 "columns": [
-                    "beat.hostname", 
+                    "agent.hostname", 
                     "auditd.summary.actor.primary", 
                     "auditd.summary.actor.secondary", 
                     "event.action", 
@@ -191,7 +191,7 @@
                         "highlightAll": true, 
                         "index": "auditbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -201,10 +201,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Audit Event Table [Auditbeat Auditd]", 
+                "title": "Audit Event Table [Auditbeat Auditd] ECS", 
                 "version": 1
             }, 
-            "id": "0f10c430-c1c3-11e7-8995-936807a28b16", 
+            "id": "0f10c430-c1c3-11e7-8995-936807a28b16-ecs", 
             "type": "search", 
             "updated_at": "2018-01-16T22:51:24.572Z", 
             "version": 4
@@ -218,7 +218,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -237,7 +237,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "97680df0-c1c0-11e7-8995-936807a28b16", 
+                        "id": "97680df0-c1c0-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "1", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -250,7 +250,7 @@
                             "x": 7, 
                             "y": 0
                         }, 
-                        "id": "08679220-c25a-11e7-8692-232bd1143e8a", 
+                        "id": "08679220-c25a-11e7-8692-232bd1143e8a-ecs", 
                         "panelIndex": "4", 
                         "type": "visualization", 
                         "version": "6.2.4"
@@ -263,17 +263,17 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "0f10c430-c1c3-11e7-8995-936807a28b16", 
+                        "id": "0f10c430-c1c3-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "5", 
                         "type": "search", 
                         "version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Auditbeat Auditd] Overview", 
+                "title": "[Auditbeat Auditd] Overview ECS", 
                 "version": 1
             }, 
-            "id": "c0ac2c00-c1c0-11e7-8995-936807a28b16", 
+            "id": "c0ac2c00-c1c0-11e7-8995-936807a28b16-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-01-16T22:55:17.775Z", 
             "version": 5

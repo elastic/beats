@@ -100,16 +100,9 @@
   to: process.executable
   alias: true
 
-
 ## Filebeat
 - from: offset
   to: log.offset
-  alias6: true
-  alias: true
-  beat: filebeat
-
-- from: fileset.name
-  to: event.dataset
   alias6: true
   alias: true
   beat: filebeat
@@ -349,11 +342,6 @@
   alias: true
   beat: filebeat
 
-- from: suricata.eve.event_type
-  to: event.type
-  alias: true
-  beat: filebeat
-
 - from: suricata.eve.fileinfo.filename
   to: file.path
   alias: true
@@ -444,6 +432,12 @@
   alias: true
   beat: filebeat
 
+- from: event.type
+  to: suricata.eve.event_type
+  alias: false
+  beat: auditbeat
+  comment: event.type is reserved for future use by ECS.
+
 ## System module
 
 - from: system.syslog.hostname
@@ -469,7 +463,26 @@
 - from: system.auth.hostname
   to: host.hostname
   alias: true
-  copy_to: false
+  beat: filebeat
+
+- from: system.auth.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: system.auth.program
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.timestamp
+  to: '@timestamp'
+  alias: true
+  beat: filebeat
+
+- from: system.auth.user
+  to: user.name
+  alias: true
   beat: filebeat
 
 - from: system.auth.pid
@@ -482,18 +495,23 @@
   alias: true
   beat: filebeat
 
+- from: system.auth.groupadd.name
+  to: group.name
+  alias: true
+  beat: filebeat
+
+- from: system.auth.useradd.gid
+  to: group.id
+  alias: true
+  beat: filebeat
+
 - from: system.auth.useradd.uid
   to: user.id
   alias: true
   beat: filebeat
 
-- from: system.auth.useradd.user
+- from: system.auth.useradd.name
   to: user.name
-  alias: true
-  beat: filebeat
-
-- from: system.auth.ssh.event
-  to: event.action
   alias: true
   beat: filebeat
 
@@ -587,8 +605,8 @@
 - from: apache2.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
-# These expand all fields under geoip and user_agent
 - from: apache2.access.geoip.continent_name
   to: source.geo.continent_name
   alias: true
@@ -619,49 +637,50 @@
   alias: true
   beat: filebeat
 
-- from: apache2.access.user_agent.device
-  to: user_agent.device
-  alias: true
-  beat: filebeat
-
-- from: apache2.access.user_agent.major
-  to: user_agent.major
-  alias: true
-  beat: filebeat
-
-- from: apache2.access.user_agent.minor
-  to: user_agent.minor
-  alias: true
-  beat: filebeat
-
-- from: apache2.access.user_agent.name
-  to: user_agent.name
-  alias: true
-  beat: filebeat
-
 - from: apache2.access.user_agent.original
   to: user_agent.original
   alias: true
   beat: filebeat
-
+- from: apache2.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
 - from: apache2.access.user_agent.os
   to: user_agent.os.full_name
   alias: true
   beat: filebeat
-
 - from: apache2.access.user_agent.os_name
   to: user_agent.os.name
   alias: true
   beat: filebeat
 
-- from: apache2.access.user_agent.patch
-  to: user_agent.patch
-  alias: true
+- from: apache2.access.user_agent.major
+  to: user_agent.version
+  alias: false
   beat: filebeat
-
-- from: apache2.access.user_agent.user_name
-  to: user.name
-  alias: true
+- from: apache2.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
   beat: filebeat
 
 ### Error fileset
@@ -692,11 +711,6 @@
 
 ## Elasticsearch module
 
-- from: elasticsearch.audit.event_type
-  to: event.type
-  alias: true
-  beat: filebeat
-
 - from: elasticsearch.audit.origin_address
   to: source.ip
   alias: true
@@ -721,6 +735,7 @@
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 ## IIS module
 
@@ -762,6 +777,47 @@
 - from: iis.access.user_agent.original
   to: user_agent.original
   alias: true
+  beat: filebeat
+- from: iis.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: iis.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
   beat: filebeat
 
 - from: iis.access.geoip.continent_name
@@ -837,15 +893,18 @@
 - from: iis.access.body_received.bytes
   to: http.request.body.bytes
   alias: true
+  beat: filebeat
 
 - from: iis.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
 - from: iis.access.request_time_ms
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: iis.error.method
   to: http.request.method
@@ -898,11 +957,13 @@
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: haproxy.http.request.time_active_ms
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: haproxy.client.ip
   to: source.address
@@ -1110,8 +1171,14 @@
   to: event.duration
   alias: false
   scale: 1000000000
+  beat: filebeat
 
 ## NGINX module
+
+- from: nginx.access.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
 
 - from: nginx.access.user_name
   to: user.name
@@ -1151,6 +1218,7 @@
 - from: nginx.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
 - from: nginx.access.geoip.continent_name
   to: source.geo.continent_name
@@ -1187,6 +1255,48 @@
   alias: true
   beat: filebeat
 
+- from: nginx.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+
 - from: nginx.error.level
   to: log.level
   alias: true
@@ -1213,6 +1323,7 @@
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: postgresql.log.timezone
   to: event.timezone
@@ -1314,50 +1425,46 @@
   to: user_agent.original
   alias: true
   beat: filebeat
-
 - from: traefik.access.user_agent.device
-  to: user_agent.device
+  to: user_agent.device.name
   alias: true
   beat: filebeat
-
-- from: traefik.access.user_agent.major
-  to: user_agent.major
-  alias: true
-  beat: filebeat
-
-- from: traefik.access.user_agent.minor
-  to: user_agent.minor
-  alias: true
-  beat: filebeat
-
 - from: traefik.access.user_agent.name
   to: user_agent.name
   alias: true
   beat: filebeat
-
-- from: traefik.access.user_agent.original
-  to: user_agent.original
-  alias: true
-  beat: filebeat
-
 - from: traefik.access.user_agent.os
   to: user_agent.os.full_name
   alias: true
   beat: filebeat
-
 - from: traefik.access.user_agent.os_name
   to: user_agent.os.name
   alias: true
   beat: filebeat
 
-- from: traefik.access.user_agent.patch
-  to: user_agent.patch
-  alias: true
+- from: traefik.access.user_agent.major
+  to: user_agent.version
+  alias: false
   beat: filebeat
-
-- from: traefik.access.user_agent.user_name
-  to: user.name
-  alias: true
+- from: traefik.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
   beat: filebeat
 
 - from: traefik.access.geoip.continent_name
@@ -1413,11 +1520,13 @@
 - from: traefik.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
 - from: traefik.access.duration
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 # Filebeat Redis Input
 
@@ -1429,6 +1538,16 @@
 # Auditbeat
 
 ## From Auditbeat's auditd module.
+- from: auditd.messages
+  to: event.original
+  alias: true
+  beat: auditbeat
+
+- from: auditd.warnings
+  to: error.message
+  alias: true
+  beat: auditbeat
+
 - from: source.hostname
   to: source.domain
   alias: true
@@ -1444,16 +1563,105 @@
   alias: true
   beat: auditbeat
 
+- from: user.auid
+  to: user.audit.id
+  alias: true
+  beat: auditbeat
+
+- from: user.uid
+  to: user.id
+  alias: true
+  beat: auditbeat
+
+- from: user.euid
+  to: user.effective.id
+  alias: true
+  beat: auditbeat
+
+- from: user.fsuid
+  to: user.filesystem.id
+  alias: true
+  beat: auditbeat
+
+- from: user.suid
+  to: user.saved.id
+  alias: true
+  beat: auditbeat
+
+- from: user.gid
+  to: user.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.egid
+  to: user.effective.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.sgid
+  to: user.saved.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.fsgid
+  to: user.filesystem.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.auid
+  to: user.audit.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.uid
+  to: user.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.euid
+  to: user.effective.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.fsuid
+  to: user.filesystem.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.suid
+  to: user.saved.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.gid
+  to: user.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.egid
+  to: user.effective.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.sgid
+  to: user.saved.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.fsgid
+  to: user.filesystem.group.name
+  alias: true
+  beat: auditbeat
+
+- from: event.type
+  to: auditd.message_type
+  alias: false
+  beat: auditbeat
+  comment: event.type is reserved for future use by ECS.
+
 # Metricbeat
 
 ## Metricbeat base fields
-- from: metricset.name
-  to: event.dataset
-  alias: false
-  comment: Data structure of field changed, old field will stay around
-  breaking: true
-  beat: metricbeat
-
 - from: metricset.module
   to: event.module
   alias: true
@@ -1479,6 +1687,18 @@
 
 ## Modules
 
+### HAProxy
+
+- from: haproxy.stat.process_id
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: haproxy.info.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
 ### Mongodb
 
 - from: mongodb.status.version
@@ -1490,6 +1710,44 @@
   to: process.name
   alias: true
   beat: metricbeat
+
+### Rabbitmq
+
+- from: rabbitmq.connection.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
 
 ### Redis
 
@@ -1539,6 +1797,117 @@
 - from: http.request.body
   to: http.request.body.content
   alias: false
+  beat: metricbeat
+
+### System
+
+- from: system.process.name
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.ppid
+  to: process.ppid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pgid
+  to: process.pgid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.cwd
+  to: process.working_directory
+  alias: true
+  beat: metricbeat
+
+- from: system.process.username
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.direction
+  to: network.direction
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.family
+  to: network.type
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.command
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.exe
+  to: process.executable
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.user.id
+  to: user.id
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.user.name
+  to: user.full_name
+  alias: true
+  beat: metricbeat
+
+### Kibana
+
+- from: kibana.stats.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.transport_address
+  to: service.address
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.version.number
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+### Logstash
+
+- from: logstash.node.host
+  to: service.hostname
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.jvm.pid
+  to: process.pid
+  alias: true
   beat: metricbeat
 
 ### Zookeeper
@@ -1740,9 +2109,127 @@
   alias: false
   beat: journalbeat
   comment: This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
+  # This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
   rename: false
 
 - from: read_timestamp
   to: event.created
   alias: true
   beat: journalbeat
+
+## Winlogbeat
+
+# Alias to ECS fields
+
+- from: xml
+  to: event.original
+  alias: true
+  beat: winlogbeat
+
+- from: level
+  to: log.level
+  alias: true
+  beat: winlogbeat
+
+# Move fields to winlog.* section, to reduce chances of top level field name conflicts.
+
+# renames to match Windows Event Log naming
+
+- from: type
+  to: winlog.api
+  alias: true
+  beat: winlogbeat
+  rename: false
+
+- from: log_name
+  to: winlog.channel
+  alias: true
+  beat: winlogbeat
+
+- from: record_number
+  to: winlog.record_id
+  alias: true
+  beat: winlogbeat
+
+- from: process_id
+  to: winlog.process.pid
+  alias: true
+  beat: winlogbeat
+
+- from: source_name
+  to: winlog.provider_name
+  alias: true
+  beat: winlogbeat
+
+- from: thread_id
+  to: winlog.process.thread.id
+  alias: true
+  beat: winlogbeat
+
+# Fields moved without adjusting the name
+
+- from: activity_id
+  to: winlog.activity_id
+  alias: true
+  beat: winlogbeat
+
+- from: computer_name
+  to: winlog.computer_name
+  alias: true
+  beat: winlogbeat
+
+- from: event_id
+  to: winlog.event_id
+  alias: true
+  beat: winlogbeat
+
+- from: keywords
+  to: winlog.keywords
+  alias: true
+  beat: winlogbeat
+
+- from: message_error
+  to: error.message
+  alias: true
+  beat: winlogbeat
+
+- from: related_activity_id
+  to: winlog.related_activity_id
+  alias: true
+  beat: winlogbeat
+
+- from: opcode
+  to: winlog.opcode
+  alias: true
+  beat: winlogbeat
+
+- from: provider_guid
+  to: winlog.provider_guid
+  alias: true
+  beat: winlogbeat
+
+- from: task
+  to: winlog.task
+  alias: true
+  beat: winlogbeat
+
+- from: user.identifier
+  to: winlog.user.identifier
+  alias: true
+  beat: winlogbeat
+
+- from: user.domain
+  to: winlog.user.domain
+  alias: true
+  beat: winlogbeat
+
+- from: user.type
+  to: winlog.user.type
+  alias: true
+  beat: winlogbeat
+
+- from: version
+  to: winlog.version
+  alias: true
+  beat: winlogbeat
+  rename: false

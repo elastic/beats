@@ -12,16 +12,28 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
+	abtest "github.com/elastic/beats/auditbeat/testing"
+	sock "github.com/elastic/beats/metricbeat/helper/socket"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/gosigar/sys/linux"
 )
 
 func TestData(t *testing.T) {
+	defer abtest.SetupDataDir(t)()
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+
+	// Set lastState and add test process to cache so it will be reported as stopped.
+	f.(*MetricSet).lastState = time.Now()
+	s := testSocket()
+	f.(*MetricSet).cache.DiffAndUpdateCache(convertToCacheable([]*Socket{s}))
+
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("received error: %+v", errs[0])
@@ -36,7 +48,24 @@ func TestData(t *testing.T) {
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
+func testSocket() *Socket {
+	return &Socket{
+		Family:      linux.AF_INET,
+		LocalIP:     net.IPv4(10, 0, 2, 15),
+		LocalPort:   22,
+		RemoteIP:    net.IPv4(10, 0, 2, 2),
+		RemotePort:  55270,
+		Direction:   sock.Inbound,
+		UID:         0,
+		Username:    "root",
+		ProcessPID:  22799,
+		ProcessName: "sshd",
+	}
+}
+
 func TestFetch(t *testing.T) {
+	defer abtest.SetupDataDir(t)()
+
 	// Consume first event: list of all currently open sockets
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(ms)

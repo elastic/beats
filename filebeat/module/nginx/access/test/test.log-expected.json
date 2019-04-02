@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -22,19 +22,17 @@
         "source.ip": "10.0.0.2",
         "url.original": "/ocelot",
         "user.name": "-",
-        "user_agent.device": "Other",
-        "user_agent.major": "49",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0",
-        "user_agent.os.full_name": "Mac OS X 10.12",
-        "user_agent.os.major": "10",
-        "user_agent.os.minor": "12",
-        "user_agent.os.name": "Mac OS X"
+        "user_agent.os.full": "Mac OS X 10.12",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.12",
+        "user_agent.version": "49.0"
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -53,18 +51,15 @@
         "source.ip": "172.17.0.1",
         "url.original": "/stringpatch",
         "user.name": "-",
-        "user_agent.device": "Other",
-        "user_agent.major": "15",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.full_name": "Windows 7",
         "user_agent.os.name": "Windows 7",
-        "user_agent.patch": "a2"
+        "user_agent.version": "15.0.a2"
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -92,19 +87,17 @@
         "source.ip": "85.181.35.98",
         "url.original": "/ocelot",
         "user.name": "-",
-        "user_agent.device": "Other",
-        "user_agent.major": "49",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0",
-        "user_agent.os.full_name": "Mac OS X 10.12",
-        "user_agent.os.major": "10",
-        "user_agent.os.minor": "12",
-        "user_agent.os.name": "Mac OS X"
+        "user_agent.os.full": "Mac OS X 10.12",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.12",
+        "user_agent.version": "49.0"
     },
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -130,20 +123,17 @@
         "source.ip": "85.181.35.98",
         "url.original": "/ocelot",
         "user.name": "-",
-        "user_agent.device": "Other",
-        "user_agent.major": "70",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36",
-        "user_agent.os.full_name": "Mac OS X 10.14.0",
-        "user_agent.os.major": "10",
-        "user_agent.os.minor": "14",
+        "user_agent.os.full": "Mac OS X 10.14.0",
         "user_agent.os.name": "Mac OS X",
-        "user_agent.patch": "3538"
+        "user_agent.os.version": "10.14.0",
+        "user_agent.version": "70.0.3538"
     },
     {
         "@timestamp": "2016-01-22T13:18:29.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -172,15 +162,13 @@
         "source.ip": "199.96.1.1",
         "url.original": "/assets/xxxx?q=100",
         "user.name": "-",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.original": "Amazon CloudFront",
-        "user_agent.os.full_name": "Other",
-        "user_agent.os.name": "Other"
+        "user_agent.original": "Amazon CloudFront"
     },
     {
         "@timestamp": "2016-12-30T06:47:09.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -205,17 +193,14 @@
         "source.ip": "2a03:0000:10ff:f00f:0000:0000:0:8000",
         "url.original": "/test.html",
         "user.name": "-",
-        "user_agent.device": "Spider",
-        "user_agent.major": "1",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Spider",
         "user_agent.name": "Facebot",
         "user_agent.original": "Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)",
-        "user_agent.os.full_name": "Other",
-        "user_agent.os.name": "Other"
+        "user_agent.version": "1.0"
     },
     {
         "@timestamp": "2018-04-12T07:48:40.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -231,10 +216,8 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.name": "-",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.original": "-",
-        "user_agent.os.full_name": "Other",
-        "user_agent.os.name": "Other"
+        "user_agent.original": "-"
     }
 ]

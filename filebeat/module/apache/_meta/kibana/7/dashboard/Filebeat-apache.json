@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs", 
-                "title": "Unique IPs map [Filebeat Apache]", 
+                "savedSearchId": "Apache-access-logs-ecs", 
+                "title": "Unique IPs map [Filebeat Apache] ECS", 
                 "uiStateJSON": {
                     "mapCenter": [
                         14.944784875088372, 
@@ -23,7 +23,7 @@
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "apache2.access.remote_ip"
+                                "field": "source.address"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -33,7 +33,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "apache2.access.geoip.location"
+                                "field": "source.geo.location"
                             }, 
                             "schema": "segment", 
                             "type": "geohash_grid"
@@ -68,11 +68,11 @@
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
-                    "title": "Apache access unique IPs map", 
+                    "title": "Apache access unique IPs map ECS", 
                     "type": "tile_map"
                 }
             }, 
-            "id": "Apache-access-unique-IPs-map", 
+            "id": "Apache-access-unique-IPs-map-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -84,8 +84,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs", 
-                "title": "Top URLs by response code [Filebeat Apache]", 
+                "savedSearchId": "Apache-access-logs-ecs", 
+                "title": "Top URLs by response code [Filebeat Apache] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -109,7 +109,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "URL", 
-                                "field": "apache2.access.url", 
+                                "field": "url.original", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "row": false, 
@@ -122,7 +122,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "apache2.access.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -139,11 +139,11 @@
                         "legendPosition": "right", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache response codes of top URLs", 
+                    "title": "Apache response codes of top URLs ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "Apache-response-codes-of-top-URLs", 
+            "id": "Apache-response-codes-of-top-URLs-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -155,8 +155,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs", 
-                "title": "Browsers breakdown [Filebeat Apache]", 
+                "savedSearchId": "Apache-access-logs-ecs", 
+                "title": "Browsers breakdown [Filebeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -165,7 +165,7 @@
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "apache2.access.remote_ip"
+                                "field": "source.address"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -174,7 +174,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "apache2.access.user_agent.name", 
+                                "field": "user_agent.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -186,7 +186,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache2.access.user_agent.major", 
+                                "field": "user_agent.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -203,11 +203,11 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache browsers", 
+                    "title": "Apache browsers ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "Apache-browsers", 
+            "id": "Apache-browsers-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -219,8 +219,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs", 
-                "title": "Operating systems breakdown [Filebeat Apache]", 
+                "savedSearchId": "Apache-access-logs-ecs", 
+                "title": "Operating systems breakdown [Filebeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -229,7 +229,7 @@
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "apache2.access.remote_ip"
+                                "field": "source.address"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -238,7 +238,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "apache2.access.user_agent.os_name", 
+                                "field": "user_agent.os.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -250,7 +250,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache2.access.user_agent.os_major", 
+                                "field": "user_agent.os.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -267,11 +267,11 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache operating systems", 
+                    "title": "Apache operating systems ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "Apache-operating-systems", 
+            "id": "Apache-operating-systems-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -283,8 +283,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-errors-log", 
-                "title": "Error logs over time [Filebeat Apache]", 
+                "savedSearchId": "Apache-errors-log-ecs", 
+                "title": "Error logs over time [Filebeat Apache] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -313,7 +313,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache2.error.level", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -336,11 +336,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache error logs over time", 
+                    "title": "Apache error logs over time ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "Apache-error-logs-over-time", 
+            "id": "Apache-error-logs-over-time-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -352,8 +352,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs", 
-                "title": "Response codes over time [Filebeat Apache]", 
+                "savedSearchId": "Apache-access-logs-ecs", 
+                "title": "Response codes over time [Filebeat Apache] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -389,7 +389,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "apache2.access.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -412,21 +412,21 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache response codes over time", 
+                    "title": "Apache response codes over time ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "Apache-response-codes-over-time", 
+            "id": "Apache-response-codes-over-time-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "apache2.error.client", 
-                    "apache2.error.level", 
+                    "source.address", 
+                    "log.level", 
                     "apache2.error.module", 
-                    "apache2.error.message"
+                    "message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -448,31 +448,29 @@
                         }, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:apache2.error"
+                            "language": "kuery",
+                                "query": "event.dataset:apache.error"
                             }
-                        }
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Apache errors log [Filebeat Apache]", 
+                "title": "Apache errors log [Filebeat Apache] ECS", 
                 "version": 1
             }, 
-            "id": "Apache-errors-log", 
+            "id": "Apache-errors-log-ecs", 
             "type": "search", 
             "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "apache2.access.remote_ip", 
-                    "apache2.access.method", 
-                    "apache2.access.url", 
-                    "apache2.access.response_code"
+                    "source.address", 
+                    "http.request.method", 
+                    "url.original", 
+                    "http.response.status_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -494,21 +492,19 @@
                         }, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:apache2.access"
+                            "language": "kuery",
+                                "query": "event.dataset:apache.access"
                             }
-                        }
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Apache access logs [Filebeat Apache]", 
+                "title": "Apache access logs [Filebeat Apache] ECS", 
                 "version": 1
             }, 
-            "id": "Apache-access-logs", 
+            "id": "Apache-access-logs-ecs", 
             "type": "search", 
             "version": 1
         }, 
@@ -521,13 +517,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -538,7 +529,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Apache-access-unique-IPs-map", 
+                        "id": "Apache-access-unique-IPs-map-ecs", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 12, 
@@ -547,7 +538,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-response-codes-of-top-URLs", 
+                        "id": "Apache-response-codes-of-top-URLs-ecs", 
                         "panelIndex": 2, 
                         "row": 6, 
                         "size_x": 8, 
@@ -556,7 +547,7 @@
                     }, 
                     {
                         "col": 9, 
-                        "id": "Apache-browsers", 
+                        "id": "Apache-browsers-ecs", 
                         "panelIndex": 3, 
                         "row": 6, 
                         "size_x": 4, 
@@ -565,7 +556,7 @@
                     }, 
                     {
                         "col": 11, 
-                        "id": "Apache-operating-systems", 
+                        "id": "Apache-operating-systems-ecs", 
                         "panelIndex": 4, 
                         "row": 4, 
                         "size_x": 2, 
@@ -574,7 +565,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-error-logs-over-time", 
+                        "id": "Apache-error-logs-over-time-ecs", 
                         "panelIndex": 5, 
                         "row": 9, 
                         "size_x": 12, 
@@ -583,7 +574,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-response-codes-over-time", 
+                        "id": "Apache-response-codes-over-time-ecs", 
                         "panelIndex": 6, 
                         "row": 4, 
                         "size_x": 10, 
@@ -593,12 +584,12 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "apache2.error.client", 
-                            "apache2.error.level", 
+                            "source.address", 
+                            "log.level", 
                             "apache2.error.module", 
-                            "apache2.error.message"
+                            "message"
                         ], 
-                        "id": "Apache-errors-log", 
+                        "id": "Apache-errors-log-ecs", 
                         "panelIndex": 7, 
                         "row": 11, 
                         "size_x": 12, 
@@ -611,7 +602,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Apache] Access and error logs", 
+                "title": "[Filebeat Apache] Access and error logs ECS", 
                 "uiStateJSON": {
                     "P-1": {
                         "mapBounds": {
@@ -644,7 +635,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "Filebeat-Apache-Dashboard", 
+            "id": "Filebeat-Apache-Dashboard-ecs", 
             "type": "dashboard", 
             "version": 2
         }

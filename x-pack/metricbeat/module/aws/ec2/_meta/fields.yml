@@ -68,3 +68,43 @@
       type: long
       description: >
         Reports whether the instance has passed the instance status check in the last minute.
+    - name: instance.core.count
+      type: integer
+      description: >
+        The number of CPU cores for the instance.
+    - name: instance.image.id
+      type: keyword
+      description: >
+        The ID of the image used to launch the instance.
+    - name: instance.monitoring.state
+      type: keyword
+      description: >
+        Indicates whether detailed monitoring is enabled.
+    - name: instance.private.dns_name
+      type: keyword
+      description: >
+        The private DNS name of the network interface.
+    - name: instance.private.ip
+      type: ip
+      description: >
+        The private IPv4 address associated with the network interface.
+    - name: instance.public.dns_name
+      type: keyword
+      description: >
+        The public DNS name of the instance.
+    - name: instance.public.ip
+      type: ip
+      description: >
+        The address of the Elastic IP address (IPv4) bound to the network interface.
+    - name: instance.state.code
+      type: integer
+      description: >
+        The state of the instance, as a 16-bit unsigned integer.
+    - name: instance.state.name
+      type: keyword
+      description: >
+        The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
+    - name: instance.threads_per_core
+      type: integer
+      description: >
+        The number of threads per CPU core.

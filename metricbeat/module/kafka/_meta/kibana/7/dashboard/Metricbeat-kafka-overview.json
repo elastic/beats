@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka]", 
+                "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -88,11 +88,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka]", 
+                    "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
+            "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
             "version": 9
@@ -103,7 +103,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Controls [Metricbeat Kafka]", 
+                "title": "Kafka Controls [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -143,11 +143,11 @@
                         "updateFiltersOnChange": true, 
                         "useTimeFilter": false
                     }, 
-                    "title": "Kafka Controls [Metricbeat Kafka]", 
+                    "title": "Kafka Controls [Metricbeat Kafka] ECS", 
                     "type": "input_control_vis"
                 }
             }, 
-            "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f", 
+            "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
             "version": 10
@@ -158,7 +158,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka]", 
+                "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -222,11 +222,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka]", 
+                    "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f", 
+            "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
             "version": 8
@@ -297,7 +297,7 @@
                         }
                     }
                 }, 
-                "title": "Kafka Metrics [Metricbeat Kafka]", 
+                "title": "Kafka Metrics [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -371,11 +371,11 @@
                         }, 
                         "type": "metric"
                     }, 
-                    "title": "Kafka Metrics [Metricbeat Kafka]", 
+                    "title": "Kafka Metrics [Metricbeat Kafka] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
+            "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
             "version": 12
@@ -386,7 +386,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Consumer Partition Reassignments [Metricbeat Kafka]", 
+                "title": "Consumer Partition Reassignments [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -450,11 +450,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Consumer Partition Reassignments [Metricbeat Kafka]", 
+                    "title": "Consumer Partition Reassignments [Metricbeat Kafka] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
+            "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
             "version": 8
@@ -494,12 +494,12 @@
                         ], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Consumer Metrics [Metricbeat Kafka]", 
+                "title": "Consumer Metrics [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -543,11 +543,11 @@
                         }, 
                         "type": "metric"
                     }, 
-                    "title": "Consumer Metrics [Metricbeat Kafka]", 
+                    "title": "Consumer Metrics [Metricbeat Kafka] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f", 
+            "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
             "version": 8
@@ -560,12 +560,12 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "title": "Kafka Consumer Group Clients [Metricbeat Kafka]", 
+                "title": "Kafka Consumer Group Clients [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -652,11 +652,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Kafka Consumer Group Clients [Metricbeat Kafka]", 
+                    "title": "Kafka Consumer Group Clients [Metricbeat Kafka] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
+            "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
             "version": 2
@@ -667,7 +667,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Broker Details [Metricbeat Kafka]", 
+                "title": "Kafka Broker Details [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {
                     "table": {
                         "sort": {
@@ -778,11 +778,11 @@
                         "time_field": "@timestamp", 
                         "type": "table"
                     }, 
-                    "title": "Kafka Broker Details [Metricbeat Kafka]", 
+                    "title": "Kafka Broker Details [Metricbeat Kafka] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9", 
+            "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:28:30.809Z", 
             "version": 6
@@ -793,7 +793,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Topic Details [Metricbeat Kafka]", 
+                "title": "Kafka Topic Details [Metricbeat Kafka] ECS", 
                 "uiStateJSON": {
                     "table": {
                         "sort": {
@@ -988,11 +988,11 @@
                         "time_field": "@timestamp", 
                         "type": "table"
                     }, 
-                    "title": "Kafka Topic Details [Metricbeat Kafka]", 
+                    "title": "Kafka Topic Details [Metricbeat Kafka] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9", 
+            "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9-ecs", 
             "type": "visualization", 
             "updated_at": "2018-10-18T16:51:33.352Z", 
             "version": 3
@@ -1026,7 +1026,7 @@
                             "x": 0, 
                             "y": 20
                         }, 
-                        "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
+                        "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f-ecs", 
                         "panelIndex": "1", 
                         "title": "Kafka Topic & Consumer Offsets", 
                         "type": "visualization", 
@@ -1040,7 +1040,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f", 
+                        "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f-ecs", 
                         "panelIndex": "3", 
                         "title": "Kafka Controls", 
                         "type": "visualization", 
@@ -1054,7 +1054,7 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f", 
+                        "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f-ecs", 
                         "panelIndex": "6", 
                         "title": "Consumer Group Lag by Topic", 
                         "type": "visualization", 
@@ -1071,7 +1071,7 @@
                             "x": 16, 
                             "y": 0
                         }, 
-                        "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
+                        "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f-ecs", 
                         "panelIndex": "10", 
                         "title": "Kafka Metrics", 
                         "type": "visualization", 
@@ -1086,7 +1086,7 @@
                             "x": 0, 
                             "y": 33
                         }, 
-                        "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
+                        "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f-ecs", 
                         "panelIndex": "12", 
                         "title": "Consumer Partition Reassignments", 
                         "type": "visualization", 
@@ -1101,7 +1101,7 @@
                             "x": 41, 
                             "y": 0
                         }, 
-                        "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f", 
+                        "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f-ecs", 
                         "panelIndex": "13", 
                         "title": "Consumer Metrics", 
                         "type": "visualization", 
@@ -1126,7 +1126,7 @@
                             "x": 24, 
                             "y": 27
                         }, 
-                        "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
+                        "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9-ecs", 
                         "panelIndex": "14", 
                         "title": "Kafka Consumer Group Clients", 
                         "type": "visualization", 
@@ -1141,7 +1141,7 @@
                             "x": 24, 
                             "y": 6
                         }, 
-                        "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9", 
+                        "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9-ecs", 
                         "panelIndex": "15", 
                         "title": "Kafka Brokers", 
                         "type": "visualization", 
@@ -1163,7 +1163,7 @@
                             "x": 24, 
                             "y": 16
                         }, 
-                        "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9", 
+                        "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9-ecs", 
                         "panelIndex": "16", 
                         "title": "Kafka Topic Details", 
                         "type": "visualization", 
@@ -1171,10 +1171,10 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Kafka] Overview", 
+                "title": "[Metricbeat Kafka] Overview ECS", 
                 "version": 1
             }, 
-            "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f", 
+            "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-10-18T17:11:35.895Z", 
             "version": 23

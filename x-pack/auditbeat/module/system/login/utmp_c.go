@@ -104,6 +104,9 @@ func newUtmp(utmp *utmpC) *Utmp {
 // byteToString converts a NULL terminated char array to a Go string.
 func byteToString(b []byte) string {
 	n := bytes.IndexByte(b, 0)
+	if n == -1 {
+		n = len(b)
+	}
 	return string(b[:n])
 }
 

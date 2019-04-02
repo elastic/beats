@@ -8,12 +8,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "User Connections [Metricbeat MSSQL]",
+        "title": "User Connections [Metricbeat MSSQL] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -119,11 +119,11 @@
               }
             ]
           },
-          "title": "User Connections [Metricbeat MSSQL]",
+          "title": "User Connections [Metricbeat MSSQL] ECS",
           "type": "line"
         }
       },
-      "id": "7784db10-18ba-11e9-9836-f37dedd3b411",
+      "id": "7784db10-18ba-11e9-9836-f37dedd3b411-ecs",
       "type": "visualization",
       "updated_at": "2019-01-22T13:04:43.827Z",
       "version": 8
@@ -136,12 +136,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Transactions [Metricbeat MSSQL]",
+        "title": "Transactions [Metricbeat MSSQL] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -247,11 +247,11 @@
               }
             ]
           },
-          "title": "Transactions [Metricbeat MSSQL]",
+          "title": "Transactions [Metricbeat MSSQL] ECS",
           "type": "line"
         }
       },
-      "id": "910f3f30-18ba-11e9-9836-f37dedd3b411",
+      "id": "910f3f30-18ba-11e9-9836-f37dedd3b411-ecs",
       "type": "visualization",
       "updated_at": "2019-01-22T13:04:34.757Z",
       "version": 8
@@ -264,12 +264,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Lock Waits/sec [Metricbeat MSSQL]",
+        "title": "Lock Waits/sec [Metricbeat MSSQL] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -375,11 +375,11 @@
               }
             ]
           },
-          "title": "Lock Waits/sec [Metricbeat MSSQL]",
+          "title": "Lock Waits/sec [Metricbeat MSSQL] ECS",
           "type": "line"
         }
       },
-      "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411",
+      "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411-ecs",
       "type": "visualization",
       "updated_at": "2019-01-22T13:04:24.139Z",
       "version": 7
@@ -392,12 +392,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Batch Requests/sec [Metricbeat MSSQL]",
+        "title": "Batch Requests/sec [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -508,11 +508,11 @@
               }
             ]
           },
-          "title": "Batch Requests/sec [Metricbeat MSSQL]",
+          "title": "Batch Requests/sec [Metricbeat MSSQL] ECS",
           "type": "line"
         }
       },
-      "id": "b29a2160-18ba-11e9-9836-f37dedd3b411",
+      "id": "b29a2160-18ba-11e9-9836-f37dedd3b411-ecs",
       "type": "visualization",
       "updated_at": "2019-01-22T13:03:10.853Z",
       "version": 9
@@ -525,12 +525,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Buffer Cache Hit Ratio [Metricbeat MSSQL]",
+        "title": "Buffer Cache Hit Ratio [Metricbeat MSSQL] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -639,11 +639,11 @@
               }
             ]
           },
-          "title": "Buffer Cache Hit Ratio [Metricbeat MSSQL]",
+          "title": "Buffer Cache Hit Ratio [Metricbeat MSSQL] ECS",
           "type": "line"
         }
       },
-      "id": "2e795230-1b2a-11e9-8b36-136038bb307a",
+      "id": "2e795230-1b2a-11e9-8b36-136038bb307a-ecs",
       "type": "visualization",
       "updated_at": "2019-01-22T13:04:16.184Z",
       "version": 8
@@ -656,7 +656,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -680,7 +680,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "7784db10-18ba-11e9-9836-f37dedd3b411",
+            "id": "7784db10-18ba-11e9-9836-f37dedd3b411-ecs",
             "panelIndex": "1",
             "title": "User Connections",
             "type": "visualization",
@@ -699,7 +699,7 @@
               "x": 16,
               "y": 15
             },
-            "id": "910f3f30-18ba-11e9-9836-f37dedd3b411",
+            "id": "910f3f30-18ba-11e9-9836-f37dedd3b411-ecs",
             "panelIndex": "2",
             "title": "Transactions",
             "type": "visualization",
@@ -718,7 +718,7 @@
               "x": 32,
               "y": 0
             },
-            "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411",
+            "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411-ecs",
             "panelIndex": "3",
             "title": "Lock Waits/sec",
             "type": "visualization",
@@ -737,7 +737,7 @@
               "x": 16,
               "y": 0
             },
-            "id": "b29a2160-18ba-11e9-9836-f37dedd3b411",
+            "id": "b29a2160-18ba-11e9-9836-f37dedd3b411-ecs",
             "panelIndex": "4",
             "title": "Batch Requests/sec",
             "type": "visualization",
@@ -752,7 +752,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "2e795230-1b2a-11e9-8b36-136038bb307a",
+            "id": "2e795230-1b2a-11e9-8b36-136038bb307a-ecs",
             "panelIndex": "5",
             "title": "Buffer Cache Hit Ratio",
             "type": "visualization",
@@ -760,10 +760,10 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat MSSQL] Performance",
+        "title": "[Metricbeat MSSQL] Performance ECS",
         "version": 1
       },
-      "id": "a2ead240-18bb-11e9-9836-f37dedd3b411",
+      "id": "a2ead240-18bb-11e9-9836-f37dedd3b411-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-22T12:55:59.857Z",
       "version": 11

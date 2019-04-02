@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -61,19 +60,20 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	return &list, nil
 }
 
-// Filter an error if any of the given config blocks is blacklisted
-func (c *ConfigBlacklist) Filter(configBlocks api.ConfigBlocks) error {
-	var errs multierror.Errors
-
+// Detect an error if any of the given config blocks is blacklisted
+func (c *ConfigBlacklist) Detect(configBlocks api.ConfigBlocks) Errors {
+	var errs Errors
 	for _, configs := range configBlocks {
 		for _, block := range configs.Blocks {
 			if c.isBlacklisted(configs.Type, block) {
-				errs = append(errs, fmt.Errorf("Config for '%s' is blacklisted", configs.Type))
+				errs = append(errs, &Error{
+					Type: ConfigError,
+					Err:  fmt.Errorf("Config for '%s' is blacklisted", configs.Type),
+				})
 			}
 		}
 	}
-
-	return errs.Err()
+	return errs
 }
 
 func (c *ConfigBlacklist) isBlacklisted(blockType string, block *api.ConfigBlock) bool {

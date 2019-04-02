@@ -86,7 +86,7 @@
               format: bytes
               description: >
                 Total memory available
-        - name: workingSet
+        - name: working_set
           type: group
           fields:
             - name: bytes
@@ -102,11 +102,11 @@
               format: bytes
               description: >
                 Total resident set size memory
-        - name: pageFaults
+        - name: page_faults
           type: long
           description: >
             Total page faults
-        - name: majorPageFaults
+        - name: major_page_faults
           type: long
           description: >
             Total major page faults

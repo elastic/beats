@@ -104,7 +104,9 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 
 	fields := common.MapStr{}
 	setMeta(fields, "module", config.Module)
-	setMeta(fields, "dataset", config.Module+"."+config.Fileset)
+	if config.Module != "" && config.Fileset != "" {
+		setMeta(fields, "dataset", config.Module+"."+config.Fileset)
+	}
 	if len(fields) > 0 {
 		fields = common.MapStr{
 			"event": fields,
@@ -115,7 +117,7 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	}
 	if config.ServiceType != "" {
 		fields.Put("service.type", config.ServiceType)
-	} else {
+	} else if config.Module != "" {
 		fields.Put("service.type", config.Module)
 	}
 	if config.Type != "" {
@@ -123,13 +125,15 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	}
 
 	client, err := p.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: config.EventMetadata,
-		DynamicFields: dynFields,
-		Meta:          meta,
-		Fields:        fields,
-		Processor:     processors,
-		Events:        f.eventer,
+		PublishMode: beat.GuaranteedSend,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: config.EventMetadata,
+			DynamicFields: dynFields,
+			Meta:          meta,
+			Fields:        fields,
+			Processor:     processors,
+		},
+		Events: f.eventer,
 	})
 	if err != nil {
 		return nil, err

@@ -12,27 +12,41 @@
     "metricset": {
         "name": "socket"
     },
+    "network": {
+        "direction": "listening",
+        "iana_number": "41",
+        "type": "ipv6"
+    },
+    "process": {
+        "args": [
+            "/tmp/go-build774092237/b001/socket.test",
+            "-data"
+        ],
+        "executable": "/tmp/go-build774092237/b001/socket.test",
+        "name": "socket.test",
+        "pid": 32127
+    },
+    "server": {
+        "ip": "::",
+        "port": 45109
+    },
     "service": {
         "type": "system"
     },
     "system": {
         "socket": {
-            "direction": "listening",
-            "family": "ipv6",
             "local": {
                 "ip": "::",
-                "port": 44367
+                "port": 45109
             },
             "process": {
-                "cmdline": "/tmp/go-build827888631/b001/socket.test -data",
-                "command": "socket.test",
-                "exe": "/tmp/go-build827888631/b001/socket.test",
-                "pid": 19047
-            },
-            "user": {
-                "id": 1000,
-                "name": "Jaime Soriano Pastor"
+                "cmdline": "/tmp/go-build774092237/b001/socket.test -data"
             }
         }
+    },
+    "user": {
+        "full_name": "Jaime Soriano Pastor",
+        "id": "1000",
+        "name": "jaime"
     }
 }

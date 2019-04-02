@@ -28,9 +28,24 @@ var outputReg = map[string]Factory{}
 
 // Factory is used by output plugins to build an output instance
 type Factory func(
+	im IndexManager,
 	beat beat.Info,
 	stats Observer,
 	cfg *common.Config) (Group, error)
+
+// IndexManager provides additional index related services to the outputs.
+type IndexManager interface {
+	// BuildSelector can be used by an output to create an IndexSelector based on
+	// the outputs configuration.
+	// The defaultIndex is interpreted as format string and used as default fallback
+	// if no index is configured or all indices are guarded using conditionals.
+	BuildSelector(cfg *common.Config) (IndexSelector, error)
+}
+
+// IndexSelector is used to find the index name an event shall be indexed to.
+type IndexSelector interface {
+	Select(event *beat.Event) (string, error)
+}
 
 // Group configures and combines multiple clients into load-balanced group of clients
 // being managed by the publisher pipeline.
@@ -54,7 +69,13 @@ func FindFactory(name string) Factory {
 }
 
 // Load creates and configures a output Group using a configuration object..
-func Load(info beat.Info, stats Observer, name string, config *common.Config) (Group, error) {
+func Load(
+	im IndexManager,
+	info beat.Info,
+	stats Observer,
+	name string,
+	config *common.Config,
+) (Group, error) {
 	factory := FindFactory(name)
 	if factory == nil {
 		return Group{}, fmt.Errorf("output type %v undefined", name)
@@ -63,5 +84,5 @@ func Load(info beat.Info, stats Observer, name string, config *common.Config) (G
 	if stats == nil {
 		stats = NewNilObserver()
 	}
-	return factory(info, stats, config)
+	return factory(im, info, stats, config)
 }

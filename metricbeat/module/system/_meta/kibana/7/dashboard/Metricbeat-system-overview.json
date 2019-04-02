@@ -7,30 +7,25 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "System Navigation [Metricbeat System]", 
+                "title": "System Navigation [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container)"
+                        "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview-ecs)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container-ecs)"
                     }, 
-                    "title": "System Navigation [Metricbeat System]", 
+                    "title": "System Navigation [Metricbeat System] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "System-Navigation", 
+            "id": "System-Navigation-ecs", 
             "type": "visualization", 
             "version": 3
         }, 
@@ -42,17 +37,12 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Number of hosts [Metricbeat System]", 
+                "title": "Number of hosts [Metricbeat System] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -68,7 +58,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Number of hosts", 
-                                "field": "beat.name"
+                                "field": "host.name"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -116,11 +106,11 @@
                         }, 
                         "type": "gauge"
                     }, 
-                    "title": "Number of hosts [Metricbeat System]", 
+                    "title": "Number of hosts [Metricbeat System] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "c6f2ffd0-4d17-11e7-a196-69b9a7a020a9", 
+            "id": "c6f2ffd0-4d17-11e7-a196-69b9a7a020a9-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -131,16 +121,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Top Hosts By Memory (Realtime) [Metricbeat System]", 
+                "title": "Top Hosts By Memory (Realtime) [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -168,7 +154,7 @@
                                 "value": 0.85
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.name:\"{{key}}\"')))", 
+                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs?_a=(query:(language:kuery,query:'host.name:\"{{key}}\"'))",
                         "filter": "", 
                         "id": "31e5afa0-1b1c-11e7-b09e-037021c4f8df", 
                         "index_pattern": "metricbeat-*", 
@@ -193,7 +179,7 @@
                                 "seperate_axis": 0, 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "beat.name", 
+                                "terms_field": "host.name", 
                                 "terms_order_by": "31e5afa2-1b1c-11e7-b09e-037021c4f8df", 
                                 "terms_size": "10"
                             }
@@ -203,11 +189,11 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Top Hosts By Memory (Realtime) [Metricbeat System]", 
+                    "title": "Top Hosts By Memory (Realtime) [Metricbeat System] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "fe064790-1b1f-11e7-bec4-a5e9ec5cab8b", 
+            "id": "fe064790-1b1f-11e7-bec4-a5e9ec5cab8b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -218,16 +204,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Top Hosts By CPU (Realtime) [Metricbeat System]", 
+                "title": "Top Hosts By CPU (Realtime) [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -255,7 +237,7 @@
                                 "value": 0.85
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8?_a=(query:(query_string:(analyze_wildcard:!t,query:'beat.name:\"{{key}}\"')))", 
+                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs?_a=(query:(language:kuery,query:'host.name:\"{{key}}\"'))",
                         "filter": "", 
                         "id": "31e5afa0-1b1c-11e7-b09e-037021c4f8df", 
                         "index_pattern": "metricbeat-*", 
@@ -280,7 +262,7 @@
                                 "seperate_axis": 0, 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "beat.name", 
+                                "terms_field": "host.name", 
                                 "terms_order_by": "31e5afa2-1b1c-11e7-b09e-037021c4f8df", 
                                 "terms_size": "10"
                             }
@@ -290,11 +272,11 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Top Hosts By CPU (Realtime) [Metricbeat System]", 
+                    "title": "Top Hosts By CPU (Realtime) [Metricbeat System] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "855899e0-1b1c-11e7-b09e-037021c4f8df", 
+            "id": "855899e0-1b1c-11e7-b09e-037021c4f8df-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -306,17 +288,12 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Hosts histogram by CPU usage [Metricbeat System]", 
+                "title": "Hosts histogram by CPU usage [Metricbeat System] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -358,7 +335,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "beat.name", 
+                                "field": "host.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 20
@@ -397,11 +374,11 @@
                             }
                         ]
                     }, 
-                    "title": "Hosts histogram by CPU usage [Metricbeat System]", 
+                    "title": "Hosts histogram by CPU usage [Metricbeat System] ECS", 
                     "type": "heatmap"
                 }
             }, 
-            "id": "7cdb1330-4d1a-11e7-a196-69b9a7a020a9", 
+            "id": "7cdb1330-4d1a-11e7-a196-69b9a7a020a9-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -412,16 +389,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Inbound Traffic [Metricbeat System]", 
+                "title": "Inbound Traffic [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -527,11 +500,11 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Inbound Traffic [Metricbeat System]", 
+                    "title": "Inbound Traffic [Metricbeat System] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b", 
+            "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -542,16 +515,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Outbound Traffic [Metricbeat System]", 
+                "title": "Outbound Traffic [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -657,11 +626,11 @@
                         "time_field": "@timestamp", 
                         "type": "metric"
                     }, 
-                    "title": "Outbound Traffic [Metricbeat System]", 
+                    "title": "Outbound Traffic [Metricbeat System] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "1aae9140-1b93-11e7-8ada-3df93aab833e", 
+            "id": "1aae9140-1b93-11e7-8ada-3df93aab833e-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -672,16 +641,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Disk used [Metricbeat System]", 
+                "title": "Disk used [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -767,11 +732,11 @@
                         "time_field": "@timestamp", 
                         "type": "gauge"
                     }, 
-                    "title": "Disk used [Metricbeat System]", 
+                    "title": "Disk used [Metricbeat System] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32", 
+            "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -782,16 +747,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Memory Usage Gauge [Metricbeat System]", 
+                "title": "Memory Usage Gauge [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -855,11 +816,11 @@
                         "time_field": "@timestamp", 
                         "type": "gauge"
                     }, 
-                    "title": "Memory Usage Gauge [Metricbeat System]", 
+                    "title": "Memory Usage Gauge [Metricbeat System] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b", 
+            "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -870,16 +831,12 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "CPU Usage Gauge [Metricbeat System]", 
+                "title": "CPU Usage Gauge [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -975,11 +932,11 @@
                         "time_field": "@timestamp", 
                         "type": "gauge"
                     }, 
-                    "title": "CPU Usage Gauge [Metricbeat System]", 
+                    "title": "CPU Usage Gauge [Metricbeat System] ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b", 
+            "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -992,13 +949,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -1009,7 +961,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "System-Navigation", 
+                        "id": "System-Navigation-ecs", 
                         "panelIndex": 9, 
                         "row": 1, 
                         "size_x": 12, 
@@ -1018,7 +970,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "c6f2ffd0-4d17-11e7-a196-69b9a7a020a9", 
+                        "id": "c6f2ffd0-4d17-11e7-a196-69b9a7a020a9-ecs", 
                         "panelIndex": 11, 
                         "row": 2, 
                         "size_x": 2, 
@@ -1027,7 +979,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "fe064790-1b1f-11e7-bec4-a5e9ec5cab8b", 
+                        "id": "fe064790-1b1f-11e7-bec4-a5e9ec5cab8b-ecs", 
                         "panelIndex": 12, 
                         "row": 4, 
                         "size_x": 6, 
@@ -1036,7 +988,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "855899e0-1b1c-11e7-b09e-037021c4f8df", 
+                        "id": "855899e0-1b1c-11e7-b09e-037021c4f8df-ecs", 
                         "panelIndex": 13, 
                         "row": 4, 
                         "size_x": 6, 
@@ -1045,7 +997,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "7cdb1330-4d1a-11e7-a196-69b9a7a020a9", 
+                        "id": "7cdb1330-4d1a-11e7-a196-69b9a7a020a9-ecs", 
                         "panelIndex": 14, 
                         "row": 9, 
                         "size_x": 12, 
@@ -1054,7 +1006,7 @@
                     }, 
                     {
                         "col": 9, 
-                        "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b", 
+                        "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b-ecs", 
                         "panelIndex": 16, 
                         "row": 2, 
                         "size_x": 2, 
@@ -1063,7 +1015,7 @@
                     }, 
                     {
                         "col": 11, 
-                        "id": "1aae9140-1b93-11e7-8ada-3df93aab833e", 
+                        "id": "1aae9140-1b93-11e7-8ada-3df93aab833e-ecs", 
                         "panelIndex": 17, 
                         "row": 2, 
                         "size_x": 2, 
@@ -1072,7 +1024,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32", 
+                        "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32-ecs", 
                         "panelIndex": 18, 
                         "row": 2, 
                         "size_x": 2, 
@@ -1081,7 +1033,7 @@
                     }, 
                     {
                         "col": 5, 
-                        "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b", 
+                        "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b-ecs", 
                         "panelIndex": 19, 
                         "row": 2, 
                         "size_x": 2, 
@@ -1090,7 +1042,7 @@
                     }, 
                     {
                         "col": 3, 
-                        "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b", 
+                        "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b-ecs", 
                         "panelIndex": 20, 
                         "row": 2, 
                         "size_x": 2, 
@@ -1099,7 +1051,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat System] Overview", 
+                "title": "[Metricbeat System] Overview ECS", 
                 "uiStateJSON": {
                     "P-11": {
                         "vis": {
@@ -1149,7 +1101,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "Metricbeat-system-overview", 
+            "id": "Metricbeat-system-overview-ecs", 
             "type": "dashboard", 
             "version": 2
         }

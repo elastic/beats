@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Kafka stacktraces", 
-                "title": "Number of stracktraces by class [Filebeat Kafka]", 
+                "savedSearchId": "Kafka stacktraces-ecs", 
+                "title": "Number of stracktraces by class [Filebeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -117,11 +117,11 @@
                             }
                         ]
                     }, 
-                    "title": "Number of Kafka stracktraces by class [Filebeat Kafka]",
+                    "title": "Number of Kafka stracktraces by class [Filebeat Kafka] ECS",
                     "type": "histogram"
                 }
             }, 
-            "id": "number-of-kafka-stracktraces-by-class",
+            "id": "number-of-kafka-stracktraces-by-class-ecs",
             "type": "visualization", 
             "version": 2
         }, 
@@ -140,8 +140,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "_exists_:kafka.log.trace.class"
+                            "language": "kuery",
+                            "query": "kafka.log.trace.class:*"
                         }, 
                         "version": true
                     }
@@ -150,19 +150,19 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Stacktraces [Filebeat Kafka]", 
+                "title": "Stacktraces [Filebeat Kafka] ECS", 
                 "version": 1
             }, 
-            "id": "Kafka stacktraces", 
+            "id": "Kafka stacktraces-ecs", 
             "type": "search", 
             "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "kafka.log.level", 
+                    "log.level", 
                     "kafka.log.component", 
-                    "kafka.log.message"
+                    "message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -177,7 +177,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "fileset.module", 
+                                    "key": "event.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "kafka", 
@@ -188,7 +188,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "fileset.module": {
+                                        "event.module": {
                                             "query": "kafka", 
                                             "type": "phrase"
                                         }
@@ -225,8 +225,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -235,10 +235,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "All logs [Filebeat Kafka]", 
+                "title": "All logs [Filebeat Kafka] ECS", 
                 "version": 1
             }, 
-            "id": "All Kafka logs", 
+            "id": "All Kafka logs-ecs", 
             "type": "search", 
             "version": 1
         }, 
@@ -250,8 +250,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "All Kafka logs", 
-                "title": "Log levels over time [Filebeat Kafka]", 
+                "savedSearchId": "All Kafka logs-ecs", 
+                "title": "Log levels over time [Filebeat Kafka] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -281,7 +281,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "Log Level", 
-                                "field": "kafka.log.level", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -360,11 +360,11 @@
                             }
                         ]
                     }, 
-                    "title": "Log levels over time [Filebeat Kafka]", 
+                    "title": "Log levels over time [Filebeat Kafka] ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "3f7c33c0-87ee-11e7-ad9c-db80de0bf8d3", 
+            "id": "3f7c33c0-87ee-11e7-ad9c-db80de0bf8d3-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -377,7 +377,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -389,7 +389,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "number-of-kafka-stracktraces-by-class",
+                        "id": "number-of-kafka-stracktraces-by-class-ecs",
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 6, 
@@ -403,7 +403,7 @@
                             "kafka.log.trace.class", 
                             "kafka.log.trace.full"
                         ], 
-                        "id": "Kafka stacktraces", 
+                        "id": "Kafka stacktraces-ecs", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 6, 
@@ -417,11 +417,11 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "kafka.log.level", 
+                            "log.level", 
                             "kafka.log.component", 
-                            "kafka.log.message"
+                            "message"
                         ], 
-                        "id": "All Kafka logs", 
+                        "id": "All Kafka logs-ecs", 
                         "panelIndex": 3, 
                         "row": 6, 
                         "size_x": 12, 
@@ -434,7 +434,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "3f7c33c0-87ee-11e7-ad9c-db80de0bf8d3", 
+                        "id": "3f7c33c0-87ee-11e7-ad9c-db80de0bf8d3-ecs", 
                         "panelIndex": 4, 
                         "row": 4, 
                         "size_x": 12, 
@@ -443,11 +443,11 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Kafka] Overview", 
+                "title": "[Filebeat Kafka] Overview ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 
-            "id": "943caca0-87ee-11e7-ad9c-db80de0bf8d3", 
+            "id": "943caca0-87ee-11e7-ad9c-db80de0bf8d3-ecs", 
             "type": "dashboard", 
             "version": 1
         }

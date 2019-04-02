@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Info OSSEC rootkit [Osquery Result]", 
+                "title": "Info OSSEC rootkit [Osquery Result] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -15,11 +15,11 @@
                         "fontSize": 12, 
                         "markdown": "This dashboard shows data collected by the ossec-rootkit pack from osquery."
                     }, 
-                    "title": "Info OSSEC rootkit [Osquery Result]", 
+                    "title": "Info OSSEC rootkit [Osquery Result] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "6ec10290-f4aa-11e7-8647-534bb4c21040", 
+            "id": "6ec10290-f4aa-11e7-8647-534bb4c21040-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T19:30:49.785Z", 
             "version": 1
@@ -31,13 +31,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040", 
-                "title": "Number of rootkits found [Osquery Result]", 
+                "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
+                "title": "Number of rootkits found [Osquery Result] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -81,11 +81,11 @@
                         }, 
                         "type": "metric"
                     }, 
-                    "title": "Number of rootkits found [Osquery Result]", 
+                    "title": "Number of rootkits found [Osquery Result] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040", 
+            "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T19:40:05.060Z", 
             "version": 3
@@ -97,13 +97,13 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
                 }, 
-                "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040", 
-                "title": "Number of hosts infected [Osquery Result]", 
+                "savedSearchId": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
+                "title": "Number of hosts infected [Osquery Result] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -113,7 +113,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "beat.hostname"
+                                "field": "agent.hostname"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -147,11 +147,11 @@
                         }, 
                         "type": "metric"
                     }, 
-                    "title": "Number of hosts infected [Osquery Result]", 
+                    "title": "Number of hosts infected [Osquery Result] ECS", 
                     "type": "metric"
                 }
             }, 
-            "id": "ab587180-f4a9-11e7-8647-534bb4c21040", 
+            "id": "ab587180-f4a9-11e7-8647-534bb4c21040-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T19:39:45.085Z", 
             "version": 2
@@ -162,20 +162,20 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Navigation [Osquery Result]", 
+                "title": "Navigation [Osquery Result] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 10, 
-                        "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040)"
+                        "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs)"
                     }, 
-                    "title": "Navigation [Osquery Result]", 
+                    "title": "Navigation [Osquery Result] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040", 
+            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
             "type": "visualization", 
             "updated_at": "2018-01-08T19:41:10.264Z", 
             "version": 3
@@ -185,7 +185,7 @@
                 "columns": [
                     "osquery.result.name", 
                     "osquery.result.columns.path", 
-                    "beat.hostname"
+                    "agent.hostname"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -219,7 +219,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "fileset.module", 
+                                    "key": "event.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "osquery", 
@@ -230,7 +230,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "fileset.module": {
+                                        "event.module": {
                                             "query": "osquery", 
                                             "type": "phrase"
                                         }
@@ -267,7 +267,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -277,10 +277,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "OSSEC Rootkits [Osquery Result]", 
+                "title": "OSSEC Rootkits [Osquery Result] ECS", 
                 "version": 1
             }, 
-            "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040", 
+            "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
             "type": "search", 
             "updated_at": "2018-01-08T19:38:24.483Z", 
             "version": 2
@@ -294,7 +294,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -314,7 +314,7 @@
                             "x": 8, 
                             "y": 1
                         }, 
-                        "id": "6ec10290-f4aa-11e7-8647-534bb4c21040", 
+                        "id": "6ec10290-f4aa-11e7-8647-534bb4c21040-ecs", 
                         "panelIndex": "1", 
                         "type": "visualization", 
                         "version": "6.1.0-SNAPSHOT"
@@ -327,7 +327,7 @@
                             "x": 4, 
                             "y": 1
                         }, 
-                        "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040", 
+                        "id": "ffdbba50-f4a9-11e7-8647-534bb4c21040-ecs", 
                         "panelIndex": "2", 
                         "type": "visualization", 
                         "version": "6.1.0-SNAPSHOT"
@@ -340,7 +340,7 @@
                             "x": 0, 
                             "y": 1
                         }, 
-                        "id": "ab587180-f4a9-11e7-8647-534bb4c21040", 
+                        "id": "ab587180-f4a9-11e7-8647-534bb4c21040-ecs", 
                         "panelIndex": "3", 
                         "type": "visualization", 
                         "version": "6.1.0-SNAPSHOT"
@@ -353,7 +353,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040", 
+                        "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
                         "panelIndex": "4", 
                         "type": "visualization", 
                         "version": "6.1.0-SNAPSHOT"
@@ -366,18 +366,18 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040", 
+                        "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs", 
                         "panelIndex": "5", 
                         "type": "search", 
                         "version": "6.1.0-SNAPSHOT"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Osquery Result] OSSEC rootkit pack", 
+                "title": "[Osquery Result] OSSEC rootkit pack ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 
-            "id": "c0a7ce90-f4aa-11e7-8647-534bb4c21040", 
+            "id": "c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-01-08T19:40:16.304Z", 
             "version": 6

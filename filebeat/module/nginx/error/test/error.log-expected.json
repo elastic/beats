@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2016-10-25T14:49:34.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.error",
         "event.module": "nginx",
         "fileset.name": "error",
@@ -16,7 +16,7 @@
     },
     {
         "@timestamp": "2016-10-25T14:50:44.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.error",
         "event.module": "nginx",
         "fileset.name": "error",

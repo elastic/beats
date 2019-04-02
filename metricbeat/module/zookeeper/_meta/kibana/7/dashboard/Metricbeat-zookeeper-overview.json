@@ -7,12 +7,12 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Approximate data size [Metricbeat Zookeeper]",
+        "title": "Approximate data size [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -53,11 +53,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Approximate data size [Metricbeat Zookeeper]",
+          "title": "Approximate data size [Metricbeat Zookeeper] ECS",
           "type": "metrics"
         }
       },
-      "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4",
+      "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4-ecs",
       "type": "visualization",
       "updated_at": "2019-01-30T13:29:19.163Z",
       "version": 2
@@ -69,12 +69,12 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Latency [Metricbeat Zookeeper]",
+        "title": "Latency [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -115,11 +115,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Latency [Metricbeat Zookeeper]",
+          "title": "Latency [Metricbeat Zookeeper] ECS",
           "type": "metrics"
         }
       },
-      "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4",
+      "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4-ecs",
       "type": "visualization",
       "updated_at": "2019-01-30T13:29:05.974Z",
       "version": 2
@@ -131,12 +131,12 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Alive Connections [Metricbeat Zookeeper]",
+        "title": "Alive Connections [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -177,11 +177,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Alive Connections [Metricbeat Zookeeper]",
+          "title": "Alive Connections [Metricbeat Zookeeper] ECS",
           "type": "metrics"
         }
       },
-      "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4",
+      "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4-ecs",
       "type": "visualization",
       "updated_at": "2019-01-30T13:28:52.034Z",
       "version": 3
@@ -193,12 +193,12 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Used file descriptors [Metricbeat Zookeeper]",
+        "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -285,11 +285,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Used file descriptors [Metricbeat Zookeeper]",
+          "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
           "type": "metrics"
         }
       },
-      "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4",
+      "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
       "type": "visualization",
       "updated_at": "2019-01-30T13:28:22.583Z",
       "version": 5
@@ -301,12 +301,12 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Packets received / sent [Metricbeat Zookeeper]",
+        "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -386,11 +386,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Packets received / sent [Metricbeat Zookeeper]",
+          "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
           "type": "metrics"
         }
       },
-      "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4",
+      "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
       "type": "visualization",
       "updated_at": "2019-01-30T13:26:42.583Z",
       "version": 3
@@ -403,7 +403,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -423,7 +423,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4",
+            "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "1",
             "title": "Approximate data size",
             "type": "visualization",
@@ -438,7 +438,7 @@
               "x": 15,
               "y": 15
             },
-            "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4",
+            "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "2",
             "title": "Latency",
             "type": "visualization",
@@ -453,7 +453,7 @@
               "x": 32,
               "y": 15
             },
-            "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4",
+            "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "3",
             "title": "Alive Connections",
             "type": "visualization",
@@ -468,7 +468,7 @@
               "x": 23,
               "y": 0
             },
-            "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4",
+            "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "4",
             "title": "Used file descriptors",
             "type": "visualization",
@@ -483,7 +483,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4",
+            "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "5",
             "title": "Packets received / sent",
             "type": "visualization",
@@ -491,10 +491,10 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Zookeeper] Overview",
+        "title": "[Metricbeat Zookeeper] Overview ECS",
         "version": 1
       },
-      "id": "467207a0-231e-11e9-bb66-8baac426dfd4",
+      "id": "467207a0-231e-11e9-bb66-8baac426dfd4-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-30T13:34:01.235Z",
       "version": 6

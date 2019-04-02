@@ -7,31 +7,26 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Navigation [Packetbeat]",
+        "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat]",
+          "title": "Navigation [Packetbeat] ECS",
           "type": "markdown"
         }
       },
-      "id": "Navigation",
+      "id": "Navigation-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
       "version": 11
@@ -43,13 +38,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
-        "title": "TLS Sessions [Packetbeat]",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Sessions [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -167,11 +162,11 @@
               }
             ]
           },
-          "title": "TLS Sessions",
+          "title": "TLS Sessions ECS",
           "type": "histogram"
         }
       },
-      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
+      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -204,12 +199,12 @@
             ],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "TLS Alerts [Packetbeat]",
+        "title": "TLS Alerts [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -250,11 +245,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "TLS Alerts",
+          "title": "TLS Alerts ECS",
           "type": "pie"
         }
       },
-      "id": "c14377a0-d353-11e7-9914-4982455b3063",
+      "id": "c14377a0-d353-11e7-9914-4982455b3063-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -285,17 +280,12 @@
             ],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Total Number of TLS Sessions [Packetbeat]",
+        "title": "Total Number of TLS Sessions [Packetbeat] ECS",
         "uiStateJSON": {
           "P-5": {
             "vis": {
@@ -354,11 +344,11 @@
             },
             "type": "metric"
           },
-          "title": "Total Number of TLS Sessions",
+          "title": "Total Number of TLS Sessions ECS",
           "type": "metric"
         }
       },
-      "id": "061de380-d361-11e7-9914-4982455b3063",
+      "id": "061de380-d361-11e7-9914-4982455b3063-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -370,13 +360,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "94908e80-d2d8-11e7-9914-4982455b3063",
-        "title": "TLS Server Name Indication [Packetbeat]",
+        "savedSearchId": "94908e80-d2d8-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Server Name Indication [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -409,11 +399,11 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "TLS Server Name Indication",
+          "title": "TLS Server Name Indication ECS",
           "type": "tagcloud"
         }
       },
-      "id": "a28d09d0-d361-11e7-9914-4982455b3063",
+      "id": "a28d09d0-d361-11e7-9914-4982455b3063-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -425,13 +415,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "bf3d23b0-d37c-11e7-9914-4982455b3063",
-        "title": "TLS Versions [Packetbeat]",
+        "savedSearchId": "bf3d23b0-d37c-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Versions [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -464,11 +454,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "TLS Versions",
+          "title": "TLS Versions ECS",
           "type": "pie"
         }
       },
-      "id": "0af0b790-d37d-11e7-9914-4982455b3063",
+      "id": "0af0b790-d37d-11e7-9914-4982455b3063-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -480,13 +470,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "8f0ff590-d37d-11e7-9914-4982455b3063",
-        "title": "TLS Server Public Key Size [Packetbeat]",
+        "savedSearchId": "8f0ff590-d37d-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Server Public Key Size [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -519,11 +509,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Server Public Key Size",
+          "title": "Server Public Key Size ECS",
           "type": "pie"
         }
       },
-      "id": "ae6e33c0-d37d-11e7-9914-4982455b3063",
+      "id": "ae6e33c0-d37d-11e7-9914-4982455b3063-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -535,13 +525,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
-        "title": "TLS Session Resume [Packetbeat]",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Session Resume [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -585,11 +575,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "TLS Session Resume [Packetbeat]",
+          "title": "TLS Session Resume [Packetbeat] ECS",
           "type": "pie"
         }
       },
-      "id": "2c467370-d392-11e7-8fa0-232aa9259081",
+      "id": "2c467370-d392-11e7-8fa0-232aa9259081-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -601,13 +591,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
-        "title": "TLS Server Certificates [Packetbeat]",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Server Certificates [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -668,11 +658,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Server Certificates",
+          "title": "TLS Server Certificates ECS",
           "type": "table"
         }
       },
-      "id": "0958a910-d396-11e7-8fa0-232aa9259081",
+      "id": "0958a910-d396-11e7-8fa0-232aa9259081-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -684,13 +674,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
-        "title": "TLS Client Certificates [Packetbeat]",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Client Certificates [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -750,11 +740,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Client Certificates",
+          "title": "TLS Client Certificates ECS",
           "type": "table"
         }
       },
-      "id": "86743f90-d396-11e7-8fa0-232aa9259081",
+      "id": "86743f90-d396-11e7-8fa0-232aa9259081-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -766,13 +756,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
-        "title": "TLS Cipher [Packetbeat]",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Cipher [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -818,11 +808,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Cipher",
+          "title": "TLS Cipher ECS",
           "type": "table"
         }
       },
-      "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961",
+      "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -834,13 +824,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
-        "title": "TLS Fingerprint [Packetbeat]",
+        "savedSearchId": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b-ecs",
+        "title": "TLS Fingerprint [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -886,11 +876,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Fingerprint",
+          "title": "TLS Fingerprint ECS",
           "type": "table"
         }
       },
-      "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b",
+      "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -927,13 +917,13 @@
               }
             ],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "8e2af860-d520-11e7-9fff-7b1ebf397ba9",
-        "title": "TLS Handshake Latency [Packetbeat]",
+        "savedSearchId": "8e2af860-d520-11e7-9fff-7b1ebf397ba9-ecs",
+        "title": "TLS Handshake Latency [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -1032,11 +1022,11 @@
               }
             ]
           },
-          "title": "TLS Handshake Latency",
+          "title": "TLS Handshake Latency ECS",
           "type": "area"
         }
       },
-      "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9",
+      "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1072,13 +1062,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1087,10 +1072,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Sessions [Packetbeat]",
+        "title": "TLS Sessions [Packetbeat] ECS",
         "version": 1
       },
-      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1126,13 +1111,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1141,10 +1121,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Server Name Indication [Packetbeat]",
+        "title": "TLS Server Name Indication [Packetbeat] ECS",
         "version": 1
       },
-      "id": "94908e80-d2d8-11e7-9914-4982455b3063",
+      "id": "94908e80-d2d8-11e7-9914-4982455b3063-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1180,13 +1160,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1195,10 +1170,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Version [Packetbeat]",
+        "title": "TLS Version [Packetbeat] ECS",
         "version": 1
       },
-      "id": "bf3d23b0-d37c-11e7-9914-4982455b3063",
+      "id": "bf3d23b0-d37c-11e7-9914-4982455b3063-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1234,13 +1209,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1249,10 +1219,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Server Public Key Size",
+        "title": "Server Public Key Size ECS",
         "version": 1
       },
-      "id": "8f0ff590-d37d-11e7-9914-4982455b3063",
+      "id": "8f0ff590-d37d-11e7-9914-4982455b3063-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1288,7 +1258,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1298,10 +1268,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Fingerprint [Packetbeat]",
+        "title": "TLS Fingerprint [Packetbeat] ECS",
         "version": 1
       },
-      "id": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
+      "id": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
@@ -1354,7 +1324,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1364,30 +1334,25 @@
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Handshake Latency [Packetbeat]",
+        "title": "TLS Handshake Latency [Packetbeat] ECS",
         "version": 1
       },
-      "id": "8e2af860-d520-11e7-9fff-7b1ebf397ba9",
+      "id": "8e2af860-d520-11e7-9fff-7b1ebf397ba9-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1
     },
     {
       "attributes": {
-        "description": "TLS Sessions",
+        "description": "TLS Sessions ECS",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1405,7 +1370,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "Navigation",
+            "id": "Navigation-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "6.2.4"
@@ -1418,7 +1383,7 @@
               "x": 3,
               "y": 0
             },
-            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
+            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "6.2.4"
@@ -1431,7 +1396,7 @@
               "x": 3,
               "y": 7
             },
-            "id": "c14377a0-d353-11e7-9914-4982455b3063",
+            "id": "c14377a0-d353-11e7-9914-4982455b3063-ecs",
             "panelIndex": "9",
             "type": "visualization",
             "version": "6.2.4"
@@ -1444,7 +1409,7 @@
               "x": 0,
               "y": 4
             },
-            "id": "061de380-d361-11e7-9914-4982455b3063",
+            "id": "061de380-d361-11e7-9914-4982455b3063-ecs",
             "panelIndex": "10",
             "type": "visualization",
             "version": "6.2.4"
@@ -1457,7 +1422,7 @@
               "x": 0,
               "y": 10
             },
-            "id": "a28d09d0-d361-11e7-9914-4982455b3063",
+            "id": "a28d09d0-d361-11e7-9914-4982455b3063-ecs",
             "panelIndex": "11",
             "type": "visualization",
             "version": "6.2.4"
@@ -1470,7 +1435,7 @@
               "x": 6,
               "y": 7
             },
-            "id": "0af0b790-d37d-11e7-9914-4982455b3063",
+            "id": "0af0b790-d37d-11e7-9914-4982455b3063-ecs",
             "panelIndex": "12",
             "type": "visualization",
             "version": "6.2.4"
@@ -1483,7 +1448,7 @@
               "x": 9,
               "y": 7
             },
-            "id": "ae6e33c0-d37d-11e7-9914-4982455b3063",
+            "id": "ae6e33c0-d37d-11e7-9914-4982455b3063-ecs",
             "panelIndex": "13",
             "type": "visualization",
             "version": "6.2.4"
@@ -1496,7 +1461,7 @@
               "x": 0,
               "y": 7
             },
-            "id": "2c467370-d392-11e7-8fa0-232aa9259081",
+            "id": "2c467370-d392-11e7-8fa0-232aa9259081-ecs",
             "panelIndex": "14",
             "type": "visualization",
             "version": "6.2.4"
@@ -1509,7 +1474,7 @@
               "x": 0,
               "y": 13
             },
-            "id": "0958a910-d396-11e7-8fa0-232aa9259081",
+            "id": "0958a910-d396-11e7-8fa0-232aa9259081-ecs",
             "panelIndex": "15",
             "type": "visualization",
             "version": "6.2.4"
@@ -1522,7 +1487,7 @@
               "x": 0,
               "y": 16
             },
-            "id": "86743f90-d396-11e7-8fa0-232aa9259081",
+            "id": "86743f90-d396-11e7-8fa0-232aa9259081-ecs",
             "panelIndex": "16",
             "type": "visualization",
             "version": "6.2.4"
@@ -1535,7 +1500,7 @@
               "x": 6,
               "y": 13
             },
-            "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961",
+            "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961-ecs",
             "panelIndex": "17",
             "type": "visualization",
             "version": "6.2.4"
@@ -1548,7 +1513,7 @@
               "x": 6,
               "y": 16
             },
-            "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b",
+            "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b-ecs",
             "panelIndex": "18",
             "type": "visualization",
             "version": "6.2.4"
@@ -1561,14 +1526,14 @@
               "x": 3,
               "y": 4
             },
-            "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9",
+            "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9-ecs",
             "panelIndex": "19",
             "type": "visualization",
             "version": "6.2.4"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] TLS Sessions",
+        "title": "[Packetbeat] TLS Sessions ECS",
         "uiStateJSON": {
           "P-15": {
             "vis": {
@@ -1630,7 +1595,7 @@
         },
         "version": 1
       },
-      "id": "tls-sessions",
+      "id": "tls-sessions-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:33.441Z",
       "version": 1

@@ -7,31 +7,26 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Navigation [Packetbeat]",
+        "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat]",
+          "title": "Navigation [Packetbeat] ECS",
           "type": "markdown"
         }
       },
-      "id": "Navigation",
+      "id": "Navigation-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
       "version": 11
@@ -44,8 +39,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-transactions",
-        "title": "Thrift requests per minute [Packetbeat]",
+        "savedSearchId": "Thrift-transactions-ecs",
+        "title": "Thrift requests per minute [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -82,11 +77,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Thrift requests per minute",
+          "title": "Thrift requests per minute ECS",
           "type": "histogram"
         }
       },
-      "id": "Thrift-requests-per-minute",
+      "id": "Thrift-requests-per-minute-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -99,8 +94,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-errors",
-        "title": "Thrift RPC Errors [Packetbeat]",
+        "savedSearchId": "Thrift-errors-ecs",
+        "title": "Thrift RPC Errors [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -139,11 +134,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Thrift RPC Errors",
+          "title": "Thrift RPC Errors ECS",
           "type": "area"
         }
       },
-      "id": "Thrift-RPC-Errors",
+      "id": "Thrift-RPC-Errors-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -160,8 +155,8 @@
             }
           }
         },
-        "savedSearchId": "Thrift-transactions",
-        "title": "Slowest Thrift RPC methods [Packetbeat]",
+        "savedSearchId": "Thrift-transactions-ecs",
+        "title": "Slowest Thrift RPC methods [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -212,11 +207,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Slowest Thrift RPC methods [Packetbeat]",
+          "title": "Slowest Thrift RPC methods [Packetbeat] ECS",
           "type": "table"
         }
       },
-      "id": "Slowest-Thrift-RPC-methods",
+      "id": "Slowest-Thrift-RPC-methods-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -233,8 +228,8 @@
             }
           }
         },
-        "savedSearchId": "Thrift-transactions",
-        "title": "Thrift response times percentiles [Packetbeat]",
+        "savedSearchId": "Thrift-transactions-ecs",
+        "title": "Thrift response times percentiles [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -339,11 +334,11 @@
               }
             ]
           },
-          "title": "Thrift response times percentiles [Packetbeat]",
+          "title": "Thrift response times percentiles [Packetbeat] ECS",
           "type": "line"
         }
       },
-      "id": "Thrift-response-times-percentiles",
+      "id": "Thrift-response-times-percentiles-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -356,8 +351,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-transactions",
-        "title": "Top Thrift-RPC methods  [Packetbeat]",
+        "savedSearchId": "Thrift-transactions-ecs",
+        "title": "Top Thrift-RPC methods  [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -393,11 +388,11 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Top Thrift-RPC methods",
+          "title": "Top Thrift-RPC methods ECS",
           "type": "histogram"
         }
       },
-      "id": "Top-Thrift-RPC-methods",
+      "id": "Top-Thrift-RPC-methods-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -410,8 +405,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-errors",
-        "title": "Top Thrift-RPC calls with errors [Packetbeat]",
+        "savedSearchId": "Thrift-errors-ecs",
+        "title": "Top Thrift-RPC calls with errors [Packetbeat] ECS",
         "version": 1,
         "visState": {
           "aggs": [
@@ -444,7 +439,7 @@
           "type": "histogram"
         }
       },
-      "id": "Top-Thrift-RPC-calls-with-errors",
+      "id": "Top-Thrift-RPC-calls-with-errors-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -504,13 +499,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
+              "language": "kuery",
                   "query": "type: thrift"
-                }
-              }
             },
             "version": true
           }
@@ -519,10 +509,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Thrift Transactions Search [Packetbeat]",
+        "title": "Thrift Transactions Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "Thrift-transactions",
+      "id": "Thrift-transactions-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -608,13 +598,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
+              "language": "kuery",
                   "query": "type: thrift"
-                }
-              }
             },
             "version": true
           }
@@ -623,10 +608,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Thrift Errors [Packetbeat]",
+        "title": "Thrift Errors [Packetbeat] ECS",
         "version": 1
       },
-      "id": "Thrift-errors",
+      "id": "Thrift-errors-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
@@ -640,13 +625,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -657,7 +637,7 @@
         "panelsJSON": [
           {
             "col": 1,
-            "id": "Navigation",
+            "id": "Navigation-ecs",
             "panelIndex": 1,
             "row": 1,
             "size_x": 3,
@@ -666,7 +646,7 @@
           },
           {
             "col": 4,
-            "id": "Thrift-requests-per-minute",
+            "id": "Thrift-requests-per-minute-ecs",
             "panelIndex": 2,
             "row": 1,
             "size_x": 5,
@@ -675,7 +655,7 @@
           },
           {
             "col": 9,
-            "id": "Thrift-RPC-Errors",
+            "id": "Thrift-RPC-Errors-ecs",
             "panelIndex": 3,
             "row": 1,
             "size_x": 4,
@@ -684,7 +664,7 @@
           },
           {
             "col": 1,
-            "id": "Slowest-Thrift-RPC-methods",
+            "id": "Slowest-Thrift-RPC-methods-ecs",
             "panelIndex": 4,
             "row": 5,
             "size_x": 6,
@@ -693,7 +673,7 @@
           },
           {
             "col": 7,
-            "id": "Thrift-response-times-percentiles",
+            "id": "Thrift-response-times-percentiles-ecs",
             "panelIndex": 5,
             "row": 5,
             "size_x": 6,
@@ -702,7 +682,7 @@
           },
           {
             "col": 1,
-            "id": "Top-Thrift-RPC-methods",
+            "id": "Top-Thrift-RPC-methods-ecs",
             "panelIndex": 6,
             "row": 8,
             "size_x": 6,
@@ -711,7 +691,7 @@
           },
           {
             "col": 7,
-            "id": "Top-Thrift-RPC-calls-with-errors",
+            "id": "Top-Thrift-RPC-calls-with-errors-ecs",
             "panelIndex": 7,
             "row": 8,
             "size_x": 6,
@@ -720,7 +700,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] Thrift performance",
+        "title": "[Packetbeat] Thrift performance ECS",
         "uiStateJSON": {
           "P-4": {
             "vis": {
@@ -735,7 +715,7 @@
         },
         "version": 1
       },
-      "id": "Packetbeat-Thrift-performance",
+      "id": "Packetbeat-Thrift-performance-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1

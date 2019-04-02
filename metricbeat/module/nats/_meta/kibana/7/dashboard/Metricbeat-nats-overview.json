@@ -8,12 +8,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Subscriptions Info [Metricbeat NATS]",
+        "title": "Subscriptions Info [Metricbeat NATS] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -120,11 +120,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Subscriptions Info [Metricbeat NATS]",
+          "title": "Subscriptions Info [Metricbeat NATS] ECS",
           "type": "table"
         }
       },
-      "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61",
+      "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:54:30.301Z",
       "version": 3
@@ -137,12 +137,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Current Memory Usage [Metricbeat NATS]",
+        "title": "Current Memory Usage [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -186,11 +186,11 @@
             },
             "type": "metric"
           },
-          "title": "Current Memory Usage [Metricbeat NATS]",
+          "title": "Current Memory Usage [Metricbeat NATS] ECS",
           "type": "metric"
         }
       },
-      "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61",
+      "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:56:32.097Z",
       "version": 4
@@ -203,12 +203,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Server Uptime [Metricbeat NATS]",
+        "title": "Server Uptime [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -252,11 +252,11 @@
             },
             "type": "metric"
           },
-          "title": "Server Uptime [Metricbeat NATS]",
+          "title": "Server Uptime [Metricbeat NATS] ECS",
           "type": "metric"
         }
       },
-      "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61",
+      "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:57:04.084Z",
       "version": 4
@@ -269,12 +269,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Total Connections [Metricbeat NATS]",
+        "title": "Total Connections [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -318,11 +318,11 @@
             },
             "type": "metric"
           },
-          "title": "Total Connections [Metricbeat NATS]",
+          "title": "Total Connections [Metricbeat NATS] ECS",
           "type": "metric"
         }
       },
-      "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61",
+      "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:57:32.006Z",
       "version": 4
@@ -335,12 +335,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS]",
+        "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -507,11 +507,11 @@
               }
             ]
           },
-          "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS]",
+          "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS] ECS",
           "type": "area"
         }
       },
-      "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61",
+      "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:53:31.785Z",
       "version": 3
@@ -524,12 +524,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Subscription Stats Timeline [Metricbeat NATS]",
+        "title": "Subscription Stats Timeline [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -714,11 +714,11 @@
               }
             ]
           },
-          "title": "Subscription Stats Timeline [Metricbeat NATS]",
+          "title": "Subscription Stats Timeline [Metricbeat NATS] ECS",
           "type": "line"
         }
       },
-      "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61",
+      "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T14:55:04.899Z",
       "version": 3
@@ -731,12 +731,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Slow Consumers Timeline [Metricbeat NATS]",
+        "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -833,11 +833,11 @@
               }
             ]
           },
-          "title": "Slow Consumers Timeline [Metricbeat NATS]",
+          "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
           "type": "line"
         }
       },
-      "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90",
+      "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T14:53:57.137Z",
       "version": 2
@@ -850,12 +850,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "IO Bytes Stats [Metricbeat NATS]",
+        "title": "IO Bytes Stats [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -974,11 +974,11 @@
               }
             ]
           },
-          "title": "IO Bytes Stats [Metricbeat NATS]",
+          "title": "IO Bytes Stats [Metricbeat NATS] ECS",
           "type": "line"
         }
       },
-      "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90",
+      "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:48:22.914Z",
       "version": 4
@@ -991,12 +991,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Memory Utilization Timeline [Metricbeat NATS]",
+        "title": "Memory Utilization Timeline [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1093,11 +1093,11 @@
               }
             ]
           },
-          "title": "Memory Utilization Timeline [Metricbeat NATS]",
+          "title": "Memory Utilization Timeline [Metricbeat NATS] ECS",
           "type": "line"
         }
       },
-      "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90",
+      "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:52:55.445Z",
       "version": 5
@@ -1110,12 +1110,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "IO Messages Stats [Metricbeat NATS]",
+        "title": "IO Messages Stats [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1234,11 +1234,11 @@
               }
             ]
           },
-          "title": "IO Messages Stats [Metricbeat NATS]",
+          "title": "IO Messages Stats [Metricbeat NATS] ECS",
           "type": "line"
         }
       },
-      "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb",
+      "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:47:25.774Z",
       "version": 2
@@ -1251,12 +1251,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "CPU Utilization Timeline [Metricbeat NATS]",
+        "title": "CPU Utilization Timeline [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1353,11 +1353,11 @@
               }
             ]
           },
-          "title": "CPU Utilization Timeline [Metricbeat NATS]",
+          "title": "CPU Utilization Timeline [Metricbeat NATS] ECS",
           "type": "line"
         }
       },
-      "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb",
+      "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T07:51:51.767Z",
       "version": 2
@@ -1370,12 +1370,12 @@
             "filter": [],
             "index": "metricbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Cache Hit Rate Timeline [Metricbeat NATS]",
+        "title": "Cache Hit Rate Timeline [Metricbeat NATS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1472,11 +1472,11 @@
               }
             ]
           },
-          "title": "Cache Hit Rate Timeline [Metricbeat NATS]",
+          "title": "Cache Hit Rate Timeline [Metricbeat NATS] ECS",
           "type": "line"
         }
       },
-      "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb",
+      "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T14:57:20.994Z",
       "version": 2
@@ -1490,7 +1490,7 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1511,7 +1511,7 @@
               "x": 0,
               "y": 45
             },
-            "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61",
+            "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "6.5.4"
@@ -1525,7 +1525,7 @@
               "x": 24,
               "y": 34
             },
-            "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61",
+            "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "6.5.4"
@@ -1539,7 +1539,7 @@
               "x": 37,
               "y": 34
             },
-            "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61",
+            "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "6.5.4"
@@ -1553,7 +1553,7 @@
               "x": 24,
               "y": 41
             },
-            "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61",
+            "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
             "panelIndex": "9",
             "type": "visualization",
             "version": "6.5.4"
@@ -1567,7 +1567,7 @@
               "x": 0,
               "y": 34
             },
-            "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61",
+            "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61-ecs",
             "panelIndex": "11",
             "type": "visualization",
             "version": "6.5.4"
@@ -1581,7 +1581,7 @@
               "x": 15,
               "y": 0
             },
-            "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61",
+            "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61-ecs",
             "panelIndex": "12",
             "type": "visualization",
             "version": "6.5.4"
@@ -1595,7 +1595,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90",
+            "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90-ecs",
             "panelIndex": "13",
             "type": "visualization",
             "version": "6.5.4"
@@ -1609,7 +1609,7 @@
               "x": 24,
               "y": 10
             },
-            "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90",
+            "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90-ecs",
             "panelIndex": "14",
             "type": "visualization",
             "version": "6.5.4"
@@ -1627,7 +1627,7 @@
               "x": 24,
               "y": 22
             },
-            "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90",
+            "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90-ecs",
             "panelIndex": "15",
             "type": "visualization",
             "version": "6.5.4"
@@ -1641,7 +1641,7 @@
               "x": 0,
               "y": 10
             },
-            "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb",
+            "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb-ecs",
             "panelIndex": "16",
             "type": "visualization",
             "version": "6.3.2"
@@ -1655,7 +1655,7 @@
               "x": 0,
               "y": 22
             },
-            "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb",
+            "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb-ecs",
             "panelIndex": "17",
             "type": "visualization",
             "version": "6.3.2"
@@ -1669,17 +1669,17 @@
               "x": 33,
               "y": 0
             },
-            "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb",
+            "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
             "panelIndex": "18",
             "type": "visualization",
             "version": "6.3.2"
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat NATS] Overview",
+        "title": "[Metricbeat NATS] Overview ECS",
         "version": 1
       },
-      "id": "Metricbeat-Nats-Dashboard",
+      "id": "Metricbeat-Nats-Dashboard-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-24T08:13:29.732Z",
       "version": 4

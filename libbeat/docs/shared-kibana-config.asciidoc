@@ -10,23 +10,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[setup-kibana-endpoint]]
-== Set up the Kibana endpoint
-ifdef::deprecate_dashboard_loading[]
+== Configure the Kibana endpoint
 
-deprecated[{deprecate_dashboard_loading}]
-
-endif::[]
-
-ifeval::["{beatname_lc}" == "apm-server"]
-The Kibana dashboards are loaded into Kibana via the Kibana API.
-This requires a Kibana endpoint configuration.
-endif::[]
-
-ifeval::["{beatname_lc}" != "apm-server"]
 Starting with {beatname_uc} 6.0.0, the Kibana dashboards are loaded into Kibana
 via the Kibana API. This requires a Kibana endpoint configuration.
-endif::[]
-
 
 You configure the endpoint in the `setup.kibana` section of the
 +{beatname_lc}.yml+ config file.

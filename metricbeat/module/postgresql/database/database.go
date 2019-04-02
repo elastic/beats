@@ -20,15 +20,18 @@ package database
 import (
 	"database/sql"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
 
 	// Register postgresql database/sql driver
 	_ "github.com/lib/pq"
 )
+
+var logger = logp.NewLogger("postgresql.database")
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
@@ -49,24 +52,30 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	db, err := sql.Open("postgres", m.HostData().URI)
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 	defer db.Close()
 
 	results, err := postgresql.QueryStats(db, "SELECT * FROM pg_stat_database")
 	if err != nil {
-		return nil, errors.Wrap(err, "QueryStats")
+		err = errors.Wrap(err, "QueryStats")
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 
-	events := []common.MapStr{}
 	for _, result := range results {
 		data, _ := schema.Apply(result)
-		events = append(events, data)
+		reporter.Event(mb.Event{
+			MetricSetFields: data,
+		})
 	}
-
-	return events, nil
 }

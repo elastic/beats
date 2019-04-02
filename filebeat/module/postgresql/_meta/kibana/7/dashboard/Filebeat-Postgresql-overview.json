@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "PostgreSQL All Logs", 
-                "title": "Log Level Count [Filebeat PostgreSQL]", 
+                "savedSearchId": "PostgreSQL All Logs-ecs", 
+                "title": "Log Level Count [Filebeat PostgreSQL] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -34,7 +34,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "postgresql.log.level", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 12
@@ -54,21 +54,21 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Log Level Count [Filebeat PostgreSQL]", 
+                    "title": "Log Level Count [Filebeat PostgreSQL] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "PostgreSQL Log Level Count", 
+            "id": "PostgreSQL Log Level Count-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
-                    "postgresql.log.user", 
+                    "user.name", 
                     "postgresql.log.database", 
-                    "postgresql.log.level", 
-                    "postgresql.log.message", 
+                    "log.level", 
+                    "message", 
                     "postgresql.log.query"
                 ], 
                 "description": "", 
@@ -84,7 +84,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "fileset.module", 
+                                    "key": "event.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "postgresql", 
@@ -95,7 +95,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "fileset.module": {
+                                        "event.module": {
                                             "query": "postgresql", 
                                             "type": "phrase"
                                         }
@@ -106,8 +106,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -116,10 +116,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "All Logs [Filebeat PostgreSQL]", 
+                "title": "All Logs [Filebeat PostgreSQL] ECS", 
                 "version": 1
             }, 
-            "id": "PostgreSQL All Logs", 
+            "id": "PostgreSQL All Logs-ecs", 
             "type": "search", 
             "version": 1
         }, 
@@ -131,8 +131,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "PostgreSQL All Logs", 
-                "title": "Logs by level over time [Filebeat PostgreSQL]", 
+                "savedSearchId": "PostgreSQL All Logs-ecs", 
+                "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -161,7 +161,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "postgresql.log.level", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -240,11 +240,11 @@
                             }
                         ]
                     }, 
-                    "title": "Logs by level over time [Filebeat PostgreSQL]", 
+                    "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3", 
+            "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -257,7 +257,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -269,7 +269,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "PostgreSQL Log Level Count", 
+                        "id": "PostgreSQL Log Level Count-ecs", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 3, 
@@ -279,13 +279,13 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "postgresql.log.user", 
+                            "user.name", 
                             "postgresql.log.database", 
-                            "postgresql.log.level", 
-                            "postgresql.log.message", 
+                            "log.level", 
+                            "message", 
                             "postgresql.log.query"
                         ], 
-                        "id": "PostgreSQL All Logs", 
+                        "id": "PostgreSQL All Logs-ecs", 
                         "panelIndex": 2, 
                         "row": 4, 
                         "size_x": 12, 
@@ -298,7 +298,7 @@
                     }, 
                     {
                         "col": 4, 
-                        "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3", 
+                        "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 9, 
@@ -307,7 +307,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat PostgreSQL] Overview", 
+                "title": "[Filebeat PostgreSQL] Overview ECS", 
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
@@ -322,7 +322,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3", 
+            "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3-ecs", 
             "type": "dashboard", 
             "version": 1
         }

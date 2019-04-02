@@ -62,6 +62,7 @@ class Test(BaseTest):
             pipeline="test",
             setup_template_name=index_name,
             setup_template_pattern=index_name + "*",
+            ilm={"enabled": False},
         )
 
         os.mkdir(self.working_dir + "/log/")

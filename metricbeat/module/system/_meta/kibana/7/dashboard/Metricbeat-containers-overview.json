@@ -8,17 +8,12 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Container CPU usage [Metricbeat System]", 
+                "title": "Container CPU usage [Metricbeat System] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -90,7 +85,7 @@
                             "id": "6", 
                             "params": {
                                 "customLabel": "Process name", 
-                                "field": "system.process.name", 
+                                "field": "process.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -110,11 +105,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Container CPU usage [Metricbeat System]", 
+                    "title": "Container CPU usage [Metricbeat System] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "Container-CPU-usage", 
+            "id": "Container-CPU-usage-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -125,30 +120,25 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "System Navigation [Metricbeat System]", 
+                "title": "System Navigation [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container)"
+                        "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview-ecs)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container-ecs)"
                     }, 
-                    "title": "System Navigation [Metricbeat System]", 
+                    "title": "System Navigation [Metricbeat System] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "System-Navigation", 
+            "id": "System-Navigation-ecs", 
             "type": "visualization", 
             "version": 3
         }, 
@@ -160,17 +150,12 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Container Memory stats [Metricbeat System]", 
+                "title": "Container Memory stats [Metricbeat System] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -272,7 +257,7 @@
                             "id": "8", 
                             "params": {
                                 "customLabel": "Process name", 
-                                "field": "system.process.name", 
+                                "field": "process.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -352,11 +337,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Container Memory stats [Metricbeat System]", 
+                    "title": "Container Memory stats [Metricbeat System] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "Container-Memory-stats", 
+            "id": "Container-Memory-stats-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -368,17 +353,12 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
-                "title": "Container Block IO [Metricbeat System]", 
+                "title": "Container Block IO [Metricbeat System] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -430,7 +410,7 @@
                             "id": "4", 
                             "params": {
                                 "customLabel": "Process name", 
-                                "field": "system.process.name", 
+                                "field": "process.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -450,11 +430,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Container Block IO [Metricbeat System]", 
+                    "title": "Container Block IO [Metricbeat System] ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "Container-Block-IO", 
+            "id": "Container-Block-IO-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -467,13 +447,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -484,7 +459,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Container-CPU-usage", 
+                        "id": "Container-CPU-usage-ecs", 
                         "panelIndex": 2, 
                         "row": 2, 
                         "size_x": 12, 
@@ -493,7 +468,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "System-Navigation", 
+                        "id": "System-Navigation-ecs", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 12, 
@@ -502,7 +477,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Container-Memory-stats", 
+                        "id": "Container-Memory-stats-ecs", 
                         "panelIndex": 4, 
                         "row": 5, 
                         "size_x": 12, 
@@ -511,7 +486,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Container-Block-IO", 
+                        "id": "Container-Block-IO-ecs", 
                         "panelIndex": 5, 
                         "row": 8, 
                         "size_x": 12, 
@@ -520,7 +495,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat System] Containers overview", 
+                "title": "[Metricbeat System] Containers overview ECS", 
                 "uiStateJSON": {
                     "P-2": {
                         "vis": {
@@ -555,7 +530,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "CPU-slash-Memory-per-container", 
+            "id": "CPU-slash-Memory-per-container-ecs", 
             "type": "dashboard", 
             "version": 1
         }

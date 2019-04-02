@@ -163,7 +163,7 @@ func RenderEvents(
 		}
 		// Parse the UTF-16 message insert strings.
 		if err = insertStrings.Parse(record, recordBuf); err != nil {
-			event.RenderErr = err.Error()
+			event.RenderErr = append(event.RenderErr, err.Error())
 			events = append(events, event)
 			continue
 		}
@@ -176,7 +176,7 @@ func RenderEvents(
 		event.Message, err = formatMessage(record.sourceName,
 			record.eventID, lang, insertStrings.Pointer(), buffer, pubHandleProvider)
 		if err != nil {
-			event.RenderErr = err.Error()
+			event.RenderErr = append(event.RenderErr, err.Error())
 			if errno, ok := err.(syscall.Errno); ok {
 				event.RenderErrorCode = uint32(errno)
 			}

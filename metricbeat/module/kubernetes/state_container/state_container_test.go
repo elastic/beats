@@ -26,7 +26,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSetEventsFetcher(t, "kubernetes", "state_container",
+	ptest.TestMetricSet(t, "kubernetes", "state_container",
 		ptest.TestCases{
 			{
 				MetricsFile:  "../_meta/test/kube-state-metrics",

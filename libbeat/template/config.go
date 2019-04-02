@@ -17,7 +17,7 @@
 
 package template
 
-import "github.com/elastic/beats/libbeat/common"
+import "github.com/elastic/beats/libbeat/mapping"
 
 type TemplateConfig struct {
 	Enabled bool   `config:"enabled"`
@@ -29,7 +29,7 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields common.Fields    `config:"append_fields"`
+	AppendFields mapping.Fields   `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`
 	Settings     TemplateSettings `config:"settings"`
 }
@@ -39,10 +39,10 @@ type TemplateSettings struct {
 	Source map[string]interface{} `config:"_source"`
 }
 
-var (
-	// DefaultConfig for index template
-	DefaultConfig = TemplateConfig{
+// DefaultConfig for index template
+func DefaultConfig() TemplateConfig {
+	return TemplateConfig{
 		Enabled: true,
 		Fields:  "",
 	}
-)
+}

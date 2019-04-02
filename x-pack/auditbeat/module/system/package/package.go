@@ -9,12 +9,11 @@ package pkg
 import (
 	"bufio"
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -59,6 +59,7 @@ const (
 	eventActionExistingPackage eventAction = iota
 	eventActionPackageInstalled
 	eventActionPackageRemoved
+	eventActionPackageUpdated
 )
 
 func (action eventAction) String() string {
@@ -69,6 +70,8 @@ func (action eventAction) String() string {
 		return "package_installed"
 	case eventActionPackageRemoved:
 		return "package_removed"
+	case eventActionPackageUpdated:
+		return "package_updated"
 	default:
 		return ""
 	}
@@ -83,7 +86,7 @@ func init() {
 
 // MetricSet collects data about the system's packages.
 type MetricSet struct {
-	mb.BaseMetricSet
+	system.SystemMetricSet
 	config    config
 	log       *logp.Logger
 	cache     *cache.Cache
@@ -103,21 +106,27 @@ type Package struct {
 	Size        uint64
 	Summary     string
 	URL         string
+	Error       error
 }
 
 // Hash creates a hash for Package.
 func (pkg Package) Hash() uint64 {
 	h := xxhash.New64()
 	h.WriteString(pkg.Name)
-	h.WriteString(pkg.InstallTime.String())
+	h.WriteString(pkg.Version)
+	h.WriteString(pkg.Release)
+	binary.Write(h, binary.LittleEndian, pkg.Size)
 	return h.Sum64()
 }
 
 func (pkg Package) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
-		"name":        pkg.Name,
-		"version":     pkg.Version,
-		"installtime": pkg.InstallTime,
+		"name":    pkg.Name,
+		"version": pkg.Version,
+	}
+
+	if pkg.Release != "" {
+		mapstr.Put("release", pkg.Release)
 	}
 
 	if pkg.Arch != "" {
@@ -128,8 +137,8 @@ func (pkg Package) toMapStr() common.MapStr {
 		mapstr.Put("license", pkg.License)
 	}
 
-	if pkg.Release != "" {
-		mapstr.Put("release", pkg.Release)
+	if !pkg.InstallTime.IsZero() {
+		mapstr.Put("installtime", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
@@ -145,6 +154,15 @@ func (pkg Package) toMapStr() common.MapStr {
 	}
 
 	return mapstr
+}
+
+// entityID creates an ID that uniquely identifies this package across machines.
+func (pkg Package) entityID(hostID string) string {
+	h := system.NewEntityHash()
+	h.Write([]byte(hostID))
+	h.Write([]byte(pkg.Name))
+	h.Write([]byte(pkg.Version))
+	return h.Sum()
 }
 
 func getOS() (*types.OSInfo, error) {
@@ -163,7 +181,7 @@ func getOS() (*types.OSInfo, error) {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -176,11 +194,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	ms := &MetricSet{
-		BaseMetricSet: base,
-		config:        config,
-		log:           logp.NewLogger(metricsetName),
-		cache:         cache.New(),
-		bucket:        bucket,
+		SystemMetricSet: system.NewSystemMetricSet(base),
+		config:          config,
+		log:             logp.NewLogger(metricsetName),
+		cache:           cache.New(),
+		bucket:          bucket,
 	}
 
 	osInfo, err := getOS()
@@ -190,7 +208,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms.osFamily = osInfo.Family
 	switch osInfo.Family {
 	case redhat:
-		return nil, fmt.Errorf("RPM support is not yet implemented")
+		// ok
 	case debian:
 		if _, err := os.Stat(dpkgStatusFile); err != nil {
 			return nil, errors.Wrapf(err, "error looking up %s", dpkgStatusFile)
@@ -274,7 +292,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error generating state ID")
 	}
 	for _, pkg := range packages {
-		event := packageEvent(pkg, eventTypeState, eventActionExistingPackage)
+		event := ms.packageEvent(pkg, eventTypeState, eventActionExistingPackage)
 		event.RootFields.Put("event.id", stateID.String())
 		report.Event(event)
 	}
@@ -303,25 +321,57 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 	ms.log.Debugf("Found %v packages", len(packages))
 
-	installed, removed := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+	newPackages := convertToPackage(newInCache)
+	missingPackages := convertToPackage(missingFromCache)
 
-	for _, cacheValue := range installed {
-		report.Event(packageEvent(cacheValue.(*Package), eventTypeEvent, eventActionPackageInstalled))
+	// Package names of updated packages
+	updated := make(map[string]struct{})
+
+	for _, missingPkg := range missingPackages {
+		found := false
+
+		// Using an inner loop is less efficient than using a map, but in this case
+		// we do not expect a lot of installed or removed packages all at once.
+		for _, newPkg := range newPackages {
+			if missingPkg.Name == newPkg.Name {
+				found = true
+				updated[newPkg.Name] = struct{}{}
+				report.Event(ms.packageEvent(newPkg, eventTypeEvent, eventActionPackageUpdated))
+				break
+			}
+		}
+
+		if !found {
+			report.Event(ms.packageEvent(missingPkg, eventTypeEvent, eventActionPackageRemoved))
+		}
 	}
 
-	for _, cacheValue := range removed {
-		report.Event(packageEvent(cacheValue.(*Package), eventTypeEvent, eventActionPackageRemoved))
+	for _, newPkg := range newPackages {
+		if _, contains := updated[newPkg.Name]; !contains {
+			report.Event(ms.packageEvent(newPkg, eventTypeEvent, eventActionPackageInstalled))
+		}
 	}
 
-	if len(installed) > 0 || len(removed) > 0 {
+	if len(newPackages) > 0 || len(missingPackages) > 0 {
 		return ms.savePackagesToDisk(packages)
 	}
 
 	return nil
 }
 
-func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
-	return mb.Event{
+func convertToPackage(cacheValues []interface{}) []*Package {
+	packages := make([]*Package, 0, len(cacheValues))
+
+	for _, c := range cacheValues {
+		packages = append(packages, c.(*Package))
+	}
+
+	return packages
+}
+
+func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
+	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"kind":   eventType,
@@ -331,6 +381,14 @@ func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 		},
 		MetricSetFields: pkg.toMapStr(),
 	}
+
+	event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
+
+	if pkg.Error != nil {
+		event.RootFields.Put("error.message", pkg.Error.Error())
+	}
+
+	return event
 }
 
 func packageMessage(pkg *Package, action eventAction) string {
@@ -342,6 +400,8 @@ func packageMessage(pkg *Package, action eventAction) string {
 		actionString = "installed"
 	case eventActionPackageRemoved:
 		actionString = "removed"
+	case eventActionPackageUpdated:
+		actionString = "updated"
 	}
 
 	return fmt.Sprintf("Package %v (%v) %v",
@@ -412,8 +472,10 @@ func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
 func getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
 	case redhat:
-		// TODO: Implement RPM
-		err = errors.New("RPM not yet supported")
+		packages, err = listRPMPackages()
+		if err != nil {
+			err = errors.Wrap(err, "error getting RPM packages")
+		}
 	case debian:
 		packages, err = listDebPackages()
 		if err != nil {
@@ -439,16 +501,24 @@ func listDebPackages() ([]*Package, error) {
 	defer file.Close()
 
 	var packages []*Package
+	var skipPackage bool
 	pkg := &Package{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(strings.TrimSpace(line)) == 0 {
 			// empty line signals new package
-			packages = append(packages, pkg)
+			if !skipPackage {
+				packages = append(packages, pkg)
+			}
+			skipPackage = false
 			pkg = &Package{}
 			continue
+		} else if skipPackage {
+			// Skipping this package - read on.
+			continue
 		}
+
 		if strings.HasPrefix(line, " ") {
 			// not interested in multi-lines for now
 			continue
@@ -461,6 +531,11 @@ func listDebPackages() ([]*Package, error) {
 		switch strings.ToLower(words[0]) {
 		case "package":
 			pkg.Name = value
+		case "status":
+			if strings.HasPrefix(value, "deinstall ok") {
+				// Package was removed but not purged. We report both cases as removed.
+				skipPackage = true
+			}
 		case "architecture":
 			pkg.Arch = value
 		case "version":
@@ -477,63 +552,7 @@ func listDebPackages() ([]*Package, error) {
 		}
 	}
 	if err = scanner.Err(); err != nil {
-		return nil, errors.Wrap(err, "error scanning file")
-	}
-	return packages, nil
-}
-
-func listBrewPackages() ([]*Package, error) {
-	packageDirs, err := ioutil.ReadDir(homebrewCellarPath)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error reading directory %s", homebrewCellarPath)
-	}
-
-	var packages []*Package
-	for _, packageDir := range packageDirs {
-		if !packageDir.IsDir() {
-			continue
-		}
-		pkgPath := path.Join(homebrewCellarPath, packageDir.Name())
-		versions, err := ioutil.ReadDir(pkgPath)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error reading directory: %s", pkgPath)
-		}
-
-		for _, version := range versions {
-			if !version.IsDir() {
-				continue
-			}
-			pkg := &Package{
-				Name:        packageDir.Name(),
-				Version:     version.Name(),
-				InstallTime: version.ModTime(),
-			}
-
-			// read formula
-			formulaPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
-			file, err := os.Open(formulaPath)
-			if err != nil {
-				//fmt.Printf("WARNING: Can't get formula for package %s-%s\n", pkg.Name, pkg.Version)
-				// TODO: follow the path from INSTALL_RECEIPT.json to find the formula
-				continue
-			}
-			scanner := bufio.NewScanner(file)
-			count := 15 // only look into the first few lines of the formula
-			for scanner.Scan() {
-				count--
-				if count == 0 {
-					break
-				}
-				line := scanner.Text()
-				if strings.HasPrefix(line, "  desc ") {
-					pkg.Summary = strings.Trim(line[7:], " \"")
-				} else if strings.HasPrefix(line, "  homepage ") {
-					pkg.URL = strings.Trim(line[11:], " \"")
-				}
-			}
-
-			packages = append(packages, pkg)
-		}
+		return nil, errors.Wrapf(err, "error scanning file %v", dpkgStatusFile)
 	}
 	return packages, nil
 }

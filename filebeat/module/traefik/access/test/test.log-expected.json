@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2017-10-02T20:22:07.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 2000000,
         "event.module": "traefik",
@@ -22,17 +22,15 @@
         "traefik.access.user_identifier": "-",
         "url.original": "/ui/favicons/favicon-16x16.png",
         "user.name": "-",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
-        "user_agent.os.full_name": "Linux",
         "user_agent.os.name": "Linux",
-        "user_agent.os.version": "..",
         "user_agent.version": "61.0.3163"
     },
     {
         "@timestamp": "2017-10-02T20:22:08.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 3000000,
         "event.module": "traefik",
@@ -60,17 +58,15 @@
         "traefik.access.user_identifier": "-",
         "url.original": "/ui/favicons/favicon.ico",
         "user.name": "-",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
-        "user_agent.os.full_name": "Linux",
         "user_agent.os.name": "Linux",
-        "user_agent.os.version": "..",
         "user_agent.version": "61.0.3163"
     },
     {
         "@timestamp": "2018-02-28T17:30:33.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 247000000,
         "event.module": "traefik",
@@ -97,17 +93,17 @@
         "traefik.access.user_identifier": "-",
         "url.original": "/en/",
         "user.name": "-",
-        "user_agent.device": "iPhone",
+        "user_agent.device.name": "iPhone",
         "user_agent.name": "Mobile Safari",
         "user_agent.original": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_2_5 like Mac OS X) AppleWebKit/604.5.6 (KHTML, like Gecko) Version/11.0 Mobile/15D60 Safari/604.1",
-        "user_agent.os.full_name": "iOS 11.2.5",
+        "user_agent.os.full": "iOS 11.2.5",
         "user_agent.os.name": "iOS",
-        "user_agent.os.version": "11.2.",
-        "user_agent.version": "11.0."
+        "user_agent.os.version": "11.2.5",
+        "user_agent.version": "11.0"
     },
     {
         "@timestamp": "2018-11-29T15:03:51.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 0,
         "event.module": "traefik",
@@ -128,17 +124,14 @@
         "traefik.access.user_identifier": "-",
         "url.original": "/",
         "user.name": "-",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.62.0",
-        "user_agent.os.full_name": "Other",
-        "user_agent.os.name": "Other",
-        "user_agent.os.version": "..",
         "user_agent.version": "7.62.0"
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 13000000,
         "event.module": "traefik",
@@ -165,17 +158,14 @@
         "traefik.access.user_identifier": "-",
         "url.original": "/assets/52f8f2e711d235d76044799e/owners?oauth_token=ya29.GltABOXd_gtG-XVvYX2YhxXJiXVvbHRMXn9fbzc_mDfl2rDhqK0CrAlwuwwRWnNnEaMDwkmyI7-QGbRSB0Hzje2cc__FjTQ1iuiYTSIBaIPfxSWip5jx6zqvsVVo",
         "user.name": "-",
-        "user_agent.device": "Generic Smartphone",
+        "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Other",
         "user_agent.original": "Android",
-        "user_agent.os.full_name": "Android",
-        "user_agent.os.name": "Android",
-        "user_agent.os.version": "..",
-        "user_agent.version": ".."
+        "user_agent.os.name": "Android"
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 8000000,
         "event.module": "traefik",
@@ -202,17 +192,14 @@
         "traefik.access.user_identifier": "-",
         "url.original": "/marketplace/tax?oauth_token=ya29.Gl0fBWnrJ7DcEU-tN-O3Vxn2XZVaz2I-hFTjP1JQzhYFVT-SKtlmo9hSzrx3n82LUwUxJ1s5lmU8U3Mc9gA_aCxBk49ShYEwvmYOWxJJyldDIJ7hY4us4LoiSY1OqAM",
         "user.name": "-",
-        "user_agent.device": "Generic Smartphone",
+        "user_agent.device.name": "Generic Smartphone",
         "user_agent.name": "Other",
         "user_agent.original": "Android",
-        "user_agent.os.full_name": "Android",
-        "user_agent.os.name": "Android",
-        "user_agent.os.version": "..",
-        "user_agent.version": ".."
+        "user_agent.os.name": "Android"
     },
     {
         "@timestamp": "2000-10-10T20:55:36.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.module": "traefik",
         "fileset.name": "access",
@@ -227,8 +214,6 @@
         "source.ip": "127.0.0.1",
         "traefik.access.user_identifier": "-",
         "url.original": "/apache_pb.gif",
-        "user.name": "frank",
-        "user_agent.os.version": "..",
-        "user_agent.version": ".."
+        "user.name": "frank"
     }
 ]

@@ -458,8 +458,8 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	auditEvent, err := aucoalesce.CoalesceMessages(msgs)
 	if err != nil {
 		// Add messages on error so that it's possible to debug the problem.
-		out := mb.Event{MetricSetFields: common.MapStr{}}
-		addMessages(msgs, out.MetricSetFields)
+		out := mb.Event{RootFields: common.MapStr{}}
+		addEventOriginal(msgs, out.RootFields)
 		return out
 	}
 
@@ -472,21 +472,20 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"category": auditEvent.Category.String(),
-				"type":     strings.ToLower(auditEvent.Type.String()),
 				"action":   auditEvent.Summary.Action,
 			},
 		},
 		ModuleFields: common.MapStr{
-			"sequence": auditEvent.Sequence,
-			"result":   auditEvent.Result,
-			"session":  auditEvent.Session,
-			"data":     createAuditdData(auditEvent.Data),
+			"message_type": strings.ToLower(auditEvent.Type.String()),
+			"sequence":     auditEvent.Sequence,
+			"result":       auditEvent.Result,
+			"session":      auditEvent.Session,
+			"data":         createAuditdData(auditEvent.Data),
 		},
 	}
 
 	// Add root level fields.
 	addUser(auditEvent.User, out.RootFields)
-	addGroup(auditEvent.User, out.RootFields)
 	addProcess(auditEvent.Process, out.RootFields)
 	addFile(auditEvent.File, out.RootFields)
 	addAddress(auditEvent.Source, "source", out.RootFields)
@@ -494,6 +493,17 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	addNetwork(auditEvent.Net, out.RootFields)
 	if len(auditEvent.Tags) > 0 {
 		out.RootFields.Put("tags", auditEvent.Tags)
+	}
+	if config.Warnings && len(auditEvent.Warnings) > 0 {
+		warnings := make([]string, 0, len(auditEvent.Warnings))
+		for _, err := range auditEvent.Warnings {
+			warnings = append(warnings, err.Error())
+		}
+		out.RootFields.Put("error.message", warnings)
+		addEventOriginal(msgs, out.RootFields)
+	}
+	if config.RawMessage {
+		addEventOriginal(msgs, out.RootFields)
 	}
 
 	// Add module fields.
@@ -519,52 +529,66 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	if len(auditEvent.Paths) > 0 {
 		m.Put("paths", auditEvent.Paths)
 	}
-	if config.Warnings && len(auditEvent.Warnings) > 0 {
-		warnings := make([]string, 0, len(auditEvent.Warnings))
-		for _, err := range auditEvent.Warnings {
-			warnings = append(warnings, err.Error())
-		}
-		m.Put("warnings", warnings)
-		addMessages(msgs, m)
-	}
-	if config.RawMessage {
-		addMessages(msgs, m)
-	}
 
 	return out
 }
 
 func addUser(u aucoalesce.User, m common.MapStr) {
-	user := make(common.MapStr, len(u.IDs))
+	user := common.MapStr{}
 	m.Put("user", user)
 
 	for id, value := range u.IDs {
-		user[id] = value
+		switch id {
+		case "uid":
+			user["id"] = value
+		case "gid":
+			user.Put("group.id", value)
+		case "euid":
+			user.Put("effective.id", value)
+		case "egid":
+			user.Put("effective.group.id", value)
+		case "suid":
+			user.Put("saved.id", value)
+		case "sgid":
+			user.Put("saved.group.id", value)
+		case "fsuid":
+			user.Put("filesystem.id", value)
+		case "fsgid":
+			user.Put("filesystem.group.id", value)
+		case "auid":
+			user.Put("audit.id", value)
+		default:
+			user.Put(id+".id", value)
+		}
+
 		if len(u.SELinux) > 0 {
 			user["selinux"] = u.SELinux
 		}
-		if len(u.Names) > 0 {
-			user["name_map"] = u.Names
-		}
 	}
-	if uid, found := u.IDs["uid"]; found {
-		user["id"] = uid
-	}
-	if uidName, found := u.Names["uid"]; found {
-		user["name"] = uidName
-	}
-}
 
-func addGroup(u aucoalesce.User, m common.MapStr) {
-	group := make(common.MapStr, 2)
-	if gid, found := u.IDs["gid"]; found {
-		group["id"] = gid
-	}
-	if gidName, found := u.Names["gid"]; found {
-		group["name"] = gidName
-	}
-	if len(group) > 0 {
-		m.Put("group", group)
+	for id, value := range u.Names {
+		switch id {
+		case "uid":
+			user["name"] = value
+		case "gid":
+			user.Put("group.name", value)
+		case "euid":
+			user.Put("effective.name", value)
+		case "egid":
+			user.Put("effective.group.name", value)
+		case "suid":
+			user.Put("saved.name", value)
+		case "sgid":
+			user.Put("saved.group.name", value)
+		case "fsuid":
+			user.Put("filesystem.name", value)
+		case "fsgid":
+			user.Put("filesystem.group.name", value)
+		case "auid":
+			user.Put("audit.name", value)
+		default:
+			user.Put(id+".name", value)
+		}
 	}
 }
 
@@ -670,15 +694,20 @@ func addNetwork(net *aucoalesce.Network, m common.MapStr) {
 	m.Put("network", network)
 }
 
-func addMessages(msgs []*auparse.AuditMessage, m common.MapStr) {
-	_, added := m["messages"]
-	if !added && len(msgs) > 0 {
-		rawMsgs := make([]string, 0, len(msgs))
-		for _, msg := range msgs {
-			rawMsgs = append(rawMsgs, "type="+msg.RecordType.String()+" msg="+msg.RawData)
-		}
-		m["messages"] = rawMsgs
+func addEventOriginal(msgs []*auparse.AuditMessage, m common.MapStr) {
+	const key = "event.original"
+	if len(msgs) == 0 {
+		return
 	}
+	original, _ := m.GetValue(key)
+	if original != nil {
+		return
+	}
+	rawMsgs := make([]string, 0, len(msgs))
+	for _, msg := range msgs {
+		rawMsgs = append(rawMsgs, "type="+msg.RecordType.String()+" msg="+msg.RawData)
+	}
+	m.Put(key, rawMsgs)
 }
 
 func createAuditdData(data map[string]string) common.MapStr {

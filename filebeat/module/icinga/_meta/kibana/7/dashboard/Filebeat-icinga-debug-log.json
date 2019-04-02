@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff", 
-                "title": "Debuglog Facility [Filebeat Icinga]", 
+                "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff-ecs", 
+                "title": "Debuglog Facility [Filebeat Icinga] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -59,11 +59,11 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Icinga Debuglog Facility", 
+                    "title": "Icinga Debuglog Facility ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "0bc34b60-2419-11e7-a83b-d5f4cebac9ff", 
+            "id": "0bc34b60-2419-11e7-a83b-d5f4cebac9ff-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -75,8 +75,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff", 
-                "title": "Debuglog Severity [Filebeat Icinga]", 
+                "savedSearchId": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff-ecs", 
+                "title": "Debuglog Severity [Filebeat Icinga] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -114,7 +114,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "icinga.debug.severity", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -135,11 +135,11 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Icinga Debuglog Severity", 
+                    "title": "Icinga Debuglog Severity ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "fb09d4b0-2418-11e7-a83b-d5f4cebac9ff", 
+            "id": "fb09d4b0-2418-11e7-a83b-d5f4cebac9ff-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -147,8 +147,8 @@
             "attributes": {
                 "columns": [
                     "icinga.debug.facility", 
-                    "icinga.debug.severity", 
-                    "icinga.debug.message"
+                    "log.level", 
+                    "message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -163,7 +163,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "fileset.module", 
+                                    "key": "event.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "icinga", 
@@ -174,7 +174,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "fileset.module": {
+                                        "event.module": {
                                             "query": "icinga", 
                                             "type": "phrase"
                                         }
@@ -211,8 +211,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -221,10 +221,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Debug Log [Filebeat Icinga]", 
+                "title": "Debug Log [Filebeat Icinga] ECS", 
                 "version": 1
             }, 
-            "id": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff", 
+            "id": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -237,13 +237,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -254,7 +249,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "0bc34b60-2419-11e7-a83b-d5f4cebac9ff", 
+                        "id": "0bc34b60-2419-11e7-a83b-d5f4cebac9ff-ecs", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 6, 
@@ -263,7 +258,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "fb09d4b0-2418-11e7-a83b-d5f4cebac9ff", 
+                        "id": "fb09d4b0-2418-11e7-a83b-d5f4cebac9ff-ecs", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 6, 
@@ -274,10 +269,10 @@
                         "col": 1, 
                         "columns": [
                             "icinga.debug.facility", 
-                            "icinga.debug.severity", 
-                            "icinga.debug.message"
+                            "log.level", 
+                            "message"
                         ], 
-                        "id": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff", 
+                        "id": "c876e6a0-2418-11e7-a83b-d5f4cebac9ff-ecs", 
                         "panelIndex": 3, 
                         "row": 4, 
                         "size_x": 12, 
@@ -290,11 +285,11 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Icinga] Debug Log", 
+                "title": "[Filebeat Icinga] Debug Log ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 
-            "id": "26309570-2419-11e7-a83b-d5f4cebac9ff", 
+            "id": "26309570-2419-11e7-a83b-d5f4cebac9ff-ecs", 
             "type": "dashboard", 
             "version": 2
         }

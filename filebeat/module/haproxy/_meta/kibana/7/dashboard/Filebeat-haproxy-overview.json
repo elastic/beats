@@ -8,12 +8,12 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Backend breakdown [Filebeat HAProxy]",
+        "title": "Backend breakdown [Filebeat HAProxy] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -55,11 +55,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Backend breakdown [Filebeat HAProxy]",
+          "title": "Backend breakdown [Filebeat HAProxy] ECS",
           "type": "pie"
         }
       },
-      "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
+      "id": "55251360-aa32-11e8-9c06-877f0445e3e0-ecs",
       "type": "visualization",
       "updated_at": "2018-12-06T11:35:36.721Z",
       "version": 2
@@ -72,12 +72,12 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Frontend breakdown [Filebeat HAProxy]",
+        "title": "Frontend breakdown [Filebeat HAProxy] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -119,11 +119,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Frontend breakdown [Filebeat HAProxy]",
+          "title": "Frontend breakdown [Filebeat HAProxy] ECS",
           "type": "pie"
         }
       },
-      "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
+      "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0-ecs",
       "type": "visualization",
       "updated_at": "2018-12-06T11:35:36.721Z",
       "version": 2
@@ -136,12 +136,12 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "IP Geohashes [Filebeat HAProxy]",
+        "title": "IP Geohashes [Filebeat HAProxy] ECS",
         "uiStateJSON": {
           "mapCenter": [
             14.944784875088372,
@@ -155,7 +155,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "haproxy.client.ip"
+                "field": "source.address"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -165,7 +165,7 @@
               "id": "2",
               "params": {
                 "autoPrecision": true,
-                "field": "haproxy.geoip.location",
+                "field": "source.geo.location",
                 "isFilteredByCollar": true,
                 "precision": 2,
                 "useGeocentroid": true
@@ -202,11 +202,11 @@
               "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
-          "title": "IP Geohashes [Filebeat HAProxy]",
+          "title": "IP Geohashes [Filebeat HAProxy] ECS",
           "type": "tile_map"
         }
       },
-      "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
+      "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0-ecs",
       "type": "visualization",
       "updated_at": "2018-12-06T11:35:36.721Z",
       "version": 2
@@ -219,12 +219,12 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Response codes over time [Filebeat HAProxy]",
+        "title": "Response codes over time [Filebeat HAProxy] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -263,7 +263,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "haproxy.http.response.status_code",
+                "field": "http.response.status_code",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -344,11 +344,11 @@
               }
             ]
           },
-          "title": "Response codes over time [Filebeat HAProxy]",
+          "title": "Response codes over time [Filebeat HAProxy] ECS",
           "type": "histogram"
         }
       },
-      "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
+      "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0-ecs",
       "type": "visualization",
       "updated_at": "2018-12-06T11:35:36.721Z",
       "version": 2
@@ -361,7 +361,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -381,7 +381,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
+            "id": "55251360-aa32-11e8-9c06-877f0445e3e0-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "6.5.2"
@@ -395,7 +395,7 @@
               "x": 24,
               "y": 0
             },
-            "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
+            "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "6.5.2"
@@ -409,7 +409,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
+            "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "6.5.2"
@@ -423,17 +423,17 @@
               "x": 24,
               "y": 15
             },
-            "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
+            "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "6.5.2"
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat HAProxy] Overview",
+        "title": "[Filebeat HAProxy] Overview ECS",
         "version": 1
       },
-      "id": "3560d580-aa34-11e8-9c06-877f0445e3e0",
+      "id": "3560d580-aa34-11e8-9c06-877f0445e3e0-ecs",
       "type": "dashboard",
       "updated_at": "2018-12-06T11:40:40.204Z",
       "version": 6

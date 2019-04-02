@@ -17,7 +17,7 @@
       description: >
         Component the log is coming from.
     - name: class
-      type: text
+      type: keyword
       description: >
         Java class the log is coming from.
     - name: trace
@@ -33,7 +33,3 @@
           type: text
           description: >
               Message part of the trace.
-        - name: full
-          type: text
-          description: >
-              The full trace in the log line.

@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Docker", 
-                "title": "Docker containers [Metricbeat Docker]", 
+                "savedSearchId": "Metricbeat-Docker-ecs", 
+                "title": "Docker containers [Metricbeat Docker] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -28,7 +28,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Name", 
-                                "field": "docker.container.name", 
+                                "field": "container.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -81,7 +81,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Number of Containers", 
-                                "field": "docker.container.id"
+                                "field": "container.id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -99,12 +99,12 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Docker containers [Metricbeat Docker]", 
+                    "title": "Docker containers [Metricbeat Docker] ECS", 
                     "type": "table"
                 }
             }, 
             "col": 1, 
-            "id": "Docker-containers", 
+            "id": "Docker-containers-ecs", 
             "panelIndex": 1, 
             "row": 1, 
             "size_x": 7, 
@@ -120,8 +120,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Docker", 
-                "title": "Number of Containers [Metricbeat Docker]", 
+                "savedSearchId": "Metricbeat-Docker-ecs", 
+                "title": "Number of Containers [Metricbeat Docker] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -207,12 +207,12 @@
                         "handleNoResults": true, 
                         "type": "gauge"
                     }, 
-                    "title": "Number of Containers [Metricbeat Docker]", 
+                    "title": "Number of Containers [Metricbeat Docker] ECS", 
                     "type": "metric"
                 }
             }, 
             "col": 8, 
-            "id": "Docker-Number-of-Containers", 
+            "id": "Docker-Number-of-Containers-ecs", 
             "panelIndex": 2, 
             "row": 1, 
             "size_x": 5, 
@@ -228,8 +228,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Docker", 
-                "title": "Docker containers per host [Metricbeat Docker]", 
+                "savedSearchId": "Metricbeat-Docker-ecs", 
+                "title": "Docker containers per host [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -239,7 +239,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Number of containers", 
-                                "field": "docker.container.id"
+                                "field": "container.id"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -249,7 +249,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "beat.hostname", 
+                                "field": "agent.hostname", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -266,12 +266,12 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Docker containers per host [Metricbeat Docker]", 
+                    "title": "Docker containers per host [Metricbeat Docker] ECS", 
                     "type": "pie"
                 }
             }, 
             "col": 8, 
-            "id": "Docker-containers-per-host", 
+            "id": "Docker-containers-per-host-ecs", 
             "panelIndex": 3, 
             "row": 3, 
             "size_x": 2, 
@@ -287,8 +287,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Docker", 
-                "title": "Docker images and names [Metricbeat Docker]", 
+                "savedSearchId": "Metricbeat-Docker-ecs", 
+                "title": "Docker images and names [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -304,7 +304,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "docker.container.image", 
+                                "field": "container.image.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -316,7 +316,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "docker.container.name", 
+                                "field": "container.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -333,12 +333,12 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Docker images and names [Metricbeat Docker]", 
+                    "title": "Docker images and names [Metricbeat Docker] ECS", 
                     "type": "pie"
                 }
             }, 
             "col": 10, 
-            "id": "Docker-images-and-names", 
+            "id": "Docker-images-and-names-ecs", 
             "panelIndex": 7, 
             "row": 3, 
             "size_x": 3, 
@@ -367,14 +367,12 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "metricset.module:docker AND metricset.name:cpu"
+                            "language": "kuery",
+                                "query": "event.module:docker AND metricset.name:cpu"
                             }
-                        }
                     }
                 }, 
-                "title": "CPU usage [Metricbeat Docker]", 
+                "title": "CPU usage [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -410,7 +408,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "Container name", 
-                                "field": "docker.container.name", 
+                                "field": "container.name", 
                                 "order": "desc", 
                                 "orderBy": "1.75", 
                                 "size": 5
@@ -496,12 +494,12 @@
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "CPU usage [Metricbeat Docker]", 
+                    "title": "CPU usage [Metricbeat Docker] ECS", 
                     "type": "area"
                 }
             }, 
             "col": 1, 
-            "id": "Docker-CPU-usage", 
+            "id": "Docker-CPU-usage-ecs", 
             "panelIndex": 4, 
             "row": 6, 
             "size_x": 6, 
@@ -530,14 +528,12 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "metricset.module:docker AND metricset.name:memory"
+                            "language": "kuery",
+                                "query": "event.module:docker AND metricset.name:memory"
                             }
-                        }
                     }
                 }, 
-                "title": "Memory usage [Metricbeat Docker]", 
+                "title": "Memory usage [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -570,7 +566,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "Container name", 
-                                "field": "docker.container.name", 
+                                "field": "container.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -656,12 +652,12 @@
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Memory usage [Metricbeat Docker]", 
+                    "title": "Memory usage [Metricbeat Docker] ECS", 
                     "type": "area"
                 }
             }, 
             "col": 7, 
-            "id": "Docker-memory-usage", 
+            "id": "Docker-memory-usage-ecs", 
             "panelIndex": 5, 
             "row": 6, 
             "size_x": 6, 
@@ -690,14 +686,12 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "metricset.module:docker AND metricset.name:network"
+                            "language": "kuery",
+                                "query": "event.module:docker AND metricset.name:network"
                             }
-                        }
                     }
                 }, 
-                "title": "Network IO [Metricbeat Docker]", 
+                "title": "Network IO [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -730,7 +724,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "Container name", 
-                                "field": "docker.container.name", 
+                                "field": "container.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -826,12 +820,12 @@
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Network IO [Metricbeat Docker]", 
+                    "title": "Network IO [Metricbeat Docker] ECS", 
                     "type": "area"
                 }
             }, 
             "col": 1, 
-            "id": "Docker-Network-IO", 
+            "id": "Docker-Network-IO-ecs", 
             "panelIndex": 6, 
             "row": 9, 
             "size_x": 12, 
@@ -864,21 +858,19 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "metricset.module:docker"
+                            "language": "kuery",
+                                "query": "event.module:docker"
                             }
-                        }
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Metricbeat Docker", 
+                "title": "Metricbeat Docker ECS", 
                 "version": 1
             }, 
-            "id": "Metricbeat-Docker", 
+            "id": "Metricbeat-Docker-ecs", 
             "type": "search", 
             "version": 4
         }, 
@@ -888,16 +880,11 @@
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [
-                            {
+                        "filter": [],
                                 "query": {
-                                    "query_string": {
-                                        "analyze_wildcard": true, 
-                                        "query": "*"
-                                    }
-                                }
-                            }
-                        ], 
+                            "language": "kuery",
+                            "query": ""
+                        },
                         "highlightAll": true, 
                         "version": true
                     }
@@ -908,7 +895,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Docker-containers", 
+                        "id": "Docker-containers-ecs", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 7, 
@@ -917,7 +904,7 @@
                     }, 
                     {
                         "col": 8, 
-                        "id": "Docker-Number-of-Containers", 
+                        "id": "Docker-Number-of-Containers-ecs", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 5, 
@@ -926,7 +913,7 @@
                     }, 
                     {
                         "col": 8, 
-                        "id": "Docker-containers-per-host", 
+                        "id": "Docker-containers-per-host-ecs", 
                         "panelIndex": 3, 
                         "row": 3, 
                         "size_x": 2, 
@@ -935,7 +922,7 @@
                     }, 
                     {
                         "col": 10, 
-                        "id": "Docker-images-and-names", 
+                        "id": "Docker-images-and-names-ecs", 
                         "panelIndex": 7, 
                         "row": 3, 
                         "size_x": 3, 
@@ -944,7 +931,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Docker-CPU-usage", 
+                        "id": "Docker-CPU-usage-ecs", 
                         "panelIndex": 4, 
                         "row": 6, 
                         "size_x": 6, 
@@ -953,7 +940,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "Docker-memory-usage", 
+                        "id": "Docker-memory-usage-ecs", 
                         "panelIndex": 5, 
                         "row": 6, 
                         "size_x": 6, 
@@ -962,7 +949,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Docker-Network-IO", 
+                        "id": "Docker-Network-IO-ecs", 
                         "panelIndex": 6, 
                         "row": 9, 
                         "size_x": 12, 
@@ -971,7 +958,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Docker] Overview", 
+                "title": "[Metricbeat Docker] Overview ECS", 
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
@@ -1008,7 +995,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "AV4REOpp5NkDleZmzKkE", 
+            "id": "AV4REOpp5NkDleZmzKkE-ecs", 
             "type": "dashboard", 
             "version": 3
         }

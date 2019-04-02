@@ -12,8 +12,8 @@
             }
           }
         },
-        "savedSearchId": "MySQL-errors",
-        "title": "MySQL Errors [Packetbeat]",
+        "savedSearchId": "MySQL-errors-ecs",
+        "title": "MySQL Errors [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -118,11 +118,11 @@
             ],
             "yAxis": {}
           },
-          "title": "MySQL Errors [Packetbeat]",
+          "title": "MySQL Errors [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "MySQL-Errors",
+      "id": "MySQL-Errors-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -139,8 +139,8 @@
             }
           }
         },
-        "savedSearchId": "MySQL-Transactions",
-        "title": "MySQL Methods [Packetbeat]",
+        "savedSearchId": "MySQL-Transactions-ecs",
+        "title": "MySQL Methods [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -261,11 +261,11 @@
             ],
             "yAxis": {}
           },
-          "title": "MySQL Methods [Packetbeat]",
+          "title": "MySQL Methods [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "MySQL-Methods",
+      "id": "MySQL-Methods-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -277,31 +277,26 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "title": "Navigation [Packetbeat]",
+        "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat]",
+          "title": "Navigation [Packetbeat] ECS",
           "type": "markdown"
         }
       },
-      "id": "Navigation",
+      "id": "Navigation-ecs",
       "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
       "version": 11
@@ -318,8 +313,8 @@
             }
           }
         },
-        "savedSearchId": "MySQL-Transactions",
-        "title": "MySQL throughput [Packetbeat]",
+        "savedSearchId": "MySQL-Transactions-ecs",
+        "title": "MySQL throughput [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -438,11 +433,11 @@
               }
             ]
           },
-          "title": "MySQL throughput [Packetbeat]",
+          "title": "MySQL throughput [Packetbeat] ECS",
           "type": "line"
         }
       },
-      "id": "MySQL-throughput",
+      "id": "MySQL-throughput-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -455,8 +450,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "MySQL-Transactions",
-        "title": "Most frequent MySQL queries",
+        "savedSearchId": "MySQL-Transactions-ecs",
+        "title": "Most frequent MySQL queries ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -485,11 +480,11 @@
             "showMeticsAtAllLevels": false,
             "showPartialRows": false
           },
-          "title": "Most frequent MySQL queries",
+          "title": "Most frequent MySQL queries ECS",
           "type": "table"
         }
       },
-      "id": "Most-frequent-MySQL-queries",
+      "id": "Most-frequent-MySQL-queries-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -506,8 +501,8 @@
             }
           }
         },
-        "savedSearchId": "MySQL-Transactions",
-        "title": "Slowest MySQL queries",
+        "savedSearchId": "MySQL-Transactions-ecs",
+        "title": "Slowest MySQL queries ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -559,11 +554,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Slowest MySQL queries",
+          "title": "Slowest MySQL queries ECS",
           "type": "table"
         }
       },
-      "id": "Slowest-MySQL-queries",
+      "id": "Slowest-MySQL-queries-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -580,8 +575,8 @@
             }
           }
         },
-        "savedSearchId": "MySQL-Transactions",
-        "title": "Mysql response times percentiles [Packetbeat]",
+        "savedSearchId": "MySQL-Transactions-ecs",
+        "title": "Mysql response times percentiles [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -686,11 +681,11 @@
               }
             ]
           },
-          "title": "Mysql response times percentiles [Packetbeat]",
+          "title": "Mysql response times percentiles [Packetbeat] ECS",
           "type": "line"
         }
       },
-      "id": "Mysql-response-times-percentiles",
+      "id": "Mysql-response-times-percentiles-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -707,8 +702,8 @@
             }
           }
         },
-        "savedSearchId": "MySQL-Transactions",
-        "title": "MySQL Reads vs Writes [Packetbeat]",
+        "savedSearchId": "MySQL-Transactions-ecs",
+        "title": "MySQL Reads vs Writes [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -742,12 +737,7 @@
                 "filters": [
                   {
                     "input": {
-                      "query": {
-                        "query_string": {
-                          "analyze_wildcard": true,
                           "query": "method: SELECT"
-                        }
-                      }
                     }
                   },
                   {
@@ -840,11 +830,11 @@
             ],
             "yAxis": {}
           },
-          "title": "MySQL Reads vs Writes [Packetbeat]",
+          "title": "MySQL Reads vs Writes [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "MySQL-Reads-vs-Writes",
+      "id": "MySQL-Reads-vs-Writes-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -930,13 +920,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -945,10 +930,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "MySQL Errors Search [Packetbeat]",
+        "title": "MySQL Errors Search [Packetbeat] ECS",
         "version": 1
       },
-      "id": "MySQL-errors",
+      "id": "MySQL-errors-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -1008,13 +993,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1023,10 +1003,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "MySQL Transactions [Packetbeat]",
+        "title": "MySQL Transactions [Packetbeat] ECS",
         "version": 1
       },
-      "id": "MySQL-Transactions",
+      "id": "MySQL-Transactions-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
@@ -1040,13 +1020,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1063,7 +1038,7 @@
               "x": 12,
               "y": 0
             },
-            "id": "MySQL-Errors",
+            "id": "MySQL-Errors-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1076,7 +1051,7 @@
               "x": 32,
               "y": 0
             },
-            "id": "MySQL-Methods",
+            "id": "MySQL-Methods-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1089,7 +1064,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "Navigation",
+            "id": "Navigation-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1102,7 +1077,7 @@
               "x": 24,
               "y": 35
             },
-            "id": "MySQL-throughput",
+            "id": "MySQL-throughput-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1125,7 +1100,7 @@
               "x": 0,
               "y": 50
             },
-            "id": "Most-frequent-MySQL-queries",
+            "id": "Most-frequent-MySQL-queries-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1148,7 +1123,7 @@
               "x": 24,
               "y": 50
             },
-            "id": "Slowest-MySQL-queries",
+            "id": "Slowest-MySQL-queries-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1161,7 +1136,7 @@
               "x": 0,
               "y": 20
             },
-            "id": "Mysql-response-times-percentiles",
+            "id": "Mysql-response-times-percentiles-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -1174,17 +1149,17 @@
               "x": 0,
               "y": 35
             },
-            "id": "MySQL-Reads-vs-Writes",
+            "id": "MySQL-Reads-vs-Writes-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] MySQL performance",
+        "title": "[Packetbeat] MySQL performance ECS",
         "version": 1
       },
-      "id": "Packetbeat-MySQL-performance",
+      "id": "Packetbeat-MySQL-performance-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1

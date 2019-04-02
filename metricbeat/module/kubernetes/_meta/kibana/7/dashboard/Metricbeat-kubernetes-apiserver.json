@@ -6,7 +6,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Top clients by number of requests", 
+                "title": "Kubernetes API Server: Top clients by number of requests ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -66,11 +66,11 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Kubernetes API Server: Top clients by number of requests", 
+                    "title": "Kubernetes API Server: Top clients by number of requests ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "7cbeb750-5794-11e8-afa2-e9067ea62228", 
+            "id": "7cbeb750-5794-11e8-afa2-e9067ea62228-ecs", 
             "type": "visualization", 
             "updated_at": "2018-05-14T18:23:10.501Z", 
             "version": 5
@@ -81,7 +81,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Requests", 
+                "title": "Kubernetes API Server: Requests ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -171,11 +171,11 @@
                         "time_field": "@timestamp", 
                         "type": "timeseries"
                     }, 
-                    "title": "Kubernetes API Server: Requests", 
+                    "title": "Kubernetes API Server: Requests ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228", 
+            "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228-ecs", 
             "type": "visualization", 
             "updated_at": "2018-05-14T18:21:27.515Z", 
             "version": 4
@@ -186,7 +186,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Top clients by resource", 
+                "title": "Kubernetes API Server: Top clients by resource ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -248,11 +248,11 @@
                         "time_field": "@timestamp", 
                         "type": "top_n"
                     }, 
-                    "title": "Kubernetes API Server: Top clients by resource", 
+                    "title": "Kubernetes API Server: Top clients by resource ECS", 
                     "type": "metrics"
                 }
             }, 
-            "id": "95a7f110-57a2-11e8-afa2-e9067ea62228", 
+            "id": "95a7f110-57a2-11e8-afa2-e9067ea62228-ecs", 
             "type": "visualization", 
             "updated_at": "2018-05-14T18:23:50.093Z", 
             "version": 4
@@ -266,7 +266,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -287,7 +287,7 @@
                             "x": 0, 
                             "y": 22
                         }, 
-                        "id": "7cbeb750-5794-11e8-afa2-e9067ea62228", 
+                        "id": "7cbeb750-5794-11e8-afa2-e9067ea62228-ecs", 
                         "panelIndex": "1", 
                         "type": "visualization", 
                         "version": "6.3.0"
@@ -301,7 +301,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228", 
+                        "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228-ecs", 
                         "panelIndex": "3", 
                         "type": "visualization", 
                         "version": "6.3.0"
@@ -315,17 +315,17 @@
                             "x": 24, 
                             "y": 22
                         }, 
-                        "id": "95a7f110-57a2-11e8-afa2-e9067ea62228", 
+                        "id": "95a7f110-57a2-11e8-afa2-e9067ea62228-ecs", 
                         "panelIndex": "4", 
                         "type": "visualization", 
                         "version": "6.3.0"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Kubernetes] API server", 
+                "title": "[Metricbeat Kubernetes] API server ECS", 
                 "version": 1
             }, 
-            "id": "af7225b0-5794-11e8-afa2-e9067ea62228", 
+            "id": "af7225b0-5794-11e8-afa2-e9067ea62228-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-05-14T18:23:55.202Z", 
             "version": 5

@@ -144,3 +144,10 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  #index.codec: best_compression
+  #_source.enabled: false

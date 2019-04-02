@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -151,4 +152,59 @@ func TestIsIntGt(t *testing.T) {
 func TestIsNil(t *testing.T) {
 	assertIsDefValid(t, IsNil, nil)
 	assertIsDefInvalid(t, IsNil, "foo")
+}
+
+func TestIsUnique(t *testing.T) {
+	tests := []struct {
+		name      string
+		validator func() Validator
+		data      common.MapStr
+		isValid   bool
+	}{
+		{
+			"IsUnique find dupes",
+			func() Validator {
+				v := IsUnique()
+				return MustCompile(Map{"a": v, "b": v})
+			},
+			common.MapStr{"a": 1, "b": 1},
+			false,
+		},
+		{
+			"IsUnique separate instances don't care about dupes",
+			func() Validator { return MustCompile(Map{"a": IsUnique(), "b": IsUnique()}) },
+			common.MapStr{"a": 1, "b": 1},
+			true,
+		},
+		{
+			"IsUniqueTo duplicates across namespaces fail",
+			func() Validator {
+				s := ScopedIsUnique()
+				return MustCompile(Map{"a": s.IsUniqueTo("test"), "b": s.IsUniqueTo("test2")})
+			},
+			common.MapStr{"a": 1, "b": 1},
+			false,
+		},
+
+		{
+			"IsUniqueTo duplicates within a namespace succeeds",
+			func() Validator {
+				s := ScopedIsUnique()
+				return MustCompile(Map{"a": s.IsUniqueTo("test"), "b": s.IsUniqueTo("test")})
+			},
+			common.MapStr{"a": 1, "b": 1},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if tt.isValid {
+				Test(t, tt.validator(), tt.data)
+			} else {
+				result := tt.validator()(tt.data)
+				require.False(t, result.Valid)
+			}
+		})
+	}
 }

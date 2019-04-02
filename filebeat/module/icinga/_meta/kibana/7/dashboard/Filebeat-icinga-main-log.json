@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
-                "title": "Mainlog Severity [Filebeat Icinga]", 
+                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
+                "title": "Mainlog Severity [Filebeat Icinga] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -45,7 +45,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "icinga.main.severity", 
+                                "field": "log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -66,11 +66,11 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Icinga Mainlog Severity", 
+                    "title": "Icinga Mainlog Severity ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff", 
+            "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -78,8 +78,8 @@
             "attributes": {
                 "columns": [
                     "icinga.main.facility", 
-                    "icinga.main.severity", 
-                    "icinga.main.message"
+                    "log.level", 
+                    "message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -94,7 +94,7 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "fileset.module", 
+                                    "key": "event.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "icinga", 
@@ -105,7 +105,7 @@
                                 }, 
                                 "query": {
                                     "match": {
-                                        "fileset.module": {
+                                        "event.module": {
                                             "query": "icinga", 
                                             "type": "phrase"
                                         }
@@ -142,7 +142,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -152,10 +152,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Main Log [Filebeat Icinga]", 
+                "title": "Main Log [Filebeat Icinga] ECS", 
                 "version": 1
             }, 
-            "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
+            "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -167,8 +167,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
-                "title": "Mainlog Facility [Filebeat Icinga]", 
+                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
+                "title": "Mainlog Facility [Filebeat Icinga] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -218,11 +218,11 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Icinga Mainlog Facility", 
+                    "title": "Icinga Mainlog Facility ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff", 
+            "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -235,13 +235,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -252,7 +247,7 @@
                 "panelsJSON": [
                     {
                         "col": 7, 
-                        "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff", 
+                        "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff-ecs", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 6, 
@@ -263,10 +258,10 @@
                         "col": 1, 
                         "columns": [
                             "icinga.main.facility", 
-                            "icinga.main.severity", 
-                            "icinga.main.message"
+                            "log.level", 
+                            "message"
                         ], 
-                        "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
+                        "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
                         "panelIndex": 2, 
                         "row": 4, 
                         "size_x": 12, 
@@ -279,7 +274,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff", 
+                        "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff-ecs", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 6, 
@@ -288,11 +283,11 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Icinga] Main Log", 
+                "title": "[Filebeat Icinga] Main Log ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 
-            "id": "f693d260-2417-11e7-a83b-d5f4cebac9ff", 
+            "id": "f693d260-2417-11e7-a83b-d5f4cebac9ff-ecs", 
             "type": "dashboard", 
             "version": 4
         }

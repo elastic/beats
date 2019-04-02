@@ -29,13 +29,15 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 )
 
-// TemplateLoader is a subset of the Elasticsearch client API capable of
+// ESClient is a subset of the Elasticsearch client API capable of
 // loading the template.
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
 
+// Loader is a template loader capable of loading the template using
+// Elasticsearch Client API
 type Loader struct {
 	config    TemplateConfig
 	client    ESClient
@@ -45,14 +47,13 @@ type Loader struct {
 }
 
 // NewLoader creates a new template loader
-func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte, migration bool) (*Loader, error) {
-	config := DefaultConfig
-
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
+func NewLoader(
+	config TemplateConfig,
+	client ESClient,
+	beatInfo beat.Info,
+	fields []byte,
+	migration bool,
+) (*Loader, error) {
 	return &Loader{
 		config:    config,
 		client:    client,
@@ -170,7 +171,7 @@ func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte
 func esVersionParams(ver common.Version) map[string]string {
 	if ver.Major == 6 && ver.Minor == 7 {
 		return map[string]string{
-			"include_type_name": "false",
+			"include_type_name": "true",
 		}
 	}
 

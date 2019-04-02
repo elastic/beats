@@ -94,6 +94,25 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
+Autodiscover provides a way to control whether log harvesting is by default disabled for the pods/containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      default.disable: true
+-------------------------------------------------------------------------------------
+
+Then, for the pods/containers that log harvesting should be enabled, you can annotate with hint:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/disable: false
+-------------------------------------------------------------------------------------
+
 You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} inputs or modules:
 
 ["source","yaml",subs="attributes"]
@@ -135,6 +154,26 @@ filebeat.autodiscover:
   providers:
     - type: docker
       hints.enabled: true
+-------------------------------------------------------------------------------------
+
+Autodiscover provides a way to control whether log harvesting is by default disabled for the 
+containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      default.disable: true
+-------------------------------------------------------------------------------------
+
+Then, for the containers that log harvesting should be enabled, you can label Docker containers with:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/disable: false
 -------------------------------------------------------------------------------------
 
 You can label Docker containers with useful info to spin up {beatname_uc} inputs, for example:

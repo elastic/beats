@@ -34,6 +34,7 @@ type Proc struct {
 	Command    string
 	Executable string
 	CmdLine    string
+	Args       []string
 }
 
 // ProcTable contains all of the active processes (if the current user is root).
@@ -101,6 +102,7 @@ func (t *ProcTable) Refresh() error {
 			if cmdline, err := p.CmdLine(); err != nil {
 				errs = append(errs, err)
 			} else {
+				proc.Args = cmdline
 				proc.CmdLine = strings.Join(cmdline, " ")
 			}
 		}

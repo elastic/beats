@@ -79,6 +79,18 @@ setup.template:
     path: {{ template_json_path }}
     name: {{ template_json_name }}
 
+{% if ilm %}
+setup.ilm:
+  enabled: {{ ilm.enabled | default("auto") }}
+  policy_name: libbeat-test-default-policy
+  {% if ilm.pattern %}
+  pattern: {{ ilm.pattern }}
+  {% endif %}
+  {% if ilm.rollover_alias %}
+  rollover_alias: {{ ilm.rollover_alias }}
+  {% endif %}
+{% endif %}
+
 #================================ Logging =====================================
 
 {% if metrics_period -%}
@@ -90,4 +102,12 @@ logging.metrics.period: {{ metrics_period }}
 keystore.path: {{keystore_path}}
 {% endif %}
 
+{% if xpack and xpack.monitoring -%}
+#================================ X-Pack Monitoring =====================================
+xpack.monitoring.elasticsearch.hosts: {{xpack.monitoring.elasticsearch.hosts}}
+xpack.monitoring.elasticsearch.metrics.period: 2s    # to speed up tests
+xpack.monitoring.elasticsearch.state.period: 3s      # to speed up tests
+{% endif -%}
+
 # vim: set ft=jinja:
+

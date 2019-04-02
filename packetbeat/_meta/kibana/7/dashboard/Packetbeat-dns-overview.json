@@ -7,13 +7,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Query Summary [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Query Summary [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -86,11 +86,11 @@
             },
             "type": "metric"
           },
-          "title": "DNS Query Summary [Packetbeat]",
+          "title": "DNS Query Summary [Packetbeat] ECS",
           "type": "metric"
         }
       },
-      "id": "DNS-Query-Summary",
+      "id": "DNS-Query-Summary-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
@@ -103,13 +103,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Request Status Over Time [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Request Status Over Time [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -237,11 +237,11 @@
             ],
             "yAxis": {}
           },
-          "title": "DNS Request Status Over Time [Packetbeat]",
+          "title": "DNS Request Status Over Time [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "DNS-Request-Status-Over-Time",
+      "id": "DNS-Request-Status-Over-Time-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
@@ -254,18 +254,13 @@
             "filter": [],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Question Types [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Question Types [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -308,11 +303,11 @@
             "shareYAxis": true,
             "type": "pie"
           },
-          "title": "DNS Question Types [Packetbeat]",
+          "title": "DNS Question Types [Packetbeat] ECS",
           "type": "pie"
         }
       },
-      "id": "DNS-Question-Types",
+      "id": "DNS-Question-Types-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
@@ -365,13 +360,13 @@
             },
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Top 10 Questions [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Top 10 Questions [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -421,11 +416,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "DNS Top 10 Questions [Packetbeat]",
+          "title": "DNS Top 10 Questions [Packetbeat] ECS",
           "type": "table"
         }
       },
-      "id": "DNS-Top-10-Questions",
+      "id": "DNS-Top-10-Questions-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
@@ -451,13 +446,13 @@
             },
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Response Codes [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Response Codes [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -507,11 +502,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "DNS Response Codes [Packetbeat]",
+          "title": "DNS Response Codes [Packetbeat] ECS",
           "type": "table"
         }
       },
-      "id": "DNS-Response-Codes",
+      "id": "DNS-Response-Codes-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
@@ -523,13 +518,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -683,11 +678,11 @@
               }
             ]
           },
-          "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat]",
+          "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat] ECS",
           "type": "area"
         }
       },
-      "id": "735d25c0-1459-11e9-9de0-f98d1808db8e",
+      "id": "735d25c0-1459-11e9-9de0-f98d1808db8e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
@@ -699,13 +694,13 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
-        "title": "DNS Client and Servers Pie Chart [Packetbeat]",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Client and Servers Pie Chart [Packetbeat] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -765,11 +760,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "DNS Client and Servers Pie Chart [Packetbeat]",
+          "title": "DNS Client and Servers Pie Chart [Packetbeat] ECS",
           "type": "pie"
         }
       },
-      "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e",
+      "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
@@ -830,7 +825,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -840,10 +835,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "DNS Protocol [Packetbeat]",
+        "title": "DNS Protocol [Packetbeat] ECS",
         "version": 1
       },
-      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
       "type": "search",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 2
@@ -856,7 +851,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -876,7 +871,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "DNS-Query-Summary",
+            "id": "DNS-Query-Summary-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -890,7 +885,7 @@
               "x": 24,
               "y": 0
             },
-            "id": "DNS-Request-Status-Over-Time",
+            "id": "DNS-Request-Status-Over-Time-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -904,7 +899,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "DNS-Question-Types",
+            "id": "DNS-Question-Types-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -918,7 +913,7 @@
               "x": 0,
               "y": 30
             },
-            "id": "DNS-Top-10-Questions",
+            "id": "DNS-Top-10-Questions-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -932,7 +927,7 @@
               "x": 24,
               "y": 30
             },
-            "id": "DNS-Response-Codes",
+            "id": "DNS-Response-Codes-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -946,7 +941,7 @@
               "x": 24,
               "y": 15
             },
-            "id": "735d25c0-1459-11e9-9de0-f98d1808db8e",
+            "id": "735d25c0-1459-11e9-9de0-f98d1808db8e-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
@@ -960,17 +955,17 @@
               "x": 13,
               "y": 15
             },
-            "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e",
+            "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] DNS Overview",
+        "title": "[Packetbeat] DNS Overview ECS",
         "version": 1
       },
-      "id": "65120940-1454-11e9-9de0-f98d1808db8e",
+      "id": "65120940-1454-11e9-9de0-f98d1808db8e-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1

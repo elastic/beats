@@ -2,7 +2,7 @@
 
 == System Module
 
-experimental[]
+beta[]
 
 The `system` module collects various security related information about
 a system. All datasets send both periodic state information (e.g. all currently
@@ -30,6 +30,14 @@ Event information is sent as the events occur (e.g. a process starts or stops).
 All datasets are currently using a poll model to retrieve their data.
 The frequency of these polls is controlled by the `period` configuration
 parameter.
+
+[float]
+==== Example dashboard
+
+The module comes with a sample dashboard:
+
+[role="screenshot"]
+image:./images/auditbeat-system-overview-dashboard.png[Auditbeat System Overview Dashboard]
 
 [float]
 === Configuration options

@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Syslog-system-logs", 
-                "title": "Syslog events by hostname [Filebeat System]", 
+                "savedSearchId": "Syslog-system-logs-ecs", 
+                "title": "Syslog events by hostname [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -38,7 +38,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "system.syslog.hostname", 
+                                "field": "host.hostname", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -61,11 +61,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Syslog events by hostname", 
+                    "title": "Syslog events by hostname ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "Syslog-events-by-hostname", 
+            "id": "Syslog-events-by-hostname-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -77,8 +77,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Syslog-system-logs", 
-                "title": "Syslog hostnames and processes [Filebeat System]", 
+                "savedSearchId": "Syslog-system-logs-ecs", 
+                "title": "Syslog hostnames and processes [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -94,7 +94,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "system.syslog.hostname", 
+                                "field": "host.hostname", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -106,7 +106,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "system.syslog.program", 
+                                "field": "process.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -123,20 +123,20 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Syslog hostnames and processes", 
+                    "title": "Syslog hostnames and processes ECS", 
                     "type": "pie"
                 }
             }, 
-            "id": "Syslog-hostnames-and-processes", 
+            "id": "Syslog-hostnames-and-processes-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
-                    "system.syslog.hostname", 
-                    "system.syslog.program", 
-                    "system.syslog.message"
+                    "host.hostname", 
+                    "process.name", 
+                    "message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -159,21 +159,19 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:system.syslog"
+                            "language": "kuery",
+                                "query": "event.dataset:system.syslog"
                             }
-                        }
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Syslog logs [Filebeat System]", 
+                "title": "Syslog logs [Filebeat System] ECS", 
                 "version": 1
             }, 
-            "id": "Syslog-system-logs", 
+            "id": "Syslog-system-logs-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -183,20 +181,20 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat System]", 
+                "title": "Dashboards [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)"
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
                     }, 
-                    "title": "Dashboards [Filebeat System]", 
+                    "title": "Dashboards [Filebeat System] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -209,13 +207,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -226,7 +219,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Syslog-events-by-hostname", 
+                        "id": "Syslog-events-by-hostname-ecs", 
                         "panelIndex": 1, 
                         "row": 2, 
                         "size_x": 8, 
@@ -235,7 +228,7 @@
                     }, 
                     {
                         "col": 9, 
-                        "id": "Syslog-hostnames-and-processes", 
+                        "id": "Syslog-hostnames-and-processes-ecs", 
                         "panelIndex": 2, 
                         "row": 2, 
                         "size_x": 4, 
@@ -245,11 +238,11 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "system.syslog.hostname", 
-                            "system.syslog.program", 
-                            "system.syslog.message"
+                            "host.hostname", 
+                            "process.name", 
+                            "message"
                         ], 
-                        "id": "Syslog-system-logs", 
+                        "id": "Syslog-system-logs-ecs", 
                         "panelIndex": 3, 
                         "row": 6, 
                         "size_x": 12, 
@@ -262,7 +255,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
                         "panelIndex": 4, 
                         "row": 1, 
                         "size_x": 12, 
@@ -271,11 +264,11 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat System] Syslog dashboard", 
+                "title": "[Filebeat System] Syslog dashboard ECS", 
                 "uiStateJSON": {}, 
                 "version": 1
             }, 
-            "id": "Filebeat-syslog-dashboard", 
+            "id": "Filebeat-syslog-dashboard-ecs", 
             "type": "dashboard", 
             "version": 6
         }

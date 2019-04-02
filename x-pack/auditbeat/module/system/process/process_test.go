@@ -12,13 +12,22 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
+	abtest "github.com/elastic/beats/auditbeat/testing"
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 func TestData(t *testing.T) {
+	defer abtest.SetupDataDir(t)()
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+
+	// Set lastState and add test process to cache so it will be reported as stopped.
+	f.(*MetricSet).lastState = time.Now()
+	p := testProcess()
+	f.(*MetricSet).cache.DiffAndUpdateCache(convertToCacheable([]*Process{p}))
+
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("received error: %+v", errs[0])
@@ -28,7 +37,7 @@ func TestData(t *testing.T) {
 		t.Fatal("no events were generated")
 	}
 
-	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+	fullEvent := mbtest.StandardizeEvent(f, events[len(events)-1], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
@@ -40,37 +49,11 @@ func getConfig() map[string]interface{} {
 }
 
 func TestProcessEvent(t *testing.T) {
-	process := Process{
-		Info: types.ProcessInfo{
-			Name:      "zsh",
-			PID:       9086,
-			PPID:      9085,
-			CWD:       "/home/elastic",
-			Exe:       "/bin/zsh",
-			Args:      []string{"zsh"},
-			StartTime: time.Date(2019, 1, 1, 0, 0, 1, 0, time.UTC),
-		},
-		UserInfo: &types.UserInfo{
-			UID:  "1002",
-			EUID: "1002",
-			SUID: "1002",
-			GID:  "1002",
-			EGID: "1002",
-			SGID: "1002",
-		},
-		User: &user.User{
-			Uid:      "1002",
-			Username: "elastic",
-		},
-		Group: &user.Group{
-			Gid:  "1002",
-			Name: "elastic",
-		},
-	}
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig()).(*MetricSet)
+
 	eventType := eventTypeEvent
 	eventAction := eventActionProcessStarted
-
-	event := processEvent(&process, eventType, eventAction)
+	event := ms.processEvent(testProcess(), eventType, eventAction)
 
 	containsError, err := event.RootFields.HasKey("error")
 	if assert.NoError(t, err) {
@@ -89,14 +72,14 @@ func TestProcessEvent(t *testing.T) {
 		"process.args":       []string{"zsh"},
 		"process.start":      "2019-01-01 00:00:01 +0000 UTC",
 
-		"user.id":                 "1002",
+		"user.id":                 "1000",
 		"user.name":               "elastic",
-		"user.group.id":           "1002",
+		"user.group.id":           "1000",
 		"user.group.name":         "elastic",
-		"user.effective.id":       "1002",
-		"user.effective.group.id": "1002",
-		"user.saved.id":           "1002",
-		"user.saved.group.id":     "1002",
+		"user.effective.id":       "1000",
+		"user.effective.group.id": "1000",
+		"user.saved.id":           "1000",
+		"user.saved.group.id":     "1000",
 	}
 	for expFieldName, expFieldValue := range expectedRootFields {
 		value, err := event.RootFields.GetValue(expFieldName)
@@ -108,6 +91,36 @@ func TestProcessEvent(t *testing.T) {
 				assert.Equalf(t, expFieldValue, value, "Unexpected value for field %v.", expFieldName)
 			}
 		}
+	}
+}
+
+func testProcess() *Process {
+	return &Process{
+		Info: types.ProcessInfo{
+			Name:      "zsh",
+			PID:       9086,
+			PPID:      9085,
+			CWD:       "/home/elastic",
+			Exe:       "/bin/zsh",
+			Args:      []string{"zsh"},
+			StartTime: time.Date(2019, 1, 1, 0, 0, 1, 0, time.UTC),
+		},
+		UserInfo: &types.UserInfo{
+			UID:  "1000",
+			EUID: "1000",
+			SUID: "1000",
+			GID:  "1000",
+			EGID: "1000",
+			SGID: "1000",
+		},
+		User: &user.User{
+			Uid:      "1000",
+			Username: "elastic",
+		},
+		Group: &user.Group{
+			Gid:  "1000",
+			Name: "elastic",
+		},
 	}
 }
 

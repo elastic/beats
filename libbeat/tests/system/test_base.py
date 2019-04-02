@@ -3,6 +3,7 @@ from base import BaseTest
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import unittest
@@ -20,6 +21,21 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         proc.check_kill_and_wait()
+        assert self.log_contains("mockbeat stopped.")
+
+    @unittest.skipIf(sys.platform.startswith("win"), "SIGHUP is not available on Windows")
+    def test_sighup(self):
+        """
+        Basic test with exiting Mockbeat because of SIGHUP
+        """
+        self.render_config_template(
+        )
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        proc.proc.send_signal(signal.SIGHUP)
+        proc.check_wait()
+        assert self.log_contains("mockbeat stopped.")
 
     def test_no_config(self):
         """
@@ -124,7 +140,6 @@ class Test(BaseTest):
             lambda: self.log_contains("Total non-zero metrics"),
             max_timeout=2)
 
-    @unittest.skipIf(sys.platform == 'darwin', 'flaky test https://github.com/elastic/beats/issues/9216')
     def test_persistent_uuid(self):
         self.render_config_template()
 
@@ -133,7 +148,7 @@ class Test(BaseTest):
         def run():
             proc = self.start_beat(extra_args=["-path.home", self.working_dir])
             self.wait_until(lambda: self.log_contains("Mockbeat is alive"),
-                            max_timeout=2)
+                            max_timeout=60)
 
             # open meta file before killing the beat, checking the file being
             # available right after startup

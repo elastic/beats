@@ -9,7 +9,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -29,7 +29,7 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3", 
+                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "2", 
                         "type": "visualization", 
                         "version": "6.2.2"
@@ -42,17 +42,17 @@
                             "x": 6, 
                             "y": 0
                         }, 
-                        "id": "86159190-47c5-11e8-bc13-1397384faad3", 
+                        "id": "86159190-47c5-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "3", 
                         "type": "visualization", 
                         "version": "6.2.2"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat HAProxy] Frontend", 
+                "title": "[Metricbeat HAProxy] Frontend ECS", 
                 "version": 1
             }, 
-            "id": "d5878d00-47c5-11e8-bc13-1397384faad3", 
+            "id": "d5878d00-47c5-11e8-bc13-1397384faad3-ecs", 
             "type": "dashboard", 
             "updated_at": "2018-04-24T18:32:51.945Z", 
             "version": 5
