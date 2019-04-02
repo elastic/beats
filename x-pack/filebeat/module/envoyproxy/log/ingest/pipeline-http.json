@@ -1,0 +1,78 @@
+{
+  "description": "Pipeline for normalizing envoy HTTP ACCESS logs",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx['http'] = new HashMap(); def p = ctx.proto.indexOf ('/'); def l = ctx.proto.length(); ctx.http.version = ctx.proto.substring(p+1, l);", 
+        "ignore_failure" : true
+      }
+    },
+    {
+      "remove": {
+        "field": ["proto"],
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "method",
+        "target_field": "http.request.method"
+      }
+    },
+    {
+      "rename": {
+        "field": "path",
+        "target_field": "url.path"
+      }
+    },
+    {
+      "rename": {
+        "field": "response_code",
+        "target_field": "http.response.status_code"
+      }
+    },
+    {
+      "rename": {
+        "field": "bytes_received",
+        "target_field": "http.response.body.bytes"
+      }
+    },
+    {
+      "convert" : {
+        "field" : "http.response.body.bytes",
+        "type": "integer"
+      }
+    },
+    {
+      "rename": {
+        "field": "bytes_sent",
+        "target_field": "http.request.body.bytes"
+      }
+    },
+    {
+      "convert" : {
+        "field" : "http.request.body.bytes",
+        "type": "integer"
+      }
+    },
+    {
+      "rename": {
+        "field": "authority",
+        "target_field": "url.domain"
+      }
+    },
+    {
+      "user_agent": {
+        "field": "user_agent.original",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure" : [{ 
+    "set" : { 
+      "field" : "error.message", 
+      "value" : "{{ _ingest.on_failure_message }}" 
+    } 
+  }]
+}

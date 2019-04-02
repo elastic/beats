@@ -1,0 +1,41 @@
+{
+  "description": "Pipeline for normalizing envoy TCP ACCESS logs",
+  "processors": [
+    {
+      "remove": {
+        "field": ["proto"],
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "bytes_received",
+        "target_field": "destination.bytes"
+      }
+    },
+    {
+      "convert" : {
+        "field" : "destination.bytes",
+        "type": "integer"
+      }
+    },
+    {
+      "rename": {
+        "field": "bytes_sent",
+        "target_field": "source.bytes"
+      }
+    },
+    {
+      "convert" : {
+        "field" : "source.bytes",
+        "type": "integer"
+      }
+    }
+  ],
+  "on_failure" : [{ 
+    "set" : { 
+      "field" : "error.message", 
+      "value" : "{{ _ingest.on_failure_message }}" 
+    } 
+  }]
+}

@@ -1,0 +1,29 @@
+- key: envoyproxy
+  title: Envoyproxy
+  description: >
+    Module for handling logs produced by envoy
+  fields:
+  - name: envoyproxy
+    type: group
+    description: >
+      Fields from envoy proxy logs after normalization
+    fields:
+    - name: log_type
+      type: keyword
+      description: >
+        Envoy log type, normally ACCESS
+
+    - name: response_flags
+      type: keyword
+
+    - name: upstream_service_time
+      type: double
+
+    - name: request_id
+      type: keyword
+
+    - name: authority
+      type: keyword
+
+
+        

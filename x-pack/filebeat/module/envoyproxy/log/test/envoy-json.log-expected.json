@@ -1,0 +1,42 @@
+[
+    {
+        "@timestamp": "2019-02-12T18:37:42.921Z",
+        "destination.address": "52.87.35.92",
+        "destination.port": 80,
+        "ecs.version": "1.0.0",
+        "envoyproxy.log_type": "ACCESS",
+        "envoyproxy.request_id": "c62ec130-6dee-4f3b-a52b-4f0d1312d89d",
+        "envoyproxy.response_flags": "-",
+        "envoyproxy.upstream_service_time": "216",
+        "event.dataset": "envoyproxy.log",
+        "event.duration": 217000000,
+        "event.module": "envoyproxy",
+        "fileset.name": "log",
+        "http.request.body.bytes": 43,
+        "http.request.method": "GET",
+        "http.response.body.bytes": 0,
+        "http.response.status_code": "200",
+        "http.version": "1.1",
+        "input.type": "log",
+        "kubernetes.container.name": "ambassador",
+        "kubernetes.labels.service": "ambassador",
+        "kubernetes.namespace": "default",
+        "kubernetes.node.name": "minikube",
+        "kubernetes.pod.name": "ambassador-76c58d9df4-jwhsg",
+        "kubernetes.pod.uid": "e57d545e-2a9d-11e9-995f-08002730e0dc",
+        "log.offset": 0,
+        "message": "ACCESS [2019-02-12T18:37:42.921Z] \"GET /httpbin/ip HTTP/1.1\" 200 - 0 43 217 216 \"172.17.0.5\" \"curl/7.59.0\" \"c62ec130-6dee-4f3b-a52b-4f0d1312d89d\" \"httpbin.org\" \"52.87.35.92:80\"",
+        "service.type": "envoyproxy",
+        "source.address": "172.17.0.5",
+        "stream": "stdout",
+        "tags": [
+            "envoyproxy"
+        ],
+        "url.domain": "httpbin.org",
+        "url.path": "/httpbin/ip",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.59.0",
+        "user_agent.version": "7.59.0"
+    }
+]

@@ -1,0 +1,64 @@
+{
+  "description": "Pipeline for normalizing envoyproxy logs",
+  "processors": [
+    {
+      "dissect": {
+        "field": "message",
+        "pattern": "%{envoyproxy.log_type} [%{timestamp}] \"%{method} %{path} %{proto}\" %{response_code} %{envoyproxy.response_flags} %{bytes_received} %{bytes_sent} %{duration} %{envoyproxy.upstream_service_time} \"%{source.address}\" \"%{user_agent.original}\" \"%{envoyproxy.request_id}\" \"%{authority}\" \"%{destination.address}:%{destination.port}\""
+       }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['timestamp']; ctx.remove('timestamp');",
+        "ignore_failure" : true
+      }
+    },
+    {
+      "convert" : {
+        "field" : "duration",
+        "type": "double"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.duration = Math.round(ctx.duration * params.scale)",
+        "params": {
+          "scale": 1000000
+        },
+        "if": "ctx.duration != null"
+      }
+    },
+    {
+      "remove": {
+        "field": ["duration", "time"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert" : {
+        "field" : "destination.port",
+        "type": "integer"
+      }
+    },
+    {
+      "pipeline": {
+          "if": "ctx.proto.charAt(0) == (char)(\"-\")",
+          "name": "{< IngestPipeline "pipeline-tcp" >}"
+      }
+    },
+    {
+      "pipeline": {
+          "if": "ctx.proto.charAt(0) != (char)(\"-\")",
+          "name": "{< IngestPipeline "pipeline-http" >}"
+      }
+    }
+  ],
+  "on_failure" : [{ 
+    "set" : { 
+      "field" : "error.message", 
+      "value" : "{{ _ingest.on_failure_message }}" 
+    } 
+  }]
+}
