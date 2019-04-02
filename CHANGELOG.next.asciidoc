@@ -43,28 +43,6 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 *Filebeat*
 
-- Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
-- Support IPv6 addresses with zone id in IIS ingest pipeline.
-  {issue}9836[9836] error log: {pull}9869[9869], access log: {pull}9955[9955].
-- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
-- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
-- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
-- Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
-- Ensure `source.address` is always populated by the nginx module (ECS). {pull}10418[10418]
-- Add support for Cisco syslog format used by their switch. {pull}10760[10760]
-- Cover empty request data, url and version in Apache2 module{pull}10730[10730]
-- Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
-- Improve detection of file deletion on Windows. {pull}10747[10747]
-- Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
-- Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
-- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test case. {issue}11004[11004] {pull}11105[11105]
-- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
-- Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
-- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
-  case. {issue}11004[11004] {pull}11105[11105]
-- Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
-- Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
-- Add fix to parse syslog message with priority value 0. {issue}11010[11010]
 - Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 
 *Heartbeat*
