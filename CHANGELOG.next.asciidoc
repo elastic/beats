@@ -197,6 +197,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Collect metrics when EC2 instances are not in running state. {issue}11008[11008] {pull}11023[11023]
 - Change ECS field cloud.provider to aws. {pull}11023[11023]
 - Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
+- Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
 
 *Packetbeat*
 
