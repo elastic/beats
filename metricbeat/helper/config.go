@@ -15,45 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package linux
+package helper
 
 import (
-	"bufio"
-	"bytes"
-	"io/ioutil"
-	"os"
+	"time"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 )
 
-const procOneCgroup = "/proc/1/cgroup"
-
-// IsContainerized returns true if this process is containerized.
-func IsContainerized() (bool, error) {
-	data, err := ioutil.ReadFile(procOneCgroup)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-
-		return false, errors.Wrap(err, "failed to read process cgroups")
-	}
-
-	return isContainerizedCgroup(data)
+// Config for an HTTP helper
+type Config struct {
+	TLS             *tlscommon.Config `config:"ssl"`
+	ConnectTimeout  time.Duration     `config:"connect_timeout"`
+	Timeout         time.Duration     `config:"timeout"`
+	Headers         map[string]string `config:"headers"`
+	BearerTokenFile string            `config:"bearer_token_file"`
 }
 
-func isContainerizedCgroup(data []byte) (bool, error) {
-	s := bufio.NewScanner(bytes.NewReader(data))
-	for n := 0; s.Scan(); n++ {
-		line := s.Bytes()
-		if len(line) == 0 || line[len(line)-1] == '/' {
-			continue
-		}
-
-		if bytes.HasSuffix(line, []byte("init.scope")) {
-			return false, nil
-		}
+func defaultConfig() Config {
+	return Config{
+		ConnectTimeout: 2 * time.Second,
+		Timeout:        10 * time.Second,
 	}
-
-	return true, s.Err()
 }

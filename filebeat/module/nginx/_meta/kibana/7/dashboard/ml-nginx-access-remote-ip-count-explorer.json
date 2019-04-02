@@ -40,7 +40,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "nginx.access.remote_ip", 
+                                "field": "source.address", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -241,7 +241,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "nginx.access.remote_ip", 
+                                "field": "source.address", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
