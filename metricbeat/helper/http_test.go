@@ -77,16 +77,17 @@ func TestGetAuthHeaderFromTokenNoFile(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
+	c := make(chan struct{})
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		select {
-		case <-time.After(5 * time.Nanosecond):
+		case <-c:
 		case <-r.Context().Done():
 		}
 	}))
 	defer ts.Close()
 
 	cfg := defaultConfig()
-	cfg.Timeout = 1 * time.Nanosecond
+	cfg.Timeout = 1 * time.Millisecond
 	hostData := mb.HostData{
 		URI:          ts.URL,
 		SanitizedURI: ts.URL,
@@ -96,6 +97,7 @@ func TestTimeout(t *testing.T) {
 	require.NoError(t, err)
 
 	checkTimeout(t, h)
+	close(c)
 }
 
 func TestConnectTimeout(t *testing.T) {

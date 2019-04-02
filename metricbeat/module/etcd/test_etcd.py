@@ -16,6 +16,7 @@ class Test(metricbeat.BaseTest):
         "leader",
         "self",
         "store",
+        "metrics",
     ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_metricset(self, metricset):

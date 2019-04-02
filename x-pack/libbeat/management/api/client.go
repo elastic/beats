@@ -96,12 +96,10 @@ func (c *Client) request(method, extraPath string,
 	return statusCode, err
 }
 
-func extractError(result []byte) error {
-	var kibanaResult struct {
-		Message string
+func extractError(b []byte) error {
+	var result BaseResponse
+	if err := json.Unmarshal(b, &result); err != nil {
+		return errors.Wrap(err, "error while parsing Kibana response")
 	}
-	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return errors.Wrap(err, "parsing Kibana response")
-	}
-	return errors.New(kibanaResult.Message)
+	return errors.New(result.Error.Message)
 }

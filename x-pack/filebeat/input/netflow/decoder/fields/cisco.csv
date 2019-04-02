@@ -267,3 +267,12 @@ netscalerUnknown432,5951,432,unsigned8
 netscalerUnknown433,5951,433,unsigned8
 netscalerUnknown453,5951,453,unsigned64
 netscalerUnknown465,5951,465,unsigned32
+ingressAclID,0,33000,aclid
+egressAclID,0,33001,aclid
+fwExtEvent,0,33002,unsigned16
+username,0,40000,string
+XlateSourceAddressIPV4,0,40001,ipv4Address
+XlateDestinationAddressIPV4,0,40002,ipv4Address
+XlateSourcePort,0,40003,unsigned16
+XlateDestinationPort,0,40004,unsigned16
+FirewallEvent,0,40005,unsigned8

@@ -41,7 +41,7 @@ var logstashName2Decoder = map[string]fields.Decoder{
 	"uint64":                  fields.Unsigned64,
 	"octet_array":             fields.OctetArray,
 	"octetarray":              fields.OctetArray,
-	"acl_id_asa":              fields.UnsupportedDecoder{},
+	"acl_id_asa":              fields.ACLID,
 	"mpls_label_stack_octets": fields.UnsupportedDecoder{},
 	"application_id":          fields.UnsupportedDecoder{},
 	"forwarding_status":       fields.UnsupportedDecoder{},

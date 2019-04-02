@@ -18,6 +18,7 @@
 package actions
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -199,6 +200,67 @@ func TestTargetRootOption(t *testing.T) {
 	assert.Equal(t, expected.String(), actual.String())
 }
 
+func TestNotJsonObjectOrArray(t *testing.T) {
+	var cases = []struct {
+		MaxDepth int
+		Expected common.MapStr
+	}{
+		{
+			MaxDepth: 1,
+			Expected: common.MapStr{
+				"msg": common.MapStr{
+					"someDate":           "2016-09-28T01:40:26.760+0000",
+					"someNumber":         1475026826760,
+					"someNumberAsString": "1475026826760",
+					"someString":         "foobar",
+					"someString2":        "2017 is awesome",
+					"someMap":            "{\"a\":\"b\"}",
+					"someArray":          "[1,2,3]",
+				},
+			},
+		},
+		{
+			MaxDepth: 10,
+			Expected: common.MapStr{
+				"msg": common.MapStr{
+					"someDate":           "2016-09-28T01:40:26.760+0000",
+					"someNumber":         1475026826760,
+					"someNumberAsString": "1475026826760",
+					"someString":         "foobar",
+					"someString2":        "2017 is awesome",
+					"someMap":            common.MapStr{"a": "b"},
+					"someArray":          []int{1, 2, 3},
+				},
+			},
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(fmt.Sprintf("TestNotJsonObjectOrArrayDepth-%v", testCase.MaxDepth), func(t *testing.T) {
+			input := common.MapStr{
+				"msg": `{
+					"someDate": "2016-09-28T01:40:26.760+0000",
+					"someNumberAsString": "1475026826760",
+					"someNumber": 1475026826760,
+					"someString": "foobar",
+					"someString2": "2017 is awesome",
+					"someMap": "{\"a\":\"b\"}",
+					"someArray": "[1,2,3]"
+				  }`,
+			}
+
+			testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+				"fields":        fields,
+				"process_array": true,
+				"max_depth":     testCase.MaxDepth,
+			})
+
+			actual := getActualValue(t, testConfig, input)
+			assert.Equal(t, testCase.Expected.String(), actual.String())
+		})
+	}
+}
+
 func TestArrayWithArraysDisabled(t *testing.T) {
 	input := common.MapStr{
 		"msg": `{
@@ -222,6 +284,7 @@ func TestArrayWithArraysDisabled(t *testing.T) {
 
 	assert.Equal(t, expected.String(), actual.String())
 }
+
 func TestArrayWithArraysEnabled(t *testing.T) {
 	input := common.MapStr{
 		"msg": `{
@@ -240,6 +303,30 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 	expected := common.MapStr{
 		"msg": common.MapStr{
 			"arrayOfMap": []common.MapStr{common.MapStr{"a": "b"}},
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestArrayWithInvalidArray(t *testing.T) {
+	input := common.MapStr{
+		"msg": `{
+			"arrayOfMap": "[]]"
+		  }`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"max_depth":     10,
+		"process_array": true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"arrayOfMap": "[]]",
 		},
 	}
 
