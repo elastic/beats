@@ -40,6 +40,7 @@ grouped in the following categories:
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
+* <<exported-fields-palo_alto>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-redis>>
@@ -11820,6 +11821,240 @@ Unix timestamp of the event, in seconds since the epoch. Used for computing the 
 +
 --
 String representation of the collection time, as formatted by osquery.
+
+
+--
+
+[[exported-fields-palo_alto]]
+== palo_alto fields
+
+Module for Palo Alto Networks (PAN-OS)
+
+
+
+[float]
+== palo_alto fields
+
+Fields from the palo_alto logs.
+
+
+
+*`palo_alto.ruleset`*::
++
+--
+type: keyword
+
+Name of the rule that matched this session.
+
+
+--
+
+[float]
+== source fields
+
+Fields to extend the top-level source object.
+
+
+
+*`palo_alto.source.zone`*::
++
+--
+type: keyword
+
+Source zone for this session.
+
+
+--
+
+*`palo_alto.source.interface`*::
++
+--
+type: keyword
+
+Source interface for this session.
+
+
+--
+
+[float]
+== nat fields
+
+Post-NAT source address, if source NAT is performed.
+
+
+
+*`palo_alto.source.nat.ip`*::
++
+--
+type: ip
+
+Post-NAT source IP.
+
+
+--
+
+*`palo_alto.source.nat.port`*::
++
+--
+type: long
+
+Post-NAT source port.
+
+
+--
+
+[float]
+== destination fields
+
+Fields to extend the top-level destination object.
+
+
+
+*`palo_alto.destination.zone`*::
++
+--
+type: keyword
+
+Destination zone for this session.
+
+
+--
+
+*`palo_alto.destination.interface`*::
++
+--
+type: keyword
+
+Destination interface for this session.
+
+
+--
+
+[float]
+== nat fields
+
+Post-NAT destination address, if destination NAT is performed.
+
+
+
+*`palo_alto.destination.nat.ip`*::
++
+--
+type: ip
+
+Post-NAT destination IP.
+
+
+--
+
+*`palo_alto.destination.nat.port`*::
++
+--
+type: long
+
+Post-NAT destination port.
+
+
+--
+
+[float]
+== network fields
+
+Fields to extend the top-level network object.
+
+
+
+*`palo_alto.network.pcap_id`*::
++
+--
+type: keyword
+
+Packet capture ID for a threat.
+
+
+--
+
+
+*`palo_alto.network.nat.community_id`*::
++
+--
+type: keyword
+
+Community ID flow-hash for the NAT 5-tuple.
+
+
+--
+
+[float]
+== file fields
+
+Fields to extend the top-level file object.
+
+
+
+*`palo_alto.file.hash`*::
++
+--
+type: keyword
+
+Binary hash for a threat file sent to be analyzed by the WildFire service.
+
+
+--
+
+[float]
+== url fields
+
+Fields to extend the top-level url object.
+
+
+
+*`palo_alto.url.category`*::
++
+--
+type: keyword
+
+For threat URLs, it's the URL category. For WildFire, the verdict on the file and is either 'malicious', 'grayware', or 'benign'.
+
+
+--
+
+*`palo_alto.flow_id`*::
++
+--
+type: keyword
+
+Internal numeric identifier for each session.
+
+
+--
+
+*`palo_alto.sequence_number`*::
++
+--
+type: long
+
+Log entry identifier that is incremented sequentially. Unique for each log type.
+
+
+--
+
+*`palo_alto.threat_file_or_url`*::
++
+--
+type: keyword
+
+URL or file name for a threat.
+
+
+--
+
+*`palo_alto.threat_id`*::
++
+--
+type: keyword
+
+Palo Alto Networks identifier for the threat.
 
 
 --

@@ -403,6 +403,18 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
+#------------------------------ Palo_alto Module ------------------------------
+- module: palo_alto
+  log:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs
