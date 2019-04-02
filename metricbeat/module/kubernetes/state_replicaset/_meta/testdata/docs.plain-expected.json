@@ -6,97 +6,8 @@
             "module": "kubernetes"
         },
         "kubernetes": {
+            "namespace": "default",
             "replicaset": {
-                "_module": {
-                    "namespace": "kube-system"
-                },
-                "name": "kube-state-metrics-1303537707",
-                "replicas": {
-                    "available": 2,
-                    "desired": 2,
-                    "labeled": 2,
-                    "observed": 1,
-                    "ready": 1
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_replicaset"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.replicaset",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "replicaset": {
-                "_module": {
-                    "namespace": "kube-system"
-                },
-                "name": "tiller-deploy-3067024529",
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "labeled": 1,
-                    "observed": 1,
-                    "ready": 1
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_replicaset"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.replicaset",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "replicaset": {
-                "_module": {
-                    "namespace": "test"
-                },
-                "name": "kube-state-metrics-1303537707",
-                "replicas": {
-                    "available": 7,
-                    "desired": 3,
-                    "labeled": 4,
-                    "observed": 5,
-                    "ready": 6
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_replicaset"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.replicaset",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "replicaset": {
-                "_module": {
-                    "namespace": "default"
-                },
                 "name": "jumpy-owl-redis-3481028193",
                 "replicas": {
                     "available": 1,
@@ -122,10 +33,35 @@
             "module": "kubernetes"
         },
         "kubernetes": {
+            "namespace": "kube-system",
             "replicaset": {
-                "_module": {
-                    "namespace": "jenkins"
-                },
+                "name": "tiller-deploy-3067024529",
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "labeled": 1,
+                    "observed": 1,
+                    "ready": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "jenkins",
+            "replicaset": {
                 "name": "wise-lynx-jenkins-1616735317",
                 "replicas": {
                     "available": 1,
@@ -133,6 +69,60 @@
                     "labeled": 1,
                     "observed": 1,
                     "ready": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "replicaset": {
+                "name": "kube-state-metrics-1303537707",
+                "replicas": {
+                    "available": 2,
+                    "desired": 2,
+                    "labeled": 2,
+                    "observed": 1,
+                    "ready": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "test",
+            "replicaset": {
+                "name": "kube-state-metrics-1303537707",
+                "replicas": {
+                    "available": 7,
+                    "desired": 3,
+                    "labeled": 4,
+                    "observed": 5,
+                    "ready": 6
                 }
             }
         },

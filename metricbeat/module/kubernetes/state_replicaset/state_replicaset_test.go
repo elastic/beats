@@ -70,16 +70,13 @@ func TestEventMapping(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := metricsetFields.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(eventKey, t, metricsetFields, k, v)
-					}
-					delete(testCases, eventKey)
+			eventKey := event.ModuleFields["namespace"].(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(eventKey, t, metricsetFields, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -100,8 +97,7 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"kube-system@kube-state-metrics-1303537707": {
-			"_module.namespace": "kube-system",
-			"name":              "kube-state-metrics-1303537707",
+			"name": "kube-state-metrics-1303537707",
 
 			"replicas.labeled":   2,
 			"replicas.observed":  1,
@@ -110,8 +106,7 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.desired":   2,
 		},
 		"test@kube-state-metrics-1303537707": {
-			"_module.namespace": "test",
-			"name":              "kube-state-metrics-1303537707",
+			"name": "kube-state-metrics-1303537707",
 
 			"replicas.labeled":   4,
 			"replicas.observed":  5,
@@ -120,8 +115,7 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.desired":   3,
 		},
 		"kube-system@tiller-deploy-3067024529": {
-			"_module.namespace": "kube-system",
-			"name":              "tiller-deploy-3067024529",
+			"name": "tiller-deploy-3067024529",
 
 			"replicas.labeled":   1,
 			"replicas.observed":  1,

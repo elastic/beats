@@ -18,6 +18,7 @@
 package state_replicaset
 
 import (
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -101,10 +102,25 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		reporter.Event(mb.Event{
+
+		var moduleFieldsMapStr common.MapStr
+		moduleFields, ok := event[mb.ModuleDataKey]
+		if ok {
+			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+			}
+		}
+		delete(event, mb.ModuleDataKey)
+
+		if reported := reporter.Event(mb.Event{
 			MetricSetFields: event,
+			ModuleFields:    moduleFieldsMapStr,
 			Namespace:       "kubernetes.replicaset",
-		})
+		}); !reported {
+			m.Logger().Debug("error trying to emit event")
+			return
+		}
 	}
 
 	return
