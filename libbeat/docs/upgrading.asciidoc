@@ -25,14 +25,20 @@ supported.
 [[upgrading-6-to-7]]
 === Upgrade from 6.x to 7.x
 
-Before upgrading your {beats}, review the <<breaking-changes,breaking changes>>.
+Before upgrading your {beats}, review the <<breaking-changes,breaking changes>>
+and the <<release-notes>>.
 
 If you're upgrading other products in the stack, also read the
 {stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. 
 
 We recommend that you fully upgrade {es} and {kib} to version 7.0
 before upgrading {beats}. If you're on {beats} 6.0 through 6.6,
-upgrade to {beats} 6.7 *before* doing the {es} upgrade.
+upgrade the {stack} and {beats} to version 6.7 *before* proceeding with the
+7.0 upgrade.
+
+// TODO: Determine whether it's necessary to remind users that the default_field
+// setting must be applied to older indices. The migration 
+// assistant in Kibana should make this clear.
 
 Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
 supported.
@@ -48,36 +54,37 @@ are required before running the software for the first time.
 ==== Upgrade to {beats} 6.7 before upgrading to 7.0
 
 The upgrade procedure assumes that you have {beats} 6.7 installed. If you're on
-a previous 6.x version of {beats}, upgrade to version 6.7 first. This is
-required because the {es} mapping template in 6.7 was modified to be compatible
-with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
+a previous 6.x version of {beats}, upgrade to version 6.7 first. If you're using
+other products in the {stack}, upgrade {beats} as part of the
+{stack-ref}/upgrading-elastic-stack.html[{stack} upgrade process].
+
+Upgrading to 6.7 is required because the {es} mapping template was modified to
+be compatible with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
 
 After upgrading to 6.7, make sure the 6.7 template gets loaded. To load the
-template, run the `setup` command with the `--template` option specified. For
-example:
+template, run the `setup` command with the `--template` option specified. 
+For example, if the {beats} output is {es}, run:
 
 [source,shell]
 ----
 metricbeat setup --template
 ----
 
-Or you can manually force loading the template:
+If the {beats} output is not `elasticsearch`, temporarily enable the
+`elasticsearch` output when you run the `setup` command. For example:
 
 [source,shell]
-----
-curl -XPUT -H'Content-Type: application/json'  http://localhost:9200/_template/metricbeat -d @metricbeat.template.json
-----
+--
+metricbeat setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+--
 
-To check the template version, open the {kib} Console and run:
+// TODO: Determine whether to mention -E setup.template.settings.index.number_of_shards=5
+// here.
 
-[source,js]
-----
-GET /_template/metricbeat
-----
-// CONSOLE
+//TODO (asiidoc migration): Replace this with a tagged region. ^^
 
-Look for the version string in the response. Repeat this step for every Beat
-running in your environment.
+NOTE: In previous versions, we advised users to manually force loading of the
+index template. This is no longer recommended. You must use the `setup` command.
 
 *Metricbeat and Filebeat users:* If you use {beats} central management,
 make sure you migrate the {beats} central management index to 6.7 before you
@@ -109,13 +116,13 @@ changes in 7.0] for the full list of changed names.
 To help you transition to the new fields, we provide a compatibility layer in
 the form of ECS-compatible field aliases. To use the aliases, set
 `migration.6_to_7.enabled: true` in the Beat's configuration file *before* you
-run {beats} 7.0 to ingest data for the first time.
+upgrade the {es} mapping template to 7.0.
 
 The compatibility layer enables you to use 6.x dashboards and visualizations
 with indices created by {beats} 7.0 or later.
 
-Did you run the Beat before reading this section? That's OK. See the clean-up
-steps described under <<missing-fields>>.
+Did you run the Beat or load the index template before reading this section?
+That's OK. See the clean-up steps described under <<missing-fields>>.
 
 [[upgrade-mapping-template]]
 ==== Upgrade the {es} mapping template
@@ -125,7 +132,7 @@ Metricbeat {stack-version} typically creates indices like this:
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
-metricbeat-{stack-version}-{localdate}
+metricbeat-{stack-version}-2019.04.02
 ------------------------------------------------------------------------------
 
 And the corresponding {es} template is named +metricbeat-{stack-version}+.
@@ -133,20 +140,23 @@ And the corresponding {es} template is named +metricbeat-{stack-version}+.
 This means that each version of the Beat creates a new index, and it's
 guaranteed that the correct template for that version is applied. With these
 changes in place, you generally don't have to do anything to upgrade the mapping
-template when you move to a new version. Just load the index template *before*
-ingesting any data into {es}.
+template when you move to a new version. Just load the new version of the
+template *before* ingesting any data into {es}. 
+
+If you plan to run {beats} 6.7 and 7.0 in parallel, make sure you
+<<enable-ecs-compatibility,enable the compatibility layer>> *before* you load
+the index template. 
 
 To load the index template, run the `setup` command with the `--template` option
-specified. For example:
+specified. For example, if the {beats} output is {es}, run:
 
 [source,shell]
 ----
 metricbeat setup --template
 ----
 
-If your {beats} configuration use an output other than `elasticsearch`,
-temporarily enable the `elasticsearch` output when you run the `setup` command.
-For example:
+If the {beats} output is not `elasticsearch`, temporarily enable the
+`elasticsearch` output when you run the `setup` command. For example:
 
 [source,shell]
 --
@@ -158,13 +168,11 @@ metricbeat setup --template -E output.logstash.enabled=false -E 'output.elastics
 
 If you've configured {beats} to send events to a different output, such as {ls},
 make sure you use versioned templates and indices. Otherwise, after you
-upgrade, there will be field conflicts. To use versioned index templates and
-indices, use the metadata from {beats} to set the index, and allow {beats} to
-manage the template.
+upgrade, there will be field conflicts.
 
-For example, for {ls}, set the {ls} `index` setting as recommended in the
-{logstash-ref}/plugins-inputs-beats.html[{beats} input plugin] documentation and
-allow {beats} to manage the index template:
+To use versioned index templates and indices with {ls}, configure your
+{ls} pipeline to use the metadata from {beats} to set the index, and allow
+Beats to manage the template:
 
 [source,json]
 ----
@@ -173,37 +181,37 @@ allow {beats} to manage the index template:
 ----
 
 When you use this configuration, the index name is set to match the index
-pattern in the {beats} index template.
+pattern in the {beats} index template. See the 
+{logstash-ref}/plugins-inputs-beats.html[{beats} input plugin] documentation
+for more information.
+
+For other non-{es} outputs, use the metadata from {beats} to set the index, and
+allow {beats} to load and manage the template, as described under
+<<upgrade-mapping-template>>.
 
 IMPORTANT: The index name must match the index pattern in the {beats} index
 template. For example, if {ls} sends events to an index called
-+metricbeat-7-{localdate}+, but the index template expects indices to match
++metricbeat-7-2019.04.02+, but the index template expects indices to match
 +metricbeat-{stack-version}-*+, you may encounter mapping errors and be unable
 to index {beats} events.
 
 ==== Upgrade dashboards
 
-We recommend that you re-import the {kib} dashboards after upgrading {kib} and
-{beats}. This way, you can take advantage of the new {beats} dashboards created
-for the 7.0 release. 
+We recommend that you import the 7.0 {kib} dashboards after upgrading
+{kib} and {beats}. This way, you can take advantage of the new dashboards
+created for the 7.0 release.
 
-Re-importing the dashboards will overwrite any manual changes that you've
-made. To avoid overwriting your changes, save any modified objects, such as
-dashboards, visualizations, and searches, under a new ID before proceeding. For
-more information about importing and exporting your modified objects, see
-{kibana-ref}/managing-saved-objects.html[Managing Saved Objects].
+If you've <<enable-ecs-compatibility,enabled the compatibility layer>> before
+loading the index template and dashboards, 6.x dashboards can co-exist with
+7.0 dashboards and will continue working after the upgrade.
 
-To re-import the dashboards, run the `setup` command with the `--dashboards`
+To import the 7.0 dashboards, run the `setup` command with the `--dashboards`
 option specified. For example:
 
 [source,shell]
 ----
 metricbeat setup --dashboards
 ----
-
-Also, if you plan to run {beats} 6.7 and 7.0 in parallel,
-<<enable-ecs-compatibility,enable the compatibility layer>> *before* you start
-ingesting data. 
 
 [[migrate-filebeat-registry]]
 ==== Migrate {filebeat} registry to use new format
@@ -260,11 +268,24 @@ up and start again:
 +
 ["source","sh",subs="attributes"]
 ----
-DELETE metricbeat-{stack-version}-{localdate}*
+DELETE metricbeat-{stack-version}-2019.04.02*
 ----
++
+WARNING: Be careful when deleting indices. The example shown here deletes
+all data indexed into the metricbeat-{stack-version} indices on 2019.04.02.
 
 . If you want the index to work with 6.x dashboards, turn on the compatibility
 layer. See <<enable-ecs-compatibility>>.
+
+. Delete the index template that was loaded earlier. For example:
++
+["source","sh",subs="attributes"]
+----
+DELETE /_template/metricbeat-{stack-version}
+----
++
+Because the index template was loaded without the compatibility layer enabled,
+the required aliases were not created. 
 
 . Load the correct index template. See <<upgrade-mapping-template>>.
 
