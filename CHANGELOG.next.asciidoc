@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 *Auditbeat*
 
+- Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
+
 *Filebeat*
 
 *Heartbeat*
