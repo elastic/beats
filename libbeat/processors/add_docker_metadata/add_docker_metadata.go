@@ -86,7 +86,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 	var sourceProcessor processors.Processor
 	if config.MatchSource {
 		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
-			"field":     "source",
+			"field":     "log.file.path",
 			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,
 			"target":    dockerContainerIDKey,
@@ -122,10 +122,10 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	var cid string
 	var err error
-
-	// Extract CID from the filepath contained in the "source" field.
+	// Extract CID from the filepath contained in the "log.file.path" field.
 	if d.sourceProcessor != nil {
-		if event.Fields["source"] != nil {
+		lfp, _ := event.Fields.GetValue("log.file.path")
+		if lfp != nil {
 			event, err = d.sourceProcessor.Run(event)
 			if err != nil {
 				d.log.Debugf("Error while extracting container ID from source path: %v", err)
