@@ -361,12 +361,12 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// If cloud key exists in event already, this processor will not overwrite the cloud fields.
 	// For example aws module writes cloud.instance.* to events already, add_cloud_metadata should not overwrite these
 	// fields again.
-	cloudValue, err := event.GetValue("cloud")
-	if cloudValue != nil && err == nil {
-		return event, err
+	cloudValue, _ := event.GetValue("cloud")
+	if cloudValue != nil {
+		return event, nil
 	}
 
-	_, err = event.PutValue("cloud", meta)
+	_, err := event.PutValue("cloud", meta)
 
 	return event, err
 }
