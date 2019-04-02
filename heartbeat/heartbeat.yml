@@ -163,4 +163,4 @@ processors:
 #================================= Migration ==================================
 
 # This allows to enable 6.7 migration aliases
-#migration.6_to_7.enabled: false
+#migration.6_to_7.enabled: true
