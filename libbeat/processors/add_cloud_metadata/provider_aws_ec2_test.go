@@ -75,23 +75,49 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	expected := common.MapStr{
-		"cloud": common.MapStr{
-			"provider": "ec2",
-			"instance": common.MapStr{
-				"id": "i-11111111",
+	cases := []struct {
+		fields          common.MapStr
+		expectedResults common.MapStr
+	}{
+		{
+			common.MapStr{},
+			common.MapStr{
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
 			},
-			"machine": common.MapStr{
-				"type": "t2.medium",
+		},
+		{
+			common.MapStr{
+				"cloud": common.MapStr{
+					"instance": common.MapStr{
+						"id": "i-000",
+					},
+				},
 			},
-			"region":            "us-east-1",
-			"availability_zone": "us-east-1c",
+			common.MapStr{
+				"cloud": common.MapStr{
+					"instance": common.MapStr{
+						"id": "i-000",
+					},
+				},
+			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+
+	for _, c := range cases {
+		actual, err := p.Run(&beat.Event{Fields: c.fields})
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, c.expectedResults, actual.Fields)
+	}
 }
