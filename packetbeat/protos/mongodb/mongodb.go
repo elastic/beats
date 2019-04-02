@@ -294,6 +294,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		trans.params = requ.params
 		trans.resource = requ.resource
 		trans.bytesIn = requ.messageLength
+		trans.documents = requ.documents
 	}
 
 	// fill response

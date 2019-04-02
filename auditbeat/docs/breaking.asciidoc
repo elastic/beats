@@ -1,49 +1,4 @@
 [[auditbeat-breaking-changes]]
-== Breaking changes in 7.0
-
-In version 7.0 the following fields were renamed.
-
-.Renamed Fields in 7.0
-[frame="topbot",options="header"]
-|======================
-|Old Field|New Field
-|`auditd.messages`        |`event.original`
-|`auditd.warnings`        |`error.message`
-|`event.type`             |`auditd.message_type`
-|`process.cwd`            |`process.working_directory`
-|`source.hostname`        |`source.domain`
-|`user.auid`              |`user.audit.id`
-|`user.uid`               |`user.id`
-|`user.euid`              |`user.effective.id`
-|`user.fsuid`             |`user.filesystem.id`
-|`user.suid`              |`user.saved.id`
-|`user.gid`               |`user.group.id`
-|`user.egid`              |`user.effective.group.id`
-|`user.sgid`              |`user.saved.group.id`
-|`user.fsgid`             |`user.filesystem.group.id`
-|`user.name_map.auid`     |`user.audit.name`
-|`user.name_map.uid`      |`user.name`
-|`user.name_map.euid`     |`user.effective.name`
-|`user.name_map.fsuid`    |`user.filesystem.name`
-|`user.name_map.suid`     |`user.saved.name`
-|`user.name_map.gid`      |`user.group.name`
-|`user.name_map.egid`     |`user.effective.group.name`
-|`user.name_map.sgid`     |`user.saved.group.name`
-|`user.name_map.fsgid`    |`user.filesystem.group.name`
-|======================
-
-The JSON data types produced by the output have been changed to align with
-the data types used in the Elasticsearch index template.
-
-.Type Changes in 7.0
-[frame="topbot",options="header"]
-|======================
-|Field|Old Type|New Type
-|`file.gid`     |number |string
-|`file.uid`     |number |string
-|`process.pid`  |string |number
-|`process.ppid` |string |number
-|======================
 
 == Breaking changes in 6.2
 

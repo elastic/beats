@@ -155,7 +155,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				},
 				{
 					data: common.MapStr{
-						"http_request_duration_microseconds": uint64(10),
+						"http_request_duration_microseconds_bucket": uint64(10),
 					},
 					labels: common.MapStr{"le": "0.99"},
 				},

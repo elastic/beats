@@ -277,6 +277,15 @@ var CiscoFields = FieldDict{
 	Key{EnterpriseID: 5951, FieldID: 433}: {Name: "netscalerUnknown433", Decoder: Unsigned8},
 	Key{EnterpriseID: 5951, FieldID: 453}: {Name: "netscalerUnknown453", Decoder: Unsigned64},
 	Key{EnterpriseID: 5951, FieldID: 465}: {Name: "netscalerUnknown465", Decoder: Unsigned32},
+	Key{EnterpriseID: 0, FieldID: 33000}:  {Name: "ingressAclID", Decoder: ACLID},
+	Key{EnterpriseID: 0, FieldID: 33001}:  {Name: "egressAclID", Decoder: ACLID},
+	Key{EnterpriseID: 0, FieldID: 33002}:  {Name: "fwExtEvent", Decoder: Unsigned16},
+	Key{EnterpriseID: 0, FieldID: 40000}:  {Name: "username", Decoder: String},
+	Key{EnterpriseID: 0, FieldID: 40001}:  {Name: "XlateSourceAddressIPV4", Decoder: Ipv4Address},
+	Key{EnterpriseID: 0, FieldID: 40002}:  {Name: "XlateDestinationAddressIPV4", Decoder: Ipv4Address},
+	Key{EnterpriseID: 0, FieldID: 40003}:  {Name: "XlateSourcePort", Decoder: Unsigned16},
+	Key{EnterpriseID: 0, FieldID: 40004}:  {Name: "XlateDestinationPort", Decoder: Unsigned16},
+	Key{EnterpriseID: 0, FieldID: 40005}:  {Name: "FirewallEvent", Decoder: Unsigned8},
 }
 
 func init() {

@@ -800,6 +800,14 @@ filebeat.inputs:
 # batch of events has been published successfully. The default value is 0s.
 #filebeat.registry.flush: 0s
 
+
+# Starting with Filebeat 7.0, the registry uses a new directory format to store
+# Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
+# registry file to use the new directory format. If you changed
+# filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
+# point to the old registry file.
+#filebeat.registry.migrate_file: ${path.data}/registry
+
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
 # everytime a new Elasticsearch connection is established.

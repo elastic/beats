@@ -82,6 +82,23 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#-------------------------------- Cisco Module --------------------------------
+- module: cisco
+  asa:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
+
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
@@ -888,6 +905,14 @@ filebeat.inputs:
 # to disk. When flush is set to 0s, the registry is written to disk after each
 # batch of events has been published successfully. The default value is 0s.
 #filebeat.registry.flush: 0s
+
+
+# Starting with Filebeat 7.0, the registry uses a new directory format to store
+# Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
+# registry file to use the new directory format. If you changed
+# filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
+# point to the old registry file.
+#filebeat.registry.migrate_file: ${path.data}/registry
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
