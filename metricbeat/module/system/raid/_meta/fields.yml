@@ -8,7 +8,7 @@
       type: keyword
       description: >
         Name of the device.
-    - name: activity_state
+    - name: status
       type: keyword
       description: >
         activity-state of the device.
@@ -20,6 +20,18 @@
       type: long
       description: >
         Total number of disks the device consists of.
+    - name: disks.spare
+      type: long
+      description: >
+         Number of spared disks.
+    - name: disks.failed
+      type: long
+      description: >
+         Number of failed disks.
+    - name: disks.states
+      type: keyword
+      description: >
+         Array of raw disk states
     - name: blocks.total
       type: long
       description: >

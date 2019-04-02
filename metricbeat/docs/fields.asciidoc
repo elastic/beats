@@ -25565,7 +25565,7 @@ Name of the device.
 
 --
 
-*`system.raid.activity_state`*::
+*`system.raid.status`*::
 +
 --
 type: keyword
@@ -25591,6 +25591,36 @@ Number of active disks.
 type: long
 
 Total number of disks the device consists of.
+
+
+--
+
+*`system.raid.disks.spare`*::
++
+--
+type: long
+
+Number of spared disks.
+
+
+--
+
+*`system.raid.disks.failed`*::
++
+--
+type: long
+
+Number of failed disks.
+
+
+--
+
+*`system.raid.disks.states`*::
++
+--
+type: keyword
+
+Array of raw disk states
 
 
 --

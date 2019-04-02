@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/metricbeat/module/system/raid/blockinfo"
 )
 
 func init() {
@@ -38,7 +39,8 @@ func init() {
 // MetricSet contains proc fs data.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs procfs.FS
+	fs    procfs.FS
+	sysfs string
 }
 
 // New creates a new instance of the raid metricset.
@@ -67,32 +69,62 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	sysMountPoint := filepath.Join(config.MountPoint, "/sys/block")
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
+		sysfs:         sysMountPoint,
 	}, nil
+}
+
+//Annoyingly, different linux subsystems report size size using different blocks
+// /proc/mdstat /proc/partitions and mdadm (Via the BLKGETSIZE64 ioctl call) count "size" as the number of 1024-byte blocks.
+// /sys/block/md*/size uses 512-byte blocks. As does /sys/block/md*/md/sync_completed
+//convert the 512-byte blocks to 1024 byte blocks to maintain how this metricset "used to" report size
+func blockto1024(b int64) int64 {
+	return b / 2
 }
 
 // Fetch fetches one event for each device
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	stats, err := m.fs.ParseMDStat()
+	devices, err := blockinfo.ListAllMDDevices(m.sysfs)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed to parse mdstat"))
+		r.Error(errors.Wrap(err, "failed to parse sysfs"))
 		return
 	}
 
-	for _, stat := range stats {
+	for _, stat := range devices {
+
+		blockDev, err := blockinfo.GetMDDevice(stat)
+		if err != nil {
+			r.Error(errors.Wrap(err, "failed to parse /sys/block"))
+			return
+		}
+
+		disks := blockDev.ReduceDisks()
 		event := common.MapStr{
-			"name":           stat.Name,
-			"activity_state": stat.ActivityState,
+			"name":   blockDev.Name,
+			"status": blockDev.ArrayState,
 			"disks": common.MapStr{
-				"active": stat.DisksActive,
-				"total":  stat.DisksTotal,
+				"active": blockDev.ActiveDisks,
+				"total":  disks.Total,
+				"spare":  disks.Spare,
+				"failed": disks.Failed,
+				"states": disks.States,
 			},
-			"blocks": common.MapStr{
-				"synced": stat.BlocksSynced,
-				"total":  stat.BlocksTotal,
-			},
+		}
+		//emulate the behavior of the previous mdstat parser by using the size when no sync data is available
+		if blockDev.SyncStatus.Total == 0 {
+			event["blocks"] = common.MapStr{
+				"synced": blockto1024(blockDev.Size),
+				"total":  blockto1024(blockDev.Size),
+			}
+		} else {
+			event["blocks"] = common.MapStr{
+				"synced": blockto1024(blockDev.SyncStatus.Complete),
+				"total":  blockto1024(blockDev.SyncStatus.Total),
+			}
 		}
 
 		r.Event(mb.Event{
