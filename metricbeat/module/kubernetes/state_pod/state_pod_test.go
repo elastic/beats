@@ -70,9 +70,8 @@ func TestEventMapping(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := metricsetFields.GetValue("_module.namespace")
 			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
+				eventKey := event.ModuleFields["namespace"].(string) + "@" + name.(string)
 				oneTestCase, oneTestCaseFound := testCases[eventKey]
 				if oneTestCaseFound {
 					for k, v := range oneTestCase {
@@ -100,9 +99,7 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"default@jumpy-owl-redis-3481028193-s78x9": {
-			"_module.namespace": "default",
-			"_module.node.name": "minikube",
-			"name":              "jumpy-owl-redis-3481028193-s78x9",
+			"name": "jumpy-owl-redis-3481028193-s78x9",
 
 			"host_ip": "192.168.99.100",
 			"ip":      "172.17.0.4",
@@ -112,9 +109,7 @@ func testCases() map[string]map[string]interface{} {
 			"status.scheduled": "true",
 		},
 		"test@jumpy-owl-redis-3481028193-s78x9": {
-			"_module.namespace": "test",
-			"_module.node.name": "minikube-test",
-			"name":              "jumpy-owl-redis-3481028193-s78x9",
+			"name": "jumpy-owl-redis-3481028193-s78x9",
 
 			"host_ip": "192.168.99.200",
 			"ip":      "172.17.0.5",
@@ -124,9 +119,7 @@ func testCases() map[string]map[string]interface{} {
 			"status.scheduled": "false",
 		},
 		"jenkins@wise-lynx-jenkins-1616735317-svn6k": {
-			"_module.namespace": "jenkins",
-			"_module.node.name": "minikube",
-			"name":              "wise-lynx-jenkins-1616735317-svn6k",
+			"name": "wise-lynx-jenkins-1616735317-svn6k",
 
 			"host_ip": "192.168.99.100",
 			"ip":      "172.17.0.7",
