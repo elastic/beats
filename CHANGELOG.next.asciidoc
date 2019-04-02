@@ -51,6 +51,8 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...master[Check the HEAD diff
 
 *Metricbeat*
 
+- Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
+
 *Packetbeat*
 
 *Winlogbeat*
