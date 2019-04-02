@@ -12,6 +12,10 @@
       type: keyword
       description: >
         activity-state of the device.
+    - name: sync_action
+      type: keyword
+      description: >
+        Current sync action, if the RAID array is redundant 
     - name: disks.active
       type: long
       description: >

@@ -126,6 +126,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				"total":  blockto1024(blockDev.SyncStatus.Total),
 			}
 		}
+		//sync action is only available on redundant RAID types
+		if blockDev.SyncAction != "" {
+			event["sync_action"] = blockDev.SyncAction
+		}
 
 		r.Event(mb.Event{
 			MetricSetFields: event,

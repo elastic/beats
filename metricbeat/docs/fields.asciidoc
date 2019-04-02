@@ -25575,6 +25575,16 @@ activity-state of the device.
 
 --
 
+*`system.raid.sync_action`*::
++
+--
+type: keyword
+
+Current sync action, if the RAID array is redundant 
+
+
+--
+
 *`system.raid.disks.active`*::
 +
 --
