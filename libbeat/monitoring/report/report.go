@@ -115,7 +115,7 @@ func getReporterConfig(
 			}{}
 			rc.Unpack(&hosts)
 
-			if settings.Format == FormatBulk && len(hosts.Hosts) > 0 {
+			if settings.Format == FormatXPackMonitoringBulk && len(hosts.Hosts) > 0 {
 				pathMonHosts := rc.PathOf("hosts")
 				pathOutHost := outCfg.PathOf("hosts")
 				err := fmt.Errorf("'%v' and '%v' are configured", pathMonHosts, pathOutHost)
