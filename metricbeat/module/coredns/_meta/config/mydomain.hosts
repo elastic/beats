@@ -1,0 +1,4 @@
+# Hosts file for Domain: my.domain.org
+# Place entries below in standard hosts file format: ipaddress hostname fqdn
+
+192.168.1.1 gateway.my.domain.org

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -129,7 +130,7 @@ func New(
 	}, nil
 }
 
-func (t *Template) load(fields common.Fields) (common.MapStr, error) {
+func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Locking to make sure dynamicTemplates and defaultFields is not accessed in parallel
 	t.Lock()
@@ -141,7 +142,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 	var err error
 	if len(t.config.AppendFields) > 0 {
 		cfgwarn.Experimental("append_fields is used.")
-		fields, err = common.ConcatFields(fields, t.config.AppendFields)
+		fields, err = mapping.ConcatFields(fields, t.config.AppendFields)
 		if err != nil {
 			return nil, err
 		}
@@ -160,7 +161,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 
 // LoadFile loads the the template from the given file path
 func (t *Template) LoadFile(file string) (common.MapStr, error) {
-	fields, err := common.LoadFieldsYaml(file)
+	fields, err := mapping.LoadFieldsYaml(file)
 	if err != nil {
 		return nil, err
 	}
@@ -311,19 +312,19 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 	return indexSettings
 }
 
-func loadYamlByte(data []byte) (common.Fields, error) {
+func loadYamlByte(data []byte) (mapping.Fields, error) {
 	cfg, err := yaml.NewConfig(data)
 	if err != nil {
 		return nil, err
 	}
 
-	var keys []common.Field
+	var keys []mapping.Field
 	err = cfg.Unpack(&keys)
 	if err != nil {
 		return nil, err
 	}
 
-	fields := common.Fields{}
+	fields := mapping.Fields{}
 	for _, key := range keys {
 		fields = append(fields, key.Fields...)
 	}

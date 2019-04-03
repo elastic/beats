@@ -60,7 +60,7 @@ Example configuration:
 
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  index: "{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
+  index: "{beat_default_index_prefix}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
@@ -548,7 +548,7 @@ use in Logstash for indexing and filtering:
 {
     ...
     "@metadata": { <1>
-      "beat": "{beatname_lc}", <2>
+      "beat": "{beat_default_index_prefix}", <2>
       "version": "{stack-version}" <3>
       "type": "doc" <4>
     }
@@ -557,7 +557,7 @@ use in Logstash for indexing and filtering:
 <1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. See the
 {logstash-ref}/event-dependent-configuration.html#metadata[Logstash documentation]
 for more about the `@metadata` field.
-<2> The default is {beatname_lc}. To change this value, set the
+<2> The default is {beat_default_index_prefix}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
 <3> The beats current version.
 <4> The value of `type` is currently hardcoded to `doc`. It was used by previous
@@ -594,7 +594,7 @@ output {
 of the `beat` metadata field, `%{[@metadata][version]}` sets the second part to
 the Beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
-+{beatname_lc}-{version}-2017.03.29+.
++{beat_default_index_prefix}-{version}-2017.03.29+.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
@@ -714,8 +714,8 @@ that when a proxy is used the name resolution occurs on the proxy server.
 ===== `index`
 
 The index root name to write events to. The default is the Beat name. For
-example +"{beatname_lc}"+ generates +"[{beatname_lc}-]{version}-YYYY.MM.DD"+
-indices (for example, +"{beatname_lc}-{version}-2017.04.26"+).
+example +"{beat_default_index_prefix}"+ generates +"[{beat_default_index_prefix}-]{version}-YYYY.MM.DD"+
+indices (for example, +"{beat_default_index_prefix}-{version}-2017.04.26"+).
 
 ===== `ssl`
 

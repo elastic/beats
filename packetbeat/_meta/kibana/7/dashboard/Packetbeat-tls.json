@@ -7,13 +7,8 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -43,7 +38,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -204,7 +199,7 @@
             ],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -285,13 +280,8 @@
             ],
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -370,7 +360,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -425,7 +415,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -480,7 +470,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -535,7 +525,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -601,7 +591,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -684,7 +674,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -766,7 +756,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -834,7 +824,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -927,7 +917,7 @@
               }
             ],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -1072,13 +1062,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1126,13 +1111,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1180,13 +1160,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1234,13 +1209,8 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }
@@ -1288,7 +1258,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1354,7 +1324,7 @@
             "highlightAll": true,
             "index": "packetbeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true
@@ -1381,13 +1351,8 @@
             "filter": [],
             "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             },
             "version": true
           }

@@ -26,5 +26,6 @@ var (
 		"sent_message_size": s.Object{
 			"bytes": c.Float("SentMessageSize"),
 		},
+		"queue.name": c.Str("QueueName"),
 	}
 )

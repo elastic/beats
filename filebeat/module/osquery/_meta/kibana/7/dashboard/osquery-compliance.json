@@ -42,8 +42,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -67,7 +67,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -174,8 +174,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -199,7 +199,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -312,7 +312,7 @@
                             }
                         ], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -459,8 +459,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "*"
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
@@ -519,7 +519,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true
@@ -546,7 +546,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true

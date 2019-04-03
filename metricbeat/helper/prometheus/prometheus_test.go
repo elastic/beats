@@ -356,7 +356,7 @@ func TestPrometheus(t *testing.T) {
 								"1000": uint64(3),
 								"+Inf": uint64(5),
 							},
-							"sum": 4.31,
+							"sum": 4310.0,
 						},
 					},
 				},
