@@ -3,6 +3,8 @@ import os
 import six
 import yaml
 
+from collections import namedtuple
+
 
 # Collects docs for all modules and metricset
 
@@ -233,16 +235,16 @@ For a description of each field in the metricset, see the
     with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
         f.write(module_list_output)
 
-
 def get_modules_path(base_dir, path_name):
-    modules_path = [{
-        'base_dir': base_dir,
-        'path': os.path.join(path_name, module),
-        'name': module,
-        'metricsets': sorted(os.listdir(path_name + "/" + module))
-    } for module in filter(lambda module: os.path.isfile(path_name + "/" + module +
-                                                         "/_meta/docs.asciidoc"),
-                           os.listdir(base_dir))]
+    fields = 'base_dir path name metricsets'
+    moduleTuple = namedtuple('Module', fields)
+    modules_path = [moduleTuple(base_dir, os.path.join(path_name, module),
+                                module, sorted(os.listdir(path_name + "/" +
+                                                          module)))
+                    for module in filter(lambda module:
+                                         os.path.isfile(path_name + "/" +
+                                                        module + "/_meta/docs.asciidoc"),
+                                         os.listdir(base_dir))]
 
     return modules_path
 
