@@ -112,3 +112,27 @@ func TestGlobManager(t *testing.T) {
 		filepath.Join(dir, "config3.yml"),
 	})
 }
+
+func TestCfgFileSorting(t *testing.T) {
+	cfgFiles := byCfgFileDisplayNames{
+		&CfgFile{
+			"foo",
+			"modules.d/foo.yml",
+			false,
+		},
+		&CfgFile{
+			"foo-variant",
+			"modules.d/foo-variant.yml",
+			false,
+		},
+		&CfgFile{
+			"fox",
+			"modules.d/fox.yml",
+			false,
+		},
+	}
+
+	assert.True(t, cfgFiles.Less(0, 1))
+	assert.False(t, cfgFiles.Less(1, 0))
+	assert.True(t, cfgFiles.Less(0, 2))
+}
