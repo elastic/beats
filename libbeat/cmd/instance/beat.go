@@ -361,14 +361,24 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	if b.Config.Monitoring.Enabled() {
+	if b.Config.Management.Enabled() {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 		}
+
+		reporterFactory := report.NewReportFactory(b.Info, b.Config.Output, settings)
+		reporters := cfgfile.NewRunnerList(management.DebugK, reporterFactory, b.Publisher)
+		reload.Register.MustRegisterList("xpack.monitoring", reporters)
+	} else if b.Config.Monitoring.Enabled() {
+		settings := report.Settings{
+			DefaultUsername: settings.Monitoring.DefaultUsername,
+		}
+
 		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
 		if err != nil {
 			return err
 		}
+		reporter.Start()
 		defer reporter.Stop()
 	}
 

@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/url"
@@ -40,17 +41,19 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
+	"github.com/mitchellh/hashstructure"
 )
 
 type reporter struct {
+	id     uint64
 	done   *stopper
 	logger *logp.Logger
+	config config
 
 	checkRetry time.Duration
 
 	// event metadata
 	beatMeta common.MapStr
-	tags     []string
 
 	// pipeline
 	pipeline *pipeline.Pipeline
@@ -204,22 +207,36 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 
 	r := &reporter{
 		logger:     log,
+		config:     config,
 		done:       newStopper(),
 		beatMeta:   makeMeta(beat),
-		tags:       config.Tags,
 		checkRetry: checkRetry,
 		pipeline:   pipeline,
 		client:     pipeConn,
 		out:        clients,
 	}
-	go r.initLoop(config)
-	return r, nil
+
+	var h map[string]interface{}
+	cfg.Unpack(&h)
+	r.id, err = hashstructure.Hash(h, nil)
+
+	return r, err
+}
+
+func (r *reporter) String() string {
+	return fmt.Sprintf("reporter [type=elasticsearch ID=%d]", r.id)
+}
+
+func (r *reporter) Start() {
+	go r.initLoop(r.config)
+	logp.Info("Started %s", r.String())
 }
 
 func (r *reporter) Stop() {
 	r.done.Stop()
 	r.client.Close()
 	r.pipeline.Close()
+	logp.Info("Stopped %s", r.String())
 }
 
 func (r *reporter) initLoop(c config) {
@@ -288,8 +305,8 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 			"beat": r.beatMeta,
 			prefix: snapshot,
 		}
-		if len(r.tags) > 0 {
-			fields["tags"] = r.tags
+		if len(r.config.Tags) > 0 {
+			fields["tags"] = r.config.Tags
 		}
 		r.client.Publish(beat.Event{
 			Timestamp: ts,

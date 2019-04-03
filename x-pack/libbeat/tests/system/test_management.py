@@ -212,6 +212,42 @@ class TestManagement(BaseTest):
         self.wait_documents(index, 1)
         proc.check_kill_and_wait()
 
+    @unittest.skipIf(not INTEGRATION_TESTS,
+                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    def test_fetch_configs_monitoring(self):
+        """
+        Monitoring config is retrieved from Central Management and updates are applied
+        """
+        # Enroll the beat
+        config_path = os.path.join(self.working_dir, "mockbeat.yml")
+        self.render_config_template("mockbeat", config_path, keystore_path=self.keystore_path)
+        exit_code = self.enroll(self.es_user, self.es_pass)
+        assert exit_code == 0
+
+        # Configure an output
+        self.create_and_assing_tag([
+            {
+                "type": "xpack.monitoring",
+                "config": {
+                        "enabled": True,
+                        "elasticsearch.hosts": [self.es_host],
+                        "elasticsearch.username": self.es_user,
+                        "elasticsearch.password": self.es_pass,
+                },
+                "id": "myconfig",
+            }
+        ])
+
+        # Start beat
+        proc = self.start_beat(extra_args=[
+            "-E", "management.period=1s",
+            "-E", "keystore.path=%s" % self.keystore_path,
+        ])
+
+        # Wait for beat to apply new conf
+        self.wait_log_contains("Started reporter [type=elasticsearch ID=")
+        proc.check_kill_and_wait()
+
     def enroll(self, user, password):
         return self.run_beat(
             extra_args=["enroll", self.get_kibana_url(),

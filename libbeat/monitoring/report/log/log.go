@@ -18,6 +18,7 @@
 package log
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
+	"github.com/mitchellh/hashstructure"
 )
 
 // List of metrics that are gauges. This is used to identify metrics that should
@@ -74,6 +76,7 @@ var (
 )
 
 type reporter struct {
+	id       uint64
 	wg       sync.WaitGroup
 	done     chan struct{}
 	period   time.Duration
@@ -92,8 +95,15 @@ func MakeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 			return nil, err
 		}
 	}
+	var h map[string]interface{}
+	cfg.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	r := &reporter{
+		id:       id,
 		done:     make(chan struct{}),
 		period:   config.Period,
 		logger:   logp.NewLogger("monitoring"),
@@ -101,16 +111,26 @@ func MakeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
 	}
 
 	r.wg.Add(1)
+
+	return r, nil
+}
+
+func (r *reporter) String() string {
+	return fmt.Sprintf("reporter [type=log ID=%d]", r.id)
+}
+
+func (r *reporter) Start() {
 	go func() {
 		defer r.wg.Done()
 		r.snapshotLoop()
 	}()
-	return r, nil
+	logp.Info("Started %s", r.String())
 }
 
 func (r *reporter) Stop() {
 	close(r.done)
 	r.wg.Wait()
+	logp.Info("Stopped %s", r.String())
 }
 
 func (r *reporter) snapshotLoop() {

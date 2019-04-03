@@ -35,6 +35,8 @@ type Settings struct {
 }
 
 type Reporter interface {
+	fmt.Stringer
+	Start()
 	Stop()
 }
 
