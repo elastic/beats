@@ -1,0 +1,65 @@
+[[release-highlights-7.0.0]]
+=== 7.0.0 release highlights
+++++
+<titleabbrev>7.0.0</titleabbrev>
+++++
+
+Each release of {Beats} brings new features and product improvements. 
+Here are the highlights of the new features and enhancements in 7.0.0.
+
+Refer to the {Beats} <<breaking-changes-7.0, Breaking Changes>> and <<release-notes, 
+Release Notes>> for a list of bug fixes and other changes.
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+
+[float]
+==== Index lifecycle management on by default
+
+In 6.6, Beats added configuration options to support
+{ref}/index-lifecycle-management.html[index lifecycle management]. To use this
+feature, you had to turn it on and load the lifecycle policy explicitly.
+
+In 7.0, Beats uses index lifecycle management by default when it connects to a
+cluster that supports it. Beats loads the default policy automatically and
+applies it to any indices created by Beats. 
+
+[float]
+==== {beats} now compatible with Elastic Common Schema (ECS)
+
+{beats} shippers are now compatible with {ecs-ref}/index.html[Elastic
+Common Schema (ECS)]. ECS defines a common set of fields for ingesting data into
+{es}. Having a common schema helps you correlate data from sources like logs and
+metrics for IT operations analytics and security analytics.
+
+// REVIEWERS: Can we say that all Beats are compatibile with ECS now and not just
+// Filebeat and Metricbeat? 
+
+[float]
+==== New Metricbeat modules
+
+Metricbeat adds several new modules and dashboards for turnkey metrics
+collection:
+
+* Community-contributed modules for
+{metricbeat-ref}/metricbeat-module-couchdb.html[CouchDB] and
+{metricbeat-ref}/metricbeat-module-nats.html[NATS]
+
+* {metricbeat-ref}/metricbeat-module-mssql.html[MSSQL] module for collecting
+performance and transaction metrics from MS SQL databases
+
+* {metricbeat-ref}/metricbeat-module-aws.html[AWS EC2] module for fetching
+metrics from AWS Cloudwatch
+
+[float]
+==== NetFlow support in Filebeat
+
+The new {filebeat-ref}/filebeat-input-netflow.htmlnew[NetFlow input] for
+Filebeat lets you tap into NetFlow and IPFIX records sent over UDP. For
+routers and switches that export NetFlow packets via UDP, you can see where
+traffic originated, where it's going, and what services or applications it is
+part of. The new input supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX.
+
+// end::notable-highlights[]
