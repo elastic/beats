@@ -68,7 +68,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 // GetPipelines returns the list of pipelines running on a Logstash node
 func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
-	content, err := fetchPath(http, resetURI, "_node/pipelines", "")
+	content, err := fetchPath(http, resetURI, "_node/pipelines", "graph=true")
 	if err != nil {
 		return nil, errors.Wrap(err, "could not fetch node pipelines")
 	}
