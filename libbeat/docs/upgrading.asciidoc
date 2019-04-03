@@ -239,7 +239,7 @@ Before proceeding with the upgrade, make sure you back up the registry file.
 [[ilm-on]]
 ==== Check privileges for index lifecycle management (on by default in 7.0)
 
-Staring with {beats} 7.0, index lifecycle management is on by default when
+Starting with {beats} 7.0, index lifecycle management is on by default when
 sending data to {beats} clusters that support it. Make sure {beats} users have
 the privileges needed to use index lifecycle management, or disable index
 lifecycle management. 
