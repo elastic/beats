@@ -366,7 +366,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 		}
 
-		reporterFactory := report.NewReportFactory(b.Info, b.Config.Output, settings)
+		reporterFactory := report.NewFactory(b.Info, b.Config.Output, settings)
 		reporters := cfgfile.NewRunnerList(management.DebugK, reporterFactory, b.Publisher)
 		reload.Register.MustRegisterList("xpack.monitoring", reporters)
 	} else if b.Config.Monitoring.Enabled() {

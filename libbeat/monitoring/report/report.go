@@ -30,16 +30,19 @@ type config struct {
 	Reporter common.ConfigNamespace `config:",inline"`
 }
 
+// Settings is a collection of options defining reporter
 type Settings struct {
 	DefaultUsername string
 }
 
+// Reporter gives ability to start,stop and identify a reporter
 type Reporter interface {
 	fmt.Stringer
 	Start()
 	Stop()
 }
 
+// ReporterFactory is a factory function returning specific Reporter
 type ReporterFactory func(beat.Info, Settings, *common.Config) (Reporter, error)
 
 var (
@@ -48,6 +51,7 @@ var (
 	reportFactories = map[string]ReporterFactory{}
 )
 
+// RegisterReporterFactory registers a factory for a specific reporter type
 func RegisterReporterFactory(name string, f ReporterFactory) {
 	if reportFactories[name] != nil {
 		panic(fmt.Sprintf("Reporter '%v' already registered", name))
@@ -55,6 +59,7 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 	reportFactories[name] = f
 }
 
+// New returns reporter for the given config
 func New(
 	beat beat.Info,
 	settings Settings,
