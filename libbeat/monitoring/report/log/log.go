@@ -22,12 +22,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/mitchellh/hashstructure"
 )
 
 // List of metrics that are gauges. This is used to identify metrics that should

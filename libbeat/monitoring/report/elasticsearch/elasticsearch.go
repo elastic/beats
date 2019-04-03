@@ -27,6 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
@@ -41,7 +43,6 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
-	"github.com/mitchellh/hashstructure"
 )
 
 type reporter struct {
