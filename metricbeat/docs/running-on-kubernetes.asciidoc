@@ -51,7 +51,7 @@ Kubernetes 1.8. You need to remove `type: DirectoryOrCreate` from the manifest a
 By default, {beatname_uc} sends events to an existing Elasticsearch deployment,
 if present. To specify a different destination, change the following parameters
 in the manifest file:
-
+just remember that you need to encode the values using default base 64 kubernetes ecoding.
 [source,yaml]
 ------------------------------------------------
 - name: ELASTICSEARCH_HOST
