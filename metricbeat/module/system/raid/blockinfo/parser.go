@@ -53,7 +53,7 @@ func parseIntVal(path string) (int64, error) {
 		return value, err
 	}
 	strVal := strings.TrimSpace(string(raw))
-	//size in 512 byte blocks
+
 	value, err = strconv.ParseInt(string(strVal), 10, 64)
 	if err != nil {
 		return value, err

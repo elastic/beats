@@ -76,7 +76,7 @@ func ListAllMDDevices(path string) ([]string, error) {
 	}
 
 	if len(mds) == 0 {
-		return nil, fmt.Errorf("no matches from path %s, objects: %s", path, dir[0].Name())
+		return nil, fmt.Errorf("no matches from path %s,", path)
 	}
 
 	return mds, nil
