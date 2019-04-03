@@ -255,3 +255,43 @@ function process(evt) {
 		t.Fatal(err)
 	}
 }
+
+func TestNewProcessorChain(t *testing.T) {
+	const script = `
+var processor = require('processor');
+
+var localeProcessor = new processor.AddLocale();
+
+var chain = new processor.Chain()
+    .Add(localeProcessor)
+    .Rename({
+        fields: [
+            {from: "event.timezone", to: "timezone"},
+        ],
+    })
+    .Add(function(evt) {
+		evt.Put("hello", "world");
+    })
+    .Build();
+
+function process(evt) {
+	chain.Run(evt);
+}
+`
+
+	logp.TestingSetup()
+	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	evt, err := p.Run(testEvent())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = evt.GetValue("timezone")
+	assert.NoError(t, err)
+	v, _ := evt.GetValue("hello")
+	assert.Equal(t, "world", v)
+}
