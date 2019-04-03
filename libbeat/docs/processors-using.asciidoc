@@ -169,18 +169,21 @@ endif::[]
 The supported processors are:
 
  * <<add-cloud-metadata,`add_cloud_metadata`>>
+ * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-fields, `add_fields`>>
+ * <<add-host-metadata,`add_host_metadata`>>
+ * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
+ * <<add-labels, `add_labels`>>
  * <<add-locale,`add_locale`>>
+ * <<add-process-metadata,`add_process_metadata`>>
+ * <<add-tags, `add_tags`>>
  * <<decode-json-fields,`decode_json_fields`>>
+ * <<dissect, `dissect`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
- * <<rename-fields,`rename`>>
- * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
- * <<add-docker-metadata,`add_docker_metadata`>>
- * <<add-host-metadata,`add_host_metadata`>>
- * <<dissect, `dissect`>>
  * <<processor-dns, `dns`>>
- * <<add-process-metadata,`add_process_metadata`>>
+ * <<rename-fields,`rename`>>
 
 [[conditions]]
 ==== Conditions
@@ -541,6 +544,89 @@ _Openstack Nova_
 }
 -------------------------------------------------------------------------------
 
+[[add-fields]]
+=== Add fields
+
+The `add_fields` processor adds additional fields to the event.  Fields can be
+scalar values, arrays, dictionaries, or any nested combination of these.  By
+default the fields that you specify will be grouped under the `fields`
+sub-dictionary in the event. To group the fields under a different
+sub-dictionary, use the `target` setting. To store the fields as
+top-level fields, set `target: ''`. 
+
+`target`:: (Optional) Sub-dictionary to put all fields into. Defaults to `fields`.
+`fields`:: Fields to be added.
+
+
+For example, this configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_fields:
+    target: project
+    fields:
+      name: myproject
+      id: '574734885120952459'
+------------------------------------------------------------------------------
+
+Adds these fields to any event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "project": {
+    "name": "myproject",
+    "id": "574734885120952459"
+  }
+}
+-------------------------------------------------------------------------------
+
+
+[[add-labels]]
+=== Add labels
+
+The `add_labels` processors adds a set of key-value pairs to an event.
+The processor will flatten nested configuration objects like arrays or
+dictionaries into a fully qualified name by merging nested names with a `.`.
+Array entries create numeric names starting with 0.  Labels are always stored
+under the Elastic Common Schema compliant `labels` sub-dictionary.
+
+`labels`:: dictionaries of labels to be added.
+
+For example, this configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_labels:
+    labels:
+      number: 1
+      with.dots: test
+      nested:
+        with.dots: nested
+      array:
+        - do
+	- re
+	- with.field: mi
+------------------------------------------------------------------------------
+
+Adds these fields to every event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "labels": {
+    "number": 1,
+    "with.dots": "test",
+    "nested.with.dots": "nested",
+    "array.0": "do",
+    "array.1": "re",
+    "array.2.with.field": "mi"
+  }
+}
+-------------------------------------------------------------------------------
+
 
 [[add-locale]]
 === Add the local time zone
@@ -572,6 +658,35 @@ processors:
 NOTE: Please note that `add_locale` differentiates between daylight savings
 time (DST) and regular time. For example `CEST` indicates DST and and `CET` is
 regular time.
+
+[[add-tags]]
+=== Add tags
+
+The `add_tags` processor adds tags to a list of tags. If the target field already exists,
+the tags are appended to the existing list of tags.
+
+`tags`:: List of tags to add.
+`target`:: (Optional) Field the tags will be added to. Defaults to `tags`.
+
+For example, this configuration:
+
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_tags:
+    tags: [web, production]
+    target: "environment"
+------------------------------------------------------------------------------
+
+Adds the environment field to every event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "environment": ["web", "production"]
+}
+-------------------------------------------------------------------------------
 
 
 [[decode-json-fields]]
