@@ -177,7 +177,6 @@ The supported processors are:
  * <<add-locale,`add_locale`>>
  * <<add-process-metadata,`add_process_metadata`>>
  * <<add-tags, `add_tags`>>
- * <<community-id,`community_id`>>
  * <<decode-json-fields,`decode_json_fields`>>
  * <<dissect, `dissect`>>
  * <<drop-event,`drop_event`>>
