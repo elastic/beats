@@ -114,13 +114,20 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 		},
 		{
 			common.MapStr{
-				"cloud": common.MapStr{
-					"provider": "ec2",
-				},
+				"cloud.provider": "ec2",
 			},
 			common.MapStr{
+				"cloud.provider": "ec2",
 				"cloud": common.MapStr{
 					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
 				},
 			},
 		},
@@ -198,11 +205,10 @@ func TestRetrieveAWSMetadataOverwriteTrue(t *testing.T) {
 		},
 		{
 			common.MapStr{
-				"cloud": common.MapStr{
-					"provider": "ec2",
-				},
+				"cloud.provider": "ec2",
 			},
 			common.MapStr{
+				"cloud.provider": "ec2",
 				"cloud": common.MapStr{
 					"provider": "ec2",
 					"instance": common.MapStr{
