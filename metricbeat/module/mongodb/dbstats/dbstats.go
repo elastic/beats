@@ -59,23 +59,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error creating new Session")
 	}
 	defer mongoSession.Close()
 
 	// Get the list of databases names, which we'll use to call db.stats() on each
 	dbNames, err := mongoSession.DatabaseNames()
 	if err != nil {
-		err = errors.Wrap(err, "Error retrieving database names from Mongo instance")
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "Error retrieving database names from Mongo instance")
 	}
 
 	// for each database, call db.stats() and append to events
@@ -87,23 +82,23 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 		err := db.Run("dbStats", &result)
 		if err != nil {
-			err = errors.Wrapf(err, "Failed to retrieve stats for db %s", dbName)
-			logger.Error(err)
-			continue
+			m.Logger().Error(errors.Wrapf(err, "Failed to retrieve stats for db %s", dbName))
+
 		}
 		data, _ := schema.Apply(result)
-		if reported := reporter.Event(mb.Event{MetricSetFields: data}); !reported {
-			logger.Debug("error reporting event")
-			return
+		reported := reporter.Event(mb.Event{MetricSetFields: data})
+		if !reported {
+			//this means the metricset has closed, no point in trying to log anything further
+			return errors.New("metricset has stopped")
+
 		}
 		totalEvents++
 	}
 
 	if totalEvents == 0 {
-		err = errors.New("Failed to retrieve dbStats from any databases")
-		logger.Error(err)
-		reporter.Error(err)
+		return errors.New("Failed to retrieve dbStats from any databases")
+
 	}
 
-	return
+	return nil
 }
