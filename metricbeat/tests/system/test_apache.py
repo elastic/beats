@@ -55,7 +55,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
             time.sleep(0.5)
 
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
