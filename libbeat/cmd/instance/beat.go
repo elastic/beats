@@ -375,23 +375,17 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	if b.Config.Management.Enabled() {
-		settings := report.Settings{
-			DefaultUsername: settings.Monitoring.DefaultUsername,
-			Format:          reporterSettings.Format,
-		}
-
+		settings := getReporterSettings(settings.Monitoring.DefaultUsername, reporterSettings)
 		reporterFactory := report.NewFactory(b.Info, b.Config.Output, settings)
 		reporters := cfgfile.NewRunnerList(management.DebugK, reporterFactory, b.Publisher)
 		reload.Register.MustRegisterList("xpack.monitoring", reporters)
 	} else if monitoringCfg.Enabled() {
-		settings := report.Settings{
-			DefaultUsername: settings.Monitoring.DefaultUsername,
-		}
-
+		settings := getReporterSettings(settings.Monitoring.DefaultUsername, reporterSettings)
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return err
 		}
+
 		reporter.Start()
 		defer reporter.Stop()
 	}
@@ -1008,4 +1002,17 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
+}
+
+func getReporterSettings(username string, settings *report.Settings) report.Settings {
+	reportFormat := report.FormatUnknown
+	if settings != nil {
+		reportFormat = settings.Format
+	}
+
+	return report.Settings{
+		DefaultUsername: username,
+		Format:          reportFormat,
+	}
+
 }
