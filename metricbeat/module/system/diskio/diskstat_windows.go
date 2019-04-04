@@ -27,15 +27,14 @@ import (
 )
 
 const (
-	FILE_DEVICE_DISK               = 0x00000007
-	METHOD_BUFFERED                = 0
-	FILE_ANY_ACCESS                = 0x0000
-	ERROR_SUCCESS    syscall.Errno = 0
+	fileDeviceDisk               = 0x00000007
+	fileAnyAccess                = 0x0000
+	errorSuccess   syscall.Errno = 0
 )
 
 var (
-	// control code - https://docs.microsoft.com/en-us/windows/desktop/api/winioctl/ni-winioctl-ioctl_disk_performance
-	IoctlDiskPerformance        = getCtlCode(FILE_DEVICE_DISK, 0x0008, METHOD_BUFFERED, FILE_ANY_ACCESS)
+	// ioctlDiskPerformance :control code - https://docs.microsoft.com/en-us/windows/desktop/api/winioctl/ni-winioctl-ioctl_disk_performance
+	ioctlDiskPerformance        = getCtlCode(fileDeviceDisk, 0x0008, 0, fileAnyAccess)
 	modkernel32                 = syscall.NewLazyDLL("kernel32.dll")
 	procGetLogicalDriveStringsW = modkernel32.NewProc("GetLogicalDriveStringsW")
 )
@@ -65,7 +64,7 @@ func getCtlCode(deviceType uint32, function uint32, method uint32, access uint32
 	return (deviceType << 16) | (access << 14) | (function << 2) | method
 }
 
-// the function gets the diskio counters and maps them to the list of counterstat objects
+// IOCounters gets the diskio counters and maps them to the list of counterstat objects
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	ret := make(map[string]disk.IOCountersStat, 0)
 	logicalDisks, err := getLogicalDriveStrings()
@@ -98,7 +97,7 @@ func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	return ret, nil
 }
 
-// the method calls syscal func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics
+// iOCounter calls syscal func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics
 func iOCounter(path string) (diskPerformance, error) {
 	var diskPerformance diskPerformance
 	var diskPerformanceSize uint32
@@ -120,7 +119,7 @@ func iOCounter(path string) (diskPerformance, error) {
 	defer syscall.CloseHandle(hFile)
 
 	err = syscall.DeviceIoControl(hFile,
-		IoctlDiskPerformance,
+		ioctlDiskPerformance,
 		nil,
 		0,
 		(*byte)(unsafe.Pointer(&diskPerformance)),
@@ -133,13 +132,13 @@ func iOCounter(path string) (diskPerformance, error) {
 	return diskPerformance, nil
 }
 
-// method calls the syscall GetLogicalDriveStrings in order to get the list of logical drives
+// getLogicalDriveStrings calls the syscall GetLogicalDriveStrings in order to get the list of logical drives
 func getLogicalDriveStrings() ([]logicalDrive, error) {
 	lpBuffer := make([]byte, 254)
 	logicalDrives := make([]logicalDrive, 0)
 	r1, _, e1 := syscall.Syscall(procGetLogicalDriveStringsW.Addr(), 2, uintptr(len(lpBuffer)), uintptr(unsafe.Pointer(&lpBuffer[0])), 0)
 	if r1 == 0 {
-		if e1 != ERROR_SUCCESS {
+		if e1 != errorSuccess {
 			return nil, e1
 		} else {
 			return nil, syscall.EINVAL
@@ -153,7 +152,7 @@ func getLogicalDriveStrings() ([]logicalDrive, error) {
 				continue
 			}
 
-			drive := LogicalDrive{path, "\\\\.\\" + path}
+			drive := logicalDrive{path, "\\\\.\\" + path}
 			logicalDrives = append(logicalDrives, drive)
 		}
 	}
