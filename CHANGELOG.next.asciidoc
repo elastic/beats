@@ -116,7 +116,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
 - Add s3_daily_storage metricset. {pull}10940[10940] {issue}10055[10055]
 - Add `coredns` metricbeat module. {pull}10585[10585]
-- Add SSL support for metricbeat HTTP server {pull}11482[11482] {issue}11457[11457]
+- Add SSL support for Metricbeat HTTP server. {pull}11482[11482] {issue}11457[11457]
 - The `elasticsearch.index` metricset (with `xpack.enabled: true`) now collects `refresh.external_total_time_in_millis` fields from Elasticsearch. {pull}11616[11616]
 
 *Packetbeat*
