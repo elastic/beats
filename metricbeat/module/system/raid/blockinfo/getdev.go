@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/pkg/errors"
 )
 
@@ -55,7 +56,7 @@ type DiskStates struct {
 	Total  int
 	Failed int
 	Spare  int
-	States []string
+	States common.MapStr
 }
 
 //ListAllMDDevices returns a list of all multidisk devices under the sysfs root
@@ -102,6 +103,7 @@ func GetMDDevice(path string) (MDDevice, error) {
 //see https://www.kernel.org/doc/html/v4.15/admin-guide/md.html#md-devices-in-sysfs
 func (dev MDDevice) ReduceDisks() DiskStates {
 	var disks DiskStates
+	disks.States = common.MapStr{}
 	for _, disk := range dev.Devices {
 		switch disk.State {
 		case "faulty", "blocked", "write_error", "want_replacement":
@@ -111,7 +113,13 @@ func (dev MDDevice) ReduceDisks() DiskStates {
 		case "spare":
 			disks.Spare++
 		}
-		disks.States = append(disks.States, disk.State)
+
+		if _, ok := disks.States[disk.State]; !ok {
+			disks.States[disk.State] = 1
+		} else {
+			disks.States[disk.State] = disks.States[disk.State].(int) + 1
+		}
+
 		disks.Total++
 	}
 

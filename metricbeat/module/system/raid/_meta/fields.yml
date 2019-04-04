@@ -32,10 +32,11 @@
       type: long
       description: >
          Number of failed disks.
-    - name: disks.states
-      type: keyword
+    - name: disks.states.*
+      type: object
+      object_type: keyword
       description: >
-         Array of raw disk states
+         map of raw disk states
     - name: blocks.total
       type: long
       description: >

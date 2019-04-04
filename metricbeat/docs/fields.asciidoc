@@ -25625,12 +25625,12 @@ Number of failed disks.
 
 --
 
-*`system.raid.disks.states`*::
+*`system.raid.disks.states.*`*::
 +
 --
-type: keyword
+type: object
 
-Array of raw disk states
+map of raw disk states
 
 
 --
