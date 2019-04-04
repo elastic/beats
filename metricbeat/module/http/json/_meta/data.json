@@ -1,18 +1,18 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
-    "http": {
-        "json": {
-            "hello": "world"
-        }
+    "event": {
+        "dataset": "testnamespace",
+        "duration": 115000,
+        "module": "http"
     },
     "metricset": {
-        "host": "127.0.0.1:8080",
-        "module": "http",
-        "name": "json",
-        "rtt": 115
+        "name": "json"
+    },
+    "service": {
+        "address": "172.26.0.2:8080",
+        "type": "http"
+    },
+    "testnamespace": {
+        "hello": "world"
     }
 }

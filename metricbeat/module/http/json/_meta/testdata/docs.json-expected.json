@@ -1,0 +1,19 @@
+[
+    {
+        "event": {
+            "dataset": "test",
+            "duration": 115000,
+            "module": "http"
+        },
+        "metricset": {
+            "name": "json"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "http"
+        },
+        "test": {
+            "hello": "world"
+        }
+    }
+]

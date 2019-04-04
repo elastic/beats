@@ -33,10 +33,10 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        assert evt["http"]["test"]["hello"] == "world"
+        assert evt["http"]["json"]["hello"] == "world"
+        assert evt["http"]["namespace"] == "test"
 
-        # Delete dynamic namespace part for fields comparison
-        del evt["http"]["test"]
+        del evt["http"]["test"]["hello"]
 
         self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
 
