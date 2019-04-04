@@ -73,6 +73,24 @@ NOTE: Filtering out a huge number of logs can cause many registry updates, slowi
 down processing. Setting `registry.flush` to a value >0s reduces write operations,
 helping Filebeat process more events.
 
+[float]
+==== `registry.migrate_file`
+
+Prior to Filebeat 7.0 the registry is stored in a single file. When you upgrade
+to 7.0, Filebeat will automatically migrate the old Filebeat 6.x registry file
+to use the new directory format. Filebeat looks for the file in the location
+specified by `filebeat.registry.path`. If you changed the path while upgrading,
+set `filebeat.registry.migrate_file` to point to the old registry file.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.registry.path: ${path.data}/registry
+filebeat.registry.migrate_file: /path/to/old/registry_file
+-------------------------------------------------------------------------------------
+
+The registry will be migrated to the new location only if a registry using the
+directory format does not already exist.
+
 
 [float]
 ==== `config_dir`

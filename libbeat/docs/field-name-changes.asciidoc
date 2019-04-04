@@ -116,7 +116,6 @@
 |`docker.container.image`            |`container.image.name`
 |`docker.container.labels`            |`container.labels`
 |`docker.container.name`            |`container.name`
-|`elasticsearch.audit.event_type`            |`event.type`
 |`elasticsearch.audit.origin_address`            |`source.ip`
 |`elasticsearch.audit.principal`            |`user.name`
 |`elasticsearch.audit.request_body`            |`http.request.body.content`
@@ -293,7 +292,9 @@
 |`suricata.eve.src_port`            |`source.port`
 |`suricata.eve.timestamp`            |`@timestamp`
 |`system.auth.groupadd.gid`            |`group.id`
+|`system.auth.groupadd.name`            |`group.name`
 |`system.auth.hostname`            |`host.hostname`
+|`system.auth.message`            |`message`
 |`system.auth.pid`            |`process.pid`
 |`system.auth.program`            |`process.name`
 |`system.auth.ssh.geoip.city_name`            |`source.geo.city_name`
@@ -304,8 +305,11 @@
 |`system.auth.ssh.geoip.region_name`            |`source.geo.region_name`
 |`system.auth.ssh.ip`            |`source.ip`
 |`system.auth.ssh.port`            |`source.port`
+|`system.auth.timestamp`            |`@timestamp`
+|`system.auth.user`            |`user.name`
+|`system.auth.useradd.gid`            |`group.id`
+|`system.auth.useradd.name`            |`user.name`
 |`system.auth.useradd.uid`            |`user.id`
-|`system.auth.useradd.user`            |`user.name`
 |`system.syslog.hostname`            |`host.hostname`
 |`system.syslog.message`            |`message`
 |`system.syslog.pid`            |`process.pid`

@@ -6,8 +6,7 @@
 == Coredns Module
 
 This is a filebeat module for coredns. It supports both standalone coredns deployment and 
-coredns deployment in Kubernetes. Standalone coredns deployment uses the log fileset, while
-Kubernetes coredns deployment uses the kubernetes fileset.
+coredns deployment in Kubernetes. 
 
 [float]
 === Compatibility
