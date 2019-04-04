@@ -13,7 +13,7 @@ metricbeat.autodiscover:
           config:
             - module: prometheus
               metricsets: ["collector"]
-              hosts: "${data.host}:{data.port}"
+              hosts: "${data.host}:${data.port}"
 -------------------------------------------------------------------------------------
 
 This configuration launches a `prometheus` module for all containers of pods annotated `prometheus.io.scrape=true`.
