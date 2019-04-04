@@ -30,6 +30,9 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...master[Check the HEAD diff
 
 *Affecting all Beats*
 
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+
 *Auditbeat*
 
 *Filebeat*
