@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin,cgo freebsd windows
+// +build darwin,cgo freebsd
 
 package diskio
 
@@ -41,4 +41,10 @@ func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetr
 
 func (stat *DiskIOStat) CloseSampling() {
 	return
+}
+
+// IOCounters should map functionality to disk package for linux os
+func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
+	stats, err := disk.IOCounters(names...)
+	return stats, err
 }
