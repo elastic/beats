@@ -51,12 +51,14 @@ const (
 var (
 	// Use `go test -generate` to update files.
 	generateFlag = flag.Bool("generate", false, "Write golden files")
+	moduleFlag   = flag.String("module", "", "Write golden files")
 )
 
 type Config struct {
-	Type   string
-	URL    string
-	Suffix string
+	Type         string
+	URL          string
+	Suffix       string
+	ModuleConfig map[string]interface{} `yaml:"module_config"`
 }
 
 func TestAll(t *testing.T) {
@@ -83,13 +85,13 @@ func TestAll(t *testing.T) {
 			config.Suffix = "json"
 		}
 
-		getTestdataFiles(t, config.URL, moduleName, metricSetName, config.Suffix)
+		getTestdataFiles(t, moduleName, metricSetName, config)
 	}
 }
 
-func getTestdataFiles(t *testing.T, url, module, metricSet, suffix string) {
+func getTestdataFiles(t *testing.T, module, metricSet string, config Config) {
 
-	ff, err := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + suffix)
+	ff, err := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + config.Suffix)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,28 +107,35 @@ func getTestdataFiles(t *testing.T, url, module, metricSet, suffix string) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			runTest(t, f, module, metricSet, url, suffix)
+			if *moduleFlag != "" {
+				if *moduleFlag == module {
+					runTest(t, f, module, metricSet, config)
+				}
+			} else {
+				runTest(t, f, module, metricSet, config)
+			}
 		})
 	}
 }
 
-func runTest(t *testing.T, file string, module, metricSetName, url, suffix string) {
+func runTest(t *testing.T, file string, module, metricSetName string, config Config) {
 
 	// starts a server serving the given file under the given url
-	s := server(t, file, url)
+	s := server(t, file, config.URL)
 	defer s.Close()
 
-	metricSet := mbtesting.NewMetricSet(t, getConfig(module, metricSetName, s.URL))
+	moduleConfig := getConfig(module, metricSetName, s.URL, config)
+	metricSet := mbtesting.NewMetricSet(t, moduleConfig)
 
 	var events []mb.Event
 	var errs []error
 
 	switch v := metricSet.(type) {
 	case mb.ReportingMetricSetV2:
-		metricSet := mbtesting.NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
+		metricSet := mbtesting.NewReportingMetricSetV2(t, moduleConfig)
 		events, errs = mbtesting.ReportingFetchV2(metricSet)
 	case mb.ReportingMetricSetV2Error:
-		metricSet := mbtesting.NewReportingMetricSetV2Error(t, getConfig(module, metricSetName, s.URL))
+		metricSet := mbtesting.NewReportingMetricSetV2Error(t, moduleConfig)
 		events, errs = mbtesting.ReportingFetchV2Error(metricSet)
 	default:
 		t.Fatalf("unknown type: %T", v)
@@ -176,7 +185,7 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 
 	assert.Equal(t, string(expected), string(output))
 
-	if strings.HasSuffix(file, "docs."+suffix) {
+	if strings.HasSuffix(file, "docs."+config.Suffix) {
 		writeDataJSON(t, data[0], module, metricSetName)
 	}
 }
@@ -201,6 +210,7 @@ func checkDocumented(t *testing.T, data []common.MapStr) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	documentedFields := fields.GetKeys()
 	keys := map[string]interface{}{}
 
@@ -226,12 +236,18 @@ func checkDocumented(t *testing.T, data []common.MapStr) {
 }
 
 // GetConfig returns config for elasticsearch module
-func getConfig(module, metricSet, url string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(module, metricSet, url string, config Config) map[string]interface{} {
+	moduleConfig := map[string]interface{}{
 		"module":     module,
 		"metricsets": []string{metricSet},
 		"hosts":      []string{url},
 	}
+
+	for k, v := range config.ModuleConfig {
+		moduleConfig[k] = v
+	}
+
+	return moduleConfig
 }
 
 // server starts a server with a mock output
