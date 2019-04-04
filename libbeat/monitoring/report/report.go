@@ -23,7 +23,35 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
+
+// Enumerations of various Formats. A reporter can choose whether to
+// interpret this setting or not, and if so, how to interpret it.
+const (
+	FormatUnknown Format = iota // to protect against zero-value errors
+	FormatXPackMonitoringBulk
+	FormatBulk
+)
+
+var (
+	defaultConfig = config{}
+
+	reportFactories = map[string]ReporterFactory{}
+
+	errMonitoringBothConfigEnabled = errors.New("both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.elasticsearch.hosts to monitoring cluster hosts")
+	warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.elasticsearch.hosts to monitoring cluster hosts"
+)
+
+// Format encodes the type of format to report monitoring data in. This
+// is currently only being used by the elasticsearch reporter.
+// This is a hack that is necessary so we can map certain monitoring
+// configuration options to certain behaviors in reporters. Depending on
+// the configuration option used, the correct format is set, and reporters
+// that know how to interpret the format use it to choose the appropriate
+// reporting behavior.
+type Format int
 
 type config struct {
 	// allow for maximum one reporter being configured
@@ -33,6 +61,7 @@ type config struct {
 // Settings is a collection of options defining reporter
 type Settings struct {
 	DefaultUsername string
+	Format          Format
 }
 
 // Reporter gives ability to start,stop and identify a reporter
@@ -45,11 +74,23 @@ type Reporter interface {
 // ReporterFactory is a factory function returning specific Reporter
 type ReporterFactory func(beat.Info, Settings, *common.Config) (Reporter, error)
 
-var (
-	defaultConfig = config{}
-
-	reportFactories = map[string]ReporterFactory{}
-)
+// SelectConfig selects the appropriate monitoring configuration based on the user's settings in $BEAT.yml. Users may either
+// use xpack.monitoring.* settings OR monitoring.* settings but not both.
+func SelectConfig(beatCfg monitoring.BeatConfig) (*common.Config, *Settings, error) {
+	switch {
+	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
+		return nil, nil, errMonitoringBothConfigEnabled
+	case beatCfg.XPackMonitoring.Enabled():
+		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
+		monitoringCfg := beatCfg.XPackMonitoring
+		return monitoringCfg, &Settings{Format: FormatXPackMonitoringBulk}, nil
+	case beatCfg.Monitoring.Enabled():
+		monitoringCfg := beatCfg.Monitoring
+		return monitoringCfg, &Settings{Format: FormatBulk}, nil
+	default:
+		return nil, nil, nil
+	}
+}
 
 // RegisterReporterFactory registers a factory for a specific reporter type
 func RegisterReporterFactory(name string, f ReporterFactory) {
@@ -66,7 +107,7 @@ func New(
 	cfg *common.Config,
 	outputs common.ConfigNamespace,
 ) (Reporter, error) {
-	name, cfg, err := getReporterConfig(cfg, outputs)
+	name, cfg, err := getReporterConfig(cfg, settings, outputs)
 	if err != nil {
 		return nil, err
 	}
@@ -80,10 +121,11 @@ func New(
 }
 
 func getReporterConfig(
-	cfg *common.Config,
+	monitoringConfig *common.Config,
+	settings Settings,
 	outputs common.ConfigNamespace,
 ) (string, *common.Config, error) {
-	cfg = collectSubObject(cfg)
+	cfg := collectSubObject(monitoringConfig)
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return "", nil, err
@@ -103,7 +145,7 @@ func getReporterConfig(
 			}{}
 			rc.Unpack(&hosts)
 
-			if len(hosts.Hosts) > 0 {
+			if settings.Format == FormatXPackMonitoringBulk && len(hosts.Hosts) > 0 {
 				pathMonHosts := rc.PathOf("hosts")
 				pathOutHost := outCfg.PathOf("hosts")
 				err := fmt.Errorf("'%v' and '%v' are configured", pathMonHosts, pathOutHost)

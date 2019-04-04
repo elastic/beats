@@ -17,7 +17,17 @@
 
 package monitoring
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/elastic/beats/libbeat/common"
+)
+
+// BeatConfig represents the part of the $BEAT.yml to do with monitoring settings
+type BeatConfig struct {
+	XPackMonitoring *common.Config `config:"xpack.monitoring"`
+	Monitoring      *common.Config `config:"monitoring"`
+}
 
 type Mode uint8
 
