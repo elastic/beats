@@ -21,9 +21,10 @@
 package diskio
 
 import (
+	"testing"
+
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {

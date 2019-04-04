@@ -32,7 +32,7 @@ func Get_CLK_TCK() uint32 {
 	return uint32(100)
 }
 
-//created IOCounters to map functionality to dick package for linux os
+// function should map functionality to disk package for linux os
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	stats, err := disk.IOCounters(names...)
 	return stats, err
