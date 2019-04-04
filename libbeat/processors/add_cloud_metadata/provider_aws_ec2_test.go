@@ -118,6 +118,14 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 			},
 			common.MapStr{
 				"cloud.provider": "ec2",
+			},
+		},
+		{
+			common.MapStr{
+				"provider": "ec2",
+			},
+			common.MapStr{
+				"provider": "ec2",
 				"cloud": common.MapStr{
 					"provider": "ec2",
 					"instance": common.MapStr{
