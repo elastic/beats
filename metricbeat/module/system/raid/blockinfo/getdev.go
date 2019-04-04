@@ -23,8 +23,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 //SyncStatus represents the status of a sync action as Complete/Total. Will be 0/0 if no sync action is going on
