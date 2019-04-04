@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
 	"github.com/pkg/errors"
 )
 
@@ -59,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	stats, err := GetIOCounters()
+	stats, err := IOCounters(m.includeDevices...)
 	if err != nil {
 		r.Error(errors.Wrap(err, "disk io counters"))
 		return
