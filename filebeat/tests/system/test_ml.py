@@ -40,6 +40,7 @@ class Test(BaseTest):
     @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     @unittest.skipIf(os.name == "nt", "skipped on Windows")
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/11629")
     def test_ml_setup(self, modules_flag):
         """ Test ML are installed in all possible ways """
         self._run_ml_test(modules_flag)

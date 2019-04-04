@@ -35,7 +35,9 @@ class Test(BaseTest):
             }
         )
 
-        self.clean()
+        self.clean_output_cluster()
+        self.clean_monitoring_cluster()
+        self.init_output_cluster()
 
         proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -45,18 +47,126 @@ class Test(BaseTest):
         self.wait_until(lambda: self.monitoring_doc_exists('beats_stats'))
         self.wait_until(lambda: self.monitoring_doc_exists('beats_state'))
 
+        proc.check_kill_and_wait()
+
         for monitoring_doc_type in ['beats_stats', 'beats_state']:
             field_names = ['cluster_uuid', 'timestamp', 'interval_ms', 'type', 'source_node', monitoring_doc_type]
             self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
 
-    def monitoring_doc_exists(self, monitoring_type):
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_direct_to_monitoring_cluster(self):
+        """
+        Test shipping monitoring data directly to the monitoring cluster.
+        Make sure expected documents are indexed in monitoring cluster.
+        """
+
+        self.render_config_template(
+            "mockbeat",
+            monitoring={
+                "elasticsearch": {
+                    "hosts": [self.get_elasticsearch_monitoring_url()]
+                }
+            }
+        )
+
+        self.clean_output_cluster()
+        self.clean_monitoring_cluster()
+
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
+        self.wait_until(lambda: self.log_contains(re.compile(
+            "Connection to .*elasticsearch\("+self.get_elasticsearch_monitoring_url()+"\).* established")))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_stats'))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_state'))
+
+        proc.check_kill_and_wait()
+
+        for monitoring_doc_type in ['beats_stats', 'beats_state']:
+            field_names = ['cluster_uuid', 'timestamp', 'interval_ms', 'type', monitoring_doc_type]
+            self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_compare(self):
+        """
+        Test that monitoring docs are the same, regardless of how they are shipped.
+        """
+
+        self.render_config_template(
+            "mockbeat",
+            xpack={
+                "monitoring": {
+                    "elasticsearch": {
+                        "hosts": [self.get_elasticsearch_url()]
+                    }
+                }
+            }
+        )
+
+        self.clean_output_cluster()
+        self.clean_monitoring_cluster()
+        self.init_output_cluster()
+
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
+        self.wait_until(lambda: self.log_contains(re.compile(
+            "Connection to .*elasticsearch\("+self.get_elasticsearch_url()+"\).* established")))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_stats'))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_state'))
+
+        proc.check_kill_and_wait()
+
+        indirect_beats_stats_doc = self.get_monitoring_doc('beats_stats')
+        indirect_beats_state_doc = self.get_monitoring_doc('beats_state')
+
+        self.render_config_template(
+            "mockbeat",
+            monitoring={
+                "elasticsearch": {
+                    "hosts": [self.get_elasticsearch_monitoring_url()]
+                }
+            }
+        )
+
+        self.clean_output_cluster()
+        self.clean_monitoring_cluster()
+
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
+        self.wait_until(lambda: self.log_contains(re.compile(
+            "Connection to .*elasticsearch\("+self.get_elasticsearch_monitoring_url()+"\).* established")))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_stats'))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_state'))
+
+        proc.check_kill_and_wait()
+
+        direct_beats_stats_doc = self.get_monitoring_doc('beats_stats')
+        direct_beats_state_doc = self.get_monitoring_doc('beats_state')
+
+        self.assert_same_structure(indirect_beats_state_doc['beats_state'], direct_beats_state_doc['beats_state'])
+        self.assert_same_structure(indirect_beats_stats_doc['beats_stats'], direct_beats_stats_doc['beats_stats'])
+
+    def search_monitoring_doc(self, monitoring_type):
         results = self.es_monitoring.search(
             index='.monitoring-beats-*',
             q='type:'+monitoring_type,
             size=1
         )
-        hits = results['hits']['hits']
+        return results['hits']['hits']
+
+    def monitoring_doc_exists(self, monitoring_type):
+        hits = self.search_monitoring_doc(monitoring_type)
         return len(hits) == 1
+
+    def get_monitoring_doc(self, monitoring_type):
+        hits = self.search_monitoring_doc(monitoring_type)
+        if len(hits) != 1:
+            return None
+        return hits[0]['_source']
 
     def assert_monitoring_doc_contains_fields(self, monitoring_type, field_names):
         results = self.es_monitoring.search(
@@ -68,9 +178,40 @@ class Test(BaseTest):
         source = hits[0]['_source']
 
         for field_name in field_names:
-            assert field_name in source
+            self.assertIn(field_name, source)
 
-    def clean(self):
+    def assert_same_structure(self, dict1, dict2):
+        dict1_keys = dict1.keys()
+        dict2_keys = dict2.keys()
+
+        self.assertEqual(len(dict1_keys), len(dict2_keys))
+        for key in dict1_keys:
+            dict1_val = dict1[key]
+            dict2_val = dict2[key]
+            self.assertEqual(type(dict1_val), type(dict2_val))
+            if type(dict1_val) is dict:
+                self.assert_same_structure(dict1_val, dict2_val)
+
+    def clean_output_cluster(self):
+        # Remove all exporters
+        self.es.cluster.put_settings(body={
+            "transient": {
+                "xpack.monitoring.exporters.*": None
+            }
+        })
+
+        # Disable collection
+        self.es.cluster.put_settings(body={
+            "transient": {
+                "xpack.monitoring.collection.enabled": None
+            }
+        })
+
+    def clean_monitoring_cluster(self):
+        # Delete any old beats monitoring data
+        self.es_monitoring.indices.delete(index=".monitoring-beats-*", ignore=[404])
+
+    def init_output_cluster(self):
         # Setup remote exporter
         self.es.cluster.put_settings(body={
             "transient": {
@@ -87,9 +228,6 @@ class Test(BaseTest):
                 "xpack.monitoring.collection.enabled": True
             }
         })
-
-        # Delete any old beats monitoring data
-        self.es_monitoring.indices.delete(index=".monitoring-beats-*", ignore=[404])
 
     def get_elasticsearch_monitoring_url(self):
         return "http://{host}:{port}".format(
