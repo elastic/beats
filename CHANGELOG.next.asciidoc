@@ -45,7 +45,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Report faulting file when config reload fails. {pull}[11304]11304
 - Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
 - Management configuration backup file will now have a timestamps in their name. {pull}11034[11034]
-- Relax License UUID validation. {issue}11640[11640]
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32bits system. {issue}11650[11650]
 
 *Auditbeat*
 

@@ -76,7 +76,7 @@ func (et *expiryTime) UnmarshalJSON(b []byte) error {
 		return fmt.Errorf("invalid value for expiry time, received: '%s'", string(b))
 	}
 
-	ts, err := strconv.Atoi(string(b))
+	ts, err := strconv.ParseInt(string(b), 0, 64)
 	if err != nil {
 		return errors.Wrap(err, "could not parse value for expiry time")
 	}
