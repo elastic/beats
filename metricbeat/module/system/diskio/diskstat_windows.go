@@ -24,26 +24,30 @@ import (
 	"github.com/shirou/gopsutil/disk"
 )
 
+// NewDiskIOStat :init DiskIOStat object
 func NewDiskIOStat() *DiskIOStat {
 	d := &DiskIOStat{}
 	d.lastDiskIOCounters = make(map[string]disk.IOCountersStat)
 	return d
 }
 
+// OpenSampling stub for linux implementation
 func (stat *DiskIOStat) OpenSampling() error {
 	return nil
 }
 
+// CalIOStatistics stub for linux implementation
 func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetric, error) {
 	var result DiskIOMetric
 	return result, errors.New("Not implemented out of linux")
 }
 
+// CloseSampling stub for linux implementation
 func (stat *DiskIOStat) CloseSampling() {
 	return
 }
 
-// function should map functionality to disk package for linux os
+// IOCounters should map functionality to disk package for linux os
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	stats, err := iOCounters(names...)
 	return stats, err
