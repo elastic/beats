@@ -48,6 +48,5 @@ func TestAllDrivesOnWindowsTestEnv(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2(t, conf)
 	data, errs := mbtest.ReportingFetchV2(f)
 	assert.Empty(t, errs)
-	assert.True(t, len(data)>= 1)
+	assert.True(t, len(data) >= 1)
 }
-
