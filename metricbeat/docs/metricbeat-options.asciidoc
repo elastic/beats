@@ -114,7 +114,7 @@ metricbeat.modules:
 ----
 
 [float]
-[[config-combos]]
+[[config-variants]]
 == Configuration variants
 
 Every module come with a default configuration file. Some modules also come with
