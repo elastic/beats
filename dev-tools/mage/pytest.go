@@ -162,10 +162,17 @@ func PythonVirtualenv() (string, error) {
 		return pythonVirtualenvDir, nil
 	}
 
+	// If set use PYTHON_EXE env var as the python interpreter.
+	var args []string
+	if pythonExe := os.Getenv("PYTHON_EXE"); pythonExe != "" {
+		args = append(args, "-p", pythonExe)
+	}
+	args = append(args, ve)
+
 	// Execute virtualenv.
 	if _, err := os.Stat(ve); err != nil {
 		// Run virtualenv if the dir does not exist.
-		if err := sh.Run("virtualenv", ve); err != nil {
+		if err := sh.Run("virtualenv", args...); err != nil {
 			return "", err
 		}
 	}
@@ -176,7 +183,7 @@ func PythonVirtualenv() (string, error) {
 	}
 
 	pip := virtualenvPath(ve, "pip")
-	args := []string{"install"}
+	args = []string{"install"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
 	}
