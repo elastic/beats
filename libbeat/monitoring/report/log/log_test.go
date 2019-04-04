@@ -55,6 +55,7 @@ var (
 // Smoke test.
 func TestStartStop(t *testing.T) {
 	r, err := MakeReporter(beat.Info{}, common.NewConfig())
+	r.Start()
 	if err != nil {
 		t.Fatal(err)
 	}
