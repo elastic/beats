@@ -52,7 +52,7 @@ type Base struct {
 	Available bool `json:"available"`
 }
 
-// Defines all the avaiables features
+// Defines all the available features
 type graph struct{ *Base }
 type logstash struct{ *Base }
 type ml struct{ *Base }
