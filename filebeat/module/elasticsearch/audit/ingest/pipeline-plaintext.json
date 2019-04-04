@@ -8,7 +8,7 @@
                     "ES_TIMESTAMP": "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.@timestamp}\\]",
                     "ES_NODE_NAME": "(\\[%{DATA:elasticsearch.node.name}\\])?",
                     "ES_AUDIT_LAYER": "\\[%{WORD:elasticsearch.audit.layer}\\]",
-                    "ES_AUDIT_EVENT_TYPE": "\\[%{WORD:event.type}\\]",
+                    "ES_AUDIT_EVENT_TYPE": "\\[%{WORD:elasticsearch.audit.event_type}\\]",
                     "ES_AUDIT_ORIGIN_TYPE": "(origin_type\\=\\[%{WORD:elasticsearch.audit.origin.type}\\])?",
                     "ES_AUDIT_ORIGIN_ADDRESS": "(origin_address\\=\\[%{IPORHOST:source.ip}\\])?",
                     "ES_AUDIT_PRINCIPAL": "(principal\\=\\[%{DATA:user.name}\\])?",

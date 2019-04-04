@@ -21,15 +21,15 @@ package ecs
 
 // An observer is defined as a special network, security, or application device
 // used to detect, observe, or create network, security, or application-related
-// events and metrics. This could be a custom hardware appliance or a server
-// that has been configured to run special network, security, or application
-// software. Examples include firewalls, intrusion detection/prevention
-// systems, network monitoring sensors, web application firewalls, data loss
-// prevention systems, and APM servers. The observer.* fields shall be
-// populated with details of the system, if any, that detects, observes and/or
-// creates a network, security, or application event or metric. Message queues
-// and ETL components used in processing events or metrics are not considered
-// observers in ECS.
+// events and metrics.
+// This could be a custom hardware appliance or a server that has been
+// configured to run special network, security, or application software.
+// Examples include firewalls, intrusion detection/prevention systems, network
+// monitoring sensors, web application firewalls, data loss prevention systems,
+// and APM servers. The observer.* fields shall be populated with details of
+// the system, if any, that detects, observes and/or creates a network,
+// security, or application event or metric. Message queues and ETL components
+// used in processing events or metrics are not considered observers in ECS.
 type Observer struct {
 	// MAC address of the observer
 	MAC string `ecs:"mac"`

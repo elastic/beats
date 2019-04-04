@@ -8,4 +8,12 @@ Some specific AWS permissions are required for IAM user to collect AWS SQS metri
 ----
 cloudwatch:GetMetricData
 ec2:DescribeRegions
+sqs:ListQueues
 ----
+
+[float]
+=== Dashboard
+
+The aws sqs metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-sqs-overview.png[]

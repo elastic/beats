@@ -246,6 +246,42 @@ winlogbeat.event_logs:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+# The following example copies the value of message to message_copied
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: message_copied
+#    fail_on_error: true
+#    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
 
 #============================= Elastic Cloud ==================================
 
@@ -1183,5 +1219,5 @@ logging.files:
 
 #================================= Migration ==================================
 
-# This allows to enable migration aliases
-#migration.enabled: false
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: false

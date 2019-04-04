@@ -9,11 +9,6 @@
       type: group
       description: >
       fields:
-        - name: node.name
-          type: keyword
-          description: >
-            Node name
-
         - name: vhost
           type: keyword
           description: >

@@ -430,7 +430,7 @@ func TestSelf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := newProcessMetadataProcessor(config)
+	proc, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -463,7 +463,7 @@ func TestBadProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := newProcessMetadataProcessor(config)
+	proc, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}

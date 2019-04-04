@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/docker/docker/api/types"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -41,7 +42,7 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
 
 	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
-		logger.Error("Error inspecting container %v: %v", cont.ID, err)
+		errors.Wrapf(err, "Error inspecting container %v", cont.ID)
 		return
 	}
 

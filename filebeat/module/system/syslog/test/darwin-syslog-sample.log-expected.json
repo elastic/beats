@@ -1,6 +1,6 @@
 [
     {
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "fileset.name": "syslog",
@@ -16,7 +16,7 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "fileset.name": "syslog",
@@ -29,7 +29,7 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "fileset.name": "syslog",
