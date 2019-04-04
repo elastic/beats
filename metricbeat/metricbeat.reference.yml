@@ -953,6 +953,32 @@ metricbeat.modules:
 #          to: message_copied
 #    fail_on_error: true
 #    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
 
 #============================= Elastic Cloud ==================================
 
