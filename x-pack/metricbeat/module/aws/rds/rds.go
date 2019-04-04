@@ -14,7 +14,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -37,29 +36,26 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	logger *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(aws.ModuleName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
 	}
 
-	// Check if period is set to be multiple of 60s or 300s
+	// Check if period is set to be multiple of 60s
 	remainder := metricSet.PeriodInSec % 60
 	if remainder != 0 {
 		err := errors.New("Period needs to be set to 60s (or a multiple of 60s). To avoid data missing or " +
 			"extra costs, please make sure period is set correctly in config.yml")
-		logger.Info(err)
+		base.Logger().Info(err)
 	}
 
 	return &MetricSet{
 		MetricSet: metricSet,
-		logger:    logger,
 	}, nil
 }
 
@@ -70,7 +66,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		m.logger.Error(errors.Wrap(err, "Error ParseDuration"))
+		m.Logger().Error(errors.Wrap(err, "Error ParseDuration"))
 		report.Error(err)
 		return
 	}
@@ -84,7 +80,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		output, err := req.Send()
 		if err != nil {
 			err = errors.Wrap(err, "DescribeDBInstancesRequest failed, skipping region "+regionName)
-			m.logger.Errorf(err.Error())
+			m.Logger().Errorf(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -101,7 +97,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		namespace := "AWS/RDS"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -119,19 +115,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				metricDataOutput, err = aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 				if err != nil {
 					err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-					m.logger.Error(err.Error())
+					m.Logger().Error(err.Error())
 					report.Error(err)
 					continue
 				}
 			}
 			// Create Cloudwatch Events for RDS
-			event, info, err := createCloudWatchEvents(metricDataOutput, dbInstanceArn, regionName)
-			if info != "" {
-				m.logger.Info(info)
-			}
-
+			event, err := createCloudWatchEvents(metricDataOutput, dbInstanceArn, regionName)
 			if err != nil {
-				m.logger.Error(err.Error())
+				m.Logger().Error(err.Error())
 				report.Error(err)
 				continue
 			}
@@ -153,13 +145,13 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceArn string, periodInSec int) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceArn string, periodInSec int) cloudwatch.MetricDataQuery {
 	statistic := "Average"
 	period := int64(periodInSec)
 	id := "rds" + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 
-	metricDataQuery = cloudwatch.MetricDataQuery{
+	metricDataQuery := cloudwatch.MetricDataQuery{
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
 			Period: &period,
@@ -168,19 +160,24 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceArn st
 		},
 	}
 
-	label := dbInstanceArn
-	if len(metricDims) != 0 {
-		label += " " + *metric.MetricName
-		for _, dim := range metricDims {
+	label := constructLabel(metricDims, dbInstanceArn, *metric.MetricName)
+	metricDataQuery.Label = &label
+	return metricDataQuery
+}
+
+func constructLabel(metricDimensions []cloudwatch.Dimension, dbInstanceArn string, metricName string) string {
+	label := dbInstanceArn + " " + metricName
+	if len(metricDimensions) != 0 {
+		for _, dim := range metricDimensions {
 			label += " "
 			label += *dim.Name + " " + *dim.Value
 		}
-		metricDataQuery.Label = &label
 	}
-	return
+	return label
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, dbInstanceArn string, regionName string) (event mb.Event, info string, err error) {
+func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, dbInstanceArn string, regionName string) (mb.Event, error) {
+	event := mb.Event{}
 	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
 
@@ -215,9 +212,9 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS EC2 metricbeat module.")
-		return
+		return event, err
 	}
 
 	event.MetricSetFields = resultMetricSetFields
-	return
+	return event, err
 }
