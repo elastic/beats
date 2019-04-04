@@ -1,0 +1,5 @@
+- name: rds
+  type: group
+  description: >
+    `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
+  release: beta

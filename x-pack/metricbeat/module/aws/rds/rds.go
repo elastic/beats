@@ -87,6 +87,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		if len(output.DBInstances) == 0 {
 			continue
 		}
+
 		// get DBInstance ARN
 		dbInstanceArns := []string{}
 		for _, dbInstance := range output.DBInstances {
@@ -211,7 +212,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
 	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS EC2 metricbeat module.")
+		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS RDS metricbeat module.")
 		return event, err
 	}
 

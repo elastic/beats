@@ -1,0 +1,47 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "rds": {
+            "cpu.total.pct": 3,
+            "deadlocks": 0,
+            "free_local_storage": 33202503680,
+            "freeable_memory": 5022711808,
+            "latency.commit": 0,
+            "latency.ddl": 0,
+            "latency.dml": 0,
+            "latency.insert": 0,
+            "latency.select": 0.22732214765100672,
+            "latency.update": 0,
+            "login_failures": 0,
+            "queries": 6.036653492754349,
+            "throughput.commit": 0,
+            "throughput.delete": 0,
+            "throughput.dml": 0,
+            "throughput.insert": 0,
+            "throughput.network": 1.4,
+            "throughput.network_receive": 0.7,
+            "throughput.network_transmit": 0.7,
+            "throughput.select": 2.482174985006997,
+            "throughput.update": 0,
+            "transactions.active": 0,
+            "transactions.blocked": 0
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-east-2"
+    },
+    "db_instance_arn": "arn:aws:rds:us-east-2:627959692251:db:test1",
+    "event": {
+        "dataset": "aws.rds",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "rds"
+    },
+    "service": {
+        "name": "rds",
+        "type": "rds"
+    }
+}

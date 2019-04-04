@@ -48,3 +48,16 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("login_failures", "float", event, t)
 	}
 }
+
+func TestData(t *testing.T) {
+	config, info := mtest.GetConfigForTest("rds", "60s")
+	if info != "" {
+		t.Skip("Skipping TestData: " + info)
+	}
+
+	sqsMetricSet := mbtest.NewReportingMetricSetV2(t, config)
+	errs := mbtest.WriteEventsReporterV2(sqsMetricSet, t, "/")
+	if errs != nil {
+		t.Fatal("write", errs)
+	}
+}

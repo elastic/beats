@@ -119,3 +119,8 @@ This metricset gives users the freedom to query metrics from AWS Cloudwatch with
 any given namespaces or specific instance with a given period.
 Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html[AWS Services That Publish CloudWatch Metrics]
 for a list of AWS services that publish metrics to CloudWatch.
+
+[float]
+=== `rds`
+`period` for `rds` metricset is recommended to be `60s` or multiples of `60s` because Amazon RDS sends metrics and
+dimensions to Amazon CloudWatch every minute.
