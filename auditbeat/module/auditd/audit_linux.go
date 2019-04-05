@@ -467,12 +467,17 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		aucoalesce.ResolveIDs(auditEvent)
 	}
 
+	eventOutcome := auditEvent.Result
+	if eventOutcome == "fail" {
+		eventOutcome = "failure"
+	}
 	out := mb.Event{
 		Timestamp: auditEvent.Timestamp,
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"category": auditEvent.Category.String(),
 				"action":   auditEvent.Summary.Action,
+				"outcome":  eventOutcome,
 			},
 		},
 		ModuleFields: common.MapStr{
@@ -483,6 +488,9 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 			"data":         createAuditdData(auditEvent.Data),
 		},
 	}
+
+	// Customize event.type / event.category to match unified values.
+	normalizeEventFields(out.RootFields)
 
 	// Add root level fields.
 	addUser(auditEvent.User, out.RootFields)
@@ -531,6 +539,28 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	}
 
 	return out
+}
+
+func normalizeEventFields(m common.MapStr) {
+	getFieldAsStr := func(key string) (s string, found bool) {
+		iface, err := m.GetValue(key)
+		if err != nil {
+			return
+		}
+		s, found = iface.(string)
+		return
+	}
+
+	category, ok1 := getFieldAsStr("event.category")
+	action, ok2 := getFieldAsStr("event.action")
+	outcome, ok3 := getFieldAsStr("event.outcome")
+	if !ok1 || !ok2 || !ok3 {
+		return
+	}
+	if category == "user-login" && action == "logged-in" { // USER_LOGIN
+		m.Put("event.category", "authentication")
+		m.Put("event.type", fmt.Sprintf("authentication_%s", outcome))
+	}
 }
 
 func addUser(u aucoalesce.User, m common.MapStr) {
