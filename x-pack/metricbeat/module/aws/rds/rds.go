@@ -40,11 +40,12 @@ type MetricSet struct {
 	*aws.MetricSet
 }
 
+// DBDetails holds detailed information from DescribeDBInstances for each rds.
 type DBDetails struct {
-	db_class             string
-	db_availability_zone string
-	db_identifier        string
-	db_status            string
+	dbClass            string
+	dbAvailabilityZone string
+	dbIdentifier       string
+	dbStatus           string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -151,10 +152,10 @@ func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetail
 	for _, dbInstance := range output.DBInstances {
 		dbInstanceARNs = append(dbInstanceARNs, *dbInstance.DBInstanceArn)
 		dbDetails := DBDetails{
-			db_availability_zone: *dbInstance.AvailabilityZone,
-			db_class:             *dbInstance.DBInstanceClass,
-			db_identifier:        *dbInstance.DBInstanceIdentifier,
-			db_status:            *dbInstance.DBInstanceStatus,
+			dbAvailabilityZone: *dbInstance.AvailabilityZone,
+			dbClass:            *dbInstance.DBInstanceClass,
+			dbIdentifier:       *dbInstance.DBInstanceIdentifier,
+			dbStatus:           *dbInstance.DBInstanceStatus,
 		}
 		dbDetailsMap[*dbInstance.DBInstanceArn] = dbDetails
 	}
@@ -245,9 +246,9 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 
 	event.MetricSetFields = resultMetricSetFields
 	event.MetricSetFields.Put("db_instance.arn", dbInstanceARN)
-	event.RootFields.Put("cloud.availability_zone", dbDetailsMap[dbInstanceARN].db_availability_zone)
-	event.MetricSetFields.Put("db_instance.class", dbDetailsMap[dbInstanceARN].db_class)
-	event.MetricSetFields.Put("db_instance.identifier", dbDetailsMap[dbInstanceARN].db_identifier)
-	event.MetricSetFields.Put("db_instance.status", dbDetailsMap[dbInstanceARN].db_status)
+	event.RootFields.Put("cloud.availability_zone", dbDetailsMap[dbInstanceARN].dbAvailabilityZone)
+	event.MetricSetFields.Put("db_instance.class", dbDetailsMap[dbInstanceARN].dbClass)
+	event.MetricSetFields.Put("db_instance.identifier", dbDetailsMap[dbInstanceARN].dbIdentifier)
+	event.MetricSetFields.Put("db_instance.status", dbDetailsMap[dbInstanceARN].dbStatus)
 	return event, err
 }
