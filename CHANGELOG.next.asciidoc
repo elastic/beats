@@ -35,6 +35,8 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...master[Check the HEAD diff
 
 *Auditbeat*
 
+- Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+
 *Filebeat*
 
 - Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
