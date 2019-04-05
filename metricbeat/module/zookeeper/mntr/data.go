@@ -72,7 +72,7 @@ func eventMapping(response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
 		if match := paramMatcher.FindStringSubmatch(scanner.Text()); len(match) == 3 {
 			fullEvent[match[1]] = match[2]
 		} else {
-			logger.Warn("Unexpected line in mntr output: %s", scanner.Text())
+			logger.Infof("Unexpected line in mntr output: %s", scanner.Text())
 		}
 	}
 

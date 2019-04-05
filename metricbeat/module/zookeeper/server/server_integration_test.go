@@ -59,7 +59,6 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	//t.Skip("Skipping `data.json` generation test")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
