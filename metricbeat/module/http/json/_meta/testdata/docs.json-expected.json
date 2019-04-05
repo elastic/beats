@@ -1,9 +1,14 @@
 [
     {
         "event": {
-            "dataset": "test",
+            "dataset": "http.test",
             "duration": 115000,
             "module": "http"
+        },
+        "http": {
+            "test": {
+                "hello": "world"
+            }
         },
         "metricset": {
             "name": "json"
@@ -11,9 +16,6 @@
         "service": {
             "address": "127.0.0.1:55555",
             "type": "http"
-        },
-        "test": {
-            "hello": "world"
         }
     }
 ]

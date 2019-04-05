@@ -1,4 +1,6 @@
 type: http
 url: "/"
-module_config:
+module:
   namespace: test
+omit_documented_fields_check:
+  - "http.test.*"

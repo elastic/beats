@@ -121,7 +121,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-	defer func(){
+	defer func() {
 		if err := response.Body.Close(); err != nil {
 			m.Logger().Debug("error closing http body")
 		}
@@ -154,7 +154,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		event := m.processBody(response, jsonBody)
 
 		if reported := reporter.Event(event); !reported {
-			return errors.New("error reporting event")
+			return errors.Errorf("error reporting event: %#v", event)
 		}
 	}
 

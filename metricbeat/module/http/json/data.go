@@ -42,7 +42,7 @@ func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) m
 
 	return mb.Event{
 		MetricSetFields: event,
-		Namespace:       m.namespace,
+		Namespace:       "http." + m.namespace,
 	}
 }
 

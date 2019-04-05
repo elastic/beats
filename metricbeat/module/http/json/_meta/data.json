@@ -1,18 +1,20 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
-        "dataset": "testnamespace",
+        "dataset": "http.test",
         "duration": 115000,
         "module": "http"
+    },
+    "http": {
+        "test": {
+            "hello": "world"
+        }
     },
     "metricset": {
         "name": "json"
     },
     "service": {
-        "address": "172.26.0.2:8080",
+        "address": "127.0.0.1:55555",
         "type": "http"
-    },
-    "testnamespace": {
-        "hello": "world"
     }
 }
