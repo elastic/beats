@@ -87,7 +87,7 @@ func TestReadService(t *testing.T) {
 					assert.Equal(t, w.DisplayName, s["display_name"],
 						"Display name of service %v does not match", w.Name)
 				}
-				//Some services have changed state before the second retrieval
+				// Some services have changed state before the second retrieval.
 				if w.State != s["state"] {
 					changed := s
 					changed["initial_state"] = w.State
