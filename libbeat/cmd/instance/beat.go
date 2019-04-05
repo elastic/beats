@@ -776,7 +776,7 @@ func (b *Beat) registerESIndexManagement() error {
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-		return m.Setup(true, true)
+		return m.Setup(false, false)
 	}
 }
 
