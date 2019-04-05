@@ -137,18 +137,18 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 		}
 
 		metricSet, err := registration.Factory(bm)
-		if err == nil {
+		if err != nil {
+			errs = append(errs, err)
+		}
+
+		if metricSet != nil {
 			err = mustHaveModule(metricSet, bm)
 			if err == nil {
 				err = mustImplementFetcher(metricSet)
 			}
-		}
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
 
-		metricsets = append(metricsets, metricSet)
+			metricsets = append(metricsets, metricSet)
+		}
 	}
 
 	return metricsets, errs.Err()

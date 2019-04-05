@@ -216,7 +216,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	case darwin:
 		if _, err := os.Stat(homebrewCellarPath); err != nil {
-			return nil, errors.Wrapf(err, "error looking up %s - is Homebrew installed?", homebrewCellarPath)
+			ms.log.Errorf("Failed to start package dataset on macOS. Error looking up %s - is Homebrew installed? Error: %v",
+				homebrewCellarPath, err)
+			return nil, nil
 		}
 	default:
 		return nil, fmt.Errorf("this metricset does not support OS family %v", osInfo.Family)
