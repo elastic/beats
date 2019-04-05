@@ -51,14 +51,15 @@ const (
 var (
 	// Use `go test -generate` to update files.
 	generateFlag = flag.Bool("generate", false, "Write golden files")
-	moduleFlag   = flag.String("module", "", "Write golden files")
+	moduleFlag   = flag.String("module", "", "Choose a module to test")
 )
 
 type Config struct {
-	Type         string
-	URL          string
-	Suffix       string
-	ModuleConfig map[string]interface{} `yaml:"module_config"`
+	Type                      string
+	URL                       string
+	Suffix                    string
+	Module                    map[string]interface{} `yaml:"module"`
+	OmitDocumentedFieldsCheck []string               `yaml:"omit_documented_fields_check"`
 }
 
 func TestAll(t *testing.T) {
@@ -90,6 +91,11 @@ func TestAll(t *testing.T) {
 }
 
 func getTestdataFiles(t *testing.T, module, metricSet string, config Config) {
+	if *moduleFlag != "" {
+		if *moduleFlag != module {
+			return
+		}
+	}
 
 	ff, err := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + config.Suffix)
 	if err != nil {
@@ -107,13 +113,7 @@ func getTestdataFiles(t *testing.T, module, metricSet string, config Config) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			if *moduleFlag != "" {
-				if *moduleFlag == module {
-					runTest(t, f, module, metricSet, config)
-				}
-			} else {
-				runTest(t, f, module, metricSet, config)
-			}
+			runTest(t, f, module, metricSet, config)
 		})
 	}
 }
@@ -163,7 +163,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Con
 		return h1 < h2
 	})
 
-	checkDocumented(t, data)
+	checkDocumented(t, data, config.OmitDocumentedFieldsCheck)
 
 	output, err := json.MarshalIndent(&data, "", "    ")
 	if err != nil {
@@ -200,7 +200,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, module, metricSet string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(t *testing.T, data []common.MapStr) {
+func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
 		t.Fatal(err)
@@ -220,8 +220,14 @@ func checkDocumented(t *testing.T, data []common.MapStr) {
 
 	for _, d := range data {
 		flat := d.Flatten()
+	keys:
 		for k := range flat {
 			if _, ok := keys[k]; !ok {
+				for _, omitField := range omitFields {
+					if omitDocumentedField(k, omitField) {
+						continue keys
+					}
+				}
 				// If a field is defined as object it can also be defined as `status_codes.*`
 				// So this checks if such a key with the * exists by removing the last part.
 				splits := strings.Split(k, ".")
@@ -235,6 +241,23 @@ func checkDocumented(t *testing.T, data []common.MapStr) {
 	}
 }
 
+func omitDocumentedField(field, omitField string) bool {
+	if strings.Contains(omitField, "*") {
+		//Omit every key prefixed with chars before "*"
+		prefixedField := strings.Trim(omitField, ".*")
+		if strings.Contains(field, prefixedField) {
+			return true
+		}
+	} else {
+		//Omit only if key matches exactly
+		if field == omitField {
+			return true
+		}
+	}
+
+	return false
+}
+
 // GetConfig returns config for elasticsearch module
 func getConfig(module, metricSet, url string, config Config) map[string]interface{} {
 	moduleConfig := map[string]interface{}{
@@ -243,7 +266,7 @@ func getConfig(module, metricSet, url string, config Config) map[string]interfac
 		"hosts":      []string{url},
 	}
 
-	for k, v := range config.ModuleConfig {
+	for k, v := range config.Module {
 		moduleConfig[k] = v
 	}
 
