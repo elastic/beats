@@ -33,32 +33,31 @@ information, see
 {xpack-ref}/setting-up-authentication.html[Setting Up User Authentication] and
 {xpack-ref}/built-in-roles.html[Built-in Roles].
 
-. Add the `xpack.monitoring` settings in the {beatname_uc} configuration file. If you
-configured {es} output, specify the following minimal configuration:
+. Add the `monitoring` settings in the {beatname_uc} configuration file. If you
+configured the {es} output and want to send {beatname_uc} monitoring events to
+the same {es} cluster, specify the following minimal configuration:
 +
 --
 [source, yml]
 --------------------
-xpack.monitoring.enabled: true
+monitoring.enabled: true
 --------------------
 
-If you configured a different output, such as {ls}, you must specify additional
-configuration options. For example:
+If you configured a different output, such as {ls} or you want to send {beatname_uc}
+monitoring events to a separate {es} cluster (referred to as the _monitoring cluster_),
+you must specify additional configuration options. For example:
 
 ["source","yml",subs="attributes"]
 --------------------
-xpack.monitoring:
+monitoring:
   enabled: true
   elasticsearch:
-    hosts: ["https://example.com:9200", "https://example2.com:9200"]
+    hosts: ["https://example.com:9200", "https://example2.com:9200"] <1>
     username: {beat_monitoring_user}
     password: somepassword
 --------------------
-
-NOTE: Currently you must send monitoring data to the same cluster as all other events.
-If you configured {es} output, do not specify additional hosts in the monitoring
-configuration.
-
+<1> This setting identifies the hosts and port numbers of {es} nodes
+that are part of the monitoring cluster.
 --
 
 . {kibana-ref}/monitoring-xpack-kibana.html[Configure monitoring in {kib}].
