@@ -673,6 +673,12 @@ packetbeat.ignore_outgoing: false
 #processors:
 #- add_docker_metadata: ~
 #
+# The following example enriches each event with LXC container metadata using
+# process IDs included in the event.
+#
+#processors:
+#- add_lxc_metadata: ~
+#
 # The following example enriches each event with host metadata.
 #
 #processors:
