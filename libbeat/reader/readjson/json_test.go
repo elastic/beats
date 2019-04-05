@@ -86,14 +86,6 @@ func TestUnmarshal(t *testing.T) {
 				"b": float64(-1),
 			},
 		},
-		{
-			Name:  "Leading BOM values",
-			Input: "\xef\xbb\xbf{\"a\": -3, \"b\": -1.0}",
-			Output: map[string]interface{}{
-				"a": int64(-3),
-				"b": float64(-1),
-			},
-		},
 	}
 
 	for _, test := range tests {
@@ -176,13 +168,6 @@ func TestDecodeJSON(t *testing.T) {
 		{
 			// Without a text key, simple return the json and an empty text
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       Config{AddErrorKey: true},
-			ExpectedText: ``,
-			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
-		},
-		{
-			// Without a text key, simple return the json and an empty text, with leading BOM
-			Text:         "\xef\xbb\xbf{\"message\": \"test\", \"value\": 1}",
 			Config:       Config{AddErrorKey: true},
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
