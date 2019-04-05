@@ -82,15 +82,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		err := db.Run("dbStats", &result)
 		if err != nil {
-			m.Logger().Error(errors.Wrapf(err, "Failed to retrieve stats for db %s", dbName))
-
+			err = errors.Wrapf(err, "Failed to retrieve stats for db %s", dbName)
+			reporter.Error(err)
+			m.Logger().Error(err)
+			continue
 		}
 		data, _ := schema.Apply(result)
 		reported := reporter.Event(mb.Event{MetricSetFields: data})
 		if !reported {
-			//this means the metricset has closed, no point in trying to log anything further
-			return errors.New("metricset has stopped")
-
+			return nil
 		}
 		totalEvents++
 	}

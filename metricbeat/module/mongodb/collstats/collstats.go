@@ -85,13 +85,17 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		infoMap, ok := info.(common.MapStr)
 		if !ok {
-			m.Logger().Error("Unexpected data returned by mongodb")
+			err = errors.New("Unexpected data returned by mongodb")
+			reporter.Error(err)
+			m.Logger().Error(err)
 			continue
 		}
 
 		event, err := eventMapping(group, infoMap)
 		if err != nil {
-			m.Logger().Error(errors.Wrap(err, "Mapping of the event data filed"))
+			err = errors.Wrap(err, "Mapping of the event data filed")
+			reporter.Error(err)
+			m.Logger().Error(err)
 			continue
 		}
 
