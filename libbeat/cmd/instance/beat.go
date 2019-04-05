@@ -378,7 +378,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		settings := getReporterSettings(settings.Monitoring.DefaultUsername, reporterSettings)
 		reporterFactory := report.NewFactory(b.Info, b.Config.Output, settings)
 		reporters := cfgfile.NewRunnerList(management.DebugK, reporterFactory, b.Publisher)
-		reload.Register.MustRegisterList("xpack.monitoring", reporters)
+		reload.Register.MustRegisterList("monitoring", reporters)
 	} else if monitoringCfg.Enabled() {
 		settings := getReporterSettings(settings.Monitoring.DefaultUsername, reporterSettings)
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
