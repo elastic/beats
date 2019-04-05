@@ -72,11 +72,7 @@ func (st *State) UnmarshalJSON(b []byte) error {
 
 // UnmarshalJSON takes a bytes array and transform the int64 to a golang time.
 func (et *expiryTime) UnmarshalJSON(b []byte) error {
-	if len(b) < 0 {
-		return fmt.Errorf("invalid value for expiry time, received: '%s'", string(b))
-	}
-
-	ts, err := strconv.Atoi(string(b))
+	ts, err := strconv.ParseInt(string(b), 0, 64)
 	if err != nil {
 		return errors.Wrap(err, "could not parse value for expiry time")
 	}
