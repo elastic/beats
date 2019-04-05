@@ -55,10 +55,36 @@ var (
 )
 
 type Config struct {
+	// The type of the test to run, usually `http`.
 	Type                      string
+
+	// URL of the endpoint that must be tested depending on each module
 	URL                       string
+
+	// Suffix is the extension of the source file with the input contents. Defaults to `json`, `plain` is also a common use.
 	Suffix                    string
+
+	// Module is a map of specific configs that will be appended to a module configuration prior initializing it.
+	// For example, the following config in yaml:
+	//   module:
+	//     namespace: test
+	//     foo: bar
+	//
+	// Will produce the following module config:
+	//   - module: http
+	//     metricsets:
+	//       - json
+	//     period: 10s
+	//     hosts: ["localhost:80"]
+	//     path: "/"
+	//     namespace: "test"
+	//     foo: bar
+	//
+	// (notice last two lines)
 	Module                    map[string]interface{} `yaml:"module"`
+
+	// OmitDocumentedFieldsCheck is a list of fields that must be omitted from the function that checks if the field
+	// is contained in {metricset}/_meta/fields.yml
 	OmitDocumentedFieldsCheck []string               `yaml:"omit_documented_fields_check"`
 }
 
@@ -241,6 +267,13 @@ func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
 	}
 }
 
+// omitDocumentedField returns true if 'field' is exactly like 'omitField' or if 'field' equals the prefix of 'omitField'
+// if the latter contains a dot.wildcard ".*". For example:
+// field: hello, 						  	omitField: world 					false
+// field: hello, 						  	omitField: hello 					true
+// field: elasticsearch.stats 			  	omitField: elasticsearch.stats 		true
+// field: elasticsearch.stats.hello.world 	omitField: elasticsearch.* 			true
+// field: elasticsearch.stats.hello.world 	omitField: * 						true
 func omitDocumentedField(field, omitField string) bool {
 	if strings.Contains(omitField, "*") {
 		//Omit every key prefixed with chars before "*"
