@@ -49,7 +49,7 @@ the lifecycle of both new and existing indices. This set of capabilities are
 grouped in the {ref}/index-lifecycle-management.html[index lifecycle management
 (ILM)] APIs.
 
-In 7.0, Beats default to rotate indices by using ILM policies, if the {es}
+In 7.0, Beats defaults to rotating indices by using ILM policies, if the {es}
 version to which they connect supports ILM. The default policy rotates indices
 when they reach 50 GB or 30 days. You can edit the ILM policy by using the {kib}
 management UI, or directly via the {es} API.
@@ -61,7 +61,7 @@ The full suite of modules to {stack-ov}/monitoring-production.html[monitor your
 {stack}] are now GA. These include the {metricbeat} modules for {es}, {ls}, and
 {kib}.
 
-In the future, we will switch to {metricbeat} as the recommended shipper
+In the future, we will switch to {metricbeat} as the recommended agent
 for monitoring the {stack}. To prepare for the switch, see
 {ref}/configuring-metricbeat.html[Collecting {es} monitoring data with {metricbeat}].
 
