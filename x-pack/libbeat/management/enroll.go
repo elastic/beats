@@ -53,10 +53,10 @@ func Enroll(
 
 	configFile := cfgfile.GetDefaultCfgfile()
 
-	ts := time.Now().Unix()
+	ts := time.Now()
 
 	// backup current settings:
-	backConfigFile := configFile + "." + string(ts) + ".bak"
+	backConfigFile := configFile + "." + ts.Format(time.RFC3339) + ".bak"
 	fmt.Println("Saving a copy of current settings to " + backConfigFile)
 	err = file.SafeFileRotate(backConfigFile, configFile)
 	if err != nil {
