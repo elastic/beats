@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/user"
 	"sort"
 	"strings"
 	"testing"
@@ -144,6 +145,7 @@ func TestLoginType(t *testing.T) {
 			"event.type":     "authentication_failure",
 			"event.outcome":  "failure",
 			"user.name":      "(invalid user)",
+			"user.id":        nil,
 		},
 		{
 			"event.category": "authentication",
@@ -152,8 +154,7 @@ func TestLoginType(t *testing.T) {
 			"user.name":      "adrian",
 		},
 		{
-			"event.category": "authentication",
-			"event.type":     "authentication_success",
+			"event.category": "user-login",
 			"event.outcome":  "success",
 			"user.name":      "root",
 			"user.id":        "0",
@@ -164,8 +165,12 @@ func TestLoginType(t *testing.T) {
 		for k, v := range expected {
 			msg := fmt.Sprintf("%s[%d]", k, idx)
 			cur, err := beatEvent.GetValue(k)
-			assert.NoError(t, err, msg)
-			assert.Equal(t, v, cur, msg)
+			if v != nil {
+				assert.NoError(t, err, msg)
+				assert.Equal(t, v, cur, msg)
+			} else {
+				assert.Error(t, err, msg)
+			}
 		}
 	}
 }
@@ -346,5 +351,33 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 		if e.Error != nil {
 			t.Errorf("received error: %+v", e.Error)
 		}
+	}
+}
+
+func BenchmarkResolveUsernameOrID(b *testing.B) {
+	for _, query := range []struct {
+		input string
+		name  string
+		id    string
+		err   bool
+	}{
+		{input: "0", name: "root", id: "0"},
+		{input: "root", name: "root", id: "0"},
+		{input: "vagrant", name: "vagrant", id: "1000"},
+		{input: "1000", name: "vagrant", id: "1000"},
+		{input: "nonexisting", err: true},
+		{input: "9987", err: true},
+	} {
+		b.Run(query.input, func(b *testing.B) {
+			var usr *user.User
+			var err error
+			for i := 0; i < b.N; i++ {
+				usr, err = resolveUsernameOrID(query.input)
+			}
+			if assert.Equal(b, query.err, err != nil, fmt.Sprintf("%v", err)) && !query.err {
+				assert.Equal(b, query.name, usr.Username)
+				assert.Equal(b, query.id, usr.Uid)
+			}
+		})
 	}
 }

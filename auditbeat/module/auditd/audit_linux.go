@@ -541,17 +541,32 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		// Customize event.type / event.category to match unified values.
 		normalizeEventFields(out.RootFields)
 		// Set ECS user fields from the attempted login account.
-		if loginUserName := auditEvent.Summary.Actor.Secondary; loginUserName != "" {
-			out.RootFields.Put("user.name", loginUserName)
-			if usr, err := user.Lookup(loginUserName); err == nil {
+		if usernameOrID := auditEvent.Summary.Actor.Secondary; usernameOrID != "" {
+			if usr, err := resolveUsernameOrID(usernameOrID); err == nil {
+				out.RootFields.Put("user.name", usr.Username)
 				out.RootFields.Put("user.id", usr.Uid)
 			} else {
+				// The login account doesn't exists. Treat it as a user name
+				out.RootFields.Put("user.name", usernameOrID)
 				out.RootFields.Delete("user.id")
 			}
 		}
 	}
 
 	return out
+}
+
+func resolveUsernameOrID(userOrID string) (usr *user.User, err error) {
+	usr, err = user.Lookup(userOrID)
+	if err == nil {
+		// User found by name
+		return
+	}
+	if _, ok := err.(user.UnknownUserError); !ok {
+		// Lookup failed by a reason other than user not found
+		return
+	}
+	return user.LookupId(userOrID)
 }
 
 func normalizeEventFields(m common.MapStr) {
