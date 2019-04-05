@@ -101,6 +101,7 @@ func (r *JSONReader) Next() (reader.Message, error) {
 	}
 
 	var fields common.MapStr
+	message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
 	message.Content, fields = r.decode(message.Content)
 	message.AddFields(common.MapStr{"json": fields})
 	return message, nil
