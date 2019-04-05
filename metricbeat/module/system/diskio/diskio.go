@@ -88,8 +88,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				"time": counters.IoTime,
 			},
 		}
-
-		extraMetrics, err := m.statistics.CalIOStatistics(counters)
+		var extraMetrics DiskIOMetric
+		err := m.statistics.CalIOStatistics(&extraMetrics, counters)
 		if err == nil {
 			event["iostat"] = common.MapStr{
 				"read": common.MapStr{

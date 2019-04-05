@@ -37,9 +37,8 @@ func (stat *DiskIOStat) OpenSampling() error {
 }
 
 // CalIOStatistics stub for linux implementation
-func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetric, error) {
-	var result DiskIOMetric
-	return result, errors.New("Not implemented out of linux")
+func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
+	return errors.New("Not implemented out of linux")
 }
 
 // CloseSampling stub for linux implementation

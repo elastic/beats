@@ -34,9 +34,8 @@ func (stat *DiskIOStat) OpenSampling() error {
 	return nil
 }
 
-func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetric, error) {
-	var result DiskIOMetric
-	return result, errors.New("Not implemented out of linux")
+func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
+	return errors.New("Not implemented out of linux")
 }
 
 func (stat *DiskIOStat) CloseSampling() {
@@ -45,6 +44,5 @@ func (stat *DiskIOStat) CloseSampling() {
 
 // IOCounters should map functionality to disk package for linux os
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
-	stats, err := disk.IOCounters(names...)
-	return stats, err
+	return disk.IOCounters(names...)
 }

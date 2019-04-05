@@ -66,17 +66,18 @@ func getCtlCode(deviceType uint32, function uint32, method uint32, access uint32
 
 // IOCounters gets the diskio counters and maps them to the list of counterstat objects
 func iOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
-	ret := make(map[string]disk.IOCountersStat, 0)
 	logicalDisks, err := getLogicalDriveStrings()
-	if err != nil || len(logicalDisks) == 0 {
+	if err != nil || logicalDisks == nil {
 		return nil, err
 	}
+	ret := make(map[string]disk.IOCountersStat, 0)
 	for _, drive := range logicalDisks {
-		if len(drive.Name) > 3 { // not get _Total or Harddrive
+		// not get _Total or Harddrive
+		if len(drive.Name) > 3 {
 			continue
 		}
-
-		if len(names) > 0 && !containsDrive(names, drive.Name) { //filter by included devices
+		//filter by included devices
+		if len(names) > 0 && !containsDrive(names, drive.Name) {
 			continue
 		}
 
@@ -135,23 +136,22 @@ func iOCounter(path string) (diskPerformance, error) {
 // getLogicalDriveStrings calls the syscall GetLogicalDriveStrings in order to get the list of logical drives
 func getLogicalDriveStrings() ([]logicalDrive, error) {
 	lpBuffer := make([]byte, 254)
-	logicalDrives := make([]logicalDrive, 0)
 	r1, _, e1 := syscall.Syscall(procGetLogicalDriveStringsW.Addr(), 2, uintptr(len(lpBuffer)), uintptr(unsafe.Pointer(&lpBuffer[0])), 0)
 	if r1 == 0 {
+		err := e1
 		if e1 != errorSuccess {
-			return nil, e1
-		} else {
-			return nil, syscall.EINVAL
+			err = syscall.EINVAL
 		}
+		return nil, err
 	}
-
+	var logicalDrives []logicalDrive
 	for _, v := range lpBuffer {
 		if v >= 65 && v <= 90 {
-			path := string(v) + ":"
-			if path == "A:" || path == "B:" {
+			s := string(v)
+			if s == "A" || s == "B" {
 				continue
 			}
-
+			path := s + ":"
 			drive := logicalDrive{path, "\\\\.\\" + path}
 			logicalDrives = append(logicalDrives, drive)
 		}
