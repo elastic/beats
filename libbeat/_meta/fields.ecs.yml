@@ -613,7 +613,7 @@
       type: long
       format: duration
       input_format: nanoseconds
-      output_format: milliseconds
+      output_format: asMilliseconds
       output_precision: 1
       description: 'Duration of the event in nanoseconds.
 
