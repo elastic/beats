@@ -31,7 +31,6 @@ type intervalRotator struct {
 	fileFormat  string
 	clock       clock
 	weekly      bool
-	arbitrary   bool
 	newInterval func(lastTime time.Time, currentTime time.Time) bool
 }
 
@@ -61,38 +60,30 @@ func newIntervalRotator(interval time.Duration) (*intervalRotator, error) {
 func (r *intervalRotator) initialize() error {
 	r.clock = realClock{}
 
-	switch r.interval {
-	case time.Second:
+	if r.interval < time.Minute {
 		r.fileFormat = "2006-01-02-15-04-05"
 		r.newInterval = newSecond
-	case time.Minute:
+	} else if r.interval < time.Hour {
 		r.fileFormat = "2006-01-02-15-04"
 		r.newInterval = newMinute
-	case time.Hour:
+	} else if r.interval < 24*time.Hour {
 		r.fileFormat = "2006-01-02-15"
 		r.newInterval = newHour
-	case 24 * time.Hour: // calendar day
+	} else if r.interval < 7*24*time.Hour {
 		r.fileFormat = "2006-01-02"
 		r.newInterval = newDay
-	case 7 * 24 * time.Hour: // calendar week
+	} else if r.interval < 30*24*time.Hour {
 		r.fileFormat = ""
-		r.newInterval = newWeek
 		r.weekly = true
-	case 30 * 24 * time.Hour: // calendar month
+		r.newInterval = newWeek
+	} else if r.interval < 365*24*time.Hour {
 		r.fileFormat = "2006-01"
 		r.newInterval = newMonth
-	case 365 * 24 * time.Hour: // calendar year
+	} else if r.interval >= 365*24*time.Hour {
 		r.fileFormat = "2006"
 		r.newInterval = newYear
-	default:
-		r.arbitrary = true
-		r.fileFormat = "2006-01-02-15-04-05"
-		r.newInterval = func(lastTime time.Time, currentTime time.Time) bool {
-			lastInterval := lastTime.Unix() / (int64(r.interval) / int64(time.Second))
-			currentInterval := currentTime.Unix() / (int64(r.interval) / int64(time.Second))
-			return lastInterval != currentInterval
-		}
 	}
+
 	return nil
 }
 
@@ -107,11 +98,6 @@ func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
 	if r.weekly {
 		y, w := t.ISOWeek()
 		return fmt.Sprintf("%s-%04d-%02d-", filename, y, w)
-	}
-	if r.arbitrary {
-		intervalNumber := t.Unix() / (int64(r.interval) / int64(time.Second))
-		intervalStart := time.Unix(0, intervalNumber*int64(r.interval))
-		return fmt.Sprintf("%s-%s-", filename, intervalStart.Format(r.fileFormat))
 	}
 	return fmt.Sprintf("%s-%s-", filename, t.Format(r.fileFormat))
 }

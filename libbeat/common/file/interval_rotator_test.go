@@ -209,49 +209,6 @@ func TestYearlyRotator(t *testing.T) {
 	assert.Equal(t, "foo-2019-", a.LogPrefix("foo", time.Now()))
 }
 
-func TestArbitraryIntervalRotator(t *testing.T) {
-	a, err := newIntervalRotator(3 * time.Second)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Monday, 2018-Dec-31
-	clock := &testClock{time.Date(2018, 12, 31, 0, 0, 1, 0, time.Local)}
-	a.clock = clock
-	assert.Equal(t, "foo-2018-12-30-00-00-00-", a.LogPrefix("foo", time.Date(2018, 12, 30, 0, 0, 0, 0, time.Local)))
-	a.Rotate()
-	n := a.NewInterval()
-	assert.False(t, n)
-	assert.Equal(t, "foo-2018-12-31-00-00-00-", a.LogPrefix("foo", time.Now()))
-
-	clock.time = clock.time.Add(time.Second)
-	n = a.NewInterval()
-	assert.False(t, n)
-	assert.Equal(t, "foo-2018-12-31-00-00-00-", a.LogPrefix("foo", time.Now()))
-
-	clock.time = clock.time.Add(time.Second)
-	n = a.NewInterval()
-	assert.True(t, n)
-	a.Rotate()
-	assert.Equal(t, "foo-2018-12-31-00-00-03-", a.LogPrefix("foo", time.Now()))
-
-	clock.time = clock.time.Add(time.Second)
-	n = a.NewInterval()
-	assert.False(t, n)
-	assert.Equal(t, "foo-2018-12-31-00-00-03-", a.LogPrefix("foo", time.Now()))
-
-	clock.time = clock.time.Add(time.Second)
-	n = a.NewInterval()
-	assert.False(t, n)
-	assert.Equal(t, "foo-2018-12-31-00-00-03-", a.LogPrefix("foo", time.Now()))
-
-	clock.time = clock.time.Add(time.Second)
-	n = a.NewInterval()
-	assert.True(t, n)
-	a.Rotate()
-	assert.Equal(t, "foo-2018-12-31-00-00-06-", a.LogPrefix("foo", time.Now()))
-}
-
 func TestIntervalIsTruncatedToSeconds(t *testing.T) {
 	a, err := newIntervalRotator(2345 * time.Millisecond)
 	if err != nil {
