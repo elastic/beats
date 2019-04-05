@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_locale"
+	"github.com/elastic/beats/libbeat/processors/add_lxc_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	"github.com/elastic/beats/libbeat/processors/communityid"
 	"github.com/elastic/beats/libbeat/processors/dissect"
@@ -114,6 +115,7 @@ func Require(runtime *goja.Runtime, module *goja.Object) {
 	// and add_tags are omitted because those can be done natively in JS.
 	o.Set("AddCloudMetadata", newConstructor(runtime, add_cloud_metadata.New))
 	o.Set("AddDockerMetadata", newConstructor(runtime, add_docker_metadata.New))
+	o.Set("AddLXCMetadata", newConstructor(runtime, add_lxc_metadata.New))
 	o.Set("AddHostMetadata", newConstructor(runtime, add_host_metadata.New))
 	o.Set("AddKubernetesMetadata", newConstructor(runtime, add_kubernetes_metadata.New))
 	o.Set("AddLocale", newConstructor(runtime, add_locale.New))

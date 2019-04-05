@@ -1,0 +1,14 @@
+- key: lxc
+  title: LXC
+  description: >
+    LXC container stats.
+  short_config: false
+  anchor: lxc-processor
+  fields:
+    - name: lxc
+      type: group
+      fields:
+        - name: container.id
+          type: alias
+          path: container.id
+          migration: true
