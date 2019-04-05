@@ -6,17 +6,15 @@ package process
 
 import (
 	"time"
+
+	"github.com/elastic/beats/auditbeat/helper/file"
 )
 
 // Config defines the host metricset's configuration options.
 type Config struct {
-	StatePeriod        time.Duration `config:"state.period"`
-	ProcessStatePeriod time.Duration `config:"process.state.period"`
-}
-
-// Validate validates the host metricset config.
-func (c *Config) Validate() error {
-	return nil
+	StatePeriod        time.Duration   `config:"state.period"`
+	ProcessStatePeriod time.Duration   `config:"process.state.period"`
+	HashTypes          []file.HashType `config:"hash_types"`
 }
 
 func (c *Config) effectiveStatePeriod() time.Duration {
@@ -28,4 +26,5 @@ func (c *Config) effectiveStatePeriod() time.Duration {
 
 var defaultConfig = Config{
 	StatePeriod: 12 * time.Hour,
+	HashTypes:   []file.HashType{file.SHA1},
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/auditbeat/datastore"
+	"github.com/elastic/beats/auditbeat/helper/file"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -80,6 +81,7 @@ type MetricSet struct {
 	log       *logp.Logger
 	bucket    datastore.Bucket
 	lastState time.Time
+	hasher    *file.FileHasher
 
 	suppressPermissionWarnings bool
 }
@@ -90,6 +92,7 @@ type Process struct {
 	UserInfo *types.UserInfo
 	User     *user.User
 	Group    *user.Group
+	Hashes   map[file.HashType]file.Digest
 	Error    error
 }
 
@@ -137,12 +140,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
+	hasher, err := file.NewFileHasher(config.HashTypes)
+	if err != nil {
+		return nil, err
+	}
+
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
 		log:             logp.NewLogger(metricsetName),
 		cache:           cache.New(),
 		bucket:          bucket,
+		hasher:          hasher,
 	}
 
 	// Load from disk: Time when state was last sent
@@ -310,6 +319,13 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 		event.RootFields.Put("user.group.name", process.Group.Name)
 	}
 
+	if process.Hashes != nil {
+		for hashType, digest := range process.Hashes {
+			fieldName := "process.hash." + string(hashType)
+			event.RootFields.Put(fieldName, digest)
+		}
+	}
+
 	if process.Error != nil {
 		event.RootFields.Put("error.message", process.Error.Error())
 	}
@@ -420,6 +436,18 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			group, err := user.LookupGroupId(userInfo.GID)
 			if err == nil {
 				process.Group = group
+			}
+		}
+
+		if process.Info.Exe != "" {
+			hashes, err := ms.hasher.HashFile(process.Info.Exe)
+			if err != nil {
+				if process.Error == nil {
+					process.Error = errors.Wrapf(err, "failed to hash executable %v for PID %v", process.Info.Exe,
+						sysinfoProc.PID())
+				}
+			} else {
+				process.Hashes = hashes
 			}
 		}
 
