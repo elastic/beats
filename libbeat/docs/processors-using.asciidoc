@@ -196,6 +196,7 @@ The supported processors are:
 
  * <<add-cloud-metadata,`add_cloud_metadata`>>
  * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-lxc-metadata,`add_lxc_metadata`>>
  * <<add-fields, `add_fields`>>
  * <<add-host-metadata,`add_host_metadata`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
@@ -1123,6 +1124,24 @@ forget metadata for a container, 60s by default.
 
 `labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
  labels with `_`.
+
+[[add-lxc-metadata]]
+=== Add LXC metadata
+
+The `add_lxc_metadata` processor annotates each event with LXC container ID.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_lxc_metadata:
+    #match_pids: ["process.pid", "process.ppid"]
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`match_pids`:: (Optional) A list of fields that contain process IDs.
+If the process is running in LXC container then the event will be enriched.
+The default value is `["process.pid", "process.ppid"]`.
 
 [[add-host-metadata]]
 === Add Host metadata
