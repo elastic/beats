@@ -25,12 +25,14 @@ import (
 	"encoding/hex"
 	"hash"
 	"io"
-	"strings"
 
 	"github.com/OneOfOne/xxhash"
+	"github.com/dustin/go-humanize"
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
+	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/libbeat/common/file"
 )
@@ -42,6 +44,12 @@ type HashType string
 func (t *HashType) Unpack(v string) error {
 	*t = HashType(v)
 	return nil
+}
+
+// IsValid checks if the hash type is valid.
+func (t *HashType) IsValid() bool {
+	_, valid := validHashes[*t]
+	return valid
 }
 
 var validHashes = map[HashType]struct{}{
@@ -94,29 +102,63 @@ func (d Digest) String() string {
 // MarshalText encodes the digest to a hexadecimal representation of itself.
 func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
-type FileHasher struct {
-	hashTypes []HashType
+// Config contains the configuration of a FileHasher.
+type Config struct {
+	HashTypes           []HashType `config:"hash_types"`
+	MaxFileSize         string     `config:"max_file_size"`
+	MaxFileSizeBytes    uint64     `config:",ignore"`
+	ScanRatePerSec      string     `config:"scan_rate_per_sec"`
+	ScanRateBytesPerSec uint64     `config:",ignore"`
 }
 
-func NewFileHasher(hashTypes []HashType) (*FileHasher, error) {
-	hasher := FileHasher{}
+// Validate validates the config.
+func (c *Config) Validate() error {
+	var errs multierror.Errors
 
-	// Check hash types are valid
-	for _, hashType := range hashTypes {
-		ht := HashType(strings.ToLower(string(hashType)))
-		if _, valid := validHashes[ht]; !valid {
-			return nil, errors.Errorf("invalid hash type '%v'", ht)
+	for _, ht := range c.HashTypes {
+		if !ht.IsValid() {
+			errs = append(errs, errors.Errorf("invalid hash_types value '%v'", ht))
 		}
-
-		hasher.hashTypes = append(hasher.hashTypes, ht)
 	}
 
-	return &hasher, nil
+	var err error
+
+	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)
+	if err != nil {
+		errs = append(errs, errors.Wrap(err, "invalid max_file_size value"))
+	} else if c.MaxFileSizeBytes <= 0 {
+		errs = append(errs, errors.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))
+	}
+
+	c.ScanRateBytesPerSec, err = humanize.ParseBytes(c.ScanRatePerSec)
+	if err != nil {
+		errs = append(errs, errors.Wrap(err, "invalid scan_rate_per_sec value"))
+	}
+
+	return errs.Err()
 }
 
+// FileHasher hashes the contents of files.
+type FileHasher struct {
+	config  Config
+	limiter *rate.Limiter
+}
+
+// NewFileHasher creates a new FileHasher.
+func NewFileHasher(c Config) (*FileHasher, error) {
+	return &FileHasher{
+		config: c,
+		limiter: rate.NewLimiter(
+			rate.Limit(c.ScanRateBytesPerSec), // Fill Rate
+			int(c.MaxFileSizeBytes),           // Max Capacity
+		),
+	}, nil
+}
+
+// HashFile hashes the contents of a file.
 func (hasher *FileHasher) HashFile(name string) (map[HashType]Digest, error) {
 	var hashes []hash.Hash
-	for _, name := range hasher.hashTypes {
+	for _, name := range hasher.config.HashTypes {
 		switch name {
 		case BLAKE2B_256:
 			h, _ := blake2b.New256(nil)
@@ -171,7 +213,7 @@ func (hasher *FileHasher) HashFile(name string) (map[HashType]Digest, error) {
 
 	nameToHash := make(map[HashType]Digest, len(hashes))
 	for i, h := range hashes {
-		nameToHash[hasher.hashTypes[i]] = h.Sum(nil)
+		nameToHash[hasher.config.HashTypes[i]] = h.Sum(nil)
 	}
 
 	return nameToHash, nil

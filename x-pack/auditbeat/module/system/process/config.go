@@ -12,9 +12,15 @@ import (
 
 // Config defines the host metricset's configuration options.
 type Config struct {
-	StatePeriod        time.Duration     `config:"state.period"`
-	ProcessStatePeriod time.Duration     `config:"process.state.period"`
-	HashTypes          []hasher.HashType `config:"hash_types"`
+	StatePeriod        time.Duration `config:"state.period"`
+	ProcessStatePeriod time.Duration `config:"process.state.period"`
+
+	HasherConfig hasher.Config `config:",inline"`
+}
+
+// Validate validates the config.
+func (c *Config) Validate() error {
+	return c.HasherConfig.Validate()
 }
 
 func (c *Config) effectiveStatePeriod() time.Duration {
@@ -26,5 +32,12 @@ func (c *Config) effectiveStatePeriod() time.Duration {
 
 var defaultConfig = Config{
 	StatePeriod: 12 * time.Hour,
-	HashTypes:   []hasher.HashType{hasher.SHA1},
+
+	HasherConfig: hasher.Config{
+		HashTypes:           []hasher.HashType{hasher.SHA1},
+		MaxFileSize:         "100 MiB",
+		MaxFileSizeBytes:    100 * 1024 * 1024,
+		ScanRatePerSec:      "50 MiB",
+		ScanRateBytesPerSec: 50 * 1024 * 1024,
+	},
 }

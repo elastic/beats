@@ -140,7 +140,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
-	hasher, err := hasher.NewFileHasher(config.HashTypes)
+	hasher, err := hasher.NewFileHasher(config.HasherConfig)
 	if err != nil {
 		return nil, err
 	}
