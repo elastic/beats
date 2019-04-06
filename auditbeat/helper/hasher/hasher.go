@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package file
+package hasher
 
 import (
 	"crypto/md5"

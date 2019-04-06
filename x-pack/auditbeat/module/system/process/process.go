@@ -18,7 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/auditbeat/datastore"
-	"github.com/elastic/beats/auditbeat/helper/file"
+	"github.com/elastic/beats/auditbeat/helper/hasher"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -81,7 +81,7 @@ type MetricSet struct {
 	log       *logp.Logger
 	bucket    datastore.Bucket
 	lastState time.Time
-	hasher    *file.FileHasher
+	hasher    *hasher.FileHasher
 
 	suppressPermissionWarnings bool
 }
@@ -92,7 +92,7 @@ type Process struct {
 	UserInfo *types.UserInfo
 	User     *user.User
 	Group    *user.Group
-	Hashes   map[file.HashType]file.Digest
+	Hashes   map[hasher.HashType]hasher.Digest
 	Error    error
 }
 
@@ -140,7 +140,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
-	hasher, err := file.NewFileHasher(config.HashTypes)
+	hasher, err := hasher.NewFileHasher(config.HashTypes)
 	if err != nil {
 		return nil, err
 	}
