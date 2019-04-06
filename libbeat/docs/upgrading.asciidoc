@@ -46,10 +46,6 @@ supported.
 IMPORTANT: Please read through all upgrade steps before proceeding. These steps
 are required before running the software for the first time.
 
-// TODO: We should add step-by-step instructions to tell users to back up the
-// registry, copy over the config file, etc. Similar to what Kibana does:
-// https://www.elastic.co/guide/en/kibana/master/upgrade-standard.html
-
 [[upgrading-to-6.7]]
 ==== Upgrade to {beats} 6.7 before upgrading to 7.0
 
@@ -61,30 +57,18 @@ other products in the {stack}, upgrade {beats} as part of the
 Upgrading to 6.7 is required because the {es} index template was modified to
 be compatible with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
 
-After upgrading to 6.7, make sure the 6.7 template gets loaded. To load the
-template, run the `setup` command with the `--template` option specified. 
-For example, if the {beats} output is {es}, run:
+After upgrading to 6.7, make sure the 6.7 template gets loaded. 
 
-[source,shell]
-----
-metricbeat setup --template
-----
+// Dear Santa, for Christmas, please give me a widget for displaying platform-
+// specific commands.
 
-If the {beats} output is not `elasticsearch`, temporarily enable the
-`elasticsearch` output when you run the `setup` command. For example:
+:asset: the index template
+:option: template
 
-[source,shell]
---
-metricbeat setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
---
-
-// TODO: Determine whether to mention -E setup.template.settings.index.number_of_shards=5
-// here.
-
-//TODO (asiidoc migration): Replace this with a tagged region. ^^
+include::upgrade-setup-commands.asciidoc[]
 
 NOTE: In previous versions, we advised users to manually force loading of the
-index template. This is no longer recommended. You must use the `setup` command.
+index template. This is no longer recommended. Use the `setup` command instead.
 
 *Metricbeat and Filebeat users:* If you use {beats} central management,
 make sure you migrate the {beats} central management index to 6.7 before you
@@ -92,6 +76,45 @@ upgrade to 7.0. Although central management is not a GA-level feature in 7.0,
 we've provided a migration tool to help you migrate your configurations. For
 more information, see the
 https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
+
+==== Upgrade {beats} binaries to 7.0
+
+// REVIEWERS: I mirrored the steps for Elasticsearch because I figured they
+// would be similar, but I have not tried these steps on all platforms. Please
+// confirm that they are accurate.
+
+Before upgrading:
+
+. Back up the `data` and `config` directories. 
+. Stop the existing {beats} process by using the appropriate command for your
+system.
+
+To upgrade using a Debian or RPM package:
+
+* Use `rpm` or `dpkg` to install the new package. All files are installed in the
+appropriate location for the operating system and {beats} config files are not
+overwritten.
+
+To upgrade using a zip or compressed tarball:
+
+. Extract the zip or tarball to a _new_ directory. This is critical if you
+are not using external `config` and `data` directories.
+. Set the following options in the {beats} configuration file:
++
+--
+* Set `path.config` to point to your external `config` directory. If you are
+not using an external `config` directory, copy your old configuration over to
+the new installation.
+* Set `path.data` to point to your external data directory. If you are not using
+an external `data` directory, copy your old data directory over to the new
+installation. 
+* Set `path.logs` to point to the location where you want to store your logs. If
+you do not specify this setting, logs are stored in the directory you extracted
+the archive to.
+--
+
+Complete the upgrade tasks described in the following sections *before*
+restarting the {beats} process.
 
 [[migrate-config-files]]
 ==== Migrate configuration files
@@ -114,12 +137,25 @@ have been renamed. See {beats-ref}/breaking-changes-7.0.html[Breaking
 changes in 7.0] for the full list of changed names.
 
 To help you transition to the new fields, we provide a compatibility layer in
-the form of ECS-compatible field aliases. To use the aliases, set
-`migration.6_to_7.enabled: true` in the Beat's configuration file *before* you
-upgrade the {es} index template to 7.0.
+the form of ECS-compatible field aliases. To use the aliases, set the following
+option in the Beat's configuration file *before* you upgrade the {es} index
+template to 7.0.
 
-The compatibility layer enables you to use 6.x dashboards and visualizations
-with indices created by {beats} 7.0 or later.
+[source,yaml]
+----
+migration.6_to_7.enabled: true
+----
+
+The field aliases enable you to use 6.x dashboards and visualizations
+with indices created by {beats} 7.0 or later. The aliases do *not* work
+with saved searches or with API calls that manipulate documents directly.
+
+We strongly advise that you adjust your custom {kib} dashboards, machine
+learning jobs, and other content to use the new ECS field names. The aliases
+may be removed in version 8.0.
+
+// REVIEWERS: Is the 8.0 statement correct? Should I mention it here? If so,
+// should I say "will be removed"?
 
 Did you run the Beat or load the index template before reading this section?
 That's OK. See the clean-up steps described under <<missing-fields>>.
@@ -128,7 +164,7 @@ That's OK. See the clean-up steps described under <<missing-fields>>.
 ==== Upgrade the {es} index template
 
 Index templates and the default index names are versioned. For example,
-Metricbeat {stack-version} typically creates indices like this:
+{metricbeat} {stack-version} typically creates indices like this:
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -147,21 +183,14 @@ If you plan to run {beats} 6.7 and 7.0 in parallel, make sure you
 <<enable-ecs-compatibility,enable the compatibility layer>> *before* you load
 the index template. 
 
-To load the index template, run the `setup` command with the `--template` option
-specified. For example, if the {beats} output is {es}, run:
+:asset: the index template
+:option: template
 
-[source,shell]
-----
-metricbeat setup --template
-----
+include::upgrade-setup-commands.asciidoc[]
 
-If the {beats} output is not `elasticsearch`, temporarily enable the
-`elasticsearch` output when you run the `setup` command. For example:
-
-[source,shell]
---
-metricbeat setup --template -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
---
+TIP: When loading the template, you can also specify
+`-E setup.template.settings.index.number_of_shards=n` where `n` is the number of
+shards to use for the index. 
 
 [[non-es-outputs]]
 ==== How to use versioned templates when the output is not {es}
@@ -205,13 +234,10 @@ If you've <<enable-ecs-compatibility,enabled the compatibility layer>> before
 loading the index template and dashboards, 6.x dashboards can co-exist with
 7.0 dashboards and will continue working after the upgrade.
 
-To import the 7.0 dashboards, run the `setup` command with the `--dashboards`
-option specified. For example:
+:asset: 7.0 dashboards
+:option: dashboards
 
-[source,shell]
-----
-metricbeat setup --dashboards
-----
+include::upgrade-setup-commands.asciidoc[]
 
 [[migrate-filebeat-registry]]
 ==== Migrate {filebeat} registry to use new format
@@ -294,8 +320,6 @@ the required aliases were not created.
 [[user-unauthorized]]
 ==== User is not authorized
 
-//TODO: Info taken from notes. I need to re-test to verify.
-
 Because index lifecycle management is on by default in 7.0, you might encounter
 new errors related to user authorization when you run version 7.0 against an
 {es} cluster that supports index lifecycle management.
@@ -325,8 +349,6 @@ user is not authorized to manage index templates.
 layer.
 
 *Solution:* Grant the `manage` privilege on the {beats} indices.
-
-//TODO: Verify ^^. Not sure about this one.
 
 ===== `[indices:data/write/bulk] is unauthorized for user` 
 
