@@ -57,15 +57,19 @@
       }
     },
     {
-      "rename": {
-        "field": "upstream_service_time",
-        "target_field": "envoyproxy.upstream_service_time"
+      "convert" : {
+        "field" : "upstream_service_time",
+        "type": "double"
       }
     },
     {
-      "convert" : {
-        "field" : "envoyproxy.upstream_service_time",
-        "type": "double"
+      "script": {
+        "lang": "painless",
+        "source": "ctx.envoyproxy.upstream_service_time = Math.round(ctx.upstream_service_time * params.scale)",
+        "params": {
+          "scale": 1000000
+        },
+        "if": "ctx.upstream_service_time != null"
       }
     },
     {

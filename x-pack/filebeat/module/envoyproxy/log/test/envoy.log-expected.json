@@ -30,7 +30,7 @@
         "destination.port": 80,
         "ecs.version": "1.0.0",
         "envoyproxy.request_id": "c62ec130-6dee-4f3b-a52b-4f0d1312d89d",
-        "envoyproxy.upstream_service_time": 216.0,
+        "envoyproxy.upstream_service_time": 216000000,
         "event.dataset": "envoyproxy.log",
         "event.duration": 217000000,
         "event.module": "envoyproxy",

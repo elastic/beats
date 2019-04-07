@@ -56,7 +56,7 @@
     },
     {
       "remove": {
-        "field": ["proto"],
+        "field": ["proto", "upstream_service_time"],
         "ignore_failure": true
       }
     },
