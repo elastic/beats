@@ -15,15 +15,18 @@
 
     - name: response_flags
       type: keyword
+      description: >
+        Response flags
 
     - name: upstream_service_time
       type: double
+      description: >
+        Upstream service time
 
     - name: request_id
       type: keyword
-
-    - name: authority
-      type: keyword
+      description: >
+        ID of the request
 
 
         

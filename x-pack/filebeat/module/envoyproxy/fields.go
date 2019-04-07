@@ -19,5 +19,5 @@ func init() {
 // AssetEnvoyproxy returns asset data.
 // This is the base64 encoded gzipped contents of module/envoyproxy.
 func AssetEnvoyproxy() string {
-	return "eJyE0E1u6zAMBOC9TjEHeLmAFw8ognTXVQ5gKBbtCJFFlaLSqqcv/IOmDgx0aYIzH60DblQbULxzTcKf1QDqNVCD0++Zo9yJT+o5NvhvAOCNXQmEngVXG13wcUDgISMJu9KRw6UuxQboPQWXGwMcEO1ITySgNVGDQbik+XsHBF7nFvTC45LHXLCwtlcSRJbRBv9lp+Qce9APPPDQTuLau+A3qh8sbp3tHoDlVab8HPq3eqHi5Xg8nc9mwwjlxDFT2wc75F1ss19SViE7tpnk7jtq1Y/bGx2XS6Bn5b1Q1ta7vwVb9Mrite6v/vym+Q4AAP//L3enEw=="
+	return "eJyUkMFOAyEQhu88xf8A9gX2YGJqTTx4sfG8oWV2S8oyOLBVfHpTQGubxqRHhnzfx7DAnnIH8gfOQfgzKyDZ5KjD6u/MUNyKDcmy73CvAOCFzewIAwt22htn/QjHY0QQNvOWDDa5ihUwWHImdgpYwOuJLpJAyoE6jMJzKOcrQeCpWDAIT5VHEdSsHhIJPMuknf3SR7Jgp/Qp7njsj8XmrfE95Q8W02ZXH4D6K0e+QHet5zIelsvVeq3OMkIxsI/UD06P8fbYa+NR+TP3HGIS0lMfSQ52S32y0/k+hueNo/8Lb82CZkGxXCzxPlNMvTW3L/D8CB6QdvRjUer3Tn0HAAD//5oFw0w="
 }

@@ -1,3 +1,8 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-envoyproxy]]
 [role="xpack"]
 
 :modulename: envoyproxy
@@ -21,3 +26,11 @@ This module comes with a sample dashboard.
 
 [role="screenshot"]
 image::./images/kibana-envoyproxy.jpg[]
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-envoyproxy,exported fields>> section.
+

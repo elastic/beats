@@ -3,8 +3,5 @@ paths:
 {{ range $i, $path := .paths }}
   - {{$path}}
 {{ end }}
-include_lines: ['^ACCESS']
-json.keys_under_root: true
-json.message_key: message
 tags: {{.tags}}
 processors:

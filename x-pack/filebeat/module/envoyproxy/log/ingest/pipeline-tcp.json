@@ -3,8 +3,7 @@
   "processors": [
     {
       "remove": {
-        "field": ["proto"],
-        "ignore_failure": true
+        "field": ["upstream_service_time", "method", "user_agent", "path", "response_code", "authority"]
       }
     },
     {
@@ -16,7 +15,7 @@
     {
       "convert" : {
         "field" : "destination.bytes",
-        "type": "integer"
+        "type": "long"
       }
     },
     {
@@ -28,14 +27,14 @@
     {
       "convert" : {
         "field" : "source.bytes",
-        "type": "integer"
+        "type": "long"
       }
     }
   ],
   "on_failure" : [{ 
     "set" : { 
       "field" : "error.message", 
-      "value" : "{{ _ingest.on_failure_message }}" 
+      "value" : "pipeline-tcp: {{ _ingest.on_failure_message }}" 
     } 
   }]
 }

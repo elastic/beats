@@ -1,0 +1,101 @@
+{
+  "description": "Pipeline for normalizing envoyproxy logs",
+  "processors": [
+    {
+      "json" : {
+        "field" : "message",
+        "target_field" : "json"
+      }
+    },
+    {
+      "dissect": {
+        "field": "json.message",
+        "pattern": "%{envoyproxy.log_type} [%{timestamp}] \"%{method} %{path} %{proto}\" %{response_code} %{envoyproxy.response_flags} %{bytes_received} %{bytes_sent} %{duration} %{upstream_service_time} \"%{source.address}\" \"%{user_agent.original}\" \"%{envoyproxy.request_id}\" \"%{authority}\" \"%{destination.address}:%{destination.port}\""
+       }
+    },
+    {
+      "remove": {
+        "field": ["message"],
+        "ignore_failure" : true
+      }
+    },
+    {
+      "rename": {
+        "field": "json.message",
+        "target_field": "message",
+        "ignore_failure" : true
+      }
+    },
+    {
+      "convert" : {
+        "field" : "duration",
+        "type": "double"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.duration = Math.round(ctx.duration * params.scale)",
+        "params": {
+          "scale": 1000000
+        },
+        "if": "ctx.duration != null"
+      }
+    },
+    {
+      "remove": {
+        "field": ["json", "duration", "time"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert" : {
+        "field" : "destination.port",
+        "type": "integer"
+      }
+    },
+    {
+      "pipeline": {
+          "if": "ctx.proto.charAt(0) != (char)(\"-\")",
+          "name": "{< IngestPipeline "pipeline-http" >}"
+      }
+    },
+    {
+      "pipeline": {
+          "if": "ctx.proto.charAt(0) == (char)(\"-\")",
+          "name": "{< IngestPipeline "pipeline-tcp" >}"
+      }
+    },
+    {
+      "remove": {
+        "field": ["proto"],
+        "ignore_failure": true
+      }
+    },
+    {
+      "remove": {
+        "field": "source.address",
+        "if": "ctx.source.address == \"-\""
+      }
+    },
+    {
+      "remove": {
+        "field": "envoyproxy.response_flags",
+        "if": "ctx.envoyproxy.response_flags == \"-\""
+      }
+    },
+    {
+      "split": {
+        "field": "envoyproxy.response_flags",
+        "separator": "," ,
+        "if": "ctx.envoyproxy.response_flags != null"
+      }
+    }
+  ],
+  "on_failure" : [{ 
+    "set" : { 
+      "field" : "error.message", 
+      "value" : "pipeline-json: {{ _ingest.on_failure_message }}" 
+    } 
+  }]
+}
