@@ -60,6 +60,8 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 *Auditbeat*
 
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+
 *Filebeat*
 
 *Heartbeat*
