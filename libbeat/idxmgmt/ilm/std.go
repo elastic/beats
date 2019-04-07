@@ -114,7 +114,7 @@ func (m *singlePolicyManager) EnsureAlias() error {
 	return m.client.CreateAlias(m.alias)
 }
 
-func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
+func (m *singlePolicyManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
 	overwrite = overwrite || m.overwrite
 
@@ -122,18 +122,18 @@ func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
 	if m.checkExists && !overwrite {
 		b, err := m.client.HasILMPolicy(m.policy.Name)
 		if err != nil {
-			return err
+			return false, err
 		}
 		exists = b
 	}
 
 	if !exists || overwrite {
-		return m.client.CreateILMPolicy(m.policy)
+		return !exists, m.client.CreateILMPolicy(m.policy)
 	}
 
 	log.Infof("do not generate ilm policy: exists=%v, overwrite=%v",
 		exists, overwrite)
-	return nil
+	return false, nil
 }
 
 func (c *infoCache) Valid() bool {
