@@ -68,7 +68,7 @@ var secdTestEvent = &beat.Event{
 			"ppid":     1,
 			"state":    "running",
 			"username": "monica",
-			"keywords": []string{"foo", "bar"},
+			"keywords": []interface{}{"foo", "bar"},
 		},
 		"type":  "process",
 		"final": false,

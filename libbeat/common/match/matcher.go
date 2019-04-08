@@ -119,19 +119,19 @@ func (m *Matcher) Unpack(s string) error {
 	return nil
 }
 
-func (m *Matcher) MatchAnyString(strs []string) bool {
+func (m *Matcher) MatchAnyString(strs []interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
-func (m *Matcher) MatchAllStrings(strs []string) bool {
+func (m *Matcher) MatchAllStrings(strs []interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
-func (m *ExactMatcher) MatchAnyString(strs []string) bool {
+func (m *ExactMatcher) MatchAnyString(strs []interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
-func (m *ExactMatcher) MatchAllStrings(strs []string) bool {
+func (m *ExactMatcher) MatchAllStrings(strs []interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
@@ -145,18 +145,18 @@ func (m *ExactMatcher) Unpack(s string) error {
 	return nil
 }
 
-func matchAnyStrings(m stringMatcher, strs []string) bool {
+func matchAnyStrings(m stringMatcher, strs []interface{}) bool {
 	for _, s := range strs {
-		if m.MatchString(s) {
+		if str, ok := s.(string); ok && m.MatchString(str) {
 			return true
 		}
 	}
 	return false
 }
 
-func matchAllStrings(m stringMatcher, strs []string) bool {
+func matchAllStrings(m stringMatcher, strs []interface{}) bool {
 	for _, s := range strs {
-		if !m.MatchString(s) {
+		if str, ok := s.(string); ok && !m.MatchString(str) {
 			return false
 		}
 	}

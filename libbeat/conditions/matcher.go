@@ -86,7 +86,7 @@ func (c Matcher) Check(event ValuesMap) bool {
 				return false
 			}
 
-		case []string:
+		case []interface{}:
 			if !matcher.MatchAnyString(v) {
 				return false
 			}
