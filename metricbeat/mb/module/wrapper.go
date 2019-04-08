@@ -315,7 +315,7 @@ func (r *eventReporter) V1() mb.PushReporter {
 func (r *eventReporter) V2() mb.PushReporterV2    { return reporterV2{r} }
 func (r *eventReporter) Context() context.Context { return r.context }
 
-// Implement context.Context
+// eventReporterContext implements context.Context by wrapping a channel
 type eventReporterContext struct {
 	done <-chan struct{}
 }
