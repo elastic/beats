@@ -101,6 +101,7 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 
 ### BUILDING ###
 
+.DEFAULT_GOAL := ${BEAT_NAME}
 
 ${BEAT_NAME}: $(GOFILES_ALL) ## @build build the beat application
 	go build $(GOBUILD_FLAGS)
@@ -128,15 +129,15 @@ check: check-headers python-env prepare-tests ## @build Checks project and sourc
 	@${FIND} -wholename "*tests/system/test_*.py" -perm ${PERM_EXEC} -exec false {} + || (echo "Python test files shouldn't be executable, otherwise nose doesn't find them" && false)
 	@${FIND} -name "*.yml" -perm ${PERM_EXEC} -exec false {} + || (echo "YAML files should not be executable" && false)
 
-.PHONY: check-headers
-check-headers:
+.PHONY: $(.OVER)check-headers
+$(.OVER)check-headers:
 ifndef CHECK_HEADERS_DISABLED
 	@go get -u github.com/elastic/go-licenser
 	@go-licenser -d -license ${LICENSE}
 endif
 
-.PHONY: add-headers
-add-headers:
+.PHONY: $(.OVER)add-headers
+$(.OVER)add-headers:
 ifndef CHECK_HEADERS_DISABLED
 	@go get github.com/elastic/go-licenser
 	@go-licenser -license ${LICENSE}
@@ -381,8 +382,8 @@ docs-preview:  ## @build Preview the documents for the beat in the browser
 ES_URL?=http://localhost:9200
 KIBANA_URL?=http://localhost:5601
 
-.PHONY: import-dashboards
-import-dashboards: update ${BEAT_NAME}
+.PHONY: $(.OVER)import-dashboards
+$(.OVER)import-dashboards: update ${BEAT_NAME}
 	${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME} setup -E setup.dashboards.directory=${PWD}/_meta/kibana.generated -E setup.kibana.host=${KIBANA_URL} --dashboards
 
 ### CONTAINER ENVIRONMENT ####
