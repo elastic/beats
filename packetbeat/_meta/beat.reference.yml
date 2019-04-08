@@ -40,6 +40,11 @@ packetbeat.interfaces.device: {{ call .device .GOOS }}
 # Use this setting to override the automatically generated BPF filter.
 #packetbeat.interfaces.bpf_filter:
 
+# With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+# This option does not work with `any` interface device.
+# The default option is false and requires manual set-up of promiscuous mode.
+#packetbeat.interfaces.auto_promisc_mode: true
+
 #================================== Flows =====================================
 
 packetbeat.flows:
