@@ -3,6 +3,31 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+include::libbeat/docs/release-notes/7.0.0.asciidoc[]
+
+[[release-notes-7.0.0-ga]]
+=== Beats version 7.0.0-GA
+https://github.com/elastic/beats/compare/v7.0.0-rc2...v7.0.0[View commits]
+
+The list below covers the changes between 7.0.0-rc2 and 7.0.0 GA only.
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Fix ILM policy always being overwritten. {pull}11671[11671]
+- Fix template always being overwritten. {pull}11671[11671]
+
+*Auditbeat*
+
+- Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+
+*Filebeat*
+
+- Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
+
 [[release-notes-7.0.0-rc2]]
 === Beats version 7.0.0-rc2
 https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD diff]
