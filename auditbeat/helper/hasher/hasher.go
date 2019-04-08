@@ -104,7 +104,7 @@ func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
 // Config contains the configuration of a FileHasher.
 type Config struct {
-	HashTypes           []HashType `config:"hash_types"`
+	HashTypes           []HashType `config:"hash_types,replace"`
 	MaxFileSize         string     `config:"max_file_size"`
 	MaxFileSizeBytes    uint64     `config:",ignore"`
 	ScanRatePerSec      string     `config:"scan_rate_per_sec"`

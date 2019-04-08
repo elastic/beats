@@ -15,7 +15,7 @@ type Config struct {
 	StatePeriod        time.Duration `config:"state.period"`
 	ProcessStatePeriod time.Duration `config:"process.state.period"`
 
-	HasherConfig hasher.Config `config:",inline"`
+	HasherConfig hasher.Config `config:"process.hash"`
 }
 
 // Validate validates the config.
