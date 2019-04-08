@@ -33,6 +33,7 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/auditbeat/core"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -48,7 +49,8 @@ import (
 var audit = flag.Bool("audit", false, "interact with the real audit framework")
 
 var (
-	userLoginMsg = `type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=failed'`
+	userLoginFailMsg    = `type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=failed'`
+	userLoginSuccessMsg = `type=USER_LOGIN msg=audit(1492896303.915:19956): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=success'`
 
 	execveMsgs = []string{
 		`type=SYSCALL msg=audit(1492752522.985:8972): arch=c000003e syscall=59 success=yes exit=0 a0=10812c8 a1=1070208 a2=1152008 a3=59a items=2 ppid=10027 pid=10043 auid=1001 uid=1001 gid=1002 euid=1001 suid=1001 fsuid=1001 egid=1002 sgid=1002 fsgid=1002 tty=pts0 ses=11 comm="uname" exe="/bin/uname" key="key=user_commands"`,
@@ -77,8 +79,8 @@ func TestData(t *testing.T) {
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
 		returnACK().returnACK().returnACK().returnACK().returnACK().
-		// Send a single audit message from the kernel.
-		returnMessage(userLoginMsg).
+		// Send three auditd messages.
+		returnMessage(userLoginFailMsg).
 		returnMessage(execveMsgs...).
 		returnMessage(acceptMsgs...)
 
@@ -98,6 +100,61 @@ func TestData(t *testing.T) {
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, beatEvent, "")
+}
+
+func TestLoginType(t *testing.T) {
+	logp.TestingSetup()
+
+	// Create a mock netlink client that provides the expected responses.
+	mock := NewMock().
+		// Get Status response for initClient
+		returnACK().returnStatus().
+		// Send expected ACKs for initialization
+		returnACK().returnACK().returnACK().returnACK().returnACK().
+		// Send an authentication failure and a success.
+		returnMessage(userLoginFailMsg).
+		returnMessage(userLoginSuccessMsg)
+
+	// Replace the default AuditClient with a mock.
+	ms := mbtest.NewPushMetricSetV2(t, getConfig())
+	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet.client.Close()
+	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
+
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
+	if len(events) != 2 {
+		t.Fatalf("expected 2 events, but received %d", len(events))
+	}
+	assertNoErrors(t, events)
+
+	assertFieldsAreDocumented(t, events)
+
+	// Sometimes the events are received in reverse order.
+	if events[0].ModuleFields["sequence"].(uint32) > events[1].ModuleFields["sequence"].(uint32) {
+		events[0], events[1] = events[1], events[0]
+	}
+
+	for idx, expected := range []common.MapStr{
+		{
+			"event.category": "authentication",
+			"event.type":     "authentication_failure",
+			"event.outcome":  "failure",
+		},
+		{
+			"event.category": "authentication",
+			"event.type":     "authentication_success",
+			"event.outcome":  "success",
+		},
+	} {
+		beatEvent := mbtest.StandardizeEvent(ms, events[idx], core.AddDatasetToEvent)
+		mbtest.WriteEventToDataJSON(t, beatEvent, "")
+		for k, v := range expected {
+			msg := fmt.Sprintf("%s[%d]", k, idx)
+			cur, err := beatEvent.GetValue(k)
+			assert.NoError(t, err, msg)
+			assert.Equal(t, v, cur, msg)
+		}
+	}
 }
 
 // assertFieldsAreDocumented mimics assert_fields_are_documented in Python system tests.

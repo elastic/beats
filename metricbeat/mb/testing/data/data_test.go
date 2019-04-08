@@ -219,7 +219,7 @@ func checkDocumented(t *testing.T, data []common.MapStr) {
 				if _, ok := keys[prefix+".*"]; ok {
 					continue
 				}
-				t.Fatalf("key missing: %s", k)
+				t.Fatalf("check if fields are documented error: key missing '%s'", k)
 			}
 		}
 	}
