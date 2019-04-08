@@ -119,18 +119,22 @@ func (m *Matcher) Unpack(s string) error {
 	return nil
 }
 
+// MatchAnyString succeeds if any string in the given array contains a match.
 func (m *Matcher) MatchAnyString(strs []interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
+// MatchAllStrings succeeds if all strings in the given array contain a match.
 func (m *Matcher) MatchAllStrings(strs []interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
 
+// MatchAnyString succeeds if any string in the given array is an exact match.
 func (m *ExactMatcher) MatchAnyString(strs []interface{}) bool {
 	return matchAnyStrings(m.stringMatcher, strs)
 }
 
+// MatchAllStrings succeeds if all strings in the given array are an exact match.
 func (m *ExactMatcher) MatchAllStrings(strs []interface{}) bool {
 	return matchAllStrings(m.stringMatcher, strs)
 }
