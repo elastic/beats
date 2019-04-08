@@ -118,10 +118,17 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-nats-subscriptions,subscriptions>>   
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
+<<<<<<< HEAD
 |<<metricbeat-module-php_fpm,PHP_FPM>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>>   
 |<<metricbeat-metricset-php_fpm-process,process>>   
 |<<metricbeat-module-postgresql,PostgreSQL>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+=======
+|<<metricbeat-module-php_fpm,PHP_FPM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>> beta[]  
+|<<metricbeat-metricset-php_fpm-process,process>> beta[]  
+|<<metricbeat-module-postgresql,PostgreSQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+>>>>>>> 6f7e6c04dddc8b2937d96520c27a66170a3b702f
 .4+| .4+|  |<<metricbeat-metricset-postgresql-activity,activity>>   
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
