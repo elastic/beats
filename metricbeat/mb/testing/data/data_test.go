@@ -30,6 +30,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pkg/errors"
+
 	"github.com/mitchellh/hashstructure"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -56,13 +58,13 @@ var (
 
 type Config struct {
 	// The type of the test to run, usually `http`.
-	Type                      string
+	Type string
 
 	// URL of the endpoint that must be tested depending on each module
-	URL                       string
+	URL string
 
 	// Suffix is the extension of the source file with the input contents. Defaults to `json`, `plain` is also a common use.
-	Suffix                    string
+	Suffix string
 
 	// Module is a map of specific configs that will be appended to a module configuration prior initializing it.
 	// For example, the following config in yaml:
@@ -81,11 +83,11 @@ type Config struct {
 	//     foo: bar
 	//
 	// (notice last two lines)
-	Module                    map[string]interface{} `yaml:"module"`
+	Module map[string]interface{} `yaml:"module"`
 
 	// OmitDocumentedFieldsCheck is a list of fields that must be omitted from the function that checks if the field
 	// is contained in {metricset}/_meta/fields.yml
-	OmitDocumentedFieldsCheck []string               `yaml:"omit_documented_fields_check"`
+	OmitDocumentedFieldsCheck []string `yaml:"omit_documented_fields_check"`
 }
 
 func TestAll(t *testing.T) {
@@ -97,6 +99,12 @@ func TestAll(t *testing.T) {
 		s := strings.Split(f, string(os.PathSeparator))
 		moduleName := s[4]
 		metricSetName := s[5]
+
+		if *moduleFlag != "" {
+			if *moduleFlag != moduleName {
+				continue
+			}
+		}
 
 		configFile, err := ioutil.ReadFile(f)
 		if err != nil {
@@ -117,12 +125,6 @@ func TestAll(t *testing.T) {
 }
 
 func getTestdataFiles(t *testing.T, module, metricSet string, config Config) {
-	if *moduleFlag != "" {
-		if *moduleFlag != module {
-			return
-		}
-	}
-
 	ff, err := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + config.Suffix)
 	if err != nil {
 		t.Fatal(err)
@@ -246,25 +248,32 @@ func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
 
 	for _, d := range data {
 		flat := d.Flatten()
-	keys:
-		for k := range flat {
-			if _, ok := keys[k]; !ok {
-				for _, omitField := range omitFields {
-					if omitDocumentedField(k, omitField) {
-						continue keys
-					}
-				}
-				// If a field is defined as object it can also be defined as `status_codes.*`
-				// So this checks if such a key with the * exists by removing the last part.
-				splits := strings.Split(k, ".")
-				prefix := strings.Join(splits[0:len(splits)-1], ".")
-				if _, ok := keys[prefix+".*"]; ok {
-					continue
-				}
-				t.Fatalf("check if fields are documented error: key missing '%s'", k)
-			}
+		if err := documentedFieldCheck(flat, keys, omitFields); err != nil {
+			t.Fatal(err)
 		}
 	}
+}
+
+func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interface{}, omitFields []string) error {
+	for foundKey := range foundKeys {
+		if _, ok := knownKeys[foundKey]; !ok {
+			for _, omitField := range omitFields {
+				if omitDocumentedField(foundKey, omitField) {
+					return nil
+				}
+			}
+			// If a field is defined as object it can also be defined as `status_codes.*`
+			// So this checks if such a key with the * exists by removing the last part.
+			splits := strings.Split(foundKey, ".")
+			prefix := strings.Join(splits[0:len(splits)-1], ".")
+			if _, ok := knownKeys[prefix+".*"]; ok {
+				continue
+			}
+			return errors.Errorf("check if fields are documented error: key missing '%s'", foundKey)
+		}
+	}
+
+	return nil
 }
 
 // omitDocumentedField returns true if 'field' is exactly like 'omitField' or if 'field' equals the prefix of 'omitField'
@@ -276,19 +285,37 @@ func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
 // field: elasticsearch.stats.hello.world 	omitField: * 						true
 func omitDocumentedField(field, omitField string) bool {
 	if strings.Contains(omitField, "*") {
-		//Omit every key prefixed with chars before "*"
+		// Omit every key prefixed with chars before "*"
 		prefixedField := strings.Trim(omitField, ".*")
 		if strings.Contains(field, prefixedField) {
 			return true
 		}
 	} else {
-		//Omit only if key matches exactly
+		// Omit only if key matches exactly
 		if field == omitField {
 			return true
 		}
 	}
 
 	return false
+}
+
+func TestOmitDocumentedField(t *testing.T) {
+	tts := []struct {
+		a, b   string
+		result bool
+	}{
+		{a: "hello", b: "world", result: false},
+		{a: "hello", b: "hello", result: true},
+		{a: "elasticsearch.stats", b: "elasticsearch.stats", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "elasticsearch.*", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "*", result: true},
+	}
+
+	for _, tt := range tts {
+		result := omitDocumentedField(tt.a, tt.b)
+		assert.Equal(t, tt.result, result)
+	}
 }
 
 // GetConfig returns config for elasticsearch module
