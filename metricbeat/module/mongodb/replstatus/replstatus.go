@@ -20,12 +20,11 @@ package replstatus
 import (
 	"gopkg.in/mgo.v2"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 )
-
-var logger = logp.NewLogger("mongodb.replstatus")
 
 func init() {
 	mb.Registry.MustAddMetricSet("mongodb", "replstatus", New,
@@ -54,13 +53,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error creating new Session")
 	}
 	defer mongoSession.Close()
 
@@ -68,21 +65,17 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	oplogInfo, err := getReplicationInfo(mongoSession)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error getting replication info")
 	}
 
 	replStatus, err := getReplicationStatus(mongoSession)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error getting replication status")
 	}
 
 	event := eventMapping(*oplogInfo, *replStatus)
 
 	reporter.Event(mb.Event{MetricSetFields: event})
 
-	return
+	return nil
 }
