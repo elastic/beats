@@ -8,13 +8,6 @@
        }
     },
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx['http'] = new HashMap(); def p = ctx.proto.indexOf ('/'); def l = ctx.proto.length(); ctx.http.version = ctx.proto.substring(p+1, l);", 
-        "ignore_failure" : true
-      }
-    },
-    {
       "convert" : {
         "field" : "duration",
         "type": "double"

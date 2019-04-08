@@ -5395,9 +5395,11 @@ Response flags
 *`envoyproxy.upstream_service_time`*::
 +
 --
-type: double
+type: long
 
-Upstream service time
+format: duration
+
+Upstream service time in nanoseconds
 
 
 --

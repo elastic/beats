@@ -1,58 +1,52 @@
 [
     {
-        "@timestamp": "2019-04-06T06:20:05.972Z",
-        "destination.address": "127.0.0.1",
-        "destination.bytes": 0,
-        "destination.port": 9200,
+        "@timestamp": "2019-04-08T16:50:12.533Z",
+        "destination.address": "172.27.0.2",
+        "destination.bytes": 87,
+        "destination.port": 80,
         "ecs.version": "1.0.0",
         "envoyproxy.request_id": "-",
-        "envoyproxy.response_flags": [
-            "UF",
-            "URX"
-        ],
         "event.dataset": "envoyproxy.log",
-        "event.duration": 0,
+        "event.duration": 4000000,
         "event.module": "envoyproxy",
         "fileset.name": "log",
-        "http.version": "-",
         "input.type": "log",
         "log.offset": 0,
-        "message": "[2019-04-06T06:20:05.972Z] \"- - -\" 0 UF,URX 0 0 0 - \"-\" \"-\" \"-\" \"-\" \"127.0.0.1:9200\"",
+        "message": "[2019-04-08T16:50:12.533Z] \"- - -\" 0 - 87 254 4 - \"-\" \"-\" \"-\" \"-\" \"172.27.0.2:80\"",
         "service.type": "envoyproxy",
-        "source.bytes": 0,
+        "source.bytes": 254,
         "tags": [
             "envoyproxy"
         ]
     },
     {
-        "@timestamp": "2019-02-12T18:37:42.921Z",
-        "destination.address": "52.87.35.92",
+        "@timestamp": "2019-04-08T16:16:55.931Z",
+        "destination.address": "172.27.0.3",
         "destination.port": 80,
         "ecs.version": "1.0.0",
-        "envoyproxy.request_id": "c62ec130-6dee-4f3b-a52b-4f0d1312d89d",
-        "envoyproxy.upstream_service_time": 216000000,
+        "envoyproxy.request_id": "c219f6da-2b7f-483e-9ced-ec323d9330a9",
+        "envoyproxy.upstream_service_time": 4000000,
         "event.dataset": "envoyproxy.log",
-        "event.duration": 217000000,
+        "event.duration": 5000000,
         "event.module": "envoyproxy",
         "fileset.name": "log",
-        "http.request.body.bytes": 43,
+        "http.request.body.bytes": 89,
         "http.request.method": "GET",
         "http.response.body.bytes": 0,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 85,
-        "message": "[2019-02-12T18:37:42.921Z] \"GET /httpbin/ip HTTP/1.1\" 200 - 0 43 217 216 \"172.17.0.5\" \"curl/7.59.0\" \"c62ec130-6dee-4f3b-a52b-4f0d1312d89d\" \"httpbin.org\" \"52.87.35.92:80\"",
+        "log.offset": 82,
+        "message": "[2019-04-08T16:16:55.931Z] \"GET /service/1 HTTP/1.1\" 200 - 0 89 5 4 \"-\" \"curl/7.54.0\" \"c219f6da-2b7f-483e-9ced-ec323d9330a9\" \"localhost:8000\" \"172.27.0.3:80\"",
         "service.type": "envoyproxy",
-        "source.address": "172.17.0.5",
         "tags": [
             "envoyproxy"
         ],
-        "url.domain": "httpbin.org",
-        "url.path": "/httpbin/ip",
+        "url.domain": "localhost:8000",
+        "url.path": "/service/1",
         "user_agent.device.name": "Other",
         "user_agent.name": "curl",
-        "user_agent.original": "curl/7.59.0",
-        "user_agent.version": "7.59.0"
+        "user_agent.original": "curl/7.54.0",
+        "user_agent.version": "7.54.0"
     }
 ]
