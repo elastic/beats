@@ -11,8 +11,9 @@ This file is generated! See scripts/docs_collector.py
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>> beta[]  
-|<<metricbeat-metricset-aws-ec2,ec2>>   
-|<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]  
+|<<metricbeat-metricset-aws-ec2,ec2>>
+|<<metricbeat-metricset-aws-rds,rds>> beta[]
+|<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]
 |<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>> beta[]  
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  

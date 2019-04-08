@@ -1154,7 +1154,13 @@ type: integer
 --
 
 [float]
-=== s3_daily_storage
+== rds fields
+
+`rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
+
+
+[float]
+== s3_daily_storage fields
 
 `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
