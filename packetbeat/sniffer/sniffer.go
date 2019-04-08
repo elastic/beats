@@ -305,7 +305,7 @@ func openAFPacket(filter string, cfg *config.InterfacesConfig) (snifferHandle, e
 	}
 
 	timeout := 500 * time.Millisecond
-	h, err := newAfpacketHandle(cfg.Device, szFrame, szBlock, numBlocks, timeout)
+	h, err := newAfpacketHandle(cfg.Device, szFrame, szBlock, numBlocks, timeout, cfg.EnableAutoPromiscMode)
 	if err != nil {
 		return nil, err
 	}

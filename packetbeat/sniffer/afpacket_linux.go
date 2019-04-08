@@ -40,21 +40,28 @@ type afpacketHandle struct {
 }
 
 func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
-	timeout time.Duration) (*afpacketHandle, error) {
+	timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
 
-	promiscEnabled, err := isPromiscEnabled(device)
-	if err != nil {
-		logp.Err("Failed to get promiscuous mode for device '%s': %v", device, err)
+	var err error
+	var promiscEnabled bool
+
+	if autoPromiscMode {
+		promiscEnabled, err = isPromiscEnabled(device)
+		if err != nil {
+			logp.Err("Failed to get promiscuous mode for device '%s': %v", device, err)
+		}
+
+		if !promiscEnabled {
+			if setPromiscErr := setPromiscMode(device, true); setPromiscErr != nil {
+				logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", device, err)
+			}
+		}
 	}
 
 	h := &afpacketHandle{
 		promiscPreviousState:         promiscEnabled,
 		device:                       device,
-		promiscPreviousStateDetected: err == nil,
-	}
-
-	if err := setPromiscMode(device, true); err != nil {
-		logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", device, err)
+		promiscPreviousStateDetected: autoPromiscMode && err != nil,
 	}
 
 	if device == "any" {
@@ -89,6 +96,7 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 
 func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
+	// previous state detected only if auto mode was on
 	if h.promiscPreviousStateDetected {
 		if err := setPromiscMode(h.device, h.promiscPreviousState); err != nil {
 			logp.Warn("Failed to reset promiscuous mode for device '%s'. Your device might be in promiscuous mode.: %v", h.device, err)
@@ -122,6 +130,9 @@ func isPromiscEnabled(device string) (bool, error) {
 	return ifreq.flags&uint16(syscall.IFF_PROMISC) != 0, nil
 }
 
+// setPromiscMode enables promisc mode if configured.
+// this makes maintenance for user simpler without any additional manual steps
+// issue [700](https://github.com/elastic/beats/issues/700)
 func setPromiscMode(device string, enabled bool) error {
 	if device == "any" {
 		logp.Warn("Cannot set promiscuous mode to device 'any'")

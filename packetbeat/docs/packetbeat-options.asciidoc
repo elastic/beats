@@ -177,6 +177,24 @@ packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
 [float]
+==== `auto_promisc_mode`
+
+With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+This option does not work with `any` interface device.
+The default option is false and requires manual set-up of promiscuous mode.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.interfaces.device: eth0
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.buffer_size_mb: 100
+packetbeat.interfaces.auto_promisc_mode: true
+------------------------------------------------------------------------------
+
+
+[float]
 ==== `with_vlans`
 
 Packetbeat automatically generates a
