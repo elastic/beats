@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
 - New module for Cisco ASA logs. {issue}9200[9200] {pull}11171[11171]
 - Added support for Cisco ASA fields to the netflow input. {pull}11201[11201]
+- Add Filebeat envoyproxy module. {pull}11700[11700]
 
 *Heartbeat*
 
