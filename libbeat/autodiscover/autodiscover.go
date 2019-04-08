@@ -62,9 +62,8 @@ type Autodiscover struct {
 	configs         map[string]map[uint64]*reload.ConfigWithMeta
 	runners         *cfgfile.RunnerList
 	meta            *meta.Map
-
-	listener bus.Listener
-	logger   *logp.Logger
+	listener        bus.Listener
+	logger          *logp.Logger
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
@@ -93,8 +92,7 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 		runners:         cfgfile.NewRunnerList("autodiscover", adapter, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
-
-		logger: logger,
+		logger:          logger,
 	}, nil
 }
 

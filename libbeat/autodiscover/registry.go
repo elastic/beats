@@ -46,7 +46,6 @@ func NewRegistry() *registry {
 		providers: make(map[string]ProviderBuilder, 0),
 		builders:  make(map[string]BuilderConstructor, 0),
 		appenders: make(map[string]AppenderBuilder, 0),
-
-		logger: logp.NewLogger("autodiscover"),
+		logger:    logp.NewLogger("autodiscover"),
 	}
 }
