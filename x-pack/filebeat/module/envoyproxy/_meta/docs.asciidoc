@@ -3,7 +3,7 @@
 :modulename: envoyproxy
 :has-dashboards: true
 
-== Coredns Module
+== Envoyproxy Module
 
 This is a filebeat module for envoy proxy. It supports both standalone deployment and 
 envoy proxy deployment in Kubernetes. 
