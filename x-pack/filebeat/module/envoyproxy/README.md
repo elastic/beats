@@ -1,4 +1,4 @@
-# Envoy Module
+# Envoyproxy Module
 
 This is a filebeat module for envoy proxy. 
 
@@ -19,12 +19,12 @@ log path to the path of the log file.
 Update filebeat.yml to point to Elasticsearch and Kibana. 
 Setup Filebeat.
 ```
-./filebeat setup --modules envoy -e
+./filebeat setup --modules envoyproxy -e
 ```
 
-Enable the Filebeat envoy module
+Enable the Filebeat envoyproxy module
 ```
-./filebeat modules enable envoy
+./filebeat modules enable envoyproxy
 ```
 
 Start Filebeat
@@ -80,7 +80,7 @@ spec:
       - name: filebeat
         image: docker.elastic.co/beats/filebeat:%VERSION%
         args: [
-          "sh", "-c", "filebeat setup -e --modules envoy -c /etc/filebeat.yml && filebeat -e -c /etc/filebeat.yml"
+          "sh", "-c", "filebeat setup -e --modules envoyproxy -c /etc/filebeat.yml && filebeat -e -c /etc/filebeat.yml"
         ]
         env:
         # Edit the following values to reflect your setup accordingly
@@ -113,7 +113,7 @@ spec:
   template:
     metadata:
       annotations:
-        "co.elastic.logs/module": "envoy"
+        "co.elastic.logs/module": "envoyproxy"
         "co.elastic.logs/fileset": "log"
         "co.elastic.logs/disable": "false"
       labels:
