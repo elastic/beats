@@ -18,11 +18,12 @@
 package json
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) mb.Event {

@@ -19,12 +19,14 @@ package json
 
 import (
 	"encoding/json"
+	"io/ioutil"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/pkg/errors"
-	"io/ioutil"
 )
 
 // init registers the MetricSet with the central registry.
