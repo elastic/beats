@@ -124,12 +124,12 @@ func (f *ElasticFetcher) Fetch() (*License, error) {
 		return nil, errors.New("unauthorized access, could not connect to the xpack endpoint, verify your credentials")
 	}
 
-	if status != http.StatusOK {
-		return nil, fmt.Errorf("error from server, response code: %d", status)
-	}
-
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve the license information from the cluster")
+	}
+
+	if status != http.StatusOK {
+		return nil, fmt.Errorf("error from server, response code: %d", status)
 	}
 
 	license, err := f.parseJSON(body)
