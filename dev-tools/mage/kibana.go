@@ -31,6 +31,9 @@ const kibanaBuildDir = "build/kibana"
 // index patterns based on the fields.yml file. It outputs to build/kibana.
 // Use PackageKibanaDashboardsFromBuildDir() with this.
 func KibanaDashboards(moduleDirs ...string) error {
+	if err := os.RemoveAll(kibanaBuildDir); err != nil {
+		return err
+	}
 	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
 		return err
 	}
