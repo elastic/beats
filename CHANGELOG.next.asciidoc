@@ -33,6 +33,9 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+
 *Auditbeat*
 
 - Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
