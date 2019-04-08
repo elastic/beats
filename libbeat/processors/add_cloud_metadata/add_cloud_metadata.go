@@ -25,7 +25,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -368,14 +367,9 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// cloud fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
 	// add_cloud_metadata should not overwrite these fields with new values.
 	if !p.initData.overwrite {
-		for key := range event.Fields {
-			keySplits := strings.Split(key, ".")
-			if keySplits[0] == "cloud" {
-				cloudValue, _ := event.GetValue(key)
-				if cloudValue != nil {
-					return event, nil
-				}
-			}
+		cloudValue, _ := event.GetValue("cloud")
+		if cloudValue != nil {
+			return event, nil
 		}
 	}
 

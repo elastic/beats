@@ -114,18 +114,32 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 		},
 		{
 			common.MapStr{
-				"cloud.provider": "ec2",
+				"provider": "ec2",
 			},
 			common.MapStr{
-				"cloud.provider": "ec2",
+				"provider": "ec2",
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
 			},
 		},
 		{
 			common.MapStr{
-				"provider": "ec2",
+				"cloud.provider": "ec2",
 			},
+			// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
+			// it won't detect cloud.provider as a cloud field. This is not the behavior we
+			// expect and will find a better solution later in issue 11697.
 			common.MapStr{
-				"provider": "ec2",
+				"cloud.provider": "ec2",
 				"cloud": common.MapStr{
 					"provider": "ec2",
 					"instance": common.MapStr{
