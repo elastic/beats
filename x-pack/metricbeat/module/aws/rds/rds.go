@@ -72,13 +72,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		m.Logger().Error(errors.Wrap(err, "Error ParseDuration"))
+		err = errors.Wrap(err, "Error ParseDuration")
 		report.Error(err)
-		return
+		return err
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
@@ -135,6 +135,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			report.Event(event)
 		}
 	}
+
+	return nil
 }
 
 func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetails, error) {
