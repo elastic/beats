@@ -32,35 +32,35 @@ import (
 func TestFetchObject(t *testing.T) {
 	compose.EnsureUp(t, "http")
 
-	f := mbtest.NewEventsFetcher(t, getConfig("object"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("object"))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %#v", f.Module().Name(), f.Name(), events)
 }
 
 func TestFetchArray(t *testing.T) {
 	compose.EnsureUp(t, "http")
 
-	f := mbtest.NewEventsFetcher(t, getConfig("array"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("array"))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "http")
 
-	f := mbtest.NewEventsFetcher(t, getConfig("object"))
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("object"))
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
-
 }
 
 func getConfig(jsonType string) map[string]interface{} {
