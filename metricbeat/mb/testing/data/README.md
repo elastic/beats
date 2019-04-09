@@ -5,7 +5,7 @@
 #### What it is
 Many modules do requests to an HTTP endpoint to fetch metrics data. Then they do data manipulation and enriching of this data before sending it to Elasticsearch.
 
-What we wanted to achieve is to mock the HTTP responses from the modules into a generic server that will serve those responses. So, for each tested metricset, an HTTP server in port 5555 is launched with the mocked response from a fixed module version to respond to the HTTP requests, once the test is done, it's shut down.. This way we isolate the manipulation of data in some tests and reduce lot of boilerplate we had in many modules.
+What we wanted to achieve is to mock the HTTP responses from the modules into a generic server that will serve those responses. So, for each tested metricset, an HTTP server is launched at a random port (but be aware that JSON responses written to disk are hardcoded with value "127.0.0.1:5555") with the mocked response from a fixed module version to respond to the HTTP requests, once the test is done, it's shut down.. This way we isolate the manipulation of data in some tests and reduce lot of boilerplate we had in many modules.
 
 #### How to use it
 
