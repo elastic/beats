@@ -70,6 +70,7 @@ var secdTestEvent = &beat.Event{
 			"username": "monica",
 			"keywords": []interface{}{"foo", "bar"},
 		},
+		"tags":  []string{"auditbeat", "prod", "security"},
 		"type":  "process",
 		"final": false,
 	},
