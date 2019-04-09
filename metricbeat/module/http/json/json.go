@@ -144,7 +144,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			event := m.processBody(response, obj)
 
 			if reported := reporter.Event(event); !reported {
-				return errors.New("error reporting event")
+				m.Logger().Debug(errors.Errorf("error reporting event: %#v", event))
+				return nil
 			}
 		}
 	} else {
@@ -156,7 +157,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		event := m.processBody(response, jsonBody)
 
 		if reported := reporter.Event(event); !reported {
-			return errors.Errorf("error reporting event: %#v", event)
+			m.Logger().Debug(errors.Errorf("error reporting event: %#v", event))
+			return nil
 		}
 	}
 

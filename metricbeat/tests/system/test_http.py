@@ -33,8 +33,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        assert evt["http"]["json"]["hello"] == "world"
-        assert evt["http"]["namespace"] == "test"
+        assert evt["http"]["test"]["hello"] == "world"
 
         del evt["http"]["test"]["hello"]
 
