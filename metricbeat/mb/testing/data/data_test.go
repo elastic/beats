@@ -88,6 +88,9 @@ type Config struct {
 	// OmitDocumentedFieldsCheck is a list of fields that must be omitted from the function that checks if the field
 	// is contained in {metricset}/_meta/fields.yml
 	OmitDocumentedFieldsCheck []string `yaml:"omit_documented_fields_check"`
+
+	// RemoveFieldsForComparison
+	RemoveFieldsForComparison []string `yaml:"remove_fields_from_comparison"`
 }
 
 func TestAll(t *testing.T) {
@@ -193,14 +196,13 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Con
 
 	checkDocumented(t, data, config.OmitDocumentedFieldsCheck)
 
-	output, err := json.MarshalIndent(&data, "", "    ")
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	// Overwrites the golden files if run with -generate
 	if *generateFlag {
-		if err = ioutil.WriteFile(file+expectedExtension, output, 0644); err != nil {
+		outputIndented, err := json.MarshalIndent(&data, "", "    ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err = ioutil.WriteFile(file+expectedExtension, outputIndented, 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -211,7 +213,36 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Con
 		t.Fatalf("could not read file: %s", err)
 	}
 
-	assert.Equal(t, string(expected), string(output))
+	expectedMap := []common.MapStr{}
+	if err := json.Unmarshal(expected, &expectedMap); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, fieldToRemove := range config.RemoveFieldsForComparison {
+		for eventIndex := range data {
+			if err := data[eventIndex].Delete(fieldToRemove); err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		for eventIndex := range expectedMap {
+			if err := expectedMap[eventIndex].Delete(fieldToRemove); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+
+	output, err := json.Marshal(&data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedJSON, err := json.Marshal(&expectedMap)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, string(expectedJSON), string(output))
 
 	if strings.HasSuffix(file, "docs."+config.Suffix) {
 		writeDataJSON(t, data[0], module, metricSetName)
