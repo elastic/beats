@@ -23,6 +23,3 @@ The list below covers the major changes between 7.0.0-rc1 and master only.
 ==== Bugfixes
 
 ==== Added
-
-- Added support for using PYTHON_EXE to control what Python interpreter is used
-  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
