@@ -138,7 +138,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd module: Add `event.outcome` and `event.type` for ECS. {pull}11432[11432]
 - Package: Enable suse. {pull}11634[11634]
 - Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
-- Process: Hash executable.
+- Process: Hash executable. {pull}11722[11722]
 
 *Filebeat*
 
