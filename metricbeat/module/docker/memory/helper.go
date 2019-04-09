@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
+// MemoryData contains parsed container memory info
 type MemoryData struct {
 	Time      common.Time
 	Container *docker.Container
@@ -34,12 +35,19 @@ type MemoryData struct {
 	UsageP    float64
 }
 
+// MemoryService is placeholder for the the memory stat parsers
 type MemoryService struct{}
 
-func (s *MemoryService) getMemoryStatsList(rawStats []docker.Stat, dedot bool) []MemoryData {
+func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool) []MemoryData {
 	formattedStats := []MemoryData{}
-	for _, myRawStats := range rawStats {
-		formattedStats = append(formattedStats, s.getMemoryStats(myRawStats, dedot))
+	for _, containerStats := range containers {
+		//There appears to be a race where a container will report with a stat object before it actually starts
+		//during this time, there doesn't appear to be any meaningful data,
+		// and Limit will never be 0 unless the container is not running & there's no cgroup data
+		if containerStats.Stats.MemoryStats.Limit == 0 {
+			continue
+		}
+		formattedStats = append(formattedStats, s.getMemoryStats(containerStats, dedot))
 	}
 
 	return formattedStats
