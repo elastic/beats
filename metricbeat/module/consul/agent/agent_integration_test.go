@@ -39,8 +39,8 @@ func TestFetch(t *testing.T) {
 
 	compose.EnsureUp(t, "consul")
 
-	f := mbtest.NewReportingMetricSetV2(t, consul.GetConfig([]string{"agent"}))
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, consul.GetConfig([]string{"agent"}))
+	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}

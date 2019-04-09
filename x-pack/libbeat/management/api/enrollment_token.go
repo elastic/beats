@@ -14,16 +14,19 @@ func (c *Client) CreateEnrollmentToken() (string, error) {
 	headers := http.Header{}
 
 	resp := struct {
-		Tokens []string `json:"tokens"`
+		Results []struct {
+			Token string `json:"item"`
+		} `json:"results"`
 	}{}
+
 	_, err := c.request("POST", "/api/beats/enrollment_tokens", nil, headers, &resp)
 	if err != nil {
 		return "", err
 	}
 
-	if len(resp.Tokens) != 1 {
-		return "", fmt.Errorf("Unexpected number of tokens, got %d, only one expected", len(resp.Tokens))
+	if tokensCount := len(resp.Results); tokensCount != 1 {
+		return "", fmt.Errorf("Unexpected number of tokens, got %d, only one expected", tokensCount)
 	}
 
-	return resp.Tokens[0], nil
+	return resp.Results[0].Token, nil
 }

@@ -21,12 +21,9 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
-
-var logger = logp.NewLogger("docker.cpu")
 
 func init() {
 	mb.Registry.MustAddMetricSet("docker", "cpu", New,
@@ -72,17 +69,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch returns a list of docker CPU stats.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
-		err = errors.Wrap(err, "failed to get docker stats")
-		logger.Error(err)
-		r.Error(err)
-		return
+		return errors.Wrap(err, "failed to get docker stats")
 	}
 
 	formattedStats := m.cpuService.getCPUStatsList(stats, m.dedot)
 	eventsMapping(r, formattedStats)
+
+	return nil
 }
 
 //Close stops the metricset

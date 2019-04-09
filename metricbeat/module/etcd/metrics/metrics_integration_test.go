@@ -17,37 +17,59 @@
 
 // +build integration
 
-package collector
+package metrics
 
 import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "prometheus")
+func TestFetch(t *testing.T) {
+	logp.TestingSetup()
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal(err)
+	compose.EnsureUp(t, "etcd")
+
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
+}
+
+func TestData(t *testing.T) {
+	compose.EnsureUp(t, "etcd")
+
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
+		t.Fatal("write", err)
 	}
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "prometheus",
-		"metricsets": []string{"collector"},
-		"hosts":      []string{getPrometheusEnvHost() + ":" + getPrometheusEnvPort()},
-		"namespace":  "collector",
+		"module":     "etcd",
+		"metricsets": []string{"metrics"},
+		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
 	}
 }
 
-func getPrometheusEnvHost() string {
-	host := os.Getenv("PROMETHEUS_HOST")
+func GetEnvHost() string {
+	host := os.Getenv("ETCD_HOST")
 
 	if len(host) == 0 {
 		host = "127.0.0.1"
@@ -55,11 +77,11 @@ func getPrometheusEnvHost() string {
 	return host
 }
 
-func getPrometheusEnvPort() string {
-	port := os.Getenv("PROMETHEUS_PORT")
+func GetEnvPort() string {
+	port := os.Getenv("ETCD_PORT")
 
 	if len(port) == 0 {
-		port = "9090"
+		port = "2379"
 	}
 	return port
 }

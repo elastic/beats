@@ -14,7 +14,7 @@
 ###########################################################################
 
 # Zone1
-my.domain.org {
+my.domain.elastic {
     log
     errors
     auto
@@ -25,7 +25,7 @@ my.domain.org {
 
     # If you wish to use a standard Hosts File format, uncomment the following
     # line and customize the specified file
-    hosts /etc/coredns/mydomain.hosts my.domain.org
+    hosts /etc/coredns/mydomain.hosts my.domain.elastic
 }
 
 # Zone2

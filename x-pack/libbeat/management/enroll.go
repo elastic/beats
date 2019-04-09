@@ -7,6 +7,7 @@ package management
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -52,8 +53,10 @@ func Enroll(
 
 	configFile := cfgfile.GetDefaultCfgfile()
 
+	ts := time.Now()
+
 	// backup current settings:
-	backConfigFile := configFile + ".bak"
+	backConfigFile := configFile + "." + ts.Format(time.RFC3339) + ".bak"
 	fmt.Println("Saving a copy of current settings to " + backConfigFile)
 	err = file.SafeFileRotate(backConfigFile, configFile)
 	if err != nil {
