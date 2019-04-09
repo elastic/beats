@@ -54,6 +54,9 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
+- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
+
 *Packetbeat*
 
 *Winlogbeat*
