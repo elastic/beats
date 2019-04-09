@@ -511,14 +511,18 @@ processors:
 - add_cloud_metadata: ~
 -------------------------------------------------------------------------------
 
-The `add_cloud_metadata` processor has one optional configuration setting named
-`timeout` that specifies the maximum amount of time to wait for a successful
-response when detecting the hosting provider. The default timeout value is
-`3s`.
+The `add_cloud_metadata` processor has two optional configuration settings.
+The first one is `timeout` which specifies the maximum amount of time to wait
+for a successful response when detecting the hosting provider. The default
+timeout value is `3s`.
 
 If a timeout occurs then no instance metadata will be added to the events. This
 makes it possible to enable this processor for all your deployments (in the
 cloud or on-premise).
+
+The second optional configuration setting is `overwrite`. When `overwrite` is
+`true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
+default).
 
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.
