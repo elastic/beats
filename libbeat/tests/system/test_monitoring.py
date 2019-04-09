@@ -188,6 +188,12 @@ class Test(BaseTest):
         for key in dict1_keys:
             dict1_val = dict1[key]
             dict2_val = dict2[key]
+
+            # Cast ints to floats for more practical type comparison further down
+            if isinstance(dict1_val, int):
+                dict1_val = float(dict1_val)
+            if isinstance(dict2_val, int):
+                dict2_val = float(dict2_val)
             self.assertEqual(type(dict1_val), type(dict2_val))
             if type(dict1_val) is dict:
                 self.assert_same_structure(dict1_val, dict2_val)
