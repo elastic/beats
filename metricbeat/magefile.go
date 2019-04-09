@@ -22,6 +22,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"time"
 
@@ -91,6 +92,27 @@ func TestPackages() error {
 // Update updates the generated files (aka make update).
 func Update() error {
 	return sh.Run("make", "update")
+}
+
+// MockedTests runs the HTTP tests using the mocked data inside each {module}/{metricset}/testdata folder.
+// Use MODULE={module_name} to run only mocked tests with a single module.
+// Use GENERATE=true or GENERATE=1 to regenerate JSON files.
+func MockedTests() error {
+	goTestDefaultArgs := mage.DefaultGoTestUnitArgs()
+
+	goTestDefaultArgs.ExtraFlags = []string{"github.com/elastic/beats/metricbeat/mb/testing/data/."}
+
+	if module := os.Getenv("MODULE"); module != "" {
+		goTestDefaultArgs.ExtraFlags = append(goTestDefaultArgs.ExtraFlags, fmt.Sprintf("-module=%s", module))
+	}
+
+	if generate := os.Getenv("GENERATE"); generate == "true" || generate == "1" {
+		goTestDefaultArgs.ExtraFlags = append(goTestDefaultArgs.ExtraFlags, "-generate")
+	}
+
+	goTestDefaultArgs.Packages = []string{}
+
+	return mage.GoTest(context.Background(), goTestDefaultArgs)
 }
 
 // Fields generates a fields.yml for the Beat.
