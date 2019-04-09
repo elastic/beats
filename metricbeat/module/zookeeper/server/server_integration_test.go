@@ -36,8 +36,8 @@ func TestFetch(t *testing.T) {
 
 	compose.EnsureUp(t, "zookeeper")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
@@ -55,6 +55,14 @@ func TestFetch(t *testing.T) {
 
 		nodeCount := metricsetFields["node_count"].(int64)
 		assert.True(t, nodeCount >= 1)
+	}
+}
+
+func TestData(t *testing.T) {
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+		t.Fatal("write", err)
 	}
 }
 
