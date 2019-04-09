@@ -36,7 +36,6 @@ var defaultConfig = config{
 		Host: "localhost:8080",
 		// TODO: What should be the default timeout?
 		Timeout:    time.Minute * 5,
-		ReadBuffer: 0 * humanize.KiByte,
 	},
 }
 
