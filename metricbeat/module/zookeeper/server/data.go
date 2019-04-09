@@ -28,6 +28,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 var latencyCapturer = regexp.MustCompile(`(\d+)/(\d+)/(\d+)`)
@@ -39,7 +40,7 @@ var fieldsCapturer = regexp.MustCompile(`^([a-zA-Z\s]+):\s(\d+)`)
 var versionCapturer = regexp.MustCompile(`:\s(.*),`)
 var dateCapturer = regexp.MustCompile(`built on (.*)`)
 
-func parseSrvr(i io.Reader) (common.MapStr, string, error) {
+func parseSrvr(i io.Reader, logger *logp.Logger) (common.MapStr, string, error) {
 	scanner := bufio.NewScanner(i)
 
 	//Get version
