@@ -3823,6 +3823,18 @@ Fields from the Windows Event Log.
 
 
 
+*`log.file.path`*::
++
+--
+type: keyword
+
+required: False
+
+The name of the file the event was read from when Winlogbeat is reading directly from an .evtx file.
+
+
+--
+
 *`event.code`*::
 +
 --
