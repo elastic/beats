@@ -36,10 +36,6 @@ before upgrading {beats}. If you're on {beats} 6.0 through 6.6,
 upgrade the {stack} and {beats} to version 6.7 *before* proceeding with the
 7.0 upgrade.
 
-// TODO: Determine whether it's necessary to remind users that the default_field
-// setting must be applied to older indices. The migration 
-// assistant in Kibana should make this clear.
-
 Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
 supported.
 
@@ -57,10 +53,8 @@ other products in the {stack}, upgrade {beats} as part of the
 Upgrading to 6.7 is required because the {es} index template was modified to
 be compatible with {es} 7.0 (the `_type` setting changed from `doc` to `_doc`).
 
-After upgrading to 6.7, make sure the 6.7 template gets loaded. 
-
-// Dear Santa, for Christmas, please give me a widget for displaying platform-
-// specific commands.
+After upgrading to 6.7, use the {ref}/indices-templates.html#getting[Index
+Template API] to verify that the 6.7 index template has been created in {ES}.
 
 :asset: the index template
 :option: template
@@ -85,9 +79,14 @@ https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
 
 Before upgrading:
 
-. Back up the `data` and `config` directories. 
 . Stop the existing {beats} process by using the appropriate command for your
 system.
+. Back up the `data` and `config` directories by copying them to another
+location.
++
+TIP: The location of these directories depends on the installation method. To
+see the current paths, start the Beat from a terminal, and the `data` and
+`config` paths are printed at startup.
 
 To upgrade using a Debian or RPM package:
 
@@ -151,11 +150,11 @@ with indices created by {beats} 7.0 or later. The aliases do *not* work
 with saved searches or with API calls that manipulate documents directly.
 
 We strongly advise that you adjust your custom {kib} dashboards, machine
-learning jobs, and other content to use the new ECS field names. The aliases
-may be removed in version 8.0.
+learning jobs, and other content to use the new ECS field names. After removing
+all references to old fields, set `migration.6_to_7.enabled: false` so that
+field aliases will not be created during your next minor upgrade.
 
-// REVIEWERS: Is the 8.0 statement correct? Should I mention it here? If so,
-// should I say "will be removed"?
+The aliases will be removed in 8.0.
 
 Did you run the Beat or load the index template before reading this section?
 That's OK. See the clean-up steps described under <<missing-fields>>.
@@ -171,13 +170,13 @@ Index templates and the default index names are versioned. For example,
 metricbeat-{stack-version}-2019.04.02
 ------------------------------------------------------------------------------
 
-And the corresponding {es} template is named +metricbeat-{stack-version}+.
+And the corresponding {es} index template is named +metricbeat-{stack-version}+.
 
 This means that each version of the Beat creates a new index, and it's
-guaranteed that the correct template for that version is applied. With these
-changes in place, you generally don't have to do anything to upgrade the index
-template when you move to a new version. Just load the new version of the
-template *before* ingesting any data into {es}. 
+guaranteed that the correct index template for that version is applied. With
+these changes in place, you generally don't have to do anything to upgrade the
+index template when you move to a new version. Just load the new version of the
+index template *before* ingesting any data into {es}. 
 
 If you plan to run {beats} 6.7 and 7.0 in parallel, make sure you
 <<enable-ecs-compatibility,enable the compatibility layer>> *before* you load
@@ -188,20 +187,20 @@ the index template.
 
 include::upgrade-setup-commands.asciidoc[]
 
-TIP: When loading the template, you can also specify
+TIP: When loading the index template, you can also specify
 `-E setup.template.settings.index.number_of_shards=n` where `n` is the number of
 shards to use for the index. 
 
 [[non-es-outputs]]
-==== How to use versioned templates when the output is not {es}
+==== How to use versioned index templates when the output is not {es}
 
 If you've configured {beats} to send events to a different output, such as {ls},
-make sure you use versioned templates and indices. Otherwise, after you
+make sure you use versioned index templates and indices. Otherwise, after you
 upgrade, there will be field conflicts.
 
 To use versioned index templates and indices with {ls}, configure your
 {ls} pipeline to use the metadata from {beats} to set the index, and allow
-Beats to manage the template:
+Beats to manage the index template:
 
 [source,json]
 ----
@@ -215,7 +214,7 @@ pattern in the {beats} index template. See the
 for more information.
 
 For other non-{es} outputs, use the metadata from {beats} to set the index, and
-allow {beats} to load and manage the template, as described under
+allow {beats} to load and manage the index template, as described under
 <<upgrade-index-template>>.
 
 IMPORTANT: The index name must match the index pattern in the {beats} index
@@ -297,8 +296,10 @@ up and start again:
 DELETE metricbeat-{stack-version}-2019.04.02*
 ----
 +
-WARNING: Be careful when deleting indices. The example shown here deletes
-all data indexed into the metricbeat-{stack-version} indices on 2019.04.02.
+WARNING: Be careful when using wildcards to delete indices. Make sure the
+pattern matches only the indices you want to delete. The example shown here
+deletes all data indexed into the metricbeat-{stack-version} indices on
+2019.04.02.
 
 . If you want the index to work with 6.x dashboards, turn on the compatibility
 layer. See <<enable-ecs-compatibility>>.
@@ -338,8 +339,8 @@ new errors related to user authorization when you run version 7.0 against an
 
 ===== `[indices:admin/template/put] is unauthorized for user` 
 
-*Problem:* Automatic template loading is required when ILM is enabled, but the
-user is not authorized to manage index templates.
+*Problem:* Automatic index template loading is required when ILM is enabled, but the user
+is not authorized to manage index templates.
 
 *Solution:* Grant the `manage_index_templates` cluster privilege.
 
@@ -369,4 +370,45 @@ under <<missing-fields>>.
 You might be writing to an index that doesn't match the index pattern used
 by {beats}. See <<non-es-outputs>>.
 
+
+[[dashboard-shard-failed]]
+==== "shard failed" error when viewing {beats} dashboards in {kib}
+
+After upgrading to {es} 7.0, any indices created by Beats 6.6 or older will not
+work in {kib} dashboards until the `index.query.default_field` setting is added
+to each index. Indices created in Beats 6.7 or later are unaffected.
+
+*Background:* Starting in {es} 7.0, some query types, such as Simple Query
+String, have a limit to the number of fields they will query against. Because
+Beats indices often contain more fields than this cap, the
+`index.query.default_field` index setting is used to inform {es} which fields to
+use by default when no field is specified for a query.
+
+To add the setting to the index, you can use the 7.0
+{kibana-ref}/upgrade-assistant.html[Upgrade Assistant], or add the setting
+manually.
+
+To add the setting manually, first identify the list of fields that you want to
+set as the default search fields, then specify the list of fields in the
+`default_field` setting. For example:
+
+// REVIEWERS: Can we provide users with a more realistic example here that
+// maybe shows some fields for metricbeat? This one is too generic. 
+
+[source,js]
+--------------------------------------------------
+PUT /myIndex/_settings
+{
+  "index": {
+    "query": {
+      "default_field": [
+        "field1",
+        "nestedfield.field4",
+        "field2",
+      ]
+    }
+  }
+}
+--------------------------------------------------
+// CONSOLE
 
