@@ -19,10 +19,10 @@ produces:
 consumes:
   - "application/json"
   - "text/plain"
-basePath: "/v1.30"
+basePath: "/v1.31"
 info:
   title: "Docker Engine API"
-  version: "1.30"
+  version: "1.31"
   x-logo:
     url: "https://docs.docker.com/images/logo-docker-main.png"
   description: |
@@ -52,10 +52,11 @@ info:
 
     The API uses an open schema model, which means server may add extra properties to responses. Likewise, the server will ignore any extra query parameters and request body properties. When you write clients, you need to ignore additional properties in responses to ensure they do not break when talking to newer Docker daemons.
 
-    This documentation is for version 1.30 of the API, which was introduced with Docker 17.06. Use this table to find documentation for previous versions of the API:
+    This documentation is for version 1.31 of the API. Use this table to find documentation for previous versions of the API:
 
     Docker version  | API version | Changes
     ----------------|-------------|---------
+    17.06.x | [1.30](https://docs.docker.com/engine/api/v1.30/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-30-api-changes)
     17.05.x | [1.29](https://docs.docker.com/engine/api/v1.29/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-29-api-changes)
     17.04.x | [1.28](https://docs.docker.com/engine/api/v1.28/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-28-api-changes)
     17.03.1 | [1.27](https://docs.docker.com/engine/api/v1.27/) | [API changes](https://docs.docker.com/engine/api/version-history/#v1-27-api-changes)
@@ -321,7 +322,6 @@ definitions:
       MaximumRetryCount:
         type: "integer"
         description: "If `on-failure` is used, the number of times to retry before giving up"
-    default: {}
 
   Resources:
     description: "A container's resources (cgroups config, ulimits, etc)"
@@ -485,6 +485,41 @@ definitions:
         description: "Maximum IO in bytes per second for the container system drive (Windows only)"
         type: "integer"
         format: "int64"
+
+  ResourceObject:
+    description: "An object describing the resources which can be advertised by a node and requested by a task"
+    type: "object"
+    properties:
+      NanoCPUs:
+        type: "integer"
+        format: "int64"
+      MemoryBytes:
+        type: "integer"
+        format: "int64"
+      GenericResources:
+        $ref: "#/definitions/GenericResources"
+
+  GenericResources:
+    description: "User defined Resources, can be either Integer resources (e.g: SSD=3) or String resources (e.g: GPU={UUID1, UUID2})"
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        NamedResourceSpec:
+          type: "object"
+          properties:
+            Kind:
+              type: "string"
+            Value:
+              type: "string"
+        DiscreteResourceSpec:
+          type: "object"
+          properties:
+            Kind:
+              type: "string"
+            Value:
+              type: "integer"
+              format: "int64"
 
   HealthConfig:
     description: "A test to perform to check that the container is healthy."
@@ -711,7 +746,7 @@ definitions:
               - "process"
               - "hyperv"
 
-  Config:
+  ContainerConfig:
     description: "Configuration for a container that is portable between hosts"
     type: "object"
     properties:
@@ -908,7 +943,7 @@ definitions:
         type: "string"
         x-nullable: false
       ContainerConfig:
-        $ref: "#/definitions/Config"
+        $ref: "#/definitions/ContainerConfig"
       DockerVersion:
         type: "string"
         x-nullable: false
@@ -916,7 +951,7 @@ definitions:
         type: "string"
         x-nullable: false
       Config:
-        $ref: "#/definitions/Config"
+        $ref: "#/definitions/ContainerConfig"
       Architecture:
         type: "string"
         x-nullable: false
@@ -948,6 +983,12 @@ definitions:
               type: "string"
           BaseLayer:
             type: "string"
+      Metadata:
+        type: "object"
+        properties:
+          LastTagTime:
+            type: "string"
+            format: "dateTime"
 
   ImageSummary:
     type: "object"
@@ -1051,7 +1092,7 @@ definitions:
       CreatedAt:
         type: "string"
         format: "dateTime"
-        description: "Time volume was created."
+        description: "Date/Time the volume was created."
       Status:
         type: "object"
         description: |
@@ -1082,17 +1123,27 @@ definitions:
           type: "string"
       UsageData:
         type: "object"
+        x-nullable: true
         required: [Size, RefCount]
+        description: |
+          Usage details about the volume. This information is used by the
+          `GET /system/df` endpoint, and omitted in other endpoints.
         properties:
           Size:
             type: "integer"
-            description: "The disk space used by the volume (local driver only)"
             default: -1
+            description: |
+              Amount of disk space used by the volume (in bytes). This information
+              is only available for volumes created with the `"local"` volume
+              driver. For volumes created with other volume drivers, this field
+              is set to `-1` ("not available")
             x-nullable: false
           RefCount:
             type: "integer"
             default: -1
-            description: "The number of containers referencing this volume."
+            description: |
+              The number of containers referencing this volume. This field
+              is set to `-1` if the reference-count is not available.
             x-nullable: false
 
     example:
@@ -1342,26 +1393,33 @@ definitions:
       Name:
         type: "string"
         x-nullable: false
+        example: "some-mount"
       Description:
         type: "string"
         x-nullable: false
+        example: "This is a mount that's used by the plugin."
       Settable:
         type: "array"
         items:
           type: "string"
       Source:
         type: "string"
+        example: "/var/lib/docker/plugins/"
       Destination:
         type: "string"
         x-nullable: false
+        example: "/mnt/state"
       Type:
         type: "string"
         x-nullable: false
+        example: "bind"
       Options:
         type: "array"
         items:
           type: "string"
-
+        example:
+          - "rbind"
+          - "rw"
   PluginDevice:
     type: "object"
     required: [Name, Description, Settable, Path]
@@ -1379,6 +1437,7 @@ definitions:
           type: "string"
       Path:
         type: "string"
+        example: "/dev/fuse"
 
   PluginEnv:
     type: "object"
@@ -1420,13 +1479,16 @@ definitions:
     properties:
       Id:
         type: "string"
+        example: "5724e2c8652da337ab2eedd19fc6fc0ec908e4bd907c7421bf6a8dfc70c4c078"
       Name:
         type: "string"
         x-nullable: false
+        example: "tiborvass/sample-volume-plugin"
       Enabled:
-        description: "True when the plugin is running. False when the plugin is not running, only installed."
+        description: "True if the plugin is running. False if the plugin is not running, only installed."
         type: "boolean"
         x-nullable: false
+        example: true
       Settings:
         description: "Settings that can be modified by users."
         type: "object"
@@ -1441,6 +1503,8 @@ definitions:
             type: "array"
             items:
               type: "string"
+            example:
+              - "DEBUG=0"
           Args:
             type: "array"
             items:
@@ -1453,6 +1517,7 @@ definitions:
         description: "plugin remote reference used to push/pull the plugin"
         type: "string"
         x-nullable: false
+        example: "localhost:5000/tiborvass/sample-volume-plugin:latest"
       Config:
         description: "The config of a plugin."
         type: "object"
@@ -1476,12 +1541,15 @@ definitions:
             description: "Docker Version used to create the plugin"
             type: "string"
             x-nullable: false
+            example: "17.06.0-ce"
           Description:
             type: "string"
             x-nullable: false
+            example: "A sample volume plugin for Docker"
           Documentation:
             type: "string"
             x-nullable: false
+            example: "https://docs.docker.com/engine/extend/plugins/"
           Interface:
             description: "The interface between Docker and the plugin"
             x-nullable: false
@@ -1492,16 +1560,23 @@ definitions:
                 type: "array"
                 items:
                   $ref: "#/definitions/PluginInterfaceType"
+                example:
+                  - "docker.volumedriver/1.0"
               Socket:
                 type: "string"
                 x-nullable: false
+                example: "plugins.sock"
           Entrypoint:
             type: "array"
             items:
               type: "string"
+            example:
+              - "/usr/bin/sample-volume-plugin"
+              - "/data"
           WorkDir:
             type: "string"
             x-nullable: false
+            example: "/bin/"
           User:
             type: "object"
             x-nullable: false
@@ -1509,9 +1584,11 @@ definitions:
               UID:
                 type: "integer"
                 format: "uint32"
+                example: 1000
               GID:
                 type: "integer"
                 format: "uint32"
+                example: 1000
           Network:
             type: "object"
             x-nullable: false
@@ -1520,6 +1597,7 @@ definitions:
               Type:
                 x-nullable: false
                 type: "string"
+                example: "host"
           Linux:
             type: "object"
             x-nullable: false
@@ -1529,9 +1607,13 @@ definitions:
                 type: "array"
                 items:
                   type: "string"
+                example:
+                  - "CAP_SYS_ADMIN"
+                  - "CAP_SYSLOG"
               AllowAllDevices:
                 type: "boolean"
                 x-nullable: false
+                example: false
               Devices:
                 type: "array"
                 items:
@@ -1539,12 +1621,15 @@ definitions:
           PropagatedMount:
             type: "string"
             x-nullable: false
+            example: "/mnt/volumes"
           IpcHost:
             type: "boolean"
             x-nullable: false
+            example: false
           PidHost:
             type: "boolean"
             x-nullable: false
+            example: false
           Mounts:
             type: "array"
             items:
@@ -1553,6 +1638,11 @@ definitions:
             type: "array"
             items:
               $ref: "#/definitions/PluginEnv"
+            example:
+              - Name: "DEBUG"
+                Description: "If set, prints debug messages"
+                Settable: null
+                Value: "0"
           Args:
             type: "object"
             x-nullable: false
@@ -1561,9 +1651,11 @@ definitions:
               Name:
                 x-nullable: false
                 type: "string"
+                example: "args"
               Description:
                 x-nullable: false
                 type: "string"
+                example: "command line arguments"
               Settable:
                 type: "array"
                 items:
@@ -1577,50 +1669,14 @@ definitions:
             properties:
               type:
                 type: "string"
+                example: "layers"
               diff_ids:
                 type: "array"
                 items:
                   type: "string"
-    example:
-      Id: "5724e2c8652da337ab2eedd19fc6fc0ec908e4bd907c7421bf6a8dfc70c4c078"
-      Name: "tiborvass/sample-volume-plugin"
-      Tag: "latest"
-      Active: true
-      Settings:
-        Env:
-          - "DEBUG=0"
-        Args: null
-        Devices: null
-      Config:
-        Description: "A sample volume plugin for Docker"
-        Documentation: "https://docs.docker.com/engine/extend/plugins/"
-        Interface:
-          Types:
-            - "docker.volumedriver/1.0"
-          Socket: "plugins.sock"
-        Entrypoint:
-          - "/usr/bin/sample-volume-plugin"
-          - "/data"
-        WorkDir: ""
-        User: {}
-        Network:
-          Type: ""
-        Linux:
-          Capabilities: null
-          AllowAllDevices: false
-          Devices: null
-        Mounts: null
-        PropagatedMount: "/data"
-        Env:
-          - Name: "DEBUG"
-            Description: "If set, prints debug messages"
-            Settable: null
-            Value: "0"
-        Args:
-          Name: "args"
-          Description: "command line arguments"
-          Settable: null
-          Value: []
+                example:
+                  - "sha256:675532206fbf3030b8458f88d6e26d4eb1577688a25efec97154c94e8b6b4887"
+                  - "sha256:e216a057b1cb1efc11f8a268f37ef62083e70b1b38323ba252e25ac88904a7e8"
 
   ObjectVersion:
     description: |
@@ -1630,7 +1686,7 @@ definitions:
       may not be applied if the version number has changed from the last read. In other words,
       if two update requests specify the same base version, only one of the requests can succeed.
       As a result, two separate update requests that happen at the same time will not
-      unintentially overwrite each other.
+      unintentionally overwrite each other.
     type: "object"
     properties:
       Index:
@@ -1695,14 +1751,7 @@ definitions:
               OS:
                 type: "string"
           Resources:
-            type: "object"
-            properties:
-              NanoCPUs:
-                type: "integer"
-                format: "int64"
-              MemoryBytes:
-                type: "integer"
-                format: "int64"
+            $ref: "#/definitions/ResourceObject"
           Engine:
             type: "object"
             properties:
@@ -1743,6 +1792,16 @@ definitions:
         Resources:
           NanoCPUs: 4000000000
           MemoryBytes: 8272408576
+          GenericResources:
+            - DiscreteResourceSpec:
+                Kind: "SSD"
+                Value: 3
+            - NamedResourceSpec:
+                Kind: "GPU"
+                Value: "UUID1"
+            - NamedResourceSpec:
+                Kind: "GPU"
+                Value: "UUID2"
         Engine:
           EngineVersion: "17.04.0"
           Labels:
@@ -1968,11 +2027,39 @@ definitions:
     description: "User modifiable task configuration."
     type: "object"
     properties:
+      PluginSpec:
+        type: "object"
+        description: "Invalid when specified with `ContainerSpec`."
+        properties:
+          Name:
+            description: "The name or 'alias' to use for the plugin."
+            type: "string"
+          Remote:
+            description: "The plugin image reference to use."
+            type: "string"
+          Disabled:
+            description: "Disable the plugin once scheduled."
+            type: "boolean"
+          PluginPrivilege:
+            type: "array"
+            items:
+              description: "Describes a permission accepted by the user upon installing the plugin."
+              type: "object"
+              properties:
+                Name:
+                  type: "string"
+                Description:
+                  type: "string"
+                Value:
+                  type: "array"
+                  items:
+                    type: "string"
       ContainerSpec:
         type: "object"
+        description: "Invalid when specified with `PluginSpec`."
         properties:
           Image:
-            description: "The image name to use for the container."
+            description: "The image name to use for the container"
             type: "string"
           Labels:
             description: "User-defined key/value data."
@@ -2008,6 +2095,57 @@ definitions:
             description: "A list of additional groups that the container process will run as."
             items:
               type: "string"
+          Privileges:
+            type: "object"
+            description: "Security options for the container"
+            properties:
+              CredentialSpec:
+                type: "object"
+                description: "CredentialSpec for managed service account (Windows only)"
+                properties:
+                  File:
+                    type: "string"
+                    description: |
+                      Load credential spec from this file. The file is read by the daemon, and must be present in the
+                      `CredentialSpecs` subdirectory in the docker data directory, which defaults to
+                      `C:\ProgramData\Docker\` on Windows.
+
+                      For example, specifying `spec.json` loads `C:\ProgramData\Docker\CredentialSpecs\spec.json`.
+
+                      <p><br /></p>
+
+                      > **Note**: `CredentialSpec.File` and `CredentialSpec.Registry` are mutually exclusive.
+                  Registry:
+                    type: "string"
+                    description: |
+                      Load credential spec from this value in the Windows registry. The specified registry value must be
+                      located in:
+
+                      `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization\Containers\CredentialSpecs`
+
+                      <p><br /></p>
+
+
+                      > **Note**: `CredentialSpec.File` and `CredentialSpec.Registry` are mutually exclusive.
+              SELinuxContext:
+                type: "object"
+                description: "SELinux labels of the container"
+                properties:
+                  Disable:
+                    type: "boolean"
+                    description: "Disable SELinux"
+                  User:
+                    type: "string"
+                    description: "SELinux user label"
+                  Role:
+                    type: "string"
+                    description: "SELinux role label"
+                  Type:
+                    type: "string"
+                    description: "SELinux type label"
+                  Level:
+                    type: "string"
+                    description: "SELinux level label"
           TTY:
             description: "Whether a pseudo-TTY should be allocated."
             type: "boolean"
@@ -2090,6 +2228,37 @@ definitions:
                     SecretName is the name of the secret that this references, but this is just provided for
                     lookup/display purposes. The secret in the reference will be identified by its ID.
                   type: "string"
+          Configs:
+            description: "Configs contains references to zero or more configs that will be exposed to the service."
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                File:
+                  description: "File represents a specific target that is backed by a file."
+                  type: "object"
+                  properties:
+                    Name:
+                      description: "Name represents the final filename in the filesystem."
+                      type: "string"
+                    UID:
+                      description: "UID represents the file UID."
+                      type: "string"
+                    GID:
+                      description: "GID represents the file GID."
+                      type: "string"
+                    Mode:
+                      description: "Mode represents the FileMode of the file."
+                      type: "integer"
+                      format: "uint32"
+                ConfigID:
+                  description: "ConfigID represents the ID of the specific config that we're referencing."
+                  type: "string"
+                ConfigName:
+                  description: |
+                    ConfigName is the name of the config that this references, but this is just provided for
+                    lookup/display purposes. The config in the reference will be identified by its ID.
+                  type: "string"
 
       Resources:
         description: "Resource requirements which apply to each individual container created as part of the service."
@@ -2097,27 +2266,10 @@ definitions:
         properties:
           Limits:
             description: "Define resources limits."
-            type: "object"
-            properties:
-              NanoCPUs:
-                description: "CPU limit in units of 10<sup>-9</sup> CPU shares."
-                type: "integer"
-                format: "int64"
-              MemoryBytes:
-                description: "Memory limit in Bytes."
-                type: "integer"
-                format: "int64"
+            $ref: "#/definitions/ResourceObject"
           Reservation:
             description: "Define resources reservation."
-            properties:
-              NanoCPUs:
-                description: "CPU reservation in units of 10<sup>-9</sup> CPU shares."
-                type: "integer"
-                format: "int64"
-              MemoryBytes:
-                description: "Memory reservation in Bytes."
-                type: "integer"
-                format: "int64"
+            $ref: "#/definitions/ResourceObject"
       RestartPolicy:
         description: "Specification for the restart policy which applies to containers created as part of this service."
         type: "object"
@@ -2248,6 +2400,8 @@ definitions:
       NodeID:
         description: "The ID of the node that this task is on."
         type: "string"
+      AssignedGenericResources:
+        $ref: "#/definitions/GenericResources"
       Status:
         type: "object"
         properties:
@@ -2327,6 +2481,16 @@ definitions:
                   Gateway: "10.255.0.1"
           Addresses:
             - "10.255.0.10/16"
+      AssignedGenericResources:
+        - DiscreteResourceSpec:
+            Kind: "SSD"
+            Value: 3
+        - NamedResourceSpec:
+            Kind: "GPU"
+            Value: "UUID1"
+        - NamedResourceSpec:
+            Kind: "GPU"
+            Value: "UUID2"
   ServiceSpec:
     description: "User modifiable configuration for a service."
     properties:
@@ -2693,11 +2857,48 @@ definitions:
         type: "string"
         format: "dateTime"
       Spec:
-        $ref: "#/definitions/ServiceSpec"
+        $ref: "#/definitions/SecretSpec"
+  ConfigSpec:
+    type: "object"
+    properties:
+      Name:
+        description: "User-defined name of the config."
+        type: "string"
+      Labels:
+        description: "User-defined key/value metadata."
+        type: "object"
+        additionalProperties:
+          type: "string"
+      Data:
+        description: "Base64-url-safe-encoded config data"
+        type: "array"
+        items:
+          type: "string"
+  Config:
+    type: "object"
+    properties:
+      ID:
+        type: "string"
+      Version:
+        $ref: "#/definitions/ObjectVersion"
+      CreatedAt:
+        type: "string"
+        format: "dateTime"
+      UpdatedAt:
+        type: "string"
+        format: "dateTime"
+      Spec:
+        $ref: "#/definitions/ConfigSpec"
+
 paths:
   /containers/json:
     get:
       summary: "List containers"
+      description: |
+        Returns a list of containers. For details on the format, see [the inspect endpoint](#operation/ContainerInspect).
+
+        Note that it uses a different, smaller representation of a container than inspecting a single container. For example,
+        the list of linked containers is not propagated .
       operationId: "ContainerList"
       produces:
         - "application/json"
@@ -2898,7 +3099,7 @@ paths:
           description: "Container to create"
           schema:
             allOf:
-              - $ref: "#/definitions/Config"
+              - $ref: "#/definitions/ContainerConfig"
               - type: "object"
                 properties:
                   HostConfig:
@@ -3196,7 +3397,7 @@ paths:
                 items:
                   $ref: "#/definitions/MountPoint"
               Config:
-                $ref: "#/definitions/Config"
+                $ref: "#/definitions/ContainerConfig"
               NetworkSettings:
                 $ref: "#/definitions/NetworkConfig"
           examples:
@@ -4739,6 +4940,27 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
       tags: ["Image"]
+  /build/prune:
+    post:
+      summary: "Delete builder cache"
+      produces:
+        - "application/json"
+      operationId: "BuildPrune"
+      responses:
+        200:
+          description: "No error"
+          schema:
+            type: "object"
+            properties:
+              SpaceReclaimed:
+                description: "Disk space reclaimed in bytes"
+                type: "integer"
+                format: "int64"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      tags: ["Image"]
   /images/create:
     post:
       summary: "Create an image"
@@ -5331,6 +5553,8 @@ paths:
                   type: "string"
               MemTotal:
                 type: "integer"
+              GenericResources:
+                $ref: "#/definitions/GenericResources"
               MemoryLimit:
                 type: "boolean"
               NCPU:
@@ -5562,7 +5786,7 @@ paths:
           in: "body"
           description: "The container configuration"
           schema:
-            $ref: "#/definitions/Config"
+            $ref: "#/definitions/ContainerConfig"
         - name: "container"
           in: "query"
           description: "The ID or name of the container to commit"
@@ -5601,15 +5825,23 @@ paths:
 
         Various objects within Docker report events when something happens to them.
 
-        Containers report these events: `attach, commit, copy, create, destroy, detach, die, exec_create, exec_detach, exec_start, export, health_status, kill, oom, pause, rename, resize, restart, start, stop, top, unpause, update`
+        Containers report these events: `attach`, `commit`, `copy`, `create`, `destroy`, `detach`, `die`, `exec_create`, `exec_detach`, `exec_start`, `export`, `health_status`, `kill`, `oom`, `pause`, `rename`, `resize`, `restart`, `start`, `stop`, `top`, `unpause`, and `update`
 
-        Images report these events: `delete, import, load, pull, push, save, tag, untag`
+        Images report these events: `delete`, `import`, `load`, `pull`, `push`, `save`, `tag`, and `untag`
 
-        Volumes report these events: `create, mount, unmount, destroy`
+        Volumes report these events: `create`, `mount`, `unmount`, and `destroy`
 
-        Networks report these events: `create, connect, disconnect, destroy`
+        Networks report these events: `create`, `connect`, `disconnect`, `destroy`, `update`, and `remove`
 
         The Docker daemon reports these events: `reload`
+
+        Services report these events: `create`, `update`, and `remove`
+
+        Nodes report these events: `create`, `update`, and `remove`
+
+        Secrets report these events: `create`, `update`, and `remove`
+
+        Configs report these events: `create`, `update`, and `remove`
 
       operationId: "SystemEvents"
       produces:
@@ -5684,7 +5916,8 @@ paths:
             - `label=<string>` image or container label
             - `network=<string>` network name or ID
             - `plugin`=<string> plugin name or ID
-            - `type=<string>` object to filter by, one of `container`, `image`, `volume`, `network`, or `daemon`
+            - `scope`＝<string> local or swarm
+            - `type=<string>` object to filter by, one of `container`, `image`, `volume`, `network`, `daemon`, `plugin`, `node`, `service` or `secret`
             - `volume=<string>` volume name or ID
           type: "string"
       tags: ["System"]
@@ -5765,13 +5998,13 @@ paths:
                 -
                   Name: "my-volume"
                   Driver: "local"
-                  Mountpoint: ""
+                  Mountpoint: "/var/lib/docker/volumes/my-volume/_data"
                   Labels: null
-                  Scope: ""
+                  Scope: "local"
                   Options: null
                   UsageData:
-                    Size: 0
-                    RefCount: 0
+                    Size: 10920104
+                    RefCount: 2
         500:
           description: "server error"
           schema:
@@ -6136,7 +6369,8 @@ paths:
           examples:
             application/json:
               Volumes:
-                - Name: "tardis"
+                - CreatedAt: "2017-07-19T12:00:26Z"
+                  Name: "tardis"
                   Driver: "local"
                   Mountpoint: "/var/lib/docker/volumes/tardis"
                   Labels:
@@ -6431,6 +6665,10 @@ paths:
           description: "Detailed inspect output for troubleshooting"
           type: "boolean"
           default: false
+        - name: "scope"
+          in: "query"
+          description: "Filter the network by scope (swarm, global, or local)"
+          type: "string"
       tags: ["Network"]
 
     delete:
@@ -6698,46 +6936,6 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Plugin"
-            example:
-              - Id: "5724e2c8652da337ab2eedd19fc6fc0ec908e4bd907c7421bf6a8dfc70c4c078"
-                Name: "tiborvass/sample-volume-plugin"
-                Tag: "latest"
-                Active: true
-                Settings:
-                  Env:
-                    - "DEBUG=0"
-                  Args: null
-                  Devices: null
-                Config:
-                  Description: "A sample volume plugin for Docker"
-                  Documentation: "https://docs.docker.com/engine/extend/plugins/"
-                  Interface:
-                    Types:
-                      - "docker.volumedriver/1.0"
-                    Socket: "plugins.sock"
-                  Entrypoint:
-                    - "/usr/bin/sample-volume-plugin"
-                    - "/data"
-                  WorkDir: ""
-                  User: {}
-                  Network:
-                    Type: ""
-                  Linux:
-                    Capabilities: null
-                    AllowAllDevices: false
-                    Devices: null
-                  Mounts: null
-                  PropagatedMount: "/data"
-                  Env:
-                    - Name: "DEBUG"
-                      Description: "If set, prints debug messages"
-                      Settable: null
-                      Value: "0"
-                  Args:
-                    Name: "args"
-                    Description: "command line arguments"
-                    Settable: null
-                    Value: []
         500:
           description: "Server error"
           schema:
@@ -7357,6 +7555,16 @@ paths:
               AdvertiseAddr:
                 description: "Externally reachable address advertised to other nodes. This can either be an address/port combination in the form `192.168.1.1:4567`, or an interface followed by a port number, like `eth0:4567`. If the port number is omitted, the port number from the listen address is used. If `AdvertiseAddr` is not specified, it will be automatically detected when possible."
                 type: "string"
+              DataPathAddr:
+                description: |
+                  Address or interface to use for data path traffic (format: `<ip|interface>`), for example,  `192.168.1.1`,
+                  or an interface, like `eth0`. If `DataPathAddr` is unspecified, the same address as `AdvertiseAddr`
+                  is used.
+
+                  The `DataPathAddr` specifies the address that global scope network drivers will publish towards other
+                  nodes in order to reach the containers running on this node. Using this parameter it is possible to
+                  separate the container data traffic from the management traffic of the cluster.
+                type: "string"
               ForceNewCluster:
                 description: "Force creation of a new swarm."
                 type: "boolean"
@@ -7405,6 +7613,17 @@ paths:
                 type: "string"
               AdvertiseAddr:
                 description: "Externally reachable address advertised to other nodes. This can either be an address/port combination in the form `192.168.1.1:4567`, or an interface followed by a port number, like `eth0:4567`. If the port number is omitted, the port number from the listen address is used. If `AdvertiseAddr` is not specified, it will be automatically detected when possible."
+                type: "string"
+              DataPathAddr:
+                description: |
+                  Address or interface to use for data path traffic (format: `<ip|interface>`), for example,  `192.168.1.1`,
+                  or an interface, like `eth0`. If `DataPathAddr` is unspecified, the same address as `AdvertiseAddr`
+                  is used.
+
+                  The `DataPathAddr` specifies the address that global scope network drivers will publish towards other
+                  nodes in order to reach the containers running on this node. Using this parameter it is possible to
+                  separate the container data traffic from the management traffic of the cluster.
+
                 type: "string"
               RemoteAddrs:
                 description: "Addresses of manager nodes already participating in the swarm."
@@ -8384,6 +8603,198 @@ paths:
           format: "int64"
           required: true
       tags: ["Secret"]
+  /configs:
+    get:
+      summary: "List configs"
+      operationId: "ConfigList"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "no error"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Config"
+            example:
+              - ID: "ktnbjxoalbkvbvedmg1urrz8h"
+                Version:
+                  Index: 11
+                CreatedAt: "2016-11-05T01:20:17.327670065Z"
+                UpdatedAt: "2016-11-05T01:20:17.327670065Z"
+                Spec:
+                  Name: "server.conf"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        503:
+          description: "node is not part of a swarm"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "filters"
+          in: "query"
+          type: "string"
+          description: |
+            A JSON encoded value of the filters (a `map[string][]string`) to process on the configs list. Available filters:
+
+            - `id=<config id>`
+            - `label=<key> or label=<key>=value`
+            - `name=<config name>`
+            - `names=<config name>`
+      tags: ["Config"]
+  /configs/create:
+    post:
+      summary: "Create a config"
+      operationId: "ConfigCreate"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        201:
+          description: "no error"
+          schema:
+            type: "object"
+            properties:
+              ID:
+                description: "The ID of the created config."
+                type: "string"
+            example:
+              ID: "ktnbjxoalbkvbvedmg1urrz8h"
+        409:
+          description: "name conflicts with an existing object"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        503:
+          description: "node is not part of a swarm"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "body"
+          in: "body"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ConfigSpec"
+              - type: "object"
+                example:
+                  Name: "server.conf"
+                  Labels:
+                    foo: "bar"
+                  Data: "VEhJUyBJUyBOT1QgQSBSRUFMIENFUlRJRklDQVRFCg=="
+      tags: ["Config"]
+  /configs/{id}:
+    get:
+      summary: "Inspect a config"
+      operationId: "ConfigInspect"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "no error"
+          schema:
+            $ref: "#/definitions/Config"
+          examples:
+            application/json:
+              ID: "ktnbjxoalbkvbvedmg1urrz8h"
+              Version:
+                Index: 11
+              CreatedAt: "2016-11-05T01:20:17.327670065Z"
+              UpdatedAt: "2016-11-05T01:20:17.327670065Z"
+              Spec:
+                Name: "app-dev.crt"
+        404:
+          description: "config not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        503:
+          description: "node is not part of a swarm"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          type: "string"
+          description: "ID of the config"
+      tags: ["Config"]
+    delete:
+      summary: "Delete a config"
+      operationId: "ConfigDelete"
+      produces:
+        - "application/json"
+      responses:
+        204:
+          description: "no error"
+        404:
+          description: "config not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        503:
+          description: "node is not part of a swarm"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          type: "string"
+          description: "ID of the config"
+      tags: ["Config"]
+  /configs/{id}/update:
+    post:
+      summary: "Update a Config"
+      operationId: "ConfigUpdate"
+      responses:
+        200:
+          description: "no error"
+        400:
+          description: "bad parameter"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        404:
+          description: "no such config"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        503:
+          description: "node is not part of a swarm"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "The ID or name of the config"
+          type: "string"
+          required: true
+        - name: "body"
+          in: "body"
+          schema:
+            $ref: "#/definitions/ConfigSpec"
+          description: "The spec of the config to update. Currently, only the Labels field can be updated. All other fields must remain unchanged from the [ConfigInspect endpoint](#operation/ConfigInspect) response values."
+        - name: "version"
+          in: "query"
+          description: "The version number of the config object being updated. This is required to avoid conflicting writes."
+          type: "integer"
+          format: "int64"
+          required: true
+      tags: ["Config"]
   /distribution/{name}/json:
     get:
       summary: "Get image information from the registry"
@@ -8471,3 +8882,46 @@ paths:
           type: "string"
           required: true
       tags: ["Distribution"]
+  /session:
+    post:
+      summary: "Initialize interactive session"
+      description: |
+        Start a new interactive session with a server. Session allows server to call back to the client for advanced capabilities.
+
+        > **Note**: This endpoint is *experimental* and only available if the daemon is started with experimental
+        > features enabled. The specifications for this endpoint may still change in a future version of the API.
+
+        ### Hijacking
+
+        This endpoint hijacks the HTTP connection to HTTP2 transport that allows the client to expose gPRC services on that connection.
+
+        For example, the client sends this request to upgrade the connection:
+
+        ```
+        POST /session HTTP/1.1
+        Upgrade: h2c
+        Connection: Upgrade
+        ```
+
+        The Docker daemon will respond with a `101 UPGRADED` response follow with the raw stream:
+
+        ```
+        HTTP/1.1 101 UPGRADED
+        Connection: Upgrade
+        Upgrade: h2c
+        ```
+      operationId: "Session"
+      produces:
+        - "application/vnd.docker.raw-stream"
+      responses:
+        101:
+          description: "no error, hijacking successful"
+        400:
+          description: "bad parameter"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      tags: ["Session (experimental)"]
