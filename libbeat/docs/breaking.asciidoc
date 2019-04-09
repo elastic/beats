@@ -21,10 +21,24 @@ See the following topics for a description of breaking changes:
 [[breaking-changes-6.7]]
 === Breaking changes in 6.7
 
+This section discusses the main changes that you should be aware of if you
+upgrade the Beats to version 6.7. {see-relnotes}
+
+[[breaking-changes-central-management]]
+==== Beats central management uses new format
+
 The data structure used to store Beats central management data in Kibana has changed. As a result of the
 template changes, enrolled Beats and configuration tags created prior to 6.7 will not work until you migrate them to the new format.
 To migrate to the new format, use the https://github.com/elastic/migrate-management-beats/releases[migration tool] we've created.
 For more information, see the https://github.com/elastic/migrate-management-beats/blob/master/README.md[documentation] about the tool. {see-relnotes}
+
+[[breaking-changes-license]]
+==== Licensed {beats} require a licensed {es} server
+
+Elastic licensed {beats} now require an {es} server that has a valid Elastic
+license. To use {beats} with a non-licensed server,
+https://www.elastic.co/downloads/beats[download] and install an
+Apache 2.0 licensed distribution.
 
 [[breaking-changes-6.3]]
 === Breaking changes in 6.3
