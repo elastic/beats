@@ -32,6 +32,7 @@ func init() {
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	memoryService *MemoryService
