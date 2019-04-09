@@ -195,7 +195,8 @@ class Test(BaseTest):
             if isinstance(dict2_val, int):
                 dict2_val = float(dict2_val)
             self.assertEqual(type(dict1_val), type(dict2_val))
-            if type(dict1_val) is dict:
+
+            if isinstance(dict1_val, dict):
                 self.assert_same_structure(dict1_val, dict2_val)
 
     def clean_output_cluster(self):
