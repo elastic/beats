@@ -47,10 +47,12 @@ var constructors = map[string]processors.Constructor{
 	"AddLocale":             add_locale.New,
 	"AddProcessMetadata":    add_process_metadata.New,
 	"CommunityID":           communityid.New,
+	"CopyFields":            actions.NewCopyFields,
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
 	"Rename":                actions.NewRenameFields,
+	"TruncateFields":        actions.NewTruncateFields,
 }
 
 // beatProcessor wraps a processor for javascript.
