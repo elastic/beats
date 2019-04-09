@@ -147,8 +147,8 @@ with saved searches or with API calls that manipulate documents directly.
 
 We strongly advise that you adjust your custom {kib} dashboards, machine
 learning jobs, and other content to use the new ECS field names. After removing
-all references to old fields, set `migration.6_to_7.enabled: false` so that
-field aliases will not be created during your next minor upgrade.
+all references to old fields, you should set `migration.6_to_7.enabled: false`
+so that field aliases will not be created during your next minor upgrade.
 
 The aliases will be removed in 8.0.
 
