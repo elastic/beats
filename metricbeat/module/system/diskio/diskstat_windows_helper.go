@@ -27,14 +27,11 @@ import (
 )
 
 const (
-	fileDeviceDisk               = 0x00000007
-	fileAnyAccess                = 0x0000
-	errorSuccess   syscall.Errno = 0
+	errorSuccess         syscall.Errno = 0
+	ioctlDiskPerformance               = 0x70020
 )
 
 var (
-	// ioctlDiskPerformance :control code - https://docs.microsoft.com/en-us/windows/desktop/api/winioctl/ni-winioctl-ioctl_disk_performance
-	ioctlDiskPerformance        = getCtlCode(fileDeviceDisk, 0x0008, 0, fileAnyAccess)
 	modkernel32                 = syscall.NewLazyDLL("kernel32.dll")
 	procGetLogicalDriveStringsW = modkernel32.NewProc("GetLogicalDriveStringsW")
 )
@@ -59,29 +56,24 @@ type diskPerformance struct {
 	StorageManagerName  [8]uint16
 }
 
-// used to get the specific IOCTL_DISK_PERFORMANCE control code
-func getCtlCode(deviceType uint32, function uint32, method uint32, access uint32) uint32 {
-	return (deviceType << 16) | (access << 14) | (function << 2) | method
-}
-
-// IOCounters gets the diskio counters and maps them to the list of counterstat objects
-func iOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
+// ioCounters gets the diskio counters and maps them to the list of counterstat objects.
+func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	logicalDisks, err := getLogicalDriveStrings()
-	if err != nil || logicalDisks == nil {
+	if err != nil || len(logicalDisks) == 0 {
 		return nil, err
 	}
-	ret := make(map[string]disk.IOCountersStat, 0)
+	ret := make(map[string]disk.IOCountersStat)
 	for _, drive := range logicalDisks {
 		// not get _Total or Harddrive
 		if len(drive.Name) > 3 {
 			continue
 		}
-		//filter by included devices
+		// filter by included devices
 		if len(names) > 0 && !containsDrive(names, drive.Name) {
 			continue
 		}
 
-		var counter, err = iOCounter(drive.UNCPath)
+		counter, err := ioCounter(drive.UNCPath)
 		if err != nil {
 			return nil, err
 		}
@@ -98,8 +90,8 @@ func iOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	return ret, nil
 }
 
-// iOCounter calls syscal func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics
-func iOCounter(path string) (diskPerformance, error) {
+// i0Counter calls syscal func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics.
+func ioCounter(path string) (diskPerformance, error) {
 	var diskPerformance diskPerformance
 	var diskPerformanceSize uint32
 	utfPath, err := syscall.UTF16PtrFromString(path)
@@ -152,7 +144,7 @@ func getLogicalDriveStrings() ([]logicalDrive, error) {
 				continue
 			}
 			path := s + ":"
-			drive := logicalDrive{path, "\\\\.\\" + path}
+			drive := logicalDrive{path, `\\.\` + path}
 			logicalDrives = append(logicalDrives, drive)
 		}
 	}

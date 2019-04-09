@@ -27,28 +27,30 @@ import (
 )
 
 func Get_CLK_TCK() uint32 {
-	//return uint32(C.sysconf(C._SC_CLK_TCK))
-	//NOTE: _SC_CLK_TCK should be fetched from sysconf using cgo
+	// return uint32(C.sysconf(C._SC_CLK_TCK))
+	// NOTE: _SC_CLK_TCK should be fetched from sysconf using cgo
 	return uint32(100)
 }
 
-// function should map functionality to disk package for linux os
+// IOCounters should map functionality to disk package for linux os.
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	return disk.IOCounters(names...)
 }
 
+// NewDiskIOStat :init DiskIOStat object.
 func NewDiskIOStat() *DiskIOStat {
-	d := &DiskIOStat{}
-	d.lastDiskIOCounters = make(map[string]disk.IOCountersStat)
-	return d
+	return &DiskIOStat{
+		lastDiskIOCounters: map[string]disk.IOCountersStat{},
+	}
 }
 
-// create current cpu sampling
-// need call as soon as get IOCounters
+// OpenSampling creates current cpu sampling
+// need call as soon as get IOCounters.
 func (stat *DiskIOStat) OpenSampling() error {
 	return stat.curCpu.Get()
 }
 
+// CalIOStatistics calculates IO statistics.
 func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
 	var last disk.IOCountersStat
 	var ok bool
