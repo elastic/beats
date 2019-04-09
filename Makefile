@@ -73,7 +73,7 @@ update: notice
 	@$(MAKE) -C deploy/kubernetes all
 
 .PHONY: clean
-clean:
+clean: mage
 	@rm -rf build
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
 	@$(MAKE) -C generator clean
