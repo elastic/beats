@@ -23,8 +23,11 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
+	"fmt"
 	"hash"
 	"io"
+	"os"
+	"time"
 
 	"github.com/OneOfOne/xxhash"
 	"github.com/dustin/go-humanize"
@@ -102,6 +105,17 @@ func (d Digest) String() string {
 // MarshalText encodes the digest to a hexadecimal representation of itself.
 func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
+// FileTooLargeError is the error that occurs when a file that
+// exceeds the max file size is attempting to be hashed.
+type FileTooLargeError struct {
+	fileSize int64
+}
+
+// Error returns the error message for FileTooLargeError.
+func (e FileTooLargeError) Error() string {
+	return fmt.Sprintf("hasher: file size %d exceeds max file size", e.fileSize)
+}
+
 // Config contains the configuration of a FileHasher.
 type Config struct {
 	HashTypes           []HashType `config:"hash_types,replace"`
@@ -142,24 +156,41 @@ func (c *Config) Validate() error {
 type FileHasher struct {
 	config  Config
 	limiter *rate.Limiter
+
+	// To cancel hashing
+	done <-chan struct{}
 }
 
 // NewFileHasher creates a new FileHasher.
-func NewFileHasher(c Config) (*FileHasher, error) {
+func NewFileHasher(c Config, done <-chan struct{}) (*FileHasher, error) {
 	return &FileHasher{
 		config: c,
 		limiter: rate.NewLimiter(
-			rate.Limit(c.ScanRateBytesPerSec), // Fill Rate
-			int(c.MaxFileSizeBytes),           // Max Capacity
+			rate.Limit(c.ScanRateBytesPerSec), // Rate
+			int(c.MaxFileSizeBytes),           // Burst
 		),
+		done: done,
 	}, nil
 }
 
 // HashFile hashes the contents of a file.
-func (hasher *FileHasher) HashFile(name string) (map[HashType]Digest, error) {
+func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to stat file %v", path)
+	}
+
+	// Throttle reading and hashing rate.
+	if len(hasher.config.HashTypes) > 0 {
+		err = hasher.throttle(info.Size())
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to hash file %v", path)
+		}
+	}
+
 	var hashes []hash.Hash
-	for _, name := range hasher.config.HashTypes {
-		switch name {
+	for _, hashType := range hasher.config.HashTypes {
+		switch hashType {
 		case BLAKE2B_256:
 			h, _ := blake2b.New256(nil)
 			hashes = append(hashes, h)
@@ -196,27 +227,53 @@ func (hasher *FileHasher) HashFile(name string) (map[HashType]Digest, error) {
 		case XXH64:
 			hashes = append(hashes, xxhash.New64())
 		default:
-			return nil, errors.Errorf("unknown hash type '%v'", name)
+			return nil, errors.Errorf("unknown hash type '%v'", hashType)
 		}
 	}
 
-	f, err := file.ReadOpen(name)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open file for hashing")
-	}
-	defer f.Close()
+	if len(hashes) > 0 {
+		f, err := file.ReadOpen(path)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to open file for hashing")
+		}
+		defer f.Close()
 
-	hashWriter := multiWriter(hashes)
-	if _, err := io.Copy(hashWriter, f); err != nil {
-		return nil, errors.Wrap(err, "failed to calculate file hashes")
+		hashWriter := multiWriter(hashes)
+		if _, err := io.Copy(hashWriter, f); err != nil {
+			return nil, errors.Wrap(err, "failed to calculate file hashes")
+		}
+
+		nameToHash := make(map[HashType]Digest, len(hashes))
+		for i, h := range hashes {
+			nameToHash[hasher.config.HashTypes[i]] = h.Sum(nil)
+		}
+
+		return nameToHash, nil
 	}
 
-	nameToHash := make(map[HashType]Digest, len(hashes))
-	for i, h := range hashes {
-		nameToHash[hasher.config.HashTypes[i]] = h.Sum(nil)
+	return nil, nil
+}
+
+func (hasher *FileHasher) throttle(fileSize int64) error {
+	reservation := hasher.limiter.ReserveN(time.Now(), int(fileSize))
+	if !reservation.OK() {
+		// File is bigger than the max file size
+		return FileTooLargeError{fileSize}
 	}
 
-	return nameToHash, nil
+	delay := reservation.Delay()
+	if delay == 0 {
+		return nil
+	}
+
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-hasher.done:
+	case <-timer.C:
+	}
+
+	return nil
 }
 
 func multiWriter(hash []hash.Hash) io.Writer {

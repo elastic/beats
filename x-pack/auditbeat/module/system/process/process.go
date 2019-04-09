@@ -140,7 +140,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
-	hasher, err := hasher.NewFileHasher(config.HasherConfig)
+	hasher, err := hasher.NewFileHasher(config.HasherConfig, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -224,6 +224,8 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error generating state ID")
 	}
 	for _, p := range processes {
+		ms.enrichProcess(p)
+
 		if p.Error == nil {
 			event := ms.processEvent(p, eventTypeState, eventActionExistingProcess)
 			event.RootFields.Put("event.id", stateID.String())
@@ -264,6 +266,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 	for _, cacheValue := range started {
 		p := cacheValue.(*Process)
+		ms.enrichProcess(p)
 
 		if p.Error == nil {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStarted))
@@ -282,6 +285,34 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+// enrichProcess enriches a process with user lookup information
+// and executable file hash.
+func (ms *MetricSet) enrichProcess(process *Process) {
+	if process.UserInfo != nil {
+		goUser, err := user.LookupId(process.UserInfo.UID)
+		if err == nil {
+			process.User = goUser
+		}
+
+		group, err := user.LookupGroupId(process.UserInfo.GID)
+		if err == nil {
+			process.Group = group
+		}
+	}
+
+	if process.Info.Exe != "" {
+		hashes, err := ms.hasher.HashFile(process.Info.Exe)
+		if err != nil {
+			if process.Error == nil {
+				process.Error = errors.Wrapf(err, "failed to hash executable %v for PID %v", process.Info.Exe,
+					process.Info.PID)
+			}
+		} else {
+			process.Hashes = hashes
+		}
+	}
 }
 
 func (ms *MetricSet) processEvent(process *Process, eventType string, action eventAction) mb.Event {
@@ -427,28 +458,6 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			}
 		} else {
 			process.UserInfo = &userInfo
-
-			goUser, err := user.LookupId(userInfo.UID)
-			if err == nil {
-				process.User = goUser
-			}
-
-			group, err := user.LookupGroupId(userInfo.GID)
-			if err == nil {
-				process.Group = group
-			}
-		}
-
-		if process.Info.Exe != "" {
-			hashes, err := ms.hasher.HashFile(process.Info.Exe)
-			if err != nil {
-				if process.Error == nil {
-					process.Error = errors.Wrapf(err, "failed to hash executable %v for PID %v", process.Info.Exe,
-						sysinfoProc.PID())
-				}
-			} else {
-				process.Hashes = hashes
-			}
 		}
 
 		// Exclude Linux kernel processes, they are not very interesting.
