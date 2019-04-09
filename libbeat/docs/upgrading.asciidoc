@@ -73,10 +73,6 @@ https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
 
 ==== Upgrade {beats} binaries to 7.0
 
-// REVIEWERS: I mirrored the steps for Elasticsearch because I figured they
-// would be similar, but I have not tried these steps on all platforms. Please
-// confirm that they are accurate.
-
 Before upgrading:
 
 . Stop the existing {beats} process by using the appropriate command for your
