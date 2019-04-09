@@ -143,6 +143,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+*Winlogbeat*
+
+- Add support for reading from .evtx files. {issue}4450[4450]
+
 ==== Deprecated
 
 *Affecting all Beats*
