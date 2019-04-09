@@ -1107,10 +1107,10 @@ process is running in Docker then the event will be enriched. The default value
 is `["process.pid", "process.ppid"]`.
 
 `match_source`:: (Optional) Match container ID from a log path present in the
-`source` field. Enabled by default.
+`log.file.path` field. Enabled by default.
 
 `match_short_id`:: (Optional) Match container short ID from a log path present
-in the `source` field. Disabled by default.
+in the `log.file.path` field. Disabled by default.
 This allows to match directories names that have the first 12 characters
 of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
 
