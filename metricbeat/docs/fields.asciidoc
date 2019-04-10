@@ -2590,7 +2590,7 @@ Contains statistics related to the coreDNS service
 
 
 
-*`coredns.stats.panic.count.total`*::
+*`coredns.stats.panic.count`*::
 +
 --
 type: long
@@ -2600,7 +2600,7 @@ Total number of panics
 
 --
 
-*`coredns.stats.dns.request.count.total`*::
+*`coredns.stats.dns.request.count`*::
 +
 --
 type: long
@@ -2672,7 +2672,7 @@ Request Size histogram count
 
 --
 
-*`coredns.stats.dns.request.do.count.total`*::
+*`coredns.stats.dns.request.do.count`*::
 +
 --
 type: long
@@ -2682,7 +2682,7 @@ Number of queries that have the DO bit set
 
 --
 
-*`coredns.stats.dns.request.type.count.total`*::
+*`coredns.stats.dns.request.type.count`*::
 +
 --
 type: long
@@ -2702,7 +2702,7 @@ Holds the query type of the request
 
 --
 
-*`coredns.stats.dns.response.rcode.count.total`*::
+*`coredns.stats.dns.response.rcode.count`*::
 +
 --
 type: long
@@ -2788,6 +2788,56 @@ The zonename used for the request/response
 type: keyword
 
 The transport of the response ("udp" or "tcp")
+
+
+--
+
+*`coredns.stats.dns.cache.hits.count`*::
++
+--
+type: long
+
+Cache hits count for the cache plugin
+
+
+--
+
+*`coredns.stats.dns.cache.misses.count`*::
++
+--
+type: long
+
+Cache misses count for the cache plugin
+
+
+--
+
+*`coredns.stats.runtime.memory.alloc.bytes`*::
++
+--
+type: long
+
+Memory allocated bytes
+
+
+--
+
+*`coredns.stats.runtime.process.threads.count`*::
++
+--
+type: long
+
+Running threads count
+
+
+--
+
+*`coredns.stats.runtime.process.go.routines.count`*::
++
+--
+type: long
+
+Running Go routines count
 
 
 --
