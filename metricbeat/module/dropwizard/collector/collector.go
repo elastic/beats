@@ -55,7 +55,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http    *helper.HTTP
+	http      *helper.HTTP
 	namespace string
 }
 
@@ -78,7 +78,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		namespace:       config.Namespace,
+		namespace:     config.Namespace,
 	}, nil
 }
 
@@ -108,7 +108,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		if reported := reporter.Event(mb.Event{
 			MetricSetFields: event,
-			Namespace:       "dropwizard."+m.namespace,
+			Namespace:       "dropwizard." + m.namespace,
 		}); !reported {
 			m.Logger().Debug("event not reported", event)
 		}
