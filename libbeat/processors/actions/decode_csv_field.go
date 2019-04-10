@@ -117,6 +117,7 @@ func (f *decodeCSVField) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+// String returns a string representation of this processor.
 func (f decodeCSVField) String() string {
 	return "decode_csv_field=" + f.Field
 }
