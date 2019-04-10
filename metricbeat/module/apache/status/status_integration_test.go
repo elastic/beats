@@ -38,12 +38,12 @@ func TestFetch(t *testing.T) {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-	event := events[0].MetricSetFields
+	event := events[0]
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check number of fields.
-	if len(event) < 11 {
+	if len(event.MetricSetFields) < 11 {
 		t.Fatal("Too few top-level elements in the event")
 	}
 }

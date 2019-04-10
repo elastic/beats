@@ -86,8 +86,8 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
@@ -165,10 +165,10 @@ func TestFetchTimeout(t *testing.T) {
 		"timeout":    "50ms",
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
 	start := time.Now()
-	events, errs := mbtest.ReportingFetchV2(f)
+	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) == 0 {
 		t.Fatalf("Expected an error, had %d. %v\n", len(errs), errs)
 	}
@@ -214,10 +214,10 @@ func TestMultipleFetches(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
 	for i := 0; i < 20; i++ {
-		_, errs := mbtest.ReportingFetchV2(f)
+		_, errs := mbtest.ReportingFetchV2Error(f)
 		if len(errs) > 0 {
 			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 		}
