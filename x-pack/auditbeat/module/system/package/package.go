@@ -216,9 +216,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	case darwin:
 		if _, err := os.Stat(homebrewCellarPath); err != nil {
-			ms.log.Errorf("Failed to start package dataset on macOS. Error looking up %s - is Homebrew installed? Error: %v",
-				homebrewCellarPath, err)
-			return nil, nil
+			ms.log.Errorf("Homebrew does not seem to be installed. Will keep trying. Error: %v", err)
 		}
 	default:
 		return nil, fmt.Errorf("this metricset does not support OS family %v", osInfo.Family)
@@ -263,8 +261,8 @@ func (ms *MetricSet) Close() error {
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
-	if needsStateUpdate || ms.cache.IsEmpty() {
-		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+	if needsStateUpdate {
+		ms.log.Debug("Sending state")
 		err := ms.reportState(report)
 		if err != nil {
 			ms.log.Error(err)
@@ -284,7 +282,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	ms.lastState = time.Now()
 
-	packages, err := getPackages(ms.osFamily)
+	packages, err := ms.getPackages(ms.osFamily)
 	if err != nil {
 		return errors.Wrap(err, "failed to get packages")
 	}
@@ -318,7 +316,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 // reportChanges detects and reports any changes to installed packages on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
-	packages, err := getPackages(ms.osFamily)
+	packages, err := ms.getPackages(ms.osFamily)
 	if err != nil {
 		return errors.Wrap(err, "failed to get packages")
 	}
@@ -472,28 +470,32 @@ func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
 	return nil
 }
 
-func getPackages(osFamily string) (packages []*Package, err error) {
+func (ms *MetricSet) getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
 	case redhat, suse:
 		packages, err = listRPMPackages()
 		if err != nil {
-			err = errors.Wrap(err, "error getting RPM packages")
+			return nil, errors.Wrap(err, "error getting RPM packages")
 		}
 	case debian:
 		packages, err = listDebPackages()
 		if err != nil {
-			err = errors.Wrap(err, "error getting DEB packages")
+			return nil, errors.Wrap(err, "error getting DEB packages")
 		}
 	case darwin:
 		packages, err = listBrewPackages()
 		if err != nil {
-			err = errors.Wrap(err, "error getting Homebrew packages")
+			if os.IsNotExist(err) {
+				ms.log.Debugf("Homebrew not installed: %v", err)
+			} else {
+				return nil, errors.Wrap(err, "error getting Homebrew packages")
+			}
 		}
 	default:
-		err = errors.Errorf("unknown OS %v - this should not have happened", osFamily)
+		return nil, errors.Errorf("unknown OS %v - this should not have happened", osFamily)
 	}
 
-	return
+	return packages, nil
 }
 
 func listDebPackages() ([]*Package, error) {
