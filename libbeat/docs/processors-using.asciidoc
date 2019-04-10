@@ -946,7 +946,7 @@ field when the `from` key is not found in the event. If false then the processor
 returns an error and does not process the remaining fields. Default is `false`.
 
 `ignore_failure`:: (Optional) If true type conversion failures are ignored and
-the processor continues to the next field.
+the processor continues to the next field. Default is `false`.
 
 `tag`:: (Optional) An identifier for this processor. Useful for debugging.
 
