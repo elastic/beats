@@ -59,7 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 - Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
 - The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
-- Fix issue where MySQL connections were not properly closed {issue}9415[9415]
+- Fix issue where MySQL connections were not properly closed {pull}9449[9449]
 
 *Packetbeat*
 

@@ -71,10 +71,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, err
 	}
 
-	err = m.db.Close()
-	if err != nil {
-		return nil, errors.Wrap(err, "mysql-status close failed")
-	}
+	defer m.db.Close()
 
 	event := eventMapping(status)
 
