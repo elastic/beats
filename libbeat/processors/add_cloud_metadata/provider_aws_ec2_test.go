@@ -178,7 +178,7 @@ func TestRetrieveAWSMetadataOverwriteTrue(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := New(config)
+	p, err := newCloudMetadata(config)
 	if err != nil {
 		t.Fatal(err)
 	}
