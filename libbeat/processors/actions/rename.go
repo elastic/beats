@@ -45,11 +45,12 @@ type fromTo struct {
 
 func init() {
 	processors.RegisterPlugin("rename",
-		configChecked(newRenameFields,
+		configChecked(NewRenameFields,
 			requireFields("fields")))
 }
 
-func newRenameFields(c *common.Config) (processors.Processor, error) {
+// NewRenameFields returns a new rename processor.
+func NewRenameFields(c *common.Config) (processors.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
