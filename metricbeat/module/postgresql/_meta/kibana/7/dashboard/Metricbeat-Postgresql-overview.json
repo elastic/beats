@@ -13,7 +13,7 @@
             }
           }
         },
-        "title": "# of deadlock over time",
+        "title": "[Postgresql] Number of deadlock over time",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -117,7 +117,7 @@
               }
             ]
           },
-          "title": "# of deadlock over time",
+          "title": "[Postgresql] Number of deadlock over time",
           "type": "line"
         }
       },
@@ -139,7 +139,7 @@
             }
           }
         },
-        "title": "Active applications",
+        "title": "[Postgresql] Active applications",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -236,7 +236,7 @@
               }
             ]
           },
-          "title": "Active applications",
+          "title": "[Postgresql] Active applications",
           "type": "histogram"
         }
       },
@@ -484,7 +484,7 @@
             }
           }
         },
-        "title": "[Postgresql] - Server Activity ",
+        "title": "[Postgresql] Server Activity ",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -571,7 +571,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "[Postgresql] - Server Activity ",
+          "title": "[Postgresql] Server Activity ",
           "type": "table"
         }
       },
