@@ -1,0 +1,33 @@
+- key: jolokia-autodiscover
+  title: Jolokia Discovery autodiscover provider
+  description: >
+    Metadata from Jolokia Discovery added by the jolokia provider.
+  fields:
+    - name: jolokia.agent.version
+      type: keyword
+      description: >
+        Version number of jolokia agent.
+    - name: jolokia.agent.id
+      type: keyword
+      description: >
+        Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+    - name: jolokia.server.product
+      type: keyword
+      description: >
+        The container product if detected.
+    - name: jolokia.server.version
+      type: keyword
+      description: >
+        The container's version (if detected).
+    - name: jolokia.server.vendor
+      type: keyword
+      description: >
+        The vendor of the container the agent is running in.
+    - name: jolokia.url
+      type: keyword
+      description: >
+        The URL how this agent can be contacted.
+    - name: jolokia.secured
+      type: boolean
+      description: >
+        Whether the agent was configured for authentication or not.

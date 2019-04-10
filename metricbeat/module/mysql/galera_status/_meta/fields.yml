@@ -1,6 +1,6 @@
 - name: galera_status
   type: group
-  release: experimental
+  release: beta
   description: >
     `galera_status` contains the metrics that were obtained by the status SQL query on Galera.
   fields:

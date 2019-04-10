@@ -44,3 +44,9 @@ journalbeat.inputs:
   # Name of the registry file. If a relative path is used, it is considered relative to the
   # data path.
   #registry_file: registry
+
+#==================== Elasticsearch template setting ==========================
+setup.template.settings:
+  index.number_of_shards: 1
+  #index.codec: best_compression
+  #_source.enabled: false

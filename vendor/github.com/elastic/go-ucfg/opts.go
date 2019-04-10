@@ -33,6 +33,7 @@ type options struct {
 	env          []*Config
 	resolvers    []func(name string) (string, error)
 	varexp       bool
+	noParse      bool
 
 	configValueHandling configHandling
 
@@ -137,7 +138,7 @@ func doResolveNOOP(o *options) {
 }
 
 var (
-	// ReplacesValues option configures all merging and unpacking operations to
+	// ReplaceValues option configures all merging and unpacking operations to
 	// replace old dictionaries and arrays while merging. Value merging can be
 	// overwritten in unpack by using struct tags.
 	ReplaceValues = makeOptValueHandling(cfgReplaceValue)
@@ -170,7 +171,7 @@ func makeOptions(opts []Option) *options {
 		validatorTag: "validate",
 		pathSep:      "", // no separator by default
 		parsed:       map[string]spliceValue{},
-		activeFields: NewFieldSet(nil),
+		activeFields: newFieldSet(nil),
 	}
 	for _, opt := range opts {
 		opt(&o)

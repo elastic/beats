@@ -1,7 +1,7 @@
 - key: test
   title: Test fields.yml
   kibana:
-    source_filters: 
+    source_filters:
       - user.name
       - url.*
   fields:
@@ -13,22 +13,26 @@
           type: text
 
     - name: long
-      type: long 
+      type: long
       format: url
       input_format: string
-      output_format: float 
+      output_format: float
       output_precision: 5
       label_template: "long template"
       url_template:
         - min_version: 5.0.0
           value: "_a=(query:(query_string:(analyze_wildcard:!t,query:'error.grouping_key:%22{{value}}%22')))"
         - min_version: 6.0.0
-          value: "_a=(query:(language:lucene,query:'context.app.name:\"{{value}}\"'))"
+          value: "_a=(query:(language:kuery,query:'context.app.name:\"{{value}}\"'))"
 
-- key: with source filter 
+    - name: alias
+      type: alias
+      path: long
+
+- key: with source filter
   title: Test
   kibana:
-    source_filters: 
+    source_filters:
       - user.email
   fields:
     - name: multifield_field

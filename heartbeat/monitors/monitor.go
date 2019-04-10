@@ -23,8 +23,11 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/heartbeat/watcher"
 	"github.com/elastic/beats/libbeat/beat"
@@ -32,16 +35,19 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Monitor represents a configured recurring monitoring task loaded from a config file. Starting it
+// Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
-	name       string
-	config     *common.Config
-	registrar  *pluginsReg
-	uniqueName string
-	scheduler  *scheduler.Scheduler
-	jobTasks   []*task
-	enabled    bool
+	id             string
+	name           string
+	typ            string
+	pluginName     string
+	config         *common.Config
+	registrar      *pluginsReg
+	uniqueName     string
+	scheduler      *scheduler.Scheduler
+	configuredJobs []*configuredJob
+	enabled        bool
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
 	// internalsMtx is used to synchronize access to critical
@@ -49,29 +55,42 @@ type Monitor struct {
 	internalsMtx sync.Mutex
 
 	// Watch related fields
-	watchPollTasks []*task
+	watchPollTasks []*configuredJob
 	watch          watcher.Watch
 
 	pipelineConnector beat.PipelineConnector
 
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
-	stats registryRecorder
+	stats           registryRecorder
+	factoryMetadata *common.MapStrPointer
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
 // values because it may be invoked from another thread in cfgfile/runner.
 func (m *Monitor) String() string {
-	return fmt.Sprintf("Monitor<name: %s, enabled: %t>", m.name, m.enabled)
+	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.name, m.enabled)
 }
 
 func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
-	_, err := newMonitor(config, registrar, nil, nil, allowWatches)
+	m, err := newMonitor(config, registrar, nil, nil, allowWatches, nil)
+	m.Stop() // Stop the monitor to free up the ID from uniqueness checks
 	return err
 }
 
 // ErrWatchesDisabled is returned when the user attempts to declare a watch poll file in a
 var ErrWatchesDisabled = errors.New("watch poll files are only allowed in heartbeat.yml, not dynamic configs")
+
+// uniqueMonitorIDs is used to keep track of explicitly configured monitor IDs and ensure no duplication within a
+// given heartbeat instance.
+var uniqueMonitorIDs sync.Map
+
+// ErrDuplicateMonitorID is returned when a monitor attempts to start using an ID already in use by another monitor.
+type ErrDuplicateMonitorID struct{ ID string }
+
+func (e ErrDuplicateMonitorID) Error() string {
+	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs must be unique values.", e.ID)
+}
 
 func newMonitor(
 	config *common.Config,
@@ -79,8 +98,9 @@ func newMonitor(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
+	factoryMetadata *common.MapStrPointer,
 ) (*Monitor, error) {
-	// Extract just the Type and Enabled fields from the config
+	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
 	// monitor we have
 	mpi, err := pluginInfo(config)
@@ -94,23 +114,43 @@ func newMonitor(
 	}
 
 	m := &Monitor{
-		name:              monitorPlugin.name,
+		id:                mpi.ID,
+		name:              mpi.Name,
+		typ:               mpi.Type,
+		pluginName:        monitorPlugin.name,
 		scheduler:         scheduler,
-		jobTasks:          []*task{},
+		configuredJobs:    []*configuredJob{},
 		pipelineConnector: pipelineConnector,
-		watchPollTasks:    []*task{},
+		watchPollTasks:    []*configuredJob{},
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             monitorPlugin.stats,
+		factoryMetadata:   factoryMetadata,
 	}
 
-	jobs, endpoints, err := monitorPlugin.create(config)
+	if m.id != "" {
+		// Ensure we don't have duplicate IDs
+		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.id, m); loaded {
+			return nil, ErrDuplicateMonitorID{m.id}
+		}
+	} else {
+		// If there's no explicit ID generate one
+		hash, err := m.configHash()
+		if err != nil {
+			return nil, err
+		}
+		m.id = fmt.Sprintf("auto-%s-%#X", m.typ, hash)
+	}
+
+	rawJobs, endpoints, err := monitorPlugin.create(config)
+	wrappedJobs := wrappers.WrapCommon(rawJobs, m.id, m.name, m.typ)
 	m.endpoints = endpoints
+
 	if err != nil {
 		return nil, fmt.Errorf("job err %v", err)
 	}
 
-	m.jobTasks, err = m.makeTasks(config, jobs)
+	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
 		return nil, err
 	}
@@ -132,18 +172,32 @@ See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartb
 	return m, nil
 }
 
-func (m *Monitor) makeTasks(config *common.Config, jobs []Job) ([]*task, error) {
-	mtConf := taskConfig{}
+func (m *Monitor) configHash() (uint64, error) {
+	unpacked := map[string]interface{}{}
+	err := m.config.Unpack(unpacked)
+	if err != nil {
+		return 0, err
+	}
+	hash, err := hashstructure.Hash(unpacked, nil)
+	if err != nil {
+		return 0, err
+	}
+
+	return hash, nil
+}
+
+func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
+	mtConf := jobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
 		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
 	}
 
-	var mTasks []*task
+	var mTasks []*configuredJob
 	for _, job := range jobs {
-		t, err := newTask(job, mtConf, m)
+		t, err := newConfiguredJob(job, mtConf, m)
 		if err != nil {
 			// Failure to compile monitor processors should not crash hb or prevent progress
-			if _, ok := err.(InvalidMonitorProcessorsError); ok {
+			if _, ok := err.(ProcessorsError); ok {
 				logp.Critical("Failed to load monitor processors: %v", err)
 				continue
 			}
@@ -166,7 +220,7 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 
 	if len(watchCfg.Path) > 0 {
 		m.watch, err = watcher.NewFilePoller(watchCfg.Path, watchCfg.Poll, func(content []byte) {
-			var newTasks []*task
+			var newTasks []*configuredJob
 
 			dec := json.NewDecoder(bytes.NewBuffer(content))
 			for dec.More() {
@@ -197,7 +251,7 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 
 				watchTasks, err := m.makeTasks(merged, watchJobs)
 				if err != nil {
-					logp.Err("Could not make task for config: %v", err)
+					logp.Err("Could not make configuredJob for config: %v", err)
 					return
 				}
 
@@ -229,7 +283,7 @@ func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
-	for _, t := range m.jobTasks {
+	for _, t := range m.configuredJobs {
 		t.Start()
 	}
 
@@ -245,8 +299,9 @@ func (m *Monitor) Start() {
 func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
+	defer m.freeID()
 
-	for _, t := range m.jobTasks {
+	for _, t := range m.configuredJobs {
 		t.Stop()
 	}
 
@@ -255,4 +310,9 @@ func (m *Monitor) Stop() {
 	}
 
 	m.stats.stopMonitor(int64(m.endpoints))
+}
+
+func (m *Monitor) freeID() {
+	// Free up the monitor ID for reuse
+	uniqueMonitorIDs.Delete(m.id)
 }

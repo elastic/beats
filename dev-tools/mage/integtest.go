@@ -20,8 +20,11 @@ package mage
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -95,6 +98,10 @@ func StopIntegTestEnv() error {
 		return nil
 	}
 
+	if _, skip := skipIntegTest(); skip {
+		return nil
+	}
+
 	composeEnv, err := integTestDockerComposeEnvVars()
 	if err != nil {
 		return err
@@ -129,6 +136,11 @@ func StopIntegTestEnv() error {
 //
 // Always use this with AddIntegTestUsage() and defer StopIntegTestEnv().
 func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...string) error {
+	if reason, skip := skipIntegTest(); skip {
+		fmt.Printf(">> %v: Skipping because %v\n", mageTarget, reason)
+		return nil
+	}
+
 	AddIntegTestUsage()
 	defer StopIntegTestEnv()
 
@@ -142,6 +154,10 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 
 func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars ...string) error {
 	if IsInIntegTestEnv() {
+		// Fix file permissions after test is done writing files as root.
+		if runtime.GOOS != "windows" {
+			defer DockerChown(".")
+		}
 		return test()
 	}
 
@@ -173,6 +189,10 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// Disable strict.perms because we moust host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
+	}
+	args, err = addUidGidEnvArgs(args)
+	if err != nil {
+		return err
 	}
 	for _, envVar := range passThroughEnvVars {
 		args = append(args, "-e", envVar+"="+os.Getenv(envVar))
@@ -221,6 +241,31 @@ func haveIntegTestEnvRequirements() error {
 		return err
 	}
 	return nil
+}
+
+// skipIntegTest returns true if integ tests should be skipped.
+func skipIntegTest() (reason string, skip bool) {
+	if IsInIntegTestEnv() {
+		return "", false
+	}
+
+	// Honor the TEST_ENVIRONMENT value if set.
+	if testEnvVar, isSet := os.LookupEnv("TEST_ENVIRONMENT"); isSet {
+		enabled, err := strconv.ParseBool(testEnvVar)
+		if err != nil {
+			panic(errors.Wrap(err, "failed to parse TEST_ENVIRONMENT value"))
+		}
+		return "TEST_ENVIRONMENT=" + testEnvVar, !enabled
+	}
+
+	// Otherwise skip if we don't have all the right dependencies.
+	if err := haveIntegTestEnvRequirements(); err != nil {
+		// Skip if we don't meet the requirements.
+		log.Println("Skipping integ test because:", err)
+		return "docker is not available", true
+	}
+
+	return "", false
 }
 
 // integTestDockerComposeEnvVars returns the environment variables used for

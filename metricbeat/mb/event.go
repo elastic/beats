@@ -18,6 +18,7 @@
 package mb
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -116,27 +117,32 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 //       "rtt": 115
 //     }
 func AddMetricSetInfo(module, metricset string, event *Event) {
-	info := common.MapStr{
-		"name":   metricset,
-		"module": module,
+
+	if event.Namespace == "" {
+		event.Namespace = fmt.Sprintf("%s.%s", module, metricset)
+	}
+
+	e := common.MapStr{
+		"event": common.MapStr{
+			"dataset": event.Namespace,
+			"module":  module,
+		},
+		// TODO: This should only be sent if migration layer is enabled
+		"metricset": common.MapStr{
+			"name": metricset,
+		},
 	}
 	if event.Host != "" {
-		info["host"] = event.Host
+		e.Put("service.address", event.Host)
 	}
 	if event.Took > 0 {
-		info["rtt"] = event.Took / time.Microsecond
-	}
-	if event.Namespace != "" {
-		info["namespace"] = event.Namespace
-	}
-	info = common.MapStr{
-		"metricset": info,
+		e.Put("event.duration", event.Took/time.Nanosecond)
 	}
 
 	if event.RootFields == nil {
-		event.RootFields = info
+		event.RootFields = e
 	} else {
-		event.RootFields.DeepUpdate(info)
+		event.RootFields.DeepUpdate(e)
 	}
 }
 

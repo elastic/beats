@@ -16,13 +16,14 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
 
 func init() {
 	mage.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
-	mage.BeatLicense = "Elastic"
+	mage.BeatLicense = "Elastic License"
 }
 
 // Build builds the Beat binary.
@@ -64,7 +65,9 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.LoadLocalNamedSpec("xpack")
+	mage.UseElasticBeatXPackPackaging()
+	customizePackaging()
+	mage.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update, prepareModulePackaging)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
@@ -78,7 +81,11 @@ func TestPackages() error {
 
 // Fields generates a fields.yml and fields.go for each module.
 func Fields() {
-	mg.Deps(fieldsYML, mage.GenerateModuleFieldsGo)
+	mg.Deps(fieldsYML, moduleFieldsGo)
+}
+
+func moduleFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("module")
 }
 
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
@@ -93,7 +100,7 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(shortConfig, referenceConfig, createDirModulesD)
+	mg.Deps(shortConfig, referenceConfig, dockerConfig, createDirModulesD)
 }
 
 // Update is an alias for running fields, dashboards, config.
@@ -240,6 +247,15 @@ func referenceConfig() error {
 	return nil
 }
 
+func dockerConfig() error {
+	var configParts = []string{
+		mage.OSSBeatDir("_meta/beat.docker.yml"),
+		mage.LibbeatDir("_meta/config.docker.yml"),
+	}
+
+	return mage.FileConcat(mage.BeatName+".docker.yml", 0600, configParts...)
+}
+
 func createDirModulesD() error {
 	if err := os.RemoveAll("modules.d"); err != nil {
 		return err
@@ -267,4 +283,66 @@ func createDirModulesD() error {
 		}
 	}
 	return nil
+}
+
+func customizePackaging() {
+	var (
+		archiveModulesDir = "modules.d"
+		unixModulesDir    = "/etc/{{.BeatName}}/modules.d"
+
+		modulesDir = mage.PackageFile{
+			Mode:    0644,
+			Source:  dirModulesDGenerated,
+			Config:  true,
+			Modules: true,
+		}
+		windowsModulesDir = mage.PackageFile{
+			Mode:    0644,
+			Source:  "{{.PackageDir}}/modules.d",
+			Config:  true,
+			Modules: true,
+			Dep: func(spec mage.PackageSpec) error {
+				if err := mage.Copy(dirModulesDGenerated, spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
+					return errors.Wrap(err, "failed to copy modules.d dir")
+				}
+
+				return mage.FindReplace(
+					spec.MustExpand("{{.PackageDir}}/modules.d/system.yml"),
+					regexp.MustCompile(`- load`), `#- load`)
+			},
+		}
+		windowsReferenceConfig = mage.PackageFile{
+			Mode:   0644,
+			Source: "{{.PackageDir}}/metricbeat.reference.yml",
+			Dep: func(spec mage.PackageSpec) error {
+				err := mage.Copy("metricbeat.reference.yml",
+					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"))
+				if err != nil {
+					return errors.Wrap(err, "failed to copy reference config")
+				}
+
+				return mage.FindReplace(
+					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"),
+					regexp.MustCompile(`- load`), `#- load`)
+			},
+		}
+	)
+
+	for _, args := range mage.Packages {
+		switch args.OS {
+		case "windows":
+			args.Spec.Files[archiveModulesDir] = windowsModulesDir
+			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", windowsReferenceConfig)
+		default:
+			pkgType := args.Types[0]
+			switch pkgType {
+			case mage.TarGz, mage.Zip, mage.Docker:
+				args.Spec.Files[archiveModulesDir] = modulesDir
+			case mage.Deb, mage.RPM, mage.DMG:
+				args.Spec.Files[unixModulesDir] = modulesDir
+			default:
+				panic(errors.Errorf("unhandled package type: %v", pkgType))
+			}
+		}
+	}
 }

@@ -2,10 +2,20 @@
   title: "Cassandra"
   description: Cassandra v4/3 specific event fields.
   fields:
+    - name: no_request
+      type: alias
+      path: cassandra.no_request
+      migration: true
+
     - name: cassandra
       type: group
       description: Information about the Cassandra request and response.
       fields:
+        - name: no_request
+          type: boolean
+          description: >
+            Indicates that there is no request because this is a PUSH message.
+
         - name: request
           type: group
           description: Cassandra request.

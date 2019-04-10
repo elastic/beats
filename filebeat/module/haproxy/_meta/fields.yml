@@ -53,14 +53,14 @@
           type: text
 
         - name: source
-          type: text
+          type: keyword
           description: The HAProxy source of the log
 
         - name: termination_state
           description: Condition the session was in when the session ended.
 
         - name: mode
-          type: text
+          type: keyword
           description: mode that the frontend is operating (TCP or HTTP)
 
         - name: connections
@@ -92,23 +92,23 @@
           type: group
           fields:
           - name: ip
-            description: >
-              IP address of the client which initiated the TCP connection to haproxy.
-
-              If connection is via unix socket, socket path is in this field.
+            type: alias
+            path: source.address
+            migration: true
           - name: port
             type: alias
             path: source.port
-
-
+            migration: true
 
         - name: process_name
           type: alias
           path: process.name
+          migration: true
 
         - name: pid
           type: alias
           path: process.pid
+          migration: true
 
         - name: destination
           description: Destination information
@@ -117,9 +117,11 @@
           - name: port
             type: alias
             path: destination.port
+            migration: true
           - name: ip
             type: alias
             path: destination.ip
+            migration: true
 
         - name: geoip
           type: group
@@ -131,18 +133,24 @@
             - name: continent_name
               type: alias
               path: source.geo.continent_name
+              migration: true
             - name: country_iso_code
               type: alias
               path: source.geo.country_iso_code
+              migration: true
             - name: location
               type: alias
               path: source.geo.location
+              migration: true
             - name: region_name
               type: alias
               path: source.geo.region_name
+              migration: true
             - name: city_name
               type: alias
               path: source.geo.city_name
+              migration: true
             - name: region_iso_code
               type: alias
               path: source.geo.region_iso_code
+              migration: true

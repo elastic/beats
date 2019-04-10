@@ -1,0 +1,29 @@
+{
+    "description": "Pipeline for Filebeat NetFlow",
+    "processors": [
+        {
+            "geoip": {
+                "if": "ctx.source?.geo == null",
+                "field": "source.ip",
+                "target_field": "source.geo",
+                "ignore_missing": true
+            }
+        },
+        {
+            "geoip": {
+                "if": "ctx.destination?.geo == null",
+                "field": "destination.ip",
+                "target_field": "destination.geo",
+                "ignore_missing": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

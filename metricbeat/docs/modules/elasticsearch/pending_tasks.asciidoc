@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-elasticsearch-pending_tasks]]
 === Elasticsearch pending_tasks metricset
 
-beta[]
-
 include::../../../module/elasticsearch/pending_tasks/_meta/docs.asciidoc[]
 
 

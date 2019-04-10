@@ -27,7 +27,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	errw "github.com/pkg/errors"
@@ -55,27 +54,23 @@ type Importer struct {
 	cfg     *Config
 	version common.Version
 
-	loader Loader
+	loader KibanaLoader
+	fields common.MapStr
 }
 
-type Loader interface {
-	ImportIndex(file string) error
-	ImportDashboard(file string) error
-	statusMsg(msg string, a ...interface{})
-	Close() error
-}
+// NewImporter creates a new dashboard importer
+func NewImporter(version common.Version, cfg *Config, loader KibanaLoader, fields common.MapStr) (*Importer, error) {
 
-func NewImporter(version common.Version, cfg *Config, loader Loader) (*Importer, error) {
-
-	// Current max version is 6
+	// Current max version is 7
 	if version.Major > 6 {
-		version.Major = 6
+		version.Major = 7
 	}
 
 	return &Importer{
 		cfg:     cfg,
 		version: version,
 		loader:  loader,
+		fields:  fields,
 	}, nil
 }
 
@@ -107,7 +102,7 @@ func (imp Importer) ImportFile(fileType string, file string) error {
 	if fileType == "dashboard" {
 		return imp.loader.ImportDashboard(file)
 	} else if fileType == "index-pattern" {
-		return imp.loader.ImportIndex(file)
+		return imp.loader.ImportIndexFile(file)
 	}
 	return fmt.Errorf("Unexpected file type %s", fileType)
 }
@@ -301,7 +296,7 @@ func (imp Importer) downloadFile(url string, target string) (string, error) {
 func (imp Importer) ImportKibanaDir(dir string) error {
 	var err error
 
-	versionPath := strconv.Itoa(imp.version.Major)
+	versionPath := "7"
 
 	dir = path.Join(dir, versionPath)
 
@@ -311,6 +306,10 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 		return newErrNotFound("No directory %s", dir)
 	}
 
+	// Loads the internal index pattern
+	if imp.fields != nil {
+		imp.loader.ImportIndex(imp.fields)
+	}
 	check := []string{}
 	if !imp.cfg.OnlyDashboards {
 		check = append(check, "index-pattern")

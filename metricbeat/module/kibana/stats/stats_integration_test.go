@@ -40,12 +40,12 @@ func TestFetch(t *testing.T) {
 
 	config := mtest.GetConfig("stats")
 	host := config["hosts"].([]string)[0]
-	version, err := getKibanaVersion(host)
+	version, err := getKibanaVersion(t, host)
 	if err != nil {
 		t.Fatal("getting kibana version", err)
 	}
 
-	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
+	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
 	if err != nil {
 		t.Fatal("checking if kibana stats API is available", err)
 	}
@@ -71,12 +71,12 @@ func TestData(t *testing.T) {
 
 	config := mtest.GetConfig("stats")
 	host := config["hosts"].([]string)[0]
-	version, err := getKibanaVersion(host)
+	version, err := getKibanaVersion(t, host)
 	if err != nil {
 		t.Fatal("getting kibana version", err)
 	}
 
-	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
+	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
 	if err != nil {
 		t.Fatal("checking if kibana stats API is available", err)
 	}
@@ -92,27 +92,29 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getKibanaVersion(kibanaHostPort string) (string, error) {
+func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {
 	resp, err := http.Get("http://" + kibanaHostPort + "/api/status")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var data common.MapStr
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
-		return "", err
+		t.Log("Kibana GET /api/status response:", string(body))
+		return nil, err
 	}
-	return version.(string), nil
+
+	return common.NewVersion(version.(string))
 }

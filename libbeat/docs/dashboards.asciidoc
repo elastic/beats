@@ -9,6 +9,13 @@
 //// include::../../libbeat/docs/dashboards.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
+ifdef::has_solutions[]
+TIP: For deeper observability into your infrastructure, use the
+{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
+{infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}. For setup details, see
+the {infra-guide}/index.html[Infrastructure Monitoring Guide].
+endif::has_solutions[]
+
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana. Before you can use
 the dashboards, you need to create the index pattern, +{beat_default_index_prefix}-*+, and

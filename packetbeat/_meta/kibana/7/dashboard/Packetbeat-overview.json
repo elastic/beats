@@ -1,0 +1,1902 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
+        "title": "HTTP Transactions [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "mode": "stacked",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "mode": "stacked",
+                "show": "true",
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "HTTP Transactions [Packetbeat] ECS",
+          "type": "histogram"
+        }
+      },
+      "id": "Web-transactions-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:21:31.922Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.type",
+                  "negate": true,
+                  "params": {
+                    "query": "flow",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "flow"
+                },
+                "query": {
+                  "match": {
+                    "event.type": {
+                      "query": "flow",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Transaction Types [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "event.dataset",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "mode": "stacked",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "mode": "stacked",
+                "show": "true",
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "Transaction Types [Packetbeat] ECS",
+          "type": "histogram"
+        }
+      },
+      "id": "DB-transactions-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:20:54.634Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Response times percentiles [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "event.duration",
+                "percents": [
+                  75,
+                  95,
+                  99
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Percentiles of event.duration"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "mode": "normal",
+                "radiusRatio": 9,
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "showCircles": true,
+            "smoothLines": true,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Percentiles of event.duration"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "Response times percentiles [Packetbeat] ECS",
+          "type": "line"
+        }
+      },
+      "id": "Response-times-percentiles-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:01:49.340Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchId": "Transactions-errors-ecs",
+        "title": "Errors count over time ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "id": "2",
+              "params": {
+                "customInterval": "30s",
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "custom",
+                "min_doc_count": 1
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "id": "3",
+              "params": {
+                "field": "type",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "defaultYExtents": false,
+            "mode": "stacked",
+            "scale": "linear",
+            "setYExtents": false,
+            "shareYAxis": true,
+            "times": [],
+            "yAxis": {}
+          },
+          "title": "New Visualization ECS",
+          "type": "histogram"
+        }
+      },
+      "id": "Errors-count-over-time-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:30.350Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Errors vs successful transactions [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "status",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "mode": "percentage",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "mode": "stacked",
+                "show": "true",
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "percentage",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "Errors vs successful transactions [Packetbeat] ECS",
+          "type": "histogram"
+        }
+      },
+      "id": "Errors-vs-successful-transactions-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:02:24.071Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Latency Histogram [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "extended_bounds": {},
+                "field": "event.duration",
+                "interval": 10000000
+              },
+              "schema": "segment",
+              "type": "histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "mode": "stacked",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": "true",
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "smoothLines": true,
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "Latency Histogram [Packetbeat] ECS",
+          "type": "area"
+        }
+      },
+      "id": "Latency-histogram-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:03:54.084Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat] ECS",
+        "uiStateJSON": {
+          "mapCenter": [
+            0,
+            -0.17578125
+          ]
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "autoPrecision": true,
+                "field": "client.geo.location",
+                "isFilteredByCollar": true,
+                "mapBounds": {
+                  "bottom_right": {
+                    "lat": -84.0160220686566,
+                    "lon": 259.80468750000006
+                  },
+                  "top_left": {
+                    "lat": 83.97925949886205,
+                    "lon": -259.80468750000006
+                  }
+                },
+                "mapCenter": {
+                  "lat": -0.17578097424708533,
+                  "lon": 0
+                },
+                "mapZoom": 2,
+                "precision": 2,
+                "useGeocentroid": true
+              },
+              "schema": "segment",
+              "type": "geohash_grid"
+            }
+          ],
+          "params": {
+            "addTooltip": true,
+            "colorSchema": "Yellow to Red",
+            "heatBlur": 15,
+            "heatClusterSize": 1.5,
+            "heatMaxZoom": 16,
+            "heatMinOpacity": 0.1,
+            "heatNormalizeData": true,
+            "heatRadius": 25,
+            "isDesaturated": true,
+            "legendPosition": "bottomright",
+            "mapCenter": [
+              15,
+              5
+            ],
+            "mapType": "Scaled Circle Markers",
+            "mapZoom": 2,
+            "wms": {
+              "enabled": false,
+              "options": {
+                "attribution": "Maps provided by USGS",
+                "format": "image/png",
+                "layers": "0",
+                "styles": "",
+                "transparent": true,
+                "version": "1.3.0"
+              },
+              "selectedTmsLayer": {
+                "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
+                "id": "road_map",
+                "maxZoom": 18,
+                "minZoom": 0,
+                "origin": "elastic_maps_service"
+              },
+              "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
+            }
+          },
+          "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat] ECS",
+          "type": "tile_map"
+        }
+      },
+      "id": "Client-locations-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:52:42.404Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "Packetbeat-Search-ecs",
+        "title": "Response times repartition [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "extended_bounds": {},
+                "field": "event.duration",
+                "interval": 10000000
+              },
+              "schema": "group",
+              "type": "histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "mode": "stacked",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "mode": "stacked",
+                "show": "true",
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "Response times repartition [Packetbeat] ECS",
+          "type": "histogram"
+        }
+      },
+      "id": "Response-times-repartition-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:00:32.530Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Navigation [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
+            "openLinksInNewTab": false
+          },
+          "title": "Navigation [Packetbeat] ECS",
+          "type": "markdown"
+        }
+      },
+      "id": "Navigation-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Transactions [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Avg Response Time",
+                "field": "event.duration"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Avg Response Time"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "3",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "lineWidth": 3.5,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-2"
+              }
+            ],
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Avg Response Time"
+                },
+                "type": "value"
+              },
+              {
+                "id": "ValueAxis-2",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "RightAxis-1",
+                "position": "right",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DNS Transactions [Packetbeat] ECS",
+          "type": "area"
+        }
+      },
+      "id": "e3f09730-1b80-11e9-83df-75eebb35951e-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:29:49.161Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+        "title": "TLS Sessions [Packetbeat] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "false": "#E24D42",
+              "true": "#7EB26D"
+            },
+            "legendOpen": false
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "customLabel": "Sessions per minute",
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Handshake completed",
+                "field": "tls.handshake_completed",
+                "json": "",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              },
+              "valueAxis": "ValueAxis-1"
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "TLS Sessions ECS",
+          "type": "histogram"
+        }
+      },
+      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:33.441Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "network.protocol",
+                  "negate": false,
+                  "params": {
+                    "query": "http",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "http"
+                },
+                "query": {
+                  "match": {
+                    "network.protocol": {
+                      "query": "http",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "HTTP Transactions Search [Packetbeat] ECS",
+        "version": 1
+      },
+      "id": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
+      "type": "search",
+      "updated_at": "2019-01-19T00:21:43.886Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "columns": [
+          "client.ip",
+          "client.port",
+          "server.ip",
+          "server.port",
+          "event.dataset",
+          "query",
+          "method",
+          "event.duration",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": true,
+                  "params": {
+                    "query": "flow",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "flow"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "flow",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ],
+              "require_field_match": false
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Packetbeat Search ECS",
+        "version": 1
+      },
+      "id": "Packetbeat-Search-ecs",
+      "type": "search",
+      "updated_at": "2019-01-19T00:01:10.720Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "client.ip",
+          "client.port",
+          "server.ip",
+          "server.port",
+          "event.dataset",
+          "query",
+          "method",
+          "event.duration",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": true,
+                  "params": {
+                    "query": "flow",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "flow"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "flow",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "status",
+                  "negate": true,
+                  "params": {
+                    "query": "OK",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "OK"
+                },
+                "query": {
+                  "match": {
+                    "status": {
+                      "query": "OK",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ],
+              "require_field_match": false
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Transactions Errors Search [Packetbeat] ECS",
+        "version": 1
+      },
+      "id": "Transactions-errors-ecs",
+      "type": "search",
+      "updated_at": "2019-01-19T00:05:18.965Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "columns": [
+          "server.ip",
+          "destination.ip",
+          "dns.question.name",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "network.protocol",
+                  "negate": false,
+                  "params": {
+                    "query": "dns",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "dns"
+                },
+                "query": {
+                  "match": {
+                    "network.protocol": {
+                      "query": "dns",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ],
+              "require_field_match": false
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "DNS Protocol [Packetbeat] ECS",
+        "version": 1
+      },
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+      "type": "search",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "tls.handshake_completed"
+                },
+                "meta": {
+                  "alias": "TLS sessions",
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "tls.handshake_completed",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "TLS Sessions [Packetbeat] ECS",
+        "version": 1
+      },
+      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+      "type": "search",
+      "updated_at": "2019-01-18T23:49:33.441Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Packetbeat overview dashboard.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false
+        },
+        "panelsJSON": [
+          {
+            "gridData": {
+              "h": 10,
+              "i": "1",
+              "w": 12,
+              "x": 12,
+              "y": 20
+            },
+            "id": "Web-transactions-ecs",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 10,
+              "i": "2",
+              "w": 12,
+              "x": 36,
+              "y": 20
+            },
+            "id": "DB-transactions-ecs",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 24,
+              "x": 0,
+              "y": 45
+            },
+            "id": "Response-times-percentiles-ecs",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "6",
+              "w": 24,
+              "x": 0,
+              "y": 60
+            },
+            "id": "Errors-count-over-time-ecs",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "7",
+              "w": 24,
+              "x": 24,
+              "y": 45
+            },
+            "id": "Errors-vs-successful-transactions-ecs",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "8",
+              "w": 24,
+              "x": 24,
+              "y": 60
+            },
+            "id": "Latency-histogram-ecs",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "mapBounds": {
+                "bottom_right": {
+                  "lat": -54.97761367069625,
+                  "lon": 153.984375
+                },
+                "top_left": {
+                  "lat": 54.97761367069628,
+                  "lon": -153.984375
+                }
+              },
+              "mapCollar": {
+                "bottom_right": {
+                  "lat": -90,
+                  "lon": 180
+                },
+                "top_left": {
+                  "lat": 90,
+                  "lon": -180
+                },
+                "zoom": 2
+              },
+              "mapZoom": 2
+            },
+            "gridData": {
+              "h": 20,
+              "i": "9",
+              "w": 36,
+              "x": 12,
+              "y": 0
+            },
+            "id": "Client-locations-ecs",
+            "panelIndex": "9",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "10",
+              "w": 48,
+              "x": 0,
+              "y": 30
+            },
+            "id": "Response-times-repartition-ecs",
+            "panelIndex": "10",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 20,
+              "i": "11",
+              "w": 12,
+              "x": 0,
+              "y": 0
+            },
+            "id": "Navigation-ecs",
+            "panelIndex": "11",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "12",
+              "w": 12,
+              "x": 0,
+              "y": 20
+            },
+            "id": "e3f09730-1b80-11e9-83df-75eebb35951e-ecs",
+            "panelIndex": "12",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "13",
+              "w": 12,
+              "x": 24,
+              "y": 20
+            },
+            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
+            "panelIndex": "13",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Packetbeat] Overview ECS",
+        "version": 1
+      },
+      "id": "Packetbeat-Dashboard-ecs",
+      "type": "dashboard",
+      "updated_at": "2019-01-19T00:31:53.357Z",
+      "version": 5
+    }
+  ],
+  "version": "7.0.0-SNAPSHOT"
+}

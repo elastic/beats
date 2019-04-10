@@ -32,10 +32,17 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
+	packetbeat "github.com/elastic/beats/packetbeat/scripts/mage"
 )
 
 func init() {
 	mage.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -119,6 +126,7 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatPackaging()
+	mage.PackageKibanaDashboardsFromBuildDir()
 	customizePackaging()
 
 	mg.Deps(Update)
@@ -131,28 +139,85 @@ func TestPackages() error {
 	return mage.TestPackages()
 }
 
-// Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
+// Update updates the generated files.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config, includeList, fieldDocs)
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Config generates the config files.
+func Config() error {
+	return mage.Config(mage.AllConfigTypes, packetbeat.ConfigFileParams(), ".")
+}
+
+func includeList() error {
+	return mage.GenerateIncludeListGo([]string{"protos/*"}, nil)
+}
+
+// Fields generates fields.yml and fields.go files for the Beat.
+func Fields() {
+	mg.Deps(libbeatAndPacketbeatCommonFieldsGo, protosFieldsGo)
+	mg.Deps(fieldsYML)
+}
+
+// libbeatAndPacketbeatCommonFieldsGo generates a fields.go containing both
+// libbeat and packetbeat's common fields.
+func libbeatAndPacketbeatCommonFieldsGo() error {
+	if err := mage.GenerateFieldsYAML(); err != nil {
+		return err
+	}
+	return mage.GenerateAllInOneFieldsGo()
+}
+
+// protosFieldsGo generates a fields.go for each protocol.
+func protosFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("protos")
+}
+
+// fieldsYML generates the fields.yml file containing all fields.
+func fieldsYML() error {
 	return mage.GenerateFieldsYAML("protos")
 }
 
-// GoTestUnit executes the Go unit tests.
+func fieldDocs() error {
+	return mage.Docs.FieldDocs("fields.yml")
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return mage.KibanaDashboards("protos")
+}
+
+// Fmt formats source code and adds file headers.
+func Fmt() {
+	mg.Deps(mage.Format)
+}
+
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(mage.Format, Update, mage.Check)
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	fmt.Println(">> integTest: Complete (no tests require the integ test environment)")
+}
+
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest, PythonUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
+func GoUnitTest(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
 }
 
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+// PythonUnitTest executes the python system tests.
+func PythonUnitTest() error {
+	mg.SerialDeps(Fields, mage.BuildSystemTestBinary)
+	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
 }
 
 // -----------------------------------------------------------------------------
@@ -380,7 +445,7 @@ func generateWin64StaticWinpcap() error {
 	)
 }
 
-var pcapGoFile = mage.MustExpand("{{elastic_beats_dir}}/vendor/github.com/tsg/gopacket/pcap/pcap.go")
+const pcapGoFile = "{{ elastic_beats_dir }}/vendor/github.com/tsg/gopacket/pcap/pcap.go"
 
 var cgoDirectiveRegex = regexp.MustCompile(`(?m)#cgo .*(?:LDFLAGS|CFLAGS).*$`)
 
@@ -388,71 +453,59 @@ func patchCGODirectives() error {
 	// cgo directives do not support GOARM tags so we will clear the tags
 	// and set them via CGO_LDFLAGS and CGO_CFLAGS.
 	// Ref: https://github.com/golang/go/issues/7211
-	log.Println("Patching", pcapGoFile, cgoDirectiveRegex.String())
-	return mage.FindReplace(pcapGoFile, cgoDirectiveRegex, "")
+	f := mage.MustExpand(pcapGoFile)
+	log.Println("Patching", f, cgoDirectiveRegex.String())
+	return mage.FindReplace(f, cgoDirectiveRegex, "")
 }
 
 func undoPatchCGODirectives() error {
-	return sh.Run("git", "checkout", pcapGoFile)
+	return sh.Run("git", "checkout", mage.MustExpand(pcapGoFile))
 }
 
 // customizePackaging modifies the device in the configuration files based on
 // the target OS.
 func customizePackaging() {
 	var (
-		defaultDevice = map[string]string{
-			"darwin":  "en0",
-			"windows": "0",
-		}
-
 		configYml = mage.PackageFile{
 			Mode:   0600,
 			Source: "{{.PackageDir}}/{{.BeatName}}.yml",
 			Config: true,
 			Dep: func(spec mage.PackageSpec) error {
-				if err := mage.Copy("packetbeat.yml",
-					spec.MustExpand("{{.PackageDir}}/packetbeat.yml")); err != nil {
-					return errors.Wrap(err, "failed to copy config")
-				}
-
-				return mage.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/packetbeat.yml"),
-					regexp.MustCompile(`device: any`), "device: "+defaultDevice[spec.OS])
+				c := packetbeat.ConfigFileParams()
+				c.ExtraVars["GOOS"] = spec.OS
+				c.ExtraVars["GOARCH"] = spec.MustExpand("{{.GOARCH}}")
+				return mage.Config(mage.ShortConfigType, c, spec.MustExpand("{{.PackageDir}}"))
 			},
 		}
 		referenceConfigYml = mage.PackageFile{
 			Mode:   0644,
 			Source: "{{.PackageDir}}/{{.BeatName}}.reference.yml",
 			Dep: func(spec mage.PackageSpec) error {
-				if err := mage.Copy("packetbeat.yml",
-					spec.MustExpand("{{.PackageDir}}/packetbeat.reference.yml")); err != nil {
-					return errors.Wrap(err, "failed to copy config")
-				}
-
-				return mage.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/packetbeat.reference.yml"),
-					regexp.MustCompile(`device: any`), "device: "+defaultDevice[spec.OS])
+				c := packetbeat.ConfigFileParams()
+				c.ExtraVars["GOOS"] = spec.OS
+				c.ExtraVars["GOARCH"] = spec.MustExpand("{{.GOARCH}}")
+				return mage.Config(mage.ReferenceConfigType, c, spec.MustExpand("{{.PackageDir}}"))
 			},
 		}
 	)
 
 	for _, args := range mage.Packages {
-		switch args.OS {
-		case "windows", "darwin":
-			if args.Types[0] == mage.DMG {
+		for _, pkgType := range args.Types {
+			switch pkgType {
+			case mage.TarGz, mage.Zip:
+				args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
+				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
+			case mage.Deb, mage.RPM, mage.DMG:
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
-				continue
+			case mage.Docker:
+				args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin=eip")
+			default:
+				panic(errors.Errorf("unhandled package type: %v", pkgType))
 			}
 
-			args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
-			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
-		}
-
-		pkgType := args.Types[0]
-		switch pkgType {
-		case mage.Docker:
-			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin=eip")
+			// Match the first package type then continue.
+			break
 		}
 	}
 }

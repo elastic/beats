@@ -30,10 +30,9 @@ import (
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
@@ -53,7 +52,8 @@ import (
 type Pipeline struct {
 	beatInfo beat.Info
 
-	logger *logp.Logger
+	monitors Monitors
+
 	queue  queue.Queue
 	output *outputController
 
@@ -73,21 +73,7 @@ type Pipeline struct {
 	ackBuilder ackBuilder
 	eventSema  *sema
 
-	processors pipelineProcessors
-}
-
-type pipelineProcessors struct {
-	// The pipeline its processor settings for
-	// constructing the clients complete processor
-	// pipeline on connect.
-	builtinMeta common.MapStr
-	fields      common.MapStr
-	tags        []string
-
-	processors beat.Processor
-
-	disabled   bool // disabled is set if outputs have been disabled via CLI
-	alwaysCopy bool
+	processors processing.Supporter
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -98,19 +84,7 @@ type Settings struct {
 
 	WaitCloseMode WaitCloseMode
 
-	Annotations Annotations
-	Processors  *processors.Processors
-
-	Disabled bool
-}
-
-// Annotations configures additional metadata to be adde to every single event
-// being published. The meta data will be added before executing the configured
-// processors, so all processors configured with the pipeline or client will see
-// the same/complete event.
-type Annotations struct {
-	Event   common.EventMetadata
-	Builtin common.MapStr
+	Processors processing.Supporter
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -130,6 +104,15 @@ const (
 	// the pipeline. Clients are still allowed to overwrite WaitClose with a timeout > 0s.
 	WaitOnClientClose
 )
+
+// OutputReloader interface, that can be queried from an active publisher pipeline.
+// The output reloader can be used to change the active output.
+type OutputReloader interface {
+	Reload(
+		cfg *reload.ConfigWithMeta,
+		factory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
+	) error
+}
 
 type pipelineEventer struct {
 	mutex      sync.Mutex
@@ -153,30 +136,29 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 func New(
 	beat beat.Info,
 	monitors Monitors,
-	metrics *monitoring.Registry,
 	queueFactory queueFactory,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
 	var err error
 
-	log := logp.NewLogger("publish")
-	annotations := settings.Annotations
-	processors := settings.Processors
-	disabledOutput := settings.Disabled
+	if monitors.Logger == nil {
+		monitors.Logger = logp.NewLogger("publish")
+	}
+
 	p := &Pipeline{
 		beatInfo:         beat,
-		logger:           log,
+		monitors:         monitors,
 		observer:         nilObserver,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
-		processors:       makePipelineProcessors(annotations, processors, disabledOutput),
+		processors:       settings.Processors,
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
 
-	if metrics != nil {
-		p.observer = newMetricsObserver(metrics)
+	if monitors.Metrics != nil {
+		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 	p.eventer.observer = p.observer
 	p.eventer.modifyable = true
@@ -205,7 +187,7 @@ func New(
 	}
 	p.eventSema = newSema(maxEvents)
 
-	p.output = newOutputController(beat, monitors, log, p.observer, p.queue)
+	p.output = newOutputController(beat, monitors, p.observer, p.queue)
 	p.output.Set(out)
 
 	return p, nil
@@ -255,7 +237,7 @@ func (p *Pipeline) SetACKHandler(handler beat.PipelineACKHandler) error {
 // for a duration of WaitClose, if there are still active events in the pipeline.
 // Note: clients must be closed before calling Close.
 func (p *Pipeline) Close() error {
-	log := p.logger
+	log := p.monitors.Logger
 
 	log.Debug("close pipeline")
 
@@ -335,7 +317,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	processors := newProcessorPipeline(p.beatInfo, p.processors, cfg)
+	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
+	if err != nil {
+		return nil, err
+	}
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
 		// Cancel events from queue if acker is configured
@@ -377,6 +362,13 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return client, nil
 }
 
+func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {
+	if p.processors == nil {
+		return nil, nil
+	}
+	return p.processors.Create(cfg, noPublish)
+}
+
 func (e *pipelineEventer) OnACK(n int) {
 	e.observer.queueACKed(n)
 
@@ -402,42 +394,7 @@ func (e *waitCloser) wait() {
 	e.events.Wait()
 }
 
-func makePipelineProcessors(
-	annotations Annotations,
-	processors *processors.Processors,
-	disabled bool,
-) pipelineProcessors {
-	p := pipelineProcessors{
-		disabled: disabled,
-	}
-
-	hasProcessors := processors != nil && len(processors.List) > 0
-	if hasProcessors {
-		tmp := &program{title: "global"}
-		for _, p := range processors.List {
-			tmp.add(p)
-		}
-		p.processors = tmp
-	}
-
-	if meta := annotations.Builtin; meta != nil {
-		p.builtinMeta = meta
-	}
-
-	if em := annotations.Event; len(em.Fields) > 0 {
-		fields := common.MapStr{}
-		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
-		p.fields = fields
-	}
-
-	if t := annotations.Event.Tags; len(t) > 0 {
-		p.tags = t
-	}
-
-	return p
-}
-
 // OutputReloader returns a reloadable object for the output section of this pipeline
-func (p *Pipeline) OutputReloader() reload.Reloadable {
+func (p *Pipeline) OutputReloader() OutputReloader {
 	return p.output
 }

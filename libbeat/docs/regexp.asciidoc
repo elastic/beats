@@ -28,7 +28,7 @@ to verify that the option you are setting accepts a regular expression.
 
 NOTE: We recommend that you wrap regular expressions in single quotation marks to work around YAML's string escaping rules. For example, `'^\[?[0-9][0-9]:?[0-9][0-9]|^[[:graph:]]+'`.
 
-For more examples of supported regexp patterns, see {filebeat}/multiline-examples.html[Managing Multiline Messages].
+For more examples of supported regexp patterns, see {filebeat-ref}/multiline-examples.html[Managing Multiline Messages].
 Although the examples pertain to Filebeat, the regexp patterns are applicable to other use cases.
 
 The following patterns are supported:

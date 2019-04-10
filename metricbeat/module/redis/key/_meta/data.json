@@ -1,0 +1,33 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "redis.key",
+        "duration": 115000,
+        "module": "redis"
+    },
+    "metricset": {
+        "name": "key"
+    },
+    "redis": {
+        "key": {
+            "expire": {
+                "ttl": 360
+            },
+            "id": "0:foo",
+            "length": 3,
+            "name": "foo",
+            "type": "string"
+        },
+        "keyspace": {
+            "id": "db0"
+        }
+    },
+    "service": {
+        "address": "127.0.0.1:6379",
+        "type": "redis"
+    }
+}

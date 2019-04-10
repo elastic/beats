@@ -22,17 +22,21 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/mapping"
 )
 
+var v640 = common.MustNewVersion("6.4.0")
+
 type fieldsTransformer struct {
-	fields                    common.Fields
+	fields                    mapping.Fields
 	transformedFields         []common.MapStr
 	transformedFieldFormatMap common.MapStr
 	version                   *common.Version
 	keys                      map[string]int
+	migration                 bool
 }
 
-func newFieldsTransformer(version *common.Version, fields common.Fields) (*fieldsTransformer, error) {
+func newFieldsTransformer(version *common.Version, fields mapping.Fields, migration bool) (*fieldsTransformer, error) {
 	if version == nil {
 		return nil, errors.New("Version must be given")
 	}
@@ -42,6 +46,7 @@ func newFieldsTransformer(version *common.Version, fields common.Fields) (*field
 		transformedFields:         []common.MapStr{},
 		transformedFieldFormatMap: common.MapStr{},
 		keys:                      map[string]int{},
+		migration:                 migration,
 	}, nil
 }
 
@@ -60,10 +65,10 @@ func (t *fieldsTransformer) transform() (transformed common.MapStr, err error) {
 	// add some meta fields
 	truthy := true
 	falsy := false
-	t.add(common.Field{Path: "_id", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
-	t.add(common.Field{Path: "_type", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &truthy, Aggregatable: &truthy})
-	t.add(common.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
-	t.add(common.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
+	t.add(mapping.Field{Path: "_id", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
+	t.add(mapping.Field{Path: "_type", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &truthy, Aggregatable: &truthy})
+	t.add(mapping.Field{Path: "_index", Type: "keyword", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
+	t.add(mapping.Field{Path: "_score", Type: "integer", Index: &falsy, Analyzed: &falsy, DocValues: &falsy, Searchable: &falsy, Aggregatable: &falsy})
 
 	transformed = common.MapStr{
 		"fields":         t.transformedFields,
@@ -72,7 +77,7 @@ func (t *fieldsTransformer) transform() (transformed common.MapStr, err error) {
 	return
 }
 
-func (t *fieldsTransformer) transformFields(commonFields common.Fields, path string) {
+func (t *fieldsTransformer) transformFields(commonFields mapping.Fields, path string) {
 	for _, f := range commonFields {
 		f.Path = f.Name
 		if path != "" {
@@ -84,6 +89,23 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 				t.transformFields(f.Fields, f.Path)
 			}
 		} else {
+			if f.Type == "alias" {
+				if t.version.LessThan(v640) {
+					continue
+				}
+				// Only adds migration aliases if migration is enabled
+				if f.MigrationAlias && !t.migration {
+					continue
+				}
+				if ff := t.fields.GetField(f.AliasPath); ff != nil {
+					// copy the field, keep
+					path := f.Path
+					name := f.Name
+					f = *ff
+					f.Path = path
+					f.Name = name
+				}
+			}
 			t.add(f)
 
 			if f.MultiFields != nil {
@@ -98,13 +120,13 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 	}
 }
 
-func (t *fieldsTransformer) update(target *common.MapStr, override common.Field) error {
+func (t *fieldsTransformer) update(target *common.MapStr, override mapping.Field) error {
 	field, _ := transformField(t.version, override)
 	if override.Type == "" || (*target)["type"] == field["type"] {
 		target.Update(field)
 		if !override.Overwrite {
 			// compatible duplication
-			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true'", override.Path)
+			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true', %+v, %+v", override.Path, override, field)
 		}
 		return nil
 	}
@@ -112,7 +134,7 @@ func (t *fieldsTransformer) update(target *common.MapStr, override common.Field)
 	return fmt.Errorf("field <%s> is duplicated", override.Path)
 }
 
-func (t *fieldsTransformer) add(f common.Field) {
+func (t *fieldsTransformer) add(f mapping.Field) {
 	if idx := t.keys[f.Path]; idx > 0 {
 		target := &t.transformedFields[idx-1] // 1-indexed
 		if err := t.update(target, f); err != nil {
@@ -129,7 +151,7 @@ func (t *fieldsTransformer) add(f common.Field) {
 	}
 }
 
-func transformField(version *common.Version, f common.Field) (common.MapStr, common.MapStr) {
+func transformField(version *common.Version, f mapping.Field) (common.MapStr, common.MapStr) {
 	field := common.MapStr{
 		"name":         f.Path,
 		"count":        f.Count,
@@ -151,6 +173,18 @@ func transformField(version *common.Version, f common.Field) (common.MapStr, com
 		field["doc_values"] = getVal(f.DocValues, false)
 		field["indexed"] = false
 		field["searchable"] = false
+	}
+
+	if f.Type == "object" && f.Enabled != nil {
+		enabled := getVal(f.Enabled, true)
+		field["enabled"] = enabled
+		if !enabled {
+			field["aggregatable"] = false
+			field["analyzed"] = false
+			field["doc_values"] = false
+			field["indexed"] = false
+			field["searchable"] = false
+		}
 	}
 
 	if f.Type == "text" {
@@ -184,7 +218,7 @@ func getVal(valP *bool, def bool) bool {
 	return def
 }
 
-func addParams(format *common.MapStr, version *common.Version, f common.Field) {
+func addParams(format *common.MapStr, version *common.Version, f mapping.Field) {
 	addFormatParam(format, "pattern", f.Pattern)
 	addFormatParam(format, "inputFormat", f.InputFormat)
 	addFormatParam(format, "outputFormat", f.OutputFormat)
@@ -215,7 +249,7 @@ func addFormatParam(f *common.MapStr, key string, val interface{}) {
 }
 
 // takes the highest version where major version <= given version
-func addVersionedFormatParam(f *common.MapStr, version *common.Version, key string, val []common.VersionizedString) {
+func addVersionedFormatParam(f *common.MapStr, version *common.Version, key string, val []mapping.VersionizedString) {
 	if len(val) == 0 {
 		return
 	}
@@ -258,5 +292,7 @@ var (
 		"":             "string",
 		"geo_point":    "geo_point",
 		"date":         "date",
+		"ip":           "ip",
+		"boolean":      "boolean",
 	}
 )

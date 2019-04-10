@@ -6,7 +6,7 @@ allowing you to separate your configuration into multiple smaller
 configuration files. See the <<load-input-config>> and the
 <<load-module-config>> sections for details.
 
-include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
 
 [float]
 [[load-input-config]]
@@ -83,7 +83,7 @@ For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-- module: apache2
+- module: apache
   access:
     enabled: true
     var.paths: [/var/log/apache2/access.log*]
@@ -129,4 +129,4 @@ set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
 
-include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]

@@ -15,5 +15,5 @@ class Test(BaseTest):
         assert o["type"] == "pgsql"
         assert o["method"] == "SELECT"
         assert o["query"] == "SELECT * from test where id = $1"
-        assert o["bytes_in"] == 90
-        assert o["bytes_out"] == 101
+        assert o["source.bytes"] == 90
+        assert o["destination.bytes"] == 101

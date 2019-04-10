@@ -18,17 +18,12 @@
 package socket_summary
 
 import (
-	"runtime"
 	"syscall"
 
-	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/shirou/gopsutil/net"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -38,6 +33,7 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet("system", "socket_summary", New,
 		mb.WithNamespace("system.socket.summary"),
+		mb.DefaultMetricSet(),
 	)
 }
 
@@ -52,11 +48,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The socket_summary metricset is experimental.")
-	if runtime.GOOS == "windows" {
-		return nil, errors.New("socket_summary metricset is not supported in Windows")
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 	}, nil
@@ -64,11 +55,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 	var (
-		allConns     = len(conns)
-		allListening = 0
-		tcpConns     = 0
-		tcpListening = 0
-		udpConns     = 0
+		allConns       = len(conns)
+		allListening   = 0
+		tcpConns       = 0
+		tcpListening   = 0
+		tcpClosewait   = 0
+		tcpEstablished = 0
+		tcpTimewait    = 0
+		udpConns       = 0
 	)
 
 	for _, conn := range conns {
@@ -78,7 +72,15 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		switch conn.Type {
 		case syscall.SOCK_STREAM:
 			tcpConns++
-
+			if conn.Status == "ESTABLISHED" {
+				tcpEstablished++
+			}
+			if conn.Status == "CLOSE_WAIT" {
+				tcpClosewait++
+			}
+			if conn.Status == "TIME_WAIT" {
+				tcpTimewait++
+			}
 			if conn.Status == "LISTEN" {
 				tcpListening++
 			}
@@ -94,8 +96,11 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		},
 		"tcp": common.MapStr{
 			"all": common.MapStr{
-				"count":     tcpConns,
-				"listening": tcpListening,
+				"count":       tcpConns,
+				"listening":   tcpListening,
+				"established": tcpEstablished,
+				"close_wait":  tcpClosewait,
+				"time_wait":   tcpTimewait,
 			},
 		},
 		"udp": common.MapStr{

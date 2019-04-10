@@ -1,0 +1,81 @@
+{
+  "test_name": "Netflow 9 Huawei Netstream",
+  "events": [
+    {
+      "Timestamp": "2018-01-29T03:02:20Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.111.112.204",
+          "locality": "private",
+          "port": 2598
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-01-29T03:02:20Z",
+          "duration": 327060000000,
+          "end": "2018-01-29T03:02:19Z",
+          "kind": "event",
+          "start": "2018-01-29T02:56:51.94Z"
+        },
+        "flow": {
+          "id": "d-FUjj8eKi8",
+          "locality": "private"
+        },
+        "netflow": {
+          "bgp_destination_as_number": 0,
+          "bgp_next_hop_ipv4_address": "0.0.0.0",
+          "bgp_source_as_number": 0,
+          "destination_ipv4_address": "10.111.112.204",
+          "destination_ipv4_prefix_length": 25,
+          "destination_transport_port": 2598,
+          "egress_interface": 31,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2018-01-29T03:02:20Z",
+            "uptime_millis": 2678492632,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "flow_end_sys_up_time": 2678491632,
+          "flow_start_sys_up_time": 2678164572,
+          "forwarding_status": 0,
+          "ingress_interface": 8,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "10.108.252.41",
+          "octet_delta_count": 200,
+          "packet_delta_count": 4,
+          "padding_octets": "AAAA",
+          "post_vlan_id": 0,
+          "protocol_identifier": 6,
+          "responder_octets": 0,
+          "source_ipv4_address": "10.108.219.53",
+          "source_ipv4_prefix_length": 24,
+          "source_transport_port": 45587,
+          "tcp_control_bits": 24,
+          "type": "netflow_flow",
+          "vlan_id": 0
+        },
+        "network": {
+          "bytes": 200,
+          "community_id": "1:0qNFnK0G9V0IPgzhxvf+nGmenME=",
+          "direction": "outbound",
+          "iana_number": 6,
+          "packets": 4,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "10.108.219.53",
+          "locality": "private",
+          "port": 45587
+        }
+      },
+      "Private": null
+    }
+  ]
+}

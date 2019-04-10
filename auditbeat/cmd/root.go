@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/mb/module"
 )
@@ -46,6 +47,6 @@ func init() {
 		),
 	)
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", create, runFlags)
+	RootCmd = cmd.GenRootCmdWithSettings(create, instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(ShowCmd)
 }

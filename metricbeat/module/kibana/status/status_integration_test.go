@@ -43,14 +43,3 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("kibana", "status").Fields.StringToPrint())
 }
-
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch", "kibana")
-
-	config := mtest.GetConfig("status")
-	f := mbtest.NewReportingMetricSetV2(t, config)
-	err := mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}

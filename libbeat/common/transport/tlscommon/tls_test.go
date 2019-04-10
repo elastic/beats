@@ -130,7 +130,7 @@ func TestApplyEmptyConfig(t *testing.T) {
 	}
 
 	cfg := tmp.BuildModuleConfig("")
-	assert.Equal(t, int(tls.VersionTLS10), int(cfg.MinVersion))
+	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
 	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
 	assert.Len(t, cfg.Certificates, 0)
 	assert.Nil(t, cfg.RootCAs)
@@ -160,7 +160,7 @@ func TestApplyWithConfig(t *testing.T) {
 	assert.NotNil(t, cfg.RootCAs)
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
-	assert.Equal(t, int(tls.VersionTLS10), int(cfg.MinVersion))
+	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
 	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
 	assert.Len(t, cfg.CurvePreferences, 1)
 }

@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -43,7 +44,8 @@ var (
 		libbeatRequirements,
 	}
 
-	pythonVirtualenvDir string // Location of python virtualenv (lazily set).
+	pythonVirtualenvDir  string // Location of python virtualenv (lazily set).
+	pythonVirtualenvLock sync.Mutex
 
 	// More globs may be needed in the future if tests are added in more places.
 	nosetestsTestFiles = []string{
@@ -131,7 +133,7 @@ func PythonNoseTest(params PythonTestArgs) error {
 	// We check both the VE and the normal PATH because on Windows if the
 	// requirements are met by the globally installed package they are not
 	// installed to the VE.
-	nosetestsPath, err := lookVirtualenvPath(ve, "nosetests")
+	nosetestsPath, err := LookVirtualenvPath(ve, "nosetests")
 	if err != nil {
 		return err
 	}
@@ -147,6 +149,9 @@ func PythonNoseTest(params PythonTestArgs) error {
 // defined in the requirements file pointed to by requirementsTxt. It returns
 // the path to the virutalenv.
 func PythonVirtualenv() (string, error) {
+	pythonVirtualenvLock.Lock()
+	defer pythonVirtualenvLock.Unlock()
+
 	// Determine the location of the virtualenv.
 	ve, err := pythonVirtualenvPath()
 	if err != nil {
@@ -162,10 +167,17 @@ func PythonVirtualenv() (string, error) {
 		return pythonVirtualenvDir, nil
 	}
 
+	// If set use PYTHON_EXE env var as the python interpreter.
+	var args []string
+	if pythonExe := os.Getenv("PYTHON_EXE"); pythonExe != "" {
+		args = append(args, "-p", pythonExe)
+	}
+	args = append(args, ve)
+
 	// Execute virtualenv.
 	if _, err := os.Stat(ve); err != nil {
 		// Run virtualenv if the dir does not exist.
-		if err := sh.Run("virtualenv", ve); err != nil {
+		if err := sh.Run("virtualenv", args...); err != nil {
 			return "", err
 		}
 	}
@@ -176,7 +188,7 @@ func PythonVirtualenv() (string, error) {
 	}
 
 	pip := virtualenvPath(ve, "pip")
-	args := []string{"install"}
+	args = []string{"install"}
 	if !mg.Verbose() {
 		args = append(args, "--quiet")
 	}
@@ -236,9 +248,9 @@ func virtualenvPath(ve string, parts ...string) string {
 	return filepath.Join(append([]string{ve, "bin"}, parts...)...)
 }
 
-// lookVirtualenvPath looks for an executable in the path and it includes the
+// LookVirtualenvPath looks for an executable in the path and it includes the
 // virtualenv in the search.
-func lookVirtualenvPath(ve, file string) (string, error) {
+func LookVirtualenvPath(ve, file string) (string, error) {
 	// This is kind of unsafe w.r.t. concurrent execs because they could end
 	// up with different PATHs. But it allows us to search the VE path without
 	// having to re-implement the exec.LookPath logic. And does not require us

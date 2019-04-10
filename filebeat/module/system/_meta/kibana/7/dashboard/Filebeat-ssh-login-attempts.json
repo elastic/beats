@@ -1,0 +1,477 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
+                        "query": {
+                            "language": "kuery",
+                                "query": "event.action:Accepted"
+                            }
+                    }
+                },
+                "title": "Successful SSH logins [Filebeat System] ECS",
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "Accepted": "#3F6833",
+                            "Failed": "#F9934E",
+                            "Invalid": "#447EBC",
+                            "password": "#BF1B00",
+                            "publickey": "#629E51"
+                        }
+                    }
+                },
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
+                            "type": "count"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customInterval": "2h",
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
+                                "min_doc_count": 1
+                            },
+                            "schema": "segment",
+                            "type": "date_histogram"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "3",
+                            "params": {
+                                "field": "system.auth.ssh.method",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": 5
+                            },
+                            "schema": "group",
+                            "type": "terms"
+                        }
+                    ],
+                    "listeners": {},
+                    "params": {
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
+                        "defaultYExtents": false,
+                        "legendPosition": "right",
+                        "mode": "stacked",
+                        "scale": "linear",
+                        "setYExtents": false,
+                        "times": []
+                    },
+                    "title": "Successful SSH logins ECS",
+                    "type": "histogram"
+                }
+            },
+            "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*"
+                    }
+                },
+                "title": "SSH login attempts [Filebeat System] ECS",
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "Accepted": "#3F6833",
+                            "Failed": "#F9934E",
+                            "Invalid": "#447EBC"
+                        }
+                    }
+                },
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
+                            "type": "count"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customInterval": "2h",
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
+                                "min_doc_count": 1
+                            },
+                            "schema": "segment",
+                            "type": "date_histogram"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "3",
+                            "params": {
+                                "field": "event.action",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": 5
+                            },
+                            "schema": "group",
+                            "type": "terms"
+                        }
+                    ],
+                    "listeners": {},
+                    "params": {
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
+                        "defaultYExtents": false,
+                        "legendPosition": "right",
+                        "mode": "stacked",
+                        "scale": "linear",
+                        "setYExtents": false,
+                        "times": []
+                    },
+                    "title": "SSH login attempts ECS",
+                    "type": "histogram"
+                }
+            },
+            "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
+                        "query": {
+                            "language": "kuery",
+                                "query": "event.action:Failed OR event.action:Invalid"
+                            }
+                    }
+                },
+                "title": "SSH users of failed login attempts [Filebeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
+                            "type": "count"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "field": "user.name",
+                                "order": "desc",
+                                "orderBy": "1",
+                                "size": 50
+                            },
+                            "schema": "segment",
+                            "type": "terms"
+                        }
+                    ],
+                    "listeners": {},
+                    "params": {
+                        "maxFontSize": 72,
+                        "minFontSize": 18,
+                        "orientation": "single",
+                        "scale": "linear"
+                    },
+                    "title": "SSH users of failed login attempts ECS",
+                    "type": "tagcloud"
+                }
+            },
+            "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
+                        "query": {
+                            "language": "kuery",
+                                "query": "event.action:Failed OR event.action:Invalid"
+                            }
+                    }
+                },
+                "title": "SSH failed login attempts source locations [Filebeat System] ECS",
+                "uiStateJSON": {
+                    "mapCenter": [
+                        17.602139123350838,
+                        69.697265625
+                    ],
+                    "mapZoom": 2
+                },
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
+                            "type": "count"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "autoPrecision": true,
+                                "field": "source.geo.location",
+                                "precision": 2
+                            },
+                            "schema": "segment",
+                            "type": "geohash_grid"
+                        }
+                    ],
+                    "listeners": {},
+                    "params": {
+                        "addTooltip": true,
+                        "heatBlur": 15,
+                        "heatMaxZoom": 16,
+                        "heatMinOpacity": 0.1,
+                        "heatNormalizeData": true,
+                        "heatRadius": 25,
+                        "isDesaturated": true,
+                        "legendPosition": "bottomright",
+                        "mapCenter": [
+                            15,
+                            5
+                        ],
+                        "mapType": "Shaded Circle Markers",
+                        "mapZoom": 2,
+                        "wms": {
+                            "enabled": false,
+                            "options": {
+                                "attribution": "Maps provided by USGS",
+                                "format": "image/png",
+                                "layers": "0",
+                                "styles": "",
+                                "transparent": true,
+                                "version": "1.3.0"
+                            },
+                            "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
+                        }
+                    },
+                    "title": "SSH failed login attempts source locations ECS",
+                    "type": "tile_map"
+                }
+            },
+            "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d-ecs",
+            "type": "visualization",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "columns": [
+                    "event.action",
+                    "system.auth.ssh.method",
+                    "user.name",
+                    "source.ip",
+                    "source.geo.country_iso_code"
+                ],
+                "description": "",
+                "hits": 0,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
+                        "query": {
+                            "language": "kuery",
+                            "query": "event.dataset:system.auth AND event.action:*"
+                        }
+                    }
+                },
+                "sort": [
+                    "@timestamp",
+                    "desc"
+                ],
+                "title": "SSH login attempts [Filebeat System] ECS",
+                "version": 1
+            },
+            "id": "62439dc0-f9c9-11e6-a747-6121780e0414-ecs",
+            "type": "search",
+            "version": 2
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                },
+                "title": "Dashboards [Filebeat System] ECS",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [],
+                    "params": {
+                        "fontSize": 12,
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
+                    },
+                    "title": "Dashboards [Filebeat System] ECS",
+                    "type": "markdown"
+                }
+            },
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs",
+            "type": "visualization",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "SSH dashboard for the System module in Filebeat",
+                "hits": 0,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "highlightAll": true,
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "version": true
+                    }
+                },
+                "optionsJSON": {
+                    "darkTheme": false
+                },
+                "panelsJSON": [
+                    {
+                        "col": 1,
+                        "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a-ecs",
+                        "panelIndex": 1,
+                        "row": 5,
+                        "size_x": 12,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a-ecs",
+                        "panelIndex": 2,
+                        "row": 2,
+                        "size_x": 12,
+                        "size_y": 3,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a-ecs",
+                        "panelIndex": 3,
+                        "row": 8,
+                        "size_x": 6,
+                        "size_y": 4,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 7,
+                        "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d-ecs",
+                        "panelIndex": 4,
+                        "row": 8,
+                        "size_x": 6,
+                        "size_y": 4,
+                        "type": "visualization"
+                    },
+                    {
+                        "col": 1,
+                        "columns": [
+                            "event.action",
+                            "system.auth.ssh.method",
+                            "user.name",
+                            "source.ip",
+                            "source.geo.country_iso_code"
+                        ],
+                        "id": "62439dc0-f9c9-11e6-a747-6121780e0414-ecs",
+                        "panelIndex": 5,
+                        "row": 12,
+                        "size_x": 12,
+                        "size_y": 3,
+                        "sort": [
+                            "@timestamp",
+                            "desc"
+                        ],
+                        "type": "search"
+                    },
+                    {
+                        "col": 1,
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs",
+                        "panelIndex": 6,
+                        "row": 1,
+                        "size_x": 12,
+                        "size_y": 1,
+                        "type": "visualization"
+                    }
+                ],
+                "timeRestore": false,
+                "title": "[Filebeat System] SSH login attempts ECS",
+                "uiStateJSON": {
+                    "P-4": {
+                        "mapBounds": {
+                            "bottom_right": {
+                                "lat": 10.31491928581316,
+                                "lon": 74.53125
+                            },
+                            "top_left": {
+                                "lat": 60.50052541051131,
+                                "lon": -27.94921875
+                            }
+                        },
+                        "mapCenter": [
+                            39.774769485295465,
+                            23.203125
+                        ],
+                        "mapCollar": {
+                            "bottom_right": {
+                                "lat": -14.777884999999998,
+                                "lon": 125.771485
+                            },
+                            "top_left": {
+                                "lat": 85.593335,
+                                "lon": -79.189455
+                            },
+                            "zoom": 3
+                        },
+                        "mapZoom": 3
+                    }
+                },
+                "version": 1
+            },
+            "id": "5517a150-f9ce-11e6-8115-a7c18106d86a-ecs",
+            "type": "dashboard",
+            "version": 7
+        }
+    ],
+    "version": "6.0.0-beta1-SNAPSHOT"
+}

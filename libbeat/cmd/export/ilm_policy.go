@@ -19,19 +19,43 @@ package export
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 )
 
 // GenGetILMPolicyCmd is the command used to export the ilm policy.
-func GenGetILMPolicyCmd() *cobra.Command {
+func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "ilm-policy",
 		Short: "Export ILM policy",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(instance.ILMPolicy.StringToPrint())
+			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+				os.Exit(1)
+			}
+			err = b.InitWithSettings(settings)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
+				os.Exit(1)
+			}
+
+			ilmFactory := settings.ILM
+			if ilmFactory == nil {
+				ilmFactory = ilm.DefaultSupport
+			}
+
+			ilm, err := ilmFactory(nil, b.Info, b.RawConfig)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing ILM support: %s\n", err)
+			}
+
+			fmt.Println(common.MapStr(ilm.Policy().Body).StringToPrint())
 		},
 	}
 

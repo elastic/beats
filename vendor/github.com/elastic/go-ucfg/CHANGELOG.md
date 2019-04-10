@@ -14,6 +14,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.7.0]
+
+### Added
+- Add (*Config).Has. #127
+- Add (*Config).Remove. #126
+
+### Removed
+- Remove CI and support for go versions <1.10. #128
+
 ## [0.6.5]
 
 ### Added
@@ -225,8 +234,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.6.5...HEAD
-[0.6.4]: https://github.com/elastic/go-ucfg/compare/v0.6.4...v0.6.5
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/elastic/go-ucfg/compare/v0.6.5...v0.7.0
+[0.6.5]: https://github.com/elastic/go-ucfg/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/elastic/go-ucfg/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/elastic/go-ucfg/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/elastic/go-ucfg/compare/v0.6.1...v0.6.2

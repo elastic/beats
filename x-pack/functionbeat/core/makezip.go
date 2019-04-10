@@ -5,9 +5,16 @@
 package core
 
 import (
+	"fmt"
+
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/core/bundle"
 )
@@ -43,16 +50,52 @@ func MakeZip() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	resources := []bundle.Resource{
+		&bundle.MemoryFile{Path: "functionbeat.yml", Raw: rawConfig, FileMode: 0766},
+		&bundle.LocalFile{Path: "pkg/functionbeat", FileMode: 0755},
+	}
+
+	rawKeystore, err := keystoreRaw()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(rawKeystore) > 0 {
+		resources = append(resources, &bundle.MemoryFile{
+			Path:     "data/functionbeat.keystore",
+			Raw:      rawKeystore,
+			FileMode: 0600,
+		})
+	}
+
 	bundle := bundle.NewZipWithLimits(
 		packageUncompressedLimit,
 		packageCompressedLimit,
-		&bundle.MemoryFile{Path: "functionbeat.yml", Raw: rawConfig, FileMode: 0766},
-		&bundle.LocalFile{Path: "pkg/functionbeat", FileMode: 0755},
-	)
+		resources...)
 
 	content, err := bundle.Bytes()
 	if err != nil {
 		return nil, err
 	}
 	return content, nil
+}
+
+func keystoreRaw() ([]byte, error) {
+	cfg, err := cfgfile.Load("", common.NewConfig())
+	if err != nil {
+		return nil, fmt.Errorf("error loading config file: %v", err)
+	}
+
+	store, err := instance.LoadKeystore(cfg, "functionbeat")
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot load the keystore for packaging")
+	}
+
+	packager, ok := store.(keystore.Packager)
+	if !ok {
+		return nil, fmt.Errorf("the configured keystore cannot be packaged")
+	}
+
+	return packager.Package()
 }

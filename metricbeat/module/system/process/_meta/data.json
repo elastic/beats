@@ -1,37 +1,56 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "system.process",
+        "duration": 115000,
+        "module": "system"
+    },
     "metricset": {
-        "module": "system",
-        "name": "process",
-        "rtt": 115
+        "name": "process"
+    },
+    "process": {
+        "args": [
+            "/usr/bin/dockerd",
+            "-H",
+            "unix://"
+        ],
+        "executable": "/usr/bin/dockerd-ce",
+        "name": "dockerd",
+        "pgid": 2080,
+        "pid": 2080,
+        "ppid": 1,
+        "working_directory": "/"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "process": {
             "cgroup": {
                 "blkio": {
-                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
-                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "id": "docker.service",
+                    "path": "/system.slice/docker.service",
                     "total": {
-                        "bytes": 0,
-                        "ios": 0
+                        "bytes": 844576104448,
+                        "ios": 54869430
                     }
                 },
                 "cpu": {
                     "cfs": {
                         "period": {
-                            "us": 0
+                            "us": 100000
                         },
                         "quota": {
                             "us": 0
                         },
-                        "shares": 0
+                        "shares": 1024
                     },
-                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
-                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "id": "docker.service",
+                    "path": "/system.slice/docker.service",
                     "rt": {
                         "period": {
                             "us": 0
@@ -49,40 +68,45 @@
                     }
                 },
                 "cpuacct": {
-                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
-                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
-                    "percpu": {},
+                    "id": "docker.service",
+                    "path": "/system.slice/docker.service",
+                    "percpu": {
+                        "1": 7058282754012,
+                        "2": 7053634662537,
+                        "3": 7069386293853,
+                        "4": 7050055153087
+                    },
                     "stats": {
                         "system": {
-                            "ns": 0
+                            "ns": 7202920000000
                         },
                         "user": {
-                            "ns": 0
+                            "ns": 19573240000000
                         }
                     },
                     "total": {
-                        "ns": 0
+                        "ns": 28231358863489
                     }
                 },
-                "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                "id": "docker.service",
                 "memory": {
-                    "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "id": "docker.service",
                     "kmem": {
                         "failures": 0,
                         "limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 0,
+                            "bytes": 21139456,
                             "max": {
-                                "bytes": 0
+                                "bytes": 480030720
                             }
                         }
                     },
                     "kmem_tcp": {
                         "failures": 0,
                         "limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "usage": {
                             "bytes": 0,
@@ -94,12 +118,12 @@
                     "mem": {
                         "failures": 0,
                         "limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 0,
+                            "bytes": 3337703424,
                             "max": {
-                                "bytes": 0
+                                "bytes": 5245300736
                             }
                         }
                     },
@@ -115,41 +139,41 @@
                             }
                         }
                     },
-                    "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
+                    "path": "/system.slice/docker.service",
                     "stats": {
                         "active_anon": {
-                            "bytes": 0
+                            "bytes": 779677696
                         },
                         "active_file": {
-                            "bytes": 0
+                            "bytes": 1753378816
                         },
                         "cache": {
-                            "bytes": 0
+                            "bytes": 2127810560
                         },
                         "hierarchical_memory_limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "hierarchical_memsw_limit": {
                             "bytes": 0
                         },
                         "inactive_anon": {
-                            "bytes": 0
+                            "bytes": 409075712
                         },
                         "inactive_file": {
-                            "bytes": 0
+                            "bytes": 374431744
                         },
-                        "major_page_faults": 0,
+                        "major_page_faults": 53164,
                         "mapped_file": {
-                            "bytes": 0
+                            "bytes": 7491584
                         },
-                        "page_faults": 0,
-                        "pages_in": 0,
-                        "pages_out": 0,
+                        "page_faults": 21923702,
+                        "pages_in": 57261049,
+                        "pages_out": 56521859,
                         "rss": {
-                            "bytes": 0
+                            "bytes": 1188753408
                         },
                         "rss_huge": {
-                            "bytes": 0
+                            "bytes": 56623104
                         },
                         "swap": {
                             "bytes": 0
@@ -159,40 +183,38 @@
                         }
                     }
                 },
-                "path": "/docker/d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e"
+                "path": "/system.slice/docker.service"
             },
-            "cmdline": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
+            "cmdline": "/usr/bin/dockerd -H unix://",
             "cpu": {
-                "start_time": "2017-12-07T07:20:59.000Z",
+                "start_time": "2019-01-08T17:06:39.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0099
+                        "pct": 0.0049
                     },
-                    "pct": 0.0397
+                    "pct": 0.0195,
+                    "value": 27827810
                 }
             },
-            "cwd": "/go/src/github.com/elastic/beats/metricbeat",
             "fd": {
                 "limit": {
                     "hard": 1048576,
                     "soft": 1048576
                 },
-                "open": 8
+                "open": 68
             },
             "memory": {
                 "rss": {
-                    "bytes": 14540800,
-                    "pct": 0.0035
+                    "bytes": 1187336192,
+                    "pct": 0.0716
                 },
-                "share": 0,
-                "size": 402231296
+                "share": 8253440,
+                "size": 4438523904
             },
-            "name": "go",
-            "pgid": 1,
-            "pid": 1,
-            "ppid": 0,
-            "state": "sleeping",
-            "username": "root"
+            "state": "sleeping"
         }
+    },
+    "user": {
+        "name": "root"
     }
 }

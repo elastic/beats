@@ -170,6 +170,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if !ok {
 		return fmt.Errorf("cluster name is not a string")
 	}
+	clusterStats.Delete("cluster_name")
 
 	license, err := elasticsearch.GetLicense(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
@@ -225,7 +226,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		"interval_ms":   m.Module().Config().Period / time.Millisecond,
 		"type":          "cluster_stats",
 		"license":       l,
-		"version":       info.Version.Number,
+		"version":       info.Version.Number.String(),
 		"cluster_stats": clusterStats,
 		"cluster_state": clusterState,
 		"stack_stats":   stackStats,

@@ -1,4 +1,4 @@
-FROM golang:1.10.3
+FROM golang:1.12.1
 
 RUN \
     apt-get update \
@@ -10,7 +10,7 @@ RUN \
 
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
-RUN pip install --upgrade docker-compose==1.21.0
+RUN pip install --upgrade docker-compose==1.23.2
 
 # Add healthcheck for the docker/healthcheck metricset to check during testing.
 HEALTHCHECK CMD exit 0

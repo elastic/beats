@@ -12,6 +12,10 @@ locations that you specify, collects log events, and forwards them to either to
 https://www.elastic.co/products/elasticsearch[Elasticsearch] or
 https://www.elastic.co/products/logstash[Logstash].
 
-{beatname_uc} is an Elastic https://www.elastic.co/products/beats[Beat]. It's
-based on the `libbeat` framework. For more information, see the
-{libbeat}/index.html[{libbeat-docs}]. 
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+
+[float]
+=== Compatibility
+
+{beatname_uc} requires systemd v233 or later. Versions prior to systemd v233
+have a defect that prevents {beatname_uc} from reading rotated journals.

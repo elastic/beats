@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-graphite]]
 == Graphite module
 
-beta[]
-
 This is the graphite Module.
 
 The default metricset is `server`.

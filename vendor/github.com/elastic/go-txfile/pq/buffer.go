@@ -42,11 +42,17 @@ type buffer struct {
 	eventHdrPage   *page
 	eventHdrOffset int
 	eventHdrSize   int
+
+	// stats
+	countPages uint
 }
 
 func newBuffer(pool *pagePool, page *page, pages, pageSize, hdrSz int) *buffer {
 	payloadSz := pageSize - hdrSz
 	avail := payloadSz * pages
+
+	tracef("init writer buffer with pages=%v, pageSize=%v, hdrSize=%v, avail=%v\n",
+		pages, pageSize, hdrSz, avail)
 
 	b := &buffer{
 		head:           nil,
@@ -72,6 +78,7 @@ func newBuffer(pool *pagePool, page *page, pages, pageSize, hdrSz int) *buffer {
 		b.avail -= contentsLength
 		b.payload = page.Data[page.Meta.EndOff:]
 		b.page = page
+		b.countPages++
 	}
 
 	return b
@@ -97,7 +104,7 @@ func (b *buffer) Append(data []byte) {
 		data = data[n:]
 		b.avail -= n
 
-		tracef("writer: append %v bytes to (page: %v, off: %v)\n", n, b.page.Meta.ID, b.page.Meta.EndOff)
+		tracef("writer: append %v bytes to (page: %v, off: %v, avail: %v)\n", n, b.page.Meta.ID, b.page.Meta.EndOff, b.avail)
 
 		b.page.Meta.EndOff += uint32(n)
 	}
@@ -120,10 +127,12 @@ func (b *buffer) advancePage() {
 }
 
 func (b *buffer) newPage() *page {
+	b.countPages++
 	return b.pool.NewPage()
 }
 
 func (b *buffer) releasePage(p *page) {
+	b.countPages--
 	b.pool.Release(p)
 }
 
@@ -193,29 +202,43 @@ func (b *buffer) CommitEvent(id uint64) {
 
 // Pages returns start and end page to be serialized.
 // The `end` page must not be serialized
-func (b *buffer) Pages() (start, end *page) {
+func (b *buffer) Pages() (start, end *page, n uint) {
+	traceln("get buffer active page range")
+
 	if b.head == nil || !b.head.Dirty() {
-		return nil, nil
+		traceln("buffer empty")
+		return nil, nil, 0
 	}
 
 	if b.eventHdrPage == nil {
+		traceln("no active page")
+
 		if b.tail.Dirty() {
-			return b.head, nil
+			traceln("tail is dirty")
+			return b.head, nil, b.countPages
 		}
+
+		traceln("tail is not dirty")
 		for current := b.head; current != nil; current = current.Next {
 			if !current.Dirty() {
-				return b.head, current
+				return b.head, current, n
 			}
+			n++
 		}
 
 		invariant.Unreachable("tail if list dirty and not dirty?")
 	}
 
 	end = b.eventHdrPage
+	n = b.countPages
 	if end.Dirty() {
+		traceln("active page is dirty")
 		end = end.Next
+	} else {
+		traceln("active page is clean")
+		n--
 	}
-	return b.head, end
+	return b.head, end, n
 }
 
 // Reset removes all but the last page non-dirty page from the buffer.

@@ -31,6 +31,32 @@ condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
 
+More complex conditional processing can be accomplished by using the
+if-then-else processor configuration. This allows multiple processors to be
+executed based on a single condition.
+
+[source,yaml]
+----
+processors:
+- if:
+    <condition>
+  then: <1>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+  else: <2>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+----
+<1> `then` must contain a single processor or a list of one or more processors
+to execute when the condition evaluates to true.
+<2> `else` is optional. It can contain a single processor or a list of
+processors to execute when the conditional evaluate to false.
 
 [[where-valid]]
 ==== Where are processors valid?
@@ -169,18 +195,25 @@ endif::[]
 The supported processors are:
 
  * <<add-cloud-metadata,`add_cloud_metadata`>>
+ * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-fields, `add_fields`>>
+ * <<add-host-metadata,`add_host_metadata`>>
+ * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
+ * <<add-labels, `add_labels`>>
  * <<add-locale,`add_locale`>>
+ * <<add-process-metadata,`add_process_metadata`>>
+ * <<add-tags, `add_tags`>>
+ * <<community-id,`community_id`>>
  * <<decode-json-fields,`decode_json_fields`>>
+ * <<dissect, `dissect`>>
+ * <<processor-dns, `dns`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
  * <<rename-fields,`rename`>>
- * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
- * <<add-docker-metadata,`add_docker_metadata`>>
- * <<add-host-metadata,`add_host_metadata`>>
- * <<dissect, `dissect`>>
- * <<processor-dns, `dns`>>
- * <<add-process-metadata,`add_process_metadata`>>
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ * <<processor-script,`script`>>
+endif::[]
 
 [[conditions]]
 ==== Conditions
@@ -201,6 +234,7 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-network, `network`>>
 * <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
@@ -292,6 +326,58 @@ range:
     system.cpu.user.pct.lt: 0.8
 ------
 
+[float]
+[[condition-network]]
+===== `network`
+
+The `network` condition checks if the field is in a certain IP network range.
+Both IPv4 and IPv6 addresses are supported. The network range may be specified
+using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", or by using one of
+these named ranges:
+
+- `loopback` - Matches loopback addresses in the range of `127.0.0.0/8` or
+  `::1/128`.
+- `unicast` - Matches global unicast addresses defined in RFC 1122, RFC 4632,
+  and RFC 4291 with the exception of the IPv4 broadcast address
+  (`255.255.255.255`). This includes private address ranges.
+- `multicast` - Matches multicast addresses.
+- `interface_local_multicast` - Matches IPv6 interface-local multicast addresses.
+- `link_local_unicast` - Matches link-local unicast addresses.
+- `link_local_multicast` - Matches link-local multicast addresses.
+- `private` - Matches private address ranges defined in RFC 1918 (IPv4) and
+  RFC 4193 (IPv6).
+- `public` - Matches addresses that are not loopback, unspecified, IPv4
+  broadcast, link local unicast, link local multicast, interface local
+  multicast, or private.
+- `unspecified` - Matches unspecified addresses (either the IPv4 address
+  "0.0.0.0" or the IPv6 address "::").
+
+The following condition returns true if the `source.ip` value is within the
+private address space.
+
+[source,yaml]
+----
+network:
+    source.ip: private
+----
+
+This condition returns true if the `destination.ip` value is within the
+IPv4 range of `192.168.1.0` - `192.168.1.255`.
+
+[source,yaml]
+----
+network:
+    destination.ip: '192.168.1.0/24'
+----
+
+And this condition returns true when `destination.ip` is within any of the given
+subnets.
+
+[source,yaml]
+----
+network:
+    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+----
 
 [float]
 [[condition-has_fields]]
@@ -425,14 +511,18 @@ processors:
 - add_cloud_metadata: ~
 -------------------------------------------------------------------------------
 
-The `add_cloud_metadata` processor has one optional configuration setting named
-`timeout` that specifies the maximum amount of time to wait for a successful
-response when detecting the hosting provider. The default timeout value is
-`3s`.
+The `add_cloud_metadata` processor has two optional configuration settings.
+The first one is `timeout` which specifies the maximum amount of time to wait
+for a successful response when detecting the hosting provider. The default
+timeout value is `3s`.
 
 If a timeout occurs then no instance metadata will be added to the events. This
 makes it possible to enable this processor for all your deployments (in the
 cloud or on-premise).
+
+The second optional configuration setting is `overwrite`. When `overwrite` is
+`true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
+default).
 
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.
@@ -442,14 +532,12 @@ _EC2_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "us-east-1c",
-      "instance_id": "i-4e123456",
-      "machine_type": "t2.medium",
-      "provider": "ec2",
-      "region": "us-east-1"
-    }
+  "cloud": {
+    "availability_zone": "us-east-1c",
+    "instance_id": "i-4e123456",
+    "machine_type": "t2.medium",
+    "provider": "ec2",
+    "region": "us-east-1"
   }
 }
 -------------------------------------------------------------------------------
@@ -459,12 +547,10 @@ _Digital Ocean_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "instance_id": "1234567",
-      "provider": "digitalocean",
-      "region": "nyc2"
-    }
+  "cloud": {
+    "instance_id": "1234567",
+    "provider": "digitalocean",
+    "region": "nyc2"
   }
 }
 -------------------------------------------------------------------------------
@@ -474,14 +560,12 @@ _GCE_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "projects/1234567890/zones/us-east1-b",
-      "instance_id": "1234556778987654321",
-      "machine_type": "projects/1234567890/machineTypes/f1-micro",
-      "project_id": "my-dev",
-      "provider": "gce"
-    }
+  "cloud": {
+    "availability_zone": "us-east1-b",
+    "instance_id": "1234556778987654321",
+    "machine_type": "f1-micro",
+    "project_id": "my-dev",
+    "provider": "gce"
   }
 }
 -------------------------------------------------------------------------------
@@ -491,13 +575,11 @@ _Tencent Cloud_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "gz-azone2",
-      "instance_id": "ins-qcloudv5",
-      "provider": "qcloud",
-      "region": "china-south-gz"
-    }
+  "cloud": {
+    "availability_zone": "gz-azone2",
+    "instance_id": "ins-qcloudv5",
+    "provider": "qcloud",
+    "region": "china-south-gz"
   }
 }
 -------------------------------------------------------------------------------
@@ -510,13 +592,11 @@ ECS instance.
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "cn-shenzhen",
-      "instance_id": "i-wz9g2hqiikg0aliyun2b",
-      "provider": "ecs",
-      "region": "cn-shenzhen-a"
-    }
+  "cloud": {
+    "availability_zone": "cn-shenzhen",
+    "instance_id": "i-wz9g2hqiikg0aliyun2b",
+    "provider": "ecs",
+    "region": "cn-shenzhen-a"
   }
 }
 -------------------------------------------------------------------------------
@@ -526,14 +606,12 @@ _Azure Virtual Machine_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "az",
-      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-      "instance_name": "test-az-vm",
-      "machine_type": "Standard_D3_v2",
-      "region": "eastus2"
-    }
+  "cloud": {
+    "provider": "az",
+    "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+    "instance_name": "test-az-vm",
+    "machine_type": "Standard_D3_v2",
+    "region": "eastus2"
   }
 }
 -------------------------------------------------------------------------------
@@ -543,14 +621,95 @@ _Openstack Nova_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "openstack",
-      "instance_name": "test-998d932195.mycloud.tld",
-      "availability_zone": "xxxx-az-c",
-      "instance_id": "i-00011a84",
-      "machine_type": "m2.large"
-    }
+  "cloud": {
+    "provider": "openstack",
+    "instance_name": "test-998d932195.mycloud.tld",
+    "availability_zone": "xxxx-az-c",
+    "instance_id": "i-00011a84",
+    "machine_type": "m2.large"
+  }
+}
+-------------------------------------------------------------------------------
+
+[[add-fields]]
+=== Add fields
+
+The `add_fields` processor adds additional fields to the event.  Fields can be
+scalar values, arrays, dictionaries, or any nested combination of these.  By
+default the fields that you specify will be grouped under the `fields`
+sub-dictionary in the event. To group the fields under a different
+sub-dictionary, use the `target` setting. To store the fields as
+top-level fields, set `target: ''`. 
+
+`target`:: (Optional) Sub-dictionary to put all fields into. Defaults to `fields`.
+`fields`:: Fields to be added.
+
+
+For example, this configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_fields:
+    target: project
+    fields:
+      name: myproject
+      id: '574734885120952459'
+------------------------------------------------------------------------------
+
+Adds these fields to any event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "project": {
+    "name": "myproject",
+    "id": "574734885120952459"
+  }
+}
+-------------------------------------------------------------------------------
+
+
+[[add-labels]]
+=== Add labels
+
+The `add_labels` processors adds a set of key-value pairs to an event.
+The processor will flatten nested configuration objects like arrays or
+dictionaries into a fully qualified name by merging nested names with a `.`.
+Array entries create numeric names starting with 0.  Labels are always stored
+under the Elastic Common Schema compliant `labels` sub-dictionary.
+
+`labels`:: dictionaries of labels to be added.
+
+For example, this configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_labels:
+    labels:
+      number: 1
+      with.dots: test
+      nested:
+        with.dots: nested
+      array:
+        - do
+	- re
+	- with.field: mi
+------------------------------------------------------------------------------
+
+Adds these fields to every event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "labels": {
+    "number": 1,
+    "with.dots": "test",
+    "nested.with.dots": "nested",
+    "array.0": "do",
+    "array.1": "re",
+    "array.2.with.field": "mi"
   }
 }
 -------------------------------------------------------------------------------
@@ -587,6 +746,35 @@ NOTE: Please note that `add_locale` differentiates between daylight savings
 time (DST) and regular time. For example `CEST` indicates DST and and `CET` is
 regular time.
 
+[[add-tags]]
+=== Add tags
+
+The `add_tags` processor adds tags to a list of tags. If the target field already exists,
+the tags are appended to the existing list of tags.
+
+`tags`:: List of tags to add.
+`target`:: (Optional) Field the tags will be added to. Defaults to `tags`.
+
+For example, this configuration:
+
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_tags:
+    tags: [web, production]
+    target: "environment"
+------------------------------------------------------------------------------
+
+Adds the environment field to every event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "environment": ["web", "production"]
+}
+-------------------------------------------------------------------------------
+
 
 [[decode-json-fields]]
 === Decode JSON fields
@@ -619,6 +807,53 @@ is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
+
+[[community-id]]
+=== Community ID Network Flow Hash
+
+The `community_id` processor computes a network flow hash according to the
+https://github.com/corelight/community-id-spec[Community ID Flow Hash
+specification].
+
+The flow hash is useful for correlating all network events related to a
+single flow. For example you can filter on a community ID value and you might
+get back the Netflow records from multiple collectors and layer 7 protocol
+records from Packetbeat.
+
+By default the processor is configured to read the flow parameters from the
+appropriate Elastic Common Schema (ECS) fields. If you are processing ECS data
+then no parameters are required.
+
+[source,yaml]
+----
+processors:
+  - community_id:
+----
+
+If the data does not conform to ECS then you can customize the field names
+that the processor reads from. You can also change the `target` field which
+is where the computed hash is written to.
+
+[source,yaml]
+----
+processors:
+  - community_id:
+      fields:
+        source_ip: my_source_ip
+        source_port: my_source_port
+        destination_ip: my_dest_ip
+        destination_port: my_dest_port
+        transport: proto
+        icmp_type: my_icmp_type
+        icmp_code: my_icmp_code
+      target: network.community_id
+----
+
+If the necessary fields are not present in the event then the processor will
+silently continue without adding the target field.
+
+The processor also accepts an optional `seed` parameter that must be a 16-bit
+unsigned integer. This value gets incorporated into all generated hashes.
 
 [[drop-event]]
 === Drop events
@@ -735,6 +970,7 @@ metadata based on which Kubernetes pod the event originated from. Each event is
 annotated with:
 
 * Pod Name
+* Pod UID
 * Namespace
 * Labels
 
@@ -754,7 +990,8 @@ construct a lookup key with the value of the field `metricset.host`.
 Each Beat can define its own default indexers and matchers which are enabled by
 default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
-the `source` field, extracts the container ID, and uses it to retrieve metadata.
+the `log.file.path` field, extracts the container ID, and uses it to retrieve 
+metadata.
 
 The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
@@ -804,6 +1041,9 @@ by default.
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
+`namespace`:: (Optional) Select the namespace from which to collect the
+metadata. If it is not set, the processor collects metadata from all namespaces.
+It is unset by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client.
 `default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
@@ -847,6 +1087,7 @@ processors:
     #match_source_index: 4
     #match_short_id: true
     #cleanup_timeout: 60
+    #labels.dedot: false
     # To connect to Docker over TLS you must specify a client and CA certificate.
     #ssl:
     #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -870,10 +1111,10 @@ process is running in Docker then the event will be enriched. The default value
 is `["process.pid", "process.ppid"]`.
 
 `match_source`:: (Optional) Match container ID from a log path present in the
-`source` field. Enabled by default.
+`log.file.path` field. Enabled by default.
 
 `match_short_id`:: (Optional) Match container short ID from a log path present
-in the `source` field. Disabled by default.
+in the `log.file.path` field. Disabled by default.
 This allows to match directories names that have the first 12 characters
 of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
 
@@ -883,6 +1124,9 @@ for container ID. It defaults to 4 to match
 
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
+
+`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
+ labels with `_`.
 
 [[add-host-metadata]]
 === Add Host metadata
@@ -895,6 +1139,14 @@ processors:
 - add_host_metadata:
     netinfo.enabled: false
     cache.ttl: 5m
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
 -------------------------------------------------------------------------------
 
 It has the following settings:
@@ -902,6 +1154,23 @@ It has the following settings:
 `netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields host.ip and host.mac
 
 `cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
+
+`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+
+`geo.location`:: Longitude and latitude in comma separated format.
+
+`geo.continent_name`:: Name of the continent.
+
+`geo.country_name`:: Name of the country.
+
+`geo.region_name`:: Name of the region.
+
+`geo.city_name`:: Name of the city.
+
+`geo.country_iso_code`:: ISO country code.
+
+`geo.region_iso_code`:: ISO region code.
+
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
 The fields added to the event are looking as following:
@@ -918,10 +1187,20 @@ The fields added to the event are looking as following:
          "build":"16G1212",
          "platform":"darwin",
          "version":"10.12.6",
-         "kernel":"16.7.0"
+         "kernel":"16.7.0",
+         "name":"Mac OS X"
       },
       "ip": ["192.168.0.1", "10.0.0.1"],
-      "mac": ["00:25:96:12:34:56", "72:00:06:ff:79:f1"]
+      "mac": ["00:25:96:12:34:56", "72:00:06:ff:79:f1"],
+      "geo": {
+          "continent_name": "North America",
+          "country_iso_code": "US",
+          "region_name": "New York",
+          "region_iso_code": "NY",
+          "city_name": "New York",
+          "name": "nyc-dc1-rack1",
+          "location": "40.7128, -74.0060"
+        }
    }
 }
 -------------------------------------------------------------------------------
@@ -1123,3 +1402,174 @@ set to `true`, this condition will be ignored.
 `restricted_fields`:: (Optional) By default, the `process.env` field is not
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
+
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+[[processor-script]]
+=== Script Processor
+
+experimental[]
+
+The script processor executes Javascript code to process an event. The processor
+uses a pure Go implementation of ECMAScript 5.1 and has no external
+dependencies. This can be useful in situations where one of the other processors
+doesn't provide the functionality you need to filter events.
+
+The processor can be configured by embedding Javascript in your configuration
+file or by pointing the processor at external file(s).
+
+[source,yaml]
+----
+processors:
+- script:
+    lang: javascript
+    id: my_filter
+    source: >
+      function process(event) {
+          event.Tag("js");
+      }
+----
+
+This loads `filter.js` from disk.
+
+[source,yaml]
+----
+processors:
+- script:
+    lang: javascript
+    id: my_filter
+    file: ${path.config}/filter.js
+----
+
+Parameters can be passed to the script by adding `params` to the config.
+This allows for a script to be made reusable. When using `params` the
+code must define a `register(params)` function to receive the parameters.
+
+[source,yaml]
+----
+processors:
+- script:
+    lang: javascript
+    id: my_filter
+    params:
+      threshold: 15
+    source: >
+      var params = {threshold: 42};
+      function register(scriptParams) {
+          params = scriptParams;
+      }
+      function process(event) {
+          if (event.Get("severity") < params.threshold) {
+              event.Cancel();
+          }
+      }
+----
+
+If the script defines a `test()` function it will be invoked when the processor
+is loaded. Any exceptions thrown will cause the processor to fail to load. This
+can be used to make assertions about the behavior of the script.
+
+[source,javascript]
+----
+function process(event) {
+    if (event.Get("event.code") === 1102) {
+        event.Put("event.action", "cleared");
+    }
+}
+
+function test() {
+    var event = process(new Event({event: {code: 1102}));
+    if (event.Get("event.action") !== "cleared") {
+        throw "expected event.action === cleared";
+    }
+}
+----
+
+[float]
+==== Configuration options
+
+The `script` processor has the following configuration settings:
+
+`lang`:: This field is required and its value must be `javascript`.
+
+`tag`:: This is an optional identifier that is added to log messages. If defined
+it enables metrics logging for this instance of the processor. The metrics
+include the number of exceptions and a histogram of the execution times for
+the `process` function.
+
+`source`:: Inline Javascript source code.
+
+`file`:: Path to a script file to load. Relative paths are interpreted as
+relative to the `path.config` directory. Globs are expanded.
+
+`files`:: List of script files to load. The scripts are concatenated together.
+Relative paths are interpreted as relative to the `path.config` directory.
+And globs are expanded.
+
+`params`:: A dictionary of parameters that are passed to the `register` of the
+script.
+
+`tag_on_exception`:: Tag to add to events in case the Javascript code causes an
+exception while processing an event. Defaults to `_js_exception`.
+
+`timeout`:: This sets an execution timeout for the `process` function. When
+the `process` function takes longer than the `timeout` period the function
+is interrupted. You can set this option to prevent a script from running for
+too long (like preventing an infinite `while` loop). By default there is no
+timeout.
+
+[float]
+==== Event API
+
+The `Event` object passed to the `process` method has the following API.
+
+[frame="topbot",options="header"]
+|===
+|Method |Description
+
+|`Get(string)`
+|Get a value from the event (either a scalar or an object). If the key does not
+exist `null` is returned. If no key is provided then an object containing all
+fields is returned.
+
+*Example*: `var value = event.Get(key);`
+
+|`Put(string, value)`
+|Put a value into the event. If the key was already set then the
+previous value is returned. It throws an exception if the key cannot be set
+because one of the intermediate values is not an object.
+
+*Example*: `var old = event.Put(key, value);`
+
+|`Rename(string, string)`
+|Rename a key in the event. The target key must not exist. It
+returns true if the source key was successfully renamed to the target key.
+
+*Example*: `var success = event.Rename("source", "target");`
+
+|`Delete(string)`
+|Delete a field from the event. It returns true on success.
+
+*Example*: `var deleted = event.Delete("user.email");`
+
+|`Cancel()`
+|Flag the event as cancelled which causes the processor to drop
+event.
+
+*Example*: `event.Cancel(); return;`
+
+|`Tag(string)`
+|Append a tag to the `tags` field if the tag does not already
+exist. Throws an exception if `tags` exists and is not a string or a list of
+strings.
+
+*Example*: `event.Tag("user_event");`
+
+|`AppendTo(string, string)`
+|`AppendTo` is a specialized `Put` method that converts the existing value to an
+array and appends the value if it does not already exist. If there is an
+existing value that's not a string or array of strings then an exception is
+thrown.
+
+*Example*: `event.AppendTo("error.message", "invalid file hash");`
+|===
+endif::[]

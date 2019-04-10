@@ -100,4 +100,4 @@ class Test(BaseTest):
         assert syslog["syslog.priority"] == 13
         assert syslog["syslog.severity_label"] == "Notice"
         assert syslog["syslog.facility_label"] == "user-level"
-        assert len(syslog["log.source.ip"]) > 0
+        assert len(syslog["log.source.address"]) > 0

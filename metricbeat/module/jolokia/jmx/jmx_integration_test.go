@@ -33,25 +33,22 @@ func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "jolokia")
 
 	for _, config := range getConfigs() {
-		f := mbtest.NewEventsFetcher(t, config)
-		events, err := f.Fetch()
-		if !assert.NoError(t, err) {
-			t.FailNow()
-		}
+		f := mbtest.NewReportingMetricSetV2Error(t, config)
+		events, errs := mbtest.ReportingFetchV2Error(f)
+		assert.Empty(t, errs)
+		assert.NotEmpty(t, events)
 		t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
-		if len(events) == 0 || len(events[0]) <= 1 {
-			t.Fatal("Empty events")
-		}
 	}
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "jolokia")
-
 	for _, config := range getConfigs() {
-		f := mbtest.NewEventsFetcher(t, config)
-		err := mbtest.WriteEvents(f, t)
-		if err != nil {
+		f := mbtest.NewReportingMetricSetV2Error(t, config)
+		events, errs := mbtest.ReportingFetchV2Error(f)
+		assert.Empty(t, errs)
+		assert.NotEmpty(t, events)
+
+		if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 			t.Fatal("write", err)
 		}
 	}
@@ -181,6 +178,15 @@ func getConfigs() []map[string]interface{} {
 						{
 							"attr":  "NonHeapMemoryUsage",
 							"field": "memory.non_heap_usage",
+						},
+					},
+				},
+				{
+					"mbean": "java.lang:type=Runtime",
+					"attributes": []map[string]string{
+						{
+							"attr":  "Uptime",
+							"field": "uptime",
 						},
 					},
 				},

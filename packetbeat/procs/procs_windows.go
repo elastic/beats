@@ -23,6 +23,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"net"
 	"syscall"
 	"unsafe"
 
@@ -31,6 +32,8 @@ import (
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 )
 
+var machineEndiannes = getMachineEndiannes()
+
 type extractor interface {
 	// Extract extracts useful information from the pointed-to structure
 	Extract(unsafe.Pointer)
@@ -38,7 +41,7 @@ type extractor interface {
 	Size() int
 }
 
-type callbackFn func(uint16, int)
+type callbackFn func(net.IP, uint16, int)
 type extractorFactory func(fn callbackFn) extractor
 
 type tcpRowOwnerPIDExtractor callbackFn
@@ -64,17 +67,17 @@ var tablesByTransport = map[applayer.Transport][]struct {
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.
-func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[uint16]int, err error) {
+func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
 	tables, ok := tablesByTransport[transport]
 	if !ok {
 		return nil, fmt.Errorf("unsupported transport protocol id: %d", transport)
 	}
 
-	storeResults := func(localPort uint16, pid int) {
-		ports[localPort] = pid
+	storeResults := func(localIP net.IP, localPort uint16, pid int) {
+		ports[endpoint{address: localIP.String(), port: localPort}] = pid
 	}
 
-	ports = make(map[uint16]int)
+	ports = make(map[endpoint]int)
 	for _, table := range tables {
 		data, err := getNetTable(table.function, false, table.family, table.class)
 		if err != nil {
@@ -147,7 +150,7 @@ func extractUDP6RowOwnerPID(fn callbackFn) extractor {
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e tcpRowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 	row := (*TCPRowOwnerPID)(ptr)
-	e(uint32FieldToPort(row.localPort), int(row.owningPID))
+	e(addressIPv4(row.localAddr), uint32FieldToPort(row.localPort), int(row.owningPID))
 }
 
 // Size returns the size of a table row
@@ -158,7 +161,7 @@ func (tcpRowOwnerPIDExtractor) Size() int {
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e tcp6RowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 	row := (*TCP6RowOwnerPID)(ptr)
-	e(uint32FieldToPort(row.localPort), int(row.owningPID))
+	e(addressIPv6(row.localAddr), uint32FieldToPort(row.localPort), int(row.owningPID))
 }
 
 // Size returns the size of a table row
@@ -169,7 +172,7 @@ func (tcp6RowOwnerPIDExtractor) Size() int {
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e udpRowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 	row := (*UDPRowOwnerPID)(ptr)
-	e(uint32FieldToPort(row.localPort), int(row.owningPID))
+	e(addressIPv4(row.localAddr), uint32FieldToPort(row.localPort), int(row.owningPID))
 }
 
 // Size returns the size of a table row
@@ -180,10 +183,29 @@ func (udpRowOwnerPIDExtractor) Size() int {
 // Extract will parse a row of Size() bytes pointed to by ptr
 func (e udp6RowOwnerPIDExtractor) Extract(ptr unsafe.Pointer) {
 	row := (*UDP6RowOwnerPID)(ptr)
-	e(uint32FieldToPort(row.localPort), int(row.owningPID))
+	e(addressIPv6(row.localAddr), uint32FieldToPort(row.localPort), int(row.owningPID))
 }
 
 // Size returns the size of a table row
 func (udp6RowOwnerPIDExtractor) Size() int {
 	return int(unsafe.Sizeof(UDP6RowOwnerPID{}))
+}
+
+func addressIPv4(value uint32) net.IP {
+	address := make([]byte, 4)
+	machineEndiannes.PutUint32(address, value)
+	return net.IP(address)
+}
+
+func addressIPv6(s [16]byte) net.IP {
+	return net.IP(s[:])
+}
+
+func getMachineEndiannes() binary.ByteOrder {
+	var buf [2]byte
+	*(*uint16)(unsafe.Pointer(&buf[0])) = 1
+	if buf[0] == 1 {
+		return binary.LittleEndian
+	}
+	return binary.BigEndian
 }

@@ -68,8 +68,8 @@ def document_field(output, field, field_path):
         if not field["index"]:
             output.write("{}\n\n".format("Field is not indexed."))
 
-    if "enable" in field:
-        if not field["enable"]:
+    if "enabled" in field:
+        if not field["enabled"]:
             output.write("{}\n\n".format("Object is not enabled."))
 
     if "multi_fields" in field:
@@ -144,23 +144,22 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Generates the documentation for a Beat.")
-    parser.add_argument("path", help="Path to the beat folder")
+    parser.add_argument("fields", help="Path to fields.yml")
     parser.add_argument("beattitle", help="The beat title")
     parser.add_argument("es_beats", help="The path to the general beats folder")
+    parser.add_argument("--output_path", default="", dest="output_path", help="Output path, if different from path")
 
     args = parser.parse_args()
 
-    beat_path = args.path
-    beat_title = args.beattitle
+    fields_yml = args.fields
+    beat_title = args.beattitle.title()
     es_beats = args.es_beats
-
-    fields_yml = beat_path + "/fields.yml"
 
     # Read fields.yml
     with open(fields_yml) as f:
         fields = f.read()
 
-    output = open(beat_path + "/docs/fields.asciidoc", 'w')
+    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w')
 
     try:
         fields_to_asciidoc(fields, output, beat_title)

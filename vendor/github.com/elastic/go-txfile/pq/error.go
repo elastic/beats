@@ -58,21 +58,23 @@ type errorCtx struct {
 //go:generate stringer -type=ErrKind -linecomment=true
 
 const (
-	NoError          ErrKind = iota // no error
-	InitFailed                      // failed to initialize queue
-	InvalidParam                    // invalid parameter
-	InvalidPageSize                 // invalid page size
-	InvalidConfig                   // invalid queue config
-	QueueClosed                     // queue is already closed
-	ReaderClosed                    // reader is already closed
-	WriterClosed                    // writer is already closed
-	NoQueueRoot                     // no queue root
-	InvalidQueueRoot                // queue root is invalid
-	QueueVersion                    // unsupported queue version
-	ACKEmptyQueue                   // invalid ack on empty queue
-	ACKTooMany                      // too many events acked
-	SeekFail                        // failed to seek to next page
-	ReadFail                        // failed to read page
+	NoError            ErrKind = iota // no error
+	InitFailed                        // failed to initialize queue
+	InvalidParam                      // invalid parameter
+	InvalidPageSize                   // invalid page size
+	InvalidConfig                     // invalid queue config
+	QueueClosed                       // queue is already closed
+	ReaderClosed                      // reader is already closed
+	WriterClosed                      // writer is already closed
+	NoQueueRoot                       // no queue root
+	InvalidQueueRoot                  // queue root is invalid
+	QueueVersion                      // unsupported queue version
+	ACKEmptyQueue                     // invalid ack on empty queue
+	ACKTooMany                        // too many events acked
+	SeekFail                          // failed to seek to next page
+	ReadFail                          // failed to read page
+	InactiveTx                        // no active transaction
+	UnexpectedActiveTx                // unexpected active transaction
 )
 
 // Error returns a user readable error message.

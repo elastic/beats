@@ -43,11 +43,10 @@ type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
 
-	index     outil.Selector
-	pipeline  *outil.Selector
-	params    map[string]string
-	timeout   time.Duration
-	eventType string
+	index    outputs.IndexSelector
+	pipeline *outil.Selector
+	params   map[string]string
+	timeout  time.Duration
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -71,14 +70,15 @@ type ClientSettings struct {
 	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
-	Index              outil.Selector
+	Index              outputs.IndexSelector
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
 	Observer           outputs.Observer
 }
 
-type connectCallback func(client *Client) error
+// ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
+type ConnectCallback func(client *Client) error
 
 // Connection manages the connection for a given client.
 type Connection struct {
@@ -104,7 +104,7 @@ type bulkCreateAction struct {
 
 type bulkEventMeta struct {
 	Index    string `json:"_index" struct:"_index"`
-	DocType  string `json:"_type" struct:"_type"`
+	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`
 	Pipeline string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
 	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
 }
@@ -132,9 +132,7 @@ var (
 )
 
 const (
-	defaultEventTypeES6 = "doc"
-	defaultEventTypeES7 = "_doc"
-	defaultEventType    = defaultEventTypeES7
+	defaultEventType = "doc"
 )
 
 // NewClient instantiates a new client.
@@ -219,7 +217,6 @@ func NewClient(
 		pipeline:  pipeline,
 		params:    params,
 		timeout:   s.Timeout,
-		eventType: defaultEventType,
 
 		bulkRequ: bulkRequ,
 
@@ -229,6 +226,16 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
+		globalCallbackRegistry.mutex.Lock()
+		defer globalCallbackRegistry.mutex.Unlock()
+
+		for _, callback := range globalCallbackRegistry.callbacks {
+			err := callback(client)
+			if err != nil {
+				return err
+			}
+		}
+
 		if onConnect != nil {
 			onConnect.mutex.Lock()
 			defer onConnect.mutex.Unlock()
@@ -306,8 +313,13 @@ func (client *Client) publishEvents(
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
 
+	eventType := ""
+	if client.GetVersion().Major < 7 {
+		eventType = defaultEventType
+	}
+
 	origCount := len(data)
-	data = bulkEncodePublishRequest(body, client.index, client.pipeline, client.eventType, data)
+	data = bulkEncodePublishRequest(body, client.index, client.pipeline, eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -365,7 +377,7 @@ func (client *Client) publishEvents(
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
 	body bulkWriter,
-	index outil.Selector,
+	index outputs.IndexSelector,
 	pipeline *outil.Selector,
 	eventType string,
 	data []publisher.Event,
@@ -389,7 +401,7 @@ func bulkEncodePublishRequest(
 }
 
 func createEventBulkMeta(
-	indexSel outil.Selector,
+	indexSel outputs.IndexSelector,
 	pipelineSel *outil.Selector,
 	eventType string,
 	event *beat.Event,
@@ -400,7 +412,7 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	index, err := getIndex(event, indexSel)
+	index, err := indexSel.Select(event)
 	if err != nil {
 		err := fmt.Errorf("failed to select event index: %v", err)
 		return nil, err
@@ -444,24 +456,6 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 		return pipelineSel.Select(event)
 	}
 	return "", nil
-}
-
-// getIndex returns the full index name
-// Index is either defined in the config as part of the output
-// or can be overload by the event through setting index
-func getIndex(event *beat.Event, index outil.Selector) (string, error) {
-	if event.Meta != nil {
-		if str, exists := event.Meta["index"]; exists {
-			idx, ok := str.(string)
-			if ok {
-				ts := event.Timestamp.UTC()
-				return fmt.Sprintf("%s-%d.%02d.%02d",
-					idx, ts.Year(), ts.Month(), ts.Day()), nil
-			}
-		}
-	}
-
-	return index.Select(event)
 }
 
 // bulkCollectPublishFails checks per item errors returning all events
@@ -686,18 +680,7 @@ func (client *Client) String() string {
 // the configured host, updates the known Elasticsearch version and calls
 // globally configured handlers.
 func (client *Client) Connect() error {
-	err := client.Connection.Connect()
-	if err != nil {
-		return err
-	}
-
-	if client.GetVersion().Major < 7 {
-		client.eventType = defaultEventTypeES6
-	} else {
-		client.eventType = defaultEventType
-	}
-
-	return nil
+	return client.Connection.Connect()
 }
 
 // Connect connects the client. It runs a GET request against the root URL of
@@ -749,7 +732,7 @@ func (conn *Connection) Ping() (string, error) {
 	}
 
 	debugf("Ping status code: %v", status)
-	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	logp.Info("Attempting to connect to Elasticsearch version %s", response.Version.Number)
 	return response.Version.Number, nil
 }
 

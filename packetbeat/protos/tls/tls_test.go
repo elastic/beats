@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type eventStore struct {
@@ -38,7 +39,7 @@ type eventStore struct {
 }
 
 const (
-	expectedClientHello = `{"dst":{"IP":"192.168.0.2","Port":27017,"Name":"","Cmdline":"","Proc":""},"server":"example.org","src":{"IP":"192.168.0.1","Port":6512,"Name":"","Cmdline":"","Proc":""},"status":"Error","tls":{"client_certificate_requested":false,"client_hello":{"extensions":{"_unparsed_":["renegotiation_info","23","status_request","18","30032"],"application_layer_protocol_negotiation":["h2","http/1.1"],"ec_points_formats":["uncompressed"],"server_name_indication":["example.org"],"session_ticket":"","signature_algorithms":["ecdsa_secp256r1_sha256","rsa_pss_sha256","rsa_pkcs1_sha256","ecdsa_secp384r1_sha384","rsa_pss_sha384","rsa_pkcs1_sha384","rsa_pss_sha512","rsa_pkcs1_sha512","rsa_pkcs1_sha1"],"supported_groups":["x25519","secp256r1","secp384r1"]},"supported_ciphers":["TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA","TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_GCM_SHA256","TLS_RSA_WITH_AES_256_GCM_SHA384","TLS_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_3DES_EDE_CBC_SHA"],"supported_compression_methods":["NULL"],"version":"3.3"},"fingerprints":{"ja3":{"hash":"94c485bca29d5392be53f2b8cf7f4304","str":"771,49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53-10,65281-0-23-35-13-5-18-16-30032-11-10,29-23-24,0"}},"handshake_completed":false,"resumed":false},"type":"tls"}`
+	expectedClientHello = `{"client":{"ip":"192.168.0.1","port":6512},"destination":{"domain":"example.org","ip":"192.168.0.2","port":27017},"event":{"category":"network_traffic","dataset":"tls","kind":"event"},"network":{"community_id":"1:jKfewJN/czjTuEpVvsKdYXXiMzs=","protocol":"tls","transport":"tcp","type":"ipv4"},"server":{"domain":"example.org","ip":"192.168.0.2","port":27017},"source":{"ip":"192.168.0.1","port":6512},"status":"Error","tls":{"client_certificate_requested":false,"client_hello":{"extensions":{"_unparsed_":["renegotiation_info","23","status_request","18","30032"],"application_layer_protocol_negotiation":["h2","http/1.1"],"ec_points_formats":["uncompressed"],"server_name_indication":["example.org"],"session_ticket":"","signature_algorithms":["ecdsa_secp256r1_sha256","rsa_pss_sha256","rsa_pkcs1_sha256","ecdsa_secp384r1_sha384","rsa_pss_sha384","rsa_pkcs1_sha384","rsa_pss_sha512","rsa_pkcs1_sha512","rsa_pkcs1_sha1"],"supported_groups":["x25519","secp256r1","secp384r1"]},"supported_ciphers":["TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA","TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_GCM_SHA256","TLS_RSA_WITH_AES_256_GCM_SHA384","TLS_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_3DES_EDE_CBC_SHA"],"supported_compression_methods":["NULL"],"version":"3.3"},"fingerprints":{"ja3":{"hash":"94c485bca29d5392be53f2b8cf7f4304","str":"771,49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53-10,65281-0-23-35-13-5-18-16-30032-11-10,29-23-24,0"}},"handshake_completed":false,"resumed":false},"type":"tls"}`
 	expectedServerHello = `{"extensions":{"_unparsed_":["renegotiation_info","status_request"],"application_layer_protocol_negotiation":["h2"],"ec_points_formats":["uncompressed","ansiX962_compressed_prime","ansiX962_compressed_char2"],"session_ticket":""},"selected_cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","selected_compression_method":"NULL","version":"3.3"}`
 	rawClientHello      = "16030100c2010000be03033367dfae0d46ec0651e49cca2ae47317e8989df710" +
 		"ee7570a88b9a7d5d56b3af00001c3a3ac02bc02fc02cc030cca9cca8c013c014" +
@@ -55,6 +56,7 @@ const (
 )
 
 func (e *eventStore) publish(event beat.Event) {
+	publish.MarshalPacketbeatFields(&event, nil)
 	e.events = append(e.events, event)
 }
 
@@ -174,9 +176,7 @@ func TestClientHello(t *testing.T) {
 
 	assert.Len(t, results.events, 1)
 	event := results.events[0]
-	// Remove responsetime (but fail if not present) so that the test
-	// does not depend on execution speed
-	assert.NoError(t, event.Fields.Delete("responsetime"))
+
 	b, err := json.Marshal(event.Fields)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedClientHello, string(b))
@@ -242,9 +242,7 @@ func TestFragmentedHandshake(t *testing.T) {
 
 	assert.Len(t, results.events, 1)
 	event := results.events[0]
-	// Remove responsetime (but fail if not present) so that the test
-	// does not depend on execution speed
-	assert.NoError(t, event.Delete("responsetime"))
+
 	b, err := json.Marshal(event.Fields)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedClientHello, string(b))

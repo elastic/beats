@@ -96,13 +96,26 @@ expected response. See <<monitor-http-options>>.
 The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
 
+[float]
+[[monitor-id]]
+==== `id`
+
+A unique identifier for this configuration. This should not change with edits to the monitor configuration
+regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. Note that this uniqueness is only within a given beat instance. If you want to monitor the same endpoint from multiple locations it is recommended that those heartbeat instances use the same IDs so that their results can be correlated. You can use the `host.geo.name` property to disambiguate them.
+
+When querying against indexed monitor data this is the field you will be aggregating with. Appears in the
+<<exported-fields,exported fields>> as `monitor.id`.
+
+If you do not set this explicitly the monitor's config will be hashed and a generated value used. This value will
+change with any options change to this monitor making aggregations over time between changes impossible. For this reason
+it is recommended that you set this manually.
 
 [float]
 [[monitor-name]]
 ==== `name`
 
-The monitor name. This value appears in the <<exported-fields,exported fields>>
-under the `monitor` field as the job name and the `type` field as the job type.
+Optional human readable name for this monitor. This value appears in the <<exported-fields,exported fields>>
+as `monitor.name`.
 
 [float]
 [[monitor-enabled]]
@@ -442,8 +455,7 @@ Under `check.request`, specify these options:
 
 Under `check.response`, specify these options:
 
-*`status`*:: The expected status code. If this setting is not configured or
-it's set to 0, any status code other than 404 is accepted.
+*`status`*:: The expected status code. 4xx and 5xx codes are considered `down` by default. Other codes are considered `up`.
 *`headers`*:: The required response headers.
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
 *`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON.

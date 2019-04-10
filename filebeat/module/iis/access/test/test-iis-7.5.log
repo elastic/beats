@@ -1,0 +1,8 @@
+#Software: Microsoft Internet Information Services 7.5
+#Version: 1.0
+#Date: 2018-08-28 18:24:25
+#Fields: date time s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs(User-Agent) sc-status sc-substatus sc-win32-status time-taken
+2018-08-28 18:24:25 [10.100.220.70](http://10.100.220.70) GET / - 80 - [10.100.118.31](http://10.100.118.31) Mozilla/4.0+(compatible;+MSIE+7.0;+Windows+NT+6.3;+WOW64;+Trident/7.0;+.NET4.0E;+.NET4.0C;+.NET+CLR+3.5.30729;+.NET+CLR[+2.0.50727](tel:+2050727);+.NET+CLR+3.0.30729) 404 4 2 792
+2019-03-06 18:43:17 10.0.140.107 GET /health-monitoring - 80 - 10.0.140.2 - 200 0 0 15
+2019-03-06 18:43:17 10.0.140.107 GET /health-monitoring - 80 - 10.0.140.2 - 200 0 0 15
+2019-03-06 18:43:17 2001:cdba:0000:0000:0000:0000:3257:9652 GET /health-monitoring - 80 - 2001:cdba:0000:0000:0000:0000:3257:9652 - 200 0 0 15

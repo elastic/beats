@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -29,6 +30,8 @@ import (
 
 var Version = "9.9.9"
 var Name = "mockbeat"
+
+var Settings = instance.Settings{Name: Name, Version: Version}
 
 type Mockbeat struct {
 	done chan struct{}
@@ -49,14 +52,25 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Wait until mockbeat is done
-	go client.Publish(beat.Event{
-		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"type":    "mock",
-			"message": "Mockbeat is alive!",
-		},
-	})
+	ticker := time.NewTicker(1 * time.Second)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				client.Publish(beat.Event{
+					Timestamp: time.Now(),
+					Fields: common.MapStr{
+						"type":    "mock",
+						"message": "Mockbeat is alive!",
+					},
+				})
+			case <-mb.done:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+
 	<-mb.done
 	return nil
 }

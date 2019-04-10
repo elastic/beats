@@ -1,0 +1,742 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Filebeat-MySQL-Slow-log-ecs", 
+                "title": "Top slowest queries [Filebeat MySQL] ECS", 
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null, 
+                                "direction": null
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Query time", 
+                                "field": "event.duration"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Query", 
+                                "field": "mysql.slowlog.query", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "User", 
+                                "field": "user.name", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "perPage": 10, 
+                        "showMeticsAtAllLevels": false, 
+                        "showPartialRows": false, 
+                        "showTotal": false, 
+                        "sort": {
+                            "columnIndex": null, 
+                            "direction": null
+                        }, 
+                        "totalFunc": "sum"
+                    }, 
+                    "title": "Top slowest queries [Filebeat MySQL] ECS", 
+                    "type": "table"
+                }
+            }, 
+            "id": "MySQL-slowest-queries-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Filebeat-MySQL-Slow-log-ecs", 
+                "title": "Slow queries over time [Filebeat MySQL] ECS", 
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "Slow queries": "#EF843C"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Slow queries"
+                            }, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "@timestamp per 30 seconds"
+                                }, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "legendPosition": "right", 
+                        "mode": "stacked", 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Slow queries"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "histogram", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "times": [], 
+                        "type": "histogram", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Slow queries"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Slow queries over time [Filebeat MySQL] ECS", 
+                    "type": "histogram"
+                }
+            }, 
+            "id": "MySQL-Slow-queries-over-time-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Filebeat-MySQL-error-log-ecs", 
+                "title": "Error logs over time [Filebeat MySQL] ECS", 
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "Count": "#447EBC", 
+                            "Error logs": "#1F78C1"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Error logs"
+                            }, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "@timestamp per 30 seconds"
+                                }, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "legendPosition": "right", 
+                        "mode": "stacked", 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Error logs"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "histogram", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "times": [], 
+                        "type": "histogram", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Error logs"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Error logs over time [Filebeat MySQL] ECS", 
+                    "type": "histogram"
+                }
+            }, 
+            "id": "MySQL-error-logs-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "log.level", 
+                    "message"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "event.module", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "mysql", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "mysql"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "event.module": {
+                                            "query": "mysql", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }, 
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "fileset.name", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "error", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "error"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "fileset.name": {
+                                            "query": "error", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }
+                        ], 
+                        "highlight": {
+                            "fields": {
+                                "*": {}
+                            }, 
+                            "fragment_size": 2147483647, 
+                            "post_tags": [
+                                "@/kibana-highlighted-field@"
+                            ], 
+                            "pre_tags": [
+                                "@kibana-highlighted-field@"
+                            ], 
+                            "require_field_match": false
+                        }, 
+                        "highlightAll": true, 
+                        "index": "filebeat-*", 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "Error logs [Filebeat MySQL] ECS", 
+                "version": 1
+            }, 
+            "id": "Filebeat-MySQL-error-log-ecs", 
+            "type": "search", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Filebeat-MySQL-error-log-ecs", 
+                "title": "Error logs levels breakdown [Filebeat MySQL] ECS", 
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "ERROR": "#E24D42", 
+                            "Note": "#9AC48A", 
+                            "Warning": "#F9934E"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "field": "log.level", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": false, 
+                        "legendPosition": "bottom", 
+                        "shareYAxis": true, 
+                        "type": "pie"
+                    }, 
+                    "title": "Error logs levels breakdown [Filebeat MySQL] ECS", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "MySQL-Error-logs-levels-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Filebeat-MySQL-Slow-log-ecs", 
+                "title": "Slow logs breakdown [Filebeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "field": "mysql.slowlog.query", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": false, 
+                        "legendPosition": "bottom", 
+                        "shareYAxis": true, 
+                        "type": "pie"
+                    }, 
+                    "title": "Slow logs breakdown [Filebeat MySQL] ECS", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "MySQL-Slow-logs-by-count-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "event.module", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "mysql", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "mysql"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "event.module": {
+                                            "query": "mysql", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }, 
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "fileset.name", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "slowlog", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "slowlog"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "fileset.name": {
+                                            "query": "slowlog", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }
+                        ], 
+                        "highlight": {
+                            "fields": {
+                                "*": {}
+                            }, 
+                            "fragment_size": 2147483647, 
+                            "post_tags": [
+                                "@/kibana-highlighted-field@"
+                            ], 
+                            "pre_tags": [
+                                "@kibana-highlighted-field@"
+                            ], 
+                            "require_field_match": false
+                        }, 
+                        "highlightAll": true, 
+                        "index": "filebeat-*", 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "Slow logs [Filebeat MySQL] ECS", 
+                "version": 1
+            }, 
+            "id": "Filebeat-MySQL-Slow-log-ecs", 
+            "type": "search", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Overview dashboard for the Filebeat MySQL module", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "col": 1, 
+                        "id": "MySQL-slowest-queries-ecs", 
+                        "panelIndex": 1, 
+                        "row": 8, 
+                        "size_x": 6, 
+                        "size_y": 4, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "MySQL-Slow-queries-over-time-ecs", 
+                        "panelIndex": 2, 
+                        "row": 1, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 7, 
+                        "id": "MySQL-error-logs-ecs", 
+                        "panelIndex": 3, 
+                        "row": 1, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 7, 
+                        "columns": [
+                            "log.level", 
+                            "message"
+                        ], 
+                        "id": "Filebeat-MySQL-error-log-ecs", 
+                        "panelIndex": 4, 
+                        "row": 8, 
+                        "size_x": 6, 
+                        "size_y": 5, 
+                        "sort": [
+                            "@timestamp", 
+                            "desc"
+                        ], 
+                        "type": "search"
+                    }, 
+                    {
+                        "col": 7, 
+                        "id": "MySQL-Error-logs-levels-ecs", 
+                        "panelIndex": 5, 
+                        "row": 4, 
+                        "size_x": 6, 
+                        "size_y": 4, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "MySQL-Slow-logs-by-count-ecs", 
+                        "panelIndex": 6, 
+                        "row": 4, 
+                        "size_x": 6, 
+                        "size_y": 4, 
+                        "type": "visualization"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Filebeat MySQL] Overview ECS", 
+                "uiStateJSON": {
+                    "P-1": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "version": 1
+            }, 
+            "id": "Filebeat-MySQL-Dashboard-ecs", 
+            "type": "dashboard", 
+            "version": 2
+        }
+    ], 
+    "version": "6.0.0-beta1-SNAPSHOT"
+}

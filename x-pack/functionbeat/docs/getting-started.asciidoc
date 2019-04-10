@@ -33,7 +33,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
@@ -52,7 +52,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
@@ -89,7 +89,7 @@ You specify settings in the  +{beatname_lc}.yml+ configuration file. This file
 is located in the archive that you extracted earlier.
 
 TIP: See the
-{libbeat}/config-file-format.html[Config File Format] section of the
+{beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following example configures a function called `cloudwatch` that collects
@@ -120,7 +120,8 @@ uploaded. For example:
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 ----
 
-. Define the functions that want to deploy. For each function, you must specify:
+. Define the functions that you want to deploy. For each function, you must
+specify:
 +
 [horizontal]
 `name`:: A unique name for the Lambda function.  

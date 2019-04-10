@@ -36,18 +36,24 @@ func ExportDashboard() error {
 		return fmt.Errorf("Dashboad ID must be specified")
 	}
 
+	kibanaURL := EnvOr("KIBANA_URL", "")
+
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		return err
 	}
 
-	// TODO: This is currently hardcoded for KB 6, we need to figure out what we do for KB 7
-	file := CWD("module", module, "_meta/kibana/6/dashboard", id+".json")
+	// TODO: This is currently hardcoded for KB 7, we need to figure out what we do for KB 8 if applicable
+	file := CWD("module", module, "_meta/kibana/7/dashboard", id+".json")
 
 	dashboardCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, "dev-tools/cmd/dashboards/export_dashboards.go"),
 		"-output", file, "-dashboard", id,
 	)
 
-	return dashboardCmd()
+	if kibanaURL != "" {
+		return dashboardCmd("-kibana", kibanaURL)
+	} else {
+		return dashboardCmd()
+	}
 }

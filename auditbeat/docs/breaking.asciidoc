@@ -1,14 +1,4 @@
 [[auditbeat-breaking-changes]]
-== Breaking changes in 7.0
-
-In version 7.0 the following fields were renamed.
-
-.Renamed Fields in 7.0
-[frame="topbot",options="header"]
-|======================
-|Old Field|New Field
-|`source.hostname`        |`source.domain`
-|======================
 
 == Breaking changes in 6.2
 
@@ -134,4 +124,3 @@ moved under the `file` namespace.]
 |`audit.file.hash`         |`hash`
 |`audit.file`              |`file`
 |======================
-

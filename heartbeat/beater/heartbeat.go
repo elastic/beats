@@ -143,7 +143,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
-		return err
+		logp.Error(errors.Wrap(err, "error loading reloadable monitors"))
 	}
 
 	// Execute the monitor

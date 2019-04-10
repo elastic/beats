@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kibana"
 )
@@ -70,6 +71,26 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		r.Event(event)
 		return event.Error
 	}
+
+	// Set service ID
+	uuid, err := dataFields.GetValue("uuid")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("uuid", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.id", uuid)
+	dataFields.Delete("uuid")
+
+	// Set service version
+	version, err := dataFields.GetValue("version.number")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("version.number", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.version", version)
+	dataFields.Delete("version")
 
 	event.MetricSetFields = dataFields
 

@@ -18,6 +18,8 @@
 package add_cloud_metadata
 
 import (
+	"path"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -30,18 +32,38 @@ func newGceMetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 	gceSchema := func(m map[string]interface{}) common.MapStr {
 		out := common.MapStr{}
 
+		trimLeadingPath := func(key string) {
+			v, err := out.GetValue(key)
+			if err != nil {
+				return
+			}
+			p, ok := v.(string)
+			if !ok {
+				return
+			}
+			out.Put(key, path.Base(p))
+		}
+
 		if instance, ok := m["instance"].(map[string]interface{}); ok {
 			s.Schema{
-				"instance_id":       c.StrFromNum("id"),
-				"instance_name":     c.Str("name"),
-				"machine_type":      c.Str("machineType"),
+				"instance": s.Object{
+					"id":   c.StrFromNum("id"),
+					"name": c.Str("name"),
+				},
+				"machine": s.Object{
+					"type": c.Str("machineType"),
+				},
 				"availability_zone": c.Str("zone"),
 			}.ApplyTo(out, instance)
+			trimLeadingPath("machine.type")
+			trimLeadingPath("availability_zone")
 		}
 
 		if project, ok := m["project"].(map[string]interface{}); ok {
 			s.Schema{
-				"project_id": c.Str("projectId"),
+				"project": s.Object{
+					"id": c.Str("projectId"),
+				},
 			}.ApplyTo(out, project)
 		}
 

@@ -60,7 +60,7 @@ Example configuration:
 
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  index: "{beatname_lc}-%{[beat.version]}-%{+yyyy.MM.dd}"
+  index: "{beat_default_index_prefix}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
@@ -86,12 +86,18 @@ output.elasticsearch:
   protocol: "https"
   username: "{beatname_lc}_internal"
   password: "{pwd}"
-
 ------------------------------------------------------------------------------
 
 
 For more information about securing {beatname_uc}, see
 <<securing-{beatname_lc}>>.
+
+ifndef::no_ilm[]
+If you are indexing large amounts of time-series data, you might also want to
+configure {beatname_uc} to use index lifecycle management. For more information
+about configuring and using index lifecycle management with {beatname_uc}, see
+<<ilm>>.
+endif::no_ilm[]
 
 ==== Compatibility
 
@@ -145,9 +151,9 @@ The default value is 0.
 
 ===== `escape_html`
 
-Configure escaping of HTML in strings. Set to `false` to disable escaping.
+Configure escaping of HTML in strings. Set to `true` to enable escaping.
 
-The default value is `true`.
+The default value is `false`.
 
 
 ===== `worker`
@@ -211,11 +217,30 @@ for more information about the environment variables.
 [[index-option-es]]
 ===== `index`
 
+ifndef::apm-server[]
 The index name to write events to. The default is
-+"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
++"{beatname_lc}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
+endif::apm-server[]
+
+ifdef::apm-server[]
+The index name to write events to. The default is
++"apm-%\{[{beat_version_key}]\}-{type\}-%\{+yyyy.MM.dd\}"+ (for example,
++"apm-{version}-transaction-{localdate}"+). See
+<<exploring-es-data,Exploring data in Elasticsearch>> for more information on
+default index configuration.
+
+IMPORTANT: If you change this setting,
+you need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>). You also must set the default index configuration
+in the `apm-server.yml` file.
+
+NOTE: +{beat_version_key}+ is a field managed by Beats that is added to every document.
+It holds the current version of APM Server.
+endif::apm-server[]
+
 ifndef::no_dashboards[]
 If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
@@ -224,35 +249,29 @@ endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event
 field. For example, this configuration uses a custom field, `fields.log_type`,
-to set the index: 
+to set the index:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "%\{[fields.log_type]\}-%\{[beat.version]\}-%\{+yyyy.MM.dd}\" <1>
+  index: "%\{[fields.log_type]\}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd}\" <1>
 ------------------------------------------------------------------------------
 
-<1> We recommend including `beat.version` in the name to avoid mapping issues
+<1> We recommend including +{beat_version_key}+ in the name to avoid mapping issues
 when you upgrade.
 
-With this configuration, all events with `log_type: normal` are sent to an 
+With this configuration, all events with `log_type: normal` are sent to an
 index named +normal-{version}-{localdate}+, and all events with
 `log_type: critical` are sent to an index named
 +critical-{version}-{localdate}+.
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.  
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<indices-option-es,`indices`>> setting for other ways to set the index
 dynamically.
 
-
-ifdef::deprecate_dashboard_loading[]
-
-deprecated[{deprecate_dashboard_loading}]
-
-endif::[]
 
 [[indices-option-es]]
 ===== `indices`
@@ -266,7 +285,7 @@ matches, the <<index-option-es,`index`>> setting is used.
 Rule settings:
 
 *`index`*:: The index format string to use. If this string contains field
-references, such as `%{[fields.name]}`, the fields must exist, or the rule fails. 
+references, such as `%{[fields.name]}`, the fields must exist, or the rule fails.
 
 *`mappings`*:: A dictionary that takes the value returned by `index` and maps it
 to a new name.
@@ -275,21 +294,23 @@ to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 The following example sets the index based on whether the `message` field
 contains the specified string:
 
-["source","yaml"]
+["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
   indices:
-    - index: "warning-%{[beat.version]}-%{+yyyy.MM.dd}"
+    - index: "warning-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "WARN"
-    - index: "error-%{[beat.version]}-%{+yyyy.MM.dd}"
+    - index: "error-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
@@ -320,6 +341,17 @@ This configuration results in indices named `sev1`, `sev2`, and `sev3`.
 The `mappings` setting simplifies the configuration, but is limited to string
 values. You cannot specify format strings within the mapping pairs.
 
+//TODO: MOVE ILM OPTIONS TO APPEAR LOGICALLY BASED ON LOCATION IN THE YAML FILE.
+
+ifndef::no_ilm[]
+[[ilm-es]]
+===== `ilm`
+
+Configuration options for index lifecycle management.
+
+See <<ilm>> for more information.
+endif::no_ilm[]
+
 ifndef::no-pipeline[]
 [[pipeline-option-es]]
 ===== `pipeline`
@@ -337,7 +369,7 @@ For more information, see <<configuring-ingest-node>>.
 
 You can set the ingest node pipeline dynamically by using a format string to
 access any event field. For example, this configuration uses a custom field,
-`fields.log_type`, to set the pipeline for each event: 
+`fields.log_type`, to set the pipeline for each event:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -352,7 +384,7 @@ named `normal_pipeline`, and all events with `log_type: critical` are sent to a
 pipeline named `critical_pipeline`.
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.   
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<pipelines-option-es,`pipelines`>> setting for other ways to set the
 ingest node pipeline dynamically.
@@ -371,7 +403,7 @@ Rule settings:
 
 *`pipeline`*:: The pipeline format string to use. If this string contains field
 references, such as `%{[fields.name]}`, the fields must exist, or the rule
-fails.  
+fails.
 
 *`mappings`*:: A dictionary that takes the value returned by `pipeline` and maps
 it to a new name.
@@ -380,8 +412,10 @@ it to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 The following example sends events to a specific pipeline based on whether the
 `message` field contains the specified string:
@@ -514,16 +548,16 @@ use in Logstash for indexing and filtering:
 {
     ...
     "@metadata": { <1>
-      "beat": "{beatname_lc}", <2>
+      "beat": "{beat_default_index_prefix}", <2>
       "version": "{stack-version}" <3>
       "type": "doc" <4>
     }
 }
 ------------------------------------------------------------------------------
 <1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. See the
-{logstashdoc}/event-dependent-configuration.html#metadata[Logstash documentation]
+{logstash-ref}/event-dependent-configuration.html#metadata[Logstash documentation]
 for more about the `@metadata` field.
-<2> The default is {beatname_lc}. To change this value, set the
+<2> The default is {beat_default_index_prefix}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
 <3> The beats current version.
 <4> The value of `type` is currently hardcoded to `doc`. It was used by previous
@@ -560,7 +594,7 @@ output {
 of the `beat` metadata field, `%{[@metadata][version]}` sets the second part to
 the Beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
 name to a date based on the Logstash `@timestamp` field. For example:
-+{beatname_lc}-{version}-2017.03.29+.
++{beat_default_index_prefix}-{version}-2017.03.29+.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
@@ -591,8 +625,7 @@ The list of known Logstash servers to connect to. If load balancing is disabled,
 multiple hosts are configured, one host is selected randomly (there is no precedence).
 If one host becomes unreachable, another one is selected randomly.
 
-All entries in this list can contain a port number. If no port number is given, the
-value specified for <<port,`port`>> is used as the default port number.
+All entries in this list can contain a port number. The default port number 5044 will be used, if no number is given.
 
 ===== `compression_level`
 
@@ -605,9 +638,9 @@ The default value is 3.
 
 ===== `escape_html`
 
-Configure escaping of HTML in strings. Set to `false` to disable escaping.
+Configure escaping of HTML in strings. Set to `true` to enable escaping.
 
-The default value is `true`.
+The default value is `false`.
 
 ===== `worker`
 
@@ -650,14 +683,6 @@ for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a values of 0 is
 configured. The default value is 2.
 
-[[port]]
-===== `port`
-
-deprecated[5.0.0]
-
-The default port to use if the port number is not given in <<hosts,`hosts`>>. The default port number
-is 5044.
-
 ===== `proxy_url`
 
 The URL of the SOCKS5 proxy to use when connecting to the Logstash servers. The
@@ -689,8 +714,8 @@ that when a proxy is used the name resolution occurs on the proxy server.
 ===== `index`
 
 The index root name to write events to. The default is the Beat name. For
-example +"{beatname_lc}"+ generates +"[{beatname_lc}-]{version}-YYYY.MM.DD"+
-indices (for example, +"{beatname_lc}-{version}-2017.04.26"+).
+example +"{beat_default_index_prefix}"+ generates +"[{beat_default_index_prefix}-]{version}-YYYY.MM.DD"+
+indices (for example, +"{beat_default_index_prefix}-{version}-2017.04.26"+).
 
 ===== `ssl`
 
@@ -792,7 +817,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 [[kafka-compatibility]]
 ==== Compatibility
 
-This output works with all Kafka versions in between 0.11 and 2.0.0. Older versions
+This output works with all Kafka versions in between 0.11 and 2.1.0. Older versions
 might work as well, but are not supported.
 
 ==== Configuration options
@@ -845,7 +870,7 @@ topic: '%{[fields.log_topic]}'
 -----
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.  
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<topics-option-kafka,`topics`>> setting for other ways to set the
 topic dynamically.
@@ -864,7 +889,7 @@ Rule settings:
 
 *`topic`*:: The topic format string to use.  If this string contains field
 references, such as `%{[fields.name]}`, the fields must exist, or the rule
-fails. 
+fails.
 
 *`mappings`*:: A dictionary that takes the value returned by `topic` and maps it
 to a new name.
@@ -873,8 +898,10 @@ to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 
 ===== `key`
@@ -927,6 +954,10 @@ Kafka metadata update settings. The metadata do contain information about
 brokers, topics, partition, and active leaders to use for publishing.
 
 *`refresh_frequency`*:: Metadata refresh interval. Defaults to 10 minutes.
+
+*`full`*:: Strategy to use when fetching metadata, when this option is `true`, the client will maintain
+a full set of metadata for all the available topics, if the this option is set to `false` it will only refresh the
+metadata for the configured topics. The default is true.
 
 *`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
 
@@ -1049,12 +1080,6 @@ distributed to the reachable servers only. You can define each Redis server by s
 `HOST` or `HOST:PORT`. For example: `"192.15.3.2"` or `"test.redis.io:12345"`. If you
 don't specify a port number, the value configured by `port` is used.
 
-===== `port`
-
-deprecated[5.0.0]
-
-The Redis port to use if `hosts` does not contain a port number. The default is 6379.
-
 ===== `index`
 
 The index name added to the events metadata for use by Logstash. The default is "{beatname_lc}".
@@ -1078,7 +1103,7 @@ output.redis:
 
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.  
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<keys-option-redis,`keys`>> setting for other ways to set the key
 dynamically.
@@ -1104,8 +1129,10 @@ a new name.
 *`default`*:: The default string value to use if `mappings` does not find a match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 Example `keys` settings:
 
@@ -1383,6 +1410,11 @@ endif::[]
 <titleabbrev>Cloud</titleabbrev>
 ++++
 
+ifdef::apm-server[]
+NOTE: This page refers to using a separate instance of APM Server with an existing Elasticsearch Service deployment.
+APM Server is not yet supported on Elasticsearch Service.
+endif::apm-server[]
+
 {beatname_uc} comes with two settings that simplify the output configuration
 when used together with https://cloud.elastic.co/[Elastic Cloud]. When defined,
 these setting overwrite settings from other parts in the configuration.
@@ -1429,7 +1461,7 @@ codec. By default the `json` codec is used.
 
 *`json.pretty`*: If `pretty` is set to true, events will be nicely formatted. The default is false.
 
-*`json.escape_html`*: If `escape_html` is set to false, html symbols will not be escaped in strings. The default is true.
+*`json.escape_html`*: If `escape_html` is set to true, html symbols will be escaped in strings. The default is false.
 
 Example configuration that uses the `json` codec with pretty printing enabled to write events to the console:
 

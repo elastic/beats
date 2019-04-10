@@ -64,32 +64,193 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 	defer server.Close()
 
 	config, err := common.NewConfigFrom(map[string]interface{}{
-		"host": server.Listener.Addr().String(),
+		"host":      server.Listener.Addr().String(),
+		"overwrite": false,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(config)
+	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":          "ec2",
-				"instance_id":       "i-11111111",
-				"machine_type":      "t2.medium",
-				"region":            "us-east-1",
-				"availability_zone": "us-east-1c",
+	cases := []struct {
+		fields          common.MapStr
+		expectedResults common.MapStr
+	}{
+		{
+			common.MapStr{},
+			common.MapStr{
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
+			},
+		},
+		{
+			common.MapStr{
+				"cloud": common.MapStr{
+					"instance": common.MapStr{
+						"id": "i-000",
+					},
+				},
+			},
+			common.MapStr{
+				"cloud": common.MapStr{
+					"instance": common.MapStr{
+						"id": "i-000",
+					},
+				},
+			},
+		},
+		{
+			common.MapStr{
+				"provider": "ec2",
+			},
+			common.MapStr{
+				"provider": "ec2",
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
+			},
+		},
+		{
+			common.MapStr{
+				"cloud.provider": "ec2",
+			},
+			// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
+			// it won't detect cloud.provider as a cloud field. This is not the behavior we
+			// expect and will find a better solution later in issue 11697.
+			common.MapStr{
+				"cloud.provider": "ec2",
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
 			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+
+	for _, c := range cases {
+		actual, err := p.Run(&beat.Event{Fields: c.fields})
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, c.expectedResults, actual.Fields)
+	}
+}
+
+func TestRetrieveAWSMetadataOverwriteTrue(t *testing.T) {
+	logp.TestingSetup()
+
+	server := initEC2TestServer()
+	defer server.Close()
+
+	config, err := common.NewConfigFrom(map[string]interface{}{
+		"host":      server.Listener.Addr().String(),
+		"overwrite": true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p, err := New(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		fields          common.MapStr
+		expectedResults common.MapStr
+	}{
+		{
+			common.MapStr{},
+			common.MapStr{
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
+			},
+		},
+		{
+			common.MapStr{
+				"cloud": common.MapStr{
+					"instance": common.MapStr{
+						"id": "i-000",
+					},
+				},
+			},
+			common.MapStr{
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
+			},
+		},
+		{
+			common.MapStr{
+				"cloud.provider": "ec2",
+			},
+			common.MapStr{
+				"cloud.provider": "ec2",
+				"cloud": common.MapStr{
+					"provider": "ec2",
+					"instance": common.MapStr{
+						"id": "i-11111111",
+					},
+					"machine": common.MapStr{
+						"type": "t2.medium",
+					},
+					"region":            "us-east-1",
+					"availability_zone": "us-east-1c",
+				},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		actual, err := p.Run(&beat.Event{Fields: c.fields})
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, c.expectedResults, actual.Fields)
+	}
 }
