@@ -3,6 +3,22 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.7.1]]
+=== Beats version 6.7.1
+https://github.com/elastic/beats/compare/v6.7.0...v6.7.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Remove IP fields from default_field in Elasticsearch template. {pull}11399[11399]
+
 [[release-notes-6.7.0]]
 === Beats version 6.7.0
 https://github.com/elastic/beats/compare/v6.6.2...v6.7.0[View commits]
