@@ -4,11 +4,11 @@
     Contains statistics related to the coreDNS service
   release: beta
   fields:
-    - name: panic.count.total
+    - name: panic.count
       type: long
       description: >
          Total number of panics
-    - name: dns.request.count.total
+    - name: dns.request.count
       type: long
       description: >
          Total query count
@@ -39,11 +39,11 @@
       type: long
       description: >
         Request Size histogram count
-    - name: dns.request.do.count.total
+    - name: dns.request.do.count
       type: long
       description: >
          Number of queries that have the DO bit set
-    - name: dns.request.type.count.total
+    - name: dns.request.type.count
       type: long
       description: >
           Counter of queries per zone and type
@@ -51,7 +51,7 @@
       type: keyword
       description: >
         Holds the query type of the request
-    - name: dns.response.rcode.count.total
+    - name: dns.response.rcode.count
       type: long
       description: >
         Counter of responses per zone and rcode
@@ -88,3 +88,27 @@
       type: keyword
       description: >
         The transport of the response ("udp" or "tcp")
+
+
+    - name: dns.cache.hits.count
+      type: long
+      description: >
+        Cache hits count for the cache plugin
+    - name: dns.cache.misses.count
+      type: long
+      description: >
+        Cache misses count for the cache plugin
+
+
+    - name: runtime.memory.alloc.bytes
+      type: long
+      description: >
+        Memory allocated bytes
+    - name: runtime.process.threads.count
+      type: long
+      description: >
+        Running threads count
+    - name: runtime.process.go.routines.count
+      type: long
+      description: >
+        Running Go routines count
