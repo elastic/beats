@@ -18,14 +18,10 @@
 package export
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/libbeat/idxmgmt"
 )
 
 // GenGetILMPolicyCmd is the command used to export the ilm policy.
@@ -34,28 +30,17 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 		Use:   "ilm-policy",
 		Short: "Export ILM policy",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
-			}
-			err = b.InitWithSettings(settings)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
+				fatalf("error initializing beat: %+v", err)
 			}
 
-			ilmFactory := settings.ILM
-			if ilmFactory == nil {
-				ilmFactory = ilm.DefaultSupport
+			idxManager := b.IdxMgmtSupporter().Manager(nil, idxmgmt.BeatsAssets(b.Fields))
+			templateLoadCfg := idxmgmt.SetupConfig{Load: new(bool)}
+			ilmLoadCfg := idxmgmt.DefaultSetupConfig()
+			if err := idxManager.Setup(templateLoadCfg, ilmLoadCfg); err != nil {
+				fatalf("exporting ilm-policy failed: %+v", err)
 			}
-
-			ilm, err := ilmFactory(nil, b.Info, b.RawConfig)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing ILM support: %s\n", err)
-			}
-
-			fmt.Println(common.MapStr(ilm.Policy().Body).StringToPrint())
 		},
 	}
 

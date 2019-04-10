@@ -21,14 +21,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 	"path"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
 type esClientHandler struct {
-	client ESClient
+	client Client
 }
+
+type stdoutClientHandler struct{}
 
 var (
 	esMinILMVersion       = common.MustNewVersion("6.6.0")
@@ -45,18 +48,17 @@ const (
 	esAliasPath = "/_alias"
 )
 
-// ESClientHandler creates a new APIHandler executing ILM, and alias queries
-// against Elasticsearch.
-func ESClientHandler(client ESClient) APIHandler {
+// ClientHandler creates a new APIHandler executing ILM, and alias queries
+func ClientHandler(client Client) APIHandler {
 	if client == nil {
-		return nil
+		return &stdoutClientHandler{}
 	}
 	return &esClientHandler{client}
 }
 
-// ESClient defines the minimal interface required for the ESClientHandler to
+// Client defines the minimal interface required for the ClientHandler to
 // prepare a policy and write alias.
-type ESClient interface {
+type Client interface {
 	GetVersion() common.Version
 	Request(
 		method, path string,
@@ -205,6 +207,27 @@ func (h *esClientHandler) queryFeatures(to interface{}) (int, error) {
 	return status, nil
 }
 
-func (h *esClientHandler) access() ESClient {
-	return h.client
+func (h *stdoutClientHandler) ILMEnabled(mode Mode) (bool, error) {
+	return mode != ModeDisabled, nil
+}
+
+func (h *stdoutClientHandler) CreateILMPolicy(policy Policy) error {
+	p := common.MapStr{policy.Name: policy.Body}
+	str := fmt.Sprintf("%s\n", p.StringToPrint())
+	if _, err := os.Stdout.WriteString(str); err != nil {
+		return fmt.Errorf("error printing policy : %v", err)
+	}
+	return nil
+}
+
+func (h *stdoutClientHandler) HasILMPolicy(name string) (bool, error) {
+	return false, nil
+}
+
+func (h *stdoutClientHandler) CreateAlias(alias Alias) error {
+	return nil
+}
+
+func (h *stdoutClientHandler) HasAlias(name string) (bool, error) {
+	return false, nil
 }

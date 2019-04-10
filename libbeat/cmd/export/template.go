@@ -21,14 +21,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
+
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/libbeat/template"
 )
 
 func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
@@ -36,69 +37,25 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 		Use:   "template",
 		Short: "Export index template to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
-			version, _ := cmd.Flags().GetString("es.version")
-			index, _ := cmd.Flags().GetString("index")
 			noILM, _ := cmd.Flags().GetBool("noilm")
-
-			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
-			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
-			}
-			err = b.InitWithSettings(settings)
-			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
+			if noILM {
+				settings.ILM = ilmNoopSupport
 			}
 
-			if version == "" {
-				version = b.Info.Version
-			}
-			esVersion, err := common.NewVersion(version)
+			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fatalf("Invalid Elasticsearch version: %+v", err)
+				fatalf("error initializing beat: %+v", err)
 			}
 
-			imFactory := settings.IndexManagement
-			if imFactory == nil {
-				imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
-			}
-			indexManager, err := imFactory(logp.NewLogger("index-management"), b.Info, b.RawConfig)
-			if err != nil {
-				fatalf("Error initializing the index manager: %+v", err)
-			}
-
-			tmplCfg, err := indexManager.TemplateConfig(!noILM)
-			if err != nil {
-				fatalf("Template error detected: %+v", err)
-			}
-			if tmplCfg.Enabled == false {
-				tmplCfg = template.DefaultConfig()
-			}
-
-			tmpl, err := template.New(b.Info.Version, index, *esVersion, tmplCfg, b.Config.Migration.Enabled())
-			if err != nil {
-				fatalf("Error generating template: %+v", err)
-			}
-
-			var templateString common.MapStr
-			if tmplCfg.Fields != "" {
-				fieldsPath := paths.Resolve(paths.Config, tmplCfg.Fields)
-				templateString, err = tmpl.LoadFile(fieldsPath)
-			} else {
-				templateString, err = tmpl.LoadBytes(b.Fields)
-			}
-			if err != nil {
-				fatalf("Error generating template: %+v", err)
-			}
-
-			_, err = os.Stdout.WriteString(templateString.StringToPrint() + "\n")
-			if err != nil {
-				fatalf("Error writing template: %+v", err)
+			idxManager := b.IdxMgmtSupporter().Manager(nil, idxmgmt.BeatsAssets(b.Fields))
+			ilmLoadCfg := idxmgmt.SetupConfig{Load: new(bool)}
+			templateLoadCfg := idxmgmt.DefaultSetupConfig()
+			if err := idxManager.Setup(templateLoadCfg, ilmLoadCfg); err != nil {
+				fatalf("exporting template failed: %+v", err)
 			}
 		},
 	}
 
-	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
-	genTemplateConfigCmd.Flags().String("index", settings.IndexPrefix, "Base index name")
 	genTemplateConfigCmd.Flags().Bool("noilm", false, "Generate template with ILM disabled")
 
 	return genTemplateConfigCmd
@@ -108,4 +65,14 @@ func fatalf(msg string, vs ...interface{}) {
 	fmt.Fprintf(os.Stderr, msg, vs...)
 	fmt.Fprintln(os.Stderr)
 	os.Exit(1)
+}
+
+func ilmNoopSupport(log *logp.Logger, info beat.Info, config *common.Config) (ilm.Supporter, error) {
+	if log == nil {
+		log = logp.NewLogger("export template")
+	} else {
+		log = log.Named("export template")
+	}
+
+	return ilm.NoopSupport(info, config)
 }

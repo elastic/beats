@@ -51,6 +51,7 @@ type Template struct {
 	esVersion   common.Version
 	config      TemplateConfig
 	migration   bool
+	order       int
 }
 
 // New creates a new template instance
@@ -127,6 +128,7 @@ func New(
 		beatName:    beatName,
 		config:      config,
 		migration:   migration,
+		order:       config.Order,
 	}, nil
 }
 
@@ -169,7 +171,7 @@ func (t *Template) LoadFile(file string) (common.MapStr, error) {
 	return t.load(fields)
 }
 
-// LoadBytes loads the the template from the given byte array
+// LoadBytes loads the template from the given byte array
 func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 	fields, err := loadYamlByte(data)
 	if err != nil {
@@ -193,19 +195,9 @@ func (t *Template) GetPattern() string {
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-
-	return common.MapStr{
+	template := common.MapStr{
 		keyPattern: patterns,
-
-		"mappings": buildMappings(
-			t.beatVersion, t.esVersion, t.beatName,
-			properties,
-			append(dynamicTemplates, buildDynTmpl(t.esVersion)),
-			common.MapStr(t.config.Settings.Source),
-		),
-
-		"order": 1,
-
+		"order":    t.order,
 		"settings": common.MapStr{
 			"index": buildIdxSettings(
 				t.esVersion,
@@ -213,6 +205,16 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 			),
 		},
 	}
+	if len(properties) == 0 && len(dynamicTemplates) == 0 {
+		return template
+	}
+
+	template["mappings"] = buildMappings(
+		t.beatVersion, t.esVersion, t.beatName,
+		properties,
+		append(dynamicTemplates, buildDynTmpl(t.esVersion)),
+		common.MapStr(t.config.Settings.Source))
+	return template
 }
 
 func buildPatternSettings(ver common.Version, pattern string) (string, interface{}) {

@@ -36,13 +36,9 @@ func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 
-			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
-			}
-			err = b.InitWithSettings(settings)
-			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
+				fatalf("error initializing beat: %+v", err)
 			}
 
 			if version == "" {

@@ -31,131 +31,185 @@ import (
 
 // ESClient is a subset of the Elasticsearch client API capable of
 // loading the template.
-type ESClient interface {
+type Client interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
 
-// Loader is a template loader capable of loading the template using
-// Elasticsearch Client API
-type Loader struct {
-	config    TemplateConfig
-	client    ESClient
-	beatInfo  beat.Info
-	fields    []byte
-	migration bool
+//Loader interface for loading templates
+type Loader interface {
+	Load(config TemplateConfig) error
 }
 
 // NewLoader creates a new template loader
 func NewLoader(
-	config TemplateConfig,
-	client ESClient,
-	beatInfo beat.Info,
+	client Client,
+	info beat.Info,
 	fields []byte,
 	migration bool,
-) (*Loader, error) {
-	return &Loader{
-		config:    config,
+) (Loader, error) {
+	if client == nil {
+		return &stdoutLoader{info: info, fields: fields, migration: migration}, nil
+	}
+	return &esLoader{
 		client:    client,
-		beatInfo:  beatInfo,
+		info:      info,
 		fields:    fields,
 		migration: migration,
 	}, nil
 }
 
+type esLoader struct {
+	client    Client
+	info      beat.Info
+	fields    []byte
+	migration bool
+}
+
 // Load checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
-func (l *Loader) Load() error {
-	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.client.GetVersion(), l.config, l.migration)
-	if err != nil {
-		return fmt.Errorf("error creating template instance: %v", err)
+func (l *esLoader) Load(config TemplateConfig) error {
+	//build template from config
+	tmpl, err := template(config, l.info, l.client.GetVersion(), l.migration)
+	if err != nil || tmpl == nil {
+		return err
 	}
 
-	templateName := tmpl.GetName()
-	if l.config.JSON.Enabled {
-		templateName = l.config.JSON.Name
-	}
 	// Check if template already exist or should be overwritten
-	exists := l.CheckTemplate(templateName)
-	if !exists || l.config.Overwrite {
-
-		version := l.client.GetVersion()
-		logp.Info("Loading template for Elasticsearch version: %s", version.String())
-		if l.config.Overwrite {
-			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
-		}
-
-		var template map[string]interface{}
-		if l.config.JSON.Enabled {
-			jsonPath := paths.Resolve(paths.Config, l.config.JSON.Path)
-			if _, err := os.Stat(jsonPath); err != nil {
-				return fmt.Errorf("error checking for json template: %s", err)
-			}
-
-			logp.Info("Loading json template from file %s", jsonPath)
-
-			content, err := ioutil.ReadFile(jsonPath)
-			if err != nil {
-				return fmt.Errorf("error reading file. Path: %s, Error: %s", jsonPath, err)
-
-			}
-			err = json.Unmarshal(content, &template)
-			if err != nil {
-				return fmt.Errorf("could not unmarshal json template: %s", err)
-			}
-			// Load fields from path
-		} else if l.config.Fields != "" {
-			logp.Debug("template", "Load fields.yml from file: %s", l.config.Fields)
-
-			fieldsPath := paths.Resolve(paths.Config, l.config.Fields)
-
-			template, err = tmpl.LoadFile(fieldsPath)
-			if err != nil {
-				return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
-			}
-		} else {
-			logp.Debug("template", "Load default fields.yml")
-			template, err = tmpl.LoadBytes(l.fields)
-			if err != nil {
-				return fmt.Errorf("error creating template: %v", err)
-			}
-		}
-
-		err = l.LoadTemplate(templateName, template)
-		if err != nil {
-			return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, template)
-		}
-
-	} else {
-		logp.Info("Template already exists and will not be overwritten.")
+	templateName := tmpl.GetName()
+	if config.JSON.Enabled {
+		templateName = config.JSON.Name
 	}
 
+	if l.templateExists(templateName) && !config.Overwrite {
+		logp.Info("Template %s already exists and will not be overwritten.", templateName)
+		return nil
+	}
+
+	//loading template to ES
+	body, err := buildBody(l.info, tmpl, config, l.fields)
+	if err != nil {
+		return err
+	}
+	if err := l.loadTemplate(templateName, body); err != nil {
+		return fmt.Errorf("could not load template. Elasticsearch returned: %v. Template is: %s", err, body.StringToPrint())
+	}
+	logp.Info("template with name '%s' loaded.", templateName)
 	return nil
 }
 
 // LoadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
-func (l *Loader) LoadTemplate(templateName string, template map[string]interface{}) error {
-	logp.Debug("template", "Try loading template with name: %s", templateName)
+func (l *esLoader) loadTemplate(templateName string, template map[string]interface{}) error {
+	logp.Info("Try loading template %s to Elasticsearch", templateName)
 	path := "/_template/" + templateName
-	body, err := loadJSON(l.client, path, template)
+	resp, err := loadJSON(l.client, path, template)
 	if err != nil {
-		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
+		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, resp)
 	}
-	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
 	return nil
 }
 
-// CheckTemplate checks if a given template already exist. It returns true if
+// exists checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
-func (l *Loader) CheckTemplate(templateName string) bool {
+func (l *esLoader) templateExists(templateName string) bool {
+	if l.client == nil {
+		return false
+	}
 	status, _, _ := l.client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
-	return status == 200
+
+	if status != 200 {
+		return false
+	}
+
+	return true
 }
 
-func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte, error) {
+type stdoutLoader struct {
+	info      beat.Info
+	fields    []byte
+	migration bool
+}
+
+func (l *stdoutLoader) Load(config TemplateConfig) error {
+	//build template from config
+	tmpl, err := template(config, l.info, common.Version{}, l.migration)
+	if err != nil || tmpl == nil {
+		return err
+	}
+
+	//create body to print
+	body, err := buildBody(l.info, tmpl, config, l.fields)
+	if err != nil {
+		return err
+	}
+
+	p := common.MapStr{tmpl.name: body}
+	str := fmt.Sprintf("%s\n", p.StringToPrint())
+	if _, err := os.Stdout.WriteString(str); err != nil {
+		return fmt.Errorf("error printing template: %v", err)
+	}
+	return nil
+}
+
+func template(config TemplateConfig, info beat.Info, esVersion common.Version, migration bool) (*Template, error) {
+	if !config.Enabled {
+		logp.Info("template config not enabled")
+		return nil, nil
+	}
+	tmpl, err := New(info.Version, info.IndexPrefix, esVersion, config, migration)
+	if err != nil {
+		return nil, fmt.Errorf("error creating template instance: %v", err)
+	}
+	return tmpl, nil
+}
+
+func buildBody(info beat.Info, tmpl *Template, config TemplateConfig, fields []byte) (common.MapStr, error) {
+	if config.Overwrite {
+		logp.Info("Existing template will be overwritten, as overwrite is enabled.")
+	}
+
+	var err error
+	var body map[string]interface{}
+	if config.JSON.Enabled {
+		jsonPath := paths.Resolve(paths.Config, config.JSON.Path)
+		if _, err = os.Stat(jsonPath); err != nil {
+			return nil, fmt.Errorf("error checking json file %s for template: %v", jsonPath, err)
+		}
+		logp.Info("Loading json template from file %s", jsonPath)
+		content, err := ioutil.ReadFile(jsonPath)
+		if err != nil {
+			return nil, fmt.Errorf("error reading file %s for template: %v", jsonPath, err)
+
+		}
+		err = json.Unmarshal(content, &body)
+		if err != nil {
+			return nil, fmt.Errorf("could not unmarshal json template: %s", err)
+		}
+
+		// Load fields from path
+	} else if config.Fields != "" {
+		logp.Debug("template", "Load fields.yml from file: %s", config.Fields)
+		fieldsPath := paths.Resolve(paths.Config, config.Fields)
+		body, err = tmpl.LoadFile(fieldsPath)
+		if err != nil {
+			return nil, fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
+		}
+
+		// Load default fields
+	} else {
+		logp.Debug("template", "Load default fields.yml")
+		body, err = tmpl.LoadBytes(fields)
+		if err != nil {
+			return nil, fmt.Errorf("error creating template: %v", err)
+		}
+	}
+	return body, nil
+}
+
+func loadJSON(client Client, path string, json map[string]interface{}) ([]byte, error) {
 	params := esVersionParams(client.GetVersion())
 	status, body, err := client.Request("PUT", path, "", params, json)
 	if err != nil {

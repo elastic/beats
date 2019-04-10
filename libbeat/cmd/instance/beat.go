@@ -186,6 +186,18 @@ func Run(settings Settings, bt beat.Creator) error {
 	}())
 }
 
+// NewInitializedBeat creates a new beat where all information and initialization is derived from settings
+func NewInitializedBeat(settings Settings) (*Beat, error) {
+	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+	if err != nil {
+		return nil, err
+	}
+	if err := b.InitWithSettings(settings); err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
 // NewBeat creates a new beat instance
 func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 	if v == "" {
@@ -269,6 +281,11 @@ func (b *Beat) BeatConfig() (*common.Config, error) {
 // Keystore return the configured keystore for this beat
 func (b *Beat) Keystore() keystore.Keystore {
 	return b.keystore
+}
+
+// IdxMgmtSupporter return the configured indexmanager for this beat
+func (b *Beat) IdxMgmtSupporter() idxmgmt.Supporter {
+	return b.index
 }
 
 // create and return the beater, this method also initializes all needed items,
@@ -477,7 +494,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				// prepare index by loading templates, lifecycle policies and write aliases
 
 				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-				err = m.Setup(setup.Template, setup.ILMPolicy)
+				err = m.Setup(idxmgmt.SetupConfig{Force: &setup.Template}, idxmgmt.SetupConfig{Force: &setup.ILMPolicy})
 				if err != nil {
 					return err
 				}
@@ -776,7 +793,7 @@ func (b *Beat) registerESIndexManagement() error {
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-		return m.Setup(false, false)
+		return m.Setup(idxmgmt.DefaultSetupConfig(), idxmgmt.DefaultSetupConfig())
 	}
 }
 

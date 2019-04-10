@@ -43,12 +43,6 @@ type Supporter interface {
 	// ILM, or aliases.
 	Enabled() bool
 
-	// ILM provides access to the configured ILM support.
-	ILM() ilm.Supporter
-
-	// TemplateConfig returns the template configuration used by the index supporter.
-	TemplateConfig(withILM bool) (template.TemplateConfig, error)
-
 	// BuildSelector create an index selector.
 	// The defaultIndex string is interpreted as format string. It is used
 	// as default index if the configuration provided does not define an index or
@@ -57,7 +51,7 @@ type Supporter interface {
 
 	// Manager creates a new manager that can be used to execute the required steps
 	// for initializing an index, ILM policies, and write aliases.
-	Manager(client ESClient, assets Asseter) Manager
+	Manager(client Client, assets Asseter) Manager
 }
 
 // Asseter provides access to beats assets required to load the template.
@@ -65,9 +59,9 @@ type Asseter interface {
 	Fields(name string) []byte
 }
 
-// ESClient defines the minimal interface required for the index manager to
+// Client defines the minimal interface required for the index manager to
 // prepare an index.
-type ESClient interface {
+type Client interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
@@ -75,7 +69,25 @@ type ESClient interface {
 // Manager is used to initialize indices, ILM policies, and aliases within the
 // Elastic Stack.
 type Manager interface {
-	Setup(forceTemplate, forcePolicy bool) error
+	Setup(template, ilm SetupConfig) error
+}
+
+// SetupConfig is used to define loading and forcing to overwrite during the setup process
+type SetupConfig struct {
+	Load  *bool
+	Force *bool
+}
+
+func DefaultSetupConfig() SetupConfig {
+	return SetupConfig{Force: new(bool)}
+}
+
+func (c *SetupConfig) ShouldLoad() bool {
+	return c.Load == nil || *c.Load
+}
+
+func (c *SetupConfig) ShouldForce() bool {
+	return c.Force != nil && *c.Force
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.

@@ -28,8 +28,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/beats/libbeat/template"
 )
 
 func TestDefaultSupport_Enabled(t *testing.T) {
@@ -82,81 +80,6 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
 			assert.Equal(t, test.want, im.Enabled())
-		})
-	}
-}
-
-func TestDefaultSupport_TemplateConfig(t *testing.T) {
-	ilmTemplateSettings := func(alias, policy string) []onCall {
-		return []onCall{
-			onMode().Return(ilm.ModeEnabled),
-			onAlias().Return(ilm.Alias{Name: alias}),
-			onPolicy().Return(ilm.Policy{Name: policy}),
-		}
-	}
-
-	cloneCfg := func(c template.TemplateConfig) template.TemplateConfig {
-		if c.AppendFields != nil {
-			tmp := make(mapping.Fields, len(c.AppendFields))
-			copy(tmp, c.AppendFields)
-			c.AppendFields = tmp
-		}
-
-		if c.Settings.Index != nil {
-			c.Settings.Index = (map[string]interface{})(common.MapStr(c.Settings.Index).Clone())
-		}
-		if c.Settings.Index != nil {
-			c.Settings.Source = (map[string]interface{})(common.MapStr(c.Settings.Source).Clone())
-		}
-		return c
-	}
-
-	cfgWith := func(s template.TemplateConfig, mods ...map[string]interface{}) template.TemplateConfig {
-		for _, mod := range mods {
-			cfg := common.MustNewConfigFrom(mod)
-			s = cloneCfg(s)
-			err := cfg.Unpack(&s)
-			if err != nil {
-				panic(err)
-			}
-		}
-		return s
-	}
-
-	cases := map[string]struct {
-		ilmCalls []onCall
-		cfg      map[string]interface{}
-		want     template.TemplateConfig
-		fail     bool
-	}{
-		"default template config": {
-			want: template.DefaultConfig(),
-		},
-		"default template with ilm": {
-			ilmCalls: ilmTemplateSettings("alias", "test-9.9.9"),
-			want: cfgWith(template.DefaultConfig(), map[string]interface{}{
-				"name":                          "alias",
-				"pattern":                       "alias-*",
-				"settings.index.lifecycle.name": "test-9.9.9",
-				"settings.index.lifecycle.rollover_alias": "alias",
-			}),
-		},
-	}
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			info := beat.Info{Beat: "test", Version: "9.9.9"}
-			factory := MakeDefaultSupport(makeMockILMSupport(test.ilmCalls...))
-			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
-			require.NoError(t, err)
-			withILM := len(test.ilmCalls) > 0
-
-			tmpl, err := im.TemplateConfig(withILM)
-			if test.fail {
-				assert.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, test.want, tmpl)
-			}
 		})
 	}
 }

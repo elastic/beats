@@ -168,7 +168,7 @@ func newESClientHandler(t *testing.T) ilm.APIHandler {
 		t.Fatalf("Failed to connect to Test Elasticsearch instance: %v", err)
 	}
 
-	return ilm.ESClientHandler(client)
+	return ilm.ClientHandler(client)
 }
 
 func makeName(base string) string {
