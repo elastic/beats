@@ -168,6 +168,60 @@ func TestDailyRotation(t *testing.T) {
 	AssertDirContents(t, dir, logname+"-"+today+"-1", logname+"-"+today+"-2", logname)
 }
 
+func TestIntervalRotationPurgeFileRotationLogs(t *testing.T) {
+	logp.TestingSetup()
+
+	dir, err := ioutil.TempDir("", "file_rotator")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	filename := filepath.Join(dir, "sample.log")
+	r, err := file.NewFileRotator(filename,
+		file.MaxBackups(10),
+		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	WriteMsg(t, r)
+	Rotate(t, r)
+	WriteMsg(t, r)
+	Rotate(t, r)
+	WriteMsg(t, r)
+	Rotate(t, r)
+	AssertDirContents(t, dir, "sample.log.1", "sample.log.2", "sample.log.3")
+	r.Close()
+
+	clock := time.Date(
+		2009, 11, 17, 20, 34, 58, 651387237, time.Local)
+
+	err = os.Chtimes(dir+"/sample.log.1", clock, clock)
+
+	clock = time.Date(
+		2009, 11, 18, 20, 34, 58, 651387237, time.Local)
+
+	err = os.Chtimes(dir+"/sample.log.2", clock, clock)
+
+	clock = time.Date(
+		2009, 11, 19, 20, 34, 58, 651387237, time.Local)
+
+	err = os.Chtimes(dir+"/sample.log.3", clock, clock)
+
+	maxSizeBytes := uint(500)
+	filename = filepath.Join(dir, "daily")
+	r, err = file.NewFileRotator(filename, file.MaxBackups(10), file.Interval(24*time.Hour), file.MaxSizeBytes(maxSizeBytes))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+
+	AssertDirContents(t, dir, "daily-2009-11-17-", "daily-2009-11-18-", "daily-2009-11-19-")
+
+}
+
 func CreateFile(t *testing.T, filename string) {
 	t.Helper()
 	f, err := os.Create(filename)

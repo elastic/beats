@@ -160,6 +160,12 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 	if err != nil {
 		return nil, err
 	}
+	if r.intervalRotator != nil {
+		err = r.purgeOldIntervalOnStartup()
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	if r.log != nil {
 		r.log.Debugw("Initialized file rotator",
@@ -310,7 +316,7 @@ func (r *Rotator) purgeOldBackups() error {
 }
 
 func (r *Rotator) purgeOldIntervalBackups() error {
-	files, err := filepath.Glob(r.filename + "*")
+	files, err := filepath.Glob(r.filename + "-*")
 	if err != nil {
 		return errors.Wrap(err, "failed to list existing logs during rotation")
 	}
@@ -439,5 +445,38 @@ func (r *Rotator) rotateBySize(reason rotateReason) error {
 			}
 		}
 	}
+	return nil
+}
+
+func (r *Rotator) purgeOldIntervalOnStartup() error {
+	files, err := filepath.Glob(filepath.Dir(r.filename) + "/*.[0-9]")
+	if err != nil {
+		return errors.New("failed to list old interval logs during initialization")
+	}
+
+	if len(files) > 0 {
+		for index, fileName := range files {
+
+			fi, err := os.Stat(fileName)
+			if err != nil {
+				return errors.New("failed to access old interval logs during initialization")
+			}
+
+			targetFilename := r.intervalRotator.LogPrefix(r.filename, fi.ModTime())
+
+			err = os.Link(fileName, targetFilename)
+			if os.IsExist(err) {
+				err = os.Link(fileName, targetFilename+strconv.Itoa(index))
+			}
+			err = os.Remove(fileName)
+
+			if err != nil {
+				return errors.New("failed to rename old interval logs during initialization")
+			}
+
+		}
+
+	}
+
 	return nil
 }
