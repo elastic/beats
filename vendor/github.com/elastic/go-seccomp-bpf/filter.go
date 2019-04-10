@@ -190,11 +190,21 @@ func (p *Policy) Assemble() ([]bpf.Instruction, error) {
 		}
 	}
 
-	program := []bpf.Instruction{
-		bpf.LoadAbsolute{Off: archOffset, Size: 4},
-		bpf.JumpIf{Cond: bpf.JumpNotEqual, Val: uint32(p.arch.ID), SkipTrue: uint8(1 + len(x32Filter) + len(instructions))},
-		bpf.LoadAbsolute{Off: syscallNumOffset, Size: 4},
+	program := make([]bpf.Instruction, 0, len(x32Filter)+len(instructions)+5)
+
+	program = append(program, bpf.LoadAbsolute{Off: archOffset, Size: 4})
+
+	// If the loaded arch ID is not equal p.arch.ID, jump to the final Ret instruction.
+	jumpN := 1 + len(x32Filter) + len(instructions)
+	if jumpN <= 255 {
+		program = append(program, bpf.JumpIf{Cond: bpf.JumpNotEqual, Val: uint32(p.arch.ID), SkipTrue: uint8(jumpN)})
+	} else {
+		// JumpIf can not handle long jumps, so we switch to two instructions for this case.
+		program = append(program, bpf.JumpIf{Cond: bpf.JumpEqual, Val: uint32(p.arch.ID), SkipTrue: 1})
+		program = append(program, bpf.Jump{Skip: uint32(jumpN)})
 	}
+
+	program = append(program, bpf.LoadAbsolute{Off: syscallNumOffset, Size: 4})
 	program = append(program, x32Filter...)
 	program = append(program, instructions...)
 	program = append(program, bpf.RetConstant{Val: uint32(action)})
@@ -237,20 +247,32 @@ func (g *SyscallGroup) Assemble() ([]bpf.Instruction, error) {
 	}
 
 	insts := make([]bpf.Instruction, 0, len(syscallNums))
-	for i, num := range syscallNums {
-		jumpN := uint8(len(g.Names) - i - 1)
-		jeq := bpf.JumpIf{Cond: bpf.JumpEqual, Val: num, SkipTrue: jumpN}
-		if jumpN == 0 {
-			// Skip the return statement if the last condition was not satisfied.
-			jeq.SkipFalse = 1
+
+	for len(syscallNums) > 0 {
+		// JumpIf can not handle long jumps, so we insert a Ret after each group of 256 checks.
+		size := len(syscallNums)
+		if size > 256 {
+			size = 256
 		}
-		insts = append(insts, jeq)
+		syscallNums256 := syscallNums[:size]
+		syscallNums = syscallNums[size:]
+
+		for i, num := range syscallNums256 {
+			jumpN := uint8(len(syscallNums256) - i - 1)
+			jeq := bpf.JumpIf{Cond: bpf.JumpEqual, Val: num, SkipTrue: jumpN}
+			if jumpN == 0 {
+				// Skip the return statement if the last condition was not satisfied.
+				jeq.SkipFalse = 1
+			}
+			insts = append(insts, jeq)
+		}
+
+		action := g.Action
+		if action == ActionErrno {
+			action |= Action(errnoEPERM)
+		}
+		insts = append(insts, bpf.RetConstant{Val: uint32(action)})
 	}
 
-	action := g.Action
-	if action == ActionErrno {
-		action |= Action(errnoEPERM)
-	}
-	insts = append(insts, bpf.RetConstant{Val: uint32(action)})
 	return insts, nil
 }
