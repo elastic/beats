@@ -40,8 +40,8 @@
     - name: blocks.total
       type: long
       description: >
-        Number of blocks the device holds.
+        Number of blocks the device holds, in 1024-byte blocks.
     - name: blocks.synced
       type: long
       description: >
-        Number of blocks on the device that are in sync.
+        Number of blocks on the device that are in sync, in 1024-byte blocks.

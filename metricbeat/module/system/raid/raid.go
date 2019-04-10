@@ -39,8 +39,8 @@ func init() {
 // MetricSet contains proc fs data.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs    procfs.FS
-	sysfs string
+	fs       procfs.FS
+	sysblock string
 }
 
 // New creates a new instance of the raid metricset.
@@ -74,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
-		sysfs:         sysMountPoint,
+		sysblock:      sysMountPoint,
 	}, nil
 }
 
@@ -88,7 +88,7 @@ func blockto1024(b int64) int64 {
 
 // Fetch fetches one event for each device
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	devices, err := blockinfo.ListAllMDDevices(m.sysfs)
+	devices, err := blockinfo.ListAllMDDevices(m.sysblock)
 	if err != nil {
 		r.Error(errors.Wrap(err, "failed to parse sysfs"))
 		return

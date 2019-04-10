@@ -28,13 +28,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-//SyncStatus represents the status of a sync action as Complete/Total. Will be 0/0 if no sync action is going on
+// SyncStatus represents the status of a sync action as Complete/Total. Will be 0/0 if no sync action is going on
 type SyncStatus struct {
 	Complete int64
 	Total    int64
 }
 
-//MDDevice represents /sys/block/[device] for an md device
+// MDDevice represents /sys/block/[device] for an md device
 type MDDevice struct {
 	Name        string     //the name of the device
 	Size        int64      //Size, as count of 512 byte blocks
@@ -45,22 +45,23 @@ type MDDevice struct {
 	SyncStatus  SyncStatus //the current sync status, if any
 }
 
-//Disk represents a single dis component, found at  /sys/block/[device]/md/dev-* for an md device
+// Disk represents a single dis component, found at  /sys/block/[device]/md/dev-* for an md device
 type Disk struct {
 	Size  int64
 	State string
 }
 
-//DiskStates summarizes the state of all the devices in the array
+// DiskStates summarizes the state of all the devices in the array
 type DiskStates struct {
-	Active int
-	Total  int
-	Failed int
-	Spare  int
-	States common.MapStr
+	Active  int
+	Total   int
+	Failed  int
+	Spare   int
+	Unknown int
+	States  common.MapStr
 }
 
-//ListAllMDDevices returns a list of all multidisk devices under the sysfs root
+// ListAllMDDevices returns a string array of the paths to all the md devices under the root
 func ListAllMDDevices(path string) ([]string, error) {
 	//I'm not convinced that using /sys/block/md* is a reliable glob, as you should be able to make those whatever you want.
 	dir, err := ioutil.ReadDir(path)
@@ -70,8 +71,7 @@ func ListAllMDDevices(path string) ([]string, error) {
 	var mds []string
 	for _, item := range dir {
 		testpath := filepath.Join(path, item.Name())
-		err = checkMD(testpath)
-		if err != nil {
+		if !isMD(testpath) {
 			continue
 		}
 		mds = append(mds, testpath)
@@ -84,23 +84,21 @@ func ListAllMDDevices(path string) ([]string, error) {
 	return mds, nil
 }
 
-//GetMDDevice returns a MDDevice object representing a multi-disk device, or error if it's not a "real" md device
+// GetMDDevice returns a MDDevice object representing a multi-disk device, or error if it's not a "real" md device
 func GetMDDevice(path string) (MDDevice, error) {
-
 	_, err := os.Stat(path)
 	if err != nil {
 		return MDDevice{}, errors.Wrap(err, "path does not exist")
 	}
 
 	//This is the best heuristic I've found so far for identifying an md device.
-	err = checkMD(path)
-	if err != nil {
+	if !isMD(path) {
 		return MDDevice{}, err
 	}
 	return newMD(path)
 }
 
-//ReduceDisks disks on linux uses the raw states to provide a common status
+// ReduceDisks disks on linux uses the raw states to provide a common status
 //see https://www.kernel.org/doc/html/v4.15/admin-guide/md.html#md-devices-in-sysfs
 func (dev MDDevice) ReduceDisks() DiskStates {
 	var disks DiskStates
@@ -113,6 +111,8 @@ func (dev MDDevice) ReduceDisks() DiskStates {
 			disks.Active++
 		case "spare":
 			disks.Spare++
+		default:
+			disks.Unknown++
 		}
 
 		if _, ok := disks.States[disk.State]; !ok {
@@ -129,10 +129,10 @@ func (dev MDDevice) ReduceDisks() DiskStates {
 
 //check if a block device directory looks like an MD device
 //Right now, we're doing this by looking for an `md` directory in the device dir.
-func checkMD(path string) error {
+func isMD(path string) bool {
 	_, err := os.Stat(filepath.Join(path, "md"))
 	if err != nil {
-		return errors.Wrap(err, "device is not an md device")
+		return false
 	}
-	return nil
+	return true
 }

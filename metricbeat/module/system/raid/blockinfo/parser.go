@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -31,7 +30,6 @@ import (
 //get the raid level and use that to determine how we fill out the array
 //Only data-reduntant RIAD levels (1,4,5,6,10) have some of these fields
 func isRedundant(path string) (bool, error) {
-
 	raw, err := ioutil.ReadFile(filepath.Join(path, "md", "level"))
 	if err != nil {
 		return false, err
@@ -46,7 +44,6 @@ func isRedundant(path string) (bool, error) {
 }
 
 func parseIntVal(path string) (int64, error) {
-
 	var value int64
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -64,7 +61,6 @@ func parseIntVal(path string) (int64, error) {
 
 //get all the disks associated with an MD device
 func getDisks(path string) ([]Disk, error) {
-
 	//so far, haven't found a less hacky way to do this.
 	devices, err := filepath.Glob(filepath.Join(path, "md", "dev-*"))
 	if err != nil {
@@ -103,8 +99,6 @@ func getDisk(path string) (Disk, error) {
 //in which case, default to to the overall size
 func getSyncStatus(path string, size int64) (SyncStatus, error) {
 
-	re := regexp.MustCompile(`^(\d*) \/ (\d*)`)
-
 	raw, err := ioutil.ReadFile(filepath.Join(path, "md", "sync_completed"))
 	if err != nil {
 		return SyncStatus{}, errors.Wrap(err, "could not open sync_completed")
@@ -113,20 +107,20 @@ func getSyncStatus(path string, size int64) (SyncStatus, error) {
 		return SyncStatus{Complete: size, Total: size}, nil
 	}
 
-	matches := re.FindStringSubmatch(string(raw))
+	matches := strings.SplitN(strings.TrimSpace(string(raw)), " / ", 2)
 
-	if len(matches) < 3 {
-		return SyncStatus{}, fmt.Errorf("Could not get data from sync_completed")
+	if len(matches) != 2 {
+		return SyncStatus{}, fmt.Errorf("could not get data from sync_completed")
 	}
 
-	current, err := strconv.ParseInt(matches[1], 10, 64)
+	current, err := strconv.ParseInt(matches[0], 10, 64)
 	if err != nil {
-		return SyncStatus{}, errors.Wrap(err, "Could not parse data sync_completed")
+		return SyncStatus{}, errors.Wrap(err, "could not parse data sync_completed")
 	}
 
-	total, err := strconv.ParseInt(matches[2], 10, 64)
+	total, err := strconv.ParseInt(matches[1], 10, 64)
 	if err != nil {
-		return SyncStatus{}, errors.Wrap(err, "Could not parse data sync_completed")
+		return SyncStatus{}, errors.Wrap(err, "could not parse data sync_completed")
 	}
 
 	return SyncStatus{Complete: current, Total: total}, nil
@@ -181,12 +175,12 @@ func newMD(path string) (MDDevice, error) {
 		dev.SyncAction = strings.TrimSpace(string(syncAction))
 
 		//sync status
-		syncComp, err := getSyncStatus(path, dev.Size)
+		syncStats, err := getSyncStatus(path, dev.Size)
 		if err != nil {
 			return dev, errors.Wrap(err, "error getting sync data")
 		}
 
-		dev.SyncStatus = syncComp
+		dev.SyncStatus = syncStats
 	}
 
 	return dev, nil
