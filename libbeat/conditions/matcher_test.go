@@ -64,6 +64,14 @@ func TestContainsSingleFieldPositiveMatch(t *testing.T) {
 	})
 }
 
+func TestContainsArrayOfStringPositiveMatch(t *testing.T) {
+	testConfig(t, true, secdTestEvent, &Config{
+		Contains: &Fields{fields: map[string]interface{}{
+			"tags": "prod",
+		}},
+	})
+}
+
 func TestRegexpCondition(t *testing.T) {
 	logp.TestingSetup()
 
