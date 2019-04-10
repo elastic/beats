@@ -104,8 +104,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	// Converts hash list to slice
 	for _, event := range eventList {
-		event[mb.NamespaceKey] = m.namespace
-
 		if reported := reporter.Event(mb.Event{
 			MetricSetFields: event,
 			Namespace:       "dropwizard." + m.namespace,
