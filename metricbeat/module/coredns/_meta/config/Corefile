@@ -19,6 +19,7 @@ my.domain.elastic {
     errors
     auto
     reload 10s
+    cache 4
 
     # Use the prometheus plugin to export metrics at '/metrics' endpoint
     prometheus :9153
