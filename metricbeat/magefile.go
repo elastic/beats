@@ -107,7 +107,7 @@ func MockedTests(ctx context.Context) error {
 		params.ExtraFlags = append(params.ExtraFlags, "-module="+module)
 	}
 
-	if generate, _ := strconv.ParseBool(os.Getenv("GENERATE")) ; generate {
+	if generate, _ := strconv.ParseBool(os.Getenv("GENERATE")); generate {
 		params.ExtraFlags = append(params.ExtraFlags, "-generate")
 	}
 
