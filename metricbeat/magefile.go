@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -97,22 +98,22 @@ func Update() error {
 // MockedTests runs the HTTP tests using the mocked data inside each {module}/{metricset}/testdata folder.
 // Use MODULE={module_name} to run only mocked tests with a single module.
 // Use GENERATE=true or GENERATE=1 to regenerate JSON files.
-func MockedTests() error {
-	goTestDefaultArgs := mage.DefaultGoTestUnitArgs()
+func MockedTests(ctx context.Context) error {
+	params := mage.DefaultGoTestUnitArgs()
 
-	goTestDefaultArgs.ExtraFlags = []string{"github.com/elastic/beats/metricbeat/mb/testing/data/."}
+	params.ExtraFlags = []string{"github.com/elastic/beats/metricbeat/mb/testing/data/."}
 
 	if module := os.Getenv("MODULE"); module != "" {
-		goTestDefaultArgs.ExtraFlags = append(goTestDefaultArgs.ExtraFlags, fmt.Sprintf("-module=%s", module))
+		params.ExtraFlags = append(params.ExtraFlags, "-module="+module)
 	}
 
-	if generate := os.Getenv("GENERATE"); generate == "true" || generate == "1" {
-		goTestDefaultArgs.ExtraFlags = append(goTestDefaultArgs.ExtraFlags, "-generate")
+	if generate, _ := strconv.ParseBool(os.Getenv("GENERATE")) ; generate {
+		params.ExtraFlags = append(params.ExtraFlags, "-generate")
 	}
 
-	goTestDefaultArgs.Packages = []string{}
+	params.Packages = nil
 
-	return mage.GoTest(context.Background(), goTestDefaultArgs)
+	return mage.GoTest(ctx, params)
 }
 
 // Fields generates a fields.yml for the Beat.
