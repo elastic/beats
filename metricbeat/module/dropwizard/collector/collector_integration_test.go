@@ -75,14 +75,6 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
 }
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
-}
-
 func getEnvHost() string {
 	host := os.Getenv("DROPWIZARD_HOST")
 
