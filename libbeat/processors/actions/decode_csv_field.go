@@ -119,5 +119,7 @@ func (f *decodeCSVField) Run(event *beat.Event) (*beat.Event, error) {
 
 // String returns a string representation of this processor.
 func (f decodeCSVField) String() string {
-	return "decode_csv_field=" + f.Field
+	return fmt.Sprintf(
+		"decode_csv_field={field:%s,target:%s,separator:'%c',ignore_missing:%t,trim_leading_space:%t,overwrite_keys:%t",
+		f.Field, f.Target, f.separator, f.IgnoreMissing, f.TrimLeadingSpace, f.OverwriteKeys)
 }
