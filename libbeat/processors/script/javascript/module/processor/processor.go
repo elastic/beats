@@ -48,6 +48,7 @@ var constructors = map[string]processors.Constructor{
 	"AddProcessMetadata":    add_process_metadata.New,
 	"CommunityID":           communityid.New,
 	"CopyFields":            actions.NewCopyFields,
+	"DecodeCSVField":        actions.NewDecodeCSVField,
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
