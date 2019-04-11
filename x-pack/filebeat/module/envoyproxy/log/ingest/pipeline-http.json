@@ -57,25 +57,19 @@
       }
     },
     {
-      "convert" : {
-        "field" : "upstream_service_time",
-        "type": "double"
-      }
-    },
-    {
       "script": {
         "lang": "painless",
-        "source": "ctx.envoyproxy.upstream_service_time = Math.round(ctx.upstream_service_time * params.scale)",
+        "source": "ctx.envoyproxy.upstream_service_time = Math.round(Double.parseDouble(ctx.upstream_service_time) * params.scale)",
         "params": {
           "scale": 1000000
         },
-        "if": "ctx.upstream_service_time != null"
+        "if": "ctx.upstream_service_time != null && ctx.upstream_service_time != '-'"
       }
     },
     {
-      "rename": {
-        "field": "authority",
-        "target_field": "url.domain"
+      "set": {
+        "field": "url.domain",
+        "value": "{{envoyproxy.authority}}"
       }
     },
     {

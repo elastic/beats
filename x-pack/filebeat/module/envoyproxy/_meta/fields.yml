@@ -30,5 +30,10 @@
       description: >
         ID of the request
 
+    - name: authority
+      type: keyword
+      description: >
+        Envoy proxy authority field
+
 
         

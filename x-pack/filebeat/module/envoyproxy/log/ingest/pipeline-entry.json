@@ -14,10 +14,22 @@
       }
     },
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['timestamp']; ctx.remove('timestamp');",
-        "ignore_failure" : true
+      "set": {
+        "field": "event.created",
+        "value": "{{@timestamp}}"
+      }
+    },
+    {
+      "set": {
+        "field": "@timestamp",
+        "value": "{{timestamp}}",
+        "if": "ctx.timestamp != null"
+      }
+    },
+    {
+      "remove": {
+        "field": ["timestamp"],
+        "ignore_failure": true
       }
     }
   ],

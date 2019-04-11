@@ -3,7 +3,7 @@
   "processors": [
     {
       "remove": {
-        "field": ["upstream_service_time", "method", "user_agent", "path", "response_code", "authority"]
+        "field": ["upstream_service_time", "method", "user_agent", "path", "response_code"]
       }
     },
     {

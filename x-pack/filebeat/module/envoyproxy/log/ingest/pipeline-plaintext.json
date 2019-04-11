@@ -1,16 +1,43 @@
 {
-  "description": "Pipeline for normalizing envoy HTTP ACCESS logs",
+  "description": "Pipeline for normalizing envoy access logs",
   "processors": [
     {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx.message.charAt(0) == (char)(\"[\")) { ctx.temp_message = \"ACCESS \" + ctx.message;} else if (ctx.message.substring(0, 7) == \"ACCESS \") { ctx.temp_message = ctx.message;} else { throw new Exception(\"Not a valid envoyproxy access log\");}"
+      }
+    },
+    {
       "dissect": {
-        "field": "message",
-        "pattern": "[%{timestamp}] \"%{method} %{path} %{proto}\" %{response_code} %{envoyproxy.response_flags} %{bytes_received} %{bytes_sent} %{duration} %{upstream_service_time} \"%{source.address}\" \"%{user_agent.original}\" \"%{envoyproxy.request_id}\" \"%{authority}\" \"%{destination.address}:%{destination.port}\""
+        "field": "temp_message",
+        "pattern": "%{envoyproxy.log_type} [%{timestamp}] \"%{method} %{path} %{proto}\" %{response_code} %{envoyproxy.response_flags} %{bytes_received} %{bytes_sent} %{duration} %{upstream_service_time} \"%{source.address}\" \"%{user_agent.original}\" \"%{envoyproxy.request_id}\" \"%{envoyproxy.authority}\" \"%{dest}\"",
+        "on_failure" : [{ 
+          "script": {
+            "lang": "painless",
+            "source": "ctx.remove('temp_message'); throw new Exception(\"Dissect error: Not a valid envoyproxy access log\");"
+          }
+        }]
        }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx.dest == \"-\") { ctx.remove('dest');} else { ctx['destination'] = new HashMap(); def p = ctx.dest.indexOf (':'); def l = ctx.dest.length(); ctx.destination.address = ctx.dest.substring(0, p); ctx.destination.port = ctx.dest.substring(p+1, l);} ctx.remove('dest');", 
+        "if": "ctx.dest != null"
+      }
+    },
+    {
+      "convert" : {
+        "field" : "destination.port",
+        "type": "integer",
+        "if": "ctx.destination?.port != null"
+      }
     },
     {
       "convert" : {
         "field" : "duration",
-        "type": "double"
+        "type": "double",
+        "if": "ctx.duration != null"
       }
     },
     {
@@ -25,14 +52,8 @@
     },
     {
       "remove": {
-        "field": ["json", "duration", "time"],
+        "field": ["json", "duration", "time", "temp_message"],
         "ignore_missing": true
-      }
-    },
-    {
-      "convert" : {
-        "field" : "destination.port",
-        "type": "integer"
       }
     },
     {

@@ -5414,6 +5414,16 @@ ID of the request
 
 --
 
+*`envoyproxy.authority`*::
++
+--
+type: keyword
+
+Envoy proxy authority field
+
+
+--
+
 [[exported-fields-haproxy]]
 == haproxy fields
 
