@@ -99,6 +99,25 @@ metrics_one_midichlorians_sum{rank="padawan",alive="yes"} 800001
 metrics_one_midichlorians_count{rank="padawan",alive="yes"} 28
 
 `
+
+	promSummaryKeyLabel = `
+# TYPE metrics_force_propagation_ms summary
+metrics_force_propagation_ms{kind="jedi",quantile="0"} 35
+metrics_force_propagation_ms{kind="jedi",quantile="0.25"} 22
+metrics_force_propagation_ms{kind="jedi",quantile="0.5"} 7
+metrics_force_propagation_ms{kind="jedi",quantile="0.75"} 20
+metrics_force_propagation_ms{kind="jedi",quantile="1"} 30
+metrics_force_propagation_ms_sum{kind="jedi"} 89
+metrics_force_propagation_ms_count{kind="jedi"} 651
+metrics_force_propagation_ms{kind="sith",quantile="0"} 30
+metrics_force_propagation_ms{kind="sith",quantile="0.25"} 20
+metrics_force_propagation_ms{kind="sith",quantile="0.5"} 12
+metrics_force_propagation_ms{kind="sith",quantile="0.75"} 21
+metrics_force_propagation_ms{kind="sith",quantile="1"} 29
+metrics_force_propagation_ms_sum{kind="sith"} 112
+metrics_force_propagation_ms_count{kind="sith"} 711
+
+`
 )
 
 type mockFetcher struct {
@@ -587,6 +606,87 @@ func TestPrometheusExtra(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			testName:           "Test summary with KeyLabel",
+			prometheusResponse: promSummaryKeyLabel,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_force_propagation_ms": Metric("metrics.force.propagation.ms"),
+				},
+				Labels: map[string]LabelMap{
+					"kind": KeyLabel("metrics.force.propagation.ms.labels.kind"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"force": common.MapStr{
+							"propagation": common.MapStr{
+								"ms": common.MapStr{
+									"count": uint64(651),
+									"sum":   89.0,
+									"percentile": common.MapStr{
+										"0":   uint64(35),
+										"25":  uint64(22),
+										"50":  uint64(7),
+										"75":  uint64(20),
+										"100": uint64(30),
+									},
+									"labels": common.MapStr{
+										"kind": "jedi",
+									},
+								},
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"force": common.MapStr{
+							"propagation": common.MapStr{
+								"ms": common.MapStr{
+									"count": uint64(711),
+									"sum":   112.0,
+									"percentile": common.MapStr{
+										"0":   uint64(30),
+										"25":  uint64(20),
+										"50":  uint64(12),
+										"75":  uint64(21),
+										"100": uint64(29),
+									},
+									"labels": common.MapStr{
+										"kind": "sith",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		// mapping: &MetricsMapping{
+		// 	Metrics: map[string]MetricMap{
+		// 		"summary_metric": Metric("summary.metric"),
+		// 	},
+		// },
+		// expected: []common.MapStr{
+		// 	common.MapStr{
+		// 		"summary": common.MapStr{
+		// 			"metric": common.MapStr{
+		// 				"sum":   234892394.0,
+		// 				"count": uint64(44000),
+		// 				"percentile": common.MapStr{
+		// 					"50": 29735.0,
+		// 					"90": 47103.0,
+		// 					"99": 50681.0,
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+
 	}
 
 	for _, tc := range testCases {
