@@ -20,9 +20,9 @@ package connection
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
 )
 
