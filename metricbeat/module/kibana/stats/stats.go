@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/kibana"
@@ -122,20 +121,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	now := time.Now()
 
-	m.fetchStats(r, now)
+	err := m.fetchStats(r, now)
+	if err != nil {
+		return err
+	}
+
 	if m.XPackEnabled {
 		m.fetchSettings(r, now)
 	}
+
+	return nil
 }
 
-func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
+func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Logger())
-		return
+		return err
 	}
 
 	if m.XPackEnabled {
@@ -143,15 +147,13 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 		err = eventMappingStatsXPack(r, intervalMs, now, content)
 		if err != nil {
 			m.Logger().Error(err)
-			return
+			return nil
 		}
 	} else {
-		err = eventMapping(r, content)
-		if err != nil {
-			elastic.ReportAndLogError(err, r, m.Logger())
-			return
-		}
+		return eventMapping(r, content)
 	}
+
+	return nil
 }
 
 func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
