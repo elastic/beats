@@ -63,31 +63,31 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		err := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		m.Log.Debug("trying to fetch pending tasks from a non-master node")
+		m.Logger().Debug("trying to fetch pending tasks from a non-master node")
 		return
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
 	err = eventsMapping(r, *info, content)
 	if err != nil {
-		m.Log.Error(err)
+		m.Logger().Error(err)
 		return
 	}
 }
