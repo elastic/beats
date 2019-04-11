@@ -665,28 +665,6 @@ func TestPrometheusExtra(t *testing.T) {
 				},
 			},
 		},
-
-		// mapping: &MetricsMapping{
-		// 	Metrics: map[string]MetricMap{
-		// 		"summary_metric": Metric("summary.metric"),
-		// 	},
-		// },
-		// expected: []common.MapStr{
-		// 	common.MapStr{
-		// 		"summary": common.MapStr{
-		// 			"metric": common.MapStr{
-		// 				"sum":   234892394.0,
-		// 				"count": uint64(44000),
-		// 				"percentile": common.MapStr{
-		// 					"50": 29735.0,
-		// 					"90": 47103.0,
-		// 					"99": 50681.0,
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// },
-
 	}
 
 	for _, tc := range testCases {
