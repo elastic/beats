@@ -86,7 +86,7 @@ func TestData(t *testing.T) {
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
-	err = mbtest.WriteEventsReporterV2(f, t, "")
+	err = mbtest.WriteEventsReporterV2Error(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
