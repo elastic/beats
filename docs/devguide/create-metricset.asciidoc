@@ -145,7 +145,8 @@ called once for each host. The frequency of calling `Fetch` is based on the `per
 defined in the configuration file.
 
 `Fetch` must publish the event using the `mb.ReporterV2.Event` method. If an error
-happens, the error must be published using the `mb.ReporterV2.Error` method. This means
+happens, `Fetch` can return an error, or if `Event` is being called in a loop,
+published using the `mb.ReporterV2.Error` method. This means
 that Metricbeat always sends an event, even on failure. You must make sure that the
 error message helps to identify the actual error.
 
@@ -154,7 +155,7 @@ incremented for each `Fetch` call:
 
 [source,go]
 ----
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	report.Event(mb.Event{
 		MetricSetFields: common.MapStr{
@@ -162,6 +163,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 	})
 	m.counter++
+
+	return nil
 }
 ----
 
@@ -172,19 +175,11 @@ https://godoc.org/github.com/elastic/beats/libbeat/common#MapStr[MapStr API docs
 
 [float]
 ===== Multi Fetching
-Metricbeat has two different `Fetch` interfaces. One of the interfaces, which you saw in the
-previous example, fetches a single event. In some cases, every fetch returns a list of events.
-Instead of using an array inside a JSON document, we recommend that you create a list of events.
 
-For this kind of data, you can use the following `Fetch` interface:
-
-[source,go]
-----
-(m *MetricSet) Fetch() ([]common.MapStr, error)
-----
-
-The only difference between this and the previous example is that the second example returns `[]common.MapStr`.
-Metricbeat will add the same timestamp to all the events in the list to make it possible to correlate the events.
+`Event` can be called multiple times inside of the `Fetch` method for metricsets that might expose multiple events.
+`Event` returns a bool that indicates if the metricset is already closed and no further events can be processed, 
+in which case `Fetch` should return immediately. If there is an error while processing one of many events, 
+it can be published using the `mb.ReporterV2.Error` method, as opposed to returning an error value.
 
 [float]
 ===== Parsing and Normalizing Fields
