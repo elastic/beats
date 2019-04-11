@@ -607,64 +607,64 @@ func TestPrometheusExtra(t *testing.T) {
 			},
 		},
 
-		// {
-		// 	testName:           "Test summary with KeyLabel",
-		// 	prometheusResponse: promSummaryKeyLabel,
-		// 	mapping: &MetricsMapping{
-		// 		Metrics: map[string]MetricMap{
-		// 			"metrics_force_propagation_ms": Metric("metrics.force.propagation.ms"),
-		// 		},
-		// 		Labels: map[string]LabelMap{
-		// 			"kind": KeyLabel("metrics.force.propagation.ms.labels.kind"),
-		// 		},
-		// 	},
-		// 	expectedEvents: []common.MapStr{
-		// 		common.MapStr{
-		// 			"metrics": common.MapStr{
-		// 				"force": common.MapStr{
-		// 					"propagation": common.MapStr{
-		// 						"ms": common.MapStr{
-		// 							"count": uint64(651),
-		// 							"sum":   89.0,
-		// 							"percentile": common.MapStr{
-		// 								"0":   uint64(35),
-		// 								"25":  uint64(22),
-		// 								"50":  uint64(7),
-		// 								"75":  uint64(20),
-		// 								"100": uint64(30),
-		// 							},
-		// 							"labels": common.MapStr{
-		// 								"kind": "jedi",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 		common.MapStr{
-		// 			"metrics": common.MapStr{
-		// 				"force": common.MapStr{
-		// 					"propagation": common.MapStr{
-		// 						"ms": common.MapStr{
-		// 							"count": uint64(711),
-		// 							"sum":   112.0,
-		// 							"percentile": common.MapStr{
-		// 								"0":   uint64(30),
-		// 								"25":  uint64(20),
-		// 								"50":  uint64(12),
-		// 								"75":  uint64(21),
-		// 								"100": uint64(29),
-		// 							},
-		// 							"labels": common.MapStr{
-		// 								"kind": "sith",
-		// 							},
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// },
+		{
+			testName:           "Test summary with KeyLabel",
+			prometheusResponse: promSummaryKeyLabel,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_force_propagation_ms": Metric("metrics.force.propagation.ms"),
+				},
+				Labels: map[string]LabelMap{
+					"kind": KeyLabel("metrics.force.propagation.ms.labels.kind"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"force": common.MapStr{
+							"propagation": common.MapStr{
+								"ms": common.MapStr{
+									"count": uint64(651),
+									"sum":   89.0,
+									"percentile": common.MapStr{
+										"0":   35.0,
+										"25":  22.0,
+										"50":  7.0,
+										"75":  20.0,
+										"100": 30.0,
+									},
+									"labels": common.MapStr{
+										"kind": "jedi",
+									},
+								},
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"force": common.MapStr{
+							"propagation": common.MapStr{
+								"ms": common.MapStr{
+									"count": uint64(711),
+									"sum":   112.0,
+									"percentile": common.MapStr{
+										"0":   30.0,
+										"25":  20.0,
+										"50":  12.0,
+										"75":  21.0,
+										"100": 29.0,
+									},
+									"labels": common.MapStr{
+										"kind": "sith",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
