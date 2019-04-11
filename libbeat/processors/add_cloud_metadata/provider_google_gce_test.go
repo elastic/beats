@@ -152,7 +152,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 
 	expected := common.MapStr{
 		"cloud": common.MapStr{
-			"provider": "gce",
+			"provider": "gcp",
 			"instance": common.MapStr{
 				"id":   "3910564293633576924",
 				"name": "test-gce-dev",
