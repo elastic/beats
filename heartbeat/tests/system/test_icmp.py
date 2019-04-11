@@ -23,18 +23,17 @@ class Test(BaseTest):
         try:
             result = subprocess.check_output(
                 ['sysctl', 'net.ipv4.ping_group_range']).strip()
+            result = result.split("= ")
+            result = result[1].split("\t")
+            result = map(int, result)
+            firstGroup = result[0]
+            lastGroup = result[1]
+            if any(firstGroup == group for group in runningGroups):
+                return (True)
+            if any(lastGroup > group for group in runningGroups):
+                return (True)
         except subprocess.CalledProcessError, e:
-            print "stdout output:\n", e.output
-
-        result = result.split("= ")
-        result = result[1].split("\t")
-        result = map(int, result)
-        firstGroup = result[0]
-        lastGroup = result[1]
-        if any(firstGroup == group for group in runningGroups):
-            return (True)
-        if any(lastGroup > group for group in runningGroups):
-            return (True)
+            print "Error trying sysctl:\n", e.output
 
         return (False)
 
@@ -75,28 +74,22 @@ class Test(BaseTest):
             **config
         )
 
-        adminRights = self.has_admin()
-        if adminRights == True:
-            proc = self.start_beat()
-            self.wait_until(lambda: self.log_contains(
-                "heartbeat is running"))
-            proc.check_kill_and_wait()
-        else:
-            if platform.system() in ["Linux", "Darwin"]:
-                groupRights = self.has_group_permission()
-                if groupRights == True:
-                    proc = self.start_beat()
-                    self.wait_until(lambda: self.log_contains(
-                        "heartbeat is running"))
-                    proc.check_kill_and_wait()
-                else:
-                    exit_code = self.run_beat()
-                    assert exit_code == 1
-                    assert self.log_contains(
-                        "You dont have root permission to run ping") is True
-            else:
-                # windows seems to allow all users to run sockets
+        if platform.system() in ["Linux", "Darwin"]:
+            adminRights = self.has_admin()
+            groupRights = self.has_group_permission()
+            if groupRights == True or adminRights == True:
                 proc = self.start_beat()
                 self.wait_until(lambda: self.log_contains(
                     "heartbeat is running"))
                 proc.check_kill_and_wait()
+            else:
+                exit_code = self.run_beat()
+                assert exit_code == 1
+                assert self.log_contains(
+                    "You dont have root permission to run ping") is True
+        else:
+            # windows seems to allow all users to run sockets
+            proc = self.start_beat()
+            self.wait_until(lambda: self.log_contains(
+                "heartbeat is running"))
+            proc.check_kill_and_wait()
