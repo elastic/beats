@@ -2,7 +2,7 @@ FROM golang:1.11.5
 MAINTAINER Noémi Ványi <noemi.vanyi@elastic.co>
 
 RUN set -x && \
-    apt-get update && \
+    apt-get update -o Acquire::Check-Valid-Until=false && \
     apt-get install -y --no-install-recommends \
       python-pip virtualenv libsystemd-dev libc6-dev-i386 gcc-arm-linux-gnueabi && \
     apt-get clean
