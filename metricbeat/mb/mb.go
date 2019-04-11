@@ -116,20 +116,6 @@ type Closer interface {
 	Close() error
 }
 
-// EventFetcher is a MetricSet that returns a single event when collecting data.
-// Use ReportingMetricSet for new MetricSet implementations.
-type EventFetcher interface {
-	MetricSet
-	Fetch() (common.MapStr, error)
-}
-
-// EventsFetcher is a MetricSet that returns a multiple events when collecting
-// data. Use ReportingMetricSet for new MetricSet implementations.
-type EventsFetcher interface {
-	MetricSet
-	Fetch() ([]common.MapStr, error)
-}
-
 // Reporter is used by a MetricSet to report events, errors, or errors with
 // metadata. The methods return false if and only if publishing failed because
 // the MetricSet is being closed.

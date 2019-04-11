@@ -108,34 +108,6 @@ func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 	return metricset
 }
 
-// NewEventFetcher instantiates a new EventFetcher using the given
-// configuration. The ModuleFactory and MetricSetFactory are obtained from the
-// global Registry.
-func NewEventFetcher(t testing.TB, config interface{}) mb.EventFetcher {
-	metricSet := NewMetricSet(t, config)
-
-	fetcher, ok := metricSet.(mb.EventFetcher)
-	if !ok {
-		t.Fatal("MetricSet does not implement EventFetcher")
-	}
-
-	return fetcher
-}
-
-// NewEventsFetcher instantiates a new EventsFetcher using the given
-// configuration. The ModuleFactory and MetricSetFactory are obtained from the
-// global Registry.
-func NewEventsFetcher(t testing.TB, config interface{}) mb.EventsFetcher {
-	metricSet := NewMetricSet(t, config)
-
-	fetcher, ok := metricSet.(mb.EventsFetcher)
-	if !ok {
-		t.Fatal("MetricSet does not implement EventsFetcher")
-	}
-
-	return fetcher
-}
-
 func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {
 	metricSet := NewMetricSet(t, config)
 

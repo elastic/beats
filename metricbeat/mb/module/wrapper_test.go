@@ -57,9 +57,13 @@ type fakeEventFetcher struct {
 	mb.BaseMetricSet
 }
 
-func (ms *fakeEventFetcher) Fetch() (common.MapStr, error) {
+func (ms *fakeEventFetcher) Fetch(reporter mb.ReporterV2) error {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	return common.MapStr{"@timestamp": common.Time(t), "metric": 1}, nil
+	reporter.Event(mb.Event{
+		Timestamp:  t,
+		RootFields: common.MapStr{"metric": 1},
+	})
+	return nil
 }
 
 func (ms *fakeEventFetcher) Close() error {
@@ -129,39 +133,6 @@ func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 }
 
 // test cases
-
-func TestWrapperOfEventFetcher(t *testing.T) {
-	hosts := []string{"alpha", "beta"}
-	c := newConfig(t, map[string]interface{}{
-		"module":     moduleName,
-		"metricsets": []string{eventFetcherName},
-		"hosts":      hosts,
-	})
-
-	m, err := module.NewWrapper(c, newTestRegistry(t))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	done := make(chan struct{})
-	output := m.Start(done)
-
-	<-output
-	<-output
-	close(done)
-
-	// Validate that the channel is closed after receiving the two
-	// initial events.
-	select {
-	case _, ok := <-output:
-		if !ok {
-			// Channel is closed.
-			return
-		} else {
-			assert.Fail(t, "received unexpected event")
-		}
-	}
-}
 
 func TestWrapperOfReportingFetcher(t *testing.T) {
 	hosts := []string{"alpha", "beta"}

@@ -37,24 +37,14 @@ func (m testModule) ParseHost(host string) (HostData, error) {
 	return m.hostParser(host)
 }
 
-// EventFetcher
+// FetchReporter
 
 type testMetricSet struct {
 	BaseMetricSet
 }
 
-func (m *testMetricSet) Fetch() (common.MapStr, error) {
-	return nil, nil
-}
-
-// EventsFetcher
-
-type testMetricSetEventsFetcher struct {
-	BaseMetricSet
-}
-
-func (m *testMetricSetEventsFetcher) Fetch() ([]common.MapStr, error) {
-	return nil, nil
+func (m *testMetricSet) Fetch(reporter ReporterV2) error {
+	return nil
 }
 
 // ReportingFetcher
@@ -246,46 +236,10 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 	r := newTestRegistry(t)
 
 	factory := func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSet{base}, nil
-	}
-
-	name := "EventFetcher"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(EventFetcher)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSetEventsFetcher{base}, nil
-	}
-
-	name = "EventsFetcher"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(EventsFetcher)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
 		return &testMetricSetReportingFetcher{base}, nil
 	}
 
-	name = "ReportingFetcher"
+	name := "ReportingFetcher"
 	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
 		t.Fatal(err)
 	}

@@ -217,14 +217,6 @@ func mustHaveModule(ms MetricSet, base BaseMetricSet) error {
 // of them.
 func mustImplementFetcher(ms MetricSet) error {
 	var ifcs []string
-	if _, ok := ms.(EventFetcher); ok {
-		ifcs = append(ifcs, "EventFetcher")
-	}
-
-	if _, ok := ms.(EventsFetcher); ok {
-		ifcs = append(ifcs, "EventsFetcher")
-	}
-
 	if _, ok := ms.(ReportingMetricSet); ok {
 		ifcs = append(ifcs, "ReportingMetricSet")
 	}

@@ -21,6 +21,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 ==== Breaking changes
 
 - Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
+- Removing Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}[]
 
 ==== Bugfixes
 

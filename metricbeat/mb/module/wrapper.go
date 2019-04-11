@@ -191,9 +191,6 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
-	case mb.EventFetcher, mb.EventsFetcher,
-		mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error:
-		msw.startPeriodicFetching(reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
 		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
@@ -204,6 +201,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 // startPeriodicFetching performs an immediate fetch for the MetricSet then it
 // begins a continuous timer scheduled loop to fetch data. To stop the loop the
 // done channel should be closed.
+// TODO: remove?
 func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 	// Fetch immediately.
 	msw.fetch(reporter)
@@ -226,10 +224,6 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.EventFetcher:
-		msw.singleEventFetch(fetcher, reporter)
-	case mb.EventsFetcher:
-		msw.multiEventFetch(fetcher, reporter)
 	case mb.ReportingMetricSet:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V1())
@@ -245,24 +239,6 @@ func (msw *metricSetWrapper) fetch(reporter reporter) {
 		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
-	}
-}
-
-func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, reporter reporter) {
-	reporter.StartFetchTimer()
-	event, err := fetcher.Fetch()
-	reporter.V1().ErrorWith(err, event)
-}
-
-func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, reporter reporter) {
-	reporter.StartFetchTimer()
-	events, err := fetcher.Fetch()
-	if len(events) == 0 {
-		reporter.V1().ErrorWith(err, nil)
-	} else {
-		for _, event := range events {
-			reporter.V1().ErrorWith(err, event)
-		}
 	}
 }
 
