@@ -80,13 +80,13 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_connections(self):
+    def test_connection(self):
         """
         ZooKeeper server module outputs an event.
         """
         self.render_config_template(modules=[{
             "name": "zookeeper",
-            "metricsets": ["connections"],
+            "metricsets": ["connection"],
             "hosts": self.get_hosts(),
             "period": "5s"
         }])
@@ -99,10 +99,10 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(ZK_FIELDS), evt.keys())
-        zk_conns = evt["zookeeper"]["connections"]
+        self.assertItemsEqual(self.de_dot(ZK_FIELDS + ["client"]), evt.keys())
+        zk_conns = evt["zookeeper"]["connection"]
 
-        assert zk_conns["port"] >= 0
+        assert zk_conns["queued"] >= 0
 
         self.assert_fields_are_documented(evt)
 

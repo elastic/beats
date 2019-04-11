@@ -26259,33 +26259,23 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 [float]
-== connections fields
+== connection fields
 
 connections
 
 
 
-*`zookeeper.connections.ip`*::
-+
---
-type: keyword
-
-Connection IP
-
-
---
-
-*`zookeeper.connections.port`*::
+*`zookeeper.connection.interest_ops`*::
 +
 --
 type: long
 
-Connection Port
+Interest ops
 
 
 --
 
-*`zookeeper.connections.queued`*::
+*`zookeeper.connection.queued`*::
 +
 --
 type: long
@@ -26295,7 +26285,7 @@ Queued connections
 
 --
 
-*`zookeeper.connections.received`*::
+*`zookeeper.connection.received`*::
 +
 --
 type: long
@@ -26305,7 +26295,7 @@ Received connections
 
 --
 
-*`zookeeper.connections.sent`*::
+*`zookeeper.connection.sent`*::
 +
 --
 type: long

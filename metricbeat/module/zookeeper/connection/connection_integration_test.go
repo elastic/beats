@@ -17,7 +17,7 @@
 
 // +build integration
 
-package connections
+package connection
 
 import (
 	"testing"
@@ -28,8 +28,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
@@ -37,7 +37,7 @@ func TestData(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "zookeeper",
-		"metricsets": []string{"connections"},
+		"metricsets": []string{"connection"},
 		"hosts":      []string{zookeeper.GetZookeeperEnvHost() + ":" + zookeeper.GetZookeeperEnvPort()},
 	}
 }

@@ -15,13 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package connections
+package connection
 
 import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
@@ -32,7 +31,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("zookeeper", "connections", New,
+	mb.Registry.MustAddMetricSet("zookeeper", "connection", New,
 		mb.WithHostParser(parse.PassThruHostParser),
 	)
 }
@@ -43,13 +42,12 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	counter int
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The zookeeper connections metricset is beta.")
+	cfgwarn.Beta("The zookeeper connection metricset is beta.")
 
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -58,26 +56,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		counter:       1,
 	}, nil
 }
 
 // Fetch fetches metrics from ZooKeeper by making a tcp connection to the
 // command port and sending the "cons" command and parsing the output.
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("cons", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		reporter.Error(errors.Wrap(err, "'cons' command failed"))
-		return
+		return errors.Wrap(err, "'cons' command failed")
 	}
 
 	events, err := m.parseCons(outputReader)
 	if err != nil {
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error parsing response from zookeeper")
 	}
 
 	for _, event := range events {
 		reporter.Event(event)
 	}
+
+	return nil
 }
