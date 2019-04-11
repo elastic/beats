@@ -48,13 +48,6 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
-}
-
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "apache",
