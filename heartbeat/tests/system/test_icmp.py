@@ -14,13 +14,14 @@ import subprocess
 class Test(BaseTest):
 
     def has_group_permission(self):
-        runningUser = subprocess.check_output(['whoami']).strip()
-        runningGroups = subprocess.check_output(
-            ['id', '-G', runningUser]).strip()
-        runningGroups = runningGroups.split(" ")
-        runningGroups = map(int, runningGroups)
-        runningGroups.sort()
+
         try:
+            runningUser = subprocess.check_output(['whoami']).strip()
+            runningGroups = subprocess.check_output(
+                ['id', '-G', runningUser]).strip()
+            runningGroups = runningGroups.split(" ")
+            runningGroups = map(int, runningGroups)
+            runningGroups.sort()
             result = subprocess.check_output(
                 ['sysctl', 'net.ipv4.ping_group_range']).strip()
             result = result.split("= ")
