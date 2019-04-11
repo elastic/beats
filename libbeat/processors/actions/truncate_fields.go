@@ -48,14 +48,15 @@ type truncater func(*truncateFields, []byte) ([]byte, bool, error)
 
 func init() {
 	processors.RegisterPlugin("truncate_fields",
-		configChecked(newTruncateFields,
+		configChecked(NewTruncateFields,
 			requireFields("fields"),
 			mutuallyExclusiveRequiredFields("max_bytes", "max_characters"),
 		),
 	)
 }
 
-func newTruncateFields(c *common.Config) (processors.Processor, error) {
+// NewTruncateFields returns a new truncate_fields processor.
+func NewTruncateFields(c *common.Config) (processors.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {

@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
 - Fix ILM policy always being overwritten. {pull}11671[11671]
 - Fix template always being overwritten. {pull}11671[11671]
+- Fix matching of string arrays in contains condition. {pull}11691[11691]
 
 *Auditbeat*
 
@@ -79,8 +80,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
 - Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
-- Stop overwriting cloud.* fields from add_cloud_metadata if they are not empty. {pull}11612[11612] {issue}11305[11305]
-- Change `add_cloud_metadata` processor to not overwrite `cloud` field when it's already exist in the event. {pull}11612[11612] {issue}11305[11305]
 - Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
 
 *Packetbeat*
