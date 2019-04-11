@@ -42,6 +42,7 @@ type MetricSet struct {
 
 // DBDetails holds detailed information from DescribeDBInstances for each rds.
 type DBDetails struct {
+	dbArn              string
 	dbClass            string
 	dbAvailabilityZone string
 	dbIdentifier       string
@@ -76,9 +77,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		err = errors.Wrap(err, "Error ParseDuration")
-		report.Error(err)
-		return err
+		return errors.Wrap(err, "Error ParseDuration")
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
@@ -126,13 +125,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			// Create Cloudwatch Events for RDS
-			event, err := createCloudWatchEvents(metricDataOutput, dbInstanceARN, regionName, dbDetailsMap)
+			event, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap[dbInstanceARN])
 			if err != nil {
 				m.Logger().Error(err.Error())
 				report.Error(err)
 				continue
 			}
-			report.Event(event)
+			if reported := report.Event(event); !reported {
+				err = errors.Wrap(err, "Error trying to emit event")
+				return err
+			}
 		}
 	}
 
@@ -154,6 +156,7 @@ func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetail
 	for _, dbInstance := range output.DBInstances {
 		dbInstanceARNs = append(dbInstanceARNs, *dbInstance.DBInstanceArn)
 		dbDetails := DBDetails{
+			dbArn:              *dbInstance.DBInstanceArn,
 			dbAvailabilityZone: *dbInstance.AvailabilityZone,
 			dbClass:            *dbInstance.DBInstanceClass,
 			dbIdentifier:       *dbInstance.DBInstanceIdentifier,
@@ -208,7 +211,7 @@ func constructLabel(metricDimensions []cloudwatch.Dimension, dbInstanceARN strin
 	return label
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, dbInstanceARN string, regionName string, dbDetailsMap map[string]DBDetails) (mb.Event, error) {
+func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap DBDetails) (mb.Event, error) {
 	event := mb.Event{}
 	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
@@ -247,10 +250,10 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	}
 
 	event.MetricSetFields = resultMetricSetFields
-	event.MetricSetFields.Put("db_instance.arn", dbInstanceARN)
-	event.RootFields.Put("cloud.availability_zone", dbDetailsMap[dbInstanceARN].dbAvailabilityZone)
-	event.MetricSetFields.Put("db_instance.class", dbDetailsMap[dbInstanceARN].dbClass)
-	event.MetricSetFields.Put("db_instance.identifier", dbDetailsMap[dbInstanceARN].dbIdentifier)
-	event.MetricSetFields.Put("db_instance.status", dbDetailsMap[dbInstanceARN].dbStatus)
+	event.RootFields.Put("cloud.availability_zone", dbInstanceMap.dbAvailabilityZone)
+	event.MetricSetFields.Put("db_instance.arn", dbInstanceMap.dbArn)
+	event.MetricSetFields.Put("db_instance.class", dbInstanceMap.dbClass)
+	event.MetricSetFields.Put("db_instance.identifier", dbInstanceMap.dbIdentifier)
+	event.MetricSetFields.Put("db_instance.status", dbInstanceMap.dbStatus)
 	return event, err
 }

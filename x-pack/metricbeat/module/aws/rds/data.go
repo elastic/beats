@@ -26,7 +26,7 @@ var (
 		"free_storage.bytes":             c.Float("FreeStorageSpace"),
 		"maximum_used_transaction_ids":   c.Float("MaximumUsedTransactionIDs"),
 		"oldest_replication_slot_lag.mb": c.Float("OldestReplicationSlotLag"),
-		"read_io":                        c.Float("ReadIOPS"),
+		"read_io.ops_per_sec":            c.Float("ReadIOPS"),
 		"throughput": s.Object{
 			"commit":           c.Float("CommitThroughput"),
 			"delete":           c.Float("DeleteThroughput"),
@@ -59,7 +59,7 @@ var (
 		},
 		"swap_usage.bytes":            c.Float("SwapUsage"),
 		"transaction_logs_generation": c.Float("TransactionLogsGeneration"),
-		"write_io":                    c.Float("WriteIOPS"),
+		"write_io.ops_per_sec":        c.Float("WriteIOPS"),
 		"queries":                     c.Float("Queries"),
 		"deadlocks":                   c.Float("Deadlocks"),
 		"volume_used.bytes":           c.Float("VolumeBytesUsed"),

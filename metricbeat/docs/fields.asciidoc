@@ -1159,6 +1159,509 @@ type: integer
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
 
 
+
+*`aws.rds.cpu.total.pct`*::
++
+--
+type: scaled_float
+
+format: percent
+
+The percentage of CPU utilization.
+
+
+--
+
+*`aws.rds.cpu.credit_usage`*::
++
+--
+type: scaled_float
+
+The number of CPU credits spent by the instance for CPU utilization.
+
+
+--
+
+*`aws.rds.cpu.credit_balance`*::
++
+--
+type: scaled_float
+
+The number of earned CPU credits that an instance has accrued since it was launched or started.
+
+
+--
+
+*`aws.rds.database_connections`*::
++
+--
+type: long
+
+The number of database connections in use.
+
+
+--
+
+*`aws.rds.db_instance.arn`*::
++
+--
+type: keyword
+
+Amazon Resource Name(ARN) for each rds.
+
+
+--
+
+*`aws.rds.db_instance.class`*::
++
+--
+type: keyword
+
+Contains the name of the compute and memory capacity class of the DB instance.
+
+
+--
+
+*`aws.rds.db_instance.identifier`*::
++
+--
+type: keyword
+
+Contains a user-supplied database identifier. This identifier is the unique key that identifies a DB instance.
+
+
+--
+
+*`aws.rds.db_instance.status`*::
++
+--
+type: keyword
+
+Specifies the current state of this database.
+
+
+--
+
+*`aws.rds.disk_queue_depth`*::
++
+--
+type: long
+
+The number of outstanding IOs (read/write requests) waiting to access the disk.
+
+
+--
+
+*`aws.rds.failed_sql_server_agent_jobs`*::
++
+--
+type: long
+
+The number of failed SQL Server Agent jobs during the last minute.
+
+
+--
+
+*`aws.rds.freeable_memory.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The amount of available random access memory.
+
+
+--
+
+*`aws.rds.free_storage.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The amount of available storage space.
+
+
+--
+
+*`aws.rds.maximum_used_transaction_ids`*::
++
+--
+type: long
+
+The maximum transaction ID that has been used. Applies to PostgreSQL.
+
+
+--
+
+*`aws.rds.oldest_replication_slot_lag.mb`*::
++
+--
+type: long
+
+The lagging size of the replica lagging the most in terms of WAL data received. Applies to PostgreSQL.
+
+
+--
+
+*`aws.rds.read_io.ops_per_sec`*::
++
+--
+type: float
+
+The average number of disk read I/O operations per second.
+
+
+--
+
+*`aws.rds.replica_lag.sec`*::
++
+--
+type: long
+
+The amount of time a Read Replica DB instance lags behind the source DB instance. Applies to MySQL, MariaDB, and PostgreSQL Read Replicas.
+
+
+--
+
+*`aws.rds.swap_usage.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The amount of swap space used on the DB instance. This metric is not available for SQL Server.
+
+
+--
+
+*`aws.rds.transaction_logs_generation`*::
++
+--
+type: long
+
+The disk space used by transaction logs. Applies to PostgreSQL.
+
+
+--
+
+*`aws.rds.write_io.ops_per_sec`*::
++
+--
+type: float
+
+The average number of disk write I/O operations per second.
+
+
+--
+
+*`aws.rds.queries`*::
++
+--
+type: long
+
+The average number of queries executed per second.
+
+
+--
+
+*`aws.rds.deadlocks`*::
++
+--
+type: long
+
+The average number of deadlocks in the database per second.
+
+
+--
+
+*`aws.rds.volume_used.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The amount of storage used by your Aurora DB instance, in bytes.
+
+
+--
+
+*`aws.rds.free_local_storage`*::
++
+--
+type: long
+
+The amount of storage available for temporary tables and logs, in bytes.
+
+
+--
+
+*`aws.rds.login_failures`*::
++
+--
+type: long
+
+The average number of failed login attempts per second.
+
+
+--
+
+*`aws.rds.throughput.commit`*::
++
+--
+type: long
+
+The average number of commit operations per second.
+
+
+--
+
+*`aws.rds.throughput.delete`*::
++
+--
+type: long
+
+The average number of delete queries per second.
+
+
+--
+
+*`aws.rds.throughput.ddl`*::
++
+--
+type: long
+
+The average number of DDL requests per second.
+
+
+--
+
+*`aws.rds.throughput.dml`*::
++
+--
+type: long
+
+The average number of inserts, updates, and deletes per second.
+
+
+--
+
+*`aws.rds.throughput.insert`*::
++
+--
+type: long
+
+The average number of insert queries per second.
+
+
+--
+
+*`aws.rds.throughput.network`*::
++
+--
+type: long
+
+The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
+
+
+--
+
+*`aws.rds.throughput.network_receive`*::
++
+--
+type: long
+
+The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
+
+
+--
+
+*`aws.rds.throughput.network_transmit`*::
++
+--
+type: long
+
+The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
+
+
+--
+
+*`aws.rds.throughput.read`*::
++
+--
+type: long
+
+The average amount of time taken per disk I/O operation.
+
+
+--
+
+*`aws.rds.throughput.select`*::
++
+--
+type: long
+
+The average number of select queries per second.
+
+
+--
+
+*`aws.rds.throughput.update`*::
++
+--
+type: long
+
+The average number of update queries per second.
+
+
+--
+
+*`aws.rds.throughput.write`*::
++
+--
+type: long
+
+The average number of bytes written to disk per second.
+
+
+--
+
+*`aws.rds.latency.commit`*::
++
+--
+type: long
+
+The amount of latency for commit operations, in milliseconds.
+
+
+--
+
+*`aws.rds.latency.ddl`*::
++
+--
+type: long
+
+The amount of latency for data definition language (DDL) requests, in milliseconds.
+
+
+--
+
+*`aws.rds.latency.dml`*::
++
+--
+type: long
+
+The amount of latency for inserts, updates, and deletes, in milliseconds.
+
+
+--
+
+*`aws.rds.latency.insert`*::
++
+--
+type: long
+
+The amount of latency for insert queries, in milliseconds.
+
+
+--
+
+*`aws.rds.latency.read`*::
++
+--
+type: long
+
+The average amount of time taken per disk I/O operation.
+
+
+--
+
+*`aws.rds.latency.select`*::
++
+--
+type: long
+
+The amount of latency for select queries, in milliseconds.
+
+
+--
+
+*`aws.rds.latency.update`*::
++
+--
+type: long
+
+The amount of latency for update queries, in milliseconds.
+
+
+--
+
+*`aws.rds.latency.write`*::
++
+--
+type: long
+
+The average amount of time taken per disk I/O operation.
+
+
+--
+
+*`aws.rds.disk_usage.bin_log.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The amount of disk space occupied by binary logs on the master. Applies to MySQL read replicas.
+
+
+--
+
+*`aws.rds.disk_usage.replication_slot.mb`*::
++
+--
+type: long
+
+The disk space used by replication slot files. Applies to PostgreSQL.
+
+
+--
+
+*`aws.rds.disk_usage.transaction_logs.mb`*::
++
+--
+type: long
+
+The disk space used by transaction logs. Applies to PostgreSQL.
+
+
+--
+
+*`aws.rds.transactions.active`*::
++
+--
+type: long
+
+The average number of current transactions executing on an Aurora database instance per second.
+
+
+--
+
+*`aws.rds.transactions.blocked`*::
++
+--
+type: long
+
+The average number of transactions in the database that are blocked per second.
+
+
+--
+
 [float]
 == s3_daily_storage fields
 

@@ -37,9 +37,11 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("cloud.provider", "string", event, t)
 		mtest.CheckEventField("cloud.provider", "string", event, t)
 		mtest.CheckEventField("cloud.region", "string", event, t)
+		mtest.CheckEventField("cloud.availability_zone", "string", event, t)
 
 		// MetricSetField
-		mtest.CheckEventField("db_instance_arn", "string", event, t)
+		mtest.CheckEventField("db_instance.arn", "string", event, t)
+		mtest.CheckEventField("db_instance.class", "string", event, t)
 		mtest.CheckEventField("queries", "float", event, t)
 		mtest.CheckEventField("latency.select", "float", event, t)
 		mtest.CheckEventField("login_failures", "float", event, t)
