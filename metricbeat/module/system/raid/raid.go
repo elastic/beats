@@ -88,19 +88,13 @@ func blockto1024(b int64) int64 {
 
 // Fetch fetches one event for each device
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	devices, err := blockinfo.ListAllMDDevices(m.sysblock)
+	devices, err := blockinfo.ListAll(m.sysblock)
 	if err != nil {
 		r.Error(errors.Wrap(err, "failed to parse sysfs"))
 		return
 	}
 
-	for _, stat := range devices {
-
-		blockDev, err := blockinfo.GetMDDevice(stat)
-		if err != nil {
-			r.Error(errors.Wrap(err, "failed to parse /sys/block"))
-			return
-		}
+	for _, blockDev := range devices {
 
 		disks := blockDev.ReduceDisks()
 		event := common.MapStr{

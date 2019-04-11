@@ -3,4 +3,4 @@ This is the raid metricset of the module system. It collects stats about the rai
 This metricset is available on:
 - Linux
 
-The config option `raid.mount_point:` can be used to configure the raid mount point.
+The config option `raid.mount_point:` can be used to configure the raid mount point. If running this metricset inside a container, you will need to mount `/sys/block` inside the container.

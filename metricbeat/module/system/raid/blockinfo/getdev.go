@@ -45,7 +45,7 @@ type MDDevice struct {
 	SyncStatus  SyncStatus //the current sync status, if any
 }
 
-// Disk represents a single dis component, found at  /sys/block/[device]/md/dev-* for an md device
+// Disk represents a single disk component, found at  /sys/block/[device]/md/dev-* for an md device
 type Disk struct {
 	Size  int64
 	State string
@@ -59,43 +59,6 @@ type DiskStates struct {
 	Spare   int
 	Unknown int
 	States  common.MapStr
-}
-
-// ListAllMDDevices returns a string array of the paths to all the md devices under the root
-func ListAllMDDevices(path string) ([]string, error) {
-	//I'm not convinced that using /sys/block/md* is a reliable glob, as you should be able to make those whatever you want.
-	dir, err := ioutil.ReadDir(path)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not read directory")
-	}
-	var mds []string
-	for _, item := range dir {
-		testpath := filepath.Join(path, item.Name())
-		if !isMD(testpath) {
-			continue
-		}
-		mds = append(mds, testpath)
-	}
-
-	if len(mds) == 0 {
-		return nil, fmt.Errorf("no matches from path %s,", path)
-	}
-
-	return mds, nil
-}
-
-// GetMDDevice returns a MDDevice object representing a multi-disk device, or error if it's not a "real" md device
-func GetMDDevice(path string) (MDDevice, error) {
-	_, err := os.Stat(path)
-	if err != nil {
-		return MDDevice{}, errors.Wrap(err, "path does not exist")
-	}
-
-	//This is the best heuristic I've found so far for identifying an md device.
-	if !isMD(path) {
-		return MDDevice{}, err
-	}
-	return newMD(path)
 }
 
 // ReduceDisks disks on linux uses the raw states to provide a common status
@@ -127,7 +90,48 @@ func (dev MDDevice) ReduceDisks() DiskStates {
 	return disks
 }
 
+//ListAll lists all the multi-disk devices in a RAID array
+func ListAll(path string) ([]MDDevice, error) {
+	dir, err := ioutil.ReadDir(path)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not read directory")
+	}
+	var mds []MDDevice
+	for _, item := range dir {
+		testpath := filepath.Join(path, item.Name())
+		if !isMD(testpath) {
+			continue
+		}
+		dev, err := getMDDevice(testpath)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not get device info")
+		}
+		mds = append(mds, dev)
+	}
+
+	if len(mds) == 0 {
+		return nil, fmt.Errorf("no matches from path %s,", path)
+	}
+
+	return mds, nil
+}
+
+// getMDDevice returns a MDDevice object representing a multi-disk device, or error if it's not a "real" md device
+func getMDDevice(path string) (MDDevice, error) {
+	_, err := os.Stat(path)
+	if err != nil {
+		return MDDevice{}, errors.Wrap(err, "path does not exist")
+	}
+
+	//This is the best heuristic I've found so far for identifying an md device.
+	if !isMD(path) {
+		return MDDevice{}, err
+	}
+	return newMD(path)
+}
+
 //check if a block device directory looks like an MD device
+//I'm not convinced that using /sys/block/md* is a reliable glob, as you should be able to make those whatever you want.
 //Right now, we're doing this by looking for an `md` directory in the device dir.
 func isMD(path string) bool {
 	_, err := os.Stat(filepath.Join(path, "md"))
