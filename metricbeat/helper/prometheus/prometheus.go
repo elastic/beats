@@ -161,10 +161,30 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
-				// Put it in the event if it's a common metric
 				event := getEvent(eventsMap, keyLabels)
+
+				// Case: histograms + keyLabels, whose labels are written at the same level as the
+				// histogram data
+				//
+				// if the path where the values are to be written exists, current fields will be overwritten
+				// if that happens we will keep the existingFields variable for restoring later
+				existingFields, _ := event.GetValue(field)
+
 				event.Put(field, value)
 				event.DeepUpdate(labels)
+
+				// If we overwrited metrics values on top of existing labels, let's restore.
+				// If there is a conflict (there shoudln't) we will keep values over labels
+				if existingFields != nil {
+					overwritten, _ := existingFields.(common.MapStr)
+					for k, v := range overwritten {
+						restorePath := field + "." + k
+						if exists, _ := event.GetValue(restorePath); exists == nil {
+							event.Put(field+"."+k, v)
+						}
+					}
+				}
+
 			}
 		}
 	}
