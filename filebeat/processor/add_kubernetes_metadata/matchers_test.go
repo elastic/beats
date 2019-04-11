@@ -19,6 +19,7 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -55,29 +56,55 @@ func TestLogsPathMatcher_InvalidSource3(t *testing.T) {
 
 func TestLogsPathMatcher_VarLibDockerContainers(t *testing.T) {
 	cfgLogsPath := "" // use the default matcher configuration
-	source := fmt.Sprintf("/var/lib/docker/containers/%s/%s-json.log", cid, cid)
+
+	path := "/var/lib/docker/containers/%s/%s-json.log"
+	if runtime.GOOS == "windows" {
+		path = "C:\\ProgramData\\Docker\\containers\\%s\\%s-json.log"
+	}
+
+	source := fmt.Sprintf(path, cid, cid)
+
 	expectedResult := cid
 	executeTest(t, cfgLogsPath, source, expectedResult)
 }
 
 func TestLogsPathMatcher_VarLogContainers(t *testing.T) {
 	cfgLogsPath := "/var/log/containers/"
-	source := fmt.Sprintf("/var/log/containers/kube-proxy-4d7nt_kube-system_kube-proxy-%s.log", cid)
+	sourcePath := "/var/log/containers/kube-proxy-4d7nt_kube-system_kube-proxy-%s.log"
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\containers\\"
+		sourcePath = "C:\\var\\log\\containers\\kube-proxy-4d7nt_kube-system_kube-proxy-%s.log"
+	}
+
+	source := fmt.Sprintf(sourcePath, cid)
 	expectedResult := cid
 	executeTest(t, cfgLogsPath, source, expectedResult)
 }
 
 func TestLogsPathMatcher_AnotherLogDir(t *testing.T) {
 	cfgLogsPath := "/var/log/other/"
-	source := fmt.Sprintf("/var/log/other/%s.log", cid)
+	sourcePath := "/var/log/other/%s.log"
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\other\\"
+		sourcePath = "C:\\var\\log\\other\\%s.log"
+	}
+
+	source := fmt.Sprintf(sourcePath, cid)
 	expectedResult := cid
 	executeTest(t, cfgLogsPath, source, expectedResult)
 }
 
 func TestLogsPathMatcher_VarLibKubeletPods(t *testing.T) {
 	cfgLogsPath := "/var/lib/kubelet/pods/"
+	sourcePath := "/var/lib/kubelet/pods/%s/volumes/kubernetes.io~empty-dir/applogs/server.log"
 	cfgResourceType := "pod"
-	source := fmt.Sprintf("/var/lib/kubelet/pods/%s/volumes/kubernetes.io~empty-dir/applogs/server.log", puid)
+
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\lib\\kubelet\\pods\\"
+		sourcePath = "C:\\var\\lib\\kubelet\\pods\\%s\\volumes\\kubernetes.io~empty-dir\\applogs\\server.log"
+	}
+
+	source := fmt.Sprintf(sourcePath, puid)
 	expectedResult := puid
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
 }
