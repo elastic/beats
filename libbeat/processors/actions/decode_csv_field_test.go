@@ -18,9 +18,7 @@
 package actions
 
 import (
-	"bytes"
 	"testing"
-	"unicode"
 
 	"github.com/stretchr/testify/assert"
 
@@ -30,15 +28,15 @@ import (
 
 func TestDecodeCSVField(t *testing.T) {
 	tests := map[string]struct {
-		config   string
+		config   common.MapStr
 		input    beat.Event
 		expected beat.Event
 		fail     bool
 	}{
 		"default target": {
-			config: `
-				field: message
-				`,
+			config: common.MapStr{
+				"field": "message",
+			},
 			input: beat.Event{
 				Fields: common.MapStr{
 					"message": "17,192.168.33.1,8.8.8.8",
@@ -52,10 +50,10 @@ func TestDecodeCSVField(t *testing.T) {
 			},
 		},
 		"alternative target": {
-			config: `
-				field: message
-				target: my.field
-				`,
+			config: common.MapStr{
+				"field":  "message",
+				"target": "my.field",
+			},
 			input: beat.Event{
 				Fields: common.MapStr{
 					"message": "17,192.168.33.1,8.8.8.8",
@@ -69,25 +67,25 @@ func TestDecodeCSVField(t *testing.T) {
 			},
 		},
 		"no field set": {
-			config: ``,
-			fail:   true,
+			fail: true,
 		},
 		"non existing field": {
-			config: `
-				field: my_field`,
+			config: common.MapStr{
+				"field": "my.field",
+			},
 			fail: true,
 		},
 		"ignore missing": {
-			config: `
-				field: my_field
-				ignore_missing: true
-				`,
+			config: common.MapStr{
+				"field":          "my_field",
+				"ignore_missing": true,
+			},
 		},
 		"overwrite keys failure": {
-			config: `
-				field: message
-				target: existing_field
-				`,
+			config: common.MapStr{
+				"field":  "message",
+				"target": "existing_field",
+			},
 			input: beat.Event{
 				Fields: common.MapStr{
 					"message":        `"hello ""world"""`,
@@ -98,11 +96,11 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"overwrite keys": {
-			config: `
-				field: message
-				overwrite_keys: true
-				target: existing_field
-				`,
+			config: common.MapStr{
+				"field":          "message",
+				"target":         "existing_field",
+				"overwrite_keys": true,
+			},
 			input: beat.Event{
 				Fields: common.MapStr{
 					"message":        `"hello ""world"""`,
@@ -118,9 +116,10 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"custom separator": {
-			config: `
-				field: message
-				separator: ;`,
+			config: common.MapStr{
+				"field":     "message",
+				"separator": ";",
+			},
 			input: beat.Event{
 				Fields: common.MapStr{
 					"message": "1.5;false;hello world;3",
@@ -135,9 +134,10 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"trim leading space": {
-			config: `
-				field: message
-				trim_leading_space: true`,
+			config: common.MapStr{
+				"field":              "message",
+				"trim_leading_space": true,
+			},
 			input: beat.Event{
 				Fields: common.MapStr{
 					"message": " Here's,   some,   extra ,whitespace",
@@ -154,13 +154,7 @@ func TestDecodeCSVField(t *testing.T) {
 
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			yaml := unindent([]byte(tt.config))
-			t.Log("config yaml=", string(yaml))
-			cfg, err := common.NewConfigWithYAML(yaml, title)
-			if err != nil {
-				t.Fatal(err)
-			}
-			processor, err := NewDecodeCSVField(cfg)
+			processor, err := NewDecodeCSVField(common.MustNewConfigFrom(tt.config))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -179,27 +173,15 @@ func TestDecodeCSVField(t *testing.T) {
 	}
 }
 
-func unindent(yaml []byte) []byte {
-	sep := []byte{'\n'}
-	lines := bytes.Split(yaml, sep)
-	if len(lines) == 0 {
-		return nil
+func TestDecodeCSVField_String(t *testing.T) {
+	p, err := NewDecodeCSVField(common.MustNewConfigFrom(common.MapStr{
+		"field":          "source",
+		"target":         "destination",
+		"separator":      "#",
+		"ignore_missing": true,
+	}))
+	if err != nil {
+		t.Fatal(err)
 	}
-	var prefix []byte
-	for _, line := range lines {
-		indentLen := bytes.IndexFunc(line, func(r rune) bool {
-			return !unicode.IsSpace(r)
-		})
-		if indentLen > 0 {
-			prefix = line[:indentLen]
-			break
-		}
-	}
-
-	for idx, line := range lines {
-		if bytes.HasPrefix(line, prefix) {
-			lines[idx] = line[len(prefix):]
-		}
-	}
-	return bytes.Join(lines, sep)
+	assert.Equal(t, "decode_csv_field={field:source,target:destination,separator:'#',ignore_missing:true,trim_leading_space:false,overwrite_keys:false", p.String())
 }
