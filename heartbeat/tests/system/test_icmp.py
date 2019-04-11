@@ -20,7 +20,6 @@ class Test(BaseTest):
         runningGroups = runningGroups.split(" ")
         runningGroups = map(int, runningGroups)
         runningGroups.sort()
-        print(runningGroups)
         result = subprocess.check_output(
             ['sysctl', 'net.ipv4.ping_group_range']).strip()
         result = result.split("= ")
@@ -89,12 +88,10 @@ class Test(BaseTest):
                 else:
                     exit_code = self.run_beat()
                     assert exit_code == 1
-                    assert self.wait_until(
-                        lambda: self.log_contains(
-                            "You dont have root permission to run ping"),
-                        max_timeout=10)
+                    assert self.log_contains(
+                        "You dont have root permission to run ping") is True
             else:
-        # windows seems to allow all users to run sockets
+                # windows seems to allow all users to run sockets
                 proc = self.start_beat()
                 self.wait_until(lambda: self.log_contains(
                     "heartbeat is running"))
