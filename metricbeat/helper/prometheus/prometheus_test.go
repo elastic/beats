@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"sort"
 	"testing"
 
@@ -31,7 +30,8 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-const promMetrics = `
+const (
+	promMetrics = `
 # TYPE first_metric gauge
 first_metric{label1="value1",label2="value2",label3="Value3",label4="FOO"} 1
 # TYPE second_metric gauge
@@ -63,26 +63,41 @@ histogram_decimal_metric_count 5
 
 `
 
-type mockFetcher struct{}
+	promGaugeKeyLabel = `
+# TYPE metrics_one_count_total gauge
+metrics_one_count_total{name="jane",surname="foster"} 1
+metrics_one_count_total{name="john",surname="williams"} 2
+metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 
+`
+
+	promCounterKeyLabel = `
+# TYPE metrics_one_count_total counter
+metrics_one_count_total{name="jane",surname="foster"} 1
+metrics_one_count_total{name="john",surname="williams"} 2
+metrics_one_count_total{name="jahn",surname="baldwin",age=30} 3
+
+`
+)
+
+type mockFetcher struct {
+	response string
+}
+
+var _ = httpfetcher(&mockFetcher{})
+
+// FetchResponse returns an HTTP response but for the Body, which
+// returns the mockFetcher.Response contents
 func (m mockFetcher) FetchResponse() (*http.Response, error) {
 	return &http.Response{
 		Header: make(http.Header),
-		Body:   ioutil.NopCloser(bytes.NewReader([]byte(promMetrics))),
+		Body:   ioutil.NopCloser(bytes.NewReader([]byte(m.response))),
 	}, nil
 }
 
 func TestPrometheus(t *testing.T) {
-	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
-		w.Write([]byte(promMetrics))
-	}))
 
-	server.Start()
-	defer server.Close()
-
-	p := &prometheus{mockFetcher{}}
+	p := &prometheus{mockFetcher{response: promMetrics}}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -379,5 +394,149 @@ func TestPrometheus(t *testing.T) {
 				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
 			}
 		})
+	}
+}
+
+func TestPrometheusExtra(t *testing.T) {
+
+	testCases := []struct {
+		testName           string
+		prometheusResponse string
+		mapping            *MetricsMapping
+		expectedEvents     []common.MapStr
+	}{
+		{
+			testName:           "Test gauge with KeyLabel",
+			prometheusResponse: promGaugeKeyLabel,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_one_count_total": Metric("metrics.one.count"),
+				},
+				Labels: map[string]LabelMap{
+					"name":    KeyLabel("metrics.one.labels.name"),
+					"surname": KeyLabel("metrics.one.labels.surname"),
+					"age":     KeyLabel("metrics.one.labels.age"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 1.0,
+							"labels": common.MapStr{
+								"name":    "jane",
+								"surname": "foster",
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 2.0,
+							"labels": common.MapStr{
+								"name":    "john",
+								"surname": "williams",
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 3.0,
+							"labels": common.MapStr{
+								"name":    "jahn",
+								"surname": "baldwin",
+								"age":     "30",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			testName:           "Test counter with KeyLabel",
+			prometheusResponse: promCounterKeyLabel,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_one_count_total": Metric("metrics.one.count"),
+				},
+				Labels: map[string]LabelMap{
+					"name":    KeyLabel("metrics.one.labels.name"),
+					"surname": KeyLabel("metrics.one.labels.surname"),
+					"age":     KeyLabel("metrics.one.labels.age"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 1.0,
+							"labels": common.MapStr{
+								"name":    "jane",
+								"surname": "foster",
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 2.0,
+							"labels": common.MapStr{
+								"name":    "john",
+								"surname": "williams",
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 3.0,
+							"labels": common.MapStr{
+								"name":    "jahn",
+								"surname": "baldwin",
+								"age":     "30",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		r := &mbtest.CapturingReporterV2{}
+		p := &prometheus{mockFetcher{response: tc.prometheusResponse}}
+		p.ReportProcessedMetrics(tc.mapping, r)
+		if !assert.Nil(t, r.GetErrors(),
+			"error reporting/processing metrincs, at %q", tc.testName) {
+			continue
+		}
+
+		events := r.GetEvents()
+		if !assert.Equal(t, len(tc.expectedEvents), len(events),
+			"number of returned events doesn't match expected, at %q", tc.testName) {
+			continue
+		}
+
+		// Sort slices of received and expeected to avoid unmatching
+		sort.Slice(events, func(i, j int) bool {
+			return events[i].MetricSetFields.String() < events[j].MetricSetFields.String()
+		})
+		sort.Slice(tc.expectedEvents, func(i, j int) bool {
+			return tc.expectedEvents[i].String() < tc.expectedEvents[j].String()
+		})
+
+		for i := range events {
+			if !assert.Equal(t, tc.expectedEvents[i], events[i].MetricSetFields,
+				"mismatch at event #%d, at %q", i, tc.testName) {
+				continue
+			}
+			t.Logf("events: %+v", events[i].MetricSetFields)
+		}
 	}
 }
