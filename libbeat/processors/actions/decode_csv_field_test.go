@@ -22,9 +22,10 @@ import (
 	"testing"
 	"unicode"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDecodeCSVField(t *testing.T) {
