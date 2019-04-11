@@ -21,10 +21,11 @@ class Test(BaseTest):
         runningGroups = map(int, runningGroups)
         runningGroups.sort()
         try:
-        result = subprocess.check_output(
-            ['sysctl', 'net.ipv4.ping_group_range']).strip()
+            result = subprocess.check_output(
+                ['sysctl', 'net.ipv4.ping_group_range']).strip()
         except subprocess.CalledProcessError, e:
             print "stdout output:\n", e.output
+
         result = result.split("= ")
         result = result[1].split("\t")
         result = map(int, result)
