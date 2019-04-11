@@ -40,6 +40,6 @@ func newEc2MetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 		return out
 	}
 
-	fetcher, err := newMetadataFetcher(config, "ec2", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)
+	fetcher, err := newMetadataFetcher(config, "aws", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)
 	return fetcher, err
 }
