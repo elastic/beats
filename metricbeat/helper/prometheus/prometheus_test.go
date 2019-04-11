@@ -75,7 +75,7 @@ metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 # TYPE metrics_one_count_total counter
 metrics_one_count_total{name="jane",surname="foster"} 1
 metrics_one_count_total{name="john",surname="williams"} 2
-metrics_one_count_total{name="jahn",surname="baldwin",age=30} 3
+metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 
 `
 
@@ -513,7 +513,7 @@ func TestPrometheusExtra(t *testing.T) {
 				common.MapStr{
 					"metrics": common.MapStr{
 						"one": common.MapStr{
-							"count": 1.0,
+							"count": int64(1),
 							"labels": common.MapStr{
 								"name":    "jane",
 								"surname": "foster",
@@ -524,7 +524,7 @@ func TestPrometheusExtra(t *testing.T) {
 				common.MapStr{
 					"metrics": common.MapStr{
 						"one": common.MapStr{
-							"count": 2.0,
+							"count": int64(2),
 							"labels": common.MapStr{
 								"name":    "john",
 								"surname": "williams",
@@ -535,7 +535,7 @@ func TestPrometheusExtra(t *testing.T) {
 				common.MapStr{
 					"metrics": common.MapStr{
 						"one": common.MapStr{
-							"count": 3.0,
+							"count": int64(3),
 							"labels": common.MapStr{
 								"name":    "jahn",
 								"surname": "baldwin",
