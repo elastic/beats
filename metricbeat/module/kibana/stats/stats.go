@@ -146,6 +146,9 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 		intervalMs := m.calculateIntervalMs()
 		err = eventMappingStatsXPack(r, intervalMs, now, content)
 		if err != nil {
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
 			m.Logger().Error(err)
 			return nil
 		}
