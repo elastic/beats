@@ -36,12 +36,13 @@ const FieldsKey = "fields"
 
 func init() {
 	processors.RegisterPlugin("add_fields",
-		configChecked(createAddFields,
+		configChecked(CreateAddFields,
 			requireFields(FieldsKey),
 			allowedFields(FieldsKey, "target", "when")))
 }
 
-func createAddFields(c *common.Config) (processors.Processor, error) {
+// CreateAddFields constructs an add_fields processor from config.
+func CreateAddFields(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Fields common.MapStr `config:"fields" validate:"required"`
 		Target *string       `config:"target"`
