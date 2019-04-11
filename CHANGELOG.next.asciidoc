@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Metricbeat*
 
+- Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
+
 *Packetbeat*
 
 *Winlogbeat*

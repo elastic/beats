@@ -43,6 +43,9 @@ const (
 
 	// Default config
 	defaultTimeOut = 3 * time.Second
+
+	// Default overwrite
+	defaultOverwrite = false
 )
 
 var debugf = logp.MakeDebug("filters")
@@ -301,9 +304,11 @@ func setupFetchers(c *common.Config) ([]*metadataFetcher, error) {
 
 func newCloudMetadata(c *common.Config) (processors.Processor, error) {
 	config := struct {
-		Timeout time.Duration `config:"timeout"` // Amount of time to wait for responses from the metadata services.
+		Timeout   time.Duration `config:"timeout"`   // Amount of time to wait for responses from the metadata services.
+		Overwrite bool          `config:"overwrite"` // Overwrite if cloud.* fields already exist.
 	}{
-		Timeout: defaultTimeOut,
+		Timeout:   defaultTimeOut,
+		Overwrite: defaultOverwrite,
 	}
 	err := c.Unpack(&config)
 	if err != nil {
@@ -316,7 +321,7 @@ func newCloudMetadata(c *common.Config) (processors.Processor, error) {
 	}
 
 	p := &addCloudMetadata{
-		initData: &initData{fetchers, config.Timeout},
+		initData: &initData{fetchers, config.Timeout, config.Overwrite},
 	}
 
 	go p.initOnce.Do(p.init)
@@ -324,8 +329,9 @@ func newCloudMetadata(c *common.Config) (processors.Processor, error) {
 }
 
 type initData struct {
-	fetchers []*metadataFetcher
-	timeout  time.Duration
+	fetchers  []*metadataFetcher
+	timeout   time.Duration
+	overwrite bool
 }
 
 type addCloudMetadata struct {
@@ -341,7 +347,6 @@ func (p *addCloudMetadata) init() {
 		return
 	}
 	p.metadata = result.metadata
-	p.initData = nil
 	logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
 		result.provider, result.metadata.String())
 }
@@ -357,8 +362,16 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// This overwrites the meta.cloud if it exists. But the cloud key should be
-	// reserved for this processor so this should happen.
+	// If cloud key exists in event already and overwrite flag is set to false, this processor will not overwrite the
+	// cloud fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,
+	// add_cloud_metadata should not overwrite these fields with new values.
+	if !p.initData.overwrite {
+		cloudValue, _ := event.GetValue("cloud")
+		if cloudValue != nil {
+			return event, nil
+		}
+	}
+
 	_, err := event.PutValue("cloud", meta)
 
 	return event, err
