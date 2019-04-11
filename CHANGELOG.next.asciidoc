@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
 - New processor: `truncate_fields`. {pull}11297[11297]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring clsuter. {pull}9260[9260]
+- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
 
 *Auditbeat*
 
