@@ -56,14 +56,16 @@ const ManagedConfigTemplate = `
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 `
 
 // Config for central management

@@ -18,15 +18,14 @@
 package status
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 
 	"gopkg.in/mgo.v2/bson"
 )
-
-var debugf = logp.MakeDebug("mongodb.status")
 
 func init() {
 	mb.Registry.MustAddMetricSet("mongodb", "status", New,
@@ -57,20 +56,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error creating new Session")
 	}
 	defer mongoSession.Close()
 
 	result := map[string]interface{}{}
 	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "failed to retrieve serverStatus")
 	}
 
 	event := mb.Event{
@@ -87,4 +84,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		event.MetricSetFields.Delete("process")
 	}
 	r.Event(event)
+
+	return nil
 }

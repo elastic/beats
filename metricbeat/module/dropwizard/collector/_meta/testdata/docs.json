@@ -1,0 +1,59 @@
+{
+    "version": "3.0.0",
+    "gauges": {
+        "my_gauge": {
+            "value": null
+        }
+    },
+    "counters": {
+        "my_counter{this=that}": {
+            "count": 1
+        }
+    },
+    "histograms": {
+        "my_histogram": {
+            "count": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0,
+            "p50": 0,
+            "p75": 0,
+            "p95": 0,
+            "p98": 0,
+            "p99": 0,
+            "p999": 0,
+            "stddev": 0
+        }
+    },
+    "meters": {
+        "my_meter{this=that}": {
+            "count": 0,
+            "m15_rate": 0,
+            "m1_rate": 0,
+            "m5_rate": 0,
+            "mean_rate": 0,
+            "units": "events/second"
+        }
+    },
+    "timers": {
+        "my_timer": {
+            "count": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0,
+            "p50": 0,
+            "p75": 0,
+            "p95": 0,
+            "p98": 0,
+            "p99": 0,
+            "p999": 0,
+            "stddev": 0,
+            "m15_rate": 0,
+            "m1_rate": 0,
+            "m5_rate": 0,
+            "mean_rate": 0,
+            "duration_units": "seconds",
+            "rate_units": "calls/second"
+        }
+    }
+}

@@ -20,7 +20,6 @@
 package service
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -59,11 +58,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	services, err := m.reader.Read()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return services, nil
+	for _, event := range services {
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+		})
+	}
+
+	return nil
 }

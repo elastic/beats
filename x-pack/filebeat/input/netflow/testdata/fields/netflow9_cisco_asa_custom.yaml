@@ -1,3 +1,4 @@
+# This renames some fields to test the loading fields from file feature.
 33000:
 - :acl_id_asa
 - :ingress_acl_id
@@ -9,19 +10,19 @@
 - :fw_ext_event
 40000:
 - :string
-- :username
+- :asa_username
 40001:
 - :ip4_addr
-- :xlate_src_addr_ipv4
+- :asa_xlate_src_addr_ipv4
 40002:
 - :ip4_addr
-- :xlate_dst_addr_ipv4
+- :asa_xlate_dst_addr_ipv4
 40003:
 - :uint16
-- :xlate_src_port
+- :asa_xlate_src_port
 40004:
 - :uint16
-- :xlate_dst_port
+- :asa_xlate_dst_port
 40005:
 - :uint8
-- :fw_event
+- :asa_fw_event
