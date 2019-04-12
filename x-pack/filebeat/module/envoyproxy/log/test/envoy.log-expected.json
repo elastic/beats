@@ -8,6 +8,7 @@
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "-",
         "envoyproxy.log_type": "ACCESS",
+        "envoyproxy.proxy_type": "tcp",
         "envoyproxy.request_id": "-",
         "event.dataset": "envoyproxy.log",
         "event.duration": 4000000,
@@ -30,6 +31,7 @@
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "localhost:8000",
         "envoyproxy.log_type": "ACCESS",
+        "envoyproxy.proxy_type": "http",
         "envoyproxy.request_id": "c219f6da-2b7f-483e-9ced-ec323d9330a9",
         "envoyproxy.upstream_service_time": 4000000,
         "event.dataset": "envoyproxy.log",
@@ -60,6 +62,7 @@
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "192.168.99.107:30901",
         "envoyproxy.log_type": "ACCESS",
+        "envoyproxy.proxy_type": "http",
         "envoyproxy.request_id": "58436667-bf70-4fd0-9fe9-cdadadecfd55",
         "envoyproxy.response_flags": [
             "NR"
@@ -101,6 +104,7 @@
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "www.elastic.co",
         "envoyproxy.log_type": "ACCESS",
+        "envoyproxy.proxy_type": "http",
         "envoyproxy.request_id": "078d1daa-b786-4d6d-85a5-7e4366adaa19",
         "envoyproxy.upstream_service_time": 39000000,
         "event.dataset": "envoyproxy.log",

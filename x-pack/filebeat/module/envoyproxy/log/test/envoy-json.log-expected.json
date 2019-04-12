@@ -14,6 +14,7 @@
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "httpbin.org",
         "envoyproxy.log_type": "ACCESS",
+        "envoyproxy.proxy_type": "http",
         "envoyproxy.request_id": "413bf460-bd56-4515-ada4-2a69c5e78e54",
         "envoyproxy.upstream_service_time": 179000000,
         "event.dataset": "envoyproxy.log",
@@ -56,6 +57,7 @@
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "-",
         "envoyproxy.log_type": "ACCESS",
+        "envoyproxy.proxy_type": "tcp",
         "envoyproxy.request_id": "-",
         "envoyproxy.response_flags": [
             "UF",
