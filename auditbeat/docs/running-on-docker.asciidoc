@@ -1,6 +1,5 @@
-include::../../libbeat/docs/shared-docker.asciidoc[]
+include::{libbeat-dir}/docs/shared-docker.asciidoc[]
 
-[float]
 ==== Special requirements
 
 Under Docker, {beatname_uc} runs as a non-root user, but requires some privileged

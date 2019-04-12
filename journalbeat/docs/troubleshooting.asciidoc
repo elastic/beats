@@ -1,0 +1,31 @@
+[[troubleshooting]]
+= Troubleshooting
+
+[partintro]
+--
+
+If you have issues installing or running {beatname_uc}, read the
+following tips:
+
+* <<getting-help>>
+* <<enable-{beatname_lc}-debugging>>
+* <<faq>>
+
+//sets block macro for getting-help.asciidoc included in next section
+
+--
+
+[[getting-help]]
+== Get help
+
+include::{libbeat-dir}/docs/getting-help.asciidoc[]
+
+//sets block macro for debugging.asciidoc included in next section
+
+[id="enable-{beatname_lc}-debugging"]
+== Debug
+
+include::{libbeat-dir}/docs/debugging.asciidoc[]
+
+
+

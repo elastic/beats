@@ -31,7 +31,7 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MONGODB_FIELDS), evt.keys())
+        self.assertItemsEqual(self.de_dot(MONGODB_FIELDS + ["process"]), evt.keys())
 
         self.assert_fields_are_documented(evt)
 

@@ -87,7 +87,7 @@ func (r *LineReader) Next() ([]byte, int, error) {
 		if buf[len(buf)-1] == '\n' {
 			break
 		} else {
-			logp.Debug("line", "Line ending char found which wasn't one: %s", buf[len(buf)-1])
+			logp.Debug("line", "Line ending char found which wasn't one: %c", buf[len(buf)-1])
 		}
 	}
 

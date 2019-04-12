@@ -17,5 +17,22 @@
 
 package logstash
 
+import (
+	"github.com/elastic/beats/metricbeat/mb"
+)
+
 // ModuleName is the name of this module.
 const ModuleName = "logstash"
+
+// MetricSet can be used to build other metricsets within the Logstash module.
+type MetricSet struct {
+	mb.BaseMetricSet
+}
+
+// NewMetricSet creates a metricset that can be used to build other metricsets
+// within the Logstash module.
+func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+	return &MetricSet{
+		base,
+	}, nil
+}

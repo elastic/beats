@@ -1,0 +1,12 @@
+- key: process
+  title: Process
+  description: >
+    Process metadata fields
+  fields:
+    - name: process
+      type: group
+      fields:
+        - name: exe
+          type: alias
+          path: process.executable
+          migration: true

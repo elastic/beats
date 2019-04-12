@@ -7,7 +7,7 @@ related products:
 * {ls} (optional) for parsing and enhancing the data.
 
 See {stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}]
-for more information.
+for more information about installing these products.
 
 [TIP]
 ==============

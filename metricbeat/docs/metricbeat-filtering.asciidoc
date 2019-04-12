@@ -1,16 +1,16 @@
 [[filtering-and-enhancing-data]]
 == Filter and enhance the exported data
 
-include::../../libbeat/docs/processors.asciidoc[]
+include::{libbeat-dir}/docs/processors.asciidoc[]
 
 For example, the following configuration reduces the exported fields by
-dropping the `beat.name` and `beat.hostname` fields under `beat` from all documents.
+dropping the `agent.name` and `agent.version` fields under `beat` from all documents.
 
 [source, yaml]
 ----
 processors:
  - drop_fields:
-    fields: ['beat']
+    fields: ['agent']
 ----
 
-include::../../libbeat/docs/processors-using.asciidoc[]
+include::{libbeat-dir}/docs/processors-using.asciidoc[]

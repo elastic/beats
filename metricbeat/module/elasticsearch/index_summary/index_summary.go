@@ -20,8 +20,7 @@ package index_summary
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -54,8 +53,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The  " + base.FullyQualifiedName() + " metricset is beta")
-
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, statsPath)
 	if err != nil {
@@ -68,32 +65,38 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
+		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "Trying to fetch index summary stats from a non-master node.")
+		m.Logger().Debug("trying to fetch index summary stats from a non-master node")
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
+		err = errors.Wrap(err, "failed to get info from Elasticsearch")
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
 	if m.XPack {
-		eventMappingXPack(r, m, *info, content)
+		err = eventMappingXPack(r, m, *info, content)
 	} else {
-		eventMapping(r, *info, content)
+		err = eventMapping(r, *info, content)
 	}
 
+	if err != nil {
+		m.Logger().Error(err)
+		return
+	}
 }

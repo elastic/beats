@@ -1,0 +1,26 @@
+[
+    {
+        "@timestamp": "2013-11-12T13:03:32.000Z",
+        "ecs.version": "1.0.0",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 5524103000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 24,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 0.000337,
+        "mysql.slowlog.query": "select count(*) from customer, orders, nation\n  where c_custkey=o_custkey\n    and c_nationkey=n_nationkey\n    and n_name='GERMANY';",
+        "mysql.slowlog.query_cache_hit": false,
+        "mysql.slowlog.rows_examined": 65633,
+        "mysql.slowlog.rows_sent": 1,
+        "mysql.slowlog.schema": "dbt3sf1",
+        "mysql.thread_id": "2",
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "root"
+    }
+]

@@ -2,126 +2,155 @@
   title: "haproxy"
   description: >
     haproxy Module
-  fields: 
+  fields:
     - name: haproxy
       type: group
       description: >
       fields:
-        - name: process_name
-          description: Name of the process
-
-        - name: pid
-          description: Process ID
-          type: long
-
-        - name: client_ip
-          description: client_ip is the IP address of the client which initiated the TCP connection to haproxy.
-
-        - name: client_port
-          description: client_port is the TCP port of the client which initiated the connection.
-          type: long
 
         - name: frontend_name
-          description: frontend_name is the name of the frontend (or listener) which received and processed the connection.
+          description: Name of the frontend (or listener) which received and processed the connection.
 
         - name: backend_name
-          description: backend_name is the name of the backend (or listener) which was selected to manage the connection to the server.
+          description: Name of the backend (or listener) which was selected to manage the connection to the server.
 
         - name: server_name
-          description: server_name is the name of the last server to which the connection was sent.
+          description: Name of the last server to which the connection was sent.
 
-        - name: time_client_req
-          description: time_client_req is the total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+        - name: total_waiting_time_ms
+          description: Total time in milliseconds spent waiting in the various queues
+          type: long
+
+        - name: connection_wait_time_ms
+          description: Total time in milliseconds spent waiting for the connection to establish to the final server
+          type: long
+
+        - name: bytes_read
+          description: Total number of bytes transmitted to the client when the log is emitted.
           type: long
 
         - name: time_queue
-          description: time_queue is the total time in milliseconds spent waiting in the various queues.
+          description: Total time in milliseconds spent waiting in the various queues.
           type: long
 
         - name: time_backend_connect
-          description: time_backend_connect is the total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
-          type: long
-
-        - name: time_server_response
-          description: time_server_response is the total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
-          type: long
-
-        - name: time_duration
-          description: time_duration is the time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+          description: Total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
           type: long
 
         - name: server_queue
-          description: server_queue is the total number of requests which were processed before this one in the server queue.
+          description: Total number of requests which were processed before this one in the server queue.
           type: long
 
         - name: backend_queue
-          description: backend_queue is the total number of requests which were processed before this one in the backend's global queue.
+          description: Total number of requests which were processed before this one in the backend's global queue.
           type: long
 
         - name: bind_name
-          description: bind_name is the name of the listening address which received the connection.
+          description: Name of the listening address which received the connection.
 
         - name: error_message
-          description: error_message is the error message logged by HAProxy in case of error.
+          description: Error message logged by HAProxy in case of error.
           type: text
-        
-        - name: geoip
-          type: group
-          description: >
-            Contains GeoIP information gathered based on the client_ip field.
-            Only present if the GeoIP Elasticsearch plugin is available and
-            used.
-          fields:
-            - name: continent_name
-              type: keyword
-              description: >
-                The name of the continent.
-            - name: country_iso_code
-              type: keyword
-              description: >
-                Country ISO code.
-            - name: location
-              type: geo_point
-              description: >
-                The longitude and latitude.
-            - name: region_name
-              type: keyword
-              description: >
-                The region name.
-            - name: city_name
-              type: keyword
-              description: >
-                The city name.
-            - name: region_iso_code
-              type: keyword
-              description: >
-                Region ISO code.
+
+        - name: source
+          type: keyword
+          description: The HAProxy source of the log
 
         - name: termination_state
-          description: termination_state is the condition the session was in when the session ended.
+          description: Condition the session was in when the session ended.
+
+        - name: mode
+          type: keyword
+          description: mode that the frontend is operating (TCP or HTTP)
 
         - name: connections
           description: Contains various counts of connections active in the process.
           type: group
           fields:
             - name: active
-              description: active is the total number of concurrent connections on the process when the session was logged.
+              description: Total number of concurrent connections on the process when the session was logged.
               type: long
 
             - name: frontend
-              description: frontend is the total number of concurrent connections on the frontend when the session was logged.
+              description: Total number of concurrent connections on the frontend when the session was logged.
               type: long
 
             - name: backend
-              description: backend is the total number of concurrent connections handled by the backend when the session was logged.
+              description: Total number of concurrent connections handled by the backend when the session was logged.
               type: long
 
             - name: server
-              description: server is the total number of concurrent connections still active on the server when the session was logged.
+              description: Total number of concurrent connections still active on the server when the session was logged.
               type: long
 
             - name: retries
-              description: retries is the number of connection retries experienced by this session when trying to connect to the server.
+              description: Number of connection retries experienced by this session when trying to connect to the server.
               type: long
-      
-      
+
+        - name: client
+          description: Information about the client doing the request
+          type: group
+          fields:
+          - name: ip
+            type: alias
+            path: source.address
+            migration: true
+          - name: port
+            type: alias
+            path: source.port
+            migration: true
+
+        - name: process_name
+          type: alias
+          path: process.name
+          migration: true
+
+        - name: pid
+          type: alias
+          path: process.pid
+          migration: true
+
+        - name: destination
+          description: Destination information
+          type: group
+          fields:
+          - name: port
+            type: alias
+            path: destination.port
+            migration: true
+          - name: ip
+            type: alias
+            path: destination.ip
+            migration: true
+
+        - name: geoip
+          type: group
+          description: >
+            Contains GeoIP information gathered based on the client.ip field.
+            Only present if the GeoIP Elasticsearch plugin is available and
+            used.
+          fields:
+            - name: continent_name
+              type: alias
+              path: source.geo.continent_name
+              migration: true
+            - name: country_iso_code
+              type: alias
+              path: source.geo.country_iso_code
+              migration: true
+            - name: location
+              type: alias
+              path: source.geo.location
+              migration: true
+            - name: region_name
+              type: alias
+              path: source.geo.region_name
+              migration: true
+            - name: city_name
+              type: alias
+              path: source.geo.city_name
+              migration: true
+            - name: region_iso_code
+              type: alias
+              path: source.geo.region_iso_code
+              migration: true

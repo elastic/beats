@@ -44,6 +44,7 @@ type fileOutput struct {
 
 // makeFileout instantiates a new file output instance.
 func makeFileout(
+	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
@@ -126,6 +127,7 @@ func (out *fileOutput) Publish(
 			} else {
 				logp.Warn("Failed to serialize the event: %v", err)
 			}
+			logp.Debug("file", "Failed event: %v", event)
 
 			dropped++
 			continue

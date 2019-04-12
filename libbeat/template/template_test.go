@@ -34,7 +34,8 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	config := TemplateConfig{}
 
 	// Test it exists in 6.1
-	template, err := New(beatVersion, beatName, "6.1.0", config)
+	ver := common.MustNewVersion("6.1.0")
+	template, err := New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
@@ -44,7 +45,8 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	assert.Equal(t, 30, shards.(int))
 
 	// Test it does not exist in 6.0
-	template, err = New(beatVersion, beatName, "6.0.0", config)
+	ver = common.MustNewVersion("6.0.0")
+	template, err = New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data = template.Generate(nil, nil)
@@ -64,7 +66,8 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 	}
 
 	// Test it exists in 6.1
-	template, err := New(beatVersion, beatName, "6.1.0", config)
+	ver := common.MustNewVersion("6.1.0")
+	template, err := New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
@@ -74,105 +77,16 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 	assert.Equal(t, 5, shards.(int))
 }
 
-func TestAppendFields(t *testing.T) {
-	tests := []struct {
-		fields       common.Fields
-		appendFields common.Fields
-		error        bool
-	}{
-		{
-			fields: common.Fields{
-				common.Field{
-					Name: "a",
-					Fields: common.Fields{
-						common.Field{
-							Name: "b",
-						},
-					},
-				},
-			},
-			appendFields: common.Fields{
-				common.Field{
-					Name: "a",
-					Fields: common.Fields{
-						common.Field{
-							Name: "c",
-						},
-					},
-				},
-			},
-			error: false,
-		},
-		{
-			fields: common.Fields{
-				common.Field{
-					Name: "a",
-					Fields: common.Fields{
-						common.Field{
-							Name: "b",
-						},
-						common.Field{
-							Name: "c",
-						},
-					},
-				},
-			},
-			appendFields: common.Fields{
-				common.Field{
-					Name: "a",
-					Fields: common.Fields{
-						common.Field{
-							Name: "c",
-						},
-					},
-				},
-			},
-			error: true,
-		},
-		{
-			fields: common.Fields{
-				common.Field{
-					Name: "a",
-				},
-			},
-			appendFields: common.Fields{
-				common.Field{
-					Name: "a",
-					Fields: common.Fields{
-						common.Field{
-							Name: "c",
-						},
-					},
-				},
-			},
-			error: true,
-		},
-		{
-			fields: common.Fields{
-				common.Field{
-					Name: "a",
-					Fields: common.Fields{
-						common.Field{
-							Name: "c",
-						},
-					},
-				},
-			},
-			appendFields: common.Fields{
-				common.Field{
-					Name: "a",
-				},
-			},
-			error: true,
-		},
-	}
+func TestTemplate(t *testing.T) {
+	beatVersion := "6.6.0"
+	beatName := "testbeat"
+	ver := common.MustNewVersion("6.6.0")
+	template, err := New(beatVersion, beatName, *ver, TemplateConfig{}, false)
+	assert.NoError(t, err)
 
-	for _, test := range tests {
-		_, err := appendFields(test.fields, test.appendFields)
-		if test.error {
-			assert.Error(t, err)
-		} else {
-			assert.NoError(t, err)
-		}
-	}
+	data := template.Generate(nil, nil)
+	assert.Equal(t, []string{"testbeat-6.6.0-*"}, data["index_patterns"])
+	meta, err := data.GetValue("mappings.doc._meta")
+	assert.NoError(t, err)
+	assert.Equal(t, common.MapStr{"beat": "testbeat", "version": "6.6.0"}, meta)
 }

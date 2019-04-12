@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-elasticsearch-cluster_stats]]
 === Elasticsearch cluster_stats metricset
 
-beta[]
-
 include::../../../module/elasticsearch/cluster_stats/_meta/docs.asciidoc[]
 
 

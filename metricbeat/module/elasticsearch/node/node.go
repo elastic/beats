@@ -18,8 +18,9 @@
 package node
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -34,44 +35,52 @@ func init() {
 	)
 }
 
+const (
+	// This only fetches data for the local node.
+	nodeStatsPath = "/_nodes/_local"
+)
+
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		PathConfigKey: "path",
-		// This only fetches data for the local node.
-		DefaultPath: "_nodes/_local",
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
-	http *helper.HTTP
+	*elasticsearch.MetricSet
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
-
-	http, err := helper.NewHTTP(base)
+	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{
-		base,
-		http,
-	}, nil
+	return &MetricSet{MetricSet: ms}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	content, err := m.http.FetchContent()
+	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
-	eventsMapping(r, content)
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+nodeStatsPath)
+	if err != nil {
+		err = errors.Wrap(err, "failed to get info from Elasticsearch")
+		elastic.ReportAndLogError(err, r, m.Logger())
+		return
+	}
+
+	err = eventsMapping(r, *info, content)
+	if err != nil {
+		elastic.ReportAndLogError(err, r, m.Logger())
+		return
+	}
 }

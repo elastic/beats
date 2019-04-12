@@ -1,0 +1,3 @@
+dashboards:
+    - id: Metricbeat-Nats-Dashboard
+      file: Metricbeat-nats-overview.json

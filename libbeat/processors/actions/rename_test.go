@@ -18,11 +18,10 @@
 package actions
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"reflect"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -93,6 +92,9 @@ func TestRenameRun(t *testing.T) {
 			Output: common.MapStr{
 				"a": 2,
 				"b": "q",
+				"error": common.MapStr{
+					"message": "Failed to rename fields in processor: target field b already exists, drop or rename this field first",
+				},
 			},
 			error:         true,
 			FailOnError:   true,
@@ -189,6 +191,9 @@ func TestRenameRun(t *testing.T) {
 			Output: common.MapStr{
 				"a": 9,
 				"c": 10,
+				"error": common.MapStr{
+					"message": "Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
+				},
 			},
 			error:         true,
 			IgnoreMissing: false,

@@ -22,7 +22,9 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -60,7 +62,8 @@ type EventLog interface {
 	// from the first event specify a zero-valued EventLogState.
 	Open(state checkpoint.EventLogState) error
 
-	// Read records from the event log.
+	// Read records from the event log. If io.EOF is returned you should stop
+	// reading and close the log.
 	Read() ([]Record, error)
 
 	// Close the event log. It should not be re-opened after closing.
@@ -73,6 +76,7 @@ type EventLog interface {
 // Record represents a single event from the log.
 type Record struct {
 	sys.Event
+	File   string                   // Source file when event is from a file.
 	API    string                   // The event log API type used to read the record.
 	XML    string                   // XML representation of the event.
 	Offset checkpoint.EventLogState // Position of the record within its source stream.
@@ -80,52 +84,70 @@ type Record struct {
 
 // ToMapStr returns a new MapStr containing the data from this Record.
 func (e Record) ToEvent() beat.Event {
-	m := common.MapStr{
-		"type":          e.API,
-		"log_name":      e.Channel,
-		"source_name":   e.Provider.Name,
-		"computer_name": e.Computer,
-		"record_number": strconv.FormatUint(e.RecordID, 10),
+	// Windows Log Specific data
+	win := common.MapStr{
+		"channel":       e.Channel,
 		"event_id":      e.EventIdentifier.ID,
+		"provider_name": e.Provider.Name,
+		"record_id":     e.RecordID,
+		"task":          e.Task,
+		"api":           e.API,
 	}
-
-	addOptional(m, "xml", e.XML)
-	addOptional(m, "provider_guid", e.Provider.GUID)
-	addOptional(m, "version", e.Version)
-	addOptional(m, "level", e.Level)
-	addOptional(m, "task", e.Task)
-	addOptional(m, "opcode", e.Opcode)
-	addOptional(m, "keywords", e.Keywords)
-	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
-	addOptional(m, "message_error", e.RenderErr)
-
+	addOptional(win, "computer_name", e.Computer)
+	addOptional(win, "kernel_time", e.Execution.KernelTime)
+	addOptional(win, "keywords", e.Keywords)
+	addOptional(win, "opcode", e.Opcode)
+	addOptional(win, "processor_id", e.Execution.ProcessorID)
+	addOptional(win, "processor_time", e.Execution.ProcessorTime)
+	addOptional(win, "provider_guid", e.Provider.GUID)
+	addOptional(win, "session_id", e.Execution.SessionID)
+	addOptional(win, "task", e.Task)
+	addOptional(win, "user_time", e.Execution.UserTime)
+	addOptional(win, "version", e.Version)
 	// Correlation
-	addOptional(m, "activity_id", e.Correlation.ActivityID)
-	addOptional(m, "related_activity_id", e.Correlation.RelatedActivityID)
-
+	addOptional(win, "activity_id", e.Correlation.ActivityID)
+	addOptional(win, "related_activity_id", e.Correlation.RelatedActivityID)
 	// Execution
-	addOptional(m, "process_id", e.Execution.ProcessID)
-	addOptional(m, "thread_id", e.Execution.ThreadID)
-	addOptional(m, "processor_id", e.Execution.ProcessorID)
-	addOptional(m, "session_id", e.Execution.SessionID)
-	addOptional(m, "kernel_time", e.Execution.KernelTime)
-	addOptional(m, "user_time", e.Execution.UserTime)
-	addOptional(m, "processor_time", e.Execution.ProcessorTime)
+	addOptional(win, "process.pid", e.Execution.ProcessID)
+	addOptional(win, "process.thread.id", e.Execution.ThreadID)
 
 	if e.User.Identifier != "" {
 		user := common.MapStr{
 			"identifier": e.User.Identifier,
 		}
-		m["user"] = user
-
+		win["user"] = user
 		addOptional(user, "name", e.User.Name)
 		addOptional(user, "domain", e.User.Domain)
 		addOptional(user, "type", e.User.Type.String())
 	}
 
-	addPairs(m, "event_data", e.EventData.Pairs)
-	userData := addPairs(m, "user_data", e.UserData.Pairs)
+	addPairs(win, "event_data", e.EventData.Pairs)
+	userData := addPairs(win, "user_data", e.UserData.Pairs)
 	addOptional(userData, "xml_name", e.UserData.Name.Local)
+
+	m := common.MapStr{
+		"winlog": win,
+	}
+
+	// ECS data
+	m.Put("event.kind", "event")
+	m.Put("event.code", e.EventIdentifier.ID)
+	addOptional(m, "event.action", e.Task)
+
+	m.Put("event.created", time.Now())
+
+	addOptional(m, "log.file.path", e.File)
+	addOptional(m, "log.level", strings.ToLower(e.Level))
+	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
+	// Errors
+	addOptional(m, "error.code", e.RenderErrorCode)
+	if len(e.RenderErr) == 1 {
+		addOptional(m, "error.message", e.RenderErr[0])
+	} else {
+		addOptional(m, "error.message", e.RenderErr)
+	}
+
+	addOptional(m, "event.original", e.XML)
 
 	return beat.Event{
 		Timestamp: e.TimeCreated.SystemTime,
@@ -139,7 +161,7 @@ func (e Record) ToEvent() beat.Event {
 // MapStr.
 func addOptional(m common.MapStr, key string, v interface{}) {
 	if m != nil && !isZero(v) {
-		m[key] = v
+		m.Put(key, v)
 	}
 }
 

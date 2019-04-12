@@ -26,6 +26,7 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
@@ -56,27 +57,53 @@ var (
 	}
 )
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte, r mb.ReporterV2) {
 	var connections []map[string]interface{}
 	err := json.Unmarshal(content, &connections)
 	if err != nil {
-		logp.Err("Error: ", err)
-		return nil, err
+		logp.Err("Error: %+v", err)
+		r.Error(err)
+		return
 	}
 
-	var events []common.MapStr
 	var errors multierror.Errors
 	for _, node := range connections {
-		event, err := eventMapping(node)
-		events = append(events, event)
+		err := eventMapping(node, r)
 		if err != nil {
 			errors = append(errors, err)
 		}
 	}
 
-	return events, errors.Err()
+	if len(errors) > 0 {
+		r.Error(errors.Err())
+	}
 }
 
-func eventMapping(connection map[string]interface{}) (common.MapStr, error) {
-	return schema.Apply(connection)
+func eventMapping(connection map[string]interface{}, r mb.ReporterV2) error {
+	fields, err := schema.Apply(connection)
+
+	rootFields := common.MapStr{}
+	if v, err := fields.GetValue("user"); err == nil {
+		rootFields.Put("user.name", v)
+		fields.Delete("user")
+	}
+
+	moduleFields := common.MapStr{}
+	if v, err := fields.GetValue("vhost"); err == nil {
+		moduleFields.Put("vhost", v)
+		fields.Delete("vhost")
+	}
+
+	if v, err := fields.GetValue("node"); err == nil {
+		moduleFields.Put("node.name", v)
+		fields.Delete("node")
+	}
+
+	event := mb.Event{
+		MetricSetFields: fields,
+		RootFields:      rootFields,
+		ModuleFields:    moduleFields,
+	}
+	r.Event(event)
+	return err
 }

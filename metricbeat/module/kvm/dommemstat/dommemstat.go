@@ -22,13 +22,14 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+
 	"github.com/pkg/errors"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -65,8 +66,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The kvm dommemstat metricset is experimental.")
-
+	cfgwarn.Beta("The kvm dommemstat metricset is beta.")
 	u, err := url.Parse(base.HostData().URI)
 	if err != nil {
 		return nil, err

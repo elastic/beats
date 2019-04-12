@@ -49,15 +49,15 @@ func newOpenstackNovaMetadataFetcher(c *common.Config) (*metadataFetcher, error)
 
 	responseHandlers := map[string]responseHandler{
 		urls[0]: func(all []byte, result *result) error {
-			result.metadata["instance_id"] = string(all)
+			result.metadata.Put("instance.id", string(all))
 			return nil
 		},
 		urls[1]: func(all []byte, result *result) error {
-			result.metadata["machine_type"] = string(all)
+			result.metadata.Put("machine.type", string(all))
 			return nil
 		},
 		urls[2]: func(all []byte, result *result) error {
-			result.metadata["instance_name"] = string(all)
+			result.metadata.Put("instance.name", string(all))
 			return nil
 		},
 		urls[3]: func(all []byte, result *result) error {

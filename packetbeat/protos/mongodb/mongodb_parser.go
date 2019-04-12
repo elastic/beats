@@ -21,11 +21,17 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"gopkg.in/mgo.v2/bson"
+)
+
+var (
+	unknownOpcodes = map[opCode]struct{}{}
+	mutex          sync.Mutex
 )
 
 func mongodbMessageParser(s *stream) (bool, bool) {
@@ -56,14 +62,19 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	opCode := opCode(code)
 
 	if !validOpcode(opCode) {
-		logp.Err("Unknown operation code: %v", opCode)
+		mutex.Lock()
+		defer mutex.Unlock()
+		if _, reported := unknownOpcodes[opCode]; !reported {
+			logp.Err("Unknown operation code: %d (%v)", opCode, opCode)
+			unknownOpcodes[opCode] = struct{}{}
+		}
 		return false, false
 	}
 
 	s.message.opCode = opCode
 	s.message.isResponse = false // default is that the message is a request. If not opReplyParse will set this to false
 	s.message.expectsResponse = false
-	debugf("opCode = %v", s.message.opCode)
+	debugf("opCode = %d (%v)", s.message.opCode, s.message.opCode)
 
 	// then split depending on operation type
 	s.message.event = common.MapStr{}
@@ -72,9 +83,9 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	case opReply:
 		s.message.isResponse = true
 		return opReplyParse(d, s.message)
-	case opMsg:
+	case opMsgLegacy:
 		s.message.method = "msg"
-		return opMsgParse(d, s.message)
+		return opMsgLegacyParse(d, s.message)
 	case opUpdate:
 		s.message.method = "update"
 		return opUpdateParse(d, s.message)
@@ -94,6 +105,9 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	case opKillCursor:
 		s.message.method = "killCursors"
 		return opKillCursorsParse(d, s.message)
+	case opMsg:
+		s.message.method = "msg"
+		return opMsgParse(d, s.message)
 	}
 
 	return false, false
@@ -137,7 +151,7 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
+func opMsgLegacyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	var err error
 	m.event["message"], err = d.readCStr()
 	if err != nil {
@@ -292,6 +306,62 @@ func opKillCursorsParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	return true, true
 }
 
+func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
+	// ignore flagbits
+	_, err := d.readInt32()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_MSG message: %s", err)
+		return false, false
+	}
+
+	// read sections
+	kind, err := d.readByte()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_MSG message: %s", err)
+		return false, false
+	}
+
+	switch msgKind(kind) {
+	case msgKindBody:
+		document, err := d.readDocument()
+		if err != nil {
+			logp.Err("An error occurred while parsing OP_MSG message: %s", err)
+			return false, false
+		}
+		m.documents = []interface{}{document}
+
+	case msgKindDocumentSequence:
+		start := d.i
+		size, err := d.readInt32()
+		if err != nil {
+			logp.Err("An error occurred while parsing OP_MSG message: %s", err)
+			return false, false
+		}
+		cstring, err := d.readCStr()
+		if err != nil {
+			logp.Err("An error occurred while parsing OP_MSG message: %s", err)
+			return false, false
+		}
+		m.event["message"] = cstring
+		var documents []interface{}
+		for d.i < start+size {
+			document, err := d.readDocument()
+			if err != nil {
+				logp.Err("An error occurred while parsing OP_MSG message: %s", err)
+				return false, false
+			}
+			documents = append(documents, document)
+		}
+		m.documents = documents
+
+	default:
+		logp.Err("Unknown message kind: %v", kind)
+		return false, false
+	}
+
+	return true, true
+}
+
 // NOTE: The following functions are inspired by the source of the go-mgo/mgo project
 // https://github.com/go-mgo/mgo/blob/v2/bson/decode.go
 
@@ -322,6 +392,15 @@ func (d *decoder) readCStr() (string, error) {
 		return "", errors.New("cstring not finished")
 	}
 	return string(d.in[start:end]), nil
+}
+
+func (d *decoder) readByte() (byte, error) {
+	i := d.i
+	d.i++
+	if d.i > len(d.in) {
+		return 0, errors.New("Read byte failed")
+	}
+	return d.in[i], nil
 }
 
 func (d *decoder) readInt32() (int, error) {

@@ -6,7 +6,7 @@ Metricbeat provides a couple different ways to enable modules and metricsets:
 * <<enable-modules-d-configs>>
 * <<enable-modules-config-file>>
 
-include::../../libbeat/docs/shared-note-file-permissions.asciidoc[]
+include::{libbeat-dir}/docs/shared-note-file-permissions.asciidoc[]
 
 [float]
 [[enable-modules-d-configs]]
@@ -114,6 +114,20 @@ metricbeat.modules:
 ----
 
 [float]
+[[config-variants]]
+== Configuration variants
+
+Every module come with a default configuration file. Some modules also come with
+one or more variant configuration files containing common alternative configurations
+for that module.
+
+When you see the list of enabled and disabled modules, those modules with configuration
+variants will be shown as `<module_name>-<variant_name>`. You can enable or disable
+specific configuration variants of a module by specifying `metricbeat modules enable
+<module_name>-<variant_name>` and `metricbeat modules disable <module_name>-<variant_name>`
+respectively.
+
+[float]
 [[config-combos]]
 == Configuration combinations
 
@@ -201,6 +215,13 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+==== `service.name`
+
+A name given by the user to the service the data is collected from. It can be
+used for example to identify information collected from nodes of different
+clusters with the same `service.type`.
+
+[float]
 [[module-http-config-options]]
 === Standard HTTP config options
 
@@ -216,6 +237,16 @@ The username to use for basic authentication.
 ==== `password`
 
 The password to use for basic authentication.
+
+[float]
+==== `connect_timeout`
+
+Total time limit for an HTTP connection to be completed (Default: 2 seconds).
+
+[float]
+==== `timeout`
+
+Total time limit for HTTP requests made by the module (Default: 10 seconds).
 
 [float]
 ==== `ssl`

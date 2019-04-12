@@ -51,6 +51,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/debug"
 	"github.com/elastic/beats/libbeat/reader/multiline"
 	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
@@ -306,8 +307,12 @@ func (h *Harvester) Run() error {
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
 			fields := common.MapStr{
-				"source": state.Source,
-				"offset": startingOffset, // Offset here is the offset before the starting char.
+				"log": common.MapStr{
+					"offset": startingOffset, // Offset here is the offset before the starting char.
+					"file": common.MapStr{
+						"path": state.Source,
+					},
+				},
 			}
 			fields.DeepUpdate(message.Fields)
 
@@ -386,12 +391,12 @@ func (h *Harvester) SendStateUpdate() {
 		return
 	}
 
-	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
-	h.states.Update(h.state)
-
 	d := util.NewData()
 	d.SetState(h.state)
 	h.publishState(d)
+
+	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+	h.states.Update(h.state)
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -554,14 +559,19 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(h.log, h.encoding, h.config.BufferSize)
+	reader, err := debug.AppendReaders(h.log)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err = readfile.NewEncodeReader(reader, h.encoding, h.config.BufferSize)
 	if err != nil {
 		return nil, err
 	}
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.CRIFlags)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
 	}
 
 	if h.config.JSON != nil {

@@ -1,0 +1,28 @@
+version: '2.3'
+services:
+  beat:
+    build: ../../filebeat
+    depends_on:
+      - proxy_dep
+    environment:
+      - BEAT_STRICT_PERMS=false
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+    working_dir: /go/src/github.com/elastic/beats/x-pack/filebeat
+    volumes:
+      - ${PWD}/../..:/go/src/github.com/elastic/beats/
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+

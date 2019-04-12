@@ -61,7 +61,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -75,21 +75,25 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	}
 
 	var errs multierror.Errors
-	for name, node := range nodesStruct.Nodes {
+	for id, node := range nodesStruct.Nodes {
 		event := mb.Event{}
-		event.MetricSetFields, err = schema.Apply(node)
-		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure applying node schema"))
-		}
-
-		// Write name here as full name only available as key
-		event.MetricSetFields["name"] = name
-
-		event.ModuleFields = common.MapStr{}
-		event.ModuleFields.Put("cluster.name", nodesStruct.ClusterName)
 
 		event.RootFields = common.MapStr{}
 		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+		event.ModuleFields = common.MapStr{}
+		event.ModuleFields.Put("cluster.name", nodesStruct.ClusterName)
+		event.ModuleFields.Put("cluster.id", info.ClusterID)
+
+		event.MetricSetFields, err = schema.Apply(node)
+		if err != nil {
+			event.Error = errors.Wrap(err, "failure applying node schema")
+			r.Event(event)
+			errs = append(errs, event.Error)
+			continue
+		}
+
+		event.MetricSetFields["id"] = id
 
 		r.Event(event)
 	}

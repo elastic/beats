@@ -26,16 +26,10 @@ package status
 import (
 	"database/sql"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mysql"
 
 	"github.com/pkg/errors"
-)
-
-var (
-	debugf = logp.MakeDebug("mysql-status")
 )
 
 func init() {
@@ -57,18 +51,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches status messages from a mysql host.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if m.db == nil {
 		var err error
 		m.db, err = mysql.NewDB(m.HostData().URI)
 		if err != nil {
-			return nil, errors.Wrap(err, "mysql-status fetch failed")
+			return errors.Wrap(err, "mysql-status fetch failed")
 		}
 	}
 
 	status, err := m.loadStatus(m.db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	event := eventMapping(status)
@@ -76,7 +70,12 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if m.Module().Config().Raw {
 		event["raw"] = rawEventMapping(status)
 	}
-	return event, nil
+
+	reporter.Event(mb.Event{
+		MetricSetFields: event,
+	})
+
+	return nil
 }
 
 // loadStatus loads all status entries from the given database into an array.
@@ -103,4 +102,12 @@ func (m *MetricSet) loadStatus(db *sql.DB) (map[string]string, error) {
 	}
 
 	return mysqlStatus, nil
+}
+
+// Close closes the database connection and prevents future queries.
+func (m *MetricSet) Close() error {
+	if m.db == nil {
+		return nil
+	}
+	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
 }

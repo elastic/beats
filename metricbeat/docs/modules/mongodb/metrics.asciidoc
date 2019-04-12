@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-mongodb-metrics]]
 === MongoDB metrics metricset
 
-experimental[]
-
 include::../../../module/mongodb/metrics/_meta/docs.asciidoc[]
 
 

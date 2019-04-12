@@ -78,3 +78,35 @@
               format: percentage
               description: >
                 Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+        - name: available
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Total memory available
+        - name: working_set
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Total working set memory
+        - name: rss
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Total resident set size memory
+        - name: page_faults
+          type: long
+          description: >
+            Total page faults
+        - name: major_page_faults
+          type: long
+          description: >
+            Total major page faults

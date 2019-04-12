@@ -69,24 +69,6 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
-	var all struct {
-		Data map[string]interface{} `json:"_all"`
-	}
-
-	err := json.Unmarshal(content, &all)
-	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
-		r.Error(err)
-		return err
-	}
-
-	fields, err := schema.Apply(all.Data, s.FailOnRequired)
-	if err != nil {
-		err = errors.Wrap(err, "failure applying stats schema")
-		r.Error(err)
-		return err
-	}
-
 	var event mb.Event
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", elasticsearch.ModuleName)
@@ -94,6 +76,24 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 	event.ModuleFields = common.MapStr{}
 	event.ModuleFields.Put("cluster.name", info.ClusterName)
 	event.ModuleFields.Put("cluster.id", info.ClusterID)
+
+	var all struct {
+		Data map[string]interface{} `json:"_all"`
+	}
+
+	err := json.Unmarshal(content, &all)
+	if err != nil {
+		event.Error = errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
+		r.Event(event)
+		return event.Error
+	}
+
+	fields, err := schema.Apply(all.Data, s.FailOnRequired)
+	if err != nil {
+		event.Error = errors.Wrap(err, "failure applying stats schema")
+		r.Event(event)
+		return event.Error
+	}
 
 	event.MetricSetFields = fields
 

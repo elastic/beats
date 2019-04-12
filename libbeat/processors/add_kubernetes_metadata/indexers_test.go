@@ -38,11 +38,13 @@ func TestPodIndexer(t *testing.T) {
 	assert.Nil(t, err)
 
 	podName := "testpod"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	ns := "testns"
 	nodeName := "testnode"
 	pod := kubernetes.Pod{
 		Metadata: &metav1.ObjectMeta{
 			Name:      &podName,
+			Uid:       &uid,
 			Namespace: &ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
@@ -60,6 +62,7 @@ func TestPodIndexer(t *testing.T) {
 	expected := common.MapStr{
 		"pod": common.MapStr{
 			"name": "testpod",
+			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 		},
 		"namespace": "testns",
 		"labels": common.MapStr{
@@ -111,6 +114,7 @@ func TestPodUIDIndexer(t *testing.T) {
 	expected := common.MapStr{
 		"pod": common.MapStr{
 			"name": "testpod",
+			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 		},
 		"namespace": "testns",
 		"labels": common.MapStr{
@@ -136,6 +140,7 @@ func TestContainerIndexer(t *testing.T) {
 
 	podName := "testpod"
 	ns := "testns"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	container := "container"
 	initContainer := "initcontainer"
 	nodeName := "testnode"
@@ -143,6 +148,7 @@ func TestContainerIndexer(t *testing.T) {
 	pod := kubernetes.Pod{
 		Metadata: &metav1.ObjectMeta{
 			Name:      &podName,
+			Uid:       &uid,
 			Namespace: &ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
@@ -162,6 +168,7 @@ func TestContainerIndexer(t *testing.T) {
 	expected := common.MapStr{
 		"pod": common.MapStr{
 			"name": "testpod",
+			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 		},
 		"namespace": "testns",
 		"labels": common.MapStr{
@@ -340,12 +347,14 @@ func TestIpPortIndexer(t *testing.T) {
 
 	podName := "testpod"
 	ns := "testns"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	container := "container"
 	ip := "1.2.3.4"
 	port := int32(80)
 	pod := kubernetes.Pod{
 		Metadata: &metav1.ObjectMeta{
 			Name:      &podName,
+			Uid:       &uid,
 			Namespace: &ns,
 			Labels: map[string]string{
 				"labelkey": "labelvalue",
@@ -375,6 +384,7 @@ func TestIpPortIndexer(t *testing.T) {
 	expected := common.MapStr{
 		"pod": common.MapStr{
 			"name": "testpod",
+			"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 		},
 		"namespace": "testns",
 		"labels": common.MapStr{

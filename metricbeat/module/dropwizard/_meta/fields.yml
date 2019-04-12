@@ -2,7 +2,7 @@
   title: "Dropwizard"
   description: >
     Stats collected from Dropwizard.
-  release: beta
+  release: ga
   settings: ["ssl", "http"]
   short_config: false
   fields:

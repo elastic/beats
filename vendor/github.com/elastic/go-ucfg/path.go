@@ -32,6 +32,7 @@ type field interface {
 	String() string
 	SetValue(opt *options, elem value, v value) Error
 	GetValue(opt *options, elem value) (value, Error)
+	Remove(opt *options, elem value) (bool, Error)
 }
 
 type namedField struct {
@@ -108,6 +109,32 @@ func (n namedField) String() string {
 
 func (i idxField) String() string {
 	return fmt.Sprintf("%d", i.i)
+}
+
+func (p cfgPath) Has(cfg *Config, opt *options) (bool, Error) {
+	fields := p.fields
+
+	cur := value(cfgSub{cfg})
+	for ; len(fields) > 0; fields = fields[1:] {
+		field := fields[0]
+		next, err := field.GetValue(opt, cur)
+		if err != nil {
+			// has checks if a value is missing -> ErrMissing is no error but a valid
+			// outcome
+			if err.Reason() == ErrMissing {
+				err = nil
+			}
+			return false, err
+		}
+
+		if next == nil {
+			return false, nil
+		}
+
+		cur = next
+	}
+
+	return true, nil
 }
 
 func (p cfgPath) GetValue(cfg *Config, opt *options) (value, Error) {
@@ -222,4 +249,61 @@ func (i idxField) SetValue(opts *options, elem value, v value) Error {
 	sub.c.fields.setAt(i.i, elem, v)
 	v.SetContext(context{parent: elem, field: i.String()})
 	return nil
+}
+
+func (p cfgPath) Remove(cfg *Config, opt *options) (bool, error) {
+	fields := p.fields
+
+	// Loop over intermediate objects. Returns an error if any intermediate is
+	// actually no object.
+	cur := value(cfgSub{cfg})
+	for ; len(fields) > 1; fields = fields[1:] {
+		field := fields[0]
+		next, err := field.GetValue(opt, cur)
+		if err != nil {
+			// Ignore ErrMissing when walking down a config tree. If intermediary is
+			// missing we can't remove our setting.
+			if err.Reason() == ErrMissing {
+				err = nil
+			}
+
+			return false, err
+		}
+
+		if next == nil {
+			return false, err
+		}
+
+		cur = next
+	}
+
+	// resolve config object in case we deal with references
+	tmp, err := cur.toConfig(opt)
+	if err != nil {
+		return false, err
+	}
+	cur = cfgSub{tmp}
+
+	field := fields[0]
+	return field.Remove(opt, cur)
+}
+
+func (n namedField) Remove(opts *options, elem value) (bool, Error) {
+	sub, ok := elem.(cfgSub)
+	if !ok {
+		return false, raiseExpectedObject(opts, elem)
+	}
+
+	removed := sub.c.fields.del(n.name)
+	return removed, nil
+}
+
+func (i idxField) Remove(opts *options, elem value) (bool, Error) {
+	sub, ok := elem.(cfgSub)
+	if !ok {
+		return false, raiseExpectedObject(opts, elem)
+	}
+
+	removed := sub.c.fields.delAt(i.i)
+	return removed, nil
 }

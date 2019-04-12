@@ -56,27 +56,27 @@ func TestEventMapping(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 
 	assert.Equal(t, 3, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
-		name, err := event.GetValue("name")
+		metricsetFields := event.MetricSetFields
+		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := event.GetValue("_module.namespace")
-			if err == nil {
-				eventKey := namespace.(string) + "@" + name.(string)
-				oneTestCase, oneTestCaseFound := testCases[eventKey]
-				if oneTestCaseFound {
-					for k, v := range oneTestCase {
-						testValue(t, event, k, v)
-					}
-					delete(testCases, eventKey)
+			eventKey := event.ModuleFields["namespace"].(string) + "@" + name.(string)
+			oneTestCase, oneTestCaseFound := testCases[eventKey]
+			if oneTestCaseFound {
+				for k, v := range oneTestCase {
+					testValue(t, metricsetFields, k, v)
 				}
+				delete(testCases, eventKey)
 			}
 		}
 	}
@@ -95,8 +95,7 @@ func testValue(t *testing.T, event common.MapStr, field string, expected interfa
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"default@elasticsearch": {
-			"_module.namespace": "default",
-			"name":              "elasticsearch",
+			"name": "elasticsearch",
 
 			"created":             1511973651,
 			"replicas.observed":   1,
@@ -105,8 +104,7 @@ func testCases() map[string]map[string]interface{} {
 			"generation.desired":  3,
 		},
 		"default@mysql": {
-			"_module.namespace": "default",
-			"name":              "mysql",
+			"name": "mysql",
 
 			"created":             1511989697,
 			"replicas.observed":   2,
@@ -115,8 +113,7 @@ func testCases() map[string]map[string]interface{} {
 			"generation.desired":  4,
 		},
 		"custom@mysql": {
-			"_module.namespace": "custom",
-			"name":              "mysql",
+			"name": "mysql",
 
 			"created":             1511999697,
 			"replicas.observed":   3,

@@ -21,16 +21,25 @@ package template
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
+	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 	"github.com/elastic/beats/libbeat/version"
-
-	"github.com/stretchr/testify/assert"
 )
+
+type testTemplate struct {
+	t      *testing.T
+	client ESClient
+	common.MapStr
+}
 
 func TestCheckTemplate(t *testing.T) {
 	client := estest.GetTestingElasticsearch(t)
@@ -61,7 +70,7 @@ func TestLoadTemplate(t *testing.T) {
 	fieldsPath := absPath + "/fields.yml"
 	index := "testbeat"
 
-	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
+	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{}, false)
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -110,24 +119,6 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	assert.False(t, loader.CheckTemplate(templateName))
 }
 
-func getTemplate(t *testing.T, client ESClient, templateName string) common.MapStr {
-	status, body, err := client.Request("GET", "/_template/"+templateName, "", nil, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, status, 200)
-
-	var response common.MapStr
-	err = json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-
-	return common.MapStr(response[templateName].(map[string]interface{}))
-}
-
-func newConfigFrom(t *testing.T, from interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(from)
-	assert.NoError(t, err)
-	return cfg
-}
-
 // Tests loading the templates for each beat
 func TestLoadBeatsTemplate(t *testing.T) {
 	beats := []string{
@@ -149,7 +140,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
 
-		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
+		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{}, false)
 		assert.NoError(t, err)
 		content, err := tmpl.LoadFile(fieldsPath)
 		assert.NoError(t, err)
@@ -198,7 +189,7 @@ func TestTemplateSettings(t *testing.T) {
 	config := TemplateConfig{
 		Settings: settings,
 	}
-	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
+	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config, false)
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -213,13 +204,8 @@ func TestTemplateSettings(t *testing.T) {
 
 	// Check that it contains the mapping
 	templateJSON := getTemplate(t, client, tmpl.GetName())
-	val, err := templateJSON.GetValue("settings.index.number_of_shards")
-	assert.NoError(t, err)
-	assert.Equal(t, val.(string), "1")
-
-	val, err = templateJSON.GetValue("mappings.doc._source.enabled")
-	assert.NoError(t, err)
-	assert.Equal(t, val.(bool), false)
+	assert.Equal(t, 1, templateJSON.NumberOfShards())
+	assert.Equal(t, false, templateJSON.SourceEnabled())
 
 	// Delete template again to clean up
 	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
@@ -250,17 +236,17 @@ func TestOverwrite(t *testing.T) {
 	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 	// Load template
-	config := newConfigFrom(t, TemplateConfig{
+	config := TemplateConfig{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
-	})
-	loader, err := NewLoader(config, client, beatInfo, nil)
+	}
+	loader, err := NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
 
 	// Load template again, this time with custom settings
-	config = newConfigFrom(t, TemplateConfig{
+	config = TemplateConfig{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 		Settings: TemplateSettings{
@@ -268,19 +254,18 @@ func TestOverwrite(t *testing.T) {
 				"enabled": false,
 			},
 		},
-	})
-	loader, err = NewLoader(config, client, beatInfo, nil)
+	}
+	loader, err = NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
 
 	// Overwrite was not enabled, so the first version should still be there
 	templateJSON := getTemplate(t, client, templateName)
-	_, err = templateJSON.GetValue("mappings.doc._source.enabled")
-	assert.Error(t, err)
+	assert.Equal(t, true, templateJSON.SourceEnabled())
 
 	// Load template again, this time with custom settings AND overwrite: true
-	config = newConfigFrom(t, TemplateConfig{
+	config = TemplateConfig{
 		Enabled:   true,
 		Overwrite: true,
 		Fields:    absPath + "/fields.yml",
@@ -289,17 +274,15 @@ func TestOverwrite(t *testing.T) {
 				"enabled": false,
 			},
 		},
-	})
-	loader, err = NewLoader(config, client, beatInfo, nil)
+	}
+	loader, err = NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
 
 	// Overwrite was enabled, so the custom setting should be there
 	templateJSON = getTemplate(t, client, templateName)
-	val, err := templateJSON.GetValue("mappings.doc._source.enabled")
-	assert.NoError(t, err)
-	assert.Equal(t, val.(bool), false)
+	assert.Equal(t, false, templateJSON.SourceEnabled())
 
 	// Delete template again to clean up
 	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
@@ -356,7 +339,7 @@ func TestTemplateWithData(t *testing.T) {
 	// Setup ES
 	client := estest.GetTestingElasticsearch(t)
 
-	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{})
+	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{}, false)
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -373,7 +356,7 @@ func TestTemplateWithData(t *testing.T) {
 	assert.True(t, loader.CheckTemplate(tmpl.GetName()))
 
 	for _, test := range dataTests {
-		_, _, err = client.Index(tmpl.GetName(), "doc", "", nil, test.data)
+		_, _, err = client.Index(tmpl.GetName(), "_doc", "", nil, test.data)
 		if test.error {
 			assert.NotNil(t, err)
 
@@ -387,4 +370,47 @@ func TestTemplateWithData(t *testing.T) {
 
 	// Make sure it was removed
 	assert.False(t, loader.CheckTemplate(tmpl.GetName()))
+}
+
+func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {
+	status, body, err := client.Request("GET", "/_template/"+templateName, "", nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, status, 200)
+
+	var response common.MapStr
+	err = json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+
+	return testTemplate{
+		t:      t,
+		client: client,
+		MapStr: common.MapStr(response[templateName].(map[string]interface{})),
+	}
+}
+
+func (tt *testTemplate) SourceEnabled() bool {
+	key := fmt.Sprintf("mappings._source.enabled")
+
+	// _source.enabled is true if it's missing (default)
+	b, _ := tt.HasKey(key)
+	if !b {
+		return true
+	}
+
+	val, err := tt.GetValue(key)
+	if !assert.NoError(tt.t, err) {
+		doc, _ := json.MarshalIndent(tt.MapStr, "", "    ")
+		tt.t.Fatal(fmt.Sprintf("failed to read '%v' in %s", key, doc))
+	}
+
+	return val.(bool)
+}
+
+func (tt *testTemplate) NumberOfShards() int {
+	val, err := tt.GetValue("settings.index.number_of_shards")
+	require.NoError(tt.t, err)
+
+	i, err := strconv.Atoi(val.(string))
+	require.NoError(tt.t, err)
+	return i
 }

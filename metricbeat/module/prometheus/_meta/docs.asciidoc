@@ -1,4 +1,2 @@
-This module periodically fetches metrics from
-https://prometheus.io/docs/[Prometheus].
-
-The default metricset is `collector`.
+This module periodically scrapes metrics from
+https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].

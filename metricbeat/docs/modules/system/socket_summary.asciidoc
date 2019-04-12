@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-system-socket_summary]]
 === System socket_summary metricset
 
-experimental[]
-
 include::../../../module/system/socket_summary/_meta/docs.asciidoc[]
 
 

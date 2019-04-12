@@ -35,11 +35,11 @@ import (
 )
 
 var (
-	esDataFeedURL        = "/_xpack/ml/datafeeds/datafeed-%s"
-	esJobURL             = "/_xpack/ml/anomaly_detectors/%s"
-	kibanaGetModuleURL   = "/api/ml/modules/get_module/%s"
-	kibanaRecognizeURL   = "/api/ml/modules/recognize/%s"
-	kibanaSetupModuleURL = "/api/ml/modules/setup/%s"
+	esMLDataFeedURLSuffix = "/datafeeds/datafeed-%s"
+	esMLJobURLSuffix      = "/anomaly_detectors/%s"
+	kibanaGetModuleURL    = "/api/ml/modules/get_module/%s"
+	kibanaRecognizeURL    = "/api/ml/modules/recognize/%s"
+	kibanaSetupModuleURL  = "/api/ml/modules/setup/%s"
 )
 
 // MLConfig contains the required configuration for loading one job and the associated
@@ -56,13 +56,13 @@ type MLConfig struct {
 type MLLoader interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
-	GetVersion() string
+	GetVersion() common.Version
 }
 
 // MLSetupper is a subset of the Kibana client API capable of setting up ML objects.
 type MLSetupper interface {
 	Request(method, path string, params url.Values, headers http.Header, body io.Reader) (int, []byte, error)
-	GetVersion() string
+	GetVersion() common.Version
 }
 
 // MLResponse stores the relevant parts of the response from Kibana to check for errors.
@@ -121,14 +121,15 @@ func readJSONFile(path string) (common.MapStr, error) {
 
 // ImportMachineLearningJob uploads the job and datafeed configuration to ES/xpack.
 func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
-	jobURL := fmt.Sprintf(esJobURL, cfg.ID)
-	datafeedURL := fmt.Sprintf(esDataFeedURL, cfg.ID)
+	esVersion := esClient.GetVersion()
+	jobURL := makeMLURLPerESVersion(esVersion, fmt.Sprintf(esMLJobURLSuffix, cfg.ID))
+	datafeedURL := makeMLURLPerESVersion(esVersion, fmt.Sprintf(esMLDataFeedURLSuffix, cfg.ID))
 
 	if len(cfg.MinVersion) > 0 {
-		esVersion, err := common.NewVersion(esClient.GetVersion())
-		if err != nil {
-			return errors.Errorf("Error parsing ES version: %s: %v", esClient.GetVersion(), err)
+		if !esVersion.IsValid() {
+			return errors.New("Invalid Elasticsearch version")
 		}
+
 		minVersion, err := common.NewVersion(cfg.MinVersion)
 		if err != nil {
 			return errors.Errorf("Error parsing min_version: %s: %v", minVersion, err)
@@ -136,7 +137,7 @@ func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
 
 		if esVersion.LessThan(minVersion) {
 			logp.Debug("machine-learning", "Skipping job %s, because ES version (%s) is smaller than min version (%s)",
-				cfg.ID, esVersion, minVersion)
+				cfg.ID, esVersion.String(), minVersion)
 			return nil
 		}
 	}
@@ -228,7 +229,7 @@ func checkResponse(r []byte) error {
 
 	for _, feed := range resp.Datafeeds {
 		if !feed.Success {
-			if strings.HasPrefix(feed.Error.Msg, "[resource_already_exists_exception]") {
+			if strings.HasPrefix(feed.Error.Msg, "[status_exception] A datafeed") || strings.HasPrefix(feed.Error.Msg, "[resource_already_exists_exception]") {
 				logp.Debug("machine-learning", "Datafeed already exists: %s, error: %s", feed.ID, feed.Error.Msg)
 				continue
 			}
@@ -273,4 +274,11 @@ func checkResponse(r []byte) error {
 	}
 
 	return errs.Err()
+}
+
+func makeMLURLPerESVersion(esVersion common.Version, mlURLPathSuffix string) string {
+	if esVersion.Major < 7 {
+		return "_xpack/ml/" + mlURLPathSuffix
+	}
+	return "_ml" + mlURLPathSuffix
 }

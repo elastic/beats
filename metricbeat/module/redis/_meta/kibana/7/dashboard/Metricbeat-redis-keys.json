@@ -1,0 +1,893 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Keyspace selector [Redis] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "redis.keyspace.id",
+                "id": "1545388837304",
+                "indexPattern": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                "label": "Keyspace",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": false
+          },
+          "title": "Keyspace selector [Redis] ECS",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "00d39210-050d-11e9-9c60-d582a238e2c5-ecs",
+      "type": "visualization",
+      "updated_at": "2018-12-21T11:19:04.179Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "key": "redis.key.type",
+                  "negate": false,
+                  "params": {
+                    "query": "list",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "list"
+                },
+                "query": {
+                  "match": {
+                    "redis.key.type": {
+                      "query": "list",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Lists length [Redis] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Number of elements",
+                "field": "redis.key.length"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Keyspace",
+                "field": "redis.keyspace.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 16
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Key name",
+                "field": "redis.key.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": true,
+                "otherBucketLabel": "Other",
+                "size": 20
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "mode": "quick",
+                  "to": "now"
+                },
+                "time_zone": "Europe/Berlin",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Number of elements"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Number of elements"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Lists length [Redis] ECS",
+          "type": "line"
+        }
+      },
+      "id": "7f4bc7d0-050c-11e9-9c60-d582a238e2c5-ecs",
+      "type": "visualization",
+      "updated_at": "2018-12-21T11:22:12.807Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Keys by type [Redis] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "legendOpen": false
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Number of keys",
+                "field": "redis.key.id"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Key type",
+                "field": "redis.key.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customInterval": "2h",
+                "customLabel": "",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "mode": "quick",
+                  "to": "now"
+                },
+                "time_zone": "Europe/Berlin",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Number of keys"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Number of keys"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Keys by type [Redis] ECS",
+          "type": "line"
+        }
+      },
+      "id": "4435ac40-050e-11e9-9c60-d582a238e2c5-ecs",
+      "type": "visualization",
+      "updated_at": "2018-12-21T11:23:46.207Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "key": "redis.key.type",
+                  "negate": false,
+                  "params": {
+                    "query": "string",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "string"
+                },
+                "query": {
+                  "match": {
+                    "redis.key.type": {
+                      "query": "string",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Average string key size [Redis] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Average key size",
+                "field": "redis.key.length"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Keyspace",
+                "field": "redis.keyspace.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "mode": "quick",
+                  "to": "now"
+                },
+                "time_zone": "Europe/Berlin",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Average key size"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Average key size"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Average string key size [Redis] ECS",
+          "type": "line"
+        }
+      },
+      "id": "8541a4a0-0513-11e9-9c60-d582a238e2c5-ecs",
+      "type": "visualization",
+      "updated_at": "2018-12-21T11:28:20.970Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "key": "redis.key.expire.ttl",
+                  "negate": false,
+                  "params": {
+                    "gte": 0,
+                    "lt": null
+                  },
+                  "type": "range",
+                  "value": "0 to +∞"
+                },
+                "range": {
+                  "redis.key.expire.ttl": {
+                    "gte": 0,
+                    "lt": null
+                  }
+                }
+              }
+            ],
+            "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Average keys TTL [Redis] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Average TTL",
+                "field": "redis.key.expire.ttl"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Keyspace",
+                "field": "redis.keyspace.id",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Key type",
+                "field": "redis.key.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "timeRange": {
+                  "from": "now-15m",
+                  "mode": "quick",
+                  "to": "now"
+                },
+                "time_zone": "Europe/Berlin",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Average TTL"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Average TTL"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Average keys TTL [Redis] ECS",
+          "type": "line"
+        }
+      },
+      "id": "517a5fd0-0514-11e9-9c60-d582a238e2c5-ecs",
+      "type": "visualization",
+      "updated_at": "2018-12-21T11:34:03.597Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Redis keys metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "controlledBy": "1545388837304",
+                  "disabled": false,
+                  "index": "bc2e8280-0509-11e9-9c60-d582a238e2c5",
+                  "key": "redis.keyspace.id",
+                  "negate": false,
+                  "params": [
+                    "db0",
+                    "db1"
+                  ],
+                  "type": "phrases",
+                  "value": "db0, db1"
+                },
+                "query": {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "match_phrase": {
+                          "redis.keyspace.id": "db0"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "redis.keyspace.id": "db1"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 5,
+              "i": "1",
+              "w": 12,
+              "x": 0,
+              "y": 0
+            },
+            "id": "00d39210-050d-11e9-9c60-d582a238e2c5-ecs",
+            "panelIndex": "1",
+            "title": "Keyspace selector",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 36,
+              "x": 12,
+              "y": 0
+            },
+            "id": "7f4bc7d0-050c-11e9-9c60-d582a238e2c5-ecs",
+            "panelIndex": "2",
+            "title": "Lists length",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 10,
+              "i": "3",
+              "w": 12,
+              "x": 0,
+              "y": 5
+            },
+            "id": "4435ac40-050e-11e9-9c60-d582a238e2c5-ecs",
+            "panelIndex": "3",
+            "title": "Keys by type",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 24,
+              "x": 0,
+              "y": 15
+            },
+            "id": "8541a4a0-0513-11e9-9c60-d582a238e2c5-ecs",
+            "panelIndex": "4",
+            "title": "Average size of string keys",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 24,
+              "x": 24,
+              "y": 15
+            },
+            "id": "517a5fd0-0514-11e9-9c60-d582a238e2c5-ecs",
+            "panelIndex": "5",
+            "title": "Average keys TTL",
+            "type": "visualization",
+            "version": "6.5.2"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Redis] Keys ECS",
+        "version": 1
+      },
+      "id": "28969190-0511-11e9-9c60-d582a238e2c5-ecs",
+      "type": "dashboard",
+      "updated_at": "2018-12-21T11:39:13.143Z",
+      "version": 4
+    }
+  ],
+  "version": "6.5.2"
+}

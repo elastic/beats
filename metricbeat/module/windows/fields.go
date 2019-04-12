@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "windows", Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "windows", asset.ModuleFieldsPri, AssetWindows); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
-	return "eJysVE1vIjkQvfMrSrnkkqDN7mn7sFI2TEaMlFE0mRGH0Yg27oIuxW17XGUI/37k/iCkgUCi+ICKsv3qvVfuuoRHXGewIlu4FQ8AhMRgBmeTJnM2ACiQdSAv5GwG/w0AAGYo6uevOrxzRTQIcxdgskHh0gWZamfntMhgrgzjACCgQcWY1dcHAHNCU3BWw1yCVRVuM0lL1h4zWAQXfZvZQ+YlUAPWL9XlmyKMYUkaN/l9hQ4Wa1beYuSgnRVFlkFKBBYlkbfd6IrxcOv+fnq7QrZJU/Ei3XF+xPXKhf4ePqnKp0aWk3++frnVV9e+d+IVbWldQ7T0OyKMR7WaWlyjZAhjAWJQUCouwc3rzUrpkiyeM3z+MR6BskVK7+C2GLWmZ0f2Ck6/75E8Qc1L/Ta535/lnUKtIPZGrafvpti+jU9LtAI3zhjU4sLbObdEalpdJ7o2vS6BRQWZJrZvEHCKiwk3+hqmz6g+4B0zzQzCUpmIDCog5NdRXKWEdH6xg5r/75zkF5CPiNXMYJHiO2WjMvlF/dDyhzULVvlxyfLBapWWqEyDfLraG2eFbCS72Cf3XkWut5qw0fstWtsmH5LDm9h538SNEek/FsecwCdK47n4QDduXXguvxl6ICVxGhbJGAzBBUhlQUolmw8uoHdBeAdyVaJt3hPZBYgDbtUma4lhRcbADGvsBVoMpPtTdwdzi0O0Bpm3WwY+uCUVqU1d6pI9apqT3rp5xFx/YFIbZxeHBsLVX//+/Q6/u1ex32/F7DQpwSIJ00ns/Xh0hH30QhUOq347DmqYu1ApyaCIQSWyvW2yPsq0O1SRMcSonS36BU6f0OfcsoS2OVgA2RfYw8GfAAAA//+CFW1s"
+// AssetWindows returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/windows.
+func AssetWindows() string {
+	return "eJysVM1uIjkQvvMUpVxySdBm97QcVsqGyYiRMoomM+JIG3dBl+K2Pa4yhLcfuX9I00AgUXyInLL7+ytT1/CMmxGsyeZuzQMAITE4gotpXbkYAOTIOpAXcnYE/w0AAB5cHg3CwgWYbj/lwgWZaWcXtBzBQhnGAUBAg4pxBEs1AFgQmpxHFcg1WFVilzwt2fh0Objom8oB/l2gGmxLNEdRnXpNwhhWpHFbP0R0lKxeWYORgXZWFFkGKRBYlETuZtGS8bDz/W4O7erb6EqmfKfcKn7GzdqF/hm+qNKnzhXTf75/u9c3t7534w1nad1CtPQ7IkzGlZfKWu1jCBMBYlBQKC7ALarDUumCLF4yfP01GYOyeSrv4TYYlafXPA4aTn8/YnmKmlf6fXZ/vto7R1pO7I3azD4ssXkZX1ZoBe6cMajFhfdrboRUstpOtG162wKLCjJLat9h4JwUE270FUxfUXXBO2aaG4SVMhEZVEDIbqO4Ugnp7GoPNfvfOcmuIBsTq7nBPO0flI3KZFfVQ8ueNixYZqctyye7VVqiMjXy+W7vnBWykezykN1HFbk6qre13x/R2qb4lBLe7p339b4OIv2P+akk8IXSaM4/MY17F17ptyMPpCBOwyIFgyG4AIkWpFCy/cEF9C4I70GuC7T1eyK7BHHAjdsULTGsyRiYY4W9RIuBdH/m7mF2NERrkLnbMvDBrShPbWpL1+xR04J058sT4fojk9o4uzw2EG7++vfvD+TdvorDeStmp0kJ5smYTmYfJ+MT6qMXKnFY9ttx1MPChVLJCPIYVBLbOybro8zaSyUZQ4za2bxPcP6EvuRGJTTNwRzI7mAPB38CAAD//+JTaOY="
 }

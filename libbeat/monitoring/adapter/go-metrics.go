@@ -106,6 +106,11 @@ func (r *GoMetricsRegistry) Get(name string) interface{} {
 	return r.get(name)
 }
 
+// GetAll retrieves all registered metrics.
+func (r *GoMetricsRegistry) GetAll() map[string]map[string]interface{} {
+	return r.shadow.GetAll()
+}
+
 func (r *GoMetricsRegistry) get(name string) interface{} {
 	m := r.find(name)
 	if m == nil {

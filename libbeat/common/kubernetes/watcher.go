@@ -70,6 +70,7 @@ type watcher struct {
 	k8sResourceFactory  func() k8s.Resource
 	items               func() []k8s.Resource
 	handler             ResourceEventHandler
+	logger              *logp.Logger
 }
 
 // NewWatcher initializes the watcher client to provide a events handler for
@@ -82,6 +83,7 @@ func NewWatcher(client *k8s.Client, resource Resource, options WatchOptions) (Wa
 		lastResourceVersion: "0",
 		ctx:                 ctx,
 		stop:                cancel,
+		logger:              logp.NewLogger("kubernetes"),
 	}
 	switch resource.(type) {
 	// add resource type which you want to support watching here
@@ -184,10 +186,12 @@ func (w *watcher) sync() error {
 		return err
 	}
 
+	w.logger.Debugf("Got %v items from the resource sync", len(w.items()))
 	for _, item := range w.items() {
 		w.onAdd(item)
 	}
 
+	w.logger.Debugf("Done syncing %v items from the resource sync", len(w.items()))
 	// Store last version
 	w.lastResourceVersion = w.resourceList.GetMetadata().GetResourceVersion()
 
@@ -251,12 +255,17 @@ func (w *watcher) watch() {
 			r := w.k8sResourceFactory()
 			eventType, err := watcher.Next(r)
 			if err != nil {
-				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()
-				if !(err == io.EOF || err == io.ErrUnexpectedEOF) {
+				switch err {
+				case io.EOF:
+					logp.Debug("kubernetes", "EOF while watching API")
+				case io.ErrUnexpectedEOF:
+					logp.Info("kubernetes: Unexpected EOF while watching API")
+				default:
 					// This is an error event which can be recovered by moving to the latest resource version
-					logp.Info("kubernetes: Ignoring event, moving to most recent resource version")
+					logp.Err("kubernetes: Watching API error %v, ignoring event and moving to most recent resource version", err)
 					w.lastResourceVersion = ""
+
 				}
 				break
 			}

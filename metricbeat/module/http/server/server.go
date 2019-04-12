@@ -20,7 +20,6 @@ package server
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/helper/server/http"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -48,8 +47,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The http server metricset is beta")
-
 	config := defaultHttpServerConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

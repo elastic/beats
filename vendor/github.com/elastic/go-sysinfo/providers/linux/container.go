@@ -21,6 +21,7 @@ import (
 	"bufio"
 	"bytes"
 	"io/ioutil"
+	"os"
 
 	"github.com/pkg/errors"
 )
@@ -31,6 +32,10 @@ const procOneCgroup = "/proc/1/cgroup"
 func IsContainerized() (bool, error) {
 	data, err := ioutil.ReadFile(procOneCgroup)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+
 		return false, errors.Wrap(err, "failed to read process cgroups")
 	}
 

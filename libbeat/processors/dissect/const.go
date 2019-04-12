@@ -37,6 +37,7 @@ var (
 	appendIndirectPrefix = "+&"
 	indirectAppendPrefix = "&+"
 	greedySuffix         = "->"
+	pointerFieldPrefix   = "*"
 
 	defaultJoinString = " "
 

@@ -1,14 +1,16 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "elasticsearch": {
         "cluster": {
-            "name": "elasticsearch"
+            "id": "wafoCXEDTrGxpYViNueSaA",
+            "name": "es1"
         },
         "node": {
+            "id": "v5gHTHqKSRa4bZ9vbyDy7g",
             "jvm": {
                 "memory": {
                     "heap": {
@@ -16,25 +18,25 @@
                             "bytes": 1073741824
                         },
                         "max": {
-                            "bytes": 1038876672
+                            "bytes": 1037959168
                         }
                     },
                     "nonheap": {
                         "init": {
-                            "bytes": 2555904
+                            "bytes": 7667712
                         },
                         "max": {
                             "bytes": 0
                         }
                     }
                 },
-                "version": "1.8.0_144"
+                "version": "11.0.1"
             },
-            "name": "523zXyT6TRWiqXcQItnkyQ",
+            "name": "es1_1",
             "process": {
                 "mlockall": false
             },
-            "version": "6.3.0"
+            "version": "7.0.0"
         }
     },
     "metricset": {

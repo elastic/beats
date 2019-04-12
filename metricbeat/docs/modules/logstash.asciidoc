@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-logstash]]
 == Logstash module
 
-beta[]
-
 This is the Logstash module.
 
 The default metricsets are `node` and `node_stats`.

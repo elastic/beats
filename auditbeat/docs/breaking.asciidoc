@@ -1,4 +1,5 @@
 [[auditbeat-breaking-changes]]
+
 == Breaking changes in 6.2
 
 As a general rule, we strive to keep backwards compatibility between minor
@@ -97,7 +98,7 @@ In Kibana you need to <<load-kibana-dashboards,import>> the latest dashboards
 that work with the new event format. The new dashboards will not work with data
 produced by older versions of Auditbeat.
 
-.Renamed Fields
+.Renamed Fields in 6.2
 [frame="topbot",options="header"]
 |======================
 |Old Field|New Field
@@ -123,4 +124,3 @@ moved under the `file` namespace.]
 |`audit.file.hash`         |`hash`
 |`audit.file`              |`file`
 |======================
-

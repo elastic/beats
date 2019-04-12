@@ -24,9 +24,18 @@ import (
 // parser extracts the useful information from the raw tokenizer string, fields, delimiters and
 // skip fields.
 type parser struct {
-	delimiters []delimiter
-	fields     []field
-	skipFields []field
+	delimiters      []delimiter
+	fields          []field
+	referenceFields []field
+}
+
+var isIndirectField = func(field field) bool {
+	switch field.(type) {
+	case indirectField:
+		return true
+	default:
+		return false
+	}
 }
 
 func newParser(tokenizer string) (*parser, error) {
@@ -74,16 +83,26 @@ func newParser(tokenizer string) (*parser, error) {
 	})
 
 	// List of fields needed for indirection but don't need to appear in the final event.
-	var skipFields []field
+	var referenceFields []field
 	for _, f := range fields {
 		if !f.IsSaveable() {
-			skipFields = append(skipFields, f)
+			referenceFields = append(referenceFields, f)
 		}
 	}
 
 	return &parser{
-		delimiters: delimiters,
-		fields:     fields,
-		skipFields: skipFields,
+		delimiters:      delimiters,
+		fields:          fields,
+		referenceFields: referenceFields,
 	}, nil
+}
+
+func filterFieldsWith(fields []field, predicate func(field) bool) []field {
+	var filtered []field
+	for _, field := range fields {
+		if predicate(field) {
+			filtered = append(filtered, field)
+		}
+	}
+	return filtered
 }

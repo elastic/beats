@@ -41,10 +41,9 @@ func TestData(t *testing.T) {
 		"metricsets": []string{"service"},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	f.Fetch()
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

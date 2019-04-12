@@ -13,10 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// {"list":[{"id":"6c385a04-f315-489e-9208-c87f41911782","type":"filebeat.inputs","config":{"paths":["/tmp/hello.log"]},"tag":"89be4cfd-6249-4ac2-abe2-8f82520ba435"},{"id":"315ff7e9-ae24-4c99-a9d0-ed4314bc8e60","type":"output","config":{"_sub_type":"elasticsearch","username":"elastic","password":"changeme"},"tag":"89be4cfd-6249-4ac2-abe2-8f82520ba435"}],"success":true}
 func TestConfiguration(t *testing.T) {
 	beatUUID, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error while generating Beat UUID: %v", err)
+		t.Fatalf("error while generating Beat ID: %v", err)
 	}
 
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,11 +27,13 @@ func TestConfiguration(t *testing.T) {
 		// Check enrollment token is correct
 		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
 
-		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"module":"apache2"}},{"type":"metricbeat.modules","config":{"module":"system","period":"10s"}}]}`)
+		fmt.Fprintf(w, `{"success": true, "list":[{"type":"filebeat.modules","config":{"_sub_type":"apache2"}},{"type":"metricbeat.modules","config":{"_sub_type":"system","period":"10s"}}]}`)
 	}))
 	defer server.Close()
 
-	configs, err := client.Configuration("thisismyenrollmenttoken", beatUUID)
+	auth := AuthClient{Client: client, AccessToken: "thisismyenrollmenttoken", BeatUUID: beatUUID}
+
+	configs, err := auth.Configuration()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,6 +100,34 @@ func TestConfigBlocksEqual(t *testing.T) {
 			equal: true,
 		},
 		{
+			name: "single element with slices",
+			a: ConfigBlocks{
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": []string{"foo", "bar"},
+							},
+						},
+					},
+				},
+			},
+			b: ConfigBlocks{
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": []string{"foo", "bar"},
+							},
+						},
+					},
+				},
+			},
+			equal: true,
+		},
+		{
 			name: "different number of blocks",
 			a: ConfigBlocks{
 				ConfigBlocksWithType{
@@ -135,7 +166,6 @@ func TestConfigBlocksEqual(t *testing.T) {
 				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
-
 						&ConfigBlock{
 							Raw: map[string]interface{}{
 								"baz": "buzz",
@@ -148,7 +178,6 @@ func TestConfigBlocksEqual(t *testing.T) {
 				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
-
 						&ConfigBlock{
 							Raw: map[string]interface{}{
 								"foo": "bar",
@@ -163,7 +192,33 @@ func TestConfigBlocksEqual(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.equal, ConfigBlocksEqual(test.a, test.b))
+			check, err := ConfigBlocksEqual(test.a, test.b)
+			if !assert.NoError(t, err) {
+				return
+			}
+			assert.Equal(t, test.equal, check)
 		})
 	}
+}
+
+func TestUnEnroll(t *testing.T) {
+	beatUUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating Beat UUID: %v", err)
+	}
+
+	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Check correct path is used
+		assert.Equal(t, "/api/beats/agent/"+beatUUID.String()+"/configuration", r.URL.Path)
+
+		// Check enrollment token is correct
+		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
+
+		http.NotFound(w, r)
+	}))
+	defer server.Close()
+
+	auth := AuthClient{Client: client, AccessToken: "thisismyenrollmenttoken", BeatUUID: beatUUID}
+	_, err = auth.Configuration()
+	assert.True(t, IsConfigurationNotFound(err))
 }

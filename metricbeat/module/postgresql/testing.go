@@ -19,14 +19,17 @@ package postgresql
 
 import "os"
 
+//GetEnvDSN returns the Data Source Name
 func GetEnvDSN() string {
 	return os.Getenv("POSTGRESQL_DSN")
 }
 
+//GetEnvUsername returns the username
 func GetEnvUsername() string {
 	return os.Getenv("POSTGRESQL_USERNAME")
 }
 
+//GetEnvPassword returns the password
 func GetEnvPassword() string {
 	return os.Getenv("POSTGRESQL_PASSWORD")
 }

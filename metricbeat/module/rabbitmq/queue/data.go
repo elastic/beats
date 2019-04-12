@@ -20,6 +20,8 @@ package queue
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -83,28 +85,50 @@ var (
 	}
 )
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte, r mb.ReporterV2) {
 	var queues []map[string]interface{}
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
-		logp.Err("Error: ", err)
-		return nil, err
+		logp.Err("Error: %+v", err)
+		r.Error(err)
+		return
 	}
 
-	var events []common.MapStr
 	var errors multierror.Errors
 	for _, queue := range queues {
-		event, err := eventMapping(queue)
-		events = append(events, event)
+		err := eventMapping(queue, r)
 		if err != nil {
 			errors = append(errors, err)
 		}
 	}
 
-	return events, errors.Err()
+	if len(errors) > 0 {
+		r.Error(errors.Err())
+	}
 }
 
-func eventMapping(queue map[string]interface{}) (common.MapStr, error) {
-	event, err := schema.Apply(queue)
-	return event, err
+func eventMapping(queue map[string]interface{}, r mb.ReporterV2) error {
+	fields, err := schema.Apply(queue)
+	if err != nil {
+		return err
+	}
+
+	moduleFields := common.MapStr{}
+	if v, err := fields.GetValue("vhost"); err == nil {
+		moduleFields.Put("vhost", v)
+		fields.Delete("vhost")
+	}
+
+	if v, err := fields.GetValue("node"); err == nil {
+		moduleFields.Put("node.name", v)
+		fields.Delete("node")
+	}
+
+	event := mb.Event{
+		MetricSetFields: fields,
+		ModuleFields:    moduleFields,
+	}
+
+	r.Event(event)
+	return nil
 }

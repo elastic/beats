@@ -2,7 +2,7 @@
   type: group
   description: >
     node
-  release: beta
+  release: ga
   fields:
     - name: disk.free.bytes
       type: long
@@ -112,7 +112,7 @@
         Number of messages which have been written to the message store.
     - name: name
       type: keyword
-      description: >
+      description:
         Node name
     - name: proc.total
       type: long

@@ -1,0 +1,8 @@
+module_version: 1.0
+
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ingest/json_logs.json
+  - ingest/plain_logs_bad.json
+
+input: config/multi.yml

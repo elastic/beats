@@ -98,8 +98,12 @@ func (stat *DiskIOStat) CalIOStatistics(counter disk.IOCountersStat) (DiskIOMetr
 	result.AvgRequestSize = size
 	result.AvgQueueSize = queue
 	result.AvgAwaitTime = wait
-	result.AvgReadAwaitTime = float64(rd_ticks) / float64(rd_ios)
-	result.AvgWriteAwaitTime = float64(wr_ticks) / float64(wr_ios)
+	if rd_ios > 0 {
+		result.AvgReadAwaitTime = float64(rd_ticks) / float64(rd_ios)
+	}
+	if wr_ios > 0 {
+		result.AvgWriteAwaitTime = float64(wr_ticks) / float64(wr_ios)
+	}
 	result.AvgServiceTime = svct
 	result.BusyPct = 100.0 * float64(ticks) / deltams
 	if result.BusyPct > 100.0 {

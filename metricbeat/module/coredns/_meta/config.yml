@@ -1,0 +1,4 @@
+- module: coredns
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:9153"]

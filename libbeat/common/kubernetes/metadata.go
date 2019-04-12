@@ -43,8 +43,9 @@ type MetaGeneratorConfig struct {
 	IncludeAnnotations []string `config:"include_annotations"`
 
 	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludePodUID          bool `config:"include_pod_uid"`
 	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
+	LabelsDedot            bool `config:"labels.dedot"`
+	AnnotationsDedot       bool `config:"annotations.dedot"`
 }
 
 type metaGenerator = MetaGeneratorConfig
@@ -54,6 +55,8 @@ func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
 	// default settings:
 	generator := metaGenerator{
 		IncludeCreatorMetadata: true,
+		LabelsDedot:            true,
+		AnnotationsDedot:       true,
 	}
 
 	err := cfg.Unpack(&generator)
@@ -71,18 +74,23 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	labelMap := common.MapStr{}
 	if len(g.IncludeLabels) == 0 {
 		for k, v := range obj.GetMetadata().Labels {
-			safemapstr.Put(labelMap, k, v)
+			if g.LabelsDedot {
+				label := common.DeDot(k)
+				labelMap.Put(label, v)
+			} else {
+				safemapstr.Put(labelMap, k, v)
+			}
 		}
 	} else {
-		labelMap = generateMapSubset(objMeta.Labels, g.IncludeLabels)
+		labelMap = generateMapSubset(objMeta.Labels, g.IncludeLabels, g.LabelsDedot)
 	}
 
 	// Exclude any labels that are present in the exclude_labels config
 	for _, label := range g.ExcludeLabels {
-		delete(labelMap, label)
+		labelMap.Delete(label)
 	}
 
-	annotationsMap := generateMapSubset(objMeta.Annotations, g.IncludeAnnotations)
+	annotationsMap := generateMapSubset(objMeta.Annotations, g.IncludeAnnotations, g.AnnotationsDedot)
 	meta := common.MapStr{}
 	if objMeta.GetNamespace() != "" {
 		meta["namespace"] = objMeta.GetNamespace()
@@ -118,11 +126,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	podMeta := g.ResourceMetadata(pod)
 
-	// Add UID metadata if enabled
-	if g.IncludePodUID {
-		safemapstr.Put(podMeta, "pod.uid", pod.GetMetadata().GetUid())
-	}
-
+	safemapstr.Put(podMeta, "pod.uid", pod.GetMetadata().GetUid())
 	safemapstr.Put(podMeta, "pod.name", pod.GetMetadata().GetName())
 	safemapstr.Put(podMeta, "node.name", pod.Spec.GetNodeName())
 
@@ -141,7 +145,7 @@ func (g *metaGenerator) ContainerMetadata(pod *Pod, container string) common.Map
 	return podMeta
 }
 
-func generateMapSubset(input map[string]string, keys []string) common.MapStr {
+func generateMapSubset(input map[string]string, keys []string, dedot bool) common.MapStr {
 	output := common.MapStr{}
 	if input == nil {
 		return output
@@ -150,7 +154,12 @@ func generateMapSubset(input map[string]string, keys []string) common.MapStr {
 	for _, key := range keys {
 		value, ok := input[key]
 		if ok {
-			safemapstr.Put(output, key, value)
+			if dedot {
+				dedotKey := common.DeDot(key)
+				output.Put(dedotKey, value)
+			} else {
+				safemapstr.Put(output, key, value)
+			}
 		}
 	}
 

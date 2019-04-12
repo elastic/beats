@@ -64,15 +64,16 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Cluster Stats API response")
-		r.Error(err)
+		event.Error = errors.Wrap(err, "failure parsing Elasticsearch Cluster Stats API response")
+		r.Event(event)
+		return event.Error
 	}
 
 	metricSetFields, err := schema.Apply(data)
 	if err != nil {
-		err = errors.Wrap(err, "failure applying cluster stats schema")
-		r.Error(err)
-		return err
+		event.Error = errors.Wrap(err, "failure applying cluster stats schema")
+		r.Event(event)
+		return event.Error
 	}
 
 	event.MetricSetFields = metricSetFields
