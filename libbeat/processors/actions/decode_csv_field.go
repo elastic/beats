@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type decodeCSVField struct {
@@ -54,9 +55,9 @@ var (
 
 func init() {
 	processors.RegisterPlugin("decode_csv_field",
-		configChecked(NewDecodeCSVField,
-			requireFields("field"),
-			allowedFields("field", "target", "ignore_missing", "overwrite_keys", "separator", "trim_leading_space", "overwrite_keys")))
+		checks.ConfigChecked(NewDecodeCSVField,
+			checks.RequireFields("field"),
+			checks.AllowedFields("field", "target", "ignore_missing", "overwrite_keys", "separator", "trim_leading_space", "overwrite_keys")))
 }
 
 // NewDecodeCSVField construct a new decode_csv_field processor.
