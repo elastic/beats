@@ -49,7 +49,7 @@ func TestCloudwatchLogs(t *testing.T) {
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"name":        "foobar",
 		"description": "my long description",
-		"role":        "arn:aws:iam::00000000:role/functionbeat",
+		"role":        "arn:aws:iam::000000000000:role/functionbeat",
 		"triggers": []map[string]interface{}{
 			map[string]interface{}{
 				"log_group_name": "foo",
