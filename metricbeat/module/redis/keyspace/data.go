@@ -34,10 +34,7 @@ func eventsMapping(r mb.ReporterV2, info map[string]string) {
 		event := mb.Event{
 			MetricSetFields: space,
 		}
-		if !r.Event(event) {
-			debugf("Failed to report event, interrupting Fetch")
-			return
-		}
+		r.Event(event)
 	}
 }
 
