@@ -160,7 +160,7 @@ func (c *CLIManager) roleTemplate(function installer, name string) *cloudformati
 			PolicyDocument: map[string]interface{}{
 				"Statement": []map[string]interface{}{
 					map[string]interface{}{
-						"Action": []string{"logs:CreateLogStream", "Logs:PutLogEvents"},
+						"Action": []string{"logs:CreateLogStream", "logs:PutLogEvents"},
 						"Effect": "Allow",
 						"Resource": []string{
 							cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
