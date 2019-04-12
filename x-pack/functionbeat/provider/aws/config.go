@@ -31,6 +31,7 @@ var (
 		Concurrency: 5,
 	}
 
+	// Source: https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Role
 	arnRolePattern = "arn:(aws[a-zA-Z-]*)?:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+"
 	roleRE         = regexp.MustCompile(arnRolePattern)
 )
