@@ -62,6 +62,7 @@ func (c *Connector) Connect() (beat.Client, error) {
 			EventMetadata: c.eventMeta,
 			Processor:     c.processors,
 			DynamicFields: c.dynamicFields,
+			TimeSeries:    true,
 		},
 	})
 }

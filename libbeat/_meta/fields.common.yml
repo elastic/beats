@@ -37,3 +37,7 @@
       type: alias
       path: agent.hostname
       migration: true
+
+    - name: timeseries.instance
+      type: keyword
+      description: Time series instance id

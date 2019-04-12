@@ -94,6 +94,10 @@ type ProcessingConfig struct {
 	// DynamicFields provides additional fields to be added to every event, supporting live updates
 	DynamicFields *common.MapStrPointer
 
+	// Timeseries id will be calculated for Events with the TimeSeries flag if this
+	// is enabled (disabled by default)
+	TimeSeries bool
+
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
 	Processor ProcessorList
