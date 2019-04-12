@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package actions
+package decode_csv_field
 
 import (
 	"encoding/csv"
