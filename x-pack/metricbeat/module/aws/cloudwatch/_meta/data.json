@@ -1,0 +1,25 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "InstanceId": "i-06fc36e56436ca041",
+            "StatusCheckFailed_Instance": 0,
+            "namespace": "AWS/EC2"
+        }
+    },
+    "cloud": {
+        "region": "eu-north-1"
+    },
+    "event": {
+        "dataset": "aws.cloudwatch",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "cloudwatch"
+    },
+    "service": {
+        "name": "cloudwatch",
+        "type": "cloudwatch"
+    }
+}

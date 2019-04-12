@@ -130,12 +130,24 @@ metricbeat.modules:
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
+- module: aws
+  period: 300s
+  metricsets:
+    - "cloudwatch"
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  cloudwatch_metrics:
+    - namespace: AWS/SNS
 ----
 
 [float]
 === Metricsets
 
 The following metricsets are available:
+
+* <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
 
 * <<metricbeat-metricset-aws-ec2,ec2>>
 
@@ -144,6 +156,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-aws-s3_request,s3_request>>
 
 * <<metricbeat-metricset-aws-sqs,sqs>>
+
+include::aws/cloudwatch.asciidoc[]
 
 include::aws/ec2.asciidoc[]
 
