@@ -227,4 +227,6 @@ func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDa
 			return errors.Wrap(err, "Error trying to emit event")
 		}
 	}
+
+	return nil
 }
