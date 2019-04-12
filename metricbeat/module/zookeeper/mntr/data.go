@@ -63,7 +63,7 @@ var (
 	}
 )
 
-func eventMapping(response io.Reader, r mb.ReporterV2) {
+func eventMapping(response io.Reader, r mb.ReporterV2, logger *logp.Logger) {
 	fullEvent := map[string]interface{}{}
 	scanner := bufio.NewScanner(response)
 
@@ -72,7 +72,7 @@ func eventMapping(response io.Reader, r mb.ReporterV2) {
 		if match := paramMatcher.FindStringSubmatch(scanner.Text()); len(match) == 3 {
 			fullEvent[match[1]] = match[2]
 		} else {
-			logp.Warn("Unexpected line in mntr output: %s", scanner.Text())
+			logger.Infof("Unexpected line in mntr output: %s", scanner.Text())
 		}
 	}
 

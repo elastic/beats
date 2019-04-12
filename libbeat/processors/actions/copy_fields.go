@@ -40,13 +40,14 @@ type copyFieldsConfig struct {
 
 func init() {
 	processors.RegisterPlugin("copy_fields",
-		configChecked(newCopyFields,
+		configChecked(NewCopyFields,
 			requireFields("fields"),
 		),
 	)
 }
 
-func newCopyFields(c *common.Config) (processors.Processor, error) {
+// NewCopyFields returns a new copy_fields processor.
+func NewCopyFields(c *common.Config) (processors.Processor, error) {
 	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
