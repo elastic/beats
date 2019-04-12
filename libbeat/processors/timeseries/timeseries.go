@@ -47,16 +47,18 @@ func NewTimeSeriesProcessor(fields mapping.Fields) processors.Processor {
 	// remove false values and convert to map where a nil value means
 	// it's a dimension
 	dimensionsNilDict := map[string]interface{}{}
-	for k, v := range dimensions {
-		if v {
+	for k, isDimension := range dimensions {
+		if isDimension {
 			dimensionsNilDict[k] = nil
 		}
 	}
 
 	// convert the prefix map to a list
 	prefixList := []string{}
-	for k := range prefixes {
-		prefixList = append(prefixList, k)
+	for k, isDimension := range prefixes {
+		if isDimension {
+			prefixList = append(prefixList, k)
+		}
 	}
 
 	return &timeseriesProcessor{dimensions: dimensionsNilDict, prefixes: prefixList}
