@@ -437,7 +437,7 @@ func TestPrometheus(t *testing.T) {
 	}
 }
 
-func TestPrometheusExtra(t *testing.T) {
+func TestPrometheusKeyLabels(t *testing.T) {
 
 	testCases := []struct {
 		testName           string
