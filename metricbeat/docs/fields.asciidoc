@@ -25595,16 +25595,6 @@ Number of active disks.
 
 --
 
-*`system.raid.disks.Unknown`*::
-+
---
-type: long
-
-Number of disks in a state that does not belong to any other category
-
-
---
-
 *`system.raid.disks.total`*::
 +
 --

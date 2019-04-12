@@ -26,7 +26,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-//ListAll lists all the multi-disk devices in a RAID array
+// ListAll lists all the multi-disk devices in a RAID array
 func ListAll(path string) ([]MDDevice, error) {
 	dir, err := ioutil.ReadDir(path)
 	if err != nil {

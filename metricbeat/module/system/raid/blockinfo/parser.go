@@ -27,7 +27,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
+
+var debugf = logp.MakeDebug("system-raid")
 
 //get the raid level and use that to determine how we fill out the array
 //Only data-reduntant RIAD levels (1,4,5,6,10) have some of these fields
@@ -65,16 +68,16 @@ func parseIntVal(path string) (int64, error) {
 //if there's no sync operation in progress, the file will just have 'none'
 //in which case, default to to the overall size
 func getSyncStatus(path string, size int64) (SyncStatus, error) {
-
 	raw, err := ioutil.ReadFile(filepath.Join(path, "md", "sync_completed"))
 	if err != nil {
 		return SyncStatus{}, errors.Wrap(err, "could not open sync_completed")
 	}
-	if string(raw) == "none\n" {
+	completedState := strings.TrimSpace(string(raw))
+	if completedState == "none" {
 		return SyncStatus{Complete: size, Total: size}, nil
 	}
 
-	matches := strings.SplitN(strings.TrimSpace(string(raw)), " / ", 2)
+	matches := strings.SplitN(completedState, " / ", 2)
 
 	if len(matches) != 2 {
 		return SyncStatus{}, fmt.Errorf("could not get data from sync_completed")
@@ -104,13 +107,6 @@ func newMD(path string) (MDDevice, error) {
 		return dev, errors.Wrap(err, "could not get device size")
 	}
 	dev.Size = size
-
-	//This is the count of 'active' disks
-	// active, err := parseIntVal(filepath.Join(path, "md", "raid_disks"))
-	// if err != nil {
-	// 	return dev, errors.Wrap(err, "could not get raid_disks")
-	// }
-	// dev.ActiveDisks = active
 
 	//RAID array state
 	state, err := ioutil.ReadFile(filepath.Join(path, "md", "array_state"))
@@ -179,7 +175,7 @@ func getDisks(path string) (DiskStates, error) {
 		case "spare":
 			disks.Spare++
 		default:
-			disks.Unknown++
+			debugf("Unknown disk state %s", disk)
 		}
 
 		if _, ok := disks.States[disk]; !ok {
@@ -196,7 +192,6 @@ func getDisks(path string) (DiskStates, error) {
 }
 
 func getDisk(path string) (string, error) {
-
 	state, err := ioutil.ReadFile(filepath.Join(path, "state"))
 	if err != nil {
 		return "", errors.Wrap(err, "error getting disk state")

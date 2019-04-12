@@ -20,10 +20,6 @@
       type: long
       description: >
          Number of active disks.
-    - name: disks.Unknown
-      type: long
-      description: >
-         Number of disks in a state that does not belong to any other category
     - name: disks.total
       type: long
       description: >

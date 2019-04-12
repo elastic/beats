@@ -78,11 +78,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-//Annoyingly, different linux subsystems report size size using different blocks
-// /proc/mdstat /proc/partitions and mdadm (Via the BLKGETSIZE64 ioctl call) count "size" as the number of 1024-byte blocks.
-// /sys/block/md*/size uses 512-byte blocks. As does /sys/block/md*/md/sync_completed
-//convert the 512-byte blocks to 1024 byte blocks to maintain how this metricset "used to" report size
 func blockto1024(b int64) int64 {
+	//Annoyingly, different linux subsystems report size size using different blocks
+	// /proc/mdstat /proc/partitions and mdadm (Via the BLKGETSIZE64 ioctl call) count "size" as the number of 1024-byte blocks.
+	// /sys/block/md*/size uses 512-byte blocks. As does /sys/block/md*/md/sync_completed
+	//convert the 512-byte blocks to 1024 byte blocks to maintain how this metricset "used to" report size
 	return b / 2
 }
 
