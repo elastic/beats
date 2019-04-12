@@ -92,6 +92,7 @@ tests:
       - netflow9_test_cisco_asa_2_tpl_27x.dat
       - netflow9_test_cisco_asa_2_data.dat
     custom_fields:
+      # This renames some fields to test the loading fields from file feature.
       - netflow9_cisco_asa_custom.yaml
   Netflow 9 ipt_netflow reduced size encoding:
     files:

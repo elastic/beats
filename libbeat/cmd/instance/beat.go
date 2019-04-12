@@ -39,6 +39,10 @@ import (
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
 
+	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
@@ -66,9 +70,6 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/version"
-	sysinfo "github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -102,8 +103,10 @@ type beatConfig struct {
 	Keystore      *common.Config `config:"keystore"`
 
 	// output/publishing related configurations
-	Pipeline   pipeline.Config `config:",inline"`
-	Monitoring *common.Config  `config:"xpack.monitoring"`
+	Pipeline pipeline.Config `config:",inline"`
+
+	// monitoring settings
+	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
 
 	// central management settings
 	Management *common.Config `config:"management"`
@@ -284,6 +287,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	err = b.registerClusterUUIDFetching()
+	if err != nil {
+		return nil, err
+	}
+
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
 		reg = monitoring.Default.NewRegistry("libbeat")
@@ -361,11 +369,17 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	if b.Config.Monitoring.Enabled() {
+	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	if err != nil {
+		return err
+	}
+
+	if monitoringCfg.Enabled() {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
+			Format:          reporterSettings.Format,
 		}
-		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
+		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return err
 		}
@@ -759,11 +773,10 @@ func (b *Beat) registerESIndexManagement() error {
 	return nil
 }
 
-// Build and return a callback to load index template into ES
-func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
+func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-		return m.Setup(true, true)
+		return m.Setup(false, false)
 	}
 }
 
@@ -788,6 +801,47 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 	}
 
 	return outputs.Load(b.index, b.Info, stats, cfg.Name(), cfg.Config())
+}
+
+func (b *Beat) registerClusterUUIDFetching() error {
+	if b.Config.Output.Name() == "elasticsearch" {
+		callback, err := b.clusterUUIDFetchingCallback()
+		if err != nil {
+			return err
+		}
+		elasticsearch.RegisterConnectCallback(callback)
+	}
+	return nil
+}
+
+// Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
+func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
+	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
+
+	callback := func(esClient *elasticsearch.Client) error {
+		var response struct {
+			ClusterUUID string `json:"cluster_uuid"`
+		}
+
+		status, body, err := esClient.Request("GET", "/", "", nil, nil)
+		if err != nil {
+			return errw.Wrap(err, "error querying /")
+		}
+		if status > 299 {
+			return fmt.Errorf("Error querying /. Status: %d. Response body: %s", status, body)
+		}
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
+		}
+
+		clusterUUIDRegVar.Set(response.ClusterUUID)
+		return nil
+	}
+
+	return callback, nil
 }
 
 // handleError handles the given error by logging it and then returning the

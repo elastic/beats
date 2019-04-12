@@ -30,6 +30,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pkg/errors"
+
 	"github.com/mitchellh/hashstructure"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -51,12 +53,44 @@ const (
 var (
 	// Use `go test -generate` to update files.
 	generateFlag = flag.Bool("generate", false, "Write golden files")
+	moduleFlag   = flag.String("module", "", "Choose a module to test")
 )
 
 type Config struct {
-	Type   string
-	URL    string
+	// The type of the test to run, usually `http`.
+	Type string
+
+	// URL of the endpoint that must be tested depending on each module
+	URL string
+
+	// Suffix is the extension of the source file with the input contents. Defaults to `json`, `plain` is also a common use.
 	Suffix string
+
+	// Module is a map of specific configs that will be appended to a module configuration prior initializing it.
+	// For example, the following config in yaml:
+	//   module:
+	//     namespace: test
+	//     foo: bar
+	//
+	// Will produce the following module config:
+	//   - module: http
+	//     metricsets:
+	//       - json
+	//     period: 10s
+	//     hosts: ["localhost:80"]
+	//     path: "/"
+	//     namespace: "test"
+	//     foo: bar
+	//
+	// (notice last two lines)
+	Module map[string]interface{} `yaml:"module"`
+
+	// OmitDocumentedFieldsCheck is a list of fields that must be omitted from the function that checks if the field
+	// is contained in {metricset}/_meta/fields.yml
+	OmitDocumentedFieldsCheck []string `yaml:"omit_documented_fields_check"`
+
+	// RemoveFieldsForComparison
+	RemoveFieldsForComparison []string `yaml:"remove_fields_from_comparison"`
 }
 
 func TestAll(t *testing.T) {
@@ -68,6 +102,12 @@ func TestAll(t *testing.T) {
 		s := strings.Split(f, string(os.PathSeparator))
 		moduleName := s[4]
 		metricSetName := s[5]
+
+		if *moduleFlag != "" {
+			if *moduleFlag != moduleName {
+				continue
+			}
+		}
 
 		configFile, err := ioutil.ReadFile(f)
 		if err != nil {
@@ -83,13 +123,12 @@ func TestAll(t *testing.T) {
 			config.Suffix = "json"
 		}
 
-		getTestdataFiles(t, config.URL, moduleName, metricSetName, config.Suffix)
+		getTestdataFiles(t, moduleName, metricSetName, config)
 	}
 }
 
-func getTestdataFiles(t *testing.T, url, module, metricSet, suffix string) {
-
-	ff, err := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + suffix)
+func getTestdataFiles(t *testing.T, module, metricSet string, config Config) {
+	ff, err := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + config.Suffix)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,28 +144,29 @@ func getTestdataFiles(t *testing.T, url, module, metricSet, suffix string) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			runTest(t, f, module, metricSet, url, suffix)
+			runTest(t, f, module, metricSet, config)
 		})
 	}
 }
 
-func runTest(t *testing.T, file string, module, metricSetName, url, suffix string) {
+func runTest(t *testing.T, file string, module, metricSetName string, config Config) {
 
 	// starts a server serving the given file under the given url
-	s := server(t, file, url)
+	s := server(t, file, config.URL)
 	defer s.Close()
 
-	metricSet := mbtesting.NewMetricSet(t, getConfig(module, metricSetName, s.URL))
+	moduleConfig := getConfig(module, metricSetName, s.URL, config)
+	metricSet := mbtesting.NewMetricSet(t, moduleConfig)
 
 	var events []mb.Event
 	var errs []error
 
 	switch v := metricSet.(type) {
 	case mb.ReportingMetricSetV2:
-		metricSet := mbtesting.NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
+		metricSet := mbtesting.NewReportingMetricSetV2(t, moduleConfig)
 		events, errs = mbtesting.ReportingFetchV2(metricSet)
 	case mb.ReportingMetricSetV2Error:
-		metricSet := mbtesting.NewReportingMetricSetV2Error(t, getConfig(module, metricSetName, s.URL))
+		metricSet := mbtesting.NewReportingMetricSetV2Error(t, moduleConfig)
 		events, errs = mbtesting.ReportingFetchV2Error(metricSet)
 	default:
 		t.Fatalf("unknown type: %T", v)
@@ -154,16 +194,15 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 		return h1 < h2
 	})
 
-	checkDocumented(t, data)
-
-	output, err := json.MarshalIndent(&data, "", "    ")
-	if err != nil {
-		t.Fatal(err)
-	}
+	checkDocumented(t, data, config.OmitDocumentedFieldsCheck)
 
 	// Overwrites the golden files if run with -generate
 	if *generateFlag {
-		if err = ioutil.WriteFile(file+expectedExtension, output, 0644); err != nil {
+		outputIndented, err := json.MarshalIndent(&data, "", "    ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err = ioutil.WriteFile(file+expectedExtension, outputIndented, 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -174,9 +213,38 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 		t.Fatalf("could not read file: %s", err)
 	}
 
-	assert.Equal(t, string(expected), string(output))
+	expectedMap := []common.MapStr{}
+	if err := json.Unmarshal(expected, &expectedMap); err != nil {
+		t.Fatal(err)
+	}
 
-	if strings.HasSuffix(file, "docs."+suffix) {
+	for _, fieldToRemove := range config.RemoveFieldsForComparison {
+		for eventIndex := range data {
+			if err := data[eventIndex].Delete(fieldToRemove); err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		for eventIndex := range expectedMap {
+			if err := expectedMap[eventIndex].Delete(fieldToRemove); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+
+	output, err := json.Marshal(&data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedJSON, err := json.Marshal(&expectedMap)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, string(expectedJSON), string(output))
+
+	if strings.HasSuffix(file, "docs."+config.Suffix) {
 		writeDataJSON(t, data[0], module, metricSetName)
 	}
 }
@@ -191,7 +259,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, module, metricSet string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(t *testing.T, data []common.MapStr) {
+func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
 		t.Fatal(err)
@@ -201,6 +269,7 @@ func checkDocumented(t *testing.T, data []common.MapStr) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	documentedFields := fields.GetKeys()
 	keys := map[string]interface{}{}
 
@@ -210,28 +279,89 @@ func checkDocumented(t *testing.T, data []common.MapStr) {
 
 	for _, d := range data {
 		flat := d.Flatten()
-		for k := range flat {
-			if _, ok := keys[k]; !ok {
-				// If a field is defined as object it can also be defined as `status_codes.*`
-				// So this checks if such a key with the * exists by removing the last part.
-				splits := strings.Split(k, ".")
-				prefix := strings.Join(splits[0:len(splits)-1], ".")
-				if _, ok := keys[prefix+".*"]; ok {
-					continue
-				}
-				t.Fatalf("key missing: %s", k)
-			}
+		if err := documentedFieldCheck(flat, keys, omitFields); err != nil {
+			t.Fatal(err)
 		}
 	}
 }
 
+func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interface{}, omitFields []string) error {
+	for foundKey := range foundKeys {
+		if _, ok := knownKeys[foundKey]; !ok {
+			for _, omitField := range omitFields {
+				if omitDocumentedField(foundKey, omitField) {
+					return nil
+				}
+			}
+			// If a field is defined as object it can also be defined as `status_codes.*`
+			// So this checks if such a key with the * exists by removing the last part.
+			splits := strings.Split(foundKey, ".")
+			prefix := strings.Join(splits[0:len(splits)-1], ".")
+			if _, ok := knownKeys[prefix+".*"]; ok {
+				continue
+			}
+			return errors.Errorf("check if fields are documented error: key missing '%s'", foundKey)
+		}
+	}
+
+	return nil
+}
+
+// omitDocumentedField returns true if 'field' is exactly like 'omitField' or if 'field' equals the prefix of 'omitField'
+// if the latter contains a dot.wildcard ".*". For example:
+// field: hello, 						  	omitField: world 					false
+// field: hello, 						  	omitField: hello 					true
+// field: elasticsearch.stats 			  	omitField: elasticsearch.stats 		true
+// field: elasticsearch.stats.hello.world 	omitField: elasticsearch.* 			true
+// field: elasticsearch.stats.hello.world 	omitField: * 						true
+func omitDocumentedField(field, omitField string) bool {
+	if strings.Contains(omitField, "*") {
+		// Omit every key prefixed with chars before "*"
+		prefixedField := strings.Trim(omitField, ".*")
+		if strings.Contains(field, prefixedField) {
+			return true
+		}
+	} else {
+		// Omit only if key matches exactly
+		if field == omitField {
+			return true
+		}
+	}
+
+	return false
+}
+
+func TestOmitDocumentedField(t *testing.T) {
+	tts := []struct {
+		a, b   string
+		result bool
+	}{
+		{a: "hello", b: "world", result: false},
+		{a: "hello", b: "hello", result: true},
+		{a: "elasticsearch.stats", b: "elasticsearch.stats", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "elasticsearch.*", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "*", result: true},
+	}
+
+	for _, tt := range tts {
+		result := omitDocumentedField(tt.a, tt.b)
+		assert.Equal(t, tt.result, result)
+	}
+}
+
 // GetConfig returns config for elasticsearch module
-func getConfig(module, metricSet, url string) map[string]interface{} {
-	return map[string]interface{}{
+func getConfig(module, metricSet, url string, config Config) map[string]interface{} {
+	moduleConfig := map[string]interface{}{
 		"module":     module,
 		"metricsets": []string{metricSet},
 		"hosts":      []string{url},
 	}
+
+	for k, v := range config.Module {
+		moduleConfig[k] = v
+	}
+
+	return moduleConfig
 }
 
 // server starts a server with a mock output
