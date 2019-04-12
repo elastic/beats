@@ -36,12 +36,6 @@
 			"versionExact": "v1.20.1"
 		},
 		{
-			"checksumSHA1": "DYv6Q1+VfnUVxMwvk5IshAClLvw=",
-			"path": "github.com/Sirupsen/logrus",
-			"revision": "5e5dc898656f695e2a086b8e12559febbfc01562",
-			"revisionTime": "2017-05-15T10:45:16Z"
-		},
-		{
 			"checksumSHA1": "Te1xRugxHQMAg7EvbIUuPWm8fvU=",
 			"path": "github.com/StackExchange/wmi",
 			"revision": "9f32b5905fd6ce7384093f9d048437e79f7b4d85",
@@ -576,10 +570,10 @@
 			"revisionTime": "2017-05-24T20:58:24Z"
 		},
 		{
-			"checksumSHA1": "UL2NF1EGiSsQoEfvycnuZIcUbZY=",
+			"checksumSHA1": "jYj/NYT4pL27gVSrKmPZT+8/kMs=",
 			"path": "github.com/docker/docker/api",
-			"revision": "d192db0d9350222d2b8bb6eba8525b04c3be7d61",
-			"revisionTime": "2017-05-29T13:58:50Z"
+			"revision": "1009e6a40b295187e038b67e184e9c0384d95538",
+			"revisionTime": "2017-07-26T21:42:13Z"
 		},
 		{
 			"checksumSHA1": "KMFpbV3mlrbc41d2DYnq05QYpSc=",
@@ -683,12 +677,10 @@
 			"versionExact": "v17.05.0-ce"
 		},
 		{
-			"checksumSHA1": "NC4Tz59SrBVdPxt12GjYCxX60eU=",
+			"checksumSHA1": "/rhDgzb51QH29Dn6v9lr/NQrLbs=",
 			"path": "github.com/docker/docker/pkg/fileutils",
-			"revision": "89658bed64c2a8fe05a978e5b87dbec409d57a0f",
-			"revisionTime": "2017-05-04T20:25:03Z",
-			"version": "v17.05.0-ce",
-			"versionExact": "v17.05.0-ce"
+			"revision": "1009e6a40b295187e038b67e184e9c0384d95538",
+			"revisionTime": "2017-07-26T21:42:13Z"
 		},
 		{
 			"checksumSHA1": "W7Rnb5YoC9u0vT9eLKoezV3N4E8=",
@@ -739,13 +731,11 @@
 			"versionExact": "v17.05.0-ce"
 		},
 		{
-			"checksumSHA1": "kr46EAa+FsUcWxOq6edyX6BUzE4=",
+			"checksumSHA1": "Aa2l7tUYFCEvHd+C//15fQnAfqQ=",
 			"origin": "github.com/exekias/moby/pkg/system",
 			"path": "github.com/docker/docker/pkg/system",
-			"revision": "83d94aa2b98f10c4534d77077645d5e328533ce4",
-			"revisionTime": "2017-05-29T14:39:59Z",
-			"version": "master",
-			"versionExact": "master"
+			"revision": "1009e6a40b295187e038b67e184e9c0384d95538",
+			"revisionTime": "2017-07-26T21:42:13Z"
 		},
 		{
 			"checksumSHA1": "8I0Ez+aUYGpsDEVZ8wN/Ztf6Zqs=",
@@ -756,20 +746,26 @@
 		{
 			"checksumSHA1": "JbiWTzH699Sqz25XmDlsARpMN9w=",
 			"path": "github.com/docker/go-connections/nat",
-			"revision": "e15c02316c12de00874640cd76311849de2aeed5",
-			"revisionTime": "2017-03-31T14:51:22Z"
+			"revision": "3ede32e2033de7505e6500d6c868c2b9ed9f169d",
+			"revisionTime": "2017-06-23T20:36:43Z",
+			"version": "v0.3.0",
+			"versionExact": "v0.3.0"
 		},
 		{
 			"checksumSHA1": "jUfDG3VQsA2UZHvvIXncgiddpYA=",
 			"path": "github.com/docker/go-connections/sockets",
-			"revision": "e15c02316c12de00874640cd76311849de2aeed5",
-			"revisionTime": "2017-03-31T14:51:22Z"
+			"revision": "3ede32e2033de7505e6500d6c868c2b9ed9f169d",
+			"revisionTime": "2017-06-23T20:36:43Z",
+			"version": "v0.3.0",
+			"versionExact": "v0.3.0"
 		},
 		{
-			"checksumSHA1": "tuSzlS1UQ03+5Fvtqr5hI5sLLhA=",
+			"checksumSHA1": "c6lDGNwTm5mYq18IHP+lqYpk8xU=",
 			"path": "github.com/docker/go-connections/tlsconfig",
-			"revision": "e15c02316c12de00874640cd76311849de2aeed5",
-			"revisionTime": "2017-03-31T14:51:22Z"
+			"revision": "3ede32e2033de7505e6500d6c868c2b9ed9f169d",
+			"revisionTime": "2017-06-23T20:36:43Z",
+			"version": "v0.3.0",
+			"versionExact": "v0.3.0"
 		},
 		{
 			"checksumSHA1": "UmXGieuTJQOzJPspPJTVKKKMiUA=",
@@ -939,33 +935,43 @@
 			"revisionTime": "2016-06-17T14:03:01Z"
 		},
 		{
-			"checksumSHA1": "TatpgVf9fhQp1GtNwSyNw5cgVKM=",
+			"checksumSHA1": "3e1eGhr4UUQOQffSHkoycT18inA=",
 			"path": "github.com/elastic/go-seccomp-bpf",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "qTs7QT+GC2Dr4aFoLFHCkAOoVeU=",
+			"checksumSHA1": "0A6V4lCcYqGVIs6pjejriMU7zpQ=",
 			"path": "github.com/elastic/go-seccomp-bpf/arch",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profile",
 			"revision": "",
-			"tree": true
+			"tree": true,
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "5vWvvnghiBzyFo+KnD9iRlRc5Uw=",
+			"checksumSHA1": "VSiEhUPkh/PQoYn4ztk2+TVvv3o=",
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "386906x6hGeUDkGJ1Wk0kUWWA4Y=",
+			"checksumSHA1": "tVV3DxysTQ8UnYqLRGZstscE8PI=",
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler/disasm",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
 			"checksumSHA1": "W459MQNQ8qF6qmzLO/QLevTKZlU=",
@@ -1727,6 +1733,12 @@
 			"revisionTime": "2017-02-10T14:05:23Z"
 		},
 		{
+			"checksumSHA1": "Aulh7C5SVOA4Jzt5eHNH6197Mbk=",
+			"path": "github.com/konsorten/go-windows-terminal-sequences",
+			"revision": "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e",
+			"revisionTime": "2019-02-26T22:47:05Z"
+		},
+		{
 			"checksumSHA1": "ASXhLVfIA2mzHf+7muYxT38JaHU=",
 			"path": "github.com/magefile/mage",
 			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
@@ -1971,6 +1983,18 @@
 			"versionExact": "v2.18.11"
 		},
 		{
+			"checksumSHA1": "1KA6FgHyBKaIqBbOMFYt5wkMap8=",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "a6c0064cfaf982707445a1c90368f956421ebcf0",
+			"revisionTime": "2019-03-31T13:19:41Z"
+		},
+		{
+			"checksumSHA1": "1Z9bN43Wk647bMXb/yMDdVEYTHo=",
+			"path": "github.com/sirupsen/logrus/terminal",
+			"revision": "a6c0064cfaf982707445a1c90368f956421ebcf0",
+			"revisionTime": "2019-03-31T13:19:41Z"
+		},
+		{
 			"checksumSHA1": "e7mAb9jMke2ASQGZepFgOmfBFzM=",
 			"path": "github.com/spf13/cobra",
 			"revision": "1be1d2841c773c01bee8289f55f7463b6e2c2539",
@@ -2039,10 +2063,10 @@
 			"revisionTime": "2019-01-31T17:02:46Z"
 		},
 		{
-			"checksumSHA1": "C1AMG/E1pIW6kHrxi4+iNm1Fa9Y=",
+			"checksumSHA1": "rdbYpwLDRkBOHwSCdr5uivkyys4=",
 			"path": "github.com/tsg/gopacket/pcap",
-			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
-			"revisionTime": "2019-01-31T17:02:46Z"
+			"revision": "dd3d0e41124a90ef5fcb14ece1b5e5922c8f8aa3",
+			"revisionTime": "2019-03-20T12:25:13Z"
 		},
 		{
 			"checksumSHA1": "nGCIgH3ohqLru6ivQSSiY6YWEow=",

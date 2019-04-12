@@ -253,7 +253,11 @@ func installDependencies(pkg, arch string) error {
 		}
 	}
 
-	if err := sh.Run("apt-get", "update"); err != nil {
+	// TODO: This is only for debian 7 and should be removed when move to a newer OS. This flag is
+	// going to be used unnecessary when building using non-debian7 images
+	// (like when making the linux/arm binaries) and we should remove it soonish.
+	// See https://github.com/elastic/beats/issues/11750 for more details.
+	if err := sh.Run("apt-get", "update", "-o", "Acquire::Check-Valid-Until=false"); err != nil {
 		return err
 	}
 

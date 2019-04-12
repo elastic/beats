@@ -134,7 +134,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Logger())
 		return
 	}
 
@@ -142,13 +142,13 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 		intervalMs := m.calculateIntervalMs()
 		err = eventMappingStatsXPack(r, intervalMs, now, content)
 		if err != nil {
-			m.Log.Error(err)
+			m.Logger().Error(err)
 			return
 		}
 	} else {
 		err = eventMapping(r, content)
 		if err != nil {
-			elastic.ReportAndLogError(err, r, m.Log)
+			elastic.ReportAndLogError(err, r, m.Logger())
 			return
 		}
 	}
@@ -157,14 +157,14 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
 	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
-		m.Log.Error(err)
+		m.Logger().Error(err)
 		return
 	}
 
 	intervalMs := m.calculateIntervalMs()
 	err = eventMappingSettingsXPack(r, intervalMs, now, content)
 	if err != nil {
-		m.Log.Error(err)
+		m.Logger().Error(err)
 		return
 	}
 }

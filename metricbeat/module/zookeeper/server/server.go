@@ -44,14 +44,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
 )
-
-var logger = logp.NewLogger("zookeeper.server")
 
 func init() {
 	mb.Registry.MustAddMetricSet("zookeeper", "server", New,
@@ -74,17 +70,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches metrics from ZooKeeper by making a tcp connection to the
 // command port and sending the "srvr" command and parsing the output.
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("srvr", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		reporter.Error(errors.Wrap(err, "srvr command failed"))
-		return
+		return errors.Wrap(err, "srvr command failed")
+
 	}
 
-	metricsetFields, version, err := parseSrvr(outputReader)
+	metricsetFields, version, err := parseSrvr(outputReader, m.Logger())
 	if err != nil {
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error parsing srvr output")
 	}
 
 	event := mb.Event{
@@ -97,4 +92,5 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	}
 
 	reporter.Event(event)
+	return nil
 }
