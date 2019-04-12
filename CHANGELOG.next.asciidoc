@@ -38,9 +38,6 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 - Fix OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
 - Fix false positives reported in the `host.containerized` field added by `add_host_metadata`. {pull}11494[11494]
 - Fix the add_host_metadata's `host.id` field on older Linux versions. {pull}11494[11494]
-- Fix ILM policy always being overwritten. {pull}11671[11671]
-- Fix template always being overwritten. {pull}11671[11671]
-- Fix matching of string arrays in contains condition. {pull}11691[11691]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 
 *Auditbeat*
