@@ -689,7 +689,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-seccomp-bpf
-Revision: 5bed103a93993f24c58dd267faaab582f2373e31
+Version: v1.1.0
+Revision: 4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-seccomp-bpf/LICENSE.txt:
 --------------------------------------------------------------------

@@ -935,33 +935,43 @@
 			"revisionTime": "2016-06-17T14:03:01Z"
 		},
 		{
-			"checksumSHA1": "TatpgVf9fhQp1GtNwSyNw5cgVKM=",
+			"checksumSHA1": "3e1eGhr4UUQOQffSHkoycT18inA=",
 			"path": "github.com/elastic/go-seccomp-bpf",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "qTs7QT+GC2Dr4aFoLFHCkAOoVeU=",
+			"checksumSHA1": "0A6V4lCcYqGVIs6pjejriMU7zpQ=",
 			"path": "github.com/elastic/go-seccomp-bpf/arch",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profile",
 			"revision": "",
-			"tree": true
+			"tree": true,
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "5vWvvnghiBzyFo+KnD9iRlRc5Uw=",
+			"checksumSHA1": "VSiEhUPkh/PQoYn4ztk2+TVvv3o=",
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "386906x6hGeUDkGJ1Wk0kUWWA4Y=",
+			"checksumSHA1": "tVV3DxysTQ8UnYqLRGZstscE8PI=",
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profiler/disasm",
-			"revision": "5bed103a93993f24c58dd267faaab582f2373e31",
-			"revisionTime": "2018-05-17T07:14:48Z"
+			"revision": "4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9",
+			"revisionTime": "2019-04-10T16:08:06Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
 			"checksumSHA1": "W459MQNQ8qF6qmzLO/QLevTKZlU=",
