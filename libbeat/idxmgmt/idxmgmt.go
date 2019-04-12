@@ -78,14 +78,18 @@ type SetupConfig struct {
 	Force *bool
 }
 
+// DefaultSetupConfig initializes a config with default settings.
 func DefaultSetupConfig() SetupConfig {
 	return SetupConfig{Force: new(bool)}
 }
 
+// ShouldLoad indicates whether or not information related to this SetupConfig should be loaded
 func (c *SetupConfig) ShouldLoad() bool {
 	return c.Load == nil || *c.Load
 }
 
+// ShouldForce indicates whether or not loading information related to this SetupConfig should be enforced and
+// potentially be overwritten
 func (c *SetupConfig) ShouldForce() bool {
 	return c.Force != nil && *c.Force
 }
