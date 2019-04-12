@@ -60,12 +60,13 @@ func Enroll(
 	}
 
 	// Update config with metadata
-	authClient := &api.AuthClient{Client: client, AccessToken: config.AccessToken, BeatUUID: beat.Info.ID}
-	err = authClient.UpdateMetadata(config.Metadata)
-	if err != nil {
-		return errors.Wrap(err, "updating metadata")
+	authClient := &api.AuthClient{Client: client, AccessToken: accessToken, BeatUUID: beat.Info.ID}
+	if len(config.Metadata) > 0 {
+		err = authClient.UpdateMetadata(config.Metadata)
+		if err != nil {
+			return errors.Wrap(err, "updating metadata")
+		}
 	}
-
 	configFile := cfgfile.GetDefaultCfgfile()
 
 	ts := time.Now()

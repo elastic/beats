@@ -56,15 +56,6 @@ func genEnrollCmd(name, version string) *cobra.Command {
 
 				// Retrieve any available configuration available for Kibana, either
 				// from the configuration file or using `-E`.
-				if beat.Config.Management != nil {
-					for _, v := range beat.Config.Management.GetFields() {
-						fmt.Println(v)
-						mm, _ := beat.Config.Management.Child(v, -1)
-						for _, vv := range mm.GetFields() {
-							fmt.Println(v, vv)
-						}
-					}
-				}
 				kibanaRaw, err := kibanaConfig(beat.Config.Management)
 				if err != nil {
 					return err
@@ -110,9 +101,12 @@ func genEnrollCmd(name, version string) *cobra.Command {
 				}
 
 				var metadata *common.Config
-				if child, err := beat.Config.Management.Child("management", -1); err == nil && child != nil {
-					metadata = child
+				if beat.Config.Management != nil {
+					if child, err := beat.Config.Management.Child("meta", -1); err == nil && child != nil {
+						metadata = child
+					}
 				}
+
 				err = management.Enroll(beat, config, metadata, enrollmentToken)
 				if err != nil {
 					return errors.Wrap(err, "Error while enrolling")
