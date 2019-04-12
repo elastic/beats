@@ -555,8 +555,8 @@ func TestPrometheusKeyLabels(t *testing.T) {
 					"metrics_one_midichlorians": Metric("metrics.one.midichlorians"),
 				},
 				Labels: map[string]LabelMap{
-					"rank":  KeyLabel("metrics.one.midichlorians.labels.rank"),
-					"alive": KeyLabel("metrics.one.midichlorians.labels.alive"),
+					"rank":  KeyLabel("metrics.one.midichlorians.rank"),
+					"alive": KeyLabel("metrics.one.midichlorians.alive"),
 				},
 			},
 			expectedEvents: []common.MapStr{
@@ -574,10 +574,9 @@ func TestPrometheusKeyLabels(t *testing.T) {
 									"32000": uint64(86),
 									"+Inf":  uint64(86),
 								},
-								"labels": common.MapStr{
-									"rank":  "youngling",
-									"alive": "yes",
-								},
+
+								"rank":  "youngling",
+								"alive": "yes",
 							},
 						},
 					},
@@ -596,10 +595,8 @@ func TestPrometheusKeyLabels(t *testing.T) {
 									"32000": uint64(27),
 									"+Inf":  uint64(28),
 								},
-								"labels": common.MapStr{
-									"rank":  "padawan",
-									"alive": "yes",
-								},
+								"rank":  "padawan",
+								"alive": "yes",
 							},
 						},
 					},
