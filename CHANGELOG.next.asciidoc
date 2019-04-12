@@ -20,6 +20,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Metricbeat*
 
+- Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
+
 *Packetbeat*
 
 *Winlogbeat*
