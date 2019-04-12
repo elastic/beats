@@ -25003,7 +25003,7 @@ All UDP connections
 --
 type: integer
 
-All open TCP connections
+All open UDP connections
 
 
 --
