@@ -55,7 +55,5 @@ include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
 
-include::./migration.asciidoc[]
-
 include::{libbeat-dir}/docs/contributing-to-beats.asciidoc[]
 
