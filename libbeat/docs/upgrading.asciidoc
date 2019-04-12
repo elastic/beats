@@ -142,8 +142,18 @@ migration.6_to_7.enabled: true
 ----
 
 The field aliases enable you to use 6.x dashboards and visualizations
-with indices created by {beats} 7.0 or later. The aliases do *not* work
-with saved searches or with API calls that manipulate documents directly.
+with indices created by {beats} 7.0 or later. However, there are a couple of
+exceptions:
+
+* The aliases do *not* work with saved searches or with API calls that
+manipulate documents directly.
+* The aliases do *not* resolve type mismatches caused by field type changes
+in 7.0. Aggregations in 6.x dashboards that rely on those fields will no longer
+work with indices created by {beats} 7.0 or later. 
+
+// TODO: Add a link to the breaking changes after we've added the list of type
+// changes. We should also add more detail to the troubleshooting section to
+// explain how to migrate the
 
 We strongly advise that you adjust your custom {kib} dashboards, machine
 learning jobs, and other content to use the new ECS field names. After removing
