@@ -69,14 +69,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/SQS"
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		m.logger.Error(errors.Wrap(err, "Error ParseDuration"))
-		report.Error(err)
-		return
+		return errors.Wrap(err, "Error ParseDuration")
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
@@ -122,8 +120,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		// Create Cloudwatch Events for SQS
-		createSQSEvents(queueURLs, metricDataResults, regionName, report)
+		err = createSQSEvents(queueURLs, metricDataResults, regionName, report)
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
@@ -209,7 +212,7 @@ func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, que
 	return
 }
 
-func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) {
+func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) error {
 	for _, queueURL := range queueURLs {
 		queueURLParsed := strings.Split(queueURL, "/")
 		queueName := queueURLParsed[len(queueURLParsed)-1]
@@ -219,6 +222,9 @@ func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDa
 			report.Event(event)
 			continue
 		}
-		report.Event(event)
+
+		if reported := report.Event(event); !reported {
+			return errors.Wrap(err, "Error trying to emit event")
+		}
 	}
 }

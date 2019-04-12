@@ -79,15 +79,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		logp.Error(errors.Wrap(err, "Error ParseDuration"))
-		m.logger.Error(err.Error())
-		report.Error(err)
-		return
+		return errors.Wrap(err, "Error ParseDuration")
 	}
 
 	// GetMetricData for AWS S3 from Cloudwatch
@@ -129,9 +126,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				report.Event(event)
 				continue
 			}
-			report.Event(event)
+
+			if reported := report.Event(event); !reported {
+				return errors.Wrap(err, "Error trying to emit event")
+			}
 		}
 	}
+
+	return nil
 }
 
 func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []string) {
