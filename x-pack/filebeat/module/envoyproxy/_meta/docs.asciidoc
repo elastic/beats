@@ -11,8 +11,8 @@ envoy proxy deployment in Kubernetes.
 [float]
 === Compatibility
 
-Although this module has been developed against Kubernetes v1.13.x, it is expected to work
-with other versions of Kubernetes.
+Although this module has been developed against Envoy proy 1.10.0 and Kubernetes v1.13.x, it is expected to work
+with other versions of Envoy proxy and Kubernetes.
 
 [float]
 === Example dashboard

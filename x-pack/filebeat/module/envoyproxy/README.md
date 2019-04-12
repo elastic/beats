@@ -12,9 +12,8 @@ Grab the filebeat binary from elastic.co, and install it by following the instru
 
 ## Deployment Scenario #1: envoy native deployment
 
-Make sure to update envoy configuration to enable log plugin. This module assumes that envoy log
-entries will be written to /var/log/envoy.log. Should it be not the case, please point the module 
-log path to the path of the log file. 
+This module assumes that envoy log entries will be written to /var/log/envoy.log. Should 
+it be not the case, please point the module log path to the path of the log file. 
 
 Update filebeat.yml to point to Elasticsearch and Kibana. 
 Setup Filebeat.
