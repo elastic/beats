@@ -76,7 +76,7 @@ also available. To install it, use the following sources list:
 
 ifeval::["{release-state}"=="prerelease"]
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 --------------------------------------------------
 echo "deb https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
 --------------------------------------------------
@@ -85,7 +85,7 @@ endif::[]
 
 ifeval::["{release-state}"!="prerelease"]
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 --------------------------------------------------
 echo "deb https://artifacts.elastic.co/packages/oss-{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
 --------------------------------------------------
@@ -185,7 +185,7 @@ also available. To install it, use the following `baseurl` in your
 
 ifeval::["{release-state}"=="prerelease"]
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 --------------------------------------------------
 baseurl=https://artifacts.elastic.co/packages/oss-{major-version}-prerelease/yum
 --------------------------------------------------
@@ -194,7 +194,7 @@ endif::[]
 
 ifeval::["{release-state}"!="prerelease"]
 
-["source","sh",subs="attributes,callouts"]
+["source","sh",subs="attributes"]
 --------------------------------------------------
 baseurl=https://artifacts.elastic.co/packages/oss-{major-version}/yum
 --------------------------------------------------
