@@ -158,9 +158,13 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
-				// Put it in the event if it's a common metric
 				event := getEvent(eventsMap, keyLabels)
-				event.Put(field, value)
+
+				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
+				update := common.MapStr{}
+				update.Put(field, value)
+				event.DeepUpdate(update)
+
 				event.DeepUpdate(labels)
 			}
 		}
