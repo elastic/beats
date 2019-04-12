@@ -25595,6 +25595,16 @@ Number of active disks.
 
 --
 
+*`system.raid.disks.Unknown`*::
++
+--
+type: long
+
+Number of disks in a state that does not belong to any other category
+
+
+--
+
 *`system.raid.disks.total`*::
 +
 --
@@ -25640,7 +25650,7 @@ map of raw disk states
 --
 type: long
 
-Number of blocks the device holds.
+Number of blocks the device holds, in 1024-byte blocks.
 
 
 --
@@ -25650,7 +25660,7 @@ Number of blocks the device holds.
 --
 type: long
 
-Number of blocks on the device that are in sync.
+Number of blocks on the device that are in sync, in 1024-byte blocks.
 
 
 --
