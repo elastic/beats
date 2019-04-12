@@ -68,6 +68,12 @@
     },
     {
       "set": {
+        "field": "envoyproxy.proxy_type",
+        "value": "http"
+      }
+    },
+    {
+      "set": {
         "field": "url.domain",
         "value": "{{envoyproxy.authority}}"
       }

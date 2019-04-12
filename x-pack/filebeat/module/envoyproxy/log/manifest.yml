@@ -4,7 +4,7 @@ var:
   - name: paths
     default:
       # Change this if it is not "/var/log/envoy.log" in native deployment mode
-      - /var/log/envoy.log
+      - /tmp/log/envoy.log
   - name: tags
     default: [envoyproxy]
 

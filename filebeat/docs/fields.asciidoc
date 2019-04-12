@@ -5424,6 +5424,16 @@ Envoy proxy authority field
 
 --
 
+*`envoyproxy.proxy_type`*::
++
+--
+type: keyword
+
+Envoy proxy type, tcp or http
+
+
+--
+
 [[exported-fields-haproxy]]
 == haproxy fields
 

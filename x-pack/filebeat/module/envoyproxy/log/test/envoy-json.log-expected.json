@@ -2,6 +2,14 @@
     {
         "@timestamp": "2019-04-10T03:49:34.451Z",
         "destination.address": "52.71.234.219",
+        "destination.geo.city_name": "Ashburn",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 39.0481,
+        "destination.geo.location.lon": -77.4728,
+        "destination.geo.region_iso_code": "US-VA",
+        "destination.geo.region_name": "Virginia",
+        "destination.ip": "52.71.234.219",
         "destination.port": 80,
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "httpbin.org",
@@ -28,6 +36,7 @@
         "message": "ACCESS [2019-04-10T03:49:34.451Z] \"GET /httpbin/status/501 HTTP/1.1\" 501 - 0 0 180 179 \"172.17.0.3\" \"curl/7.59.0\" \"413bf460-bd56-4515-ada4-2a69c5e78e54\" \"httpbin.org\" \"52.71.234.219:80\"",
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",
+        "source.ip": "172.17.0.3",
         "tags": [
             "envoyproxy"
         ],
@@ -42,6 +51,7 @@
         "@timestamp": "2019-04-06T06:20:05.972Z",
         "destination.address": "127.0.0.1",
         "destination.bytes": 0,
+        "destination.ip": "127.0.0.1",
         "destination.port": 9200,
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "-",

@@ -29,6 +29,12 @@
         "field" : "source.bytes",
         "type": "long"
       }
+    },
+    {
+      "set": {
+        "field": "envoyproxy.proxy_type",
+        "value": "tcp"
+      }
     }
   ],
   "on_failure" : [{ 

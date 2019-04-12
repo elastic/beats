@@ -3,6 +3,7 @@
         "@timestamp": "2019-04-08T16:50:12.533Z",
         "destination.address": "172.27.0.2",
         "destination.bytes": 87,
+        "destination.ip": "172.27.0.2",
         "destination.port": 80,
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "-",
@@ -24,6 +25,7 @@
     {
         "@timestamp": "2019-04-08T16:16:55.931Z",
         "destination.address": "172.27.0.3",
+        "destination.ip": "172.27.0.3",
         "destination.port": 80,
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "localhost:8000",
@@ -76,6 +78,7 @@
         "message": "[2019-04-11T00:31:55.439Z] \"GET /elastic HTTP/1.1\" 404 NR 0 0 0 - \"172.17.0.3\" \"curl/7.59.0\" \"58436667-bf70-4fd0-9fe9-cdadadecfd55\" \"192.168.99.107:30901\" \"-\"",
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",
+        "source.ip": "172.17.0.3",
         "tags": [
             "envoyproxy"
         ],
@@ -89,6 +92,11 @@
     {
         "@timestamp": "2019-04-11T00:51:07.980Z",
         "destination.address": "151.101.66.217",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "151.101.66.217",
         "destination.port": 80,
         "ecs.version": "1.0.0",
         "envoyproxy.authority": "www.elastic.co",
@@ -109,6 +117,7 @@
         "message": "[2019-04-11T00:51:07.980Z] \"GET /elastic/ HTTP/1.1\" 301 - 0 0 41 39 \"172.17.0.3\" \"curl/7.59.0\" \"078d1daa-b786-4d6d-85a5-7e4366adaa19\" \"www.elastic.co\" \"151.101.66.217:80\"",
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",
+        "source.ip": "172.17.0.3",
         "tags": [
             "envoyproxy"
         ],

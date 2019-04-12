@@ -35,5 +35,11 @@
       description: >
         Envoy proxy authority field
 
+    - name: proxy_type
+      type: keyword
+      description: >
+        Envoy proxy type, tcp or http
+
+
 
         
