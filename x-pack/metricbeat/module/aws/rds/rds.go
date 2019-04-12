@@ -132,8 +132,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 			if reported := report.Event(event); !reported {
-				err = errors.Wrap(err, "Error trying to emit event")
-				return err
+				m.Logger().Debug("Fetch interrupted, failed to emit event")
+				return nil
 			}
 		}
 	}
