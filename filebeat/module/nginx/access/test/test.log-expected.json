@@ -222,7 +222,7 @@
     },
     {
         "@timestamp": "2019-02-26T14:39:42.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -231,10 +231,8 @@
         "http.response.status_code": 400,
         "input.type": "log",
         "log.offset": 1184,
-        "nginx.access.origin": [
-            "unix:"
-        ],
         "service.type": "nginx",
+        "source.address": "unix:",
         "user.name": "-",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
@@ -242,7 +240,7 @@
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -253,10 +251,8 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1247,
-        "nginx.access.origin": [
-            "localhost"
-        ],
         "service.type": "nginx",
+        "source.address": "localhost",
         "url.original": "/test2",
         "user.name": "-",
         "user_agent.device.name": "Other",
@@ -267,7 +263,7 @@
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
         "fileset.name": "access",
@@ -278,11 +274,8 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1398,
-        "nginx.access.origin": [
-            "localhost",
-            "localhost"
-        ],
         "service.type": "nginx",
+        "source.address": "localhost, localhost",
         "url.original": "/test2",
         "user.name": "-",
         "user_agent.device.name": "Other",

@@ -11453,15 +11453,6 @@ alias to: http.response.body.bytes
 
 --
 
-*`nginx.access.remote_ip`*::
-+
---
-type: alias
-
-alias to: source.address
-
---
-
 *`nginx.access.user_name`*::
 +
 --
@@ -11807,7 +11798,7 @@ Query statement.
 *`postgresql.log.timezone`*::
 +
 --
-type: array
+type: alias
 
 alias to: event.timezone
 
