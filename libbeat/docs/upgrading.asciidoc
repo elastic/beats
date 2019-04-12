@@ -386,21 +386,29 @@ manually.
 
 To add the setting manually, first identify the list of fields that you want to
 set as the default search fields, then specify the list of fields in the
-`default_field` setting. For example:
+`default_field` setting.
 
-// REVIEWERS: Can we provide users with a more realistic example here that
-// maybe shows some fields for metricbeat? This one is too generic. 
+For example, here's a snippet that shows how to add default search fields to a
+Metricbeat 6.6 index. This example is truncated. Full examples for Metricbeat
+and Filebeat are available in
+https://github.com/elastic/beats/blob/master/libbeat/docs/troubleshooting/default_field.md[this file]. 
 
 [source,js]
 --------------------------------------------------
-PUT /myIndex/_settings
+PUT /metricbeat-6.6.2-2019.04.09/_settings
 {
   "index": {
     "query": {
       "default_field": [
-        "field1",
-        "nestedfield.field4",
-        "field2",
+        "aerospike.namespace.name",
+        "aerospike.namespace.node.host",
+        "aerospike.namespace.node.name",
+        "apache.status.hostname",
+        "beat.hostname",
+        "beat.name",
+        "beat.timezone",
+        "beat.version",
+        ...
       ]
     }
   }
