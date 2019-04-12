@@ -16,7 +16,7 @@ func TestEnrollmentToken(t *testing.T) {
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check correct path is used
 		assert.Equal(t, "/api/beats/enrollment_tokens", r.URL.Path)
-		fmt.Fprintf(w, `{"tokens":["65074ff8639a4661ba7e1bd5ccc209ed"]}`)
+		fmt.Fprintf(w, `{"results": [{"item":"65074ff8639a4661ba7e1bd5ccc209ed"}]}`)
 	}))
 	defer server.Close()
 
