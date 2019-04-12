@@ -44,7 +44,7 @@ var mapping = &prometheus.MetricsMapping{
 		// go runtime
 		"go_memstats_alloc_bytes": prometheus.Metric("runtime.memory.alloc.bytes"),
 		"go_threads":              prometheus.Metric("runtime.process.threads.count"),
-		"go_goroutines":           prometheus.Metric("runtime.process.go.routines.count"),
+		"go_goroutines":           prometheus.Metric("runtime.go.routines.count"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{

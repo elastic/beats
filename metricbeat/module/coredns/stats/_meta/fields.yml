@@ -108,7 +108,7 @@
       type: long
       description: >
         Running threads count
-    - name: runtime.process.go.routines.count
+    - name: runtime.go.routines.count
       type: long
       description: >
         Running Go routines count
