@@ -96,17 +96,16 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	for _, blockDev := range devices {
 
-		disks := blockDev.ReduceDisks()
 		event := common.MapStr{
 			"name":   blockDev.Name,
 			"status": blockDev.ArrayState,
 			"disks": common.MapStr{
-				"active":  blockDev.ActiveDisks,
-				"total":   disks.Total,
-				"spare":   disks.Spare,
-				"failed":  disks.Failed,
-				"states":  disks.States,
-				"unknown": disks.Unknown,
+				"active":  blockDev.DiskStates.Active,
+				"total":   blockDev.DiskStates.Total,
+				"spare":   blockDev.DiskStates.Spare,
+				"failed":  blockDev.DiskStates.Failed,
+				"unknown": blockDev.DiskStates.Unknown,
+				"states":  blockDev.DiskStates.States,
 			},
 		}
 		//emulate the behavior of the previous mdstat parser by using the size when no sync data is available

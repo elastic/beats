@@ -25,6 +25,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 //get the raid level and use that to determine how we fill out the array
@@ -57,41 +59,6 @@ func parseIntVal(path string) (int64, error) {
 	}
 
 	return value, nil
-}
-
-//get all the disks associated with an MD device
-func getDisks(path string) ([]Disk, error) {
-	//so far, haven't found a less hacky way to do this.
-	devices, err := filepath.Glob(filepath.Join(path, "md", "dev-*"))
-	if err != nil {
-		return nil, errors.Wrap(err, "could not get device list")
-	}
-
-	var diskList []Disk
-	for _, disk := range devices {
-		d, err := getDisk(disk)
-		if err != nil {
-			return nil, err
-		}
-		diskList = append(diskList, d)
-	}
-
-	return diskList, nil
-}
-
-func getDisk(path string) (Disk, error) {
-	size, err := parseIntVal(filepath.Join(path, "size"))
-	if err != nil {
-		return Disk{}, errors.Wrap(err, "error getting disk size")
-	}
-
-	state, err := ioutil.ReadFile(filepath.Join(path, "state"))
-	if err != nil {
-		return Disk{}, errors.Wrap(err, "error getting disk state")
-	}
-
-	return Disk{Size: size, State: strings.TrimSpace(string(state))}, nil
-
 }
 
 //get the current sync status as it exists under md/sync_completed
@@ -139,11 +106,11 @@ func newMD(path string) (MDDevice, error) {
 	dev.Size = size
 
 	//This is the count of 'active' disks
-	active, err := parseIntVal(filepath.Join(path, "md", "raid_disks"))
-	if err != nil {
-		return dev, errors.Wrap(err, "could not get raid_disks")
-	}
-	dev.ActiveDisks = active
+	// active, err := parseIntVal(filepath.Join(path, "md", "raid_disks"))
+	// if err != nil {
+	// 	return dev, errors.Wrap(err, "could not get raid_disks")
+	// }
+	// dev.ActiveDisks = active
 
 	//RAID array state
 	state, err := ioutil.ReadFile(filepath.Join(path, "md", "array_state"))
@@ -157,7 +124,7 @@ func newMD(path string) (MDDevice, error) {
 	if err != nil {
 		return dev, errors.Wrap(err, "could not get disk data")
 	}
-	dev.Devices = disks
+	dev.DiskStates = disks
 
 	//sync action and sync status will only exist for redundant raid levels
 	redundant, err := isRedundant(path)
@@ -184,4 +151,57 @@ func newMD(path string) (MDDevice, error) {
 	}
 
 	return dev, nil
+}
+
+//get all the disks associated with an MD device
+func getDisks(path string) (DiskStates, error) {
+	//so far, haven't found a less hacky way to do this.
+	devices, err := filepath.Glob(filepath.Join(path, "md", "dev-*"))
+	if err != nil {
+		return DiskStates{}, errors.Wrap(err, "could not get device list")
+	}
+
+	var disks DiskStates
+	disks.States = common.MapStr{}
+	//This is meant to provide a 'common status' for disks in the array
+	//see https://www.kernel.org/doc/html/v4.15/admin-guide/md.html#md-devices-in-sysfs
+	for _, disk := range devices {
+		disk, err := getDisk(disk)
+		if err != nil {
+			return DiskStates{}, err
+		}
+
+		switch disk {
+		case "faulty", "blocked", "write_error", "want_replacement":
+			disks.Failed++
+		case "in_sync", "writemostly", "replacement":
+			disks.Active++
+		case "spare":
+			disks.Spare++
+		default:
+			disks.Unknown++
+		}
+
+		if _, ok := disks.States[disk]; !ok {
+			disks.States[disk] = 1
+		} else {
+			disks.States[disk] = disks.States[disk].(int) + 1
+		}
+
+		disks.Total++
+
+	}
+
+	return disks, nil
+}
+
+func getDisk(path string) (string, error) {
+
+	state, err := ioutil.ReadFile(filepath.Join(path, "state"))
+	if err != nil {
+		return "", errors.Wrap(err, "error getting disk state")
+	}
+
+	return strings.TrimSpace(string(state)), nil
+
 }
