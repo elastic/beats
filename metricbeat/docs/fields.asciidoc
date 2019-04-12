@@ -2832,7 +2832,7 @@ Running threads count
 
 --
 
-*`coredns.stats.runtime.process.go.routines.count`*::
+*`coredns.stats.runtime.go.routines.count`*::
 +
 --
 type: long
