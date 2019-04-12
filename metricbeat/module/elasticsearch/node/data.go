@@ -69,9 +69,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 	err := json.Unmarshal(content, &nodesStruct)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
 	var errs multierror.Errors
@@ -87,9 +85,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			event.Error = errors.Wrap(err, "failure applying node schema")
-			r.Event(event)
-			errs = append(errs, event.Error)
+			errs = append(errs, errors.Wrap(err, "failure applying node schema"))
 			continue
 		}
 
