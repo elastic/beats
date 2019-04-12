@@ -240,12 +240,9 @@ func (m *indexManager) Setup(setupTemplate, setupILM SetupConfig) error {
 		}
 
 		fields := m.assets.Fields(m.support.info.Beat)
-		loader, err := template.NewLoader(m.client, m.support.info, fields, m.support.migration)
-		if err != nil {
-			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
-		}
+		loader := template.NewLoader(m.client, m.support.info)
 
-		err = loader.Load(tmplCfg)
+		err = loader.Load(tmplCfg, fields, m.support.migration)
 		if err != nil {
 			return fmt.Errorf("Error loading Elasticsearch template: %v", err)
 		}

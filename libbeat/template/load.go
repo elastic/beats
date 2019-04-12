@@ -38,40 +38,35 @@ type Client interface {
 
 //Loader interface for loading templates
 type Loader interface {
-	Load(config TemplateConfig) error
+	Load(config TemplateConfig, fields []byte, migration bool) error
 }
 
 // NewLoader creates a new template loader
 func NewLoader(
 	client Client,
 	info beat.Info,
-	fields []byte,
-	migration bool,
-) (Loader, error) {
+) Loader {
 	if client == nil {
-		return &stdoutLoader{info: info, fields: fields, migration: migration}, nil
+		return &stdoutLoader{info: info}
 	}
-	return &esLoader{
-		client:    client,
-		info:      info,
-		fields:    fields,
-		migration: migration,
-	}, nil
+	return &esLoader{client: client, info: info}
 }
 
 type esLoader struct {
-	client    Client
-	info      beat.Info
-	fields    []byte
-	migration bool
+	client Client
+	info   beat.Info
+}
+
+type stdoutLoader struct {
+	info beat.Info
 }
 
 // Load checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
-func (l *esLoader) Load(config TemplateConfig) error {
+func (l *esLoader) Load(config TemplateConfig, fields []byte, migration bool) error {
 	//build template from config
-	tmpl, err := template(config, l.info, l.client.GetVersion(), l.migration)
+	tmpl, err := template(config, l.info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {
 		return err
 	}
@@ -88,7 +83,7 @@ func (l *esLoader) Load(config TemplateConfig) error {
 	}
 
 	//loading template to ES
-	body, err := buildBody(l.info, tmpl, config, l.fields)
+	body, err := buildBody(l.info, tmpl, config, fields)
 	if err != nil {
 		return err
 	}
@@ -127,21 +122,15 @@ func (l *esLoader) templateExists(templateName string) bool {
 	return true
 }
 
-type stdoutLoader struct {
-	info      beat.Info
-	fields    []byte
-	migration bool
-}
-
-func (l *stdoutLoader) Load(config TemplateConfig) error {
+func (l *stdoutLoader) Load(config TemplateConfig, fields []byte, migration bool) error {
 	//build template from config
-	tmpl, err := template(config, l.info, common.Version{}, l.migration)
+	tmpl, err := template(config, l.info, common.Version{}, migration)
 	if err != nil || tmpl == nil {
 		return err
 	}
 
 	//create body to print
-	body, err := buildBody(l.info, tmpl, config, l.fields)
+	body, err := buildBody(l.info, tmpl, config, fields)
 	if err != nil {
 		return err
 	}
