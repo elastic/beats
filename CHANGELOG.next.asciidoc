@@ -30,20 +30,6 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Ensure all beat commands respect configured settings. {pull}10721[10721]
-- Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
-- decode_json_field: process objects and arrays only {pull}11312[11312]
-- decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
-- Report faulting file when config reload fails. {pull}[11304]11304
-- Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
-- Management configuration backup file will now have a timestamps in their name. {pull}11034[11034]
-- [CM] Parse enrollment_token response correctly {pull}11648[11648]
-- Not hiding error in case of http failure using elastic fetcher {pull}11604[11604]
-- Relax validation of the X-Pack license UID value. {issue}11640[11640]
-- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
-- Fix ILM policy always being overwritten. {pull}11671[11671]
-- Fix template always being overwritten. {pull}11671[11671]
-- Fix matching of string arrays in contains condition. {pull}11691[11691]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 
 *Auditbeat*
