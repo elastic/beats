@@ -132,6 +132,7 @@ for a list of AWS services that publish metrics to CloudWatch.
 `period` for `rds` metricset is recommended to be `60s` or multiples of `60s` because Amazon RDS sends metrics and
 dimensions to Amazon CloudWatch every minute.
 
+
 [float]
 === Example configuration
 
