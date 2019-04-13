@@ -69,19 +69,17 @@ if [ -d "/vagrant" ]  && [ ! -e "beats" ]; then ln -s /vagrant beats; fi
 SCRIPT
 
 # Linux GVM
-def linuxGvmProvision(arch="amd64")
-  return <<SCRIPT
+$linuxGvmProvision = <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-linux-#{arch}
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-linux-amd64
   chmod +x ~/bin/gvm
-  ~/bin/gvm #{GO_VERSION}
+  ~/bin/gvm $GO_VERSION
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
   echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
   echo 'eval "$(gvm #{GO_VERSION})"' >> ~/.bash_profile
 fi
 SCRIPT
-end
 
 Vagrant.configure(2) do |config|
 
@@ -143,17 +141,7 @@ Vagrant.configure(2) do |config|
     c.vm.network :forwarded_port, guest: 22,   host: 2226,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
-
-    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
-  end
-
-  config.vm.define "precise32", primary: true do |c|
-    c.vm.box = "ubuntu/precise32"
-    c.vm.network :forwarded_port, guest: 22,   host: 2226,  id: "ssh", auto_correct: true
-
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision("386"), privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
@@ -163,7 +151,7 @@ Vagrant.configure(2) do |config|
     c.vm.network :forwarded_port, guest: 22,   host: 2229,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
@@ -174,7 +162,7 @@ Vagrant.configure(2) do |config|
     c.vm.network :forwarded_port, guest: 22,   host: 2227,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
     c.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
@@ -185,7 +173,7 @@ Vagrant.configure(2) do |config|
     c.vm.network :forwarded_port, guest: 22,   host: 2228,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
     c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python-pip python-virtualenv git"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
@@ -196,7 +184,7 @@ Vagrant.configure(2) do |config|
     c.vm.network :forwarded_port, guest: 22,   host: 2229,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
     c.vm.provision "shell", inline: "apt-get update && apt-get install -y make gcc python-pip python-virtualenv git"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
@@ -207,7 +195,7 @@ Vagrant.configure(2) do |config|
     c.vm.network :forwarded_port, guest: 22,   host: 2230,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
     c.vm.provision "shell", inline: "pip install virtualenv"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"

@@ -29,7 +29,7 @@ func mustUUIDV4() uuid.UUID {
 // OSSLicense default license to use.
 var (
 	OSSLicense = &License{
-		UUID:   mustUUIDV4().String(),
+		UUID:   mustUUIDV4(),
 		Type:   OSS,
 		Mode:   OSS,
 		Status: Active,

@@ -39,7 +39,6 @@ const (
 	namespace     = "system.audit.package"
 
 	redhat = "redhat"
-	suse   = "suse"
 	debian = "debian"
 	darwin = "darwin"
 
@@ -208,7 +207,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	ms.osFamily = osInfo.Family
 	switch osInfo.Family {
-	case redhat, suse:
+	case redhat:
 		// ok
 	case debian:
 		if _, err := os.Stat(dpkgStatusFile); err != nil {
@@ -472,7 +471,7 @@ func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
 
 func getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
-	case redhat, suse:
+	case redhat:
 		packages, err = listRPMPackages()
 		if err != nil {
 			err = errors.Wrap(err, "error getting RPM packages")

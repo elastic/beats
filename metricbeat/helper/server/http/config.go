@@ -17,12 +17,9 @@
 
 package http
 
-import "github.com/elastic/beats/libbeat/common/transport/tlscommon"
-
 type HttpConfig struct {
-	Host string                  `config:"host"`
-	Port int                     `config:"port"`
-	TLS  *tlscommon.ServerConfig `config:"ssl"`
+	Host string `config:"host"`
+	Port int    `config:"port"`
 }
 
 func defaultHttpConfig() HttpConfig {

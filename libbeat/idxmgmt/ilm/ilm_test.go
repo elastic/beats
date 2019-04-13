@@ -220,11 +220,9 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 		calls     []onCall
 		overwrite bool
 		cfg       map[string]interface{}
-		create    bool
 		fail      error
 	}{
 		"create new policy": {
-			create: true,
 			calls: []onCall{
 				onHasILMPolicy(testPolicy.Name).Return(false, nil),
 				onCreateILMPolicy(testPolicy).Return(nil),
@@ -260,16 +258,14 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 
 			h := newMockHandler(test.calls...)
 			m := createManager(t, h, test.cfg)
-			created, err := m.EnsurePolicy(test.overwrite)
+			err := m.EnsurePolicy(test.overwrite)
 
 			if test.fail == nil {
-				assert.Equal(t, test.create, created)
 				require.NoError(t, err)
 			} else {
 				require.Error(t, err)
 				assert.Equal(t, test.fail, ErrReason(err))
 			}
-
 			h.AssertExpectations(t)
 		})
 	}

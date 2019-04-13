@@ -25,23 +25,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// Format encodes the type of format to report monitoring data in. This
-// is currently only being used by the elaticsearch reporter.
-// This is a hack that is necessary so we can map certain monitoring
-// configuration options to certain behaviors in reporters. Depending on
-// the configuration option used, the correct format is set, and reporters
-// that know how to interpret the format use it to choose the appropriate
-// reporting behavior.
-type Format int
-
-// Enumerations of various Formats. A reporter can choose whether to
-// interpret this setting or not, and if so, how to interpret it.
-const (
-	FormatUnknown Format = iota // to protect against zero-value errors
-	FormatXPackMonitoringBulk
-	FormatBulk
-)
-
 type config struct {
 	// allow for maximum one reporter being configured
 	Reporter common.ConfigNamespace `config:",inline"`
@@ -49,7 +32,6 @@ type config struct {
 
 type Settings struct {
 	DefaultUsername string
-	Format          Format
 }
 
 type Reporter interface {
@@ -77,7 +59,7 @@ func New(
 	cfg *common.Config,
 	outputs common.ConfigNamespace,
 ) (Reporter, error) {
-	name, cfg, err := getReporterConfig(cfg, settings, outputs)
+	name, cfg, err := getReporterConfig(cfg, outputs)
 	if err != nil {
 		return nil, err
 	}
@@ -91,11 +73,10 @@ func New(
 }
 
 func getReporterConfig(
-	monitoringConfig *common.Config,
-	settings Settings,
+	cfg *common.Config,
 	outputs common.ConfigNamespace,
 ) (string, *common.Config, error) {
-	cfg := collectSubObject(monitoringConfig)
+	cfg = collectSubObject(cfg)
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return "", nil, err
@@ -115,7 +96,7 @@ func getReporterConfig(
 			}{}
 			rc.Unpack(&hosts)
 
-			if settings.Format == FormatXPackMonitoringBulk && len(hosts.Hosts) > 0 {
+			if len(hosts.Hosts) > 0 {
 				pathMonHosts := rc.PathOf("hosts")
 				pathOutHost := outCfg.PathOf("hosts")
 				err := fmt.Errorf("'%v' and '%v' are configured", pathMonHosts, pathOutHost)

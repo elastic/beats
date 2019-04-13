@@ -45,14 +45,8 @@ type Supporter interface {
 // Manager uses an APIHandler to install a policy.
 type Manager interface {
 	Enabled() (bool, error)
-
 	EnsureAlias() error
-
-	// EnsurePolicy installs a policy if it does not exist. The policy is always
-	// written if overwrite is set.
-	// The created flag is set to true only if a new policy is created. `created`
-	// is false if an existing policy gets overwritten.
-	EnsurePolicy(overwrite bool) (created bool, err error)
+	EnsurePolicy(overwrite bool) error
 }
 
 // APIHandler defines the interface between a remote service and the Manager.

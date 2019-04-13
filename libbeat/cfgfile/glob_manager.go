@@ -20,7 +20,6 @@ package cfgfile
 import (
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -111,7 +110,6 @@ func (g *GlobManager) ListEnabled() []*CfgFile {
 		}
 	}
 
-	sort.Sort(byCfgFileDisplayNames(enabled))
 	return enabled
 }
 
@@ -124,7 +122,6 @@ func (g *GlobManager) ListDisabled() []*CfgFile {
 		}
 	}
 
-	sort.Sort(byCfgFileDisplayNames(disabled))
 	return disabled
 }
 
@@ -184,32 +181,4 @@ func (g *GlobManager) Disable(name string) error {
 	}
 
 	return errors.Errorf("module %s not found", name)
-}
-
-// For sorting config files in the desired order, so variants will
-// show up after the default, e.g. elasticsearch-xpack will show up
-// after elasticsearch.
-type byCfgFileDisplayNames []*CfgFile
-
-func (s byCfgFileDisplayNames) Len() int {
-	return len(s)
-}
-
-func (s byCfgFileDisplayNames) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-func (s byCfgFileDisplayNames) Less(i, j int) bool {
-	namei := s[i].Name
-	namej := s[j].Name
-
-	if strings.HasPrefix(namei, namej) {
-		// namei starts with namej, so namei is longer and we want it to come after namej
-		return false
-	} else if strings.HasPrefix(namej, namei) {
-		// namej starts with namei, so namej is longer and we want it to come after namei
-		return true
-	} else {
-		return namei < namej
-	}
 }
