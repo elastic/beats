@@ -6,6 +6,8 @@ package licenser
 
 import (
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 // License represents the license of this beat, the license is fetched and returned from
@@ -25,7 +27,7 @@ import (
 // mode is the license in operation. (effective license)
 // status is the type installed is active or not.
 type License struct {
-	UUID        string      `json:"uid"`
+	UUID        uuid.UUID   `json:"uid"`
 	Type        LicenseType `json:"type"`
 	Mode        LicenseType `json:"mode"`
 	Status      State       `json:"status"`
@@ -52,7 +54,7 @@ type Base struct {
 	Available bool `json:"available"`
 }
 
-// Defines all the available features
+// Defines all the avaiables features
 type graph struct{ *Base }
 type logstash struct{ *Base }
 type ml struct{ *Base }

@@ -200,8 +200,8 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 	}, nil
 }
 
-func (m *indexManager) Setup(forceTemplate, forcePolicy bool) error {
-	return m.load(forceTemplate, forcePolicy)
+func (m *indexManager) Setup(template, policy bool) error {
+	return m.load(template, policy)
 }
 
 func (m *indexManager) Load() error {
@@ -231,16 +231,10 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 
 	// install ilm policy
 	if withILM {
-		policyCreated, err := m.ilm.EnsurePolicy(forcePolicy)
-		if err != nil {
+		if err := m.ilm.EnsurePolicy(forcePolicy); err != nil {
 			return err
 		}
 		log.Info("ILM policy successfully loaded.")
-
-		// The template should be updated if a new policy is created.
-		if policyCreated {
-			forceTemplate = true
-		}
 	}
 
 	// create and install template

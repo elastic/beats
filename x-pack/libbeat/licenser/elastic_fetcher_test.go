@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
@@ -132,7 +133,8 @@ func TestParseJSON(t *testing.T) {
 					return
 				}
 
-				assert.True(t, len(license.UUID) > 0)
+				id, _ := uuid.FromString("936183d8-f48c-4a3f-959a-a52aa2563279")
+				assert.Equal(t, id, license.UUID)
 
 				assert.NotNil(t, license.Type)
 				assert.NotNil(t, license.Mode)

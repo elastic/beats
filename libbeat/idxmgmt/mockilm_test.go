@@ -86,9 +86,9 @@ func (m *mockILMSupport) EnsureAlias() error {
 }
 
 func onEnsurePolicy() onCall { return makeOnCall("EnsurePolicy") }
-func (m *mockILMSupport) EnsurePolicy(overwrite bool) (bool, error) {
+func (m *mockILMSupport) EnsurePolicy(overwrite bool) error {
 	args := m.Called()
-	return args.Bool(0), args.Error(1)
+	return args.Error(0)
 }
 
 func makeOnCall(name string, args ...interface{}) onCall {
