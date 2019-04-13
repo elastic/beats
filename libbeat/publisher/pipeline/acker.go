@@ -132,21 +132,22 @@ func (a *gapCountACK) ackLoop() {
 	// - all events of the closed client have been acked/processed by the pipeline
 
 	acks, drop := a.acks, a.drop
-	closing := false
-
 	for {
 		select {
 		case <-a.done:
-			closing = true
 			a.done = nil
+			if a.events.Load() == 0 {
+				// Stop worker now because no more acks are going to be received
+				return
+			}
 
 		case <-a.pipeline.ackDone:
 			return
 
 		case n := <-acks:
 			empty := a.handleACK(n)
-			if empty && closing && a.events.Load() == 0 {
-				// stop worker, iff all events accounted for have been ACKed
+			if empty && a.done == nil && a.events.Load() == 0 {
+				// Stop worker, if all events accounted for have been ACKed
 				return
 			}
 
