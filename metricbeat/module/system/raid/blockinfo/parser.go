@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var debugf = logp.MakeDebug("system-raid")
+var debugf = logp.MakeDebug("system.raid")
 
 //get the raid level and use that to determine how we fill out the array
 //Only data-reduntant RIAD levels (1,4,5,6,10) have some of these fields
