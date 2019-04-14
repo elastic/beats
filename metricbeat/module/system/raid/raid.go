@@ -99,6 +99,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		event := common.MapStr{
 			"name":   blockDev.Name,
 			"status": blockDev.ArrayState,
+			"level":  blockDev.Level,
 			"disks": common.MapStr{
 				"active":  blockDev.DiskStates.Active,
 				"total":   blockDev.DiskStates.Total,

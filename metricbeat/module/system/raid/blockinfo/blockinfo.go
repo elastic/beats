@@ -28,6 +28,7 @@ type SyncStatus struct {
 // MDDevice represents /sys/block/[device] for an md device
 type MDDevice struct {
 	Name       string     //the name of the device
+	Level      string     //The RAID level of the device
 	Size       int64      //Size, as count of 512 byte blocks
 	ArrayState string     //State of the Array
 	DiskStates DiskStates //Disks in the Array

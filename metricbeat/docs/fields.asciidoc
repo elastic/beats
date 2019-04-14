@@ -25575,6 +25575,16 @@ activity-state of the device.
 
 --
 
+*`system.raid.level`*::
++
+--
+type: keyword
+
+The raid level of the device
+
+
+--
+
 *`system.raid.sync_action`*::
 +
 --

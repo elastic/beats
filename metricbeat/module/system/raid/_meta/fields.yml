@@ -12,6 +12,10 @@
       type: keyword
       description: >
         activity-state of the device.
+    - name: level
+      type: keyword
+      description: >
+        The raid level of the device
     - name: sync_action
       type: keyword
       description: >

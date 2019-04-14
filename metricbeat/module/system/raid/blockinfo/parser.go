@@ -34,18 +34,13 @@ var debugf = logp.MakeDebug("system-raid")
 
 //get the raid level and use that to determine how we fill out the array
 //Only data-reduntant RIAD levels (1,4,5,6,10) have some of these fields
-func isRedundant(path string) (bool, error) {
-	raw, err := ioutil.ReadFile(filepath.Join(path, "md", "level"))
-	if err != nil {
-		return false, err
-	}
-	raidStr := strings.TrimSpace(string(raw))
+func isRedundant(raidStr string) bool {
 	if raidStr == "raid1" || raidStr == "raid4" || raidStr == "raid5" ||
 		raidStr == "raid6" || raidStr == "raid10" {
-		return true, nil
+		return true
 	}
 
-	return false, nil
+	return false
 }
 
 func parseIntVal(path string) (int64, error) {
@@ -122,12 +117,14 @@ func newMD(path string) (MDDevice, error) {
 	}
 	dev.DiskStates = disks
 
-	//sync action and sync status will only exist for redundant raid levels
-	redundant, err := isRedundant(path)
+	level, err := ioutil.ReadFile(filepath.Join(path, "md", "level"))
 	if err != nil {
-		return dev, errors.Wrap(err, "error getting raid level")
+		return dev, errors.Wrap(err, "could not get raid level")
 	}
-	if redundant {
+	dev.Level = strings.TrimSpace(string(level))
+
+	//sync action and sync status will only exist for redundant raid levels
+	if isRedundant(dev.Level) {
 
 		//Get the sync action
 		//Will be idle if nothing is going on
