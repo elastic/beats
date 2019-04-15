@@ -40,9 +40,9 @@ func (r *LimitReader) Next() (reader.Message, error) {
 	message, err := r.reader.Next()
 	if len(message.Content) > r.maxBytes {
 		tmp := make([]byte, r.maxBytes)
-		n = copy(tmp, message.Content)
-		if n != r.MaxBytes {
-			return event, fmt.Errorf("unexpected number of bytes were copied, %d instead of limit %d", n, r.MaxBytes)
+		n := copy(tmp, message.Content)
+		if n != r.maxBytes {
+			return message, fmt.Errorf("unexpected number of bytes were copied, %d instead of limit %d", n, r.maxBytes)
 		}
 		message.Content = tmp
 		message.AddFlagsWithKey("log.flags", "truncated")
