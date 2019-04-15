@@ -65,6 +65,8 @@ func (m *MetricSet) parseCons(i io.Reader) ([]mb.Event, error) {
 
 		if oneParsingIsCorrect {
 			result = append(result, mb.Event{MetricSetFields: metricsetFields, RootFields: rootFields})
+		} else {
+			m.Logger().Debug("no field from incoming string '%s' could be parsed", line)
 		}
 	}
 
