@@ -25,12 +25,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestData(t *testing.T) {
+func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "coredns")
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
@@ -39,12 +38,7 @@ func TestData(t *testing.T) {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-
-	if err := mbtest.WriteEventsReporterV2Cond(f, t, "",
-		func(m common.MapStr) bool { return true }); err != nil {
-		t.Fatal("write", err)
-	}
-
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
 func getConfig() map[string]interface{} {
