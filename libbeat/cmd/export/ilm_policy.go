@@ -30,17 +30,24 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 		Use:   "ilm-policy",
 		Short: "Export ILM policy",
 		Run: func(cmd *cobra.Command, args []string) {
+			version, _ := cmd.Flags().GetString("es.version")
+			dir, _ := cmd.Flags().GetString("dir")
+
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
 				fatalfInitCmd(err)
 			}
 
-			idxManager := b.IdxSupporter.Manager(nil, idxmgmt.BeatsAssets(b.Fields))
+			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
+			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeEnabled); err != nil {
 				fatalf("Error exporting ilm-policy: %+v.", err)
 			}
 		},
 	}
+
+	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
+	genTemplateConfigCmd.Flags().String("dir", "", "Specify directory for printing policy files. By default policies are printed to stdout.")
 
 	return genTemplateConfigCmd
 }

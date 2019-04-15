@@ -275,7 +275,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	}
 }
 
-func createManager(t *testing.T, h APIHandler, cfg map[string]interface{}) Manager {
+func createManager(t *testing.T, h ClientHandler, cfg map[string]interface{}) Manager {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 	s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(cfg))
 	require.NoError(t, err)

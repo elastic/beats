@@ -51,19 +51,12 @@ type Supporter interface {
 
 	// Manager creates a new manager that can be used to execute the required steps
 	// for initializing an index, ILM policies, and write aliases.
-	Manager(client ESClient, assets Asseter) Manager
+	Manager(client ClientHandler, assets Asseter) Manager
 }
 
 // Asseter provides access to beats assets required to load the template.
 type Asseter interface {
 	Fields(name string) []byte
-}
-
-// ESClient defines the minimal interface required for the index manager to
-// prepare an index.
-type ESClient interface {
-	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
 }
 
 // Manager is used to initialize indices, ILM policies, and aliases within the

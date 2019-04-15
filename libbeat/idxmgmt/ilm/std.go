@@ -36,7 +36,7 @@ type ilmSupport struct {
 
 type singlePolicyManager struct {
 	*ilmSupport
-	client APIHandler
+	client ClientHandler
 
 	// cached info
 	cache infoCache
@@ -71,7 +71,7 @@ func (s *ilmSupport) Mode() Mode     { return s.mode }
 func (s *ilmSupport) Alias() Alias   { return s.alias }
 func (s *ilmSupport) Policy() Policy { return s.policy }
 
-func (s *ilmSupport) Manager(h APIHandler) Manager {
+func (s *ilmSupport) Manager(h ClientHandler) Manager {
 	return &singlePolicyManager{
 		client:     h,
 		ilmSupport: s,

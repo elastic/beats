@@ -19,6 +19,7 @@ package template
 
 import "github.com/elastic/beats/libbeat/mapping"
 
+// TemplateConfig holds config information about the Elasticsearch template
 type TemplateConfig struct {
 	Enabled bool   `config:"enabled"`
 	Name    string `config:"name"`
@@ -35,6 +36,7 @@ type TemplateConfig struct {
 	Order        int              `config:"order"`
 }
 
+// TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
 type TemplateSettings struct {
 	Index  map[string]interface{} `config:"index"`
 	Source map[string]interface{} `config:"_source"`

@@ -37,7 +37,7 @@ import (
 
 type testTemplate struct {
 	t      *testing.T
-	client Client
+	client ESClient
 	common.MapStr
 }
 
@@ -51,16 +51,13 @@ var (
 	templateName = "testbeatidx-" + version.GetDefaultVersion()
 )
 
-func defaultESLoader(t *testing.T) esLoader {
+func defaultESLoader(t *testing.T) *ESClientHandler {
 	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
 
-	return esLoader{
-		client: client,
-		info:   beatInfo,
-	}
+	return NewESClientHandler(client)
 }
 
 func TestCheckTemplate(t *testing.T) {
@@ -223,7 +220,7 @@ func TestOverwrite(t *testing.T) {
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 	}
-	err = loader.Load(config)
+	err = loader.Load(config, beatInfo, nil, false)
 	assert.NoError(t, err)
 
 	// Load template again, this time with custom settings
@@ -237,7 +234,7 @@ func TestOverwrite(t *testing.T) {
 		},
 	}
 
-	err = loader.Load(config)
+	err = loader.Load(config, beatInfo, nil, false)
 	assert.NoError(t, err)
 
 	// Overwrite was not enabled, so the first version should still be there
@@ -255,7 +252,7 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 	}
-	err = loader.Load(config)
+	err = loader.Load(config, beatInfo, nil, false)
 	assert.NoError(t, err)
 
 	// Overwrite was enabled, so the custom setting should be there
@@ -319,8 +316,7 @@ func TestTemplateWithData(t *testing.T) {
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
-
-	loader := esLoader{client: client, info: beatInfo}
+	loader := NewESClientHandler(client)
 
 	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{}, false)
 	assert.NoError(t, err)
@@ -351,7 +347,7 @@ func TestTemplateWithData(t *testing.T) {
 	assert.False(t, loader.templateExists(tmpl.GetName()))
 }
 
-func getTemplate(t *testing.T, client Client, templateName string) testTemplate {
+func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {
 	status, body, err := client.Request("GET", "/_template/"+templateName, "", nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, status, 200)

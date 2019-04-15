@@ -487,7 +487,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 
 				// prepare index by loading templates, lifecycle policies and write aliases
 
-				m := b.IdxSupporter.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
+				m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 				var tmplLoadMode, ilmLoadMode = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
 				if setup.Template {
 					tmplLoadMode = idxmgmt.LoadModeForce
@@ -794,7 +794,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
-		m := b.IdxSupporter.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
+		m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
 	}
 }

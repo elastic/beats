@@ -21,21 +21,30 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"os"
 	"path"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type esClientHandler struct {
-	client Client
+// ClientHandler defines the interface between a remote service and the Manager.
+type ClientHandler interface {
+	CheckILMEnabled(Mode) (bool, error)
+
+	HasAlias(name string) (bool, error)
+	CreateAlias(alias Alias) error
+
+	HasILMPolicy(name string) (bool, error)
+	CreateILMPolicy(policy Policy) error
 }
 
-type stdoutClientHandler struct{}
+// ESClientHandler implements the ClientHandler interface for talking to ES.
+type ESClientHandler struct {
+	client ESClient
+}
 
 var (
-	esMinILMVersion       = common.MustNewVersion("6.6.0")
-	esMinDefaultILMVesion = common.MustNewVersion("7.0.0")
+	esMinILMVersion        = common.MustNewVersion("6.6.0")
+	esMinDefaultILMVersion = common.MustNewVersion("7.0.0")
 )
 
 const (
@@ -48,17 +57,9 @@ const (
 	esAliasPath = "/_alias"
 )
 
-// ClientHandler creates a new APIHandler executing ILM, and alias queries
-func ClientHandler(client Client) APIHandler {
-	if client == nil {
-		return &stdoutClientHandler{}
-	}
-	return &esClientHandler{client}
-}
-
-// Client defines the minimal interface required for the ClientHandler to
+// ESClient defines the minimal interface required for the ClientHandler to
 // prepare a policy and write alias.
-type Client interface {
+type ESClient interface {
 	GetVersion() common.Version
 	Request(
 		method, path string,
@@ -68,12 +69,18 @@ type Client interface {
 	) (int, []byte, error)
 }
 
-func (h *esClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
+// NewESClientHandler initializes and returns an ESClientHandler,
+func NewESClientHandler(c ESClient) *ESClientHandler {
+	return &ESClientHandler{client: c}
+}
+
+// CheckILMEnabled indicates whether or not ILM is supported for the configured mode and ES instance.
+func (h *ESClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
 	if mode == ModeDisabled {
 		return false, nil
 	}
 
-	avail, probe := h.checkILMVersion(mode)
+	avail, probe := checkILMVersion(mode, h.client.GetVersion())
 	if !avail {
 		if mode == ModeEnabled {
 			ver := h.client.GetVersion()
@@ -107,13 +114,15 @@ func (h *esClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
 	return enabled, nil
 }
 
-func (h *esClientHandler) CreateILMPolicy(policy Policy) error {
+// CreateILMPolicy loads the given policy to Elasticsearch.
+func (h *ESClientHandler) CreateILMPolicy(policy Policy) error {
 	path := path.Join(esILMPath, policy.Name)
 	_, _, err := h.client.Request("PUT", path, "", nil, policy.Body)
 	return err
 }
 
-func (h *esClientHandler) HasILMPolicy(name string) (bool, error) {
+// HasILMPolicy queries Elasticsearch to see if policy with given name exists.
+func (h *ESClientHandler) HasILMPolicy(name string) (bool, error) {
 	// XXX: HEAD method does currently not work for checking if a policy exists
 	path := path.Join(esILMPath, name)
 	status, b, err := h.client.Request("GET", path, "", nil, nil)
@@ -124,7 +133,8 @@ func (h *esClientHandler) HasILMPolicy(name string) (bool, error) {
 	return status == 200, nil
 }
 
-func (h *esClientHandler) HasAlias(name string) (bool, error) {
+// HasAlias queries Elasticsearch to see if alias exists.
+func (h *ESClientHandler) HasAlias(name string) (bool, error) {
 	path := path.Join(esAliasPath, name)
 	status, b, err := h.client.Request("HEAD", path, "", nil, nil)
 	if err != nil && status != 404 {
@@ -134,7 +144,8 @@ func (h *esClientHandler) HasAlias(name string) (bool, error) {
 	return status == 200, nil
 }
 
-func (h *esClientHandler) CreateAlias(alias Alias) error {
+// CreateAlias sends request to Elasticsearch for creating alias.
+func (h *ESClientHandler) CreateAlias(alias Alias) error {
 	// Escaping because of date pattern
 	// This always assume it's a date pattern by sourrounding it by <...>
 	firstIndex := fmt.Sprintf("<%s-%s>", alias.Name, alias.Pattern)
@@ -159,18 +170,7 @@ func (h *esClientHandler) CreateAlias(alias Alias) error {
 	return nil
 }
 
-func (h *esClientHandler) checkILMVersion(mode Mode) (avail, probe bool) {
-	ver := h.client.GetVersion()
-	avail = !ver.LessThan(esMinILMVersion)
-	if avail {
-		probe = (mode == ModeEnabled) ||
-			(mode == ModeAuto && !ver.LessThan(esMinDefaultILMVesion))
-	}
-
-	return avail, probe
-}
-
-func (h *esClientHandler) checkILMSupport() (avail, enbaled bool, err error) {
+func (h *ESClientHandler) checkILMSupport() (avail, enbaled bool, err error) {
 	var response struct {
 		Features struct {
 			ILM struct {
@@ -193,7 +193,7 @@ func (h *esClientHandler) checkILMSupport() (avail, enbaled bool, err error) {
 	return avail, enbaled, nil
 }
 
-func (h *esClientHandler) queryFeatures(to interface{}) (int, error) {
+func (h *ESClientHandler) queryFeatures(to interface{}) (int, error) {
 	status, body, err := h.client.Request("GET", esFeaturesPath, "", nil, nil)
 	if status >= 400 || err != nil {
 		return status, err
@@ -207,27 +207,77 @@ func (h *esClientHandler) queryFeatures(to interface{}) (int, error) {
 	return status, nil
 }
 
-func (h *stdoutClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
-	return mode != ModeDisabled, nil
+// FileClientHandler implements the ClientHandler interface for writing to a file.
+type FileClientHandler struct {
+	client FileClient
 }
 
-func (h *stdoutClientHandler) CreateILMPolicy(policy Policy) error {
+// FileClient defines the minimal interface required for the ClientHandler to
+// prepare a policy and write alias.
+type FileClient interface {
+	GetVersion() common.Version
+	Write(name string, body string) error
+}
+
+// NewFileClientHandler initializes and returns a new FileClientHandler instance.
+func NewFileClientHandler(c FileClient) *FileClientHandler {
+	return &FileClientHandler{client: c}
+}
+
+// CheckILMEnabled indicates whether or not ILM is supported for the configured mode and client version.
+func (h *FileClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
+	if mode == ModeDisabled {
+		return false, nil
+	}
+
+	avail, probe := checkILMVersion(mode, h.client.GetVersion())
+	if !avail {
+		if mode == ModeEnabled {
+			ver := h.client.GetVersion()
+			return false, errf(ErrESVersionNotSupported,
+				"Elasticsearch %v does not support ILM", ver.String())
+		}
+		return false, nil
+	}
+
+	if !probe {
+		// version potentially supports ILM, but mode + version indicates that we
+		// want to disable ILM support.
+		return false, nil
+	}
+	return true, nil
+}
+
+// CreateILMPolicy writes given policy to the configured file.
+func (h *FileClientHandler) CreateILMPolicy(policy Policy) error {
 	p := common.MapStr{policy.Name: policy.Body}
 	str := fmt.Sprintf("%s\n", p.StringToPrint())
-	if _, err := os.Stdout.WriteString(str); err != nil {
+	if err := h.client.Write(policy.Name, str); err != nil {
 		return fmt.Errorf("error printing policy : %v", err)
 	}
 	return nil
 }
 
-func (h *stdoutClientHandler) HasILMPolicy(name string) (bool, error) {
+// HasILMPolicy always returns false.
+func (h *FileClientHandler) HasILMPolicy(name string) (bool, error) {
 	return false, nil
 }
 
-func (h *stdoutClientHandler) CreateAlias(alias Alias) error {
+// CreateAlias is a noop implementation.
+func (h *FileClientHandler) CreateAlias(alias Alias) error {
 	return nil
 }
 
-func (h *stdoutClientHandler) HasAlias(name string) (bool, error) {
+// HasAlias always returns false.
+func (h *FileClientHandler) HasAlias(name string) (bool, error) {
 	return false, nil
+}
+
+func checkILMVersion(mode Mode, ver common.Version) (avail, probe bool) {
+	avail = !ver.LessThan(esMinILMVersion)
+	if avail {
+		probe = (mode == ModeEnabled) ||
+			(mode == ModeAuto && !ver.LessThan(esMinDefaultILMVersion))
+	}
+	return avail, probe
 }

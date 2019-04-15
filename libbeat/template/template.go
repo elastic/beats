@@ -42,6 +42,7 @@ var (
 	defaultFields []string
 )
 
+// Template holds information for the ES template.
 type Template struct {
 	sync.Mutex
 	name        string

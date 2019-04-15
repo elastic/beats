@@ -20,15 +20,19 @@
 package ilm_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/version"
+
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -151,7 +155,7 @@ func TestESClientHandler_Alias(t *testing.T) {
 	})
 }
 
-func newESClientHandler(t *testing.T) ilm.APIHandler {
+func newESClientHandler(t *testing.T) ilm.ClientHandler {
 	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
 		URL:              getURL(),
 		Index:            outil.MakeSelector(),
@@ -168,7 +172,7 @@ func newESClientHandler(t *testing.T) ilm.APIHandler {
 		t.Fatalf("Failed to connect to Test Elasticsearch instance: %v", err)
 	}
 
-	return ilm.ClientHandler(client)
+	return ilm.NewESClientHandler(client)
 }
 
 func makeName(base string) string {
@@ -204,4 +208,81 @@ func getEnv(name, def string) string {
 		return v
 	}
 	return def
+}
+
+func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
+	for name, test := range map[string]struct {
+		m       ilm.Mode
+		version string
+		enabled bool
+		err     bool
+	}{
+		"ilm enabled": {
+			m:       ilm.ModeEnabled,
+			enabled: true,
+		},
+		"ilm auto": {
+			m:       ilm.ModeAuto,
+			enabled: true,
+		},
+		"ilm disabled": {
+			m:       ilm.ModeDisabled,
+			enabled: false,
+		},
+		"ilm enabled, version too old": {
+			m:       ilm.ModeEnabled,
+			version: "5.0.0",
+			err:     true,
+		},
+		"ilm auto, version too old": {
+			m:       ilm.ModeAuto,
+			version: "5.0.0",
+			enabled: false,
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			h := ilm.NewFileClientHandler(newMockClient(test.version))
+			b, err := h.CheckILMEnabled(test.m)
+			assert.Equal(t, test.enabled, b)
+			if test.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
+	c := newMockClient("")
+	h := ilm.NewFileClientHandler(c)
+	name := "test-policy"
+	body := map[string]interface{}{"foo": "bar"}
+	h.CreateILMPolicy(ilm.Policy{Name: name, Body: body})
+
+	assert.Equal(t, name, c.name)
+	var out common.MapStr
+	json.Unmarshal([]byte(c.body), &out)
+	assert.Equal(t, common.MapStr{name: body}, out)
+}
+
+type mockClient struct {
+	v          common.Version
+	name, body string
+}
+
+func newMockClient(v string) *mockClient {
+	if v == "" {
+		v = version.GetDefaultVersion()
+	}
+	return &mockClient{v: *common.MustNewVersion(v)}
+}
+
+func (c *mockClient) GetVersion() common.Version {
+	return c.v
+}
+
+func (c *mockClient) Write(name string, body string) error {
+	c.name, c.body = name, body
+	return nil
 }

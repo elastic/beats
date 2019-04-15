@@ -50,8 +50,8 @@ type indexManager struct {
 	support *indexSupport
 	ilm     ilm.Manager
 
-	client ESClient
-	assets Asseter
+	clientHandler ClientHandler
+	assets        Asseter
 }
 
 type indexSelector outil.Selector
@@ -99,15 +99,15 @@ func (s *indexSupport) Enabled() bool {
 }
 
 func (s *indexSupport) Manager(
-	client ESClient,
+	clientHandler ClientHandler,
 	assets Asseter,
 ) Manager {
-	ilm := s.ilm.Manager(ilm.ClientHandler(client))
+	ilm := s.ilm.Manager(clientHandler.ILMClient())
 	return &indexManager{
-		support: s,
-		ilm:     ilm,
-		client:  client,
-		assets:  assets,
+		support:       s,
+		ilm:           ilm,
+		clientHandler: clientHandler,
+		assets:        assets,
 	}
 }
 
@@ -209,7 +209,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		log.Info("ILM policy successfully loaded.")
 
 		// The template should be updated if a new policy is created.
-		if policyCreated {
+		if policyCreated && loadTemplate.Enabled() {
 			loadTemplate = LoadModeForce
 		}
 
@@ -241,11 +241,10 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		}
 
 		fields := m.assets.Fields(m.support.info.Beat)
-		loader := template.NewLoader(m.client, m.support.info)
 
-		err = loader.Load(tmplCfg, fields, m.support.migration)
+		err = m.clientHandler.TemplateClient().Load(tmplCfg, m.support.info, fields, m.support.migration)
 		if err != nil {
-			return fmt.Errorf("Error loading Elasticsearch template: %v", err)
+			return fmt.Errorf("error loading template: %v", err)
 		}
 
 		log.Info("Loaded index template.")
