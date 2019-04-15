@@ -51,7 +51,8 @@ var (
 	generateFlag = flag.Bool("generate", false, "Write golden files")
 )
 
-type Config struct {
+// DataConfig is the configuration for testdata tests
+type DataConfig struct {
 	// Path is the directory containing this configuration
 	Path string
 
@@ -94,16 +95,17 @@ type Config struct {
 	RemoveFieldsForComparison []string `yaml:"remove_fields_from_comparison"`
 }
 
-func defaultConfig() Config {
-	return Config{
+func defaultDataConfig() DataConfig {
+	return DataConfig{
 		Path:      ".",
 		WritePath: ".",
 		Suffix:    "json",
 	}
 }
 
-func ReadConfig(t *testing.T, f string) Config {
-	config := defaultConfig()
+// ReadDataConfig reads the testdataconfig from a path
+func ReadDataConfig(t *testing.T, f string) DataConfig {
+	config := defaultDataConfig()
 	config.Path = filepath.Dir(f)
 	config.WritePath = filepath.Dir(config.Path)
 	configFile, err := ioutil.ReadFile(f)
@@ -117,11 +119,14 @@ func ReadConfig(t *testing.T, f string) Config {
 	return config
 }
 
-func TestDataConfig(t *testing.T) Config {
-	return ReadConfig(t, "_meta/testdata/config.yml")
+// TestDataConfig is a convenience helper function to read the testdata config
+// from the usual path
+func TestDataConfig(t *testing.T) DataConfig {
+	return ReadDataConfig(t, "_meta/testdata/config.yml")
 }
 
-func TestDataFiles(t *testing.T, module, metricSet string, config Config) {
+// TestDataFiles run tests for a testdata config
+func TestDataFiles(t *testing.T, module, metricSet string, config DataConfig) {
 	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
 	if err != nil {
 		t.Fatal(err)
@@ -146,7 +151,7 @@ func TestDataFiles(t *testing.T, module, metricSet string, config Config) {
 	}
 }
 
-func runTest(t *testing.T, file string, module, metricSetName string, config Config) {
+func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
 
 	// starts a server serving the given file under the given url
 	s := server(t, file, config.URL)
@@ -328,26 +333,8 @@ func omitDocumentedField(field, omitField string) bool {
 	return false
 }
 
-func TestOmitDocumentedField(t *testing.T) {
-	tts := []struct {
-		a, b   string
-		result bool
-	}{
-		{a: "hello", b: "world", result: false},
-		{a: "hello", b: "hello", result: true},
-		{a: "elasticsearch.stats", b: "elasticsearch.stats", result: true},
-		{a: "elasticsearch.stats.hello.world", b: "elasticsearch.*", result: true},
-		{a: "elasticsearch.stats.hello.world", b: "*", result: true},
-	}
-
-	for _, tt := range tts {
-		result := omitDocumentedField(tt.a, tt.b)
-		assert.Equal(t, tt.result, result)
-	}
-}
-
 // GetConfig returns config for elasticsearch module
-func getConfig(module, metricSet, url string, config Config) map[string]interface{} {
+func getConfig(module, metricSet, url string, config DataConfig) map[string]interface{} {
 	moduleConfig := map[string]interface{}{
 		"module":     module,
 		"metricsets": []string{metricSet},

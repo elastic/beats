@@ -15,35 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package data
+package testing
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 	"testing"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	_ "github.com/elastic/beats/metricbeat/include"
 )
 
-func TestAll(t *testing.T) {
-	configFiles, _ := filepath.Glob(getModulesPath() + "/*/*/_meta/testdata/config.yml")
-
-	for _, f := range configFiles {
-		// get module and metricset name from path
-		s := strings.Split(f, string(os.PathSeparator))
-		moduleName := s[4]
-		metricSetName := s[5]
-
-		t.Run(fmt.Sprintf("%s.%s", moduleName, metricSetName), func(t *testing.T) {
-			mbtest.TestDataFiles(t, moduleName, metricSetName, mbtest.ReadDataConfig(t, f))
-		})
+func TestOmitDocumentedField(t *testing.T) {
+	tts := []struct {
+		a, b   string
+		result bool
+	}{
+		{a: "hello", b: "world", result: false},
+		{a: "hello", b: "hello", result: true},
+		{a: "elasticsearch.stats", b: "elasticsearch.stats", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "elasticsearch.*", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "*", result: true},
 	}
-}
 
-func getModulesPath() string {
-	return "../../../module"
+	for _, tt := range tts {
+		result := omitDocumentedField(tt.a, tt.b)
+		assert.Equal(t, tt.result, result)
+	}
 }
