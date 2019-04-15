@@ -5,14 +5,16 @@
 package cloudwatch
 
 import (
-	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-	"github.com/pkg/errors"
 	"strconv"
 	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
 var metricsetName = "cloudwatch"
@@ -39,11 +41,11 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Beta("The aws cloudwatch metricset is beta.")
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
 	}
-
 
 	return &MetricSet{
 		MetricSet: metricSet,
@@ -68,6 +70,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	for _, cw := range cloudwatchConfig {
 		namespace := cw["namespace"].(string)
 		for _, regionName := range m.MetricSet.RegionsList {
+			m.MetricSet.AwsConfig.Region = regionName
 			svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 			if err != nil {
@@ -95,36 +98,46 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
+			// Get IdentifierName
+			identifier := getIdentifierName(listMetricsOutput)
+
+			// Get IdentifierValues
+			identifierValues := getIdentifierValues(listMetricsOutput, identifier)
+
+			// Initialize events map per region, which stores one event per identifierValue(eg: InstanceId, BucketName,...)
+			events := map[string]mb.Event{}
+			for _, idValue := range identifierValues {
+				events[idValue] = initEvent(regionName)
+			}
+
 			// Find a timestamp for all metrics in output
 			timestamp := aws.FindTimestamp(metricDataResults)
 			if !timestamp.IsZero() {
 				for _, output := range metricDataResults {
-					event := mb.Event{}
-					event.Service = metricsetName
-					event.RootFields = common.MapStr{}
-					event.RootFields.Put("service.name", metricsetName)
-					event.RootFields.Put("cloud.region", regionName)
-
 					if len(output.Values) == 0 {
 						continue
 					}
 
 					exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 					if exists {
-						event.MetricSetFields = common.MapStr{}
-						event.MetricSetFields.Put("namespace", namespace)
 						labels := strings.Split(*output.Label, " ")
-						for i := 0; i < len(labels)/2; i++ {
-							event.MetricSetFields.Put(labels[i+1], labels[i+2])
-						}
-						if len(output.Values) > timestampIdx {
-							event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+						identifierValue := getIdentifierFromLabels(identifier, labels)
+						if identifierValue != "" {
+							events[identifierValue] = insertMetricSetFields(events[identifierValue], namespace, output.Values[timestampIdx], labels)
+						} else {
+							eventNew := initEvent(regionName)
+							eventNew = insertMetricSetFields(eventNew, namespace, output.Values[timestampIdx], labels)
+							if reported := report.Event(eventNew); !reported {
+								return nil
+							}
 						}
 					}
+				}
+			}
 
-					if reported := report.Event(event); !reported {
-						return nil
-					}
+			for _, event := range events {
+				if reported := report.Event(event); !reported {
+					return nil
 				}
 			}
 		}
@@ -163,4 +176,77 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (m
 		Label: &label,
 	}
 	return
+}
+
+func getIdentifierName(listMetricsOutputs []cloudwatch.Metric) string {
+	if len(listMetricsOutputs) > 0 {
+		if len(listMetricsOutputs[0].Dimensions) == 0 {
+			return *listMetricsOutputs[0].Dimensions[0].Name
+		} else {
+			for _, dim := range listMetricsOutputs[0].Dimensions {
+				switch *dim.Name {
+				case "BucketName":
+					return "BucketName"
+				case "InstanceId":
+					return "InstanceId"
+				case "TopicName":
+					return "TopicName"
+				default:
+					return ""
+				}
+			}
+		}
+	}
+	return ""
+}
+
+func getIdentifierValues(listMetricsOutputs []cloudwatch.Metric, identifierName string) (identifierValues []string) {
+	for _, output := range listMetricsOutputs {
+		for _, dim := range output.Dimensions {
+			if *dim.Name == identifierName {
+				if aws.StringInSlice(*dim.Value, identifierValues) {
+					continue
+				}
+				identifierValues = append(identifierValues, *dim.Value)
+			}
+		}
+	}
+	return
+}
+
+func initEvent(regionName string) mb.Event {
+	event := mb.Event{}
+	event.Service = metricsetName
+	event.RootFields = common.MapStr{}
+	event.MetricSetFields = common.MapStr{}
+	event.RootFields.Put("service.name", metricsetName)
+	event.RootFields.Put("cloud.region", regionName)
+	return event
+}
+
+func getIdentifierFromLabels(identifier string, labels []string) string {
+	identifierValue := ""
+	if len(labels) <= 2 {
+		return identifierValue
+	}
+	for i := 0; i < len(labels)/2; i++ {
+		if labels[i+1] == identifier {
+			identifierValue = labels[i+2]
+			break
+		}
+	}
+	return identifierValue
+}
+
+func insertMetricSetFields(event mb.Event, namespace string, metricValue float64, labels []string) mb.Event {
+	event.MetricSetFields.Put("namespace", namespace)
+	event.MetricSetFields.Put(labels[0], metricValue)
+	if len(labels) <= 2 {
+		return event
+	}
+
+	for i := 0; i < len(labels)/2; i++ {
+		event.MetricSetFields.Put(labels[i+1], labels[i+2])
+	}
+	return event
 }

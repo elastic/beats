@@ -2,13 +2,28 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
         "cloudwatch": {
+            "CPUCreditBalance": 144,
+            "CPUCreditUsage": 0.002752,
+            "CPUSurplusCreditBalance": 0,
+            "CPUSurplusCreditsCharged": 0,
+            "CPUUtilization": 0.066666666666606,
+            "DiskReadBytes": 0,
+            "DiskReadOps": 0,
+            "DiskWriteBytes": 0,
+            "DiskWriteOps": 0,
             "InstanceId": "i-06fc36e56436ca041",
+            "NetworkIn": 1865,
+            "NetworkOut": 2527.4,
+            "NetworkPacketsIn": 14.2,
+            "NetworkPacketsOut": 13.8,
+            "StatusCheckFailed": 0,
             "StatusCheckFailed_Instance": 0,
+            "StatusCheckFailed_System": 0,
             "namespace": "AWS/EC2"
         }
     },
     "cloud": {
-        "region": "eu-north-1"
+        "region": "us-west-1"
     },
     "event": {
         "dataset": "aws.cloudwatch",
