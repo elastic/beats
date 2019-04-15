@@ -150,6 +150,44 @@ func TestDecodeCSVField(t *testing.T) {
 				},
 			},
 		},
+
+		"tab separator": {
+			config: common.MapStr{
+				"field":          "message",
+				"separator":      "\t",
+				"target":         "message",
+				"overwrite_keys": true,
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "Tab\tin\tASCII\thave\tthe\t\"decimal\tcharacter\tcode\"\t9",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": []string{"Tab", "in", "ASCII", "have", "the", "decimal\tcharacter\tcode", "9"},
+				},
+			},
+		},
+
+		"unicode separator": {
+			config: common.MapStr{
+				"field":          "message",
+				"separator":      "🍺",
+				"target":         "message",
+				"overwrite_keys": true,
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": `🐢🍺🌔🐈🍺🍺🐥🐲`,
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": []string{"🐢", "🌔🐈", "", "🐥🐲"},
+				},
+			},
+		},
 	}
 
 	for title, tt := range tests {
