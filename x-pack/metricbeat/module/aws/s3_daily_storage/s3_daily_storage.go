@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -38,23 +37,16 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	logger *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The aws s3_daily_storage metricset is beta.")
-	s3Logger := logp.NewLogger(aws.ModuleName)
 
 	moduleConfig := aws.Config{}
 	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
 		return nil, err
-	}
-
-	if moduleConfig.Period == "" {
-		err := errors.New("period is not set in AWS module config")
-		s3Logger.Error(err)
 	}
 
 	metricSet, err := aws.NewMetricSet(base)
@@ -68,12 +60,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		err := errors.New("period needs to be set to 86400s (or a multiple of 86400s). " +
 			"To avoid data missing or extra costs, please make sure period is set correctly " +
 			"in config.yml")
-		s3Logger.Info(err)
+		base.Logger().Info(err)
 	}
 
 	return &MetricSet{
 		MetricSet: metricSet,
-		logger:    s3Logger,
 	}, nil
 }
 
@@ -95,7 +86,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			err = errors.Wrap(err, "GetListMetricsOutput failed, skipping region "+regionName)
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -109,7 +100,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		metricDataOutputs, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-			m.logger.Error(err)
+			m.Logger().Error(err)
 			report.Error(err)
 			continue
 		}
@@ -120,14 +111,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName)
 			if err != nil {
 				err = errors.Wrap(err, "createCloudWatchEvents failed")
-				m.logger.Error(err)
+				m.Logger().Error(err)
 				event.Error = err
 				report.Event(event)
 				continue
 			}
 
 			if reported := report.Event(event); !reported {
-				return errors.Wrap(err, "Error trying to emit event")
+				m.Logger().Debug("Error trying to emit event")
+				return nil
 			}
 		}
 	}

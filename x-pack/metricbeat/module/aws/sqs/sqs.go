@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 
@@ -17,7 +19,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -40,13 +41,13 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	logger *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(aws.ModuleName)
+	cfgwarn.Beta("The aws sqs metricset is beta.")
+
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
@@ -57,12 +58,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if remainder != 0 {
 		err := errors.New("period needs to be set to 300s (or a multiple of 300s). " +
 			"To avoid data missing or extra costs, please make sure period is set correctly in config.yml")
-		logger.Info(err)
+		base.Logger().Info(err)
 	}
 
 	return &MetricSet{
 		MetricSet: metricSet,
-		logger:    logger,
 	}, nil
 }
 
@@ -85,7 +85,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Get queueUrls for each region
 		queueURLs, err := getQueueUrls(svcSQS)
 		if err != nil {
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -96,7 +96,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Get listMetrics output
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -114,7 +114,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -122,7 +122,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Create Cloudwatch Events for SQS
 		err = createSQSEvents(queueURLs, metricDataResults, regionName, report)
 		if err != nil {
-			return err
+			m.Logger().Debug("Error trying to emit event")
+			return nil
 		}
 	}
 
