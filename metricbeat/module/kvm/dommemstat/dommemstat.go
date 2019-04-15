@@ -114,7 +114,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 	defer func() {
 		if err = l.Disconnect(); err != nil {
-			report.Error(errors.Wrap(err, "failed to disconnect"))
+			msg := errors.Wrap(err, "failed to disconnect")
+			report.Error(msg)
+			m.Logger().Error(msg)
 		}
 	}()
 
