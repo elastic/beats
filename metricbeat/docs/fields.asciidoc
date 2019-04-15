@@ -26707,6 +26707,53 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 [float]
+== connection fields
+
+connections
+
+
+
+*`zookeeper.connection.interest_ops`*::
++
+--
+type: long
+
+Interest ops
+
+
+--
+
+*`zookeeper.connection.queued`*::
++
+--
+type: long
+
+Queued connections
+
+
+--
+
+*`zookeeper.connection.received`*::
++
+--
+type: long
+
+Received connections
+
+
+--
+
+*`zookeeper.connection.sent`*::
++
+--
+type: long
+
+Connections sent
+
+
+--
+
+[float]
 == mntr fields
 
 `mntr` contains the metrics reported by the four-letter `mntr` command.
