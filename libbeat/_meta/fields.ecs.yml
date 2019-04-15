@@ -613,6 +613,8 @@
       type: long
       format: duration
       input_format: nanoseconds
+      output_format: asMilliseconds
+      output_precision: 1
       description: 'Duration of the event in nanoseconds.
 
         If event.start and event.end are known this value should be the difference

@@ -75,7 +75,7 @@ type ESClient interface {
 // Manager is used to initialize indices, ILM policies, and aliases within the
 // Elastic Stack.
 type Manager interface {
-	Setup(template, policy bool) error
+	Setup(forceTemplate, forcePolicy bool) error
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.

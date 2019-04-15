@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 var srvrTestInput = `Zookeeper version: 3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03, built on 06/29/2018 04:05 GMT
@@ -39,7 +40,8 @@ Proposal sizes last/min/max: -3/-999/-1
 `
 
 func TestParser(t *testing.T) {
-	mapStr, versionID, err := parseSrvr(bytes.NewReader([]byte(srvrTestInput)))
+	logger := logp.NewLogger("zookeeper.server")
+	mapStr, versionID, err := parseSrvr(bytes.NewReader([]byte(srvrTestInput)), logger)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -18,16 +18,13 @@
 package key
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/redis"
-)
-
-var (
-	debugf = logp.MakeDebug("redis-key")
 )
 
 func init() {
@@ -71,35 +68,42 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches information from Redis keys
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
 	for _, p := range m.patterns {
 		if err := redis.Select(conn, p.Keyspace); err != nil {
-			logp.Err("Failed to select keyspace %d: %s", p.Keyspace, err)
+			msg := errors.Wrapf(err, "Failed to select keyspace %d", p.Keyspace)
+			m.Logger().Error(msg)
+			r.Error(err)
 			continue
 		}
 
 		keys, err := redis.FetchKeys(conn, p.Pattern, p.Limit)
 		if err != nil {
-			logp.Err("Failed to list keys in keyspace %d with pattern '%s': %s", p.Keyspace, p.Pattern, err)
+			msg := errors.Wrapf(err, "Failed to list keys in keyspace %d with pattern '%s'", p.Keyspace, p.Pattern)
+			m.Logger().Error(msg)
+			r.Error(err)
 			continue
 		}
 		if p.Limit > 0 && len(keys) > int(p.Limit) {
-			debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit)
+			m.Logger().Debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit)
 			keys = keys[:p.Limit]
 		}
 
 		for _, key := range keys {
 			keyInfo, err := redis.FetchKeyInfo(conn, key)
 			if err != nil {
-				logp.Err("Failed to fetch key info for key %s in keyspace %d", key, p.Keyspace)
+				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, p.Keyspace)
+				m.Logger().Error(msg)
+				r.Error(err)
 				continue
 			}
 			event := eventMapping(p.Keyspace, keyInfo)
 			if !r.Event(event) {
-				debugf("Failed to report event, interrupting Fetch")
-				return
+				return errors.New("metricset has closed")
 			}
 		}
 	}
+
+	return nil
 }
