@@ -21,13 +21,14 @@
                 "active": 2,
                 "failed": 0,
                 "spare": 1,
-                "states": [
-                    "in_sync",
-                    "in_sync",
-                    "spare"
-                ],
-                "total": 3
+                "states": {
+                    "in_sync": 2,
+                    "spare": 1
+                },
+                "total": 3,
+                "unknown": 0
             },
+            "level": "raid1",
             "name": "md0",
             "status": "clean",
             "sync_action": "repair"
