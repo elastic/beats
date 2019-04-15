@@ -15,16 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package node
+package connection
 
 import (
-	"time"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/munin"
+	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/zookeeper"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -32,8 +31,8 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("munin", "node", New,
-		mb.DefaultMetricSet(),
+	mb.Registry.MustAddMetricSet("zookeeper", "connection", New,
+		mb.WithHostParser(parse.PassThruHostParser),
 	)
 }
 
@@ -43,72 +42,39 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	serviceType string
-	plugins     []string
-	sanitize    bool
-	timeout     time.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Beta("The zookeeper connection metricset is beta.")
 
-	config := defaultConfig
+	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		plugins:       config.Plugins,
-		sanitize:      config.Sanitize,
-		timeout:       base.Module().Config().Timeout,
 	}, nil
 }
 
-// Fetch method implements the data gathering
-func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	node, err := munin.Connect(m.Host(), m.timeout)
+// Fetch fetches metrics from ZooKeeper by making a tcp connection to the
+// command port and sending the "cons" command and parsing the output.
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	outputReader, err := zookeeper.RunCommand("cons", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error in Connect")
-	}
-	defer node.Close()
-
-	plugins := m.plugins
-	if len(plugins) == 0 {
-		plugins, err = node.List()
-		if err != nil {
-			return errors.Wrap(err, "error getting plugin list")
-		}
+		return errors.Wrap(err, "'cons' command failed")
 	}
 
-	for _, plugin := range plugins {
-		metrics, err := node.Fetch(plugin, m.sanitize)
-		if err != nil {
-			msg := errors.Wrap(err, "error fetching metrics")
-			r.Error(err)
-			m.Logger().Error(msg)
-			continue
-		}
-
-		// Even if there was some error, keep sending succesfully collected metrics if any
-		if len(metrics) == 0 {
-			continue
-		}
-		event := mb.Event{
-			Service: plugin,
-			RootFields: common.MapStr{
-				"munin": common.MapStr{
-					"plugin": common.MapStr{
-						"name": plugin,
-					},
-					"metrics": metrics,
-				},
-			},
-		}
-		if !r.Event(event) {
-			return errors.New("metricset has closed")
-		}
+	events, err := m.parseCons(outputReader)
+	if err != nil {
+		return errors.Wrap(err, "error parsing response from zookeeper")
 	}
+
+	for _, event := range events {
+		reporter.Event(event)
+	}
+
 	return nil
 }

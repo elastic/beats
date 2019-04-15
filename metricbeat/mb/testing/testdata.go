@@ -205,7 +205,11 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		return h1 < h2
 	})
 
-	checkDocumented(t, data, config.OmitDocumentedFieldsCheck)
+	if err := checkDocumented(t, data, config.OmitDocumentedFieldsCheck); err != nil {
+		t.Errorf("%v: check if fields are documented in `metricbeat/%s/%s/_meta/fields.yml` "+
+			"file or run 'make update' on Metricbeat folder to update fields in `metricbeat/fields.yml`",
+			err, module, metricSetName)
+	}
 
 	// Overwrites the golden files if run with -generate
 	if *generateFlag {
@@ -270,15 +274,15 @@ func writeDataJSON(t *testing.T, data common.MapStr, path string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
+func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) error {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
-		t.Fatal(err)
+		return err
 	}
 
 	fields, err := mapping.LoadFields(fieldsData)
 	if err != nil {
-		t.Fatal(err)
+		return err
 	}
 
 	documentedFields := fields.GetKeys()
@@ -291,9 +295,11 @@ func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
 	for _, d := range data {
 		flat := d.Flatten()
 		if err := documentedFieldCheck(flat, keys, omitFields); err != nil {
-			t.Fatal(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interface{}, omitFields []string) error {
@@ -311,7 +317,7 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 			if _, ok := knownKeys[prefix+".*"]; ok {
 				continue
 			}
-			return errors.Errorf("check if fields are documented error: key missing '%s'", foundKey)
+			return errors.Errorf("field missing '%s'", foundKey)
 		}
 	}
 
@@ -342,7 +348,25 @@ func omitDocumentedField(field, omitField string) bool {
 	return false
 }
 
-// GetConfig returns config for elasticsearch module
+func TestOmitDocumentedField(t *testing.T) {
+	tts := []struct {
+		a, b   string
+		result bool
+	}{
+		{a: "hello", b: "world", result: false},
+		{a: "hello", b: "hello", result: true},
+		{a: "elasticsearch.stats", b: "elasticsearch.stats", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "elasticsearch.*", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "*", result: true},
+	}
+
+	for _, tt := range tts {
+		result := omitDocumentedField(tt.a, tt.b)
+		assert.Equal(t, tt.result, result)
+	}
+}
+
+// getConfig returns config for elasticsearch module
 func getConfig(module, metricSet, url string, config DataConfig) map[string]interface{} {
 	moduleConfig := map[string]interface{}{
 		"module":     module,
