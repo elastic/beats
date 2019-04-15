@@ -19,6 +19,8 @@ package testing
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestOmitDocumentedField(t *testing.T) {

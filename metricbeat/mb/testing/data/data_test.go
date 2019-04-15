@@ -39,7 +39,8 @@ func TestAll(t *testing.T) {
 		metricSetName := s[5]
 
 		t.Run(fmt.Sprintf("%s.%s", moduleName, metricSetName), func(t *testing.T) {
-			mbtest.TestDataFiles(t, moduleName, metricSetName, mbtest.ReadDataConfig(t, f))
+			config := mbtest.ReadDataConfig(t, f)
+			mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config)
 		})
 	}
 }

@@ -348,24 +348,6 @@ func omitDocumentedField(field, omitField string) bool {
 	return false
 }
 
-func TestOmitDocumentedField(t *testing.T) {
-	tts := []struct {
-		a, b   string
-		result bool
-	}{
-		{a: "hello", b: "world", result: false},
-		{a: "hello", b: "hello", result: true},
-		{a: "elasticsearch.stats", b: "elasticsearch.stats", result: true},
-		{a: "elasticsearch.stats.hello.world", b: "elasticsearch.*", result: true},
-		{a: "elasticsearch.stats.hello.world", b: "*", result: true},
-	}
-
-	for _, tt := range tts {
-		result := omitDocumentedField(tt.a, tt.b)
-		assert.Equal(t, tt.result, result)
-	}
-}
-
 // getConfig returns config for elasticsearch module
 func getConfig(module, metricSet, url string, config DataConfig) map[string]interface{} {
 	moduleConfig := map[string]interface{}{
