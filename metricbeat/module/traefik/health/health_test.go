@@ -76,5 +76,5 @@ func TestFetchEventContents(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "traefik", "health", mbtest.TestDataConfig(t))
+	mbtest.TestDataFiles(t, "traefik", "health")
 }

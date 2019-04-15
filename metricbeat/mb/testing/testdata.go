@@ -105,6 +105,7 @@ func defaultDataConfig() DataConfig {
 
 // ReadDataConfig reads the testdataconfig from a path
 func ReadDataConfig(t *testing.T, f string) DataConfig {
+	t.Helper()
 	config := defaultDataConfig()
 	config.Path = filepath.Dir(f)
 	config.WritePath = filepath.Dir(config.Path)
@@ -122,11 +123,20 @@ func ReadDataConfig(t *testing.T, f string) DataConfig {
 // TestDataConfig is a convenience helper function to read the testdata config
 // from the usual path
 func TestDataConfig(t *testing.T) DataConfig {
+	t.Helper()
 	return ReadDataConfig(t, "_meta/testdata/config.yml")
 }
 
+// TestDataFiles run tests from the usual path (`_meta/testdata`)
+func TestDataFiles(t *testing.T, module, metricSet string) {
+	t.Helper()
+	config := TestDataConfig(t)
+	TestDataFilesWithConfig(t, module, metricSet, config)
+}
+
 // TestDataFiles run tests for a testdata config
-func TestDataFiles(t *testing.T, module, metricSet string, config DataConfig) {
+func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig) {
+	t.Helper()
 	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
 	if err != nil {
 		t.Fatal(err)
@@ -152,7 +162,6 @@ func TestDataFiles(t *testing.T, module, metricSet string, config DataConfig) {
 }
 
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
-
 	// starts a server serving the given file under the given url
 	s := server(t, file, config.URL)
 	defer s.Close()
