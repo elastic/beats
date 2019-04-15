@@ -11530,15 +11530,6 @@ alias to: http.response.body.bytes
 
 --
 
-*`nginx.access.remote_ip`*::
-+
---
-type: alias
-
-alias to: source.address
-
---
-
 *`nginx.access.user_name`*::
 +
 --

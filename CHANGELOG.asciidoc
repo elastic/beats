@@ -226,7 +226,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the 
 - The `elasticsearch/deprecation` fileset now indexes the `component` field under `elasticsearch` instead of `elasticsearch.server`. {pull}10445[10445]
 - Remove field `kafka.log.trace.full` from kafka.log fielset. {pull}10398[10398]
 - Change field `kafka.log.class` for kafka.log fileset from text to keyword. {pull}10398[10398]
-- Address add_kubernetes_metadata processor issue where old source field is 
+- Address add_kubernetes_metadata processor issue where old source field is
   still used for matcher. {issue}10505[10505] {pull}10506[10506]
 - Change type of haproxy.source from text to keyword. {pull}10506[10506]
 - Rename `event.type` to `suricata.eve.event_type` in Suricata module because event.type is reserved for future use by ECS. {pull}10575[10575]
@@ -1732,6 +1732,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 *Winlogbeat*
 
 - Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
+- Fix config validation to allow `event_logs.processors`. [pull]6217[6217]
 
 ==== Added
 
@@ -2096,7 +2097,6 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 
 - Fix the registry file. It was not correctly storing event log names, and
   upon restart it would begin reading at the start of each event log. {issue}5813[5813]
-- Fix config validation to allow `event_logs.processors`. [pull]6217[6217]
 
 ==== Added
 

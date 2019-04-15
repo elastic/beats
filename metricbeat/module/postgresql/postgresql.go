@@ -42,6 +42,7 @@ func init() {
 	}
 }
 
+//NewModule returns a new instance of the module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := struct {
@@ -54,6 +55,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
+//ParseURL is the postgres host parser
 func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 	c := struct {
 		Username string `config:"username"`
@@ -102,6 +104,7 @@ func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 	return h, nil
 }
 
+//QueryStats makes the database call for a given metric
 func QueryStats(db *sql.DB, query string) ([]map[string]interface{}, error) {
 	rows, err := db.Query(query)
 	if err != nil {

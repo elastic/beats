@@ -20,14 +20,9 @@ package keyspace
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/redis"
-)
-
-var (
-	debugf = logp.MakeDebug("redis-keyspace")
 )
 
 func init() {
@@ -52,14 +47,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Fetch default INFO.
 	info, err := redis.FetchRedisInfo("keyspace", m.Connection())
 	if err != nil {
-		logp.Err("Failed to fetch redis info for keyspaces: %s", err)
-		return
+		return errors.Wrap(err, "Failed to fetch redis info for keyspaces")
 	}
 
-	debugf("Redis INFO from %s: %+v", m.Host(), info)
+	m.Logger().Debugf("Redis INFO from %s: %+v", m.Host(), info)
 	eventsMapping(r, info)
+	return nil
 }

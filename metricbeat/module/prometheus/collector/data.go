@@ -115,7 +115,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 				events = append(events, PromEvent{
 					data: common.MapStr{
-						name: bucket.GetCumulativeCount(),
+						name + "_bucket": bucket.GetCumulativeCount(),
 					},
 					labels: bucketLabels,
 				})

@@ -22,6 +22,7 @@ Winlogbeat. The main event loop is implemented in this package.
 package beater
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -126,6 +127,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	acker := newEventACKer(eb.checkpoint)
 	persistedState := eb.checkpoint.States()
 
 	// Initialize metrics.
@@ -133,13 +135,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// setup global event ACK handler
 	err := eb.pipeline.SetACKHandler(beat.PipelineACKHandler{
-		ACKLastEvents: func(data []interface{}) {
-			for _, datum := range data {
-				if st, ok := datum.(checkpoint.EventLogState); ok {
-					eb.checkpoint.PersistState(st)
-				}
-			}
-		},
+		ACKEvents: acker.ACKEvents,
 	})
 	if err != nil {
 		return err
@@ -151,11 +147,20 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 		// Start a goroutine for each event log.
 		wg.Add(1)
-		go eb.processEventLog(&wg, log, state)
+		go eb.processEventLog(&wg, log, state, acker)
 	}
 
 	wg.Wait()
-	eb.checkpoint.Shutdown()
+	defer eb.checkpoint.Shutdown()
+
+	if eb.config.ShutdownTimeout > 0 {
+		logp.Info("Shutdown will wait max %v for the remaining %v events to publish.",
+			eb.config.ShutdownTimeout, acker.Active())
+		ctx, cancel := context.WithTimeout(context.Background(), eb.config.ShutdownTimeout)
+		defer cancel()
+		acker.Wait(ctx)
+	}
+
 	return nil
 }
 
@@ -171,7 +176,8 @@ func (eb *Winlogbeat) processEventLog(
 	wg *sync.WaitGroup,
 	logger *eventLogger,
 	state checkpoint.EventLogState,
+	acker *eventACKer,
 ) {
 	defer wg.Done()
-	logger.run(eb.done, eb.pipeline, state)
+	logger.run(eb.done, eb.pipeline, state, acker)
 }
