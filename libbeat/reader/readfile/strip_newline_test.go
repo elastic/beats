@@ -42,6 +42,13 @@ func TestLineEndingChars(t *testing.T) {
 		reader := NewStripNewline(nil, terminator)
 
 		line := append([]byte("This is a line"), nl...)
-		assert.Equal(t, reader.lineEndingChars(line), len(nl))
+		assert.Equal(t, reader.lineEndingFunc(reader, line), len(nl))
 	}
+}
+
+func TestAutoLineEndingChars(t *testing.T) {
+	reader := NewStripNewline(nil, AutoLineTerminator)
+
+	assert.Equal(t, reader.lineEndingFunc(reader, []byte("this is a windows line\r\n")), 2)
+	assert.Equal(t, reader.lineEndingFunc(reader, []byte("this is a not windows line\n")), 1)
 }

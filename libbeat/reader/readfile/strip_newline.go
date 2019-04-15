@@ -53,7 +53,7 @@ func (p *StripNewline) Next() (reader.Message, error) {
 	}
 
 	L := message.Content
-	message.Content = L[:len(L)-p.lineEndingChars(L)]
+	message.Content = L[:len(L)-p.lineEndingFunc(p, L)]
 
 	return message, err
 }
