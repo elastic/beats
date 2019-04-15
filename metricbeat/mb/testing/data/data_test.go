@@ -195,7 +195,8 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Con
 	})
 
 	if err := checkDocumented(t, data, config.OmitDocumentedFieldsCheck); err != nil {
-		t.Errorf("check if fields are documented error: %v in `fields.yml` file", err)
+		t.Errorf("'%v' check if fields are documented in `metricbeat/{module}/{metricset}/_meta/fields.yml` " +
+			"file or run 'make update' on Metricbeat folder to update root `metricbeat/fields.yml` in ", err)
 	}
 
 	// Overwrites the golden files if run with -generate
