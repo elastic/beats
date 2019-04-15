@@ -18,29 +18,16 @@
 package export
 
 import (
-	"github.com/spf13/cobra"
-
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/idxmgmt"
+	"fmt"
+	"os"
 )
 
-// GenGetILMPolicyCmd is the command used to export the ilm policy.
-func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
-	genTemplateConfigCmd := &cobra.Command{
-		Use:   "ilm-policy",
-		Short: "Export ILM policy",
-		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewInitializedBeat(settings)
-			if err != nil {
-				fatalfInitCmd(err)
-			}
+func fatalf(msg string, vs ...interface{}) {
+	fmt.Fprintf(os.Stderr, msg, vs...)
+	fmt.Fprintln(os.Stderr)
+	os.Exit(1)
+}
 
-			idxManager := b.IdxSupporter.Manager(nil, idxmgmt.BeatsAssets(b.Fields))
-			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeEnabled); err != nil {
-				fatalf("Error exporting ilm-policy: %+v.", err)
-			}
-		},
-	}
-
-	return genTemplateConfigCmd
+func fatalfInitCmd(err error) {
+	fatalf("Failed to initialize 'export' command: %+v.", err)
 }

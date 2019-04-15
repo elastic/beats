@@ -98,32 +98,32 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 		},
 		"disabled via handler": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(false, nil),
+				onCheckILMEnabled(ModeAuto).Return(false, nil),
 			},
 		},
 		"enabled via handler": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(true, nil),
+				onCheckILMEnabled(ModeAuto).Return(true, nil),
 			},
 			b: true,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
-				onILMEnabled(ModeEnabled).Return(true, nil),
+				onCheckILMEnabled(ModeEnabled).Return(true, nil),
 			},
 			cfg: map[string]interface{}{"enabled": true},
 			b:   true,
 		},
 		"fail enabled": {
 			calls: []onCall{
-				onILMEnabled(ModeEnabled).Return(false, nil),
+				onCheckILMEnabled(ModeEnabled).Return(false, nil),
 			},
 			cfg:  map[string]interface{}{"enabled": true},
 			fail: ErrESILMDisabled,
 		},
 		"io error": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(false, errors.New("ups")),
+				onCheckILMEnabled(ModeAuto).Return(false, errors.New("ups")),
 			},
 			cfg: map[string]interface{}{},
 			err: true,

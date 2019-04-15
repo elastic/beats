@@ -68,7 +68,7 @@ type Client interface {
 	) (int, []byte, error)
 }
 
-func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
+func (h *esClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
 	if mode == ModeDisabled {
 		return false, nil
 	}
@@ -207,7 +207,7 @@ func (h *esClientHandler) queryFeatures(to interface{}) (int, error) {
 	return status, nil
 }
 
-func (h *stdoutClientHandler) ILMEnabled(mode Mode) (bool, error) {
+func (h *stdoutClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
 	return mode != ModeDisabled, nil
 }
 

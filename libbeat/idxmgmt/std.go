@@ -50,7 +50,7 @@ type indexManager struct {
 	support *indexSupport
 	ilm     ilm.Manager
 
-	client Client
+	client ESClient
 	assets Asseter
 }
 
@@ -99,7 +99,7 @@ func (s *indexSupport) Enabled() bool {
 }
 
 func (s *indexSupport) Manager(
-	client Client,
+	client ESClient,
 	assets Asseter,
 ) Manager {
 	ilm := s.ilm.Manager(ilm.ClientHandler(client))
@@ -177,7 +177,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 	}, nil
 }
 
-func (m *indexManager) Setup(setupTemplate, setupILM SetupConfig) error {
+func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	var err error
 	log := m.support.log
 
@@ -188,20 +188,21 @@ func (m *indexManager) Setup(setupTemplate, setupILM SetupConfig) error {
 			return err
 		}
 	}
-	if setupILM.Load == nil {
-		setupILM.Load = &withILM
-
+	if loadILM == LoadModeUnset {
 		if withILM {
+			loadILM = LoadModeEnabled
 			log.Info("Auto ILM enable success.")
+		} else {
+			loadILM = LoadModeDisabled
 		}
 	}
 
-	if setupILM.ShouldLoad() {
+	if withILM && loadILM.Enabled() {
 		// mark ILM as enabled in indexState if withILM is true
 		m.support.st.withILM.CAS(false, true)
 
 		// install ilm policy
-		policyCreated, err := m.ilm.EnsurePolicy(setupILM.ShouldForce())
+		policyCreated, err := m.ilm.EnsurePolicy(loadILM == LoadModeForce)
 		if err != nil {
 			return err
 		}
@@ -209,7 +210,7 @@ func (m *indexManager) Setup(setupTemplate, setupILM SetupConfig) error {
 
 		// The template should be updated if a new policy is created.
 		if policyCreated {
-			setupTemplate.Force = &policyCreated
+			loadTemplate = LoadModeForce
 		}
 
 		// create alias
@@ -224,7 +225,7 @@ func (m *indexManager) Setup(setupTemplate, setupILM SetupConfig) error {
 	}
 
 	// create and install template
-	if m.support.templateCfg.Enabled && setupTemplate.ShouldLoad() {
+	if m.support.templateCfg.Enabled && loadTemplate.Enabled() {
 		tmplCfg := m.support.templateCfg
 
 		if withILM {
@@ -235,7 +236,7 @@ func (m *indexManager) Setup(setupTemplate, setupILM SetupConfig) error {
 			}
 		}
 
-		if setupTemplate.ShouldForce() {
+		if loadTemplate == LoadModeForce {
 			tmplCfg.Overwrite = true
 		}
 

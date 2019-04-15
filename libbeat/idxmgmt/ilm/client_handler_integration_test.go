@@ -41,24 +41,24 @@ const (
 	ElasticsearchDefaultPort = "9200"
 )
 
-func TestESClientHandler_ILMEnabled(t *testing.T) {
+func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("no ilm if disabled", func(t *testing.T) {
 		h := newESClientHandler(t)
-		b, err := h.ILMEnabled(ilm.ModeDisabled)
+		b, err := h.CheckILMEnabled(ilm.ModeDisabled)
 		assert.NoError(t, err)
 		assert.False(t, b)
 	})
 
 	t.Run("with ilm if auto", func(t *testing.T) {
 		h := newESClientHandler(t)
-		b, err := h.ILMEnabled(ilm.ModeAuto)
+		b, err := h.CheckILMEnabled(ilm.ModeAuto)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
 
 	t.Run("with ilm if enabled", func(t *testing.T) {
 		h := newESClientHandler(t)
-		b, err := h.ILMEnabled(ilm.ModeEnabled)
+		b, err := h.CheckILMEnabled(ilm.ModeEnabled)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})

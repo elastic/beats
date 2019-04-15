@@ -18,7 +18,6 @@
 package export
 
 import (
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -38,7 +37,7 @@ func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fatalf("error initializing beat: %+v", err)
+				fatalfInitCmd(err)
 			}
 
 			if version == "" {
@@ -48,21 +47,21 @@ func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 			// Index pattern generation
 			v, err := common.NewVersion(version)
 			if err != nil {
-				fatalf("Error creating version: %+v", err)
+				fatalf("Error creating version: %+v.", err)
 			}
 			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, settings.Version, *v, b.Config.Migration.Enabled())
 			if err != nil {
-				log.Fatal(err)
+				fatalf("Error creating Kibana Generator: %+v.", err)
 			}
 
 			pattern, err := indexPattern.Generate()
 			if err != nil {
-				log.Fatalf("ERROR: %s", err)
+				fatalf("Error generating Index Pattern: %+v.", err)
 			}
 
 			_, err = os.Stdout.WriteString(pattern.StringToPrint() + "\n")
 			if err != nil {
-				fatalf("Error writing index pattern: %+v", err)
+				fatalf("Error writing Index Pattern: %+v.", err)
 			}
 		},
 	}

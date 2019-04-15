@@ -41,7 +41,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fatalf("error initializing beat: %+v", err)
+				fatalfInitCmd(err)
 			}
 
 			// Use empty config to use default configs if not set
@@ -51,14 +51,14 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 			client, err := kibana.NewKibanaClient(b.Config.Kibana)
 			if err != nil {
-				fatalf("error creating Kibana client: %+v\n", err)
+				fatalf("Error creating Kibana client: %+v.\n", err)
 			}
 
 			// Export dashboards from yml file
 			if yml != "" {
 				results, info, err := dashboards.ExportAllFromYml(client, yml)
 				if err != nil {
-					fatalf("error getting dashboards from yml: %+v\n", err)
+					fatalf("Error exporting dashboards from yml: %+v.\n", err)
 				}
 				for i, r := range results {
 					if decode {
@@ -67,7 +67,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
-						fatalf("error saving dashboard '%s' to file '%s' : %+v\n",
+						fatalf("Error saving dashboard '%s' to file '%s' : %+v.\n",
 							info.Dashboards[i].ID, info.Dashboards[i].File, err)
 					}
 				}
@@ -78,7 +78,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			if dashboard != "" {
 				result, err := dashboards.Export(client, dashboard)
 				if err != nil {
-					fatalf("error getting dashboard: %+v\n", err)
+					fatalf("Error exporting dashboard: %+v.\n", err)
 				}
 
 				if decode {

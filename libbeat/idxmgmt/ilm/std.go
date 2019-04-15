@@ -87,7 +87,7 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 		return m.cache.Enabled, nil
 	}
 
-	enabled, err := m.client.ILMEnabled(m.mode)
+	enabled, err := m.client.CheckILMEnabled(m.mode)
 	if err != nil {
 		return enabled, err
 	}

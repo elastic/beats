@@ -18,9 +18,6 @@
 package export
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 
 	"github.com/spf13/cobra"
@@ -44,14 +41,12 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fatalf("error initializing beat: %+v", err)
+				fatalfInitCmd(err)
 			}
 
-			idxManager := b.IdxMgmtSupporter().Manager(nil, idxmgmt.BeatsAssets(b.Fields))
-			ilmLoadCfg := idxmgmt.SetupConfig{Load: new(bool)}
-			templateLoadCfg := idxmgmt.DefaultSetupConfig()
-			if err := idxManager.Setup(templateLoadCfg, ilmLoadCfg); err != nil {
-				fatalf("exporting template failed: %+v", err)
+			idxManager := b.IdxSupporter.Manager(nil, idxmgmt.BeatsAssets(b.Fields))
+			if err := idxManager.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeDisabled); err != nil {
+				fatalf("Error exporting template: %+v.", err)
 			}
 		},
 	}
@@ -61,18 +56,6 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 	return genTemplateConfigCmd
 }
 
-func fatalf(msg string, vs ...interface{}) {
-	fmt.Fprintf(os.Stderr, msg, vs...)
-	fmt.Fprintln(os.Stderr)
-	os.Exit(1)
-}
-
-func ilmNoopSupport(log *logp.Logger, info beat.Info, config *common.Config) (ilm.Supporter, error) {
-	if log == nil {
-		log = logp.NewLogger("export template")
-	} else {
-		log = log.Named("export template")
-	}
-
+func ilmNoopSupport(_ *logp.Logger, info beat.Info, config *common.Config) (ilm.Supporter, error) {
 	return ilm.NoopSupport(info, config)
 }

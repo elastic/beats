@@ -32,8 +32,7 @@ type TemplateConfig struct {
 	AppendFields mapping.Fields   `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`
 	Settings     TemplateSettings `config:"settings"`
-
-	Order int
+	Order        int              `config:"order"`
 }
 
 type TemplateSettings struct {

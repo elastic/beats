@@ -51,7 +51,7 @@ type Supporter interface {
 
 	// Manager creates a new manager that can be used to execute the required steps
 	// for initializing an index, ILM policies, and write aliases.
-	Manager(client Client, assets Asseter) Manager
+	Manager(client ESClient, assets Asseter) Manager
 }
 
 // Asseter provides access to beats assets required to load the template.
@@ -59,9 +59,9 @@ type Asseter interface {
 	Fields(name string) []byte
 }
 
-// Client defines the minimal interface required for the index manager to
+// ESClient defines the minimal interface required for the index manager to
 // prepare an index.
-type Client interface {
+type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
@@ -69,29 +69,27 @@ type Client interface {
 // Manager is used to initialize indices, ILM policies, and aliases within the
 // Elastic Stack.
 type Manager interface {
-	Setup(template, ilm SetupConfig) error
+	Setup(template, ilm LoadMode) error
 }
 
-// SetupConfig is used to define loading and forcing to overwrite during the setup process
-type SetupConfig struct {
-	Load  *bool
-	Force *bool
-}
+// LoadMode defines the mode to be used for loading idxmgmt related information.
+// It will be used in combination with idxmgmt configuration settings.
+type LoadMode uint8
 
-// DefaultSetupConfig initializes a config with default settings.
-func DefaultSetupConfig() SetupConfig {
-	return SetupConfig{Force: new(bool)}
-}
+const (
+	// LoadModeUnset indicates that no specific mode is set, loading should be derived only from config.
+	LoadModeUnset LoadMode = iota
+	// LoadModeEnabled indicates loading if not already available
+	LoadModeEnabled
+	// LoadModeForce indicates loading in any case.
+	LoadModeForce
+	// LoadModeDisabled indicates no loading
+	LoadModeDisabled
+)
 
-// ShouldLoad indicates whether or not information related to this SetupConfig should be loaded
-func (c *SetupConfig) ShouldLoad() bool {
-	return c.Load == nil || *c.Load
-}
-
-// ShouldForce indicates whether or not loading information related to this SetupConfig should be enforced and
-// potentially be overwritten
-func (c *SetupConfig) ShouldForce() bool {
-	return c.Force != nil && *c.Force
+// Enabled returns whether or not the LoadMode should be considered enabled
+func (m *LoadMode) Enabled() bool {
+	return m == nil || *m != LoadModeDisabled
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.

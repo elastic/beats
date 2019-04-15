@@ -57,7 +57,7 @@ type Manager interface {
 
 // APIHandler defines the interface between a remote service and the Manager.
 type APIHandler interface {
-	ILMEnabled(Mode) (bool, error)
+	CheckILMEnabled(Mode) (bool, error)
 
 	HasAlias(name string) (bool, error)
 	CreateAlias(alias Alias) error

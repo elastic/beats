@@ -42,17 +42,17 @@ func exportConfig(settings instance.Settings) error {
 	settings.DisableConfigResolver = true
 	b, err := instance.NewInitializedBeat(settings)
 	if err != nil {
-		fatalf("error initializing beat: %+v", err)
+		fatalfInitCmd(err)
 	}
 
 	var config map[string]interface{}
 	err = b.RawConfig.Unpack(&config)
 	if err != nil {
-		fatalf("error unpacking config, error: %s", err)
+		fatalf("Error unpacking config: %+v.", err)
 	}
 	res, err := yaml.Marshal(config)
 	if err != nil {
-		fatalf("error converting config to YAML format, error: %s", err)
+		fatalf("Error converting config to YAML format: %+v.", err)
 	}
 
 	os.Stdout.Write(res)
