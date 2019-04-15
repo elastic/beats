@@ -26,13 +26,23 @@ import (
 // StripNewline reader removes the last trailing newline characters from
 // read lines.
 type StripNewline struct {
-	reader reader.Reader
-	nl     []byte
+	reader         reader.Reader
+	nl             []byte
+	lineEndingFunc func(*StripNewline, []byte) int
 }
 
 // New creates a new line reader stripping the last tailing newline.
 func NewStripNewline(r reader.Reader, terminator LineTerminator) *StripNewline {
-	return &StripNewline{r, lineTerminatorCharacters[terminator]}
+	lineEndingFunc := (*StripNewline).lineEndingChars
+	if terminator == AutoLineTerminator {
+		lineEndingFunc = (*StripNewline).autoLineEndingChars
+	}
+
+	return &StripNewline{
+		reader:         r,
+		nl:             lineTerminatorCharacters[terminator],
+		lineEndingFunc: lineEndingFunc,
+	}
 }
 
 // Next returns the next line.
@@ -59,4 +69,15 @@ func (p *StripNewline) lineEndingChars(l []byte) int {
 	}
 
 	return len(p.nl)
+}
+
+func (p *StripNewline) autoLineEndingChars(l []byte) int {
+	if !p.isLine(l) {
+		return 0
+	}
+
+	if len(l) > 1 && l[len(l)-2] == '\r' {
+		return 2
+	}
+	return 1
 }

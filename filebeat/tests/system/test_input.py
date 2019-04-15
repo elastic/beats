@@ -609,7 +609,6 @@ class Test(BaseTest):
         """
         Check that file reading via recursive glob patterns continues after restart
         """
-
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/**",
             scan_frequency="1s"

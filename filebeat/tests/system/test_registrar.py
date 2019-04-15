@@ -1445,13 +1445,13 @@ class Test(BaseTest):
     ids:
       - container_id
 - type: docker
-  line_terminator: line_feed
   containers:
     path: {path}
     stream: stderr
     ids:
       - container_id
-            '''.format(path=os.path.abspath(self.working_dir) + "/log/", line_terminator="line_feed"))
+            '''.format(path=os.path.abspath(self.working_dir) + "/log/")
+        )
         os.mkdir(self.working_dir + "/log/")
         os.mkdir(self.working_dir + "/log/container_id")
         testfile_path1 = self.working_dir + "/log/container_id/test.log"

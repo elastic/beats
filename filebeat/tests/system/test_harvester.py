@@ -221,7 +221,6 @@ class Test(BaseTest):
         """
         Checks that no empty events are sent for a file with only empty lines
         """
-
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
         )
@@ -261,7 +260,6 @@ class Test(BaseTest):
         """
         Checks that also full line is sent if lines exceeds buffer
         """
-
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
             harvester_buffer_size=10,
@@ -442,7 +440,6 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            line_terminator="carriage_return",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -480,7 +477,6 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/" + fb_encoding + "*",
             encoding=fb_encoding,
             output_file_filename=fb_encoding,
-            line_terminator="line_feed",
         )
 
         logfile = self.working_dir + "/log/" + fb_encoding + "test.log"
@@ -790,19 +786,18 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             encoding="utf-16be",
-            line_terminator="line_feed",
         )
 
         os.mkdir(self.working_dir + "/log/")
 
         logfile = self.working_dir + "/log/test.log"
 
-        with io.open(logfile, 'w', encoding="utf-16le", newline="\n") as file:
+        with io.open(logfile, 'w', encoding="utf-16le") as file:
             file.write(u'hello world1')
             file.write(u"\n")
-        with io.open(logfile, 'a', encoding="utf-16le", newline="\n") as file:
-            file.write(u"\u00012345=Ra")
-        with io.open(logfile, 'a', encoding="utf-16le", newline="\n") as file:
+        with io.open(logfile, 'a', encoding="utf-16le") as file:
+            file.write(u"\U00012345=Ra")
+        with io.open(logfile, 'a', encoding="utf-16le") as file:
             file.write(u"\n")
             file.write(u"hello world2")
             file.write(u"\n")
@@ -859,27 +854,5 @@ class Test(BaseTest):
         # 13 on unix, 14 on windows.
         self.wait_until(lambda: self.log_contains(re.compile(
             'Matching null byte found at offset (13|14)')), max_timeout=5)
-
-        filebeat.check_kill_and_wait()
-
-    def test_line_terminator(self):
-        """
-        Test if line_terminator can be configured to vertical tab
-        """
-
-        self.render_config_template(
-            path=os.path.abspath(self.beat_path) + "/tests/system/input/test-newline.log",
-            line_terminator="vertical_tab",
-        )
-
-        filebeat = self.start_beat()
-
-        messages = [
-            "\"message\": \"hello world\"",
-            "\"message\": \"goodbye world\"",
-        ]
-
-        for message in messages:
-            self.wait_until(lambda: self.log_contains(message))
 
         filebeat.check_kill_and_wait()

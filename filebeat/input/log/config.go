@@ -58,7 +58,7 @@ var (
 		// Harvester
 		BufferSize:     16 * humanize.KiByte,
 		MaxBytes:       10 * humanize.MiByte,
-		LineTerminator: readfile.LineFeed,
+		LineTerminator: readfile.AutoLineTerminator,
 		LogConfig: LogConfig{
 			Backoff:       1 * time.Second,
 			BackoffFactor: 2,

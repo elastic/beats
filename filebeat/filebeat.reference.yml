@@ -485,9 +485,9 @@ filebeat.inputs:
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
 
-  # Characters which separate the lines. Valid values: line_feed, vertical_tab, form_feed,
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
   # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
-  #line_terminator: line_feed
+  #line_terminator: auto
 
   ### Recursive glob configuration
 

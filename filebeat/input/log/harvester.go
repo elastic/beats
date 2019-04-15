@@ -34,7 +34,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"runtime"
 	"sync"
 	"time"
 
@@ -120,13 +119,8 @@ func NewHarvester(
 		return nil, err
 	}
 
-	cfg := defaultConfig
-	if runtime.GOOS == "windows" {
-		cfg.LineTerminator = readfile.CarriageReturnLineFeed
-	}
-
 	h := &Harvester{
-		config:        cfg,
+		config:        defaultConfig,
 		state:         state,
 		states:        states,
 		publishState:  publishState,

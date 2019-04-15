@@ -172,7 +172,6 @@ class Test(BaseTest):
         """
         Check dissect with a bad tokenizer
         """
-
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
             processors=[{

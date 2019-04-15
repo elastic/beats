@@ -26,6 +26,8 @@ type LineTerminator uint8
 const (
 	// InvalidTerminator is the invalid terminator
 	InvalidTerminator LineTerminator = iota
+	// AutoLineTerminator accepts both LF and CR+LF
+	AutoLineTerminator
 	// LineFeed is the unicode char LF
 	LineFeed
 	// VerticalTab is the unicode char VT
@@ -46,6 +48,7 @@ const (
 
 var (
 	lineTerminators = map[string]LineTerminator{
+		"auto":                      AutoLineTerminator,
 		"line_feed":                 LineFeed,
 		"vertical_tab":              VerticalTab,
 		"form_feed":                 FormFeed,
@@ -57,6 +60,7 @@ var (
 	}
 
 	lineTerminatorCharacters = map[LineTerminator][]byte{
+		AutoLineTerminator:     []byte{'\u000A'},
 		LineFeed:               []byte{'\u000A'},
 		VerticalTab:            []byte{'\u000B'},
 		FormFeed:               []byte{'\u000C'},
