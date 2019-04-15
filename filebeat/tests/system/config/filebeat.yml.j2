@@ -19,6 +19,7 @@ filebeat.{{input_config | default("inputs")}}:
   harvester_buffer_size: {{harvester_buffer_size}}
   encoding: {{encoding | default("utf-8") }}
   tail_files: {{tail_files}}
+  line_terminator: {{ line_terminator }}
   backoff: 0.1s
   backoff_factor: 1
   max_backoff: 0.1s
