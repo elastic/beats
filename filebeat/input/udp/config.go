@@ -35,7 +35,7 @@ var defaultConfig = config{
 		// TODO: What should be default port?
 		Host: "localhost:8080",
 		// TODO: What should be the default timeout?
-		Timeout:    time.Minute * 5,
+		Timeout: time.Minute * 5,
 	},
 }
 
