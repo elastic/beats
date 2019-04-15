@@ -241,6 +241,10 @@ filebeat.inputs:
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
+  # Size of the UDP read buffer in bytes
+  #read_buffer: 0
+
+
 #------------------------------ TCP input --------------------------------
 # Experimental: Config options for the TCP input
 #- type: tcp

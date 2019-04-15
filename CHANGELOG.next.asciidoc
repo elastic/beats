@@ -17,6 +17,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd module: Normalized value of `event.category` field from `user-login` to `authentication`. {pull}11432[11432]
 
 *Filebeat*
+- Modify apache/error dataset to follow ECS. {pull}8963[8963]
+- Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
+- Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
+- Add read_buffer configuration option. {pull}11739[11739]
 
 *Heartbeat*
 
@@ -58,6 +62,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix template always being overwritten. {pull}11671[11671]
 - Fix matching of string arrays in contains condition. {pull}11691[11691]
 - Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
+- Fix initialization of the TCP input logger. {pull}11605[11605]
+- Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
 
 *Auditbeat*
 
