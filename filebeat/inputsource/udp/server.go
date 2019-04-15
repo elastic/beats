@@ -68,7 +68,7 @@ func (u *Server) Start() error {
 	if err != nil {
 		return err
 	}
-    socketSize := int(u.config.ReadBuffer) * humanize.KiByte
+	socketSize := int(u.config.ReadBuffer) * humanize.KiByte
 	if socketSize != 0 {
 		if err := u.Listener.SetReadBuffer(int(u.config.ReadBuffer)); err != nil {
 			return err
