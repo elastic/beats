@@ -25894,7 +25894,7 @@ All UDP connections
 --
 type: integer
 
-All open TCP connections
+All open UDP connections
 
 
 --
@@ -26705,6 +26705,53 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 `zookeeper` contains the metrics reported by ZooKeeper commands.
 
 
+
+[float]
+== connection fields
+
+connections
+
+
+
+*`zookeeper.connection.interest_ops`*::
++
+--
+type: long
+
+Interest ops
+
+
+--
+
+*`zookeeper.connection.queued`*::
++
+--
+type: long
+
+Queued connections
+
+
+--
+
+*`zookeeper.connection.received`*::
++
+--
+type: long
+
+Received connections
+
+
+--
+
+*`zookeeper.connection.sent`*::
++
+--
+type: long
+
+Connections sent
+
+
+--
 
 [float]
 == mntr fields
