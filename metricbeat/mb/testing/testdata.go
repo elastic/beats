@@ -127,14 +127,14 @@ func TestDataConfig(t *testing.T) DataConfig {
 	return ReadDataConfig(t, "_meta/testdata/config.yml")
 }
 
-// TestDataFiles run tests from the usual path (`_meta/testdata`)
+// TestDataFiles run tests with config from the usual path (`_meta/testdata`)
 func TestDataFiles(t *testing.T, module, metricSet string) {
 	t.Helper()
 	config := TestDataConfig(t)
 	TestDataFilesWithConfig(t, module, metricSet, config)
 }
 
-// TestDataFiles run tests for a testdata config
+// TestDataFilesWithConfig run tests for a testdata config
 func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig) {
 	t.Helper()
 	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
