@@ -76,6 +76,5 @@ func TestFetchEventContents(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config := mbtest.ReadConfig(t, "_meta/testdata/config.yml")
-	mbtest.TestDataFiles(t, "traefik", "health", config)
+	mbtest.TestDataFiles(t, "traefik", "health", mbtest.TestDataConfig(t))
 }

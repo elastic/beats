@@ -117,6 +117,10 @@ func ReadConfig(t *testing.T, f string) Config {
 	return config
 }
 
+func TestDataConfig(t *testing.T) Config {
+	return ReadConfig(t, "_meta/testdata/config.yml")
+}
+
 func TestDataFiles(t *testing.T, module, metricSet string, config Config) {
 	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
 	if err != nil {
