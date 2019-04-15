@@ -15,18 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package udp
+// +build integration
+
+package connection
 
 import (
-	"time"
+	"testing"
 
-	"github.com/elastic/beats/libbeat/common/cfgtype"
+	"github.com/elastic/beats/metricbeat/module/zookeeper"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-// Config options for the UDPServer
-type Config struct {
-	Host           string           `config:"host"`
-	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"positive,nonzero"`
-	Timeout        time.Duration    `config:"timeout"`
-	ReadBuffer     cfgtype.ByteSize `config:"read_buffer" validate:"positive,nonzero"`
+func TestData(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
+}
+
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "zookeeper",
+		"metricsets": []string{"connection"},
+		"hosts":      []string{zookeeper.GetZookeeperEnvHost() + ":" + zookeeper.GetZookeeperEnvPort()},
+	}
 }

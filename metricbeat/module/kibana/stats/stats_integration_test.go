@@ -36,6 +36,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("flaky")
 	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
 
 	config := mtest.GetConfig("stats")
@@ -67,6 +68,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	t.Skip("flaky")
 	compose.EnsureUp(t, "kibana")
 
 	config := mtest.GetConfig("stats")

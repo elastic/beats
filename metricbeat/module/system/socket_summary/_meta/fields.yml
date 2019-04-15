@@ -61,7 +61,7 @@
             - name: count
               type: integer
               description: >
-                All open TCP connections
+                All open UDP connections
 
 
 

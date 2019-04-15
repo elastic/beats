@@ -39,8 +39,8 @@ func TestFetch(t *testing.T) {
 	addEntry(t)
 
 	// Fetch data
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, err := mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, err := mbtest.ReportingFetchV2Error(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
@@ -63,8 +63,8 @@ func TestData(t *testing.T) {
 
 	addEntry(t)
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

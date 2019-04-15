@@ -15,70 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package pending_tasks
+package connection
 
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/elasticsearch"
+	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/zookeeper"
 )
 
-// init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
+// init registers the MetricSet with the central registry as soon as the program
+// starts. The New function will be called later to instantiate an instance of
+// the MetricSet for each host defined in the module's configuration. After the
+// MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "pending_tasks", New,
-		mb.WithHostParser(elasticsearch.HostParser),
-		mb.DefaultMetricSet(),
-		mb.WithNamespace("elasticsearch.pending_tasks"),
+	mb.Registry.MustAddMetricSet("zookeeper", "connection", New,
+		mb.WithHostParser(parse.PassThruHostParser),
 	)
 }
-
-const (
-	pendingTasksPath = "/_cluster/pending_tasks"
-)
 
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
-	*elasticsearch.MetricSet
+	mb.BaseMetricSet
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := elasticsearch.NewMetricSet(base, pendingTasksPath)
-	if err != nil {
+	cfgwarn.Beta("The zookeeper connection metricset is beta.")
+
+	config := struct{}{}
+	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	return &MetricSet{MetricSet: ms}, nil
+	return &MetricSet{
+		BaseMetricSet: base,
+	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
+// Fetch fetches metrics from ZooKeeper by making a tcp connection to the
+// command port and sending the "cons" command and parsing the output.
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	outputReader, err := zookeeper.RunCommand("cons", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		return errors.Wrap(err, "'cons' command failed")
 	}
 
-	// Not master, no event sent
-	if !isMaster {
-		m.Logger().Debug("trying to fetch pending tasks from a non-master node")
-		return nil
-	}
-
-	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
+	events, err := m.parseCons(outputReader)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error parsing response from zookeeper")
 	}
 
-	content, err := m.HTTP.FetchContent()
-	if err != nil {
-		return err
+	for _, event := range events {
+		reporter.Event(event)
 	}
 
-	return eventsMapping(r, *info, content)
+	return nil
 }

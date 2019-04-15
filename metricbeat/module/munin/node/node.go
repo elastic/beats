@@ -20,8 +20,9 @@ package node
 import (
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/munin"
 )
@@ -66,11 +67,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch method implements the data gathering
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	node, err := munin.Connect(m.Host(), m.timeout)
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error in Connect")
 	}
 	defer node.Close()
 
@@ -78,15 +78,17 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	if len(plugins) == 0 {
 		plugins, err = node.List()
 		if err != nil {
-			r.Error(err)
-			return
+			return errors.Wrap(err, "error getting plugin list")
 		}
 	}
 
 	for _, plugin := range plugins {
 		metrics, err := node.Fetch(plugin, m.sanitize)
 		if err != nil {
+			msg := errors.Wrap(err, "error fetching metrics")
 			r.Error(err)
+			m.Logger().Error(msg)
+			continue
 		}
 
 		// Even if there was some error, keep sending succesfully collected metrics if any
@@ -105,8 +107,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			},
 		}
 		if !r.Event(event) {
-			logp.Debug("munin", "Failed to report event, interrupting Fetch")
-			return
+			return errors.New("metricset has closed")
 		}
 	}
+	return nil
 }
