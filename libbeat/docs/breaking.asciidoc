@@ -17,7 +17,6 @@ See the following topics for a description of breaking changes:
 * <<breaking-changes-6.2>>
 * <<breaking-changes-6.1>>
 * <<breaking-changes-6.0>>
-* {auditbeat-ref}/auditbeat-breaking-changes.html[Breaking changes in Auditbeat 6.2]
 
 [[breaking-changes-7.0]]
 
@@ -57,6 +56,12 @@ release moved most ILM settings from the `output.elasticsearch.ilm` namespace to
 the `setup.ilm` namespace.
 
 //tag::notable-breaking-changes[]
+
+[float]
+==== Filebeat apache2 module renamed
+
+The Filebeat `apache2` module is renamed to `apache` in 7.0. 
+
 [float]
 ==== Field name changes
 
