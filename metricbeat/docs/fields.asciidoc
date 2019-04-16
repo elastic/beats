@@ -2812,36 +2812,6 @@ Cache misses count for the cache plugin
 
 --
 
-*`coredns.stats.runtime.memory.alloc.bytes`*::
-+
---
-type: long
-
-Memory allocated bytes
-
-
---
-
-*`coredns.stats.runtime.process.threads.count`*::
-+
---
-type: long
-
-Running threads count
-
-
---
-
-*`coredns.stats.runtime.go.routines.count`*::
-+
---
-type: long
-
-Running Go routines count
-
-
---
-
 [[exported-fields-couchbase]]
 == Couchbase fields
 
