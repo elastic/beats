@@ -1,0 +1,20 @@
+[[release-highlights-7.1.0]]
+=== 7.1.0 release highlights
+++++
+<titleabbrev>7.1.0</titleabbrev>
+++++
+
+Each release of {beats} brings new features and product improvements. 
+Here are the highlights of the new features and enhancements in 7.1.0.
+
+Refer to the {beats} <<breaking-changes,Breaking Changes>> and <<release-notes, 
+Release Notes>> for a list of bug fixes and other changes.
+
+coming[7.1.0]
+
+//NOTE: The notable-highlights tagged regions are re-used in the
+//Installation and Upgrade Guide
+
+// tag::notable-highlights[]
+
+// end::notable-highlights[]

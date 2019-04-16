@@ -27,6 +27,8 @@ include::./upgrading.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 
+include::./highlights.asciidoc[]
+
 include::./release.asciidoc[]
 
 include::../../libbeat/docs/contributing-to-beats.asciidoc[]
