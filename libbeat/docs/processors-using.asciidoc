@@ -783,6 +783,8 @@ ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
 [[decode-csv-fields]]
 === Decode CSV fields
 
+experimental[]
+
 The `decode_csv_fields` processor decodes fields containing records in
 comma-separated format (CSV). It will output the values as an array of strings.
 This processor is only available for Filebeat and Journalbeat.
