@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build !integration
+// +build integration
 
 package cloudwatch
 
@@ -47,7 +47,7 @@ func TestData(t *testing.T) {
 func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]interface{} {
 	cloudwatchMetricsConfig := []map[string]interface{}{}
 	cloudwatchMetric := map[string]interface{}{}
-	cloudwatchMetric["namespace"] = "AWS/SQS"
+	cloudwatchMetric["namespace"] = "AWS/EC2"
 	cloudwatchMetricsConfig = append(cloudwatchMetricsConfig, cloudwatchMetric)
 	config["cloudwatch_metrics"] = cloudwatchMetricsConfig
 	return config

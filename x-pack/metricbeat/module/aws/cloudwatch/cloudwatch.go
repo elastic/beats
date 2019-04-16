@@ -17,7 +17,11 @@ import (
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
-var metricsetName = "cloudwatch"
+var (
+	metricsetName         = "cloudwatch"
+	suppportedIdentifiers = []string{"InstanceId", "BucketName", "QueueName",
+		"TopicName"}
+)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -98,13 +102,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			// Get IdentifierName
-			identifier := getIdentifierName(listMetricsOutput)
+			// Get identifier name and values
+			identifier, identifierValues := getIdentifiers(listMetricsOutput)
 
-			// Get IdentifierValues
-			identifierValues := getIdentifierValues(listMetricsOutput, identifier)
-
-			// Initialize events map per region, which stores one event per identifierValue(eg: InstanceId, BucketName,...)
+			// Initialize events map per region, which stores one event per identifierValue
 			events := map[string]mb.Event{}
 			for _, idValue := range identifierValues {
 				events[idValue] = initEvent(regionName)
@@ -155,16 +156,22 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64)
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (metricDataQuery cloudwatch.MetricDataQuery) {
-	statistic := "Average"
-	id := "cw" + strconv.Itoa(index)
+func constructLabel(metric cloudwatch.Metric) string {
 	metricDims := metric.Dimensions
 	metricName := *metric.MetricName
-	label := metricName + " "
+	label := metricName
 	for _, dim := range metricDims {
+		label += " "
 		label += *dim.Name
 		label += " " + *dim.Value
 	}
+	return label
+}
+
+func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (metricDataQuery cloudwatch.MetricDataQuery) {
+	statistic := "Average"
+	id := "cw" + strconv.Itoa(index)
+	label := constructLabel(metric)
 
 	metricDataQuery = cloudwatch.MetricDataQuery{
 		Id: &id,
@@ -178,29 +185,24 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (m
 	return
 }
 
-func getIdentifierName(listMetricsOutputs []cloudwatch.Metric) string {
-	if len(listMetricsOutputs) > 0 {
-		if len(listMetricsOutputs[0].Dimensions) == 0 {
-			return *listMetricsOutputs[0].Dimensions[0].Name
-		} else {
-			for _, dim := range listMetricsOutputs[0].Dimensions {
-				switch *dim.Name {
-				case "BucketName":
-					return "BucketName"
-				case "InstanceId":
-					return "InstanceId"
-				case "TopicName":
-					return "TopicName"
-				default:
-					return ""
-				}
-			}
+func getIdentifiers(listMetricsOutputs []cloudwatch.Metric) (string, []string) {
+	if len(listMetricsOutputs) == 0 {
+		return "", nil
+	}
+
+	if len(listMetricsOutputs[0].Dimensions) == 0 {
+		return "", nil
+	}
+
+	identifierName := ""
+	identifierValues := []string{}
+	for _, dim := range listMetricsOutputs[0].Dimensions {
+		if aws.StringInSlice(*dim.Name, suppportedIdentifiers) {
+			identifierName = *dim.Name
+			break
 		}
 	}
-	return ""
-}
 
-func getIdentifierValues(listMetricsOutputs []cloudwatch.Metric, identifierName string) (identifierValues []string) {
 	for _, output := range listMetricsOutputs {
 		for _, dim := range output.Dimensions {
 			if *dim.Name == identifierName {
@@ -211,7 +213,7 @@ func getIdentifierValues(listMetricsOutputs []cloudwatch.Metric, identifierName 
 			}
 		}
 	}
-	return
+	return identifierName, identifierValues
 }
 
 func initEvent(regionName string) mb.Event {
@@ -226,7 +228,7 @@ func initEvent(regionName string) mb.Event {
 
 func getIdentifierFromLabels(identifier string, labels []string) string {
 	identifierValue := ""
-	if len(labels) <= 2 {
+	if len(labels) <= 1 {
 		return identifierValue
 	}
 	for i := 0; i < len(labels)/2; i++ {
@@ -241,7 +243,7 @@ func getIdentifierFromLabels(identifier string, labels []string) string {
 func insertMetricSetFields(event mb.Event, namespace string, metricValue float64, labels []string) mb.Event {
 	event.MetricSetFields.Put("namespace", namespace)
 	event.MetricSetFields.Put(labels[0], metricValue)
-	if len(labels) <= 2 {
+	if len(labels) <= 1 {
 		return event
 	}
 

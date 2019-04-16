@@ -70,12 +70,23 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 	for init || getMetricDataOutput.NextToken != nil {
 		init = false
-		output, err := getMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svc, startTime, endTime)
-		if err != nil {
-			err = errors.Wrap(err, "getMetricDataPerRegion failed")
-			return getMetricDataOutput.MetricDataResults, err
+		// Split metricDataQueries into smaller slices that length no longer than 100.
+		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
+		iter := len(metricDataQueries) / 100
+		for i := 0; i <= iter; i++ {
+			metricDataQueriesPartial := metricDataQueries[iter*100:]
+			if i != iter {
+				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100-1]
+			}
+
+			output, err := getMetricDataPerRegion(metricDataQueriesPartial, getMetricDataOutput.NextToken, svc, startTime, endTime)
+			if err != nil {
+				err = errors.Wrap(err, "getMetricDataPerRegion failed")
+				return getMetricDataOutput.MetricDataResults, err
+			}
+
+			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 		}
-		getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 	}
 	return getMetricDataOutput.MetricDataResults, nil
 }
