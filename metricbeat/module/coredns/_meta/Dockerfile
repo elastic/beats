@@ -1,5 +1,5 @@
 # Start from coredns base Docker image
-FROM coredns/coredns:latest
+FROM coredns/coredns:1.5.0
 
 # create an enhanced container with nc command available since coredns is based
 # on scratch image making healthcheck impossible
