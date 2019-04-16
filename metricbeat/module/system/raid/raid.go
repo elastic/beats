@@ -101,12 +101,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			"status": blockDev.ArrayState,
 			"level":  blockDev.Level,
 			"disks": common.MapStr{
-				"active":  blockDev.DiskStates.Active,
-				"total":   blockDev.DiskStates.Total,
-				"spare":   blockDev.DiskStates.Spare,
-				"failed":  blockDev.DiskStates.Failed,
-				"unknown": blockDev.DiskStates.Unknown,
-				"states":  blockDev.DiskStates.States,
+				"active": blockDev.DiskStates.Active,
+				"total":  blockDev.DiskStates.Total,
+				"spare":  blockDev.DiskStates.Spare,
+				"failed": blockDev.DiskStates.Failed,
+				"states": blockDev.DiskStates.States,
 			},
 		}
 		//emulate the behavior of the previous mdstat parser by using the size when no sync data is available

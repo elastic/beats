@@ -25,8 +25,7 @@
                     "in_sync": 2,
                     "spare": 1
                 },
-                "total": 3,
-                "unknown": 0
+                "total": 3
             },
             "level": "raid1",
             "name": "md0",

@@ -38,10 +38,9 @@ type MDDevice struct {
 
 // DiskStates summarizes the state of all the devices in the array
 type DiskStates struct {
-	Active  int
-	Total   int
-	Failed  int
-	Spare   int
-	Unknown int
-	States  common.MapStr
+	Active int
+	Total  int
+	Failed int
+	Spare  int
+	States common.MapStr
 }
