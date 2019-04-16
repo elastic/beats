@@ -51,13 +51,13 @@ var (
 	templateName = "testbeatidx-" + version.GetDefaultVersion()
 )
 
-func defaultESLoader(t *testing.T) *ESClientHandler {
+func defaultESLoader(t *testing.T) *ESLoader {
 	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
 
-	return NewESClientHandler(client)
+	return NewESLoader(client)
 }
 
 func TestCheckTemplate(t *testing.T) {
@@ -316,7 +316,7 @@ func TestTemplateWithData(t *testing.T) {
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
-	loader := NewESClientHandler(client)
+	loader := NewESLoader(client)
 
 	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{}, false)
 	assert.NoError(t, err)

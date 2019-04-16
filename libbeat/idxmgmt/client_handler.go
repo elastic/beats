@@ -23,30 +23,15 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
-// ClientHandler defines the interface between a remote service and the Manager for ILM and templates.
+// Loader defines the interface between a remote service and the Manager for ILM and templates.
 type ClientHandler interface {
-	ILMClient() ilm.ClientHandler
-	TemplateClient() template.ClientHandler
+	ilm.ClientHandler
+	template.Loader
 }
 
-// ESClientHandler implements the ClientHandler interface for talking to ES.
-type ESClientHandler struct {
-	client ESClient
-}
-
-// ILMClient returns ESClientHandler for ILM handling.
-func (c *ESClientHandler) ILMClient() ilm.ClientHandler {
-	return ilm.NewESClientHandler(c.client)
-}
-
-// TemplateClient returns ESClientHandler for template handling.
-func (c *ESClientHandler) TemplateClient() template.ClientHandler {
-	return template.NewESClientHandler(c.client)
-}
-
-// NewESClientHandler returns a new ESClientHandler instance.
-func NewESClientHandler(c ESClient) *ESClientHandler {
-	return &ESClientHandler{client: c}
+type clientHandler struct {
+	ilm.ClientHandler
+	template.Loader
 }
 
 // ESClient defines the minimal interface required for the index manager to
@@ -56,29 +41,26 @@ type ESClient interface {
 	GetVersion() common.Version
 }
 
-// FileClientHandler implements the ClientHandler interface for loading to a file.
-type FileClientHandler struct {
-	client FileClient
-}
-
-// FileClient defines the minimal interface required for the ClientHandler to
+// FileClient defines the minimal interface required for the Loader to
 // prepare a policy and write alias.
 type FileClient interface {
 	GetVersion() common.Version
 	Write(name string, body string) error
 }
 
-// NewFileClientHandler returns a new instance of a FileClientHandler
-func NewFileClientHandler(c FileClient) *FileClientHandler {
-	return &FileClientHandler{client: c}
+// NewClientHandler initializes and returns a new instance of ClientHandler
+func NewClientHandler(ilm ilm.ClientHandler, template template.Loader) ClientHandler {
+	return &clientHandler{ilm, template}
 }
 
-// ILMClient returns FileClientHandler for ILM handling.
-func (c *FileClientHandler) ILMClient() ilm.ClientHandler {
-	return ilm.NewFileClientHandler(c.client)
+// NewESLoader returns a new ESLoader instance,
+// initialized with an ilm and template client handler based on the passed in client.
+func NewESClientHandler(c ESClient) ClientHandler {
+	return NewClientHandler(ilm.NewESClientHandler(c), template.NewESLoader(c))
 }
 
-// TemplateClient returns FileClientHandler for template handling.
-func (c *FileClientHandler) TemplateClient() template.ClientHandler {
-	return template.NewFileClientHandler(c.client)
+// NewFileLoader returns a new ESLoader instance,
+// initialized with an ilm and template client handler based on the passed in client.
+func NewFileClientHandler(c FileClient) ClientHandler {
+	return NewClientHandler(ilm.NewFileClientHandler(c), template.NewFileLoader(c))
 }

@@ -69,8 +69,10 @@ type Manager interface {
 // It will be used in combination with idxmgmt configuration settings.
 type LoadMode uint8
 
+//go:generate stringer -linecomment -type LoadMode
 const (
-	// LoadModeUnset indicates that no specific mode is set, loading should be derived only from config.
+	// LoadModeUnset indicates that no specific mode is set.
+	// Instead the decision about loading data will be derived from the config or their respective default values.
 	LoadModeUnset LoadMode = iota
 	// LoadModeEnabled indicates loading if not already available
 	LoadModeEnabled

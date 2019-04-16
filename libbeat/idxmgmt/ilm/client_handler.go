@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// ClientHandler defines the interface between a remote service and the Manager.
+// Loader defines the interface between a remote service and the Manager.
 type ClientHandler interface {
 	CheckILMEnabled(Mode) (bool, error)
 
@@ -37,27 +37,12 @@ type ClientHandler interface {
 	CreateILMPolicy(policy Policy) error
 }
 
-// ESClientHandler implements the ClientHandler interface for talking to ES.
+// ESClientHandler implements the Loader interface for talking to ES.
 type ESClientHandler struct {
 	client ESClient
 }
 
-var (
-	esMinILMVersion        = common.MustNewVersion("6.6.0")
-	esMinDefaultILMVersion = common.MustNewVersion("7.0.0")
-)
-
-const (
-	// esFeaturesPath is used to query Elasticsearch for availability of licensed
-	// features.
-	esFeaturesPath = "/_xpack"
-
-	esILMPath = "/_ilm/policy"
-
-	esAliasPath = "/_alias"
-)
-
-// ESClient defines the minimal interface required for the ClientHandler to
+// ESClient defines the minimal interface required for the Loader to
 // prepare a policy and write alias.
 type ESClient interface {
 	GetVersion() common.Version
@@ -69,9 +54,41 @@ type ESClient interface {
 	) (int, []byte, error)
 }
 
+// FileClientHandler implements the Loader interface for writing to a file.
+type FileClientHandler struct {
+	client FileClient
+}
+
+// FileClient defines the minimal interface required for the Loader to
+// prepare a policy and write alias.
+type FileClient interface {
+	GetVersion() common.Version
+	Write(name string, body string) error
+}
+
+const (
+	// esFeaturesPath is used to query Elasticsearch for availability of licensed
+	// features.
+	esFeaturesPath = "/_xpack"
+
+	esILMPath = "/_ilm/policy"
+
+	esAliasPath = "/_alias"
+)
+
+var (
+	esMinILMVersion        = common.MustNewVersion("6.6.0")
+	esMinDefaultILMVersion = common.MustNewVersion("7.0.0")
+)
+
 // NewESClientHandler initializes and returns an ESClientHandler,
 func NewESClientHandler(c ESClient) *ESClientHandler {
 	return &ESClientHandler{client: c}
+}
+
+// NewFileClientHandler initializes and returns a new FileClientHandler instance.
+func NewFileClientHandler(c FileClient) *FileClientHandler {
+	return &FileClientHandler{client: c}
 }
 
 // CheckILMEnabled indicates whether or not ILM is supported for the configured mode and ES instance.
@@ -170,7 +187,7 @@ func (h *ESClientHandler) CreateAlias(alias Alias) error {
 	return nil
 }
 
-func (h *ESClientHandler) checkILMSupport() (avail, enbaled bool, err error) {
+func (h *ESClientHandler) checkILMSupport() (avail, enabled bool, err error) {
 	var response struct {
 		Features struct {
 			ILM struct {
@@ -189,8 +206,8 @@ func (h *ESClientHandler) checkILMSupport() (avail, enbaled bool, err error) {
 	}
 
 	avail = response.Features.ILM.Available
-	enbaled = response.Features.ILM.Enabled
-	return avail, enbaled, nil
+	enabled = response.Features.ILM.Enabled
+	return avail, enabled, nil
 }
 
 func (h *ESClientHandler) queryFeatures(to interface{}) (int, error) {
@@ -207,45 +224,21 @@ func (h *ESClientHandler) queryFeatures(to interface{}) (int, error) {
 	return status, nil
 }
 
-// FileClientHandler implements the ClientHandler interface for writing to a file.
-type FileClientHandler struct {
-	client FileClient
-}
-
-// FileClient defines the minimal interface required for the ClientHandler to
-// prepare a policy and write alias.
-type FileClient interface {
-	GetVersion() common.Version
-	Write(name string, body string) error
-}
-
-// NewFileClientHandler initializes and returns a new FileClientHandler instance.
-func NewFileClientHandler(c FileClient) *FileClientHandler {
-	return &FileClientHandler{client: c}
-}
-
 // CheckILMEnabled indicates whether or not ILM is supported for the configured mode and client version.
 func (h *FileClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
 	if mode == ModeDisabled {
 		return false, nil
 	}
-
 	avail, probe := checkILMVersion(mode, h.client.GetVersion())
-	if !avail {
-		if mode == ModeEnabled {
-			ver := h.client.GetVersion()
-			return false, errf(ErrESVersionNotSupported,
-				"Elasticsearch %v does not support ILM", ver.String())
-		}
+	if avail {
+		return probe, nil
+	}
+	if mode != ModeEnabled {
 		return false, nil
 	}
-
-	if !probe {
-		// version potentially supports ILM, but mode + version indicates that we
-		// want to disable ILM support.
-		return false, nil
-	}
-	return true, nil
+	version := h.client.GetVersion()
+	return false, errf(ErrESVersionNotSupported,
+		"Elasticsearch %v does not support ILM", version.String())
 }
 
 // CreateILMPolicy writes given policy to the configured file.
@@ -273,6 +266,9 @@ func (h *FileClientHandler) HasAlias(name string) (bool, error) {
 	return false, nil
 }
 
+// avail: indicates whether version supports ILM
+// probe: in case version potentially supports ILM, check the combination of mode + version
+// to indicate whether or not ILM support should be enabled or disabled
 func checkILMVersion(mode Mode, ver common.Version) (avail, probe bool) {
 	avail = !ver.LessThan(esMinILMVersion)
 	if avail {

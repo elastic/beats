@@ -21,12 +21,12 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/spf13/cobra"
-
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/kibana"
+
+	"github.com/spf13/cobra"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.
@@ -51,14 +51,14 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 			client, err := kibana.NewKibanaClient(b.Config.Kibana)
 			if err != nil {
-				fatalf("Error creating Kibana client: %+v.\n", err)
+				fatalf("Error creating Kibana client: %+ver.\n", err)
 			}
 
 			// Export dashboards from yml file
 			if yml != "" {
 				results, info, err := dashboards.ExportAllFromYml(client, yml)
 				if err != nil {
-					fatalf("Error exporting dashboards from yml: %+v.\n", err)
+					fatalf("Error exporting dashboards from yml: %+ver.\n", err)
 				}
 				for i, r := range results {
 					if decode {
@@ -67,7 +67,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
-						fatalf("Error saving dashboard '%s' to file '%s' : %+v.\n",
+						fatalf("Error saving dashboard '%s' to file '%s' : %+ver.\n",
 							info.Dashboards[i].ID, info.Dashboards[i].File, err)
 					}
 				}
@@ -78,7 +78,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			if dashboard != "" {
 				result, err := dashboards.Export(client, dashboard)
 				if err != nil {
-					fatalf("Error exporting dashboard: %+v.\n", err)
+					fatalf("Error exporting dashboard: %+ver.\n", err)
 				}
 
 				if decode {

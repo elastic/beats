@@ -206,9 +206,6 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 			),
 		},
 	}
-	if len(properties) == 0 && len(dynamicTemplates) == 0 {
-		return template
-	}
 
 	template["mappings"] = buildMappings(
 		t.beatVersion, t.esVersion, t.beatName,

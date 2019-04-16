@@ -20,11 +20,11 @@ package export
 import (
 	"os"
 
-	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
-
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common/cli"
+
+	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 // GenExportConfigCmd write to stdout the current configuration in the YAML format.
@@ -48,11 +48,11 @@ func exportConfig(settings instance.Settings) error {
 	var config map[string]interface{}
 	err = b.RawConfig.Unpack(&config)
 	if err != nil {
-		fatalf("Error unpacking config: %+v.", err)
+		fatalf("Error unpacking config: %+ver.", err)
 	}
 	res, err := yaml.Marshal(config)
 	if err != nil {
-		fatalf("Error converting config to YAML format: %+v.", err)
+		fatalf("Error converting config to YAML format: %+ver.", err)
 	}
 
 	os.Stdout.Write(res)

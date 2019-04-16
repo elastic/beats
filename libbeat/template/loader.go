@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -29,13 +30,13 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 )
 
-//ClientHandler interface for loading templates
-type ClientHandler interface {
+//Loader interface for loading templates
+type Loader interface {
 	Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error
 }
 
-// ESClientHandler implements ClientHandler interface for loading templates to Elasticsearch.
-type ESClientHandler struct {
+// ESLoader implements Loader interface for loading templates to Elasticsearch.
+type ESLoader struct {
 	client ESClient
 }
 
@@ -46,15 +47,31 @@ type ESClient interface {
 	GetVersion() common.Version
 }
 
-// NewESClientHandler creates a new template loader for ES
-func NewESClientHandler(client ESClient) *ESClientHandler {
-	return &ESClientHandler{client: client}
+// FileLoader implements Loader interface for loading templates to a File.
+type FileLoader struct {
+	client FileClient
+}
+
+// FileClient defines the minimal interface required for the FileLoader
+type FileClient interface {
+	GetVersion() common.Version
+	Write(name string, body string) error
+}
+
+// NewESLoader creates a new template loader for ES
+func NewESLoader(client ESClient) *ESLoader {
+	return &ESLoader{client: client}
+}
+
+// NewFileLoader creates a new template loader for the given file.
+func NewFileLoader(c FileClient) *FileLoader {
+	return &FileLoader{client: c}
 }
 
 // Load checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
 // template is built and written to index
-func (l *ESClientHandler) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
+func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
 	//build template from config
 	tmpl, err := template(config, info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {
@@ -87,7 +104,7 @@ func (l *ESClientHandler) Load(config TemplateConfig, info beat.Info, fields []b
 // loadTemplate loads a template into Elasticsearch overwriting the existing
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
-func (l *ESClientHandler) loadTemplate(templateName string, template map[string]interface{}) error {
+func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
 	logp.Info("Try loading template %s to Elasticsearch", templateName)
 	path := "/_template/" + templateName
 	params := esVersionParams(l.client.GetVersion())
@@ -95,7 +112,7 @@ func (l *ESClientHandler) loadTemplate(templateName string, template map[string]
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
 	}
-	if status > 300 {
+	if status > http.StatusMultipleChoices { //http status 300
 		return fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 	return nil
@@ -103,37 +120,19 @@ func (l *ESClientHandler) loadTemplate(templateName string, template map[string]
 
 // templateExists checks if a given template already exist. It returns true if
 // and only if Elasticsearch returns with HTTP status code 200.
-func (l *ESClientHandler) templateExists(templateName string) bool {
+func (l *ESLoader) templateExists(templateName string) bool {
 	if l.client == nil {
 		return false
 	}
 	status, _, _ := l.client.Request("HEAD", "/_template/"+templateName, "", nil, nil)
-
-	if status != 200 {
+	if status != http.StatusOK {
 		return false
 	}
-
 	return true
 }
 
-// FileClientHandler implements ClientHandler interface for loading templates to a File.
-type FileClientHandler struct {
-	client FileClient
-}
-
-// FileClient defines the minimal interface required for the FileClientHandler
-type FileClient interface {
-	GetVersion() common.Version
-	Write(name string, body string) error
-}
-
-// NewFileClientHandler creates a new template loader for the given file.
-func NewFileClientHandler(c FileClient) *FileClientHandler {
-	return &FileClientHandler{client: c}
-}
-
 // Load reads the template from the config, creates the template body and prints it to the configured file.
-func (l *FileClientHandler) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
+func (l *FileLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
 	//build template from config
 	tmpl, err := template(config, info, l.client.GetVersion(), migration)
 	if err != nil || tmpl == nil {

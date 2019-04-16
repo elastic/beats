@@ -22,12 +22,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/libbeat/mapping"
+	"github.com/elastic/beats/libbeat/template"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDefaultSupport_Enabled(t *testing.T) {
@@ -193,4 +195,185 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			assert.Equal(t, test.want(ts), idx)
 		})
 	}
+}
+
+func TestDefaultSupport_TemplateHandling(t *testing.T) {
+	cloneCfg := func(c template.TemplateConfig) template.TemplateConfig {
+		if c.AppendFields != nil {
+			tmp := make(mapping.Fields, len(c.AppendFields))
+			copy(tmp, c.AppendFields)
+			c.AppendFields = tmp
+		}
+
+		if c.Settings.Index != nil {
+			c.Settings.Index = (map[string]interface{})(common.MapStr(c.Settings.Index).Clone())
+		}
+		if c.Settings.Index != nil {
+			c.Settings.Source = (map[string]interface{})(common.MapStr(c.Settings.Source).Clone())
+		}
+		return c
+	}
+
+	cfgWith := func(s template.TemplateConfig, mods ...map[string]interface{}) *template.TemplateConfig {
+		for _, mod := range mods {
+			cfg := common.MustNewConfigFrom(mod)
+			s = cloneCfg(s)
+			err := cfg.Unpack(&s)
+			if err != nil {
+				panic(err)
+			}
+		}
+		return &s
+	}
+	defaultCfg := template.DefaultConfig()
+
+	cases := map[string]struct {
+		cfg                   common.MapStr
+		loadTemplate, loadILM LoadMode
+
+		err           bool
+		tmplCfg       *template.TemplateConfig
+		alias, policy string
+	}{
+		"template default, ilm default": {
+			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+				"overwrite":                     "true",
+				"name":                          "test-9.9.9",
+				"pattern":                       "test-9.9.9-*",
+				"settings.index.lifecycle.name": "test-9.9.9",
+				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
+			}),
+			alias:  "test-9.9.9",
+			policy: "test-9.9.9",
+		},
+		"template default, ilm default with alias and policy changed": {
+			cfg: common.MapStr{
+				"setup.ilm.rollover_alias": "mocktest",
+				"setup.ilm.policy_name":    "policy-keep",
+			},
+			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+				"overwrite":                     "true",
+				"name":                          "mocktest",
+				"pattern":                       "mocktest-*",
+				"settings.index.lifecycle.name": "policy-keep",
+				"settings.index.lifecycle.rollover_alias": "mocktest",
+			}),
+			alias:  "mocktest",
+			policy: "policy-keep",
+		},
+		"template default, ilm disabled": {
+			cfg: common.MapStr{
+				"setup.ilm.enabled": false,
+			},
+			loadTemplate: LoadModeEnabled,
+			tmplCfg:      &defaultCfg,
+		},
+		"template loadMode disabled, ilm disabled": {
+			cfg: common.MapStr{
+				"setup.ilm.enabled": false,
+			},
+			loadTemplate: LoadModeDisabled,
+		},
+		"template disabled, ilm default": {
+			cfg: common.MapStr{
+				"setup.template.enabled": false,
+			},
+			alias:  "test-9.9.9",
+			policy: "test-9.9.9",
+		},
+		"template loadmode disabled, ilm loadMode enabled": {
+			loadTemplate: LoadModeDisabled,
+			loadILM:      LoadModeEnabled,
+			alias:        "test-9.9.9",
+			policy:       "test-9.9.9",
+		},
+		"template default, ilm loadMode disabled": {
+			loadILM: LoadModeDisabled,
+			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+				"name":                          "test-9.9.9",
+				"pattern":                       "test-9.9.9-*",
+				"settings.index.lifecycle.name": "test-9.9.9",
+				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
+			}),
+		},
+		"template loadmode disabled, ilm loadmode disabled": {
+			loadTemplate: LoadModeDisabled,
+			loadILM:      LoadModeDisabled,
+		},
+	}
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			info := beat.Info{Beat: "test", Version: "9.9.9"}
+			factory := MakeDefaultSupport(nil)
+			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
+			require.NoError(t, err)
+
+			clientHandler := newMockClientHandler()
+			manager := im.Manager(clientHandler, BeatsAssets([]byte("testbeat fields")))
+			err = manager.Setup(test.loadTemplate, test.loadILM)
+			if test.err {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				if test.tmplCfg == nil {
+					assert.Nil(t, clientHandler.tl.tmplCfg)
+				} else {
+					assert.Equal(t, test.tmplCfg, clientHandler.tl.tmplCfg)
+				}
+				assert.Equal(t, test.alias, clientHandler.il.alias)
+				assert.Equal(t, test.policy, clientHandler.il.policy)
+			}
+		})
+	}
+}
+
+func newMockClientHandler() *mockClientHandler {
+	tl := mockTemplateLoader{}
+	il := mockILMClientHandler{}
+	return &mockClientHandler{&il, &tl, &tl, &il}
+}
+
+type mockClientHandler struct {
+	ilm.ClientHandler
+	template.Loader
+
+	tl *mockTemplateLoader
+	il *mockILMClientHandler
+}
+
+type mockTemplateLoader struct {
+	tmplCfg *template.TemplateConfig
+	force   bool
+}
+
+func (l *mockTemplateLoader) Load(config template.TemplateConfig, _ beat.Info, fields []byte, migration bool) error {
+	l.force = config.Overwrite
+	l.tmplCfg = &config
+	return nil
+}
+
+type mockILMClientHandler struct {
+	alias, policy string
+}
+
+func (ch *mockILMClientHandler) CheckILMEnabled(m ilm.Mode) (bool, error) {
+	return m == ilm.ModeEnabled || m == ilm.ModeAuto, nil
+}
+
+func (ch *mockILMClientHandler) HasAlias(name string) (bool, error) {
+	return ch.alias == name, nil
+}
+
+func (ch *mockILMClientHandler) CreateAlias(alias ilm.Alias) error {
+	ch.alias = alias.Name
+	return nil
+}
+
+func (ch *mockILMClientHandler) HasILMPolicy(name string) (bool, error) {
+	return ch.policy == name, nil
+}
+
+func (ch *mockILMClientHandler) CreateILMPolicy(policy ilm.Policy) error {
+	ch.policy = policy.Name
+	return nil
 }

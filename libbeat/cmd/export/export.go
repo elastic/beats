@@ -22,12 +22,84 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/libbeat/idxmgmt"
-
-	"github.com/elastic/beats/libbeat/version"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/idxmgmt"
+	"github.com/elastic/beats/libbeat/version"
 )
+
+type stdoutClient struct {
+	ver common.Version
+	f   *os.File
+}
+
+type fileClient struct {
+	ver common.Version
+	dir string
+}
+
+func newIdxmgmtClient(dir string, ver string) idxmgmt.FileClient {
+	if dir == "" {
+		c, err := newStdoutClient(ver)
+		if err != nil {
+			fatalf("Error creating stdout writer: %+ver.", err)
+		}
+		return c
+	}
+	c, err := newFileClient(dir, ver)
+	if err != nil {
+		fatalf("Error creating directory: %+ver.", err)
+	}
+	return c
+}
+
+func newStdoutClient(ver string) (*stdoutClient, error) {
+	if ver == "" {
+		ver = version.GetDefaultVersion()
+	}
+	version, err := common.NewVersion(ver)
+	if err != nil {
+		return nil, err
+	}
+	return &stdoutClient{ver: *version, f: os.Stdout}, nil
+}
+
+func newFileClient(dir string, ver string) (*fileClient, error) {
+	if ver == "" {
+		ver = version.GetDefaultVersion()
+	}
+	path, err := filepath.Abs(dir)
+	if err != nil {
+		return nil, err
+	}
+	err = os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+	return &fileClient{ver: *common.MustNewVersion(ver), dir: path}, nil
+}
+
+func (c *stdoutClient) GetVersion() common.Version {
+	return c.ver
+}
+
+func (c *stdoutClient) Write(_ string, body string) error {
+	_, err := c.f.WriteString(body)
+	return err
+}
+
+func (c *fileClient) GetVersion() common.Version {
+	return c.ver
+}
+
+func (c *fileClient) Write(name string, body string) error {
+	f, err := os.Create(filepath.Join(c.dir, fmt.Sprintf("%s.json", name)))
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+	_, err = f.WriteString(body)
+	return err
+}
 
 func fatalf(msg string, vs ...interface{}) {
 	fmt.Fprintf(os.Stderr, msg, vs...)
@@ -36,71 +108,5 @@ func fatalf(msg string, vs ...interface{}) {
 }
 
 func fatalfInitCmd(err error) {
-	fatalf("Failed to initialize 'export' command: %+v.", err)
-}
-
-func newIdxmgmtClient(dir string, version string) idxmgmt.FileClient {
-	if dir == "" {
-		return newStdoutClient(version)
-	}
-	c, err := newFileClient(dir, version)
-	if err != nil {
-		fatalf("Error creating directory: %+v.", err)
-	}
-	return c
-}
-
-type stdoutClient struct {
-	v common.Version
-	f *os.File
-}
-
-func newStdoutClient(v string) *stdoutClient {
-	if v == "" {
-		v = version.GetDefaultVersion()
-	}
-	return &stdoutClient{v: *common.MustNewVersion(v), f: os.Stdout}
-}
-
-func (c *stdoutClient) GetVersion() common.Version {
-	return c.v
-}
-
-func (c *stdoutClient) Write(_ string, body string) error {
-	c.f.WriteString(body)
-	return nil
-}
-
-type fileClient struct {
-	v common.Version
-	d string
-}
-
-func newFileClient(dir string, v string) (*fileClient, error) {
-	if v == "" {
-		v = version.GetDefaultVersion()
-	}
-	d, err := filepath.Abs(dir)
-	if err != nil {
-		return nil, err
-	}
-	err = os.MkdirAll(d, os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
-	return &fileClient{v: *common.MustNewVersion(v), d: d}, nil
-}
-
-func (c *fileClient) GetVersion() common.Version {
-	return c.v
-}
-
-func (c *fileClient) Write(name string, body string) error {
-	f, err := os.Create(filepath.Join(c.d, fmt.Sprintf("%s.json", name)))
-	defer f.Close()
-	if err != nil {
-		return err
-	}
-	f.WriteString(body)
-	return nil
+	fatalf("Failed to initialize 'export' command: %+ver.", err)
 }
