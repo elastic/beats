@@ -34,7 +34,7 @@ import (
 	_ "github.com/elastic/beats/journalbeat/include"
 
 	// Add dedicated processors
-	_ "github.com/elastic/beats/libbeat/processors/decode_csv_field"
+	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 )
 
 // Journalbeat instance

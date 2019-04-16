@@ -256,8 +256,10 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
             processors=[{
-                "decode_csv_field": {
-                    "field": "message",
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "csv"
+                    }
                 },
             }]
         )
@@ -279,9 +281,10 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
             processors=[{
-                "decode_csv_field": {
-                    "field": "message",
-                    "target": "message",
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "message"
+                    },
                     "overwrite_keys": True,
                     "separator": "\"\t\"",
                     "trim_leading_space": True,
