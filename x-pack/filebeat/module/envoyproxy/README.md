@@ -1,6 +1,6 @@
 # Envoyproxy Module
 
-This is a filebeat module for envoy proxy. 
+This is a filebeat module for Envoy proxy access log. 
 
 ## Caveats
 

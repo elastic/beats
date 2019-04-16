@@ -5,8 +5,7 @@
 
 == Envoyproxy Module
 
-This is a filebeat module for envoy proxy. It supports both standalone deployment and 
-envoy proxy deployment in Kubernetes. 
+This is a filebeat module for Envoy proxy access log (https://www.envoyproxy.io/docs/envoy/v1.10.0/configuration/access_log). It supports both standalone deployment and Envoy proxy deployment in Kubernetes. 
 
 [float]
 === Compatibility
