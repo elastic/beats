@@ -20,14 +20,12 @@ package timeseries
 import (
 	"strings"
 
-	"github.com/elastic/beats/libbeat/mapping"
-
 	"github.com/mitchellh/hashstructure"
-
-	"github.com/elastic/beats/libbeat/processors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/mapping"
+	"github.com/elastic/beats/libbeat/processors"
 )
 
 type timeseriesProcessor struct {
