@@ -176,6 +176,27 @@
     {
         "coredns": {
             "stats": {
+                "panic": {
+                    "count": 0
+                }
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
                 "dns": {
                     "response": {
                         "rcode": {
@@ -495,44 +516,6 @@
                 "server": "dns://:53",
                 "type": "A",
                 "zone": "my.domain.elastic."
-            }
-        },
-        "event": {
-            "dataset": "coredns.stats",
-            "duration": 115000,
-            "module": "coredns"
-        },
-        "metricset": {
-            "name": "stats"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "coredns"
-        }
-    },
-    {
-        "coredns": {
-            "stats": {
-                "panic": {
-                    "count": 0
-                },
-                "runtime": {
-                    "go": {
-                        "routines": {
-                            "count": 21
-                        }
-                    },
-                    "memory": {
-                        "alloc": {
-                            "bytes": 1843744
-                        }
-                    },
-                    "process": {
-                        "threads": {
-                            "count": 18
-                        }
-                    }
-                }
             }
         },
         "event": {

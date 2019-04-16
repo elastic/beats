@@ -40,11 +40,6 @@ var mapping = &prometheus.MetricsMapping{
 		// cache plugin metrics (might not be present if cache plugin is not configured)
 		"coredns_cache_hits_total":   prometheus.Metric("dns.cache.hits.count"),
 		"coredns_cache_misses_total": prometheus.Metric("dns.cache.misses.count"),
-
-		// go runtime
-		"go_memstats_alloc_bytes": prometheus.Metric("runtime.memory.alloc.bytes"),
-		"go_threads":              prometheus.Metric("runtime.process.threads.count"),
-		"go_goroutines":           prometheus.Metric("runtime.go.routines.count"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{

@@ -2,26 +2,15 @@
     {
         "coredns": {
             "stats": {
-                "panic": {
-                    "count": 0
-                },
-                "runtime": {
-                    "go": {
-                        "routines": {
-                            "count": 22
-                        }
-                    },
-                    "memory": {
-                        "alloc": {
-                            "bytes": 2917800
-                        }
-                    },
-                    "process": {
-                        "threads": {
-                            "count": 16
-                        }
+                "dns": {
+                    "request": {
+                        "count": 440
                     }
-                }
+                },
+                "family": "1",
+                "proto": "udp",
+                "server": "dns://:53",
+                "zone": "."
             }
         },
         "event": {
@@ -40,15 +29,9 @@
     {
         "coredns": {
             "stats": {
-                "dns": {
-                    "request": {
-                        "count": 440
-                    }
-                },
-                "family": "1",
-                "proto": "udp",
-                "server": "dns://:53",
-                "zone": "."
+                "panic": {
+                    "count": 0
+                }
             }
         },
         "event": {
