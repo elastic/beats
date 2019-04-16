@@ -48,7 +48,10 @@ type builder struct {
 	builtinMeta common.MapStr
 	fields      common.MapStr
 	tags        []string
-	timeseries  bool
+
+	// Time series id will be calculated for Events with the TimeSeries flag if this
+	// is enabled (disabled by default)
+	timeSeries bool
 
 	// global pipeline processors
 	processors *group
@@ -97,6 +100,7 @@ func MakeDefaultSupport(
 		cfg := struct {
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
 			Processors           processors.PluginConfig `config:"processors"`
+			TimeSeries           bool                    `config:"timeseries.enabled"`
 		}{}
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
@@ -107,7 +111,7 @@ func MakeDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize), nil
+		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries), nil
 	}
 }
 
@@ -159,12 +163,14 @@ func newBuilder(
 	eventMeta common.EventMetadata,
 	modifiers []modifier,
 	skipNormalize bool,
+	timeSeries bool,
 ) *builder {
 	b := &builder{
 		skipNormalize: skipNormalize,
 		modifiers:     modifiers,
 		log:           log,
 		info:          info,
+		timeSeries:    timeSeries,
 	}
 
 	hasProcessors := processors != nil && len(processors.List) > 0
@@ -296,7 +302,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	processors.add(b.processors)
 
 	// setup 9: time series metadata
-	if cfg.TimeSeries {
+	if b.timeSeries {
 		rawFields, err := asset.GetFields(b.info.Beat)
 		if err != nil {
 			return nil, err

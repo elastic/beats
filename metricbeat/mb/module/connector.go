@@ -30,6 +30,7 @@ type Connector struct {
 	processors    *processors.Processors
 	eventMeta     common.EventMetadata
 	dynamicFields *common.MapStrPointer
+	timeSeries    bool
 }
 
 type connectorConfig struct {
@@ -62,7 +63,6 @@ func (c *Connector) Connect() (beat.Client, error) {
 			EventMetadata: c.eventMeta,
 			Processor:     c.processors,
 			DynamicFields: c.dynamicFields,
-			TimeSeries:    true,
 		},
 	})
 }
