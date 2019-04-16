@@ -75,7 +75,7 @@ type ESClient interface {
 // Manager is used to initialize indices, ILM policies, and aliases within the
 // Elastic Stack.
 type Manager interface {
-	Setup(template, policy bool) error
+	Setup(forceTemplate, forcePolicy bool) error
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.
@@ -98,7 +98,7 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 			ILM       *common.Config         `config:"setup.ilm"`
 			Template  *common.Config         `config:"setup.template"`
 			Output    common.ConfigNamespace `config:"output"`
-			Migration *common.Config         `config:"migration"`
+			Migration *common.Config         `config:"migration.6_to_7"`
 		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {

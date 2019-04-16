@@ -14,13 +14,18 @@
 # in the directory in which it was started.
 #winlogbeat.registry_file: .winlogbeat.yml
 
+# The maximum amount of time Winlogbeat should wait for events to finish
+# publishing when shutting down.
+#winlogbeat.shutdown_timeout: 0s
+
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
 #
 # The supported keys are name (required), tags, fields, fields_under_root,
-# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
-# visit the documentation for the complete details of each option.
+# forwarded, ignore_older, level, no_more_events, event_id, provider, and
+# include_xml. Please visit the documentation for the complete details of each
+# option.
 # https://go.es.io/WinlogbeatConfig
 winlogbeat.event_logs:
   - name: Application
@@ -145,7 +150,7 @@ winlogbeat.event_logs:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -236,7 +241,7 @@ winlogbeat.event_logs:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -246,6 +251,42 @@ winlogbeat.event_logs:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+# The following example copies the value of message to message_copied
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: message_copied
+#    fail_on_error: true
+#    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
 
 #============================= Elastic Cloud ==================================
 
@@ -537,6 +578,9 @@ output.elasticsearch:
 
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
+
+    # Strategy for fetching the topics metadata from the broker. Default is true.
+    #full: true
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -1055,20 +1099,22 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# winlogbeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== Xpack Monitoring ===============================
+# winlogbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
@@ -1180,5 +1226,5 @@ logging.files:
 
 #================================= Migration ==================================
 
-# This allows to enable migration aliases
-#migration.enabled: false
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: false

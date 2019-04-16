@@ -1,5 +1,6 @@
 import sys
 import os
+import glob
 import json
 import requests
 import string
@@ -13,7 +14,9 @@ from os import path
 from base import BaseTest
 
 
+# Disable because waiting artifacts from https://github.com/elastic/kibana/pull/31660
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+# INTEGRATION_TESTS = False
 TIMEOUT = 2 * 60
 
 
@@ -39,6 +42,8 @@ class TestManagement(BaseTest):
         Enroll the beat in Kibana Central Management
         """
 
+        assert len(glob.glob(os.path.join(self.working_dir, "mockbeat.yml.*.bak"))) == 0
+
         # We don't care about this as it will be replaced by enrollment
         # process:
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
@@ -61,9 +66,9 @@ class TestManagement(BaseTest):
         assert config_content != new_content
 
         # Settings backup has been created
-        assert os.path.isfile(os.path.join(
-            self.working_dir, "mockbeat.yml.bak"))
-        backup_content = open(config_path + ".bak", 'r').read()
+        backup_file = glob.glob(os.path.join(self.working_dir, "mockbeat.yml.*.bak"))[0]
+        assert os.path.isfile(backup_file)
+        backup_content = open(backup_file).read()
         assert config_content == backup_content
 
     @unittest.skipIf(not INTEGRATION_TESTS,

@@ -8,7 +8,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -103,8 +103,8 @@
             "highlightAll": true,
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
-              "query": "syslog.facility:0 AND syslog.priority:\\u003c4"
+              "language": "kuery",
+              "query": "syslog.facility:0 AND syslog.priority<4"
             },
             "version": true
           }
@@ -147,7 +147,7 @@
             "highlightAll": true,
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "syslog.facility:4"
             },
             "version": true
@@ -190,7 +190,7 @@
             "highlightAll": true,
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             },
             "version": true

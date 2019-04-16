@@ -20,14 +20,14 @@
 package ecs
 
 // A Server is defined as the responder in a network connection for events
-// regarding sessions, connections, or bidirectional flow records. For TCP
-// events, the server is the receiver of the initial SYN packet(s) of the TCP
-// connection. For other protocols, the server is generally the responder in
-// the network transaction. Some systems actually use the term "responder" to
-// refer the server in TCP connections. The server fields describe details
-// about the system acting as the server in the network event. Server fields
-// are usually populated in conjunction with client fields. Server fields are
-// generally not populated for packet-level events.
+// regarding sessions, connections, or bidirectional flow records.
+// For TCP events, the server is the receiver of the initial SYN packet(s) of
+// the TCP connection. For other protocols, the server is generally the
+// responder in the network transaction. Some systems actually use the term
+// "responder" to refer the server in TCP connections. The server fields
+// describe details about the system acting as the server in the network event.
+// Server fields are usually populated in conjunction with client fields.
+// Server fields are generally not populated for packet-level events.
 // Client / server representations can add semantic context to an exchange,
 // which is helpful to visualize the data in certain situations. If your
 // context falls in that category, you should still ensure that source and

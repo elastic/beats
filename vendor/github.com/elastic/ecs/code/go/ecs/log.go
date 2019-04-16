@@ -21,8 +21,8 @@ package ecs
 
 // Fields which are specific to log events.
 type Log struct {
-	// Log level of the log event.
-	// Some examples are `WARN`, `ERR`, `INFO`.
+	// Original log level of the log event.
+	// Some examples are `warn`, `error`, `i`.
 	Level string `ecs:"level"`
 
 	// This is the original log message and contains the full log message

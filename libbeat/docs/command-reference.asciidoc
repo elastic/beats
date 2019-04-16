@@ -656,12 +656,23 @@ modules to load pipelines for.
 endif::[]
 
 ifeval::["{beatname_lc}"!="filebeat"]
+
+ifndef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} setup --dashboards
 {beatname_lc} setup --machine-learning
 {beatname_lc} setup --template
 -----
+endif::no_dashboards[]
+ifdef::no_dashboards[]
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} setup --machine-learning
+{beatname_lc} setup --template
+-----
+endif::no_dashboards[]
+
 endif::[]
 
 [[test-command]]
@@ -839,7 +850,7 @@ Sets the path for log files. See the <<directory-layout>> section for details.
 *`--strict.perms`*::
 Sets strict permission checking on configuration files. The default is
 `-strict.perms=true`. See
-{libbeat}/config-file-permissions.html[Config file ownership and permissions] in
+{beats-ref}/config-file-permissions.html[Config file ownership and permissions] in
 the _Beats Platform Reference_ for more information.
 
 *`-v, --v`*::

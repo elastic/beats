@@ -39,7 +39,7 @@ const logName = "processor.dns"
 var instanceID = atomic.MakeUint32(0)
 
 func init() {
-	processors.RegisterPlugin("dns", newDNSProcessor)
+	processors.RegisterPlugin("dns", New)
 }
 
 type processor struct {
@@ -48,7 +48,8 @@ type processor struct {
 	log      *logp.Logger
 }
 
-func newDNSProcessor(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new DNS processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the dns configuration")

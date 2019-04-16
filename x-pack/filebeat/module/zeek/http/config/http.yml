@@ -8,6 +8,10 @@ tags: {{.tags}}
 
 json.keys_under_root: false
 
+fields_under_root: true
+fields:
+  network.transport: tcp
+
 processors:
   - rename:
       fields:
@@ -25,9 +29,6 @@ processors:
 
         - from: "zeek.http.id.resp_p"
           to: "destination.port"
-
-        - from: "zeek.http.proto"
-          to: "network.transport"
 
         - from: "zeek.http.uid"
           to: "zeek.session_id"
@@ -67,3 +68,9 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

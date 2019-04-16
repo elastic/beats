@@ -9,7 +9,9 @@ var:
     os.darwin:
       - /usr/local/var/logs/current/ssl.log
   - name: tags
-    default: [zeek]
+    default: [zeek.ssl]
+  - name: community_id
+    default: true
 
 ingest_pipeline: ingest/pipeline.json
 input: config/ssl.yml

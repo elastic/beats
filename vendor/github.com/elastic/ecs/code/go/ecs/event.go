@@ -24,15 +24,15 @@ import (
 )
 
 // The event fields are used for context information about the log or metric
-// event itself. A log is defined as an event containing details of something
-// that happened. Log events must include the time at which the thing happened.
-// Examples of log events include a process starting on a host, a network
-// packet being sent from a source to a destination, or a network connection
-// between a client and a server being initiated or closed. A metric is defined
-// as an event containing one or more numerical or categorical measurements and
-// the time at which the measurement was taken. Examples of metric events
-// include memory pressure measured on a host, or vulnerabilities measured on a
-// scanned host.
+// event itself.
+// A log is defined as an event containing details of something that happened.
+// Log events must include the time at which the thing happened. Examples of
+// log events include a process starting on a host, a network packet being sent
+// from a source to a destination, or a network connection between a client and
+// a server being initiated or closed. A metric is defined as an event
+// containing one or more numerical or categorical measurements and the time at
+// which the measurement was taken. Examples of metric events include memory
+// pressure measured on a host, or vulnerabilities measured on a scanned host.
 type Event struct {
 	// Unique ID to describe the event.
 	ID string `ecs:"id"`
@@ -80,9 +80,10 @@ type Event struct {
 	// in metricset.name and metricset.module or fileset.name.
 	Dataset string `ecs:"dataset"`
 
-	// Severity describes the severity of the event. What the different
-	// severity values mean can very different between use cases. It's up to
-	// the implementer to make sure severities are consistent across events.
+	// Severity describes the original severity of the event. What the
+	// different severity values mean can very different between use cases.
+	// It's up to the implementer to make sure severities are consistent across
+	// events.
 	Severity int64 `ecs:"severity"`
 
 	// Raw text message of entire event. Used to demonstrate log integrity.
@@ -107,15 +108,15 @@ type Event struct {
 	// (e.g. "-05:00").
 	Timezone string `ecs:"timezone"`
 
-	// event.created contains the date when the event was created.
-	// This timestamp is distinct from @timestamp in that @timestamp contains
-	// the processed timestamp. For logs these two timestamps can be different
-	// as the timestamp in the log line and when the event is read for example
-	// by Filebeat are not identical. `@timestamp` must contain the timestamp
-	// extracted from the log line, event.created when the log line is read.
-	// The same could apply to package capturing where @timestamp contains the
-	// timestamp extracted from the network package and event.created when the
-	// event was created.
+	// event.created contains the date/time when the event was first read by an
+	// agent, or by your pipeline.
+	// This field is distinct from @timestamp in that @timestamp typically
+	// contain the time extracted from the original event.
+	// In most situations, these two timestamps will be slightly different. The
+	// difference can be used to calculate the delay between your source
+	// generating an event, and the time when your agent first processed it.
+	// This can be used to monitor your agent's or pipeline's ability to keep
+	// up with your event source.
 	// In case the two timestamps are identical, @timestamp should be used.
 	Created time.Time `ecs:"created"`
 

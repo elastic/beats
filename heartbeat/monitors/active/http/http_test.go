@@ -27,7 +27,9 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -279,7 +281,16 @@ func runHTTPSServerCheck(
 		mergedExtraConfig[k] = v
 	}
 
-	event := testTLSRequest(t, server.URL, mergedExtraConfig)
+	// Sometimes the test server can take a while to start. Since we're only using this to test up statuses,
+	// we give it a few attempts to see if the server can come up before we run the real assertions.
+	var event *beat.Event
+	for i := 0; i < 10; i++ {
+		event = testTLSRequest(t, server.URL, mergedExtraConfig)
+		if v, err := event.GetValue("monitor.status"); err == nil && reflect.DeepEqual(v, "up") {
+			break
+		}
+		time.Sleep(time.Millisecond * 500)
+	}
 
 	mapval.Test(
 		t,

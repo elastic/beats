@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build !integration
+// +build integration
 
 package sqs
 
@@ -17,7 +17,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("sqs")
+	config, info := mtest.GetConfigForTest("sqs", "300s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -48,11 +48,12 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("messages.visible", "float", event, t)
 		mtest.CheckEventField("oldest_message_age.sec", "float", event, t)
 		mtest.CheckEventField("sent_message_size", "float", event, t)
+		mtest.CheckEventField("queue.name", "string", event, t)
 	}
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("sqs")
+	config, info := mtest.GetConfigForTest("sqs", "300s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}

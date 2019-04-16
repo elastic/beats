@@ -18,7 +18,8 @@
 package expvar
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -82,18 +83,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	json, err := m.http.FetchJSON()
-
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in http fetch")
 	}
 
 	//flatten cmdline
 	json["cmdline"] = golang.GetCmdStr(json["cmdline"])
 
-	//set namespace
-	json[mb.NamespaceKey] = m.namespace
+	reporter.Event(mb.Event{
+		MetricSetFields: json,
+		Namespace:       m.Module().Name() + "." + m.namespace,
+	})
 
-	return json, nil
+	return nil
 }

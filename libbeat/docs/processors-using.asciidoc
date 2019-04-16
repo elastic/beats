@@ -195,19 +195,25 @@ endif::[]
 The supported processors are:
 
  * <<add-cloud-metadata,`add_cloud_metadata`>>
+ * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-fields, `add_fields`>>
+ * <<add-host-metadata,`add_host_metadata`>>
+ * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
+ * <<add-labels, `add_labels`>>
  * <<add-locale,`add_locale`>>
+ * <<add-process-metadata,`add_process_metadata`>>
+ * <<add-tags, `add_tags`>>
  * <<community-id,`community_id`>>
  * <<decode-json-fields,`decode_json_fields`>>
+ * <<dissect, `dissect`>>
+ * <<processor-dns, `dns`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
  * <<rename-fields,`rename`>>
- * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
- * <<add-docker-metadata,`add_docker_metadata`>>
- * <<add-host-metadata,`add_host_metadata`>>
- * <<dissect, `dissect`>>
- * <<processor-dns, `dns`>>
- * <<add-process-metadata,`add_process_metadata`>>
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ * <<processor-script,`script`>>
+endif::[]
 
 [[conditions]]
 ==== Conditions
@@ -489,7 +495,7 @@ provider and cache the instance metadata.
 
 The following cloud providers are supported:
 
-- Amazon Elastic Compute Cloud (EC2)
+- Amazon Web Services (AWS)
 - Digital Ocean
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
@@ -505,31 +511,33 @@ processors:
 - add_cloud_metadata: ~
 -------------------------------------------------------------------------------
 
-The `add_cloud_metadata` processor has one optional configuration setting named
-`timeout` that specifies the maximum amount of time to wait for a successful
-response when detecting the hosting provider. The default timeout value is
-`3s`.
+The `add_cloud_metadata` processor has two optional configuration settings.
+The first one is `timeout` which specifies the maximum amount of time to wait
+for a successful response when detecting the hosting provider. The default
+timeout value is `3s`.
 
 If a timeout occurs then no instance metadata will be added to the events. This
 makes it possible to enable this processor for all your deployments (in the
 cloud or on-premise).
 
+The second optional configuration setting is `overwrite`. When `overwrite` is
+`true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
+default).
+
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.
 
-_EC2_
+_AWS_
 
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "us-east-1c",
-      "instance_id": "i-4e123456",
-      "machine_type": "t2.medium",
-      "provider": "ec2",
-      "region": "us-east-1"
-    }
+  "cloud": {
+    "availability_zone": "us-east-1c",
+    "instance_id": "i-4e123456",
+    "machine_type": "t2.medium",
+    "provider": "aws",
+    "region": "us-east-1"
   }
 }
 -------------------------------------------------------------------------------
@@ -539,29 +547,25 @@ _Digital Ocean_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "instance_id": "1234567",
-      "provider": "digitalocean",
-      "region": "nyc2"
-    }
+  "cloud": {
+    "instance_id": "1234567",
+    "provider": "digitalocean",
+    "region": "nyc2"
   }
 }
 -------------------------------------------------------------------------------
 
-_GCE_
+_GCP_
 
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "projects/1234567890/zones/us-east1-b",
-      "instance_id": "1234556778987654321",
-      "machine_type": "projects/1234567890/machineTypes/f1-micro",
-      "project_id": "my-dev",
-      "provider": "gce"
-    }
+  "cloud": {
+    "availability_zone": "us-east1-b",
+    "instance_id": "1234556778987654321",
+    "machine_type": "f1-micro",
+    "project_id": "my-dev",
+    "provider": "gcp"
   }
 }
 -------------------------------------------------------------------------------
@@ -571,13 +575,11 @@ _Tencent Cloud_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "gz-azone2",
-      "instance_id": "ins-qcloudv5",
-      "provider": "qcloud",
-      "region": "china-south-gz"
-    }
+  "cloud": {
+    "availability_zone": "gz-azone2",
+    "instance_id": "ins-qcloudv5",
+    "provider": "qcloud",
+    "region": "china-south-gz"
   }
 }
 -------------------------------------------------------------------------------
@@ -590,13 +592,11 @@ ECS instance.
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "cn-shenzhen",
-      "instance_id": "i-wz9g2hqiikg0aliyun2b",
-      "provider": "ecs",
-      "region": "cn-shenzhen-a"
-    }
+  "cloud": {
+    "availability_zone": "cn-shenzhen",
+    "instance_id": "i-wz9g2hqiikg0aliyun2b",
+    "provider": "ecs",
+    "region": "cn-shenzhen-a"
   }
 }
 -------------------------------------------------------------------------------
@@ -606,14 +606,12 @@ _Azure Virtual Machine_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "az",
-      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-      "instance_name": "test-az-vm",
-      "machine_type": "Standard_D3_v2",
-      "region": "eastus2"
-    }
+  "cloud": {
+    "provider": "az",
+    "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+    "instance_name": "test-az-vm",
+    "machine_type": "Standard_D3_v2",
+    "region": "eastus2"
   }
 }
 -------------------------------------------------------------------------------
@@ -623,14 +621,95 @@ _Openstack Nova_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "openstack",
-      "instance_name": "test-998d932195.mycloud.tld",
-      "availability_zone": "xxxx-az-c",
-      "instance_id": "i-00011a84",
-      "machine_type": "m2.large"
-    }
+  "cloud": {
+    "provider": "openstack",
+    "instance_name": "test-998d932195.mycloud.tld",
+    "availability_zone": "xxxx-az-c",
+    "instance_id": "i-00011a84",
+    "machine_type": "m2.large"
+  }
+}
+-------------------------------------------------------------------------------
+
+[[add-fields]]
+=== Add fields
+
+The `add_fields` processor adds additional fields to the event.  Fields can be
+scalar values, arrays, dictionaries, or any nested combination of these.  By
+default the fields that you specify will be grouped under the `fields`
+sub-dictionary in the event. To group the fields under a different
+sub-dictionary, use the `target` setting. To store the fields as
+top-level fields, set `target: ''`. 
+
+`target`:: (Optional) Sub-dictionary to put all fields into. Defaults to `fields`.
+`fields`:: Fields to be added.
+
+
+For example, this configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_fields:
+    target: project
+    fields:
+      name: myproject
+      id: '574734885120952459'
+------------------------------------------------------------------------------
+
+Adds these fields to any event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "project": {
+    "name": "myproject",
+    "id": "574734885120952459"
+  }
+}
+-------------------------------------------------------------------------------
+
+
+[[add-labels]]
+=== Add labels
+
+The `add_labels` processors adds a set of key-value pairs to an event.
+The processor will flatten nested configuration objects like arrays or
+dictionaries into a fully qualified name by merging nested names with a `.`.
+Array entries create numeric names starting with 0.  Labels are always stored
+under the Elastic Common Schema compliant `labels` sub-dictionary.
+
+`labels`:: dictionaries of labels to be added.
+
+For example, this configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_labels:
+    labels:
+      number: 1
+      with.dots: test
+      nested:
+        with.dots: nested
+      array:
+        - do
+	- re
+	- with.field: mi
+------------------------------------------------------------------------------
+
+Adds these fields to every event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "labels": {
+    "number": 1,
+    "with.dots": "test",
+    "nested.with.dots": "nested",
+    "array.0": "do",
+    "array.1": "re",
+    "array.2.with.field": "mi"
   }
 }
 -------------------------------------------------------------------------------
@@ -666,6 +745,35 @@ processors:
 NOTE: Please note that `add_locale` differentiates between daylight savings
 time (DST) and regular time. For example `CEST` indicates DST and and `CET` is
 regular time.
+
+[[add-tags]]
+=== Add tags
+
+The `add_tags` processor adds tags to a list of tags. If the target field already exists,
+the tags are appended to the existing list of tags.
+
+`tags`:: List of tags to add.
+`target`:: (Optional) Field the tags will be added to. Defaults to `tags`.
+
+For example, this configuration:
+
+
+[source,yaml]
+------------------------------------------------------------------------------
+processors:
+- add_tags:
+    tags: [web, production]
+    target: "environment"
+------------------------------------------------------------------------------
+
+Adds the environment field to every event:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "environment": ["web", "production"]
+}
+-------------------------------------------------------------------------------
 
 
 [[decode-json-fields]]
@@ -1003,10 +1111,10 @@ process is running in Docker then the event will be enriched. The default value
 is `["process.pid", "process.ppid"]`.
 
 `match_source`:: (Optional) Match container ID from a log path present in the
-`source` field. Enabled by default.
+`log.file.path` field. Enabled by default.
 
 `match_short_id`:: (Optional) Match container short ID from a log path present
-in the `source` field. Disabled by default.
+in the `log.file.path` field. Disabled by default.
 This allows to match directories names that have the first 12 characters
 of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
 
@@ -1294,3 +1402,174 @@ set to `true`, this condition will be ignored.
 `restricted_fields`:: (Optional) By default, the `process.env` field is not
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
+
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+[[processor-script]]
+=== Script Processor
+
+experimental[]
+
+The script processor executes Javascript code to process an event. The processor
+uses a pure Go implementation of ECMAScript 5.1 and has no external
+dependencies. This can be useful in situations where one of the other processors
+doesn't provide the functionality you need to filter events.
+
+The processor can be configured by embedding Javascript in your configuration
+file or by pointing the processor at external file(s).
+
+[source,yaml]
+----
+processors:
+- script:
+    lang: javascript
+    id: my_filter
+    source: >
+      function process(event) {
+          event.Tag("js");
+      }
+----
+
+This loads `filter.js` from disk.
+
+[source,yaml]
+----
+processors:
+- script:
+    lang: javascript
+    id: my_filter
+    file: ${path.config}/filter.js
+----
+
+Parameters can be passed to the script by adding `params` to the config.
+This allows for a script to be made reusable. When using `params` the
+code must define a `register(params)` function to receive the parameters.
+
+[source,yaml]
+----
+processors:
+- script:
+    lang: javascript
+    id: my_filter
+    params:
+      threshold: 15
+    source: >
+      var params = {threshold: 42};
+      function register(scriptParams) {
+          params = scriptParams;
+      }
+      function process(event) {
+          if (event.Get("severity") < params.threshold) {
+              event.Cancel();
+          }
+      }
+----
+
+If the script defines a `test()` function it will be invoked when the processor
+is loaded. Any exceptions thrown will cause the processor to fail to load. This
+can be used to make assertions about the behavior of the script.
+
+[source,javascript]
+----
+function process(event) {
+    if (event.Get("event.code") === 1102) {
+        event.Put("event.action", "cleared");
+    }
+}
+
+function test() {
+    var event = process(new Event({event: {code: 1102}));
+    if (event.Get("event.action") !== "cleared") {
+        throw "expected event.action === cleared";
+    }
+}
+----
+
+[float]
+==== Configuration options
+
+The `script` processor has the following configuration settings:
+
+`lang`:: This field is required and its value must be `javascript`.
+
+`tag`:: This is an optional identifier that is added to log messages. If defined
+it enables metrics logging for this instance of the processor. The metrics
+include the number of exceptions and a histogram of the execution times for
+the `process` function.
+
+`source`:: Inline Javascript source code.
+
+`file`:: Path to a script file to load. Relative paths are interpreted as
+relative to the `path.config` directory. Globs are expanded.
+
+`files`:: List of script files to load. The scripts are concatenated together.
+Relative paths are interpreted as relative to the `path.config` directory.
+And globs are expanded.
+
+`params`:: A dictionary of parameters that are passed to the `register` of the
+script.
+
+`tag_on_exception`:: Tag to add to events in case the Javascript code causes an
+exception while processing an event. Defaults to `_js_exception`.
+
+`timeout`:: This sets an execution timeout for the `process` function. When
+the `process` function takes longer than the `timeout` period the function
+is interrupted. You can set this option to prevent a script from running for
+too long (like preventing an infinite `while` loop). By default there is no
+timeout.
+
+[float]
+==== Event API
+
+The `Event` object passed to the `process` method has the following API.
+
+[frame="topbot",options="header"]
+|===
+|Method |Description
+
+|`Get(string)`
+|Get a value from the event (either a scalar or an object). If the key does not
+exist `null` is returned. If no key is provided then an object containing all
+fields is returned.
+
+*Example*: `var value = event.Get(key);`
+
+|`Put(string, value)`
+|Put a value into the event. If the key was already set then the
+previous value is returned. It throws an exception if the key cannot be set
+because one of the intermediate values is not an object.
+
+*Example*: `var old = event.Put(key, value);`
+
+|`Rename(string, string)`
+|Rename a key in the event. The target key must not exist. It
+returns true if the source key was successfully renamed to the target key.
+
+*Example*: `var success = event.Rename("source", "target");`
+
+|`Delete(string)`
+|Delete a field from the event. It returns true on success.
+
+*Example*: `var deleted = event.Delete("user.email");`
+
+|`Cancel()`
+|Flag the event as cancelled which causes the processor to drop
+event.
+
+*Example*: `event.Cancel(); return;`
+
+|`Tag(string)`
+|Append a tag to the `tags` field if the tag does not already
+exist. Throws an exception if `tags` exists and is not a string or a list of
+strings.
+
+*Example*: `event.Tag("user_event");`
+
+|`AppendTo(string, string)`
+|`AppendTo` is a specialized `Put` method that converts the existing value to an
+array and appends the value if it does not already exist. If there is an
+existing value that's not a string or array of strings then an exception is
+thrown.
+
+*Example*: `event.AppendTo("error.message", "invalid file hash");`
+|===
+endif::[]

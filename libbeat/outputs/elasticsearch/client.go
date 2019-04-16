@@ -77,7 +77,8 @@ type ClientSettings struct {
 	Observer           outputs.Observer
 }
 
-type connectCallback func(client *Client) error
+// ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
+type ConnectCallback func(client *Client) error
 
 // Connection manages the connection for a given client.
 type Connection struct {
@@ -225,6 +226,16 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
+		globalCallbackRegistry.mutex.Lock()
+		defer globalCallbackRegistry.mutex.Unlock()
+
+		for _, callback := range globalCallbackRegistry.callbacks {
+			err := callback(client)
+			if err != nil {
+				return err
+			}
+		}
+
 		if onConnect != nil {
 			onConnect.mutex.Lock()
 			defer onConnect.mutex.Unlock()
@@ -721,7 +732,7 @@ func (conn *Connection) Ping() (string, error) {
 	}
 
 	debugf("Ping status code: %v", status)
-	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	logp.Info("Attempting to connect to Elasticsearch version %s", response.Version.Number)
 	return response.Version.Number, nil
 }
 

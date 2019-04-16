@@ -25,7 +25,7 @@ You only need to sign the CLA once.
 
 . Send a pull request! Push your changes to your fork of the repository and
 https://help.github.com/articles/using-pull-requests[submit a pull request] using our
-<pr-review,pull request guidelines>. In the pull request, describe what your changes do and mention
+<<pr-review,pull request guidelines>>. In the pull request, describe what your changes do and mention
 any bugs/issues related to the pull request. Please also add a changelog entry to
 https://github.com/elastic/beats/blob/master/CHANGELOG.next.asciidoc[CHANGELOG.next.asciidoc].
 
@@ -44,9 +44,8 @@ Beats].
 [[setting-up-dev-environment]]
 === Setting Up Your Dev Environment
 
-The Beats are Go programs, so install the latest version of
-http://golang.org/[Go] if you don't have it already. The current Go version
-used for development is Go {go-version}.
+The Beats are Go programs, so install the {go-version} version of
+http://golang.org/[Go] which is being used for Beats development.
 
 The location where you clone is important. Please clone under the source
 directory of your `GOPATH`. If you don't have `GOPATH` already set, you can

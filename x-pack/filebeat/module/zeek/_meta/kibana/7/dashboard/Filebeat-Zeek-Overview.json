@@ -3,17 +3,194 @@
     {
       "attributes": {
         "description": "",
+        "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Destination Geo [SIEM Zeek] ECS",
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 20,
+              "i": "1",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "2",
+              "w": 16,
+              "x": 0,
+              "y": 20
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "3",
+              "w": 16,
+              "x": 16,
+              "y": 20
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "4",
+              "w": 16,
+              "x": 32,
+              "y": 20
+            },
+            "panelIndex": "4",
+            "panelRefName": "panel_3",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "5",
+              "w": 16,
+              "x": 0,
+              "y": 32
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_4",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "6",
+              "w": 16,
+              "x": 16,
+              "y": 32
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_5",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "7",
+              "w": 16,
+              "x": 32,
+              "y": 32
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_6",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "8",
+              "w": 48,
+              "x": 0,
+              "y": 44
+            },
+            "panelIndex": "8",
+            "panelRefName": "panel_7",
+            "version": "7.0.0-beta1"
+          }
+        ],
+        "timeRestore": false,
+        "title": "Zeek Overview Dashboard",
+        "version": 1
+      },
+      "id": "7cbb5410-3700-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "dashboard": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "f469f230-370c-11e9-aa6d-ff445a78330c",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "1df7ea80-370d-11e9-aa6d-ff445a78330c",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "466e5850-370d-11e9-aa6d-ff445a78330c",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "649acd40-370d-11e9-aa6d-ff445a78330c",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "9436c270-370d-11e9-aa6d-ff445a78330c",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "bec2f0e0-370d-11e9-aa6d-ff445a78330c",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "e042fda0-370d-11e9-aa6d-ff445a78330c",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "f8c40810-370d-11e9-aa6d-ff445a78330c",
+          "name": "panel_7",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-02-23T05:05:18.205Z",
+      "version": "WzMxMTYsNF0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Destination Geo [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -47,6 +224,18 @@
           "params": {
             "addTooltip": true,
             "colorSchema": "Yellow to Red",
+            "dimensions": {
+              "geocentroid": null,
+              "geohash": null,
+              "metric": {
+                "accessor": 0,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
             "heatClusterSize": 1.5,
             "isDesaturated": true,
             "legendPosition": "bottomright",
@@ -61,25 +250,27 @@
               "options": {
                 "format": "image/png",
                 "transparent": true
-              },
-              "selectedTmsLayer": {
-                "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
-                "id": "road_map",
-                "maxZoom": 18,
-                "minZoom": 0,
-                "subdomains": [],
-                "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.5.4\u0026license=decdfd78-7d5b-47b7-9627-603d9b789d29"
               }
             }
           },
-          "title": "Destination Geo [SIEM Zeek] ECS",
+          "title": "Destination Geo [Zeek]",
           "type": "tile_map"
         }
       },
-      "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8-ecs",
+      "id": "f469f230-370c-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-01-17T07:27:37.758Z",
-      "version": 1
+      "updated_at": "2019-02-26T00:06:27.634Z",
+      "version": "WzMyNzUsNV0="
     },
     {
       "attributes": {
@@ -87,14 +278,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Network Transport [SIEM Zeek] ECS",
+        "title": "Network Transport [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -126,6 +317,16 @@
           "params": {
             "addLegend": true,
             "addTooltip": true,
+            "dimensions": {
+              "metric": {
+                "accessor": 0,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
             "isDonut": true,
             "labels": {
               "last_level": true,
@@ -136,14 +337,24 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Transport [SIEM Zeek] ECS",
+          "title": "Network Transport [Zeek]",
           "type": "pie"
         }
       },
-      "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8-ecs",
+      "id": "1df7ea80-370d-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-01-17T07:30:28.271Z",
-      "version": 1
+      "updated_at": "2019-02-26T00:07:08.521Z",
+      "version": "WzMyNzgsNV0="
     },
     {
       "attributes": {
@@ -151,14 +362,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Network Application [SIEM Zeek] ECS",
+        "title": "Network Application [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -181,7 +392,7 @@
                 "orderBy": "1",
                 "otherBucket": false,
                 "otherBucketLabel": "Other",
-                "size": 10
+                "size": 5
               },
               "schema": "segment",
               "type": "terms"
@@ -190,6 +401,16 @@
           "params": {
             "addLegend": true,
             "addTooltip": true,
+            "dimensions": {
+              "metric": {
+                "accessor": 0,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
             "isDonut": true,
             "labels": {
               "last_level": true,
@@ -200,14 +421,24 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Application [SIEM Zeek] ECS",
+          "title": "Network Application [Zeek]",
           "type": "pie"
         }
       },
-      "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8-ecs",
+      "id": "466e5850-370d-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-01-17T07:31:43.959Z",
-      "version": 1
+      "updated_at": "2019-02-26T00:06:41.868Z",
+      "version": "WzMyNzYsNV0="
     },
     {
       "attributes": {
@@ -215,14 +446,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Network Traffic Direction [SIEM Zeek] ECS",
+        "title": "Network Traffic Direction [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -254,6 +485,16 @@
           "params": {
             "addLegend": true,
             "addTooltip": true,
+            "dimensions": {
+              "metric": {
+                "accessor": 0,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
             "isDonut": true,
             "labels": {
               "last_level": true,
@@ -264,14 +505,24 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Traffic Direction [SIEM Zeek] ECS",
+          "title": "Network Traffic Direction [Zeek]",
           "type": "pie"
         }
       },
-      "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8-ecs",
+      "id": "649acd40-370d-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-01-17T07:32:46.436Z",
-      "version": 1
+      "updated_at": "2019-02-26T00:06:55.885Z",
+      "version": "WzMyNzcsNV0="
     },
     {
       "attributes": {
@@ -279,14 +530,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Top DNS Domains [SIEM Zeek] ECS",
+        "title": "Top DNS Domains [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -309,7 +560,7 @@
                 "orderBy": "1",
                 "otherBucket": false,
                 "otherBucketLabel": "Other",
-                "size": 8
+                "size": 10
               },
               "schema": "segment",
               "type": "terms"
@@ -318,6 +569,16 @@
           "params": {
             "addLegend": true,
             "addTooltip": true,
+            "dimensions": {
+              "metric": {
+                "accessor": 0,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
             "isDonut": true,
             "labels": {
               "last_level": true,
@@ -328,14 +589,24 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top DNS Domains [SIEM Zeek] ECS",
+          "title": "Top DNS Domains [Zeek]",
           "type": "pie"
         }
       },
-      "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8-ecs",
+      "id": "9436c270-370d-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-01-17T07:51:30.288Z",
-      "version": 1
+      "updated_at": "2019-02-26T00:07:23.763Z",
+      "version": "WzMyNzksNV0="
     },
     {
       "attributes": {
@@ -343,14 +614,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Top URL Domain [SIEM Zeek] ECS",
+        "title": "Top URL Domains [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -373,7 +644,7 @@
                 "orderBy": "1",
                 "otherBucket": false,
                 "otherBucketLabel": "Other",
-                "size": 8
+                "size": 10
               },
               "schema": "segment",
               "type": "terms"
@@ -382,6 +653,31 @@
           "params": {
             "addLegend": true,
             "addTooltip": true,
+            "dimensions": {
+              "buckets": [
+                {
+                  "accessor": 0,
+                  "aggType": "terms",
+                  "format": {
+                    "id": "terms",
+                    "params": {
+                      "id": "string",
+                      "missingBucketLabel": "Missing",
+                      "otherBucketLabel": "Other"
+                    }
+                  },
+                  "params": {}
+                }
+              ],
+              "metric": {
+                "accessor": 1,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
             "isDonut": true,
             "labels": {
               "last_level": true,
@@ -392,14 +688,24 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top URL Domain [SIEM Zeek] ECS",
+          "title": "Top URL Domains [Zeek]",
           "type": "pie"
         }
       },
-      "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8-ecs",
+      "id": "bec2f0e0-370d-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-01-17T07:53:10.300Z",
-      "version": 1
+      "updated_at": "2019-02-26T00:07:49.910Z",
+      "version": "WzMyODEsNV0="
     },
     {
       "attributes": {
@@ -407,14 +713,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Top SSL Server [SIEM Zeek] ECS",
+        "title": "Top SSL Servers [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -437,7 +743,7 @@
                 "orderBy": "1",
                 "otherBucket": false,
                 "otherBucketLabel": "Other",
-                "size": 8
+                "size": 10
               },
               "schema": "segment",
               "type": "terms"
@@ -446,6 +752,16 @@
           "params": {
             "addLegend": true,
             "addTooltip": true,
+            "dimensions": {
+              "metric": {
+                "accessor": 0,
+                "aggType": "count",
+                "format": {
+                  "id": "number"
+                },
+                "params": {}
+              }
+            },
             "isDonut": true,
             "labels": {
               "last_level": true,
@@ -456,14 +772,24 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top SSL Server [SIEM Zeek] ECS",
+          "title": "Top SSL Servers [Zeek]",
           "type": "pie"
         }
       },
-      "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8-ecs",
+      "id": "e042fda0-370d-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-01-17T07:54:11.067Z",
-      "version": 1
+      "updated_at": "2019-02-26T00:07:36.653Z",
+      "version": "WzMyODAsNV0="
     },
     {
       "attributes": {
@@ -472,12 +798,12 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Time Series Count [SIEM Zeek] ECS",
+        "title": "Number of Sessions Overtime [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -486,26 +812,8 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
-            "background_color_rules": [
-              {
-                "id": "3716ea90-1a2d-11e9-b2af-13b289f0bf65"
-              }
-            ],
-            "bar_color_rules": [
-              {
-                "id": "3822dc50-1a2d-11e9-b2af-13b289f0bf65"
-              }
-            ],
-            "gauge_color_rules": [
-              {
-                "id": "4c1a3ff0-1a2d-11e9-b2af-13b289f0bf65"
-              }
-            ],
-            "gauge_inner_width": 10,
-            "gauge_style": "half",
-            "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "filebeat-*",
+            "index_pattern": "",
             "interval": "auto",
             "series": [
               {
@@ -513,7 +821,6 @@
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": 0.5,
-                "filter": "tags:zeek",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "line_width": 1,
@@ -525,183 +832,28 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
-                "split_mode": "filter",
+                "split_mode": "everything",
                 "stacked": "none"
               }
             ],
             "show_grid": 1,
-            "show_legend": 0,
+            "show_legend": 1,
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Time Series Count [SIEM Zeek] ECS",
+          "title": "Number of Sessions Overtime [Zeek]",
           "type": "metrics"
         }
       },
-      "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25-ecs",
-      "type": "visualization",
-      "updated_at": "2019-01-17T07:56:26.486Z",
-      "version": 74
-    },
-    {
-      "attributes": {
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "mapCenter": [
-                20.3034175184893,
-                -5.537109375000001
-              ],
-              "mapZoom": 2
-            },
-            "gridData": {
-              "h": 18,
-              "i": "1",
-              "w": 48,
-              "x": 0,
-              "y": 0
-            },
-            "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8-ecs",
-            "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": true
-              }
-            },
-            "gridData": {
-              "h": 10,
-              "i": "2",
-              "w": 16,
-              "x": 0,
-              "y": 18
-            },
-            "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8-ecs",
-            "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": true
-              }
-            },
-            "gridData": {
-              "h": 10,
-              "i": "3",
-              "w": 17,
-              "x": 16,
-              "y": 18
-            },
-            "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8-ecs",
-            "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": true
-              }
-            },
-            "gridData": {
-              "h": 10,
-              "i": "4",
-              "w": 15,
-              "x": 33,
-              "y": 18
-            },
-            "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8-ecs",
-            "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "5",
-              "w": 16,
-              "x": 0,
-              "y": 28
-            },
-            "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8-ecs",
-            "panelIndex": "5",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "6",
-              "w": 17,
-              "x": 16,
-              "y": 28
-            },
-            "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8-ecs",
-            "panelIndex": "6",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "7",
-              "w": 15,
-              "x": 33,
-              "y": 28
-            },
-            "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8-ecs",
-            "panelIndex": "7",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 9,
-              "i": "8",
-              "w": 48,
-              "x": 0,
-              "y": 39
-            },
-            "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25-ecs",
-            "panelIndex": "8",
-            "type": "visualization",
-            "version": "6.5.4"
-          }
-        ],
-        "timeRestore": false,
-        "title": "Zeek Overview Dashboard [SIEM] ECS",
-        "version": 1
+      "id": "f8c40810-370d-11e9-aa6d-ff445a78330c",
+      "migrationVersion": {
+        "visualization": "7.0.0"
       },
-      "id": "87b0c430-1a2d-11e9-84b1-a12c578fa9e8-ecs",
-      "type": "dashboard",
-      "updated_at": "2019-01-17T07:57:50.613Z",
-      "version": 2
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-26T00:05:56.379Z",
+      "version": "WzMyNzQsNV0="
     }
   ],
-  "version": "6.5.4"
+  "version": "7.0.0-beta1"
 }

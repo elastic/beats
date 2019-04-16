@@ -24,6 +24,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"math"
 	"math/big"
 	"math/rand"
@@ -37,6 +38,10 @@ import (
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
@@ -62,11 +67,9 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/version"
-	sysinfo "github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -78,6 +81,8 @@ type Beat struct {
 
 	keystore keystore.Keystore
 	index    idxmgmt.Supporter
+
+	processing processing.Supporter
 }
 
 type beatConfig struct {
@@ -98,15 +103,20 @@ type beatConfig struct {
 	Keystore      *common.Config `config:"keystore"`
 
 	// output/publishing related configurations
-	Pipeline   pipeline.Config `config:",inline"`
-	Monitoring *common.Config  `config:"xpack.monitoring"`
+	Pipeline pipeline.Config `config:",inline"`
 
-	// central managmenet settings
+	// monitoring settings
+	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
+
+	// central management settings
 	Management *common.Config `config:"management"`
 
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Kibana     *common.Config `config:"setup.kibana"`
+
+	// Migration config to migration from 6 to 7
+	Migration *common.Config `config:"migration.6_to_7"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -277,6 +287,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	err = b.registerClusterUUIDFetching()
+	if err != nil {
+		return nil, err
+	}
+
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
 		reg = monitoring.Default.NewRegistry("libbeat")
@@ -310,6 +325,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			Logger:    logp.L().Named("publisher"),
 		},
 		b.Config.Pipeline,
+		b.processing,
 		b.makeOutputFactory(b.Config.Output),
 	)
 
@@ -353,11 +369,17 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	if b.Config.Monitoring.Enabled() {
+	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	if err != nil {
+		return err
+	}
+
+	if monitoringCfg.Enabled() {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
+			Format:          reporterSettings.Format,
 		}
-		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
+		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return err
 		}
@@ -562,7 +584,8 @@ func (b *Beat) configure(settings Settings) error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
-	err = b.loadMeta()
+	metaPath := paths.Resolve(paths.Data, "meta.json")
+	err = b.loadMeta(metaPath)
 	if err != nil {
 		return err
 	}
@@ -593,15 +616,24 @@ func (b *Beat) configure(settings Settings) error {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
 	}
 	b.index, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	if err != nil {
+		return err
+	}
+
+	processingFactory := settings.Processing
+	if processingFactory == nil {
+		processingFactory = processing.MakeDefaultBeatSupport(true)
+	}
+	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+
 	return err
 }
 
-func (b *Beat) loadMeta() error {
+func (b *Beat) loadMeta(metaPath string) error {
 	type meta struct {
 		UUID uuid.UUID `json:"uuid"`
 	}
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
 	logp.Debug("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
@@ -611,7 +643,7 @@ func (b *Beat) loadMeta() error {
 
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil {
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
 			return fmt.Errorf("Beat meta file reading error: %v", err)
 		}
@@ -633,10 +665,19 @@ func (b *Beat) loadMeta() error {
 		return fmt.Errorf("Failed to create Beat meta file: %s", err)
 	}
 
-	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
-	f.Close()
+	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
+	err = f.Sync()
 	if err != nil {
 		return fmt.Errorf("Beat meta file failed to write: %s", err)
+	}
+
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("Beat meta file failed to write: %s", err)
+	}
+
+	if encodeErr != nil {
+		return fmt.Errorf("Beat meta file failed to write: %s", encodeErr)
 	}
 
 	// move temporary file into final location
@@ -680,17 +721,9 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-		var withMigration bool
-		if b.RawConfig.HasField("migration") {
-			sub, err := b.RawConfig.Child("migration", -1)
-			if err != nil {
-				return fmt.Errorf("Failed to read migration setting: %+v", err)
-			}
-			withMigration = sub.Enabled()
-		}
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
-		// initKibanaConfig will attach the ussername and password into kibana config as a part of the initialization.
+		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig, err := initKibanaConfig(b.Config)
 		if err != nil {
 			return fmt.Errorf("error initKibanaConfig: %v", err)
@@ -704,7 +737,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// but it's assumed that KB and ES have the same minor version.
 		v := client.GetVersion()
 
-		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, withMigration)
+		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, b.Config.Migration.Enabled())
 		if err != nil {
 			return fmt.Errorf("error creating index pattern generator: %v", err)
 		}
@@ -740,11 +773,10 @@ func (b *Beat) registerESIndexManagement() error {
 	return nil
 }
 
-// Build and return a callback to load index template into ES
-func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
+func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-		return m.Setup(true, true)
+		return m.Setup(false, false)
 	}
 }
 
@@ -769,6 +801,47 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 	}
 
 	return outputs.Load(b.index, b.Info, stats, cfg.Name(), cfg.Config())
+}
+
+func (b *Beat) registerClusterUUIDFetching() error {
+	if b.Config.Output.Name() == "elasticsearch" {
+		callback, err := b.clusterUUIDFetchingCallback()
+		if err != nil {
+			return err
+		}
+		elasticsearch.RegisterConnectCallback(callback)
+	}
+	return nil
+}
+
+// Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
+func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
+	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
+
+	callback := func(esClient *elasticsearch.Client) error {
+		var response struct {
+			ClusterUUID string `json:"cluster_uuid"`
+		}
+
+		status, body, err := esClient.Request("GET", "/", "", nil, nil)
+		if err != nil {
+			return errw.Wrap(err, "error querying /")
+		}
+		if status > 299 {
+			return fmt.Errorf("Error querying /. Status: %d. Response body: %s", status, body)
+		}
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
+		}
+
+		clusterUUIDRegVar.Set(response.ClusterUUID)
+		return nil
+	}
+
+	return callback, nil
 }
 
 // handleError handles the given error by logging it and then returning the

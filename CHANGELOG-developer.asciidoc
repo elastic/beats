@@ -12,6 +12,26 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
+=== Beats version 7.0.0-rc2
+https://github.com/elastic/beats/compare/v7.0.0-rc1..v7.0.0-rc2[Check the HEAD diff]
+
+=== Beats version 7.0.0-rc1
+https://github.com/elastic/beats/compare/v7.0.0-beta1..v7.0.0-rc1[Check the HEAD diff]
+
+==== Breaking changes
+
+- Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
+- Remove SkipNormalization, SkipAgentMetadata, SkipAddHostName. {pull}10801[10801] {pull}10769[10769]
+
+==== Bugfixes
+
+- Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
+- Fix duplication check for `append_fields` option. {pull}10959[10959]
+
+==== Added
+
+- Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]
+
 === Beats version 7.0.0-beta1
 https://github.com/elastic/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the HEAD diff]
 
@@ -89,3 +109,4 @@ The list below covers the major changes between 6.3.0 and 7.0.0-alpha2 only.
 - Update Beats to use go 1.11.2 {pull}8746[8746]
 - Allow/Merge fields.yml overrides {pull}9188[9188]
 - Filesets can now define multiple ingest pipelines, with the first one considered as the entry point pipeline. {pull}8914[8914]
+- Add `group_measurements_by_instance` option to windows perfmon metricset. {pull}8688[8688]

@@ -7,7 +7,7 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }
                     }
@@ -71,7 +71,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": "log.level: F or log.level: W"
                         }, 
                         "version": true
@@ -105,7 +105,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": "log.level: *"
                         }, 
                         "version": true
@@ -131,7 +131,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": ""
                         }, 
                         "version": true

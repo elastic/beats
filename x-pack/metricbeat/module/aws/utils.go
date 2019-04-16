@@ -84,3 +84,55 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 func EventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr, error) {
 	return schema.Apply(input, s.FailOnRequired)
 }
+
+// CheckTimestampInArray checks if input timestamp exists in timestampArray and if it exists, return the position.
+func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (bool, int) {
+	for i := 0; i < len(timestampArray); i++ {
+		if timestamp.Equal(timestampArray[i]) {
+			return true, i
+		}
+	}
+	return false, -1
+}
+
+// FindTimestamp function checks MetricDataResults and find the timestamp to collect metrics from.
+// For example, MetricDataResults might look like:
+// metricDataResults =  [{
+//	 Id: "sqs0",
+//   Label: "testName SentMessageSize",
+//   StatusCode: Complete,
+//   Timestamps: [2019-03-11 17:45:00 +0000 UTC],
+//   Values: [981]
+// } {
+//	 Id: "sqs1",
+//	 Label: "testName NumberOfMessagesSent",
+//	 StatusCode: Complete,
+//	 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
+//	 Values: [0.5,0]
+// }]
+// This case, we are collecting values for both metrics from timestamp 2019-03-11 17:45:00 +0000 UTC.
+func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time {
+	timestamp := time.Time{}
+	for _, output := range getMetricDataResults {
+		// When there are outputs with one timestamp, use this timestamp.
+		if output.Timestamps != nil && len(output.Timestamps) == 1 {
+			// Use the first timestamp from Timestamps field to collect the latest data.
+			timestamp = output.Timestamps[0]
+			return timestamp
+		}
+	}
+
+	// When there is no output with one timestamp, use the latest timestamp from timestamp list.
+	if timestamp.IsZero() {
+		for _, output := range getMetricDataResults {
+			// When there are outputs with one timestamp, use this timestamp
+			if output.Timestamps != nil && len(output.Timestamps) > 1 {
+				// Example Timestamps: [2019-03-11 17:36:00 +0000 UTC,2019-03-11 17:31:00 +0000 UTC]
+				timestamp = output.Timestamps[0]
+				return timestamp
+			}
+		}
+	}
+
+	return timestamp
+}

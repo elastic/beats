@@ -22,11 +22,9 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/pkg/errors"
@@ -39,14 +37,13 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
-var logger = logp.NewLogger("vsphere")
-
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "virtualmachine", New,
 		mb.DefaultMetricSet(),
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	HostURL         *url.URL
@@ -54,6 +51,7 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
+// New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The vsphere virtualmachine metricset is beta")
 
@@ -85,15 +83,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	var events []common.MapStr
-
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in NewClient")
 	}
 
 	defer client.Logout(ctx)
@@ -106,7 +105,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		var err error
 		customFieldsMap, err = setCustomFieldsMap(ctx, c)
 		if err != nil {
-			return nil, err
+			return errors.Wrap(err, "error in setCustomFieldsMap")
 		}
 	}
 
@@ -115,7 +114,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in CreateContainerView")
 	}
 
 	defer v.Destroy(ctx)
@@ -124,72 +123,60 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	var vmt []mo.VirtualMachine
 	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary"}, &vmt)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in Retrieve")
 	}
-
-	var wg sync.WaitGroup
-	var mutex sync.Mutex
 
 	for _, vm := range vmt {
 
-		wg.Add(1)
+		freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
 
-		go func(vm mo.VirtualMachine, c *vim25.Client) {
+		event := common.MapStr{}
 
-			defer wg.Done()
+		event["name"] = vm.Summary.Config.Name
+		event.Put("cpu.used.mhz", vm.Summary.QuickStats.OverallCpuUsage)
+		event.Put("memory.used.guest.bytes", int64(vm.Summary.QuickStats.GuestMemoryUsage)*1024*1024)
+		event.Put("memory.used.host.bytes", int64(vm.Summary.QuickStats.HostMemoryUsage)*1024*1024)
+		event.Put("memory.total.guest.bytes", int64(vm.Summary.Config.MemorySizeMB)*1024*1024)
+		event.Put("memory.free.guest.bytes", freeMemory)
 
-			freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
+		if vm.Summary.Runtime.Host != nil {
+			event["host"] = vm.Summary.Runtime.Host.Value
+		} else {
+			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
+				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
+				"from host/guest")
+		}
 
-			event := common.MapStr{}
+		// Get custom fields (attributes) values if get_custom_fields is true.
+		if m.GetCustomFields && vm.Summary.CustomValue != nil {
+			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
 
-			event["name"] = vm.Summary.Config.Name
-			event.Put("cpu.used.mhz", vm.Summary.QuickStats.OverallCpuUsage)
-			event.Put("memory.used.guest.bytes", int64(vm.Summary.QuickStats.GuestMemoryUsage)*1024*1024)
-			event.Put("memory.used.host.bytes", int64(vm.Summary.QuickStats.HostMemoryUsage)*1024*1024)
-			event.Put("memory.total.guest.bytes", int64(vm.Summary.Config.MemorySizeMB)*1024*1024)
-			event.Put("memory.free.guest.bytes", freeMemory)
-
-			if vm.Summary.Runtime.Host != nil {
-				event["host"] = vm.Summary.Runtime.Host.Value
-			} else {
-				logger.Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
-					"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
-					"from host/guest")
+			if len(customFields) > 0 {
+				event["custom_fields"] = customFields
 			}
+		} else {
+			m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
+				"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
+				"information returned from host/guest")
+		}
 
-			// Get custom fields (attributes) values if get_custom_fields is true.
-			if m.GetCustomFields && vm.Summary.CustomValue != nil {
-				customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
-
-				if len(customFields) > 0 {
-					event["custom_fields"] = customFields
-				}
+		if vm.Summary.Vm != nil {
+			networkNames, err := getNetworkNames(c, vm.Summary.Vm.Reference())
+			if err != nil {
+				m.Logger().Debug(err.Error())
 			} else {
-				logger.Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
-					"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
-					"information returned from host/guest")
-			}
-
-			if vm.Summary.Vm != nil {
-				networkNames, err := getNetworkNames(c, vm.Summary.Vm.Reference())
-				if err != nil {
-					logger.Debug(err.Error())
-				} else {
-					if len(networkNames) > 0 {
-						event["network_names"] = networkNames
-					}
+				if len(networkNames) > 0 {
+					event["network_names"] = networkNames
 				}
 			}
+		}
 
-			mutex.Lock()
-			events = append(events, event)
-			mutex.Unlock()
-		}(vm, c)
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+		})
 	}
 
-	wg.Wait()
-
-	return events, nil
+	return nil
 }
 
 func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap map[int32]string) common.MapStr {
@@ -258,15 +245,14 @@ func setCustomFieldsMap(ctx context.Context, client *vim25.Client) (map[int32]st
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get custom fields manager")
-	} else {
-		field, err := customFieldsManager.Field(ctx)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to get custom fields")
-		}
+	}
+	field, err := customFieldsManager.Field(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get custom fields")
+	}
 
-		for _, def := range field {
-			customFieldsMap[def.Key] = def.Name
-		}
+	for _, def := range field {
+		customFieldsMap[def.Key] = def.Name
 	}
 
 	return customFieldsMap, nil

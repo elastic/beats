@@ -18,8 +18,9 @@
 package agent
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -70,19 +71,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		logp.Error(err)
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error in http fetch")
 	}
 
 	mappings, err := eventMapping(content)
 	if err != nil {
-		logp.Error(err)
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error in event mapping")
 	}
 
 	for _, m := range mappings {
@@ -90,4 +87,5 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			MetricSetFields: m,
 		})
 	}
+	return nil
 }

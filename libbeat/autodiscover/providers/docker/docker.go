@@ -19,6 +19,7 @@ package docker
 
 import (
 	"errors"
+	"time"
 
 	"github.com/gofrs/uuid"
 
@@ -115,7 +116,9 @@ func (d *Provider) Start() {
 				d.emitContainer(event, "start")
 
 			case event := <-d.stopListener.Events():
-				d.emitContainer(event, "stop")
+				time.AfterFunc(d.config.CleanupTimeout, func() {
+					d.emitContainer(event, "stop")
+				})
 			}
 		}
 	}()

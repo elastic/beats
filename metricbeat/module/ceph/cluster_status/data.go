@@ -20,8 +20,9 @@ package cluster_status
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type PgState struct {
@@ -81,8 +82,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: %+v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "error getting HealthRequest data")
 	}
 
 	//osd map info

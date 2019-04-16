@@ -1,0 +1,32 @@
+/usr/sbin/mysqld, Version: 8.0.15-5 (Percona Server (GPL), Release '5', Revision 'f8a9e99'). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+# Time: 2019-03-24T16:22:43.836524Z
+# User@Host: root[root] @ localhost []  Id:   182
+# Schema: employees  Last_errno: 0  Killed: 0
+# Query_time: 2.746607  Lock_time: 0.000138  Rows_sent: 10  Rows_examined: 3145718  Rows_affected: 0
+# Bytes_sent: 312
+use employees;
+SET timestamp=1553444561;
+SELECT last_name, MAX(salary) AS salary FROM employees     INNER JOIN salaries ON employees.emp_no = salaries.emp_no     GROUP BY last_name     ORDER BY salary DESC     LIMIT 10;
+/usr/sbin/mysqld, Version: 8.0.15-5 (Percona Server (GPL), Release '5', Revision 'f8a9e99'). started with:
+Tcp port: 0  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+# Time: 2019-03-24T16:26:04.482151Z
+# User@Host: root[root] @ localhost []  Id:     8
+# Schema: employees  Last_errno: 0  Killed: 0
+# Query_time: 3.133066  Lock_time: 0.000190  Rows_sent: 10  Rows_examined: 3145718  Rows_affected: 0
+# Bytes_sent: 312  Tmp_tables: 1  Tmp_disk_tables: 0  Tmp_table_sizes: 0
+# InnoDB_trx_id: 0
+# Full_scan: Yes  Full_join: No  Tmp_table: Yes  Tmp_table_on_disk: No
+# Filesort: Yes  Filesort_on_disk: No  Merge_passes: 0
+#   InnoDB_IO_r_ops: 5491  InnoDB_IO_r_bytes: 89964544  InnoDB_IO_r_wait: 0.003183
+#   InnoDB_rec_lock_wait: 0.000000  InnoDB_queue_wait: 0.000000
+#   InnoDB_pages_distinct: 6122
+use employees;
+SET timestamp=1553444761;
+SELECT last_name, MAX(salary) AS salary FROM employees
+    INNER JOIN salaries ON employees.emp_no = salaries.emp_no
+    GROUP BY last_name
+    ORDER BY salary DESC
+    LIMIT 10;

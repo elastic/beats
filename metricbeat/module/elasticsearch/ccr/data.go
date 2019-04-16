@@ -51,7 +51,8 @@ var (
 )
 
 type response struct {
-	FollowStats struct {
+	AutoFollowStats map[string]interface{} `json:"auto_follow_stats"`
+	FollowStats     struct {
 		Indices []struct {
 			Shards []map[string]interface{} `json:"shards"`
 		} `json:"indices"`
@@ -62,9 +63,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
 	}
 
 	var errs multierror.Errors
@@ -80,9 +79,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 			event.MetricSetFields, err = schema.Apply(followerShard)
 			if err != nil {
-				event.Error = errors.Wrap(err, "failure applying shard schema")
-				r.Event(event)
-				errs = append(errs, event.Error)
+				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
 				continue
 			}
 
