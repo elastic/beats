@@ -398,14 +398,6 @@ functionbeat.provider.aws.functions:
 #    max_bytes: 1024
 #    fail_on_error: false
 #    ignore_missing: true
-#
-# The following example decodes CSV-encoded data found in the message field
-# into an array under the csv field.
-#
-#processors:
-#- decode_csv_field:
-#    field: message
-#    separator: ','
 
 #============================= Elastic Cloud ==================================
 
