@@ -180,7 +180,7 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 			return event, nil
 		}
 
-		log.Debugf("Publish event: %s", b)
+		logp.Debug("publish", "Publish event: %s", b)
 		return event, nil
 	})
 }
