@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
-// Loader defines the interface between a remote service and the Manager for ILM and templates.
+// ClientHandler defines the interface between a remote service and the Manager for ILM and templates.
 type ClientHandler interface {
 	ilm.ClientHandler
 	template.Loader
@@ -53,13 +53,13 @@ func NewClientHandler(ilm ilm.ClientHandler, template template.Loader) ClientHan
 	return &clientHandler{ilm, template}
 }
 
-// NewESLoader returns a new ESLoader instance,
+// NewESClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
 func NewESClientHandler(c ESClient) ClientHandler {
 	return NewClientHandler(ilm.NewESClientHandler(c), template.NewESLoader(c))
 }
 
-// NewFileLoader returns a new ESLoader instance,
+// NewFileClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
 func NewFileClientHandler(c FileClient) ClientHandler {
 	return NewClientHandler(ilm.NewFileClientHandler(c), template.NewFileLoader(c))

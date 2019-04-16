@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// Loader defines the interface between a remote service and the Manager.
+// ClientHandler defines the interface between a remote service and the Manager.
 type ClientHandler interface {
 	CheckILMEnabled(Mode) (bool, error)
 
