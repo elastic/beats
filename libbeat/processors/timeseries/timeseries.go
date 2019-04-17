@@ -20,12 +20,13 @@ package timeseries
 import (
 	"strings"
 
-	"github.com/mitchellh/hashstructure"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/libbeat/processors"
+
+	"github.com/mitchellh/hashstructure"
 )
 
 type timeseriesProcessor struct {
@@ -38,6 +39,8 @@ type timeseriesProcessor struct {
 // hold a dimension of the metrics) and compute a hash of all their values into
 // `timeseries.instance` field.
 func NewTimeSeriesProcessor(fields mapping.Fields) processors.Processor {
+	cfgwarn.Experimental("timeseries.instance field is experimental")
+
 	dimensions := map[string]bool{}
 	prefixes := map[string]bool{}
 	populateDimensions("", dimensions, prefixes, fields)
