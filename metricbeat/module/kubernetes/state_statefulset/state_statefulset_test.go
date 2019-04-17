@@ -30,6 +30,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
 )
 
 const testFile = "../_meta/test/kube-state-metrics"
@@ -122,4 +124,8 @@ func testCases() map[string]map[string]interface{} {
 			"generation.desired":  5,
 		},
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "state_statefulset")
 }
