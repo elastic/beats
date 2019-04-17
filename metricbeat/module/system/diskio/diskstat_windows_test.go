@@ -23,6 +23,8 @@ package diskio
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -39,6 +41,25 @@ func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {
 	data, errs := mbtest.ReportingFetchV2(f)
 	assert.Empty(t, errs)
 	assert.Equal(t, 1, len(data))
+	assert.Equal(t, data[0].MetricSetFields["name"], "C:")
+	reads := data[0].MetricSetFields["read"].(common.MapStr)
+	writes := data[0].MetricSetFields["write"].(common.MapStr)
+	// Check values
+	readCount := reads["count"].(uint64)
+	readBytes := reads["bytes"].(uint64)
+	readTime := reads["time"].(uint64)
+	writeCount := writes["count"].(uint64)
+	writeBytes := writes["bytes"].(uint64)
+	writeTime := writes["time"].(uint64)
+
+	assert.True(t, readCount > 0)
+	assert.True(t, readBytes > 0)
+	assert.True(t, readTime > 0)
+
+	assert.True(t, writeCount > 0)
+	assert.True(t, writeBytes > 0)
+	assert.True(t, writeTime > 0)
+
 }
 
 func TestAllDrivesOnWindowsTestEnv(t *testing.T) {

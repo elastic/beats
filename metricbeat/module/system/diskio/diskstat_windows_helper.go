@@ -23,6 +23,9 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/pkg/errors"
+	"golang.org/x/sys/windows/registry"
+
 	"github.com/shirou/gopsutil/disk"
 )
 
@@ -34,6 +37,7 @@ const (
 var (
 	modkernel32                 = syscall.NewLazyDLL("kernel32.dll")
 	procGetLogicalDriveStringsW = modkernel32.NewProc("GetLogicalDriveStringsW")
+	procGetDriveTypeW           = modkernel32.NewProc("GetDriveTypeW")
 )
 
 type logicalDrive struct {
@@ -58,6 +62,9 @@ type diskPerformance struct {
 
 // ioCounters gets the diskio counters and maps them to the list of counterstat objects.
 func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
+	if err := enablePerformanceCounters(); err != nil {
+		return nil, err
+	}
 	logicalDisks, err := getLogicalDriveStrings()
 	if err != nil || len(logicalDisks) == 0 {
 		return nil, err
@@ -125,6 +132,18 @@ func ioCounter(path string) (diskPerformance, error) {
 	return diskPerformance, nil
 }
 
+// enablePerformanceCounters will enable performance counters by adding the EnableCounterForIoctl registry key
+func enablePerformanceCounters() error {
+	key, err := registry.OpenKey(registry.LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\partmgr", registry.READ|registry.WRITE)
+	if err != nil {
+		return errors.Errorf("cannot open new key in the registry in order to enable the performance counters: %s", err)
+	}
+	if err = key.SetDWordValue("EnableCounterForIoctl", 1); err != nil {
+		return errors.Errorf("cannot create EnableCounterForIoctl key in the registry in order to enable the performance counters: %s", err)
+	}
+	return nil
+}
+
 // getLogicalDriveStrings calls the syscall GetLogicalDriveStrings in order to get the list of logical drives
 func getLogicalDriveStrings() ([]logicalDrive, error) {
 	lpBuffer := make([]byte, 254)
@@ -145,7 +164,9 @@ func getLogicalDriveStrings() ([]logicalDrive, error) {
 			}
 			path := s + ":"
 			drive := logicalDrive{path, `\\.\` + path}
-			logicalDrives = append(logicalDrives, drive)
+			if isValidLogicalDrive(path) {
+				logicalDrives = append(logicalDrives, drive)
+			}
 		}
 	}
 	return logicalDrives, nil
@@ -158,4 +179,19 @@ func containsDrive(devices []string, disk string) bool {
 		}
 	}
 	return false
+}
+
+// filterLogicalDrives should filter CD-ROM type drives based on https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-getdrivetypew
+func isValidLogicalDrive(path string) bool {
+	utfPath, err := syscall.UTF16PtrFromString(path + `\`)
+	if err != nil {
+		return false
+	}
+	ret, _, err := syscall.Syscall(procGetDriveTypeW.Addr(), 1, uintptr(unsafe.Pointer(utfPath)), 0, 0)
+
+	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5
+	if ret == 1 || ret == 5 || err != errorSuccess {
+		return false
+	}
+	return true
 }
