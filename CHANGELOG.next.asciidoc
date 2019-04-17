@@ -86,6 +86,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Add backoff again. {pull}11861[11861]
+
 *Metricbeat*
 
 - Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
