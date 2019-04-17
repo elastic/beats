@@ -18,9 +18,7 @@ import (
 )
 
 var (
-	metricsetName         = "cloudwatch"
-	suppportedIdentifiers = []string{"InstanceId", "BucketName", "QueueName",
-		"TopicName"}
+	metricsetName = "cloudwatch"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -87,6 +85,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
+			// get identifiers from listMetrics
+			identifiers := getIdentifiers(listMetricsOutput)
+
 			// Construct metricDataQueries
 			metricDataQueries := constructMetricQueries(listMetricsOutput, int64(m.PeriodInSec))
 			if len(metricDataQueries) == 0 {
@@ -102,13 +103,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			// Get identifier name and values
-			identifier, identifierValues := getIdentifiers(listMetricsOutput)
-
 			// Initialize events map per region, which stores one event per identifierValue
 			events := map[string]mb.Event{}
-			for _, idValue := range identifierValues {
-				events[idValue] = initEvent(regionName)
+			for _, values := range identifiers {
+				for _, v := range values {
+					events[v] = initEvent(regionName)
+				}
 			}
 
 			// Find a timestamp for all metrics in output
@@ -122,8 +122,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 					if exists {
 						labels := strings.Split(*output.Label, " ")
-						identifierValue := getIdentifierFromLabels(identifier, labels)
-						if identifierValue != "" {
+						if len(labels) == 3 {
+							identifierValue := labels[2]
 							events[identifierValue] = insertMetricSetFields(events[identifierValue], namespace, output.Values[timestampIdx], labels)
 						} else {
 							eventNew := initEvent(regionName)
@@ -137,8 +137,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			for _, event := range events {
-				if reported := report.Event(event); !reported {
-					return nil
+				if len(event.MetricSetFields) != 0 {
+					if reported := report.Event(event); !reported {
+						return nil
+					}
 				}
 			}
 		}
@@ -160,10 +162,20 @@ func constructLabel(metric cloudwatch.Metric) string {
 	metricDims := metric.Dimensions
 	metricName := *metric.MetricName
 	label := metricName
-	for _, dim := range metricDims {
-		label += " "
-		label += *dim.Name
-		label += " " + *dim.Value
+	dimNames := ""
+	dimValues := ""
+	for i, dim := range metricDims {
+		dimNames += *dim.Name
+		dimValues += *dim.Value
+		if i != len(metricDims)-1 {
+			dimNames += ","
+			dimValues += ","
+		}
+	}
+
+	if dimNames != "" && dimValues != "" {
+		label += " " + dimNames
+		label += " " + dimValues
 	}
 	return label
 }
@@ -185,35 +197,39 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (m
 	return
 }
 
-func getIdentifiers(listMetricsOutputs []cloudwatch.Metric) (string, []string) {
+func getIdentifiers(listMetricsOutputs []cloudwatch.Metric) map[string][]string {
 	if len(listMetricsOutputs) == 0 {
-		return "", nil
+		return nil
 	}
 
-	if len(listMetricsOutputs[0].Dimensions) == 0 {
-		return "", nil
-	}
-
-	identifierName := ""
-	identifierValues := []string{}
-	for _, dim := range listMetricsOutputs[0].Dimensions {
-		if aws.StringInSlice(*dim.Name, suppportedIdentifiers) {
-			identifierName = *dim.Name
-			break
+	identifiers := map[string][]string{}
+	for _, listMetrics := range listMetricsOutputs {
+		identifierName := ""
+		identifierValue := ""
+		if len(listMetrics.Dimensions) == 0 {
+			continue
 		}
-	}
 
-	for _, output := range listMetricsOutputs {
-		for _, dim := range output.Dimensions {
-			if *dim.Name == identifierName {
-				if aws.StringInSlice(*dim.Value, identifierValues) {
-					continue
-				}
-				identifierValues = append(identifierValues, *dim.Value)
+		for i, dim := range listMetrics.Dimensions {
+			identifierName += *dim.Name
+			identifierValue += *dim.Value
+			if i != len(listMetrics.Dimensions)-1 {
+				identifierName += ","
+				identifierValue += ","
 			}
+
+		}
+
+		if identifiers[identifierName] != nil {
+			if !aws.StringInSlice(identifierValue, identifiers[identifierName]) {
+				identifiers[identifierName] = append(identifiers[identifierName], identifierValue)
+			}
+		} else {
+			identifiers[identifierName] = []string{identifierValue}
 		}
 	}
-	return identifierName, identifierValues
+
+	return identifiers
 }
 
 func initEvent(regionName string) mb.Event {
@@ -226,29 +242,17 @@ func initEvent(regionName string) mb.Event {
 	return event
 }
 
-func getIdentifierFromLabels(identifier string, labels []string) string {
-	identifierValue := ""
-	if len(labels) <= 1 {
-		return identifierValue
-	}
-	for i := 0; i < len(labels)/2; i++ {
-		if labels[i+1] == identifier {
-			identifierValue = labels[i+2]
-			break
-		}
-	}
-	return identifierValue
-}
-
 func insertMetricSetFields(event mb.Event, namespace string, metricValue float64, labels []string) mb.Event {
 	event.MetricSetFields.Put("namespace", namespace)
 	event.MetricSetFields.Put(labels[0], metricValue)
-	if len(labels) <= 1 {
+	if len(labels) == 1 {
 		return event
 	}
 
-	for i := 0; i < len(labels)/2; i++ {
-		event.MetricSetFields.Put(labels[i+1], labels[i+2])
+	dimNames := strings.Split(labels[1], ",")
+	dimValues := strings.Split(labels[2], ",")
+	for i := 0; i < len(dimNames); i++ {
+		event.MetricSetFields.Put(dimNames[i], dimValues[i])
 	}
 	return event
 }

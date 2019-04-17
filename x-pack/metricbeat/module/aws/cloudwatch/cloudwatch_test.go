@@ -7,7 +7,6 @@
 package cloudwatch
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -67,9 +66,8 @@ var (
 
 func TestGetIdentifiers(t *testing.T) {
 	listMetricsOutput := []cloudwatch.Metric{listMetric1, listMetric2, listMetric3, listMetric4}
-	identifierName, identifierValues := getIdentifiers(listMetricsOutput)
-	assert.Equal(t, "InstanceId", identifierName)
-	assert.Equal(t, []string{instanceID1, instanceID2}, identifierValues)
+	identifiers := getIdentifiers(listMetricsOutput)
+	assert.Equal(t, []string{instanceID1, instanceID2}, identifiers["InstanceId"])
 }
 
 func TestConstructLabel(t *testing.T) {
@@ -102,35 +100,5 @@ func TestConstructLabel(t *testing.T) {
 	for _, c := range cases {
 		label := constructLabel(c.listMetric)
 		assert.Equal(t, c.expectedLabel, label)
-	}
-}
-
-func TestGetIdentifierFromLabels(t *testing.T) {
-	cases := []struct {
-		label              string
-		expectedIdentifier string
-	}{
-		{"CPUUtilization InstanceId i-1",
-			"i-1",
-		},
-		{"StatusCheckFailed InstanceId i-1",
-			"i-1",
-		},
-		{"StatusCheckFailed_System InstanceId i-2",
-			"i-2",
-		},
-		{"StatusCheckFailed_Instance InstanceId i-2",
-			"i-2",
-		},
-		{
-			"CPUUtilization",
-			"",
-		},
-	}
-
-	for _, c := range cases {
-		labels := strings.Split(c.label, " ")
-		identifierValue := getIdentifierFromLabels("InstanceId", labels)
-		assert.Equal(t, c.expectedIdentifier, identifierValue)
 	}
 }

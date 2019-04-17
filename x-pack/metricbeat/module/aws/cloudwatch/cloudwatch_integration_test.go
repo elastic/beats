@@ -16,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("cloudwatch", "60s")
+	config, info := mtest.GetConfigForTest("cloudwatch", "300s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -47,7 +47,7 @@ func TestData(t *testing.T) {
 func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]interface{} {
 	cloudwatchMetricsConfig := []map[string]interface{}{}
 	cloudwatchMetric := map[string]interface{}{}
-	cloudwatchMetric["namespace"] = "AWS/EC2"
+	cloudwatchMetric["namespace"] = "AWS/RDS"
 	cloudwatchMetricsConfig = append(cloudwatchMetricsConfig, cloudwatchMetric)
 	config["cloudwatch_metrics"] = cloudwatchMetricsConfig
 	return config
