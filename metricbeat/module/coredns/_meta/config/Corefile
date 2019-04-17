@@ -19,13 +19,17 @@ my.domain.elastic {
     errors
     auto
     reload 10s
+    cache 4
 
     # Use the prometheus plugin to export metrics at '/metrics' endpoint
     prometheus :9153
 
     # If you wish to use a standard Hosts File format, uncomment the following
     # line and customize the specified file
-    hosts /etc/coredns/mydomain.hosts my.domain.elastic
+    hosts my.domain.elastic {
+        127.0.0.1   my.domain.elastic
+        fallthrough
+    }
 }
 
 # Zone2

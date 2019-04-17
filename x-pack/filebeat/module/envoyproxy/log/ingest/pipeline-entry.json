@@ -1,0 +1,42 @@
+{
+  "description": "Pipeline for normalizing envoyproxy logs",
+  "processors": [
+    {
+      "pipeline": {
+          "if": "ctx.message.charAt(0) != (char)(\"{\")",
+          "name": "{< IngestPipeline "pipeline-plaintext" >}"
+      }
+    },
+    {
+      "pipeline": {
+          "if": "ctx.message.charAt(0) == (char)(\"{\")",
+          "name": "{< IngestPipeline "pipeline-json" >}"
+      }
+    },
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{@timestamp}}"
+      }
+    },
+    {
+      "set": {
+        "field": "@timestamp",
+        "value": "{{timestamp}}",
+        "if": "ctx.timestamp != null"
+      }
+    },
+    {
+      "remove": {
+        "field": ["timestamp"],
+        "ignore_failure": true
+      }
+    }
+  ],
+  "on_failure" : [{ 
+    "set" : { 
+      "field" : "error.message", 
+      "value" : "pipeline-entry: {{ _ingest.on_failure_message }}" 
+    } 
+  }]
+}
