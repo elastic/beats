@@ -1,0 +1,174 @@
+[
+    {
+        "@timestamp": "2019-04-02T13:19:45.938Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.path": "/Users/shaunak/logstash-6.7.0/data/queue",
+        "logstash.log.log_event.setting": "path.queue",
+        "logstash.log.message": "Creating directory",
+        "logstash.log.module": "logstash.setting.writabledirectory",
+        "logstash.log.thread": "main",
+        "offset": 0,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:45.989Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.path": "/Users/shaunak/logstash-6.7.0/data/dead_letter_queue",
+        "logstash.log.log_event.setting": "path.dead_letter_queue",
+        "logstash.log.message": "Creating directory",
+        "logstash.log.module": "logstash.setting.writabledirectory",
+        "logstash.log.thread": "main",
+        "offset": 227,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:46.100Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "WARN",
+        "logstash.log.message": "Ignoring the 'pipelines.yml' file because modules or command line options are specified",
+        "logstash.log.module": "logstash.config.source.multilocal",
+        "logstash.log.thread": "LogStash::Runner",
+        "offset": 478,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:46.118Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.logstash.version": "6.7.0",
+        "logstash.log.message": "Starting Logstash",
+        "logstash.log.module": "logstash.runner",
+        "logstash.log.thread": "LogStash::Runner",
+        "offset": 712,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:46.157Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.path": "/Users/shaunak/logstash-6.7.0/data/uuid",
+        "logstash.log.log_event.uuid": "9e1f7d9d-54df-4d5f-a8c6-a749cc6bc65e",
+        "logstash.log.message": "No persistent UUID file found. Generating new UUID",
+        "logstash.log.module": "logstash.agent",
+        "logstash.log.thread": "LogStash::Runner",
+        "offset": 885,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:51.608Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.pipeline.batch.delay": 50,
+        "logstash.log.log_event.pipeline.batch.size": 125,
+        "logstash.log.log_event.pipeline.workers": 8,
+        "logstash.log.log_event.pipeline_id": "main",
+        "logstash.log.message": "Starting pipeline",
+        "logstash.log.module": "logstash.pipeline",
+        "logstash.log.thread": "Converge PipelineAction::Create<main>",
+        "offset": 1158,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:51.728Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.pipeline_id": "main",
+        "logstash.log.log_event.thread": "#<Thread:0x6caf3d40 run>",
+        "logstash.log.message": "Pipeline started successfully",
+        "logstash.log.module": "logstash.pipeline",
+        "logstash.log.thread": "Converge PipelineAction::Create<main>",
+        "offset": 1421,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:51.782Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.count": 1,
+        "logstash.log.log_event.running_pipelines": [
+            {
+                "metaClass": {
+                    "metaClass": {
+                        "metaClass": {
+                            "non_running_pipelines": [],
+                            "running_pipelines": "[:main]"
+                        }
+                    }
+                }
+            }
+        ],
+        "logstash.log.message": "Pipelines running",
+        "logstash.log.module": "logstash.agent",
+        "logstash.log.thread": "Ruby-0-Thread-1: /Users/shaunak/logstash-6.7.0/lib/bootstrap/environment.rb:6",
+        "offset": 1659,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:52.126Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.port": 9600,
+        "logstash.log.message": "Successfully started Logstash API endpoint",
+        "logstash.log.module": "logstash.agent",
+        "logstash.log.thread": "Api Webserver",
+        "offset": 1998,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:58.930Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "WARN",
+        "logstash.log.message": "SIGINT received. Shutting down.",
+        "logstash.log.module": "logstash.runner",
+        "logstash.log.thread": "SIGINT handler",
+        "offset": 2177,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-04-02T13:19:59.144Z",
+        "event.dataset": "logstash.log",
+        "fileset.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "logstash.log.level": "INFO",
+        "logstash.log.log_event.pipeline_id": "main",
+        "logstash.log.log_event.thread": "#<Thread:0x6caf3d40 run>",
+        "logstash.log.message": "Pipeline has terminated",
+        "logstash.log.module": "logstash.pipeline",
+        "logstash.log.thread": "[main]-pipeline-manager",
+        "offset": 2335,
+        "prospector.type": "log"
+    }
+]

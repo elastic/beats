@@ -61,7 +61,7 @@ func (m *mockFetcher) Close() {
 
 func TestRetrieveLicense(t *testing.T) {
 	i := &License{
-		UUID:   mustUUIDV4(),
+		UUID:   mustUUIDV4().String(),
 		Type:   Basic,
 		Mode:   Basic,
 		Status: Active,
@@ -124,7 +124,7 @@ func TestRetrieveLicense(t *testing.T) {
 		}
 
 		i := &License{
-			UUID:   mustUUIDV4(),
+			UUID:   mustUUIDV4().String(),
 			Type:   Platinum,
 			Mode:   Platinum,
 			Status: Active,
@@ -144,7 +144,7 @@ func TestRetrieveLicense(t *testing.T) {
 
 func TestWatcher(t *testing.T) {
 	i := &License{
-		UUID:   mustUUIDV4(),
+		UUID:   mustUUIDV4().String(),
 		Type:   Basic,
 		Mode:   Basic,
 		Status: Active,
@@ -246,7 +246,7 @@ func TestWatcher(t *testing.T) {
 				if c == 0 {
 					assert.Equal(t, Basic, license.Get())
 					mock.Insert(&License{
-						UUID:   mustUUIDV4(),
+						UUID:   mustUUIDV4().String(),
 						Type:   Platinum,
 						Mode:   Platinum,
 						Status: Active,
@@ -288,7 +288,7 @@ func TestWatcher(t *testing.T) {
 
 func TestWaitForLicense(t *testing.T) {
 	i := &License{
-		UUID:   mustUUIDV4(),
+		UUID:   mustUUIDV4().String(),
 		Type:   Basic,
 		Mode:   Basic,
 		Status: Active,
