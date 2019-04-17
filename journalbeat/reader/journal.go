@@ -206,6 +206,7 @@ func (r *Reader) Next() (*beat.Event, error) {
 				return nil, err
 			}
 			if !hasNewEntry {
+				r.backoff.Wait()
 				continue
 			}
 		}
@@ -215,6 +216,7 @@ func (r *Reader) Next() (*beat.Event, error) {
 			return nil, err
 		}
 		event := r.toEvent(entry)
+		r.backoff.Reset()
 
 		return event, nil
 	}
