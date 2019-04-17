@@ -43,8 +43,7 @@ const (
 	debian = "debian"
 	darwin = "darwin"
 
-	dpkgStatusFile     = "/var/lib/dpkg/status"
-	homebrewCellarPath = "/usr/local/Cellar"
+	dpkgStatusFile = "/var/lib/dpkg/status"
 
 	bucketName              = "package.v1"
 	bucketKeyPackages       = "packages"
@@ -52,6 +51,10 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
+)
+
+var (
+	homebrewCellarPath = "/usr/local/Cellar"
 )
 
 type eventAction uint8
