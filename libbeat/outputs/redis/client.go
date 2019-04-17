@@ -312,6 +312,7 @@ func serializeEvents(
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			logp.Err("Encoding event failed with error: %v", err)
+			logp.Debug("redis", "Failed event: %v", d.Content)
 			goto failLoop
 		}
 
@@ -329,6 +330,7 @@ failLoop:
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			logp.Err("Encoding event failed with error: %v", err)
+			logp.Debug("redis", "Failed event: %v", d.Content)
 			i++
 			continue
 		}

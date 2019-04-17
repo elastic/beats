@@ -40,6 +40,7 @@ var (
 )
 
 type stateStruct struct {
+	ClusterID   string `json:"cluster_uuid"`
 	ClusterName string `json:"cluster_name"`
 	StateID     string `json:"state_uuid"`
 	MasterNode  string `json:"master_node"`
@@ -57,9 +58,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Cluster State API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Cluster State API response")
 	}
 
 	var errs multierror.Errors
@@ -73,31 +72,26 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
+				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
 
 				fields, err := schema.Apply(shard)
 				if err != nil {
-					event.Error = errors.Wrap(err, "failure applying shard schema")
-					r.Event(event)
-					errs = append(errs, event.Error)
+					errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
 					continue
 				}
 
 				// Handle node field: could be string or null
 				err = elasticsearch.PassThruField("node", shard, fields)
 				if err != nil {
-					event.Error = errors.Wrap(err, "failure passing through node field")
-					r.Event(event)
-					errs = append(errs, event.Error)
+					errs = append(errs, errors.Wrap(err, "failure passing through node field"))
 					continue
 				}
 
 				// Handle relocating_node field: could be string or null
 				err = elasticsearch.PassThruField("relocating_node", shard, fields)
 				if err != nil {
-					event.Error = errors.Wrap(err, "failure passing through relocating_node field")
-					r.Event(event)
-					errs = append(errs, event.Error)
+					errs = append(errs, errors.Wrap(err, "failure passing through relocating_node field"))
 					continue
 				}
 

@@ -77,9 +77,10 @@ const containerIdLen = 64
 const podUIDPos = 5
 
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
-	if value, ok := event["source"]; ok {
+	value, err := event.GetValue("log.file.path")
+	if err == nil {
 		source := value.(string)
-		logp.Debug("kubernetes", "Incoming source value: %s", source)
+		logp.Debug("kubernetes", "Incoming log.file.path value: %s", source)
 
 		if !strings.Contains(source, f.LogsPath) {
 			logp.Debug("kubernetes", "Error extracting container id - source value does not contain matcher's logs_path '%s'.", f.LogsPath)

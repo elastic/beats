@@ -218,5 +218,9 @@ func (r *reader) time(h *host) {
 }
 
 func (r *reader) uniqueID(h *host) {
-	// TODO: call gethostuuid(uuid [16]byte, timespec)
+	v, err := MachineID()
+	if r.addErr(err) {
+		return
+	}
+	h.info.UniqueID = v
 }

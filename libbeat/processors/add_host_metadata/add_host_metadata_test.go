@@ -18,12 +18,14 @@
 package add_host_metadata
 
 import (
+	"fmt"
+	"runtime"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"runtime"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -38,7 +40,7 @@ func TestConfigDefault(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := newHostMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -55,6 +57,10 @@ func TestConfigDefault(t *testing.T) {
 	assert.NotNil(t, v)
 
 	v, err = newEvent.GetValue("host.os.kernel")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = newEvent.GetValue("host.os.name")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
@@ -77,7 +83,7 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := newHostMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -97,6 +103,10 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
+	v, err = newEvent.GetValue("host.os.name")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
 	v, err = newEvent.GetValue("host.ip")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
@@ -104,4 +114,132 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	v, err = newEvent.GetValue("host.mac")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
+}
+
+func TestConfigName(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{},
+		Timestamp: time.Now(),
+	}
+
+	config := map[string]interface{}{
+		"name": "my-host",
+	}
+
+	testConfig, err := common.NewConfigFrom(config)
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(event)
+	assert.NoError(t, err)
+
+	for configKey, configValue := range config {
+		t.Run(fmt.Sprintf("Check of %s", configKey), func(t *testing.T) {
+			v, err := newEvent.GetValue(fmt.Sprintf("host.%s", configKey))
+			assert.NoError(t, err)
+			assert.Equal(t, configValue, v, "Could not find in %s", newEvent)
+		})
+	}
+}
+
+func TestConfigGeoEnabled(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{},
+		Timestamp: time.Now(),
+	}
+
+	config := map[string]interface{}{
+		"geo.name":             "yerevan-am",
+		"geo.location":         "40.177200, 44.503490",
+		"geo.continent_name":   "Asia",
+		"geo.country_iso_code": "AM",
+		"geo.region_name":      "Erevan",
+		"geo.region_iso_code":  "AM-ER",
+		"geo.city_name":        "Yerevan",
+	}
+
+	testConfig, err := common.NewConfigFrom(config)
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(event)
+	assert.NoError(t, err)
+
+	for configKey, configValue := range config {
+		t.Run(fmt.Sprintf("Check of %s", configKey), func(t *testing.T) {
+			v, err := newEvent.GetValue(fmt.Sprintf("host.%s", configKey))
+			assert.NoError(t, err)
+			assert.Equal(t, configValue, v, "Could not find in %s", newEvent)
+		})
+	}
+}
+
+func TestPartialGeo(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{},
+		Timestamp: time.Now(),
+	}
+
+	config := map[string]interface{}{
+		"geo.name":      "yerevan-am",
+		"geo.city_name": "  ",
+	}
+
+	testConfig, err := common.NewConfigFrom(config)
+	assert.NoError(t, err)
+
+	p, err := New(testConfig)
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(event)
+	assert.NoError(t, err)
+
+	v, err := newEvent.Fields.GetValue("host.geo.name")
+	assert.NoError(t, err)
+	assert.Equal(t, "yerevan-am", v)
+
+	missing := []string{"continent_name", "country_name", "country_iso_code", "region_name", "region_iso_code", "city_name"}
+
+	for _, k := range missing {
+		path := "host.geo." + k
+		v, err = newEvent.Fields.GetValue(path)
+
+		assert.Equal(t, common.ErrKeyNotFound, err, "din expect to find %v", path)
+	}
+}
+
+func TestGeoLocationValidation(t *testing.T) {
+	locations := []struct {
+		str   string
+		valid bool
+	}{
+		{"40.177200, 44.503490", true},
+		{"-40.177200, -44.503490", true},
+		{"garbage", false},
+		{"9999999999", false},
+	}
+
+	for _, location := range locations {
+		t.Run(fmt.Sprintf("Location %s validation should be %t", location.str, location.valid), func(t *testing.T) {
+
+			conf, err := common.NewConfigFrom(map[string]interface{}{
+				"geo": map[string]interface{}{
+					"location": location.str,
+				},
+			})
+			require.NoError(t, err)
+
+			_, err = New(conf)
+
+			if location.valid {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+		})
+	}
 }

@@ -19,9 +19,7 @@ import (
 
 // Cache keeps a copy of configs provided by Kibana, it's used when Kibana is down
 type Cache struct {
-	// ConfigOK is true if last config update was successful
-	ConfigOK bool
-	Configs  api.ConfigBlocks
+	Configs api.ConfigBlocks
 }
 
 // Load settings from its source file
@@ -60,4 +58,9 @@ func (c *Cache) Save() error {
 
 	// move temporary file into final location
 	return file.SafeFileRotate(path, tempFile)
+}
+
+// HasConfig returns true if configs are cached.
+func (c *Cache) HasConfig() bool {
+	return len(c.Configs) > 0
 }

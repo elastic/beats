@@ -18,11 +18,6 @@ function Exec {
     }
 }
 
-# TMP working to fix this in https://github.com/elastic/beats/pull/8753
-if ($env:beat -eq "x-pack/functionbeat") {
-  exit 0
-}
-
 # Setup Go.
 $env:GOPATH = $env:WORKSPACE
 $env:PATH = "$env:GOPATH\bin;C:\tools\mingw64\bin;$env:PATH"

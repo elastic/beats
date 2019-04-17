@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build linux,cgo
+
 package reader
 
 import (
@@ -63,8 +65,10 @@ func TestToEvent(t *testing.T) {
 				},
 			},
 			expectedFields: common.MapStr{
-				"custom": common.MapStr{
-					"my_custom_field": "value",
+				"journald": common.MapStr{
+					"custom": common.MapStr{
+						"my_custom_field": "value",
+					},
 				},
 			},
 		},
@@ -86,7 +90,7 @@ func TestToEvent(t *testing.T) {
 	}
 	for _, test := range tests {
 		event := r.toEvent(&test.entry)
-		delete(event.Fields, "read_timestamp")
+		event.Fields.Delete("event")
 		assert.True(t, reflect.DeepEqual(event.Fields, test.expectedFields))
 	}
 }

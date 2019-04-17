@@ -42,20 +42,20 @@ type MapperSettings []*struct {
 }
 
 // NewConfigMapper builds a template Mapper from given settings
-func NewConfigMapper(configs MapperSettings) (*Mapper, error) {
-	var mapper Mapper
+func NewConfigMapper(configs MapperSettings) (mapper Mapper, err error) {
 	for _, c := range configs {
-		condition, err := conditions.NewCondition(c.ConditionConfig)
-		if err != nil {
-			return nil, err
+		condMap := &ConditionMap{Configs: c.Configs}
+		if c.ConditionConfig != nil {
+			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig)
+			if err != nil {
+				return nil, err
+			}
 		}
-		mapper = append(mapper, &ConditionMap{
-			Condition: condition,
-			Configs:   c.Configs,
-		})
+
+		mapper = append(mapper, condMap)
 	}
 
-	return &mapper, nil
+	return mapper, nil
 }
 
 // Event adapts MapStr to processors.ValuesMap interface
@@ -71,11 +71,13 @@ func (e Event) GetValue(key string) (interface{}, error) {
 }
 
 // GetConfig returns a matching Config if any, nil otherwise
-func (c *Mapper) GetConfig(event bus.Event) []*common.Config {
+func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
 
-	for _, mapping := range *c {
-		if mapping.Configs != nil && !mapping.Condition.Check(Event(event)) {
+	for _, mapping := range c {
+		// An empty condition matches everything
+		conditionOk := mapping.Condition == nil || mapping.Condition.Check(Event(event))
+		if mapping.Configs != nil && !conditionOk {
 			continue
 		}
 

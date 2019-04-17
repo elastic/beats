@@ -1,0 +1,648 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Connections rate [Metricbeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Connections rate", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.connections", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "aee9bbf0-f1f3-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Connections rate [Metricbeat MySQL] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-05T09:14:45.934Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Command rates [Metricbeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": "0.2", 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "SELECT", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.command.select", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "2d149f90-f1f4-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(104,204,202,1)", 
+                                "fill": "0.2", 
+                                "formatter": "number", 
+                                "id": "3c2a2a40-f1f4-11e7-a752-236fe3270d99", 
+                                "label": "INSERT", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.command.insert", 
+                                        "id": "3c2a2a41-f1f4-11e7-a752-236fe3270d99", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "3c2a2a41-f1f4-11e7-a752-236fe3270d99", 
+                                        "id": "3c2a2a42-f1f4-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(252,220,0,1)", 
+                                "fill": "0.2", 
+                                "formatter": "number", 
+                                "id": "485ce050-f1f4-11e7-a752-236fe3270d99", 
+                                "label": "UPDATE", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.command.update", 
+                                        "id": "485ce051-f1f4-11e7-a752-236fe3270d99", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "485ce051-f1f4-11e7-a752-236fe3270d99", 
+                                        "id": "485ce052-f1f4-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(244,78,59,1)", 
+                                "fill": "0.2", 
+                                "formatter": "number", 
+                                "id": "543a4a70-f1f4-11e7-a752-236fe3270d99", 
+                                "label": "DELETE", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.command.delete", 
+                                        "id": "543a4a71-f1f4-11e7-a752-236fe3270d99", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "543a4a71-f1f4-11e7-a752-236fe3270d99", 
+                                        "id": "543a4a72-f1f4-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Command rates [Metricbeat MySQL] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-05T09:14:45.934Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Running threads [Metricbeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(174,161,255,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Running threads", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.threads.running", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Running threads [Metricbeat MySQL] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-05T09:14:45.934Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Opened tables rate [Metricbeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(252,196,0,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Opened tables rate", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.opened_tables", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "9972d250-f1f5-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Opened tables rate [Metricbeat MySQL] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-05T09:14:45.934Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Threads created rate [Metricbeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(123,100,255,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Threads created rate", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.threads.created", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "9972d250-f1f5-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Threads created rate [Metricbeat MySQL] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-05T09:14:45.934Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Open files [Metricbeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(22,165,165,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Open files", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.open.files", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Open files [Metricbeat MySQL] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-05T09:14:45.934Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(0,98,177,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "2b1c2390-f1f7-11e7-a752-236fe3270d99", 
+                                "label": "Received bytes", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.bytes.received", 
+                                        "id": "2b1c2391-f1f7-11e7-a752-236fe3270d99", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "2b1c2391-f1f7-11e7-a752-236fe3270d99", 
+                                        "id": "2b1c2392-f1f7-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Sent bytes", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "mysql.status.bytes.sent", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "23cfda50-f1f7-11e7-a752-236fe3270d99", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-05T09:15:49.714Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "Overview of MySQL server",
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false, 
+                    "useMargins": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "10", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 3
+                        }, 
+                        "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
+                        "panelIndex": "10", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "11", 
+                            "w": 12, 
+                            "x": 0, 
+                            "y": 0
+                        }, 
+                        "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
+                        "panelIndex": "11", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "13", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 3
+                        }, 
+                        "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+                        "panelIndex": "13", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "14", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 6
+                        }, 
+                        "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+                        "panelIndex": "14", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "15", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 6
+                        }, 
+                        "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+                        "panelIndex": "15", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "16", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 9
+                        }, 
+                        "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
+                        "panelIndex": "16", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "17", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 9
+                        }, 
+                        "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
+                        "panelIndex": "17", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Metricbeat MySQL] Overview ECS", 
+                "version": 1
+            }, 
+            "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306-ecs", 
+            "type": "dashboard", 
+            "updated_at": "2018-01-05T09:14:45.934Z", 
+            "version": 3
+        }
+    ], 
+    "version": "6.2.4"
+}

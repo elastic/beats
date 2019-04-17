@@ -14,7 +14,7 @@ There's also a full example configuration file at
 options. For mac and win, look in the archive that you extracted.
 
 The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
-See the {libbeat}/config-file-format.html[Config File Format] section of the
+See the {beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure Packetbeat:
@@ -26,10 +26,11 @@ The following topics describe how to configure Packetbeat:
 * <<configuration-general-options>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
-* <<packetbeat-geoip>>
+* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
@@ -46,34 +47,36 @@ include::./packetbeat-options.asciidoc[]
 
 include::./packetbeat-general-options.asciidoc[]
 
-:allplatforms:
-include::../../libbeat/docs/queueconfig.asciidoc[]
+include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
-include::../../libbeat/docs/outputconfig.asciidoc[]
+include::{libbeat-dir}/docs/outputconfig.asciidoc[]
 
-include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 
 include::./packetbeat-filtering.asciidoc[]
 
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
 
-include::./packetbeat-geoip.asciidoc[]
+include::{libbeat-dir}/docs/shared-geoip.asciidoc[]
 
-include::../../libbeat/docs/shared-path-config.asciidoc[]
+include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
 
-include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
 
-include::../../libbeat/docs/setup-config.asciidoc[]
+include::{libbeat-dir}/docs/setup-config.asciidoc[]
 
-include::../../libbeat/docs/loggingconfig.asciidoc[]
-
-:standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
+include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
 
 :standalone:
-:allplatforms:
-include::../../libbeat/docs/yaml.asciidoc[]
+include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
+:standalone!:
 
-include::../../libbeat/docs/http-endpoint.asciidoc[]
+:standalone:
+include::{libbeat-dir}/docs/yaml.asciidoc[]
+:standalone!:
 
-include::../../libbeat/docs/reference-yml.asciidoc[]
+include::{libbeat-dir}/docs/http-endpoint.asciidoc[]
+
+include::{libbeat-dir}/docs/reference-yml.asciidoc[]

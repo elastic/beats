@@ -27,31 +27,33 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
-
 	_ "github.com/elastic/beats/libbeat/processors/actions"
 	_ "github.com/elastic/beats/libbeat/processors/add_cloud_metadata"
 )
 
-func GetProcessors(t *testing.T, yml []map[string]interface{}) *processors.Processors {
-	config := processors.PluginConfig{}
-
-	for _, action := range yml {
-		c := map[string]*common.Config{}
-
-		for name, actionYml := range action {
-			actionConfig, err := common.NewConfigFrom(actionYml)
-			assert.Nil(t, err)
-
-			c[name] = actionConfig
-		}
-		config = append(config, c)
-
+func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Processors {
+	list, err := MakeProcessors(t, yml)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	list, err := processors.New(config)
-	assert.Nil(t, err)
-
 	return list
+}
+
+func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.Processors, error) {
+	t.Helper()
+
+	var config processors.PluginConfig
+	for _, processor := range yml {
+		processorCfg, err := common.NewConfigFrom(processor)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		config = append(config, processorCfg)
+	}
+
+	return processors.New(config)
 }
 
 func TestBadConfig(t *testing.T) {
@@ -73,22 +75,8 @@ func TestBadConfig(t *testing.T) {
 		},
 	}
 
-	config := processors.PluginConfig{}
-
-	for _, action := range yml {
-		c := map[string]*common.Config{}
-
-		for name, actionYml := range action {
-			actionConfig, err := common.NewConfigFrom(actionYml)
-			assert.Nil(t, err)
-
-			c[name] = actionConfig
-		}
-		config = append(config, c)
-	}
-
-	_, err := processors.New(config)
-	assert.NotNil(t, err)
+	_, err := MakeProcessors(t, yml)
+	assert.Error(t, err)
 }
 
 func TestIncludeFields(t *testing.T) {
@@ -137,7 +125,10 @@ func TestIncludeFields(t *testing.T) {
 		},
 	}
 
-	processedEvent := processors.Run(event)
+	processedEvent, err := processors.Run(event)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	expectedEvent := common.MapStr{
 		"proc": common.MapStr{
@@ -203,7 +194,7 @@ func TestIncludeFields1(t *testing.T) {
 		},
 	}
 
-	processedEvent := processors.Run(event)
+	processedEvent, _ := processors.Run(event)
 
 	expectedEvent := common.MapStr{
 		"type": "process",
@@ -256,7 +247,7 @@ func TestDropFields(t *testing.T) {
 		},
 	}
 
-	processedEvent := processors.Run(event)
+	processedEvent, _ := processors.Run(event)
 
 	expectedEvent := common.MapStr{
 		"proc": common.MapStr{
@@ -363,8 +354,8 @@ func TestMultipleIncludeFields(t *testing.T) {
 		"type": "process",
 	}
 
-	actual1 := processors.Run(event1)
-	actual2 := processors.Run(event2)
+	actual1, _ := processors.Run(event1)
+	actual2, _ := processors.Run(event2)
 
 	assert.Equal(t, expected1, actual1.Fields)
 	assert.Equal(t, expected2, actual2.Fields)
@@ -417,7 +408,7 @@ func TestDropEvent(t *testing.T) {
 		},
 	}
 
-	processedEvent := processors.Run(event)
+	processedEvent, _ := processors.Run(event)
 
 	assert.Nil(t, processedEvent)
 }
@@ -461,7 +452,7 @@ func TestEmptyCondition(t *testing.T) {
 		},
 	}
 
-	processedEvent := processors.Run(event)
+	processedEvent, _ := processors.Run(event)
 
 	assert.Nil(t, processedEvent)
 }
@@ -481,23 +472,7 @@ func TestBadCondition(t *testing.T) {
 		},
 	}
 
-	config := processors.PluginConfig{}
-
-	for _, action := range yml {
-		c := map[string]*common.Config{}
-
-		for name, actionYml := range action {
-			actionConfig, err := common.NewConfigFrom(actionYml)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			c[name] = actionConfig
-		}
-		config = append(config, c)
-	}
-
-	_, err := processors.New(config)
+	_, err := MakeProcessors(t, yml)
 	assert.Error(t, err)
 }
 
@@ -516,22 +491,8 @@ func TestMissingFields(t *testing.T) {
 		},
 	}
 
-	config := processors.PluginConfig{}
-
-	for _, action := range yml {
-		c := map[string]*common.Config{}
-
-		for name, actionYml := range action {
-			actionConfig, err := common.NewConfigFrom(actionYml)
-			assert.Nil(t, err)
-
-			c[name] = actionConfig
-		}
-		config = append(config, c)
-	}
-
-	_, err := processors.New(config)
-	assert.NotNil(t, err)
+	_, err := MakeProcessors(t, yml)
+	assert.Error(t, err)
 }
 
 func TestBadConditionConfig(t *testing.T) {
@@ -550,22 +511,8 @@ func TestBadConditionConfig(t *testing.T) {
 		},
 	}
 
-	config := processors.PluginConfig{}
-
-	for _, action := range yml {
-		c := map[string]*common.Config{}
-
-		for name, actionYml := range action {
-			actionConfig, err := common.NewConfigFrom(actionYml)
-			assert.Nil(t, err)
-
-			c[name] = actionConfig
-		}
-		config = append(config, c)
-	}
-
-	_, err := processors.New(config)
-	assert.NotNil(t, err)
+	_, err := MakeProcessors(t, yml)
+	assert.Error(t, err)
 }
 
 func TestDropMissingFields(t *testing.T) {
@@ -607,7 +554,7 @@ func TestDropMissingFields(t *testing.T) {
 		},
 	}
 
-	processedEvent := processors.Run(event)
+	processedEvent, _ := processors.Run(event)
 
 	expectedEvent := common.MapStr{
 		"proc": common.MapStr{

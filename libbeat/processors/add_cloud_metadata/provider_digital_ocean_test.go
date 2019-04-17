@@ -101,7 +101,7 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p, err := newCloudMetadata(config)
+	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,12 +112,12 @@ func TestRetrieveDigitalOceanMetadata(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":    "digitalocean",
-				"instance_id": "1111111",
-				"region":      "nyc3",
+		"cloud": common.MapStr{
+			"provider": "digitalocean",
+			"instance": common.MapStr{
+				"id": "1111111",
 			},
+			"region": "nyc3",
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

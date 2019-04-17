@@ -20,6 +20,8 @@ package kibana
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,8 +37,7 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := IsStatsAPIAvailable(test.input)
-		assert.NoError(t, err)
+		actual := IsStatsAPIAvailable(common.MustNewVersion(test.input))
 		assert.Equal(t, test.expected, actual)
 	}
 }

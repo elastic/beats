@@ -6,8 +6,8 @@ type CreationPolicy struct {
 	// AutoScalingCreationPolicy specifies how many instances must signal success for the update to succeed.
 	AutoScalingCreationPolicy *AutoScalingCreationPolicy `json:"AutoScalingCreationPolicy,omitempty"`
 
-	// ResourcesSignal configures the number of required success signals and the length of time that AWS CloudFormation waits for those signals.
-	ResourcesSignal *ResourcesSignal `json:"ResourcesSignal,omitempty"`
+	// ResourceSignal configures the number of required success signals and the length of time that AWS CloudFormation waits for those signals.
+	ResourceSignal *ResourceSignal `json:"ResourceSignal,omitempty"`
 }
 
 // AutoScalingCreationPolicy specifies how many instances must signal success for the update to succeed.
@@ -17,8 +17,8 @@ type AutoScalingCreationPolicy struct {
 	MinSuccessfulInstancesPercent float64 `json:"MinSuccessfulInstancesPercent,omitempty"`
 }
 
-// ResourcesSignal configures the number of required success signals and the length of time that AWS CloudFormation waits for those signals.
-type ResourcesSignal struct {
+// ResourceSignal configures the number of required success signals and the length of time that AWS CloudFormation waits for those signals.
+type ResourceSignal struct {
 
 	// Count is the number of success signals AWS CloudFormation must receive before it sets the resource status as CREATE_COMPLETE. If the resource receives a failure signal or doesn't receive the specified number of signals before the timeout period expires, the resource creation fails and AWS CloudFormation rolls the stack back.
 	Count float64 `json:"Count,omitempty"`

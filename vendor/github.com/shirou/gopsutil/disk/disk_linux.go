@@ -241,7 +241,7 @@ func PartitionsWithContext(ctx context.Context, all bool) ([]PartitionStat, erro
 		fields := strings.Fields(line)
 		d := PartitionStat{
 			Device:     fields[0],
-			Mountpoint: fields[1],
+			Mountpoint: unescapeFstab(fields[1]),
 			Fstype:     fields[2],
 			Opts:       fields[3],
 		}
@@ -395,7 +395,7 @@ func GetDiskSerialNumberWithContext(ctx context.Context, name string) string {
 	minor := unix.Minor(uint64(stat.Rdev))
 
 	// Try to get the serial from udev data
-	udevDataPath := fmt.Sprintf("/run/udev/data/b%d:%d", major, minor)
+	udevDataPath := common.HostRun(fmt.Sprintf("udev/data/b%d:%d", major, minor))
 	if udevdata, err := ioutil.ReadFile(udevDataPath); err == nil {
 		scanner := bufio.NewScanner(bytes.NewReader(udevdata))
 		for scanner.Scan() {
@@ -408,7 +408,7 @@ func GetDiskSerialNumberWithContext(ctx context.Context, name string) string {
 
 	// Try to get the serial from sysfs, look at the disk device (minor 0) directly
 	// because if it is a partition it is not going to contain any device information
-	devicePath := fmt.Sprintf("/sys/dev/block/%d:0/device", major)
+	devicePath := common.HostSys(fmt.Sprintf("dev/block/%d:0/device", major))
 	model, _ := ioutil.ReadFile(filepath.Join(devicePath, "model"))
 	serial, _ := ioutil.ReadFile(filepath.Join(devicePath, "serial"))
 	if len(model) > 0 && len(serial) > 0 {

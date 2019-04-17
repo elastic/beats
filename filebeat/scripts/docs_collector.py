@@ -50,11 +50,7 @@ This file is generated! See scripts/docs_collector.py
 
         modules_list[module] = title
 
-        # TODO (andrewkroh on 10-23-2018): Generate field docs that include
-        # field data from x-pack modules. Until then we cannot add links to the
-        # field docs for x-pack modules.
-        if "x-pack" not in module_dir:
-            module_file += """
+        module_file += """
 
 [float]
 === Fields

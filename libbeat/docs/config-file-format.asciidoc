@@ -77,11 +77,11 @@ For example this setting:
 
 output:
   elasticsearch:
-    index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'
+    index: 'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}'
 
 ------------------------------------------------------------------------------
 
-gets collapsed into `output.elasticsearch.index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'`. The
+gets collapsed into +output.elasticsearch.index: \'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}\'+. The
 full name of a setting is based on all parent structures involved.
 
 Lists create numeric names starting with 0.
@@ -378,5 +378,4 @@ output.console:
 [[config-file-format-tips]]
 === YAML tips and gotchas
 
-:allplatforms:
 include::yaml.asciidoc[]

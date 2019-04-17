@@ -18,15 +18,157 @@
 package mage
 
 import (
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/magefile/mage/mg"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
+
+// Paths to generated config file templates.
+var (
+	shortTemplate     = filepath.Join("build", BeatName+".yml.tmpl")
+	referenceTemplate = filepath.Join("build", BeatName+".reference.yml.tmpl")
+	dockerTemplate    = filepath.Join("build", BeatName+".docker.yml.tmpl")
+)
+
+// ConfigFileType is a bitset that indicates what types of config files to
+// generate.
+type ConfigFileType uint8
+
+// Config file types.
+const (
+	ShortConfigType ConfigFileType = 1 << iota
+	ReferenceConfigType
+	DockerConfigType
+
+	AllConfigTypes ConfigFileType = 0xFF
+)
+
+// IsShort return true if ShortConfigType is set.
+func (t ConfigFileType) IsShort() bool { return t&ShortConfigType > 0 }
+
+// IsReference return true if ReferenceConfigType is set.
+func (t ConfigFileType) IsReference() bool { return t&ReferenceConfigType > 0 }
+
+// IsDocker return true if DockerConfigType is set.
+func (t ConfigFileType) IsDocker() bool { return t&DockerConfigType > 0 }
+
+// ConfigFileParams defines the files that make up each config file.
+type ConfigFileParams struct {
+	ShortParts     []string // List of files or globs.
+	ShortDeps      []interface{}
+	ReferenceParts []string // List of files or globs.
+	ReferenceDeps  []interface{}
+	DockerParts    []string // List of files or globs.
+	DockerDeps     []interface{}
+	ExtraVars      map[string]interface{}
+}
+
+// Config generates config files. Set DEV_OS and DEV_ARCH to change the target
+// host for the generated configs. Defaults to linux/amd64.
+func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error {
+	if err := makeConfigTemplates(types, args); err != nil {
+		return errors.Wrap(err, "failed making config templates")
+	}
+
+	params := map[string]interface{}{
+		"GOOS":      EnvOr("DEV_OS", "linux"),
+		"GOARCH":    EnvOr("DEV_ARCH", "amd64"),
+		"Reference": false,
+		"Docker":    false,
+	}
+	for k, v := range args.ExtraVars {
+		params[k] = v
+	}
+
+	// Short
+	if types.IsShort() {
+		file := filepath.Join(targetDir, BeatName+".yml")
+		fmt.Printf(">> Building %v for %v/%v\n", file, params["GOOS"], params["GOARCH"])
+		if err := ExpandFile(shortTemplate, file, params); err != nil {
+			return errors.Wrapf(err, "failed building %v", file)
+		}
+	}
+
+	// Reference
+	if types.IsReference() {
+		file := filepath.Join(targetDir, BeatName+".reference.yml")
+		params["Reference"] = true
+		fmt.Printf(">> Building %v for %v/%v\n", file, params["GOOS"], params["GOARCH"])
+		if err := ExpandFile(referenceTemplate, file, params); err != nil {
+			return errors.Wrapf(err, "failed building %v", file)
+		}
+	}
+
+	// Docker
+	if types.IsDocker() {
+		file := filepath.Join(targetDir, BeatName+".docker.yml")
+		params["Reference"] = false
+		params["Docker"] = true
+		fmt.Printf(">> Building %v for %v/%v\n", file, params["GOOS"], params["GOARCH"])
+		if err := ExpandFile(dockerTemplate, file, params); err != nil {
+			return errors.Wrapf(err, "failed building %v", file)
+		}
+	}
+
+	return nil
+}
+
+func makeConfigTemplates(types ConfigFileType, args ConfigFileParams) error {
+	var err error
+
+	if types.IsShort() {
+		mg.SerialDeps(args.ShortDeps...)
+		if err = makeConfigTemplate(shortTemplate, 0600, args.ShortParts...); err != nil {
+			return err
+		}
+	}
+
+	if types.IsReference() {
+		mg.SerialDeps(args.ReferenceDeps...)
+		if err = makeConfigTemplate(referenceTemplate, 0644, args.ReferenceParts...); err != nil {
+			return err
+		}
+	}
+
+	if types.IsDocker() {
+		mg.SerialDeps(args.DockerDeps...)
+		if err = makeConfigTemplate(dockerTemplate, 0600, args.DockerParts...); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func makeConfigTemplate(destination string, mode os.FileMode, parts ...string) error {
+	configFiles, err := FindFiles(parts...)
+	if err != nil {
+		return errors.Wrap(err, "failed to find config templates")
+	}
+
+	if IsUpToDate(destination, configFiles...) {
+		return nil
+	}
+
+	log.Println(">> Building", destination)
+	if err = FileConcat(destination, mode, configFiles...); err != nil {
+		return err
+	}
+	if err = FindReplace(destination, regexp.MustCompile("beatname"), "{{.BeatName}}"); err != nil {
+		return err
+	}
+	return FindReplace(destination, regexp.MustCompile("beat-index-prefix"), "{{.BeatIndexPrefix}}")
+}
 
 const moduleConfigTemplate = `
 #==========================  Modules configuration =============================
@@ -78,7 +220,7 @@ func moduleDashes(name string) string {
 		titleSuffixLen = len(" Module ")
 	)
 
-	numDashes := lineLen - headerLen - titleSuffixLen - len(name)
+	numDashes := lineLen - headerLen - titleSuffixLen - len(name) - 1
 	numDashes /= 2
 	return strings.Repeat("-", numDashes)
 }
@@ -151,5 +293,5 @@ func GenerateModuleReferenceConfig(out string, moduleDirs ...string) error {
 		"Modules": moduleConfigs,
 	})
 
-	return ioutil.WriteFile(out, []byte(config), 0644)
+	return ioutil.WriteFile(createDir(out), []byte(config), 0644)
 }

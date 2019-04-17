@@ -80,8 +80,9 @@ specs:
         <<: *binary_spec
         <<: *functionbeat_binaries
         <<: *elastic_license_for_binaries
-        '{{.BeatName}}{{.BinaryExt}}':
-          source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin
       types: [tgz]

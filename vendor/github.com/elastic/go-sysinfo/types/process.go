@@ -23,6 +23,8 @@ type Process interface {
 	CPUTimer
 	Info() (ProcessInfo, error)
 	Memory() (MemoryInfo, error)
+	User() (UserInfo, error)
+	PID() int
 }
 
 type ProcessInfo struct {
@@ -33,6 +35,38 @@ type ProcessInfo struct {
 	Exe       string    `json:"exe"`
 	Args      []string  `json:"args"`
 	StartTime time.Time `json:"start_time"`
+}
+
+// UserInfo contains information about the UID and GID
+// values of a process.
+type UserInfo struct {
+	// UID is the user ID.
+	// On Linux and Darwin (macOS) this is the real user ID.
+	// On Windows, this is the security identifier (SID) of the
+	// user account of the process access token.
+	UID string `json:"uid"`
+
+	// On Linux and Darwin (macOS) this is the effective user ID.
+	// On Windows, this is empty.
+	EUID string `json:"euid"`
+
+	// On Linux and Darwin (macOS) this is the saved user ID.
+	// On Windows, this is empty.
+	SUID string `json:"suid"`
+
+	// GID is the primary group ID.
+	// On Linux and Darwin (macOS) this is the real group ID.
+	// On Windows, this is the security identifier (SID) of the
+	// primary group of the process access token.
+	GID string `json:"gid"`
+
+	// On Linux and Darwin (macOS) this is the effective group ID.
+	// On Windows, this is empty.
+	EGID string `json:"egid"`
+
+	// On Linux and Darwin (macOS) this is the saved group ID.
+	// On Windows, this is empty.
+	SGID string `json:"sgid"`
 }
 
 type Environment interface {

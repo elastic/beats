@@ -1,4 +1,4 @@
-// +build darwin,go1.10
+// +build darwin
 
 package fsevents
 
@@ -33,9 +33,6 @@ import (
 	"time"
 	"unsafe"
 )
-
-// eventIDSinceNow is a sentinel to begin watching events "since now".
-const eventIDSinceNow = uint64(C.kFSEventStreamEventIdSinceNow)
 
 // LatestEventID returns the most recently generated event ID, system-wide.
 func LatestEventID() uint64 {
@@ -105,21 +102,11 @@ func GetStreamRefPaths(f FSEventStreamRef) []string {
 	return ss
 }
 
-// GetDeviceUUID retrieves the UUID required to identify an EventID
-// in the FSEvents database
-func GetDeviceUUID(deviceID int32) string {
-	uuid := C.FSEventsCopyUUIDForDevice(C.dev_t(deviceID))
-	if uuid == C.CFUUIDRef(0) {
-		return ""
-	}
-	return cfStringToGoString(C.CFUUIDCreateString(nil, uuid))
-}
-
 func cfStringToGoString(cfs C.CFStringRef) string {
-	if cfs == 0 {
+	if cfs == nullCFStringRef {
 		return ""
 	}
-	cfStr := C.CFStringCreateCopy(nil, cfs)
+	cfStr := copyCFString(cfs)
 	length := C.CFStringGetLength(cfStr)
 	if length == 0 {
 		// short-cut for empty strings
@@ -148,6 +135,11 @@ func cfStringToGoString(cfs C.CFStringRef) string {
 	return *(*string)(unsafe.Pointer(strHeader))
 }
 
+// copyCFString makes an immutable copy of a string with CFStringCreateCopy.
+func copyCFString(cfs C.CFStringRef) C.CFStringRef {
+	return C.CFStringCreateCopy(C.kCFAllocatorDefault, cfs)
+}
+
 // CFRunLoopRef wraps C.CFRunLoopRef
 type CFRunLoopRef C.CFRunLoopRef
 
@@ -169,10 +161,7 @@ func createPaths(paths []string) (C.CFArrayRef, error) {
 			// because of them
 			errs = append(errs, err)
 		}
-		cpath := C.CString(p)
-		defer C.free(unsafe.Pointer(cpath))
-
-		str := C.CFStringCreateWithCString(nil, cpath, C.kCFStringEncodingUTF8)
+		str := makeCFString(p)
 		C.CFArrayAppendValue(C.CFMutableArrayRef(cPaths), unsafe.Pointer(str))
 	}
 	var err error
@@ -180,6 +169,13 @@ func createPaths(paths []string) (C.CFArrayRef, error) {
 		err = fmt.Errorf("%q", errs)
 	}
 	return cPaths, err
+}
+
+// makeCFString makes an immutable string with CFStringCreateWithCString.
+func makeCFString(str string) C.CFStringRef {
+	s := C.CString(str)
+	defer C.free(unsafe.Pointer(s))
+	return C.CFStringCreateWithCString(C.kCFAllocatorDefault, s, C.kCFStringEncodingUTF8)
 }
 
 // CFArrayLen retrieves the length of CFArray type

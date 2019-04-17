@@ -1,0 +1,104 @@
+{
+  "test_name": "Netflow 9 Fortigate FortiOS 5.2.1",
+  "events": [
+    {
+      "Timestamp": "2017-07-18T05:42:14Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_options",
+          "category": "network_traffic",
+          "created": "2017-07-18T05:42:14Z",
+          "kind": "event"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-07-18T05:42:14Z",
+            "uptime_millis": 20427178,
+            "version": 9
+          },
+          "options": {
+            "exported_flow_record_total_count": 107864,
+            "exported_message_total_count": 11920854,
+            "exported_octet_total_count": 6871319015,
+            "flow_active_timeout": 1800,
+            "flow_idle_timeout": 15,
+            "sampling_algorithm": 1,
+            "sampling_interval": 1
+          },
+          "scope": {
+            "octet_delta_count": 1
+          },
+          "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-07-18T05:41:59Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "31.13.87.36",
+          "locality": "public",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-07-18T05:41:59Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "SKsZNpZob60",
+          "locality": "public"
+        },
+        "netflow": {
+          "destination_ipv4_address": "31.13.87.36",
+          "destination_transport_port": 443,
+          "egress_interface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-07-18T05:41:59Z",
+            "uptime_millis": 20412178,
+            "version": 9
+          },
+          "flow_end_sys_up_time": 621770700,
+          "flow_start_sys_up_time": 621761700,
+          "ingress_interface": 9,
+          "octet_delta_count": 152,
+          "packet_delta_count": 3,
+          "post_octet_delta_count": 0,
+          "post_packet_delta_count": 0,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.99.7",
+          "source_transport_port": 61910,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 152,
+          "community_id": "1:/WRdjqoOaqvaSKG3KADN7XCzjYI=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 3,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.99.7",
+          "locality": "private",
+          "port": 61910
+        }
+      },
+      "Private": null
+    }
+  ]
+}

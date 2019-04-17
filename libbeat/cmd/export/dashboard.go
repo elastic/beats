@@ -20,28 +20,32 @@ package export
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/dashboards"
 	"github.com/elastic/beats/libbeat/kibana"
 )
 
 // GenDashboardCmd is the command used to export a dashboard.
-func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
+func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "dashboard",
 		Short: "Export defined dashboard to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			dashboard, _ := cmd.Flags().GetString("id")
+			yml, _ := cmd.Flags().GetString("yml")
+			decode, _ := cmd.Flags().GetBool("decode")
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error creating beat: %s\n", err)
 				os.Exit(1)
 			}
-			err = b.Init()
+			err = b.InitWithSettings(settings)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
@@ -58,16 +62,47 @@ func GenDashboardCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 				os.Exit(1)
 			}
 
-			result, err := client.GetDashboard(dashboard)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error getting dashboard: %+v\n", err)
-				os.Exit(1)
+			// Export dashboards from yml file
+			if yml != "" {
+				results, info, err := dashboards.ExportAllFromYml(client, yml)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error getting dashboards from yml: %+v\n", err)
+					os.Exit(1)
+				}
+				for i, r := range results {
+					if decode {
+						r = dashboards.DecodeExported(r)
+					}
+
+					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "Error saving dashboard '%s' to file '%s' : %+v\n",
+							info.Dashboards[i].ID, info.Dashboards[i].File, err)
+						os.Exit(1)
+					}
+				}
+				return
 			}
-			fmt.Println(result.StringToPrint())
+
+			// Export single dashboard
+			if dashboard != "" {
+				result, err := dashboards.Export(client, dashboard)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error getting dashboard: %+v\n", err)
+					os.Exit(1)
+				}
+
+				if decode {
+					result = dashboards.DecodeExported(result)
+				}
+				fmt.Println(result.StringToPrint())
+			}
 		},
 	}
 
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
+	genTemplateConfigCmd.Flags().String("yml", "", "Yaml file containing list of dashboard ID and filename pairs")
+	genTemplateConfigCmd.Flags().Bool("decode", false, "Decode exported dashboard")
 
 	return genTemplateConfigCmd
 }

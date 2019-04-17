@@ -1,0 +1,17 @@
+version: '2.3'
+services:
+  beat:
+    build: ../../metricbeat
+    environment:
+      - TEST_ENVIRONMENT=false
+    working_dir: /go/src/github.com/elastic/beats/x-pack/metricbeat
+    volumes:
+      - ${PWD}/../..:/go/src/github.com/elastic/beats/
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+    env_file:
+      - ./module/mssql/_meta/env
+
+  # Modules
+  mssql:
+    build: ./module/mssql/_meta

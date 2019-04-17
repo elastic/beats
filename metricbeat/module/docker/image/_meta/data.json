@@ -1,29 +1,42 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "docker": {
         "image": {
-            "created": "2017-12-07T06:18:10.000Z",
+            "created": "2019-03-25T09:57:14.000Z",
             "id": {
-                "current": "sha256:8af9af305016ff6501ad0605e390e0a3b535265c0d0cf43375ea8149b794d1d3",
-                "parent": "sha256:d082cc35db8aef622e2a3e659cca62962158e72fbad5c8edd9f664007ae048f1"
+                "current": "sha256:fa96dbd9baead0b3a4550c861cc871f40c0c7482889fb5f09c705e7d0622358f",
+                "parent": ""
+            },
+            "labels": {
+                "license": "Elastic License",
+                "org_label-schema_build-date": "20190305",
+                "org_label-schema_license": "GPLv2",
+                "org_label-schema_name": "logstash",
+                "org_label-schema_schema-version": "1.0",
+                "org_label-schema_url": "https://www.elastic.co/products/logstash",
+                "org_label-schema_vcs-url": "https://github.com/elastic/logstash-docker",
+                "org_label-schema_vendor": "Elastic",
+                "org_label-schema_version": "8.0.0-SNAPSHOT"
             },
             "size": {
-                "regular": 799052371,
-                "virtual": 799052371
+                "regular": 770558778,
+                "virtual": 770558778
             },
             "tags": [
-                "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat:latest"
+                "docker.elastic.co/logstash/logstash:8.0.0-SNAPSHOT"
             ]
         }
     },
+    "event": {
+        "dataset": "docker.image",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "unix:///var/run/docker.sock",
-        "module": "docker",
-        "name": "image",
-        "rtt": 115
+        "name": "image"
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
     }
 }

@@ -23,7 +23,10 @@ indent_size = 4
 indent_style = space
 indent_size = 2
 
-[Makefile]
+[Makefile*]
+indent_style = tab
+
+[*.mk]
 indent_style = tab
 
 [Vagrantfile]

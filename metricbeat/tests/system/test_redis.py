@@ -44,7 +44,8 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        fields = REDIS_FIELDS + ["process", "os"]
+        self.assertItemsEqual(self.de_dot(fields), evt.keys())
         redis_info = evt["redis"]["info"]
         self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
         self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
@@ -60,9 +61,10 @@ class Test(metricbeat.BaseTest):
 
         # At least one event must be inserted so db stats exist
         r = redis.StrictRedis(
-            host=self.compose_hosts()[0],
+            host=self.get_host(),
             port=os.getenv('REDIS_PORT', '6379'),
             db=0)
+        r.flushall()
         r.set('foo', 'bar')
 
         self.render_config_template(modules=[{
@@ -87,12 +89,49 @@ class Test(metricbeat.BaseTest):
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    def test_key(self):
+        """
+        Test redis key metricset
+        """
+
+        # At least one event must be inserted so db stats exist
+        r = redis.StrictRedis(
+            host=self.get_host(),
+            port=os.getenv('REDIS_PORT', '6379'),
+            db=0)
+        r.flushall()
+        r.rpush('list-key', 'one', 'two', 'three')
+
+        self.render_config_template(modules=[{
+            "name": "redis",
+            "metricsets": ["key"],
+            "hosts": self.get_hosts(),
+            "period": "5s",
+            "additional_content": """
+  key.patterns:
+    - pattern: list-key
+"""
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_module_processors(self):
         """
         Test local processors for Redis info event.
         """
         fields = ["clients", "cpu"]
-        eventFields = ['beat', 'metricset']
+        eventFields = ['beat', 'metricset', 'service', 'event']
         eventFields += ['redis.info.' + f for f in fields]
         self.render_config_template(modules=[{
             "name": "redis",
@@ -120,8 +159,13 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
 
     def get_hosts(self):
-        return [self.compose_hosts()[0] + ':' +
+        return [self.get_host() + ':' +
                 os.getenv('REDIS_PORT', '6379')]
+
+    def get_host(self):
+        if len(self.compose_hosts()) > 0:
+            return self.compose_hosts()[0]
+        return "localhost"
 
 
 class TestRedis4(Test):

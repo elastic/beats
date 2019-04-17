@@ -30,8 +30,13 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
+var info = elasticsearch.Info{
+	ClusterID:   "1234",
+	ClusterName: "helloworld",
+}
+
 func TestGetMappings(t *testing.T) {
-	elasticsearch.TestMapper(t, "./_meta/test/node.*.json", eventsMapping)
+	elasticsearch.TestMapperWithInfo(t, "./_meta/test/node.*.json", eventsMapping)
 }
 
 func TestInvalid(t *testing.T) {
@@ -41,6 +46,6 @@ func TestInvalid(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventsMapping(reporter, info, content)
 	assert.Error(t, err)
 }

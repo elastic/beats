@@ -23,10 +23,10 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/reader"
-
-	"github.com/pkg/errors"
 )
 
 // DockerJSONReader processor renames a given field
@@ -170,8 +170,14 @@ func (p *DockerJSONReader) parseLine(message *reader.Message, msg *logLine) erro
 
 // Next returns the next line.
 func (p *DockerJSONReader) Next() (reader.Message, error) {
+	var bytes int
 	for {
 		message, err := p.reader.Next()
+
+		// keep the right bytes count even if we return an error
+		bytes += message.Bytes
+		message.Bytes = bytes
+
 		if err != nil {
 			return message, err
 		}
@@ -185,6 +191,11 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		// Handle multiline messages, join partial lines
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
+
+			// keep the right bytes count even if we return an error
+			bytes += next.Bytes
+			message.Bytes = bytes
+
 			if err != nil {
 				return message, err
 			}
@@ -193,7 +204,6 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 				return message, err
 			}
 			message.Content = append(message.Content, next.Content...)
-			message.Bytes += next.Bytes
 		}
 
 		if p.stream != "all" && p.stream != logLine.Stream {

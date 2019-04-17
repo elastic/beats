@@ -26,7 +26,8 @@ import (
 // UnmarshalEventXML unmarshals the given XML into a new Event.
 func UnmarshalEventXML(rawXML []byte) (Event, error) {
 	var event Event
-	err := xml.Unmarshal(rawXML, &event)
+	decoder := xml.NewDecoder(newXMLSafeReader(rawXML))
+	err := decoder.Decode(&event)
 	return event, err
 }
 
@@ -60,7 +61,7 @@ type Event struct {
 	// ProcessingErrorData
 	RenderErrorCode         uint32 `xml:"ProcessingErrorData>ErrorCode"`
 	RenderErrorDataItemName string `xml:"ProcessingErrorData>DataItemName"`
-	RenderErr               string
+	RenderErr               []string
 }
 
 // Provider identifies the provider that logged the event. The Name and GUID

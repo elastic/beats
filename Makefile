@@ -13,12 +13,27 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 XPACK_SUFFIX=x-pack/
 
+# PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
+# in the x-pack directory (rather than having the OSS build produce both sets
+# of artifacts). This will be removed once we complete the transition.
+PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/filebeat x-pack/metricbeat
+# PROJECTS_XPACK_MAGE is a list of Beats whose primary build logic is based in
+# Mage. For compatibility with CI testing these projects support a subset of the
+# makefile targets. After all Beats converge to primarily using Mage we can
+# remove this and treat all sub-projects the same.
+PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG)
+
+#
+# Includes
+#
+include dev-tools/make/mage.mk
+
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
 
 .PHONY: testsuite
 testsuite:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
+	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) testsuite || exit 1;)
 
 .PHONY: setup-commit-hook
 setup-commit-hook:
@@ -54,15 +69,15 @@ coverage-report:
 
 .PHONY: update
 update: notice
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) update || exit 1;)
+	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) update || exit 1;)
 	@$(MAKE) -C deploy/kubernetes all
 
 .PHONY: clean
-clean:
+clean: mage
 	@rm -rf build
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
+	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
 	@$(MAKE) -C generator clean
-	@-mage -clean 2> /dev/null
+	@-mage -clean
 
 # Cleans up the vendor directory from unnecessary files
 # This should always be run after updating the dependencies
@@ -72,7 +87,7 @@ clean-vendor:
 
 .PHONY: check
 check: python-env
-	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) check || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
 	@# Checks also python files which are not part of the beats
 	@$(FIND) -name *.py -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
 	@# Validate that all updates were committed
@@ -107,7 +122,7 @@ misspell:
 
 .PHONY: fmt
 fmt: add-headers python-env
-	@$(foreach var,$(PROJECTS) dev-tools,$(MAKE) -C $(var) fmt || exit 1;)
+	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) fmt || exit 1;)
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
 
@@ -150,8 +165,8 @@ snapshot:
 # Builds a release.
 .PHONY: release
 release: beats-dashboards
-	@$(foreach var,$(BEATS),$(MAKE) -C $(var) release || exit 1;)
-	@$(foreach var,$(BEATS), \
+	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG),$(MAKE) -C $(var) release || exit 1;)
+	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG), \
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
       mkdir -p build/distributions/$(subst $(XPACK_SUFFIX),'',$(var)) && mv -f $(var)/build/distributions/* build/distributions/$(subst $(XPACK_SUFFIX),'',$(var))/ || exit 1;)
 
@@ -166,11 +181,6 @@ release-manager-snapshot:
 .PHONY: release-manager-release
 release-manager-release:
 	./dev-tools/run_with_go_ver $(MAKE) release
-
-# Installs the mage build tool from the vendor directory.
-.PHONY: mage
-mage:
-	@go install github.com/elastic/beats/vendor/github.com/magefile/mage
 
 # Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards

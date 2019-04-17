@@ -71,10 +71,11 @@ type processMetadataProvider interface {
 }
 
 func init() {
-	processors.RegisterPlugin(processorName, newProcessMetadataProcessor)
+	processors.RegisterPlugin(processorName, New)
 }
 
-func newProcessMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_process_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache)
 }
 
@@ -189,7 +190,7 @@ func (p *processMetadata) toMap() common.MapStr {
 		"process": common.MapStr{
 			"name":       p.name,
 			"title":      p.title,
-			"exe":        p.exe,
+			"executable": p.exe,
 			"args":       p.args,
 			"env":        p.env,
 			"pid":        p.pid,

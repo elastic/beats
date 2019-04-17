@@ -23,18 +23,20 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/user"
 	"path/filepath"
-	"sync/atomic"
+	"strconv"
 	"syscall"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	sock "github.com/elastic/beats/metricbeat/helper/socket"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/gosigar/sys/linux"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -50,14 +52,13 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	readBuffer    []byte
-	seq           uint32
-	ptable        *ProcTable
+	netlink       *sock.NetlinkSession
+	ptable        *sock.ProcTable
 	euid          int
 	previousConns hashSet
 	currentConns  hashSet
 	reverseLookup *ReverseLookupCache
-	listeners     *ListenerTable
+	listeners     *sock.ListenerTable
 	users         UserCache
 }
 
@@ -72,7 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.New("unexpected module type")
 	}
 
-	ptable, err := NewProcTable(filepath.Join(systemModule.HostFS, "/proc"))
+	ptable, err := sock.NewProcTable(filepath.Join(systemModule.HostFS, "/proc"))
 	if err != nil {
 		return nil, err
 	}
@@ -83,12 +84,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
-		readBuffer:    make([]byte, os.Getpagesize()),
+		netlink:       sock.NewNetlinkSession(),
 		ptable:        ptable,
 		euid:          os.Geteuid(),
 		previousConns: hashSet{},
 		currentConns:  hashSet{},
-		listeners:     NewListenerTable(),
+		listeners:     sock.NewListenerTable(),
 		users:         NewUserCache(),
 	}
 
@@ -108,18 +109,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return m, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch socket metrics from the system
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	// Refresh inode to process mapping (must be root).
 	if err := m.ptable.Refresh(); err != nil {
 		debugf("process table refresh had failures: %v", err)
 	}
 
-	// Send request over netlink and parse responses.
-	req := linux.NewInetDiagReq()
-	req.Header.Seq = atomic.AddUint32(&m.seq, 1)
-	sockets, err := linux.NetlinkInetDiagWithBuf(req, m.readBuffer, nil)
+	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed requesting socket dump")
+		r.Error(errors.Wrap(err, "failed requesting socket dump"))
+		return
 	}
 	debugf("netlink returned %d sockets", len(sockets))
 
@@ -127,11 +127,16 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	sockets = m.filterAndRememberSockets(sockets)
 
 	// Enrich sockets with direction/pid/process/user/hostname and convert to MapStr.
-	rtn := make([]common.MapStr, 0, len(sockets))
 	for _, s := range sockets {
 		c := newConnection(s)
 		m.enrichConnectionData(c)
-		rtn = append(rtn, c.ToMapStr())
+
+		root, metricSet := c.ToMapStr()
+
+		r.Event(mb.Event{
+			RootFields:      root,
+			MetricSetFields: metricSet,
+		})
 	}
 
 	// Set the "previous" connections set to the "current" connections.
@@ -141,8 +146,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// Reset the listeners for the next iteration.
 	m.listeners.Reset()
-
-	return rtn, nil
 }
 
 // filterAndRememberSockets filters sockets to remove sockets that were seen
@@ -185,14 +188,14 @@ func (m *MetricSet) isNewSocket(diag *linux.InetDiagMsg) bool {
 // hostname of the remote IP (if enabled), eTLD + 1 of the hostname, and the
 // process owning the socket.
 func (m *MetricSet) enrichConnectionData(c *connection) {
-	c.Username = m.users.LookupUID(int(c.UID))
+	c.User = m.users.LookupUID(int(c.UID))
 
 	// Determine direction (incoming, outgoing, or listening).
 	c.Direction = m.listeners.Direction(uint8(syscall.IPPROTO_TCP),
 		c.LocalIP, c.LocalPort, c.RemoteIP, c.RemotePort)
 
 	// Reverse DNS lookup on the remote IP.
-	if m.reverseLookup != nil && c.Direction != Listening {
+	if m.reverseLookup != nil && c.Direction != sock.Listening {
 		hostname, err := m.reverseLookup.Lookup(c.RemoteIP)
 		if err != nil {
 			c.DestHostError = err
@@ -208,6 +211,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 		c.Exe = proc.Executable
 		c.Command = proc.Command
 		c.CmdLine = proc.CmdLine
+		c.Args = proc.Args
 	} else if m.euid == 0 {
 		if c.Inode == 0 {
 			c.ProcessError = fmt.Errorf("process has exited. inode=%v, tcp_state=%v",
@@ -227,23 +231,24 @@ type connection struct {
 	RemotePort int
 
 	State     linux.TCPState
-	Direction Direction
+	Direction sock.Direction
 
 	DestHost            string // Reverse lookup of dest IP.
 	DestHostETLDPlusOne string
 	DestHostError       error // Resolver error.
 
 	// Process identifiers.
-	Inode        uint32 // Inode of the socket.
-	PID          int    // PID of the socket owner.
-	Exe          string // Absolute path to the executable.
-	Command      string // Command
-	CmdLine      string // Full command line with arguments.
-	ProcessError error  // Reason process info is unavailable.
+	Inode        uint32   // Inode of the socket.
+	PID          int      // PID of the socket owner.
+	Exe          string   // Absolute path to the executable.
+	Command      string   // Command
+	CmdLine      string   // Full command line with arguments.
+	Args         []string // Raw arguments
+	ProcessError error    // Reason process info is unavailable.
 
 	// User identifiers.
-	UID      uint32 // UID of the socket owner.
-	Username string // Username of the socket.
+	UID  uint32     // UID of the socket owner.
+	User *user.User // Owner of the socket.
 }
 
 func newConnection(diag *linux.InetDiagMsg) *connection {
@@ -260,54 +265,112 @@ func newConnection(diag *linux.InetDiagMsg) *connection {
 	}
 }
 
-func (c *connection) ToMapStr() common.MapStr {
-	evt := common.MapStr{
-		"family": c.Family.String(),
+// Map helpers for conversion to event
+var (
+	ianaNumbersMap = map[string]string{
+		"ipv4": "4",
+		"ipv6": "41",
+	}
+
+	localHostInfoGroup = map[string]string{
+		sock.InboundName:   "destination",
+		sock.OutboundName:  "source",
+		sock.ListeningName: "server",
+	}
+
+	remoteHostInfoGroup = map[string]string{
+		sock.InboundName:  "source",
+		sock.OutboundName: "destination",
+	}
+)
+
+func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.MapStr) {
+	localGroup := "server"
+	if g, ok := localHostInfoGroup[c.Direction.String()]; ok {
+		localGroup = g
+	}
+
+	fields = common.MapStr{
+		"network": common.MapStr{
+			"type":        c.Family.String(),
+			"iana_number": ianaNumbersMap[c.Family.String()],
+			"direction":   c.Direction.String(),
+		},
+		"user": common.MapStr{
+			"id": strconv.Itoa(int(c.UID)),
+		},
+		// Aliases for this are not going to be possible, keeping
+		// duplicated fields by now for backwards comatibility
+		localGroup: common.MapStr{
+			"ip":   c.LocalIP.String(),
+			"port": c.LocalPort,
+		},
+	}
+
+	metricSetFields = common.MapStr{
 		"local": common.MapStr{
 			"ip":   c.LocalIP.String(),
 			"port": c.LocalPort,
 		},
-		"user": common.MapStr{
-			"id": c.UID,
-		},
-		"direction": c.Direction.String(),
 	}
 
-	if c.Username != "" {
-		evt.Put("user.name", c.Username)
+	if c.User.Username != "" {
+		fields.Put("user.name", c.User.Username)
+	}
+
+	if c.User.Name != "" {
+		fields.Put("user.full_name", c.User.Name)
 	}
 
 	if c.ProcessError != nil {
-		evt.Put("process.error", c.ProcessError.Error())
+		fields.Put("error.code", c.ProcessError.Error())
 	} else {
 		process := common.MapStr{"pid": c.PID}
-		evt["process"] = process
 
 		if c.PID > 0 {
-			addOptionalString(process, "exe", c.Exe)
-			addOptionalString(process, "command", c.Command)
-			addOptionalString(process, "cmdline", c.CmdLine)
+			addOptionalString(process, "executable", c.Exe)
+			addOptionalString(process, "name", c.Command)
+
+			if len(c.Args) >= 0 {
+				process["args"] = c.Args
+				metricSetFields["process"] = common.MapStr{
+					"cmdline": c.CmdLine,
+				}
+			}
 		} else if c.PID == 0 {
 			process["command"] = "kernel"
+		}
+
+		if c.PID >= 0 {
+			fields["process"] = process
 		}
 	}
 
 	if c.RemotePort != 0 {
+		// Aliases for this are not going to be possible, keeping
+		// duplicated fields by now for backwards comatibility
 		remote := common.MapStr{
 			"ip":   c.RemoteIP.String(),
 			"port": c.RemotePort,
 		}
-		evt["remote"] = remote
-
 		if c.DestHostError != nil {
 			remote["host_error"] = c.DestHostError.Error()
 		} else {
 			addOptionalString(remote, "host", c.DestHost)
 			addOptionalString(remote, "etld_plus_one", c.DestHostETLDPlusOne)
 		}
+		metricSetFields["remote"] = remote
+
+		remoteGroup, ok := remoteHostInfoGroup[c.Direction.String()]
+		if ok {
+			fields[remoteGroup] = common.MapStr{
+				"ip":   c.RemoteIP.String(),
+				"port": c.RemotePort,
+			}
+		}
 	}
 
-	return evt
+	return fields, metricSetFields
 }
 
 func addOptionalString(m common.MapStr, key, value string) {

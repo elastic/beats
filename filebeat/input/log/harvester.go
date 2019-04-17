@@ -51,6 +51,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/debug"
 	"github.com/elastic/beats/libbeat/reader/multiline"
 	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
@@ -182,6 +183,8 @@ func (h *Harvester) Setup() error {
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
 
+	logp.Debug("harvester", "Harvester setup successful. Line terminator: %d", h.config.LineTerminator)
+
 	return nil
 }
 
@@ -306,8 +309,12 @@ func (h *Harvester) Run() error {
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
 			fields := common.MapStr{
-				"source": state.Source,
-				"offset": startingOffset, // Offset here is the offset before the starting char.
+				"log": common.MapStr{
+					"offset": startingOffset, // Offset here is the offset before the starting char.
+					"file": common.MapStr{
+						"path": state.Source,
+					},
+				},
 			}
 			fields.DeepUpdate(message.Fields)
 
@@ -386,12 +393,12 @@ func (h *Harvester) SendStateUpdate() {
 		return
 	}
 
-	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
-	h.states.Update(h.state)
-
 	d := util.NewData()
 	d.SetState(h.state)
 	h.publishState(d)
+
+	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+	h.states.Update(h.state)
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -554,7 +561,16 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(h.log, h.encoding, h.config.BufferSize)
+	reader, err := debug.AppendReaders(h.log)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err = readfile.NewEncodeReader(reader, readfile.Config{
+		Codec:      h.encoding,
+		BufferSize: h.config.BufferSize,
+		Terminator: h.config.LineTerminator,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -568,7 +584,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		r = readjson.NewJSONReader(r, h.config.JSON)
 	}
 
-	r = readfile.NewStripNewline(r)
+	r = readfile.NewStripNewline(r, h.config.LineTerminator)
 
 	if h.config.Multiline != nil {
 		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)

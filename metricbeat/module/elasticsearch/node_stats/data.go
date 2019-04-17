@@ -19,6 +19,9 @@ package node_stats
 
 import (
 	"encoding/json"
+	"fmt"
+
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -32,6 +35,7 @@ import (
 
 var (
 	schema = s.Schema{
+		"name": c.Str("name"),
 		"jvm": c.Dict("jvm", s.Schema{
 			"mem": c.Dict("mem", s.Schema{
 				"pools": c.Dict("pools", s.Schema{
@@ -103,22 +107,19 @@ var (
 )
 
 type nodesStruct struct {
-	ClusterName string                            `json:"cluster_name"`
-	Nodes       map[string]map[string]interface{} `json:"nodes"`
+	Nodes map[string]map[string]interface{} `json:"nodes"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
 	}
 
 	var errs multierror.Errors
-	for name, node := range nodeData.Nodes {
+	for id, node := range nodeData.Nodes {
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}
@@ -126,19 +127,33 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.ModuleFields = common.MapStr{
 			"node": common.MapStr{
-				"name": name,
+				"id": id,
 			},
 			"cluster": common.MapStr{
-				"name": nodeData.ClusterName,
+				"name": info.ClusterName,
+				"id":   info.ClusterID,
 			},
 		}
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			event.Error = errors.Wrap(err, "failure to apply node schema")
-			r.Event(event)
-			errs = append(errs, event.Error)
+			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
+			continue
 		}
+
+		name, err := event.MetricSetFields.GetValue("name")
+		if err != nil {
+			errs = append(errs, elastic.MakeErrorForMissingField("name", elastic.Elasticsearch))
+			continue
+		}
+
+		nameStr, ok := name.(string)
+		if !ok {
+			errs = append(errs, fmt.Errorf("name is not a string"))
+			continue
+		}
+		event.ModuleFields.Put("node.name", nameStr)
+		event.MetricSetFields.Delete("name")
 
 		r.Event(event)
 	}

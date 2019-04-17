@@ -68,7 +68,7 @@ func buildMethodsMap(thriftFiles map[string]parser.Thrift) map[string]*thriftIdl
 			for _, method := range service.Methods {
 				if _, exists := output[method.Name]; exists {
 					logp.Warn("Thrift IDL: Method %s is defined in more services: %s and %s",
-						output[method.Name].service.Name, service.Name)
+						method.Name, output[method.Name].service.Name, service.Name)
 				}
 				output[method.Name] = &thriftIdlMethod{
 					service:    service,

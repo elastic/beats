@@ -41,7 +41,7 @@ type kubernetesAnnotator struct {
 }
 
 func init() {
-	processors.RegisterPlugin("add_kubernetes_metadata", newKubernetesAnnotator)
+	processors.RegisterPlugin("add_kubernetes_metadata", New)
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
@@ -52,7 +52,8 @@ func init() {
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
-func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_kubernetes_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultKubernetesAnnotatorConfig()
 
 	err := cfg.Unpack(&config)
@@ -103,7 +104,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 
-	logp.Debug("kubernetes", "Using host ", config.Host)
+	logp.Debug("kubernetes", "Using host: %s", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
@@ -112,7 +113,7 @@ func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
+		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 

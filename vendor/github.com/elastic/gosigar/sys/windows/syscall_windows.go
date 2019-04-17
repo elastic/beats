@@ -151,25 +151,81 @@ func GetLogicalDriveStrings() ([]string, error) {
 		return nil, errors.Wrap(err, "GetLogicalDriveStringsW failed")
 	}
 
-	// Split the uint16 slice at null-terminators.
-	var startIdx int
-	var drivesUTF16 [][]uint16
-	for i, value := range buffer {
-		if value == 0 {
-			drivesUTF16 = append(drivesUTF16, buffer[startIdx:i])
-			startIdx = i + 1
+	return UTF16SliceToStringSlice(buffer), nil
+}
+
+// GetAccessPaths returns the list of access paths for volumes in the system.
+func GetAccessPaths() ([]string, error) {
+	volumes, err := GetVolumes()
+	if err != nil {
+		return nil, errors.Wrap(err, "GetVolumes failed")
+	}
+
+	var paths []string
+	for _, volumeName := range volumes {
+		volumePaths, err := GetVolumePathsForVolume(volumeName)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to get list of access paths for volume '%s'", volumeName)
+		}
+		if len(volumePaths) == 0 {
+			continue
+		}
+
+		// Get only the first path
+		paths = append(paths, volumePaths[0])
+	}
+
+	return paths, nil
+}
+
+// GetVolumes returs the list of volumes in the system.
+// https://docs.microsoft.com/es-es/windows/desktop/api/fileapi/nf-fileapi-findfirstvolumew
+func GetVolumes() ([]string, error) {
+	buffer := make([]uint16, MAX_PATH+1)
+
+	var volumes []string
+
+	h, err := _FindFirstVolume(&buffer[0], uint32(len(buffer)))
+	if err != nil {
+		return nil, errors.Wrap(err, "FindFirstVolumeW failed")
+	}
+	defer _FindVolumeClose(h)
+
+	for {
+		volumes = append(volumes, syscall.UTF16ToString(buffer))
+
+		err = _FindNextVolume(h, &buffer[0], uint32(len(buffer)))
+		if err != nil {
+			if errors.Cause(err) == syscall.ERROR_NO_MORE_FILES {
+				break
+			}
+			return nil, errors.Wrap(err, "FindNextVolumeW failed")
 		}
 	}
 
-	// Convert the utf16 slices to strings.
-	drives := make([]string, 0, len(drivesUTF16))
-	for _, driveUTF16 := range drivesUTF16 {
-		if len(driveUTF16) > 0 {
-			drives = append(drives, syscall.UTF16ToString(driveUTF16))
-		}
+	return volumes, nil
+}
+
+// GetVolumePathsForVolume returns the list of volume paths for a volume.
+// https://docs.microsoft.com/en-us/windows/desktop/api/FileAPI/nf-fileapi-getvolumepathnamesforvolumenamew
+func GetVolumePathsForVolume(volumeName string) ([]string, error) {
+	var length uint32
+	err := _GetVolumePathNamesForVolumeName(volumeName, nil, 0, &length)
+	if errors.Cause(err) != syscall.ERROR_MORE_DATA {
+		return nil, errors.Wrap(err, "GetVolumePathNamesForVolumeNameW failed to get needed buffer length")
+	}
+	if length == 0 {
+		// Not mounted, no paths, that's ok
+		return nil, nil
 	}
 
-	return drives, nil
+	buffer := make([]uint16, length*(MAX_PATH+1))
+	err = _GetVolumePathNamesForVolumeName(volumeName, &buffer[0], length, &length)
+	if err != nil {
+		return nil, errors.Wrap(err, "GetVolumePathNamesForVolumeNameW failed")
+	}
+
+	return UTF16SliceToStringSlice(buffer), nil
 }
 
 // GlobalMemoryStatusEx retrieves information about the system's current usage
@@ -361,10 +417,34 @@ func Process32Next(handle syscall.Handle) (ProcessEntry32, error) {
 	return processEntry32, nil
 }
 
+// UTF16SliceToStringSlice converts slice of uint16 containing a list of UTF16
+// strings to a slice of strings.
+func UTF16SliceToStringSlice(buffer []uint16) []string {
+	// Split the uint16 slice at null-terminators.
+	var startIdx int
+	var stringsUTF16 [][]uint16
+	for i, value := range buffer {
+		if value == 0 {
+			stringsUTF16 = append(stringsUTF16, buffer[startIdx:i])
+			startIdx = i + 1
+		}
+	}
+
+	// Convert the utf16 slices to strings.
+	result := make([]string, 0, len(stringsUTF16))
+	for _, stringUTF16 := range stringsUTF16 {
+		if len(stringUTF16) > 0 {
+			result = append(result, syscall.UTF16ToString(stringUTF16))
+		}
+	}
+
+	return result
+}
+
 // Use "GOOS=windows go generate -v -x ." to generate the source.
 
 // Add -trace to enable debug prints around syscalls.
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output zsyscall_windows.go syscall_windows.go
+//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -systemdll=false -output zsyscall_windows.go syscall_windows.go
 
 // Windows API calls
 //sys   _GlobalMemoryStatusEx(buffer *MemoryStatusEx) (err error) = kernel32.GlobalMemoryStatusEx
@@ -383,3 +463,7 @@ func Process32Next(handle syscall.Handle) (ProcessEntry32, error) {
 //sys   _LookupPrivilegeName(systemName string, luid *int64, buffer *uint16, size *uint32) (err error) = advapi32.LookupPrivilegeNameW
 //sys   _LookupPrivilegeValue(systemName string, name string, luid *int64) (err error) = advapi32.LookupPrivilegeValueW
 //sys   _AdjustTokenPrivileges(token syscall.Token, releaseAll bool, input *byte, outputSize uint32, output *byte, requiredSize *uint32) (success bool, err error) [true] = advapi32.AdjustTokenPrivileges
+//sys   _FindFirstVolume(volumeName *uint16, size uint32) (handle syscall.Handle, err error) = kernel32.FindFirstVolumeW
+//sys  _FindNextVolume(handle syscall.Handle, volumeName *uint16, size uint32) (err error) = kernel32.FindNextVolumeW
+//sys  _FindVolumeClose(handle syscall.Handle) (err error) = kernel32.FindVolumeClose
+//sys  _GetVolumePathNamesForVolumeName(volumeName string, buffer *uint16, bufferSize uint32, length *uint32) (err error) = kernel32.GetVolumePathNamesForVolumeNameW

@@ -22,7 +22,7 @@ import (
 // automatically be populated when calling getWin32Process.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa394372(v=vs.85).aspx
 type Win32_Process struct {
-	CommandLine string
+	CommandLine *string
 }
 
 // Win32_OperatingSystem WMI class represents a Windows-based operating system
@@ -155,9 +155,9 @@ func (self *CpuList) Get() error {
 }
 
 func (self *FileSystemList) Get() error {
-	drives, err := windows.GetLogicalDriveStrings()
+	drives, err := windows.GetAccessPaths()
 	if err != nil {
-		return errors.Wrap(err, "GetLogicalDriveStrings failed")
+		return errors.Wrap(err, "GetAccessPaths failed")
 	}
 
 	for _, drive := range drives {
@@ -376,8 +376,10 @@ func (self *ProcArgs) Get(pid int) error {
 	if err != nil {
 		return errors.Wrapf(err, "ProcArgs failed for pid=%v", pid)
 	}
+	if process.CommandLine != nil {
+		self.List = []string{*process.CommandLine}
+	}
 
-	self.List = []string{process.CommandLine}
 	return nil
 }
 

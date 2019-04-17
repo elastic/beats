@@ -21,7 +21,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/go-windows"
+	windows "github.com/elastic/go-windows"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 

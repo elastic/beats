@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build linux,cgo
+
 package reader
 
 import "github.com/coreos/go-systemd/sdjournal"
@@ -60,7 +62,7 @@ var (
 		sdjournal.SD_JOURNAL_FIELD_COMM:              fieldConversion{"process.name", false, false},
 		sdjournal.SD_JOURNAL_FIELD_EXE:               fieldConversion{"process.executable", false, false},
 		sdjournal.SD_JOURNAL_FIELD_GID:               fieldConversion{"process.uid", true, false},
-		sdjournal.SD_JOURNAL_FIELD_HOSTNAME:          fieldConversion{"host.name", false, false},
+		sdjournal.SD_JOURNAL_FIELD_HOSTNAME:          fieldConversion{"host.hostname", false, false},
 		sdjournal.SD_JOURNAL_FIELD_MACHINE_ID:        fieldConversion{"host.id", false, false},
 		sdjournal.SD_JOURNAL_FIELD_MESSAGE:           fieldConversion{"message", false, false},
 		sdjournal.SD_JOURNAL_FIELD_PID:               fieldConversion{"process.pid", true, false},
@@ -78,10 +80,10 @@ var (
 		sdjournal.SD_JOURNAL_FIELD_UID:               fieldConversion{"process.uid", true, false},
 
 		// docker journald fields from: https://docs.docker.com/config/containers/logging/journald/
-		"CONTAINER_ID":              fieldConversion{"conatiner.id_truncated", false, false},
+		"CONTAINER_ID":              fieldConversion{"container.id_truncated", false, false},
 		"CONTAINER_ID_FULL":         fieldConversion{"container.id", false, false},
 		"CONTAINER_NAME":            fieldConversion{"container.name", false, false},
-		"CONTAINER_TAG":             fieldConversion{"container.image.tag", false, false},
+		"CONTAINER_TAG":             fieldConversion{"container.log.tag", false, false},
 		"CONTAINER_PARTIAL_MESSAGE": fieldConversion{"container.partial", false, false},
 
 		// dropped fields

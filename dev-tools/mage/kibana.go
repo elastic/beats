@@ -27,9 +27,13 @@ import (
 
 // KibanaDashboards collects the Kibana dashboards files and generates the
 // index patterns based on the fields.yml file. It outputs to build/kibana.
+// Use PackageKibanaDashboardsFromBuildDir() with this.
 func KibanaDashboards(moduleDirs ...string) error {
 	var kibanaBuildDir = "build/kibana"
 
+	if err := os.RemoveAll(kibanaBuildDir); err != nil {
+		return err
+	}
 	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
 		return err
 	}
@@ -65,25 +69,36 @@ func KibanaDashboards(moduleDirs ...string) error {
 	// Convert 6.x dashboards to strings.
 	err = sh.Run("python",
 		filepath.Join(esBeatsDir, "libbeat/scripts/unpack_dashboards.py"),
-		"--glob="+filepath.Join(kibanaBuildDir, "6/dashboard/*.json"))
+		"--glob="+filepath.Join(kibanaBuildDir, "7/dashboard/*.json"))
 	if err != nil {
 		return err
 	}
 
-	beatVersion, err := BeatQualifiedVersion()
-	if err != nil {
-		return err
+	return nil
+}
+
+// PackageKibanaDashboardsFromBuildDir reconfigures the packaging configuration
+// to pull Kibana dashboards from build/kibana rather than _meta/kibana.generated.
+// Use this with KibanaDashboards() (aka mage dashboards).
+func PackageKibanaDashboardsFromBuildDir() {
+	kibanaDashboards := PackageFile{
+		Source: "build/kibana",
+		Mode:   0644,
 	}
 
-	// Generate Kibana index pattern files from fields.yml.
-	indexPatternCmd := sh.RunCmd("go", "run",
-		filepath.Join(esBeatsDir, "dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go"),
-		"-beat", BeatName,
-		"-version", beatVersion,
-		"-index", BeatIndexPrefix+"-*",
-		"-fields", "fields.yml",
-		"-out", kibanaBuildDir,
-	)
-
-	return indexPatternCmd()
+	for _, pkgArgs := range Packages {
+		for _, pkgType := range pkgArgs.Types {
+			switch pkgType {
+			case TarGz, Zip, Docker:
+				pkgArgs.Spec.ReplaceFile("kibana", kibanaDashboards)
+			case Deb, RPM:
+				pkgArgs.Spec.ReplaceFile("/usr/share/{{.BeatName}}/kibana", kibanaDashboards)
+			case DMG:
+				pkgArgs.Spec.ReplaceFile("/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/kibana", kibanaDashboards)
+			default:
+				panic(errors.Errorf("unhandled package type: %v", pkgType))
+			}
+			break
+		}
+	}
 }

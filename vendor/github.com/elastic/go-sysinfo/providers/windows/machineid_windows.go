@@ -35,6 +35,7 @@ func getMachineGUID() (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
 	}
+	defer k.Close()
 
 	guid, _, err := k.GetStringValue(name)
 	if err != nil {

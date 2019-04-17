@@ -26,6 +26,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input/file"
 	helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
@@ -63,20 +64,30 @@ var (
 
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
-func New(registryFile string, fileMode os.FileMode, flushTimeout time.Duration, out successLogger) (*Registrar, error) {
+func New(cfg config.Registry, out successLogger) (*Registrar, error) {
+	home := paths.Resolve(paths.Data, cfg.Path)
+	migrateFile := cfg.MigrateFile
+	if migrateFile != "" {
+		migrateFile = paths.Resolve(paths.Data, migrateFile)
+	}
+
+	err := ensureCurrent(home, migrateFile, cfg.Permissions)
+	if err != nil {
+		return nil, err
+	}
+
+	dataFile := filepath.Join(home, "filebeat", "data.json")
 	r := &Registrar{
-		registryFile: registryFile,
-		fileMode:     fileMode,
+		registryFile: dataFile,
+		fileMode:     cfg.Permissions,
 		done:         make(chan struct{}),
 		states:       file.NewStates(),
 		Channel:      make(chan []file.State, 1),
-		flushTimeout: flushTimeout,
+		flushTimeout: cfg.FlushTimeout,
 		out:          out,
 		wg:           sync.WaitGroup{},
 	}
-	err := r.Init()
-
-	return r, err
+	return r, r.Init()
 }
 
 // Init sets up the Registrar and make sure the registry file is setup correctly
@@ -207,7 +218,7 @@ func mergeStates(st, other *file.State) {
 	}
 
 	// update file meta-data. As these are updated concurrently by the
-	// prospectors, select the newer state based on the update timestamp.
+	// inputs, select the newer state based on the update timestamp.
 	var meta, metaOld, metaNew map[string]string
 	if st.Timestamp.Before(other.Timestamp) {
 		st.Source = other.Source
@@ -397,7 +408,7 @@ func (r *Registrar) writeRegistry() error {
 }
 
 func writeTmpFile(baseName string, perm os.FileMode, states []file.State) (string, error) {
-	logp.Debug("registrar", "Write registry file: %s", baseName)
+	logp.Debug("registrar", "Write registry file: %s (%v)", baseName, len(states))
 
 	tempfile := baseName + ".new"
 	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, perm)

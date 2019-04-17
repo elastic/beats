@@ -22,8 +22,6 @@ import (
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type oplogInfo struct {
@@ -50,7 +48,6 @@ func getReplicationInfo(mongoSession *mgo.Session) (*oplogInfo, error) {
 			err = errors.New("collection oplog.rs was not found")
 		}
 
-		logp.Err(err.Error())
 		return nil, err
 	}
 	collection := db.C(oplogCol)
@@ -88,9 +85,7 @@ func getOpTimestamp(collection *mgo.Collection, sort string) (int64, error) {
 
 	var opTime OpTime
 	if !iter.Next(&opTime) {
-		err := errors.New("objects not found in local.oplog.rs -- Is this a new and empty db instance?")
-		logp.Err(err.Error())
-		return 0, err
+		return 0, errors.New("objects not found in local.oplog.rs -- Is this a new and empty db instance?")
 	}
 
 	return opTime.getTimeStamp(), nil

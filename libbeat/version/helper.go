@@ -31,7 +31,7 @@ func GetDefaultVersion() string {
 var (
 	buildTime = "unknown"
 	commit    = "unknown"
-	qualifier = "alpha1"
+	qualifier = ""
 )
 
 // BuildTime exposes the compile-time build time information.

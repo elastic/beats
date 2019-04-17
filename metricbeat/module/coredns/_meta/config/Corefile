@@ -1,0 +1,43 @@
+######################## Description and Version ##########################
+# This Corefile configures multiple DNS zones and uses coreDNS plugins
+#
+# To run a container with the image generated from this Dockerfile, execute:
+#
+# docker run -m 256m \
+#     --name coredns \
+#     --expose=9153/tcp -p 127.0.0.1:9153:9153/tcp \
+#     -v "$PWD"/config:/etc/coredns \
+#     coredns:test -conf /etc/coredns/Corefile
+#
+# Version: 1.0
+#
+###########################################################################
+
+# Zone1
+my.domain.elastic {
+    log
+    errors
+    auto
+    reload 10s
+    cache 4
+
+    # Use the prometheus plugin to export metrics at '/metrics' endpoint
+    prometheus :9153
+
+    # If you wish to use a standard Hosts File format, uncomment the following
+    # line and customize the specified file
+    hosts my.domain.elastic {
+        127.0.0.1   my.domain.elastic
+        fallthrough
+    }
+}
+
+# Zone2
+. {
+    log
+    errors
+    prometheus :9153
+
+    # Use the forward plugin to forward traffic to external DNS servers
+    forward . 8.8.8.8 8.8.4.4
+}

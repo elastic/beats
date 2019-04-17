@@ -70,7 +70,8 @@
       description: >
         Number of synced followers reported when a node server_state is leader.
     - name: version
-      type: keyword
+      type: alias
+      path: service.version
       description: >
         ZooKeeper version and build string reported.
     - name: watch_count

@@ -2,14 +2,14 @@
   type: group
   description: >
     ceph osd tree info
-  release: beta
+  release: ga
   fields:
     - name: id
       type: long
       description: >
         osd or bucket node id
     - name: name
-      type: text
+      type: keyword
       description: >
         osd or bucket node name
     - name: type
@@ -21,7 +21,7 @@
       description: >
         osd or bucket node typeID
     - name: children
-      type: text
+      type: keyword
       description: >
         bucket children list, separated by comma.
     - name: crush_weight

@@ -47,6 +47,9 @@ type Reloadable interface {
 	Reload(config *ConfigWithMeta) error
 }
 
+// ReloadableFunc wraps a custom function in order to implement the Reloadable interface.
+type ReloadableFunc func(config *ConfigWithMeta) error
+
 // Registry of reloadable objects and lists
 type Registry struct {
 	sync.RWMutex
@@ -110,6 +113,23 @@ func (r *Registry) MustRegisterList(name string, list ReloadableList) {
 	}
 }
 
+// GetRegisteredNames returns the list of names registered
+func (r *Registry) GetRegisteredNames() []string {
+	r.RLock()
+	defer r.RUnlock()
+	var names []string
+
+	for name := range r.confs {
+		names = append(names, name)
+	}
+
+	for name := range r.confsLists {
+		names = append(names, name)
+	}
+
+	return names
+}
+
 // GetReloadable returns the reloadable object with the given name, nil if not found
 func (r *Registry) GetReloadable(name string) Reloadable {
 	r.RLock()
@@ -134,4 +154,9 @@ func (r *Registry) nameTaken(name string) bool {
 	}
 
 	return false
+}
+
+// Reload calls the underlying function.
+func (fn ReloadableFunc) Reload(config *ConfigWithMeta) error {
+	return fn(config)
 }

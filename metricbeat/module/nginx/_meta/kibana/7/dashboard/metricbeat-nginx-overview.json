@@ -1,0 +1,474 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Request Rate [Metricbeat Nginx] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Request rate", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.requests", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Request Rate [Metricbeat Nginx] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T22:48:58.542Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Accepts and Handled Rate [Metricbeat Nginx] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "annotations": [
+                            {
+                                "color": "#F00", 
+                                "icon": "fa-tag", 
+                                "id": "8644f980-f1a3-11e7-95d0-8ddf041d42a2", 
+                                "ignore_global_filters": 1, 
+                                "ignore_panel_filters": 1, 
+                                "index_pattern": "*", 
+                                "time_field": "@timestamp"
+                            }
+                        ], 
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": "0.5", 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Accepts rate", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.accepts", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_color_mode": "gradient", 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(0,156,224,1)", 
+                                "fill": "0.9", 
+                                "formatter": "number", 
+                                "id": "56dd33b0-f1a3-11e7-95d0-8ddf041d42a2", 
+                                "label": "Handled rate", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.handled", 
+                                        "id": "56dd33b1-f1a3-11e7-95d0-8ddf041d42a2", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "56dd33b1-f1a3-11e7-95d0-8ddf041d42a2", 
+                                        "id": "56dd33b2-f1a3-11e7-95d0-8ddf041d42a2", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": "3", 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Accepts and Handled Rate [Metricbeat Nginx] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T23:07:23.056Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Drops Rate [Metricbeat Nginx] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(188,0,65,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Drops rate", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.dropped", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }, 
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
+                                        "type": "derivative", 
+                                        "unit": ""
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Drops Rate [Metricbeat Nginx] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T22:51:46.375Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Active connections [Metricbeat Nginx] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.active", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Active connections [Metricbeat Nginx] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T23:09:55.944Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {}
+                }, 
+                "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [], 
+                    "params": {
+                        "axis_formatter": "number", 
+                        "axis_position": "left", 
+                        "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
+                        "index_pattern": "metricbeat-*", 
+                        "interval": "auto", 
+                        "legend_position": "bottom", 
+                        "series": [
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "#68BC00", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
+                                "label": "Reading", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.reading", 
+                                        "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
+                                        "type": "avg"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(0,156,224,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "b1773680-f1a4-11e7-95d0-8ddf041d42a2", 
+                                "label": "Writing", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.writing", 
+                                        "id": "b1773681-f1a4-11e7-95d0-8ddf041d42a2", 
+                                        "type": "avg"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }, 
+                            {
+                                "axis_position": "right", 
+                                "chart_type": "line", 
+                                "color": "rgba(252,220,0,1)", 
+                                "fill": 0.5, 
+                                "formatter": "number", 
+                                "id": "b68aa6c0-f1a4-11e7-95d0-8ddf041d42a2", 
+                                "label": "Waiting", 
+                                "line_width": 1, 
+                                "metrics": [
+                                    {
+                                        "field": "nginx.stubstatus.waiting", 
+                                        "id": "b68aa6c1-f1a4-11e7-95d0-8ddf041d42a2", 
+                                        "type": "avg"
+                                    }
+                                ], 
+                                "point_size": 1, 
+                                "seperate_axis": 0, 
+                                "split_mode": "everything", 
+                                "stacked": "none"
+                            }
+                        ], 
+                        "show_grid": 1, 
+                        "show_legend": 1, 
+                        "time_field": "@timestamp", 
+                        "type": "timeseries"
+                    }, 
+                    "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx] ECS", 
+                    "type": "metrics"
+                }
+            }, 
+            "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129-ecs", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T23:13:23.859Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Overview dashboard for the Nginx module in Metricbeat",
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false, 
+                    "hidePanelTitles": false, 
+                    "useMargins": true
+                }, 
+                "panelsJSON": [
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "1", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 0
+                        }, 
+                        "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+                        "panelIndex": "1", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "2", 
+                            "w": 6, 
+                            "x": 6, 
+                            "y": 3
+                        }, 
+                        "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+                        "panelIndex": "2", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "3", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 3
+                        }, 
+                        "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+                        "panelIndex": "3", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "4", 
+                            "w": 6, 
+                            "x": 0, 
+                            "y": 0
+                        }, 
+                        "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129-ecs", 
+                        "panelIndex": "4", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }, 
+                    {
+                        "gridData": {
+                            "h": 3, 
+                            "i": "5", 
+                            "w": 12, 
+                            "x": 0, 
+                            "y": 6
+                        }, 
+                        "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129-ecs", 
+                        "panelIndex": "5", 
+                        "type": "visualization", 
+                        "version": "6.2.4"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Metricbeat Nginx] Overview ECS", 
+                "version": 1
+            }, 
+            "id": "023d2930-f1a5-11e7-a9ef-93c69af7b129-ecs", 
+            "type": "dashboard", 
+            "updated_at": "2018-01-04T23:14:26.755Z", 
+            "version": 1
+        }
+    ], 
+    "version": "6.2.4"
+}

@@ -1,24 +1,14 @@
-:libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
-:kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
-:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
-:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/{doc-branch}
-:metricbeat: http://www.elastic.co/guide/en/beats/metricbeat/{doc-branch}
-:heartbeat: http://www.elastic.co/guide/en/beats/heartbeat/{doc-branch}
-:filebeat: http://www.elastic.co/guide/en/beats/filebeat/{doc-branch}
-:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/{doc-branch}
-:auditbeat: http://www.elastic.co/guide/en/beats/auditbeat/{doc-branch}
-:logstashdoc: https://www.elastic.co/guide/en/logstash/{doc-branch}
-:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/{doc-branch}
-:elasticsearch-plugins: https://www.elastic.co/guide/en/elasticsearch/plugins/{doc-branch}
-:securitydoc: https://www.elastic.co/guide/en/elastic-stack-overview/{doc-branch}
-:monitoringdoc: https://www.elastic.co/guide/en/elastic-stack-overview/{doc-branch}
+:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{branch}
 :dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
-:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
+:dockerconfig: https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/docker/{beatname_lc}.docker.yml
 :downloads: https://artifacts.elastic.co/downloads/beats
-:ES-version: {stack-version}
-:LS-version: {stack-version}
-:Kibana-version: {stack-version}
+
+:cm-ui: Central Management
+:libbeat-docs: Beats Platform Reference
 :beat_monitoring_user: beats_system
 :beat_monitoring_user_version: 6.3.0
 :beat_monitoring_version: 6.2
+:beat_version_key: agent.version
+:access_role: {beat_default_index_prefix}_reader
+:repo: Beats

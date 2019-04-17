@@ -1,0 +1,159 @@
+{
+    "description": "Pipeline for parsing elasticsearch audit logs in JSON format",
+    "processors": [
+        {
+            "json": {
+                "field": "message",
+                "target_field": "elasticsearch.audit"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "event.action",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.event.action",
+                "target_field": "event.action"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "event.type",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.event.type",
+                "target_field": "elasticsearch.audit.layer"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "origin.address",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "grok": {
+                "field": "elasticsearch.audit.origin.address",
+                "patterns": [
+                    "\\[%{IPORHOST:source.ip}\\]:%{INT:source.port:int}",
+                    "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+                ]
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.origin.address",
+                "target_field": "source.address"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "url.path",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "url.query",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query == null",
+                "field": "url.original",
+                "value": "{{elasticsearch.audit.url.path}}"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null",
+                "field": "url.original",
+                "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.elasticsearch.audit?.url?.path != null",
+                "field": "elasticsearch.audit.url.path"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.elasticsearch.audit?.url?.query != null",
+                "field": "elasticsearch.audit.url.query"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "node.id",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "node.name",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.node",
+                "target_field": "elasticsearch.node"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "user.name",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.user.name",
+                "target_field": "user.name"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "request.method",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.request.method",
+                "target_field": "http.request.method",
+                "ignore_missing": true
+            }
+
+        },
+        {
+            "dot_expander": {
+                "field": "request.body",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.request.body",
+                "target_field": "http.request.body.content",
+                "ignore_missing": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

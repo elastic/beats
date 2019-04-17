@@ -4,3 +4,7 @@
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false

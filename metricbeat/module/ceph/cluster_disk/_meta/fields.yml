@@ -2,7 +2,7 @@
   type: group
   description: >
     cluster_disk
-  release: beta
+  release: ga
   fields:
     - name: available.bytes
       type: long

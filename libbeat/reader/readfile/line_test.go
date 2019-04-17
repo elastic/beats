@@ -43,6 +43,31 @@ var tests = []struct {
 	{"gb18030", []string{"我能吞下玻璃", "而不傷身。體"}},
 	{"euc-kr", []string{" 나는 유리를 먹을 수 있어요.", " 그래도 아프지 않아요"}},
 	{"euc-jp", []string{"私はガラスを食べられます。", "それは私を傷つけません。"}},
+	{"plain", []string{"I can", "eat glass"}},
+	{"iso8859-1", []string{"Filebeat is my favourite"}},
+	{"iso8859-2", []string{"Filebeat je môj obľúbený"}},                          // slovak: filebeat is my favourite
+	{"iso8859-3", []string{"büyükannem Filebeat kullanıyor"}},                    // turkish: my granmother uses filebeat
+	{"iso8859-4", []string{"Filebeat on mõeldud kõigile"}},                       // estonian: filebeat is for everyone
+	{"iso8859-5", []string{"я люблю кодировки"}},                                 // russian: i love encodings
+	{"iso8859-6", []string{"أنا بحاجة إلى المزيد من الترميزات"}},                 // arabic: i need more encodings
+	{"iso8859-7", []string{"όπου μπορώ να αγοράσω περισσότερες κωδικοποιήσεις"}}, // greek: where can i buy more encodings?
+	{"iso8859-8", []string{"אני צריך קידוד אישי"}},                               // hebrew: i need a personal encoding
+	{"iso8859-9", []string{"kodlamaları pişirebilirim"}},                         // turkish: i can cook encodings
+	{"iso8859-10", []string{"koodaukset jäädyttävät nollaan"}},                   // finnish: encodings freeze below zero
+	{"iso8859-13", []string{"mój pies zjada kodowanie"}},                         // polish: my dog eats encodings
+	{"iso8859-14", []string{"An féidir leat cáise a ionchódú?"}},                 // irish: can you encode a cheese?
+	{"iso8859-15", []string{"bedes du kode", "for min €"}},                       // danish: please encode my euro symbol
+	{"iso8859-16", []string{"rossz karakterkódolást", "használsz"}},              // hungarian: you use the wrong character encoding
+	{"koi8r", []string{"я люблю кодировки"}},                                     // russian: i love encodings
+	{"koi8u", []string{"я люблю кодировки"}},                                     // russian: i love encodings
+	{"windows1250", []string{"Filebeat je môj obľúbený"}},                        // slovak: filebeat is my favourite
+	{"windows1251", []string{"я люблю кодировки"}},                               // russian: i love encodings
+	{"windows1252", []string{"what is better than an encoding?", "a legacy encoding"}},
+	{"windows1253", []string{"όπου μπορώ να αγοράσω", "περισσότερες κωδικοποιήσεις"}}, // greek: where can i buy more encodings?
+	{"windows1254", []string{"kodlamaları", "pişirebilirim"}},                         // turkish: i can cook encodings
+	{"windows1255", []string{"אני צריך קידוד אישי"}},                                  // hebrew: i need a personal encoding
+	{"windows1256", []string{"أنا بحاجة إلى المزيد من الترميزات"}},                    // arabic: i need more encodings
+	{"windows1257", []string{"toite", "kodeerijaid"}},                                 // estonian: feed the encoders
 }
 
 func TestReaderEncodings(t *testing.T) {
@@ -57,18 +82,19 @@ func TestReaderEncodings(t *testing.T) {
 
 		buffer := bytes.NewBuffer(nil)
 		codec, _ := codecFactory(buffer)
+		nl := lineTerminatorCharacters[LineFeed]
 
 		// write with encoding to buffer
 		writer := transform.NewWriter(buffer, codec.NewEncoder())
 		var expectedCount []int
 		for _, line := range test.strings {
 			writer.Write([]byte(line))
-			writer.Write([]byte{'\n'})
+			writer.Write(nl)
 			expectedCount = append(expectedCount, buffer.Len())
 		}
 
 		// create line reader
-		reader, err := NewLineReader(buffer, codec, 1024)
+		reader, err := NewLineReader(buffer, Config{codec, 1024, LineFeed})
 		if err != nil {
 			t.Errorf("failed to initialize reader: %v", err)
 			continue
@@ -81,7 +107,7 @@ func TestReaderEncodings(t *testing.T) {
 		for {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
-				readLines = append(readLines, string(bytes[:len(bytes)-1]))
+				readLines = append(readLines, string(bytes[:len(bytes)-len(nl)]))
 			}
 
 			if err != nil {
@@ -104,6 +130,43 @@ func TestReaderEncodings(t *testing.T) {
 			assert.Equal(t, expected, actual)
 			assert.Equal(t, expectedCount[i], byteCounts[i])
 		}
+	}
+}
+
+func TestLineTerminators(t *testing.T) {
+	codecFactory, ok := encoding.FindEncoding("plain")
+	if !ok {
+		t.Errorf("can not find plain encoding")
+	}
+
+	buffer := bytes.NewBuffer(nil)
+	codec, _ := codecFactory(buffer)
+
+	for terminator, nl := range lineTerminatorCharacters {
+		buffer.Reset()
+
+		buffer.Write([]byte("this is my first line"))
+		buffer.Write(nl)
+		buffer.Write([]byte("this is my second line"))
+		buffer.Write(nl)
+
+		reader, err := NewLineReader(buffer, Config{codec, 1024, terminator})
+		if err != nil {
+			t.Errorf("failed to initialize reader: %v", err)
+			continue
+		}
+
+		nrLines := 0
+		for {
+			line, _, err := reader.Next()
+			if err != nil {
+				break
+			}
+
+			assert.True(t, bytes.HasSuffix(line, nl))
+			nrLines++
+		}
+		assert.Equal(t, nrLines, 2, "unexpected number of lines for terminator %+v", terminator)
 	}
 }
 
@@ -159,7 +222,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
 	codec, _ := encoding.Plain(buffer)
-	reader, err := NewLineReader(buffer, codec, buffer.Len())
+	reader, err := NewLineReader(buffer, Config{codec, buffer.Len(), LineFeed})
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}

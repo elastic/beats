@@ -25,13 +25,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 )
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
-const CCRStatsAPIAvailableVersion = "6.5.0"
+var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -44,7 +46,7 @@ type Info struct {
 	ClusterName string `json:"cluster_name"`
 	ClusterID   string `json:"cluster_uuid"`
 	Version     struct {
-		Number string `json:"number"`
+		Number *common.Version `json:"number"`
 	} `json:"version"`
 }
 
@@ -55,6 +57,23 @@ type NodeInfo struct {
 	IP               string `json:"ip"`
 	Name             string `json:"name"`
 	ID               string
+}
+
+// License contains data about the Elasticsearch license
+type License struct {
+	Status            string    `json:"status"`
+	ID                string    `json:"uid"`
+	Type              string    `json:"type"`
+	IssueDate         time.Time `json:"issue_date"`
+	IssueDateInMillis int       `json:"issue_date_in_millis"`
+	MaxNodes          int       `json:"max_nodes"`
+	IssuedTo          string    `json:"issued_to"`
+	Issuer            string    `json:"issuer"`
+	StartDateInMillis int       `json:"start_date_in_millis"`
+}
+
+type licenseWrapper struct {
+	License License `json:"license"`
 }
 
 // GetClusterID fetches cluster id for given nodeID.
@@ -96,7 +115,7 @@ func IsMaster(http *helper.HTTP, uri string) (bool, error) {
 }
 
 func getNodeName(http *helper.HTTP, uri string) (string, error) {
-	content, err := fetchPath(http, uri, "/_nodes/_local/nodes")
+	content, err := fetchPath(http, uri, "/_nodes/_local/nodes", "")
 	if err != nil {
 		return "", err
 	}
@@ -116,7 +135,7 @@ func getNodeName(http *helper.HTTP, uri string) (string, error) {
 
 func getMasterName(http *helper.HTTP, uri string) (string, error) {
 	// TODO: evaluate on why when run with ?local=true request does not contain master_node field
-	content, err := fetchPath(http, uri, "_cluster/state/master_node")
+	content, err := fetchPath(http, uri, "_cluster/state/master_node", "")
 	if err != nil {
 		return "", err
 	}
@@ -133,24 +152,27 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 // GetInfo returns the data for the Elasticsearch / endpoint.
 func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
 
-	content, err := fetchPath(http, uri, "/")
+	content, err := fetchPath(http, uri, "/", "")
 	if err != nil {
 		return nil, err
 	}
 
 	info := &Info{}
-	json.Unmarshal(content, info)
+	err = json.Unmarshal(content, &info)
+	if err != nil {
+		return nil, err
+	}
 
 	return info, nil
 }
 
-func fetchPath(http *helper.HTTP, uri, path string) ([]byte, error) {
+func fetchPath(http *helper.HTTP, uri, path string, query string) ([]byte, error) {
 	defer http.SetURI(uri)
 
 	// Parses the uri to replace the path
 	u, _ := url.Parse(uri)
 	u.Path = path
-	u.RawQuery = ""
+	u.RawQuery = query
 
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())
@@ -160,7 +182,7 @@ func fetchPath(http *helper.HTTP, uri, path string) ([]byte, error) {
 // GetNodeInfo returns the node information.
 func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error) {
 
-	content, err := fetchPath(http, uri, "/_nodes/_local/nodes")
+	content, err := fetchPath(http, uri, "/_nodes/_local/nodes", "")
 	if err != nil {
 		return nil, err
 	}
@@ -185,34 +207,36 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 // GetLicense returns license information. Since we don't expect license information
 // to change frequently, the information is cached for 1 minute to avoid
 // hitting Elasticsearch frequently.
-func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	// First, check the cache
 	license := licenseCache.get()
 
+	info, err := GetInfo(http, resetURI)
+	if err != nil {
+		return nil, err
+	}
+	var licensePath string
+	if info.Version.Number.Major < 7 {
+		licensePath = "_xpack/license"
+	} else {
+		licensePath = "_license"
+	}
+
 	// Not cached, fetch license from Elasticsearch
 	if license == nil {
-		content, err := fetchPath(http, resetURI, "_xpack/license")
+		content, err := fetchPath(http, resetURI, licensePath, "")
 		if err != nil {
 			return nil, err
 		}
 
-		var data common.MapStr
+		var data licenseWrapper
 		err = json.Unmarshal(content, &data)
 		if err != nil {
 			return nil, err
 		}
 
-		l, err := data.GetValue("license")
-		if err != nil {
-			return nil, err
-		}
-		license, ok := l.(map[string]interface{})
-		if !ok {
-			return nil, elastic.MakeErrorForMissingField("license", elastic.Elasticsearch)
-		}
-
 		// Cache license for a minute
-		licenseCache.set(license, time.Minute)
+		licenseCache.set(&data.License, time.Minute)
 	}
 
 	return licenseCache.get(), nil
@@ -225,7 +249,7 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (comm
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
-	content, err := fetchPath(http, resetURI, clusterStateURI)
+	content, err := fetchPath(http, resetURI, clusterStateURI, "")
 	if err != nil {
 		return nil, err
 	}
@@ -235,9 +259,39 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (comm
 	return clusterState, err
 }
 
+// GetClusterSettingsWithDefaults returns cluster settings.
+func GetClusterSettingsWithDefaults(http *helper.HTTP, resetURI string, filterPaths []string) (common.MapStr, error) {
+	return GetClusterSettings(http, resetURI, true, filterPaths)
+}
+
+// GetClusterSettings returns cluster settings
+func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool, filterPaths []string) (common.MapStr, error) {
+	clusterSettingsURI := "_cluster/settings"
+	var queryParams []string
+	if includeDefaults {
+		queryParams = append(queryParams, "include_defaults=true")
+	}
+
+	if filterPaths != nil && len(filterPaths) > 0 {
+		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
+		queryParams = append(queryParams, filterPathQueryParam)
+	}
+
+	queryString := strings.Join(queryParams, "&")
+
+	content, err := fetchPath(http, resetURI, clusterSettingsURI, queryString)
+	if err != nil {
+		return nil, err
+	}
+
+	var clusterSettings map[string]interface{}
+	err = json.Unmarshal(content, &clusterSettings)
+	return clusterSettings, err
+}
+
 // GetStackUsage returns stack usage information.
 func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
-	content, err := fetchPath(http, resetURI, "_xpack/usage")
+	content, err := fetchPath(http, resetURI, "_xpack/usage", "")
 	if err != nil {
 		return nil, err
 	}
@@ -259,10 +313,45 @@ func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error
 	return nil
 }
 
-// IsCCRStatsAPIAvailable returns whether the CCR stats API is available in the given version
-// of Elasticsearch.
-func IsCCRStatsAPIAvailable(currentElasticsearchVersion string) (bool, error) {
-	return elastic.IsFeatureAvailable(currentElasticsearchVersion, CCRStatsAPIAvailableVersion)
+// MergeClusterSettings merges cluster settings in the correct precedence order
+func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) {
+	transientSettings, err := getSettingGroup(clusterSettings, "transient")
+	if err != nil {
+		return nil, err
+	}
+
+	persistentSettings, err := getSettingGroup(clusterSettings, "persistent")
+	if err != nil {
+		return nil, err
+	}
+
+	settings, err := getSettingGroup(clusterSettings, "default")
+	if err != nil {
+		return nil, err
+	}
+
+	// Transient settings override persistent settings which override default settings
+	if settings == nil {
+		settings = persistentSettings
+	}
+
+	if settings == nil {
+		settings = transientSettings
+	}
+
+	if settings == nil {
+		return nil, nil
+	}
+
+	if persistentSettings != nil {
+		settings.DeepUpdate(persistentSettings)
+	}
+
+	if transientSettings != nil {
+		settings.DeepUpdate(transientSettings)
+	}
+
+	return settings, nil
 }
 
 // Global cache for license information. Assumption is that license information changes infrequently.
@@ -270,12 +359,12 @@ var licenseCache = &_licenseCache{}
 
 type _licenseCache struct {
 	sync.RWMutex
-	license  common.MapStr
+	license  *License
 	cachedOn time.Time
 	ttl      time.Duration
 }
 
-func (c *_licenseCache) get() common.MapStr {
+func (c *_licenseCache) get() *License {
 	c.Lock()
 	defer c.Unlock()
 
@@ -287,11 +376,47 @@ func (c *_licenseCache) get() common.MapStr {
 	return c.license
 }
 
-func (c *_licenseCache) set(license common.MapStr, ttl time.Duration) {
+func (c *_licenseCache) set(license *License, ttl time.Duration) {
 	c.Lock()
 	defer c.Unlock()
 
 	c.license = license
 	c.ttl = ttl
 	c.cachedOn = time.Now()
+}
+
+// IsOneOf returns whether the license is one of the specified candidate licenses
+func (l *License) IsOneOf(candidateLicenses ...string) bool {
+	t := l.Type
+
+	for _, candidateLicense := range candidateLicenses {
+		if candidateLicense == t {
+			return true
+		}
+	}
+
+	return false
+}
+
+func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr, error) {
+	hasSettingGroup, err := allSettings.HasKey(groupKey)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to determine if "+groupKey+" settings exist")
+	}
+
+	if !hasSettingGroup {
+		return nil, nil
+	}
+
+	settings, err := allSettings.GetValue(groupKey)
+	if err != nil {
+		return nil, errors.Wrap(err, "failure to extract "+groupKey+" settings")
+	}
+
+	v, ok := settings.(map[string]interface{})
+	if !ok {
+		return nil, errors.Wrap(err, groupKey+" settings are not a map")
+	}
+
+	return common.MapStr(v), nil
 }

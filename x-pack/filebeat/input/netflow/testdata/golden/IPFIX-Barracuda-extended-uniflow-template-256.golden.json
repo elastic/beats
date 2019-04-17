@@ -1,0 +1,161 @@
+{
+  "test_name": "IPFIX Barracuda extended uniflow template 256",
+  "events": [
+    {
+      "Timestamp": "2018-04-18T08:16:47Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "64.235.151.76",
+          "locality": "public",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-04-18T08:16:47Z",
+          "duration": 0,
+          "kind": "event"
+        },
+        "flow": {
+          "id": "kSpZ1WuBhjc",
+          "locality": "public"
+        },
+        "netflow": {
+          "audit_counter": 4157725,
+          "bind_ipv4_address": "213.208.150.99",
+          "bind_transport_port": 64238,
+          "conn_ipv4_address": "64.235.151.76",
+          "conn_transport_port": 443,
+          "destination_ipv4_address": "64.235.151.76",
+          "destination_transport_port": 443,
+          "egress_interface": 3689,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2018-04-18T08:16:47Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "firewall_event": 1,
+          "flow_duration_milliseconds": 0,
+          "flow_end_sys_up_time": 1957197969,
+          "flow_start_sys_up_time": 1957197969,
+          "fw_rule": "MTH:MTH-MC-to-Inet",
+          "ingress_interface": 35233,
+          "log_op": 1,
+          "octet_delta_count": 0,
+          "octet_total_count": 0,
+          "packet_delta_count": 0,
+          "packet_total_count": 0,
+          "protocol_identifier": 6,
+          "reason": 0,
+          "reason_text": "Normal Operation",
+          "service_name": "https",
+          "source_ipv4_address": "10.236.5.4",
+          "source_mac_address": "00:50:56:b9:26:46",
+          "source_transport_port": 51917,
+          "timestamp": 1524039407,
+          "traffic_type": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 0,
+          "community_id": "1:3g7/10xslZq/7OW7ucdoDYgE3IY=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 0,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "10.236.5.4",
+          "locality": "private",
+          "mac": "00:50:56:b9:26:46",
+          "port": 51917
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2018-04-18T08:16:47Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.236.5.4",
+          "locality": "private",
+          "port": 51917
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-04-18T08:16:47Z",
+          "duration": 0,
+          "kind": "event"
+        },
+        "flow": {
+          "id": "kSpZ1WuBhjc",
+          "locality": "public"
+        },
+        "netflow": {
+          "audit_counter": 4157725,
+          "bind_ipv4_address": "213.208.150.99",
+          "bind_transport_port": 64238,
+          "conn_ipv4_address": "64.235.151.76",
+          "conn_transport_port": 443,
+          "destination_ipv4_address": "10.236.5.4",
+          "destination_transport_port": 51917,
+          "egress_interface": 35233,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2018-04-18T08:16:47Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "firewall_event": 1,
+          "flow_duration_milliseconds": 0,
+          "flow_end_sys_up_time": 1957197969,
+          "flow_start_sys_up_time": 1957197969,
+          "fw_rule": "MTH:MTH-MC-to-Inet",
+          "ingress_interface": 3689,
+          "log_op": 1,
+          "octet_delta_count": 0,
+          "octet_total_count": 0,
+          "packet_delta_count": 0,
+          "packet_total_count": 0,
+          "protocol_identifier": 6,
+          "reason": 0,
+          "reason_text": "Normal Operation",
+          "service_name": "https",
+          "source_ipv4_address": "64.235.151.76",
+          "source_mac_address": "00:00:00:00:00:00",
+          "source_transport_port": 443,
+          "timestamp": 1524039407,
+          "traffic_type": 0,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 0,
+          "community_id": "1:3g7/10xslZq/7OW7ucdoDYgE3IY=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 0,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "64.235.151.76",
+          "locality": "public",
+          "mac": "00:00:00:00:00:00",
+          "port": 443
+        }
+      },
+      "Private": null
+    }
+  ]
+}
