@@ -87,10 +87,12 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if conv.To != "" {
-			event.PutValue(conv.To, v)
-
-			if p.Mode == renameMode {
+			switch p.Mode {
+			case renameMode:
+				event.PutValue(conv.To, v)
 				event.Delete(conv.From)
+			case copyMode:
+				event.PutValue(conv.To, cloneValue(v))
 			}
 		} else {
 			// In-place conversion.
@@ -296,4 +298,18 @@ func annotateError(id string, err error) error {
 		return errors.Wrapf(err, "failed in processor.convert with instance_id=%v", id)
 	}
 	return errors.Wrap(err, "failed in processor.convert")
+}
+
+// cloneValue returns a shallow copy of a map. All other types are passed
+// through in the return. This should be used when making straight copies of
+// maps without doing any type conversions.
+func cloneValue(value interface{}) interface{} {
+	switch v := value.(type) {
+	case common.MapStr:
+		return v.Clone()
+	case map[string]interface{}:
+		return common.MapStr(v).Clone()
+	default:
+		return value
+	}
 }
