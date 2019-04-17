@@ -8,6 +8,7 @@ package pkg
 
 import (
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -28,22 +29,36 @@ func TestHomebrew(t *testing.T) {
 	}()
 	homebrewCellarPath = "../../../tests/files/homebrew/"
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	defer f.(*MetricSet).bucket.DeleteBucket()
+	// Test just listBrewPackages()
+	packages, err := listBrewPackages()
+	assert.NoError(t, err)
+	assert.Len(t, packages, 1)
+	pkg := packages[0]
+	assert.Equal(t, "test-package", pkg.Name)
+	assert.Equal(t, "Test package", pkg.Summary)
+	assert.Equal(t, "https://www.elastic.co/", pkg.URL)
+	assert.Equal(t, "1.0.0", pkg.Version)
+	assert.True(t, time.Date(2019, 4, 17, 13, 14, 57, 205133721, time.FixedZone("BST", 60*60)).Equal(pkg.InstallTime), "Time is not equal: %+v", pkg.InstallTime)
 
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("received error: %+v", errs[0])
+	// Test whole dataset if on Darwin
+	if runtime.GOOS == "darwin" {
+		f := mbtest.NewReportingMetricSetV2(t, getConfig())
+		defer f.(*MetricSet).bucket.DeleteBucket()
+
+		events, errs := mbtest.ReportingFetchV2(f)
+		if len(errs) > 0 {
+			t.Fatalf("received error: %+v", errs[0])
+		}
+		assert.Len(t, events, 1)
+
+		event := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+		checkFieldValue(t, event, "system.audit.package.name", "test-package")
+		checkFieldValue(t, event, "system.audit.package.summary", "Test package")
+		checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
+		checkFieldValue(t, event, "system.audit.package.version", "1.0.0")
+		checkFieldValue(t, event, "system.audit.package.installtime", time.Date(2019, 4, 17, 13, 14, 57, 205133721, time.FixedZone("BST", 60*60)))
+		checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
 	}
-	assert.Len(t, events, 1)
-
-	event := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
-	checkFieldValue(t, event, "system.audit.package.name", "test-package")
-	checkFieldValue(t, event, "system.audit.package.summary", "Test package")
-	checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
-	checkFieldValue(t, event, "system.audit.package.version", "1.0.0")
-	checkFieldValue(t, event, "system.audit.package.installtime", time.Date(2019, 4, 17, 13, 14, 57, 205133721, time.FixedZone("BST", 60*60)))
-	checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
 }
 
 func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValue interface{}) {
@@ -74,13 +89,15 @@ func TestHomebrewNotExist(t *testing.T) {
 	}
 	assert.Empty(t, packages)
 
-	// Test whole dataset
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	defer f.(*MetricSet).bucket.DeleteBucket()
+	// Test whole dataset if on Darwin
+	if runtime.GOOS == "darwin" {
+		f := mbtest.NewReportingMetricSetV2(t, getConfig())
+		defer f.(*MetricSet).bucket.DeleteBucket()
 
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("received error: %+v", errs[0])
+		events, errs := mbtest.ReportingFetchV2(f)
+		if len(errs) > 0 {
+			t.Fatalf("received error: %+v", errs[0])
+		}
+		assert.Empty(t, events)
 	}
-	assert.Empty(t, events)
 }
