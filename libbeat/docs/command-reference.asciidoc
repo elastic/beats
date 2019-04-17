@@ -656,12 +656,23 @@ modules to load pipelines for.
 endif::[]
 
 ifeval::["{beatname_lc}"!="filebeat"]
+
+ifndef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} setup --dashboards
 {beatname_lc} setup --machine-learning
 {beatname_lc} setup --template
 -----
+endif::no_dashboards[]
+ifdef::no_dashboards[]
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} setup --machine-learning
+{beatname_lc} setup --template
+-----
+endif::no_dashboards[]
+
 endif::[]
 
 [[test-command]]
