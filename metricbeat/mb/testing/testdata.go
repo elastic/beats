@@ -52,6 +52,20 @@ var (
 )
 
 // DataConfig is the configuration for testdata tests
+//
+// For example for an http service that mimics the apache status page the following
+// configuration could be used:
+// ```
+// type: http
+// url: "/server-status?auto="
+// suffix: plain
+// omit_documented_fields_check:
+//  - "apache.status.hostname"
+// remove_fields_from_comparison:
+// - "apache.status.hostname"
+// ```
+// A test will be run for each file with the `plain` extension in the same directory
+// where a file with this configuration is placed.
 type DataConfig struct {
 	// Path is the directory containing this configuration
 	Path string
