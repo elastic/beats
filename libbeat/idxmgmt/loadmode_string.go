@@ -31,9 +31,9 @@ func _() {
 	_ = x[LoadModeDisabled-3]
 }
 
-const _LoadMode_name = "LoadModeUnsetLoadModeEnabledLoadModeForceLoadModeDisabled"
+const _LoadMode_name = "unsetenabledforcedisabled"
 
-var _LoadMode_index = [...]uint8{0, 13, 28, 41, 57}
+var _LoadMode_index = [...]uint8{0, 5, 12, 17, 25}
 
 func (i LoadMode) String() string {
 	if i >= LoadMode(len(_LoadMode_index)-1) {

@@ -73,13 +73,13 @@ type LoadMode uint8
 const (
 	// LoadModeUnset indicates that no specific mode is set.
 	// Instead the decision about loading data will be derived from the config or their respective default values.
-	LoadModeUnset LoadMode = iota
+	LoadModeUnset LoadMode = iota //unset
 	// LoadModeEnabled indicates loading if not already available
-	LoadModeEnabled
+	LoadModeEnabled //enabled
 	// LoadModeForce indicates loading in any case.
-	LoadModeForce
+	LoadModeForce //force
 	// LoadModeDisabled indicates no loading
-	LoadModeDisabled
+	LoadModeDisabled //disabled
 )
 
 // Enabled returns whether or not the LoadMode should be considered enabled
