@@ -223,7 +223,7 @@ func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDa
 		}
 
 		if reported := report.Event(event); !reported {
-			return errors.Wrap(err, "Error trying to emit event")
+			return errors.Wrap(err, "Fetch interrupted, failed to emit event")
 		}
 	}
 

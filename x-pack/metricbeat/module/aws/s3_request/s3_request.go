@@ -119,7 +119,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			if reported := report.Event(event); !reported {
-				m.Logger().Debug("Error trying to emit event")
+				m.Logger().Debug("Fetch interrupted, failed to emit event")
 				return nil
 			}
 		}
