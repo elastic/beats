@@ -51,7 +51,8 @@ type builder struct {
 
 	// Time series id will be calculated for Events with the TimeSeries flag if this
 	// is enabled (disabled by default)
-	timeSeries bool
+	timeSeries       bool
+	timeseriesFields mapping.Fields
 
 	// global pipeline processors
 	processors *group
@@ -111,7 +112,7 @@ func MakeDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries), nil
+		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize, cfg.TimeSeries)
 	}
 }
 
@@ -164,7 +165,7 @@ func newBuilder(
 	modifiers []modifier,
 	skipNormalize bool,
 	timeSeries bool,
-) *builder {
+) (*builder, error) {
 	b := &builder{
 		skipNormalize: skipNormalize,
 		modifiers:     modifiers,
@@ -198,11 +199,25 @@ func newBuilder(
 		common.MergeFields(b.fields, fields.Clone(), eventMeta.FieldsUnderRoot)
 	}
 
+	if timeSeries {
+		rawFields, err := asset.GetFields(info.Beat)
+		if err != nil {
+			return nil, err
+		}
+
+		fields, err := mapping.LoadFields(rawFields)
+		if err != nil {
+			return nil, err
+		}
+
+		b.timeseriesFields = fields
+	}
+
 	if t := eventMeta.Tags; len(t) > 0 {
 		b.tags = t
 	}
 
-	return b
+	return b, nil
 }
 
 // Create combines the builder configuration with the client settings
@@ -303,17 +318,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 9: time series metadata
 	if b.timeSeries {
-		rawFields, err := asset.GetFields(b.info.Beat)
-		if err != nil {
-			return nil, err
-		}
-
-		fields, err := mapping.LoadFields(rawFields)
-		if err != nil {
-			return nil, err
-		}
-
-		processors.add(timeseries.NewTimeSeriesProcessor(fields))
+		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields))
 	}
 
 	// setup 10: debug print final event (P)
