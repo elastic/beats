@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix ILM policy always being overwritten. {pull}11671[11671]
 - Fix template always being overwritten. {pull}11671[11671]
 - Fix matching of string arrays in contains condition. {pull}11691[11691]
+- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
 
@@ -78,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
 - Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
+- Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
 
 *Heartbeat*
 
@@ -132,6 +134,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New module for Cisco ASA logs. {issue}9200[9200] {pull}11171[11171]
 - Added support for Cisco ASA fields to the netflow input. {pull}11201[11201]
 - Configurable line terminator. {pull}11015[11015]
+- Add Filebeat envoyproxy module. {pull}11700[11700]
 
 *Heartbeat*
 

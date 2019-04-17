@@ -44,7 +44,11 @@ ifndef::apm-server[]
 ==== Run the {beatname_uc} setup
 
 Running {beatname_uc} with the setup command will create the index pattern and
-load visualizations, dashboards, and machine learning jobs.  Run this command:
+load visualizations
+ifndef::no_dashboards[]
+, dashboards,
+endif::no_dashboards[]
+and machine learning jobs.  Run this command:
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat") or ("{beatname_lc}"=="journalbeat")]
 ["source", "sh", subs="attributes"]
