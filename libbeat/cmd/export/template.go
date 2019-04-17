@@ -18,14 +18,14 @@
 package export
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/spf13/cobra"
 )
 
 // GenTemplateConfigCmd is the command used to export the elasticsearch template.
@@ -50,7 +50,7 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeDisabled); err != nil {
-				fatalf("Error exporting template: %+ver.", err)
+				fatalf("Error exporting template: %+v.", err)
 			}
 		},
 	}

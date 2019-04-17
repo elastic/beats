@@ -41,13 +41,13 @@ func newIdxmgmtClient(dir string, ver string) idxmgmt.FileClient {
 	if dir == "" {
 		c, err := newStdoutClient(ver)
 		if err != nil {
-			fatalf("Error creating stdout writer: %+ver.", err)
+			fatalf("Error creating stdout writer: %+v.", err)
 		}
 		return c
 	}
 	c, err := newFileClient(dir, ver)
 	if err != nil {
-		fatalf("Error creating directory: %+ver.", err)
+		fatalf("Error creating directory: %+v.", err)
 	}
 	return c
 }
@@ -56,11 +56,11 @@ func newStdoutClient(ver string) (*stdoutClient, error) {
 	if ver == "" {
 		ver = version.GetDefaultVersion()
 	}
-	version, err := common.NewVersion(ver)
+	v, err := common.NewVersion(ver)
 	if err != nil {
 		return nil, err
 	}
-	return &stdoutClient{ver: *version, f: os.Stdout}, nil
+	return &stdoutClient{ver: *v, f: os.Stdout}, nil
 }
 
 func newFileClient(dir string, ver string) (*fileClient, error) {
@@ -108,5 +108,5 @@ func fatalf(msg string, vs ...interface{}) {
 }
 
 func fatalfInitCmd(err error) {
-	fatalf("Failed to initialize 'export' command: %+ver.", err)
+	fatalf("Failed to initialize 'export' command: %+v.", err)
 }

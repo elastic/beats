@@ -196,9 +196,14 @@ func (t *Template) GetPattern() string {
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	template := common.MapStr{
+	return common.MapStr{
 		keyPattern: patterns,
 		"order":    t.order,
+		"mappings": buildMappings(
+			t.beatVersion, t.esVersion, t.beatName,
+			properties,
+			append(dynamicTemplates, buildDynTmpl(t.esVersion)),
+			common.MapStr(t.config.Settings.Source)),
 		"settings": common.MapStr{
 			"index": buildIdxSettings(
 				t.esVersion,
@@ -206,13 +211,6 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 			),
 		},
 	}
-
-	template["mappings"] = buildMappings(
-		t.beatVersion, t.esVersion, t.beatName,
-		properties,
-		append(dynamicTemplates, buildDynTmpl(t.esVersion)),
-		common.MapStr(t.config.Settings.Source))
-	return template
 }
 
 func buildPatternSettings(ver common.Version, pattern string) (string, interface{}) {

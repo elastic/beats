@@ -18,10 +18,10 @@
 package export
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/idxmgmt"
-
-	"github.com/spf13/cobra"
 )
 
 // GenGetILMPolicyCmd is the command used to export the ilm policy.
@@ -41,7 +41,7 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeEnabled); err != nil {
-				fatalf("Error exporting ilm-policy: %+ver.", err)
+				fatalf("Error exporting ilm-policy: %+v.", err)
 			}
 		},
 	}

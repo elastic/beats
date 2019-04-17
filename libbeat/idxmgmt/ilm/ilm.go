@@ -42,7 +42,7 @@ type Supporter interface {
 	Manager(h ClientHandler) Manager
 }
 
-// Manager uses an Loader to install a policy.
+// Manager uses a ClientHandler to install a policy.
 type Manager interface {
 	Enabled() (bool, error)
 

@@ -20,11 +20,11 @@ package export
 import (
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/kibana"
-
-	"github.com/spf13/cobra"
 )
 
 // GenIndexPatternConfigCmd generates an index pattern for Kibana
@@ -47,21 +47,21 @@ func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 			// Index pattern generation
 			v, err := common.NewVersion(version)
 			if err != nil {
-				fatalf("Error creating version: %+ver.", err)
+				fatalf("Error creating version: %+v.", err)
 			}
 			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, settings.Version, *v, b.Config.Migration.Enabled())
 			if err != nil {
-				fatalf("Error creating Kibana Generator: %+ver.", err)
+				fatalf("Error creating Kibana Generator: %+v.", err)
 			}
 
 			pattern, err := indexPattern.Generate()
 			if err != nil {
-				fatalf("Error generating Index Pattern: %+ver.", err)
+				fatalf("Error generating Index Pattern: %+v.", err)
 			}
 
 			_, err = os.Stdout.WriteString(pattern.StringToPrint() + "\n")
 			if err != nil {
-				fatalf("Error writing Index Pattern: %+ver.", err)
+				fatalf("Error writing Index Pattern: %+v.", err)
 			}
 		},
 	}
