@@ -27,7 +27,7 @@ func TestHomebrew(t *testing.T) {
 	defer func() {
 		homebrewCellarPath = oldPath
 	}()
-	homebrewCellarPath = "../../../tests/files/homebrew/"
+	homebrewCellarPath = "testdata/homebrew/"
 
 	// Test just listBrewPackages()
 	packages, err := listBrewPackages()
