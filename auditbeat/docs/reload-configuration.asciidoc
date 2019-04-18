@@ -15,7 +15,7 @@ in the main +{beatname_lc}.yml+ config file. For example:
 ["source","sh"]
 ------------------------------------------------------------------------------
 auditbeat.config.modules:
-  path: ${path.config}/conf.d/*.yml
+  path: ${path.config}/modules.d/*.yml
   reload.enabled: true
   reload.period: 10s
 ------------------------------------------------------------------------------
