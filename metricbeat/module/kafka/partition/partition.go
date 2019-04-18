@@ -22,12 +22,13 @@ import (
 
 	"github.com/Shopify/sarama"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/kafka"
-	"github.com/pkg/errors"
 )
 
 // init registers the partition MetricSet with the central registry.

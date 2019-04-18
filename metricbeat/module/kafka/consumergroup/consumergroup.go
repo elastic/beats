@@ -20,11 +20,12 @@ package consumergroup
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/kafka"
-	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry.
