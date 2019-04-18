@@ -7,17 +7,10 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "highlightAll": true,
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
-            },
-            "version": true
+              "language": "kuery",
+              "query": ""
+            }
           }
         },
         "optionsJSON": {
@@ -61,7 +54,7 @@
             },
             "panelIndex": "14",
             "panelRefName": "panel_2",
-            "title": "Average query rows",
+            "title": "Average deadlocks",
             "version": "7.0.0"
           },
           {
@@ -92,43 +85,43 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Postgres] Overview",
+        "title": "[Metricbeat PostgreSQL] Overview",
         "version": 1
       },
-      "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306-ecs",
+      "id": "63b041e4-61ce-11e9-91d0-efd192a57cbc",
       "migrationVersion": {
         "dashboard": "7.0.0"
       },
       "references": [
         {
-          "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs",
+          "id": "63b4e55a-61ce-11e9-a47e-fbd47e9970af",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs",
+          "id": "63b780da-61ce-11e9-947b-abdd6bc9dd2a",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs",
+          "id": "63b8640a-61ce-11e9-aab9-f35ea3a0c8eb",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs",
+          "id": "63bb8a9a-61ce-11e9-8eec-fb93bf9a933b",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs",
+          "id": "63bb10d8-61ce-11e9-ba28-c30231dd4649",
           "name": "panel_4",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-04-18T11:06:36.689Z",
-      "version": "WzYyMCwxXQ=="
+      "updated_at": "2019-04-18T12:51:49.957Z",
+      "version": "WzEyMjEsMV0="
     },
     {
       "attributes": {
@@ -142,7 +135,7 @@
             }
           }
         },
-        "title": "Transactions [Metricbeat Postgresq]",
+        "title": "Transactions [Metricbeat PostgreSQL]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -152,7 +145,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "id": "63b56656-61ce-11e9-b101-8b2113a42030",
             "index_pattern": "metricbeat-*",
             "interval": "auto",
             "legend_position": "bottom",
@@ -163,18 +156,18 @@
                 "color": "#68BC00",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "id": "63b5f97c-61ce-11e9-8e4f-9b3ae8ac0cc3",
                 "label": "Transaction commit",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.transactions.commit",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "63b6760e-61ce-11e9-8be2-7b538661dae2",
                     "type": "avg"
                   },
                   {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "aee9bbf0-f1f3-11e7-a752-236fe3270d99",
+                    "field": "63b6760e-61ce-11e9-8be2-7b538661dae2",
+                    "id": "63b8d2d2-61ce-11e9-bfa5-1fc2c7e6a9f9",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -190,18 +183,18 @@
                 "color": "#68BC00",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "eaa381b0-61c0-11e9-82cd-2b4b4256e02f",
+                "id": "63b9bd64-61ce-11e9-b032-ebaad1ea1106",
                 "label": "Transaction rollback",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.transactions.rollback",
-                    "id": "eaa3a8c0-61c0-11e9-82cd-2b4b4256e02f",
+                    "id": "63ba3320-61ce-11e9-a7ed-d78098d0dc1c",
                     "type": "avg"
                   },
                   {
-                    "field": "eaa3a8c0-61c0-11e9-82cd-2b4b4256e02f",
-                    "id": "fba747d0-61c0-11e9-82cd-2b4b4256e02f",
+                    "field": "63ba3320-61ce-11e9-a7ed-d78098d0dc1c",
+                    "id": "63bc0308-61ce-11e9-9a00-bfb183abb3a0",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -217,18 +210,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Transactions [Metricbeat Postgresq]",
+          "title": "Transactions [Metricbeat PostgreSQL]",
           "type": "metrics"
         }
       },
-      "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs",
+      "id": "63b4e55a-61ce-11e9-a47e-fbd47e9970af",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-18T10:45:22.176Z",
-      "version": "WzYxMSwxXQ=="
+      "updated_at": "2019-04-18T12:16:09.279Z",
+      "version": "WzExNTgsMV0="
     },
     {
       "attributes": {
@@ -242,7 +235,7 @@
             }
           }
         },
-        "title": "Command rates [Metricbeat Postgres]",
+        "title": "Command rates [Metricbeat PostgreSQL]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -252,7 +245,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "id": "63b56656-61ce-11e9-b101-8b2113a42030",
             "index_pattern": "metricbeat-*",
             "interval": "auto",
             "series": [
@@ -262,18 +255,18 @@
                 "color": "#68BC00",
                 "fill": "0.2",
                 "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "id": "63b5f97c-61ce-11e9-8e4f-9b3ae8ac0cc3",
                 "label": "FETCHED",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.rows.fetched",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "63b6760e-61ce-11e9-8be2-7b538661dae2",
                     "type": "avg"
                   },
                   {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "2d149f90-f1f4-11e7-a752-236fe3270d99",
+                    "field": "63b6760e-61ce-11e9-8be2-7b538661dae2",
+                    "id": "63ab9de2-61ce-11e9-955b-4b7cb34e6a87",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -289,19 +282,19 @@
                 "color": "rgba(104,204,202,1)",
                 "fill": "0.2",
                 "formatter": "number",
-                "id": "3c2a2a40-f1f4-11e7-a752-236fe3270d99",
+                "id": "63ad8594-61ce-11e9-8d9b-c78bf0899e81",
                 "label": "INSERTED",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.rows.inserted",
-                    "id": "3c2a2a41-f1f4-11e7-a752-236fe3270d99",
+                    "id": "63af5fc2-61ce-11e9-bcc1-abafaeb24414",
                     "type": "avg",
                     "unit": ""
                   },
                   {
-                    "field": "3c2a2a41-f1f4-11e7-a752-236fe3270d99",
-                    "id": "d083fef0-61bf-11e9-82cd-2b4b4256e02f",
+                    "field": "63af5fc2-61ce-11e9-bcc1-abafaeb24414",
+                    "id": "63b94d16-61ce-11e9-92e6-5f30aed13f23",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -317,18 +310,18 @@
                 "color": "rgba(252,220,0,1)",
                 "fill": "0.2",
                 "formatter": "number",
-                "id": "485ce050-f1f4-11e7-a752-236fe3270d99",
+                "id": "63b0e932-61ce-11e9-a41c-93d431159c89",
                 "label": "UPDATED",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.rows.updated",
-                    "id": "485ce051-f1f4-11e7-a752-236fe3270d99",
+                    "id": "63b17a96-61ce-11e9-bda3-b7bd574ec4db",
                     "type": "avg"
                   },
                   {
-                    "field": "485ce051-f1f4-11e7-a752-236fe3270d99",
-                    "id": "485ce052-f1f4-11e7-a752-236fe3270d99",
+                    "field": "63b17a96-61ce-11e9-bda3-b7bd574ec4db",
+                    "id": "63b24886-61ce-11e9-828c-231ac7612aef",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -344,18 +337,18 @@
                 "color": "rgba(244,78,59,1)",
                 "fill": "0.2",
                 "formatter": "number",
-                "id": "543a4a70-f1f4-11e7-a752-236fe3270d99",
+                "id": "63b32ecc-61ce-11e9-9283-43bf3c78b72e",
                 "label": "DELETED",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.rows.deleted",
-                    "id": "543a4a71-f1f4-11e7-a752-236fe3270d99",
+                    "id": "63b3c346-61ce-11e9-b0c2-072e792c36ba",
                     "type": "avg"
                   },
                   {
-                    "field": "543a4a71-f1f4-11e7-a752-236fe3270d99",
-                    "id": "543a4a72-f1f4-11e7-a752-236fe3270d99",
+                    "field": "63b3c346-61ce-11e9-b0c2-072e792c36ba",
+                    "id": "63b43ede-61ce-11e9-880b-839dc62a40d5",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -371,18 +364,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Command rates [Metricbeat Postgres]",
+          "title": "Affected rows [Metricbeat PostgreSQL]",
           "type": "metrics"
         }
       },
-      "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs",
+      "id": "63b780da-61ce-11e9-947b-abdd6bc9dd2a",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-18T10:24:03.948Z",
-      "version": "WzYwOCwxXQ=="
+      "updated_at": "2019-04-18T12:16:09.279Z",
+      "version": "WzExNTksMV0="
     },
     {
       "attributes": {
@@ -396,7 +389,7 @@
             }
           }
         },
-        "title": "Average query rows [Metricbeat Postgres]",
+        "title": "Average deadlocks [Metricbeat PostgreSQL]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -406,7 +399,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "id": "63b56656-61ce-11e9-b101-8b2113a42030",
             "index_pattern": "metricbeat-*",
             "interval": "auto",
             "legend_position": "bottom",
@@ -417,23 +410,17 @@
                 "color": "rgba(252,196,0,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "Average query rows",
+                "id": "63b5f97c-61ce-11e9-8e4f-9b3ae8ac0cc3",
+                "label": "Average deadlocks",
                 "line_width": 1,
                 "metrics": [
                   {
                     "agg_with": "avg",
-                    "field": "postgresql.statement.query.rows",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "field": "postgresql.database.deadlocks",
+                    "id": "63b6760e-61ce-11e9-8be2-7b538661dae2",
                     "order": "desc",
                     "size": 1,
                     "type": "avg"
-                  },
-                  {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "805a9630-61c6-11e9-82cd-2b4b4256e02f",
-                    "type": "count",
-                    "unit": ""
                   }
                 ],
                 "point_size": 1,
@@ -447,18 +434,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Average query rows [Metricbeat Postgres]",
+          "title": "Average deadlocks [Metricbeat PostgreSQL]",
           "type": "metrics"
         }
       },
-      "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs",
+      "id": "63b8640a-61ce-11e9-aab9-f35ea3a0c8eb",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-18T10:47:09.722Z",
-      "version": "WzYxMywxXQ=="
+      "updated_at": "2019-04-18T12:48:36.950Z",
+      "version": "WzEyMjAsMV0="
     },
     {
       "attributes": {
@@ -472,7 +459,7 @@
             }
           }
         },
-        "title": "Block hits [Metricbeat Postgres]",
+        "title": "Block hits [Metricbeat PostgreSQL]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -482,7 +469,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "id": "63b56656-61ce-11e9-b101-8b2113a42030",
             "index_pattern": "metricbeat-*",
             "interval": "auto",
             "legend_position": "bottom",
@@ -493,18 +480,18 @@
                 "color": "rgba(123,100,255,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "id": "63b5f97c-61ce-11e9-8e4f-9b3ae8ac0cc3",
                 "label": "Hits",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.blocks.hit",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "63b6760e-61ce-11e9-8be2-7b538661dae2",
                     "type": "avg"
                   },
                   {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "9972d250-f1f5-11e7-a752-236fe3270d99",
+                    "field": "63b6760e-61ce-11e9-8be2-7b538661dae2",
+                    "id": "63b7f420-61ce-11e9-a0f3-eb54ff2c0f9d",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -520,18 +507,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Block hits [Metricbeat Postgres]",
+          "title": "Block hits [Metricbeat PostgreSQL]",
           "type": "metrics"
         }
       },
-      "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs",
+      "id": "63bb8a9a-61ce-11e9-8eec-fb93bf9a933b",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-18T10:22:15.238Z",
-      "version": "WzYwNywxXQ=="
+      "updated_at": "2019-04-18T12:16:09.279Z",
+      "version": "WzExNjEsMV0="
     },
     {
       "attributes": {
@@ -545,7 +532,7 @@
             }
           }
         },
-        "title": "Block read [Metricbeat Postgres]",
+        "title": "Block read [Metricbeat PostgreSQL]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -555,7 +542,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "id": "63b56656-61ce-11e9-b101-8b2113a42030",
             "index_pattern": "metricbeat-*",
             "interval": "auto",
             "legend_position": "bottom",
@@ -566,18 +553,18 @@
                 "color": "rgba(22,25,165,1)",
                 "fill": 0.5,
                 "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "id": "63b5f97c-61ce-11e9-8e4f-9b3ae8ac0cc3",
                 "label": "Block read",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "postgresql.database.blocks.read",
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "63b6760e-61ce-11e9-8be2-7b538661dae2",
                     "type": "avg"
                   },
                   {
-                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "id": "f0c828f0-61c2-11e9-82cd-2b4b4256e02f",
+                    "field": "63b6760e-61ce-11e9-8be2-7b538661dae2",
+                    "id": "63baa0ee-61ce-11e9-9d60-bfdc72fc770b",
                     "type": "derivative",
                     "unit": ""
                   }
@@ -593,18 +580,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Block read [Metricbeat Postgres]",
+          "title": "Block read [Metricbeat PostgreSQL]",
           "type": "metrics"
         }
       },
-      "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs",
+      "id": "63bb10d8-61ce-11e9-ba28-c30231dd4649",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-18T10:20:54.275Z",
-      "version": "WzYwNiwxXQ=="
+      "updated_at": "2019-04-18T12:16:09.279Z",
+      "version": "WzExNjIsMV0="
     }
   ],
   "version": "7.0.0"
