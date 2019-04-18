@@ -140,6 +140,31 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 				},
 			},
 		},
+
+		"multicopy": {
+			config: common.MapStr{
+				"field": "array",
+				"mappings": common.MapStr{
+					"a": 1,
+					"b": 1,
+					"c": 1,
+				},
+				"fail_on_error": false,
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"array": []interface{}{0, 42},
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"array": []interface{}{0, 42},
+					"a":     42,
+					"b":     42,
+					"c":     42,
+				},
+			},
+		},
 	}
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
