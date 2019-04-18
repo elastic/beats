@@ -32,13 +32,14 @@ func TestHomebrew(t *testing.T) {
 	// Test just listBrewPackages()
 	packages, err := listBrewPackages()
 	assert.NoError(t, err)
-	assert.Len(t, packages, 1)
-	pkg := packages[0]
-	assert.Equal(t, "test-package", pkg.Name)
-	assert.Equal(t, "Test package", pkg.Summary)
-	assert.Equal(t, "https://www.elastic.co/", pkg.URL)
-	assert.Equal(t, "1.0.0", pkg.Version)
-	assert.True(t, time.Date(2019, 4, 17, 13, 14, 57, 205133721, time.FixedZone("BST", 60*60)).Equal(pkg.InstallTime), "Time is not equal: %+v", pkg.InstallTime)
+	if assert.Len(t, packages, 1) {
+		pkg := packages[0]
+		assert.Equal(t, "test-package", pkg.Name)
+		assert.Equal(t, "Test package", pkg.Summary)
+		assert.Equal(t, "https://www.elastic.co/", pkg.URL)
+		assert.Equal(t, "1.0.0", pkg.Version)
+		assert.True(t, time.Date(2019, 4, 17, 13, 14, 57, 205133721, time.FixedZone("BST", 60*60)).Equal(pkg.InstallTime), "Time is not equal: %+v", pkg.InstallTime)
+	}
 
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
