@@ -18,21 +18,24 @@
 package tlscommon
 
 import (
-	"crypto/tls"
+    "crypto/tls"
+    "errors"
 
-	"github.com/joeshaw/multierror"
+    wincrypt "github.com/elastic/beats/libbeat/wincrypt_client_certs"
+    "github.com/joeshaw/multierror"
 )
 
 // Config defines the user configurable options in the yaml file.
 type Config struct {
-	Enabled          *bool                   `config:"enabled" yaml:"enabled,omitempty"`
-	VerificationMode TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
-	Versions         []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
-	CipherSuites     []tlsCipherSuite        `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
-	CAs              []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
-	Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
-	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
-	Renegotiation    tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
+    Enabled          *bool                   `config:"enabled" yaml:"enabled,omitempty"`
+    VerificationMode TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
+    Versions         []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
+    CipherSuites     []tlsCipherSuite        `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
+    CAs              []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
+    Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
+    CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
+    Renegotiation tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
+    WincryptConfig   *wincrypt.Config        `config:"wincrypt" yaml:"wincrypt,omitempty"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
@@ -40,64 +43,81 @@ type Config struct {
 // will be configured. If no CAs are configured, the host CA will be used by go
 // built-in TLS support.
 func LoadTLSConfig(config *Config) (*TLSConfig, error) {
-	if !config.IsEnabled() {
-		return nil, nil
-	}
+    if !config.IsEnabled() {
+        return nil, nil
+    }
 
-	fail := multierror.Errors{}
-	logFail := func(es ...error) {
-		for _, e := range es {
-			if e != nil {
-				fail = append(fail, e)
-			}
-		}
-	}
+    if (config.Certificate.Key != "") && (config.WincryptConfig == nil) {
+        err := errors.New("Either a tls client certificate or wincrypt configuration must be supplied")
+        return nil, err
+    }
 
-	var cipherSuites []uint16
-	for _, suite := range config.CipherSuites {
-		cipherSuites = append(cipherSuites, uint16(suite))
-	}
+    fail := multierror.Errors{}
+    logFail := func(es ...error) {
+        for _, e := range es {
+            if e != nil {
+                fail = append(fail, e)
+            }
+        }
+    }
 
-	var curves []tls.CurveID
-	for _, id := range config.CurveTypes {
-		curves = append(curves, tls.CurveID(id))
-	}
+    var cipherSuites []uint16
+    for _, suite := range config.CipherSuites {
+        cipherSuites = append(cipherSuites, uint16(suite))
+    }
 
-	cert, err := LoadCertificate(&config.Certificate)
-	logFail(err)
+    var curves []tls.CurveID
+    for _, id := range config.CurveTypes {
+        curves = append(curves, tls.CurveID(id))
+    }
 
-	cas, errs := LoadCertificateAuthorities(config.CAs)
-	logFail(errs...)
+    var certs []tls.Certificate
+    var err error
+    var tp wincrypt.ClientCertificateGetter
+    var cert *tls.Certificate
 
-	// fail, if any error occurred when loading certificate files
-	if err = fail.Err(); err != nil {
-		return nil, err
-	}
+    if config.Certificate.Key != "" {
+        cert, err = LoadCertificate(&config.Certificate)
+        logFail(err)
+    }
 
-	var certs []tls.Certificate
-	if cert != nil {
-		certs = []tls.Certificate{*cert}
-	}
+    if config.WincryptConfig != nil {
+        tp, err = wincrypt.New(config.WincryptConfig)
+        logFail(err)
+    }
 
-	// return config if no error occurred
-	return &TLSConfig{
-		Versions:         config.Versions,
-		Verification:     config.VerificationMode,
-		Certificates:     certs,
-		RootCAs:          cas,
-		CipherSuites:     cipherSuites,
-		CurvePreferences: curves,
-		Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
-	}, nil
+    // fail, if any error occurred when loading certificate files
+    if err = fail.Err(); err != nil {
+        return nil, err
+    }
+
+    if cert != nil {
+        certs = []tls.Certificate{*cert}
+    }
+
+    cas, errs := LoadCertificateAuthorities(config.CAs)
+    logFail(errs...)
+
+    // return config if no error occurred
+    return &TLSConfig{
+        Versions:         config.Versions,
+        Verification:     config.VerificationMode,
+        Certificates:     certs,
+        RootCAs:          cas,
+        CipherSuites:     cipherSuites,
+        CurvePreferences: curves,
+        Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
+        Wincrypt:          tp,
+    }, nil
 }
 
 // Validate values the TLSConfig struct making sure certificate sure we have both a certificate and
 // a key.
 func (c *Config) Validate() error {
-	return c.Certificate.Validate()
+    return c.Certificate.Validate()
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
 func (c *Config) IsEnabled() bool {
-	return c != nil && (c.Enabled == nil || *c.Enabled)
+    return c != nil && (c.Enabled == nil || *c.Enabled)
 }

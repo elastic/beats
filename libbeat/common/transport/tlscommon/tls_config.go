@@ -22,6 +22,7 @@ import (
 	"crypto/x509"
 
 	"github.com/elastic/beats/libbeat/logp"
+	wincrypt "github.com/elastic/beats/libbeat/wincrypt_client_certs"
 )
 
 // TLSConfig is the interface used to configure a tcp client or server from a `Config`
@@ -64,6 +65,9 @@ type TLSConfig struct {
 	// ClientAuth controls how we want to verify certificate from a client, `none`, `optional` and
 	// `required`, default to required. Do not affect TCP client.
 	ClientAuth tls.ClientAuthType
+
+	// If Wincrypt is set it is used to retrieve client certificates.
+	Wincrypt wincrypt.ClientCertificateGetter
 }
 
 // BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
@@ -79,7 +83,7 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 		logp.Warn("SSL/TLS verifications disabled.")
 	}
 
-	return &tls.Config{
+	config :=  &tls.Config{
 		ServerName:         host,
 		MinVersion:         minVersion,
 		MaxVersion:         maxVersion,
@@ -92,4 +96,10 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,
 	}
+
+	if c.Wincrypt != nil {
+		config.GetClientCertificate = c.Wincrypt.GetClientCertificate
+	}
+
+	return config
 }

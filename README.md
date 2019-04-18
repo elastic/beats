@@ -2,6 +2,22 @@
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
 [![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
 
+# About this Fork
+
+This fork adds the ability to use certificates from the windows certificate store for client authentication.
+
+**Usage:**
+
+Replace the `ssl.key` and `ssl.cert` option  in your beats yml configuration with a `ssl.wincrypt` config object:
+```
+  ssl.wincrypt:
+     stores: ["LocalMachine/My"]
+     query: "X509_Subject_CommonName == 'nytimes.com'"
+```
+
+More information:
+- [wincrypt_client_certs library](libbeat/wincrypt_client_certs/README.md)
+
 # Beats - The Lightweight Shippers of the Elastic Stack
 
 The [Beats](https://www.elastic.co/products/beats) are lightweight data
