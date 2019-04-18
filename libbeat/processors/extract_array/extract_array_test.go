@@ -21,7 +21,7 @@ func TestExtractArrayProcessor_String(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, "extract_array={field:csv, mappings:[{0 source.ip} {2 network.transport} {99 destination.ip}]}", p.String())
+	assert.Equal(t, "extract_array={field=csv, mappings=[{0 source.ip} {2 network.transport} {99 destination.ip}]}", p.String())
 }
 
 func TestExtractArrayProcessor_Run(t *testing.T) {

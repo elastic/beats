@@ -142,7 +142,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (f *extractArrayProcessor) String() (r string) {
-	return fmt.Sprintf("extract_array={field:%s, mappings:%v}", f.config.Field, f.mappings)
+	return fmt.Sprintf("extract_array={field=%s, mappings=%v}", f.config.Field, f.mappings)
 }
 
 func clone(value interface{}) interface{} {
@@ -151,6 +151,8 @@ func clone(value interface{}) interface{} {
 	switch v := value.(type) {
 	case common.MapStr:
 		return v.Clone()
+	case map[string]interface{}:
+		return common.MapStr(v).Clone()
 	}
 	return value
 }
