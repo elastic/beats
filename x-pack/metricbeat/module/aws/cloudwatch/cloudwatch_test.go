@@ -77,23 +77,23 @@ func TestConstructLabel(t *testing.T) {
 	}{
 		{
 			listMetric1,
-			"CPUUtilization InstanceId i-1",
+			"CPUUtilization AWS/EC2 InstanceId i-1",
 		},
 		{
 			listMetric2,
-			"StatusCheckFailed InstanceId i-1",
+			"StatusCheckFailed AWS/EC2 InstanceId i-1",
 		},
 		{
 			listMetric3,
-			"StatusCheckFailed_System InstanceId i-2",
+			"StatusCheckFailed_System AWS/EC2 InstanceId i-2",
 		},
 		{
 			listMetric4,
-			"StatusCheckFailed_Instance InstanceId i-2",
+			"StatusCheckFailed_Instance AWS/EC2 InstanceId i-2",
 		},
 		{
 			listMetric5,
-			"CPUUtilization",
+			"CPUUtilization AWS/EC2",
 		},
 	}
 

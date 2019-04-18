@@ -184,7 +184,12 @@ metricbeat.modules:
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
   cloudwatch_metrics:
-    - namespace: AWS/SNS
+    - namespace: AWS/EC2
+      metricname: CPUUtilization
+      dimensions:
+        - name: InstanceId
+          value: i-0686946e22cf9494a
+    - namespace: AWS/EBS
 
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph

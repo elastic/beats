@@ -7,8 +7,10 @@ package cloudwatch
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -59,8 +61,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get CloudwatchMetrics Config
-	cloudwatchConfig := m.CloudwatchMetrics
-	if len(cloudwatchConfig) == 0 {
+	cloudwatchConfigs := m.CloudwatchMetrics
+	if len(cloudwatchConfigs) == 0 {
 		return errors.New("cloudwatch_metrics in config is missing")
 	}
 	// Get startTime and endTime
@@ -69,8 +71,28 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return errors.Wrap(err, "Error ParseDuration")
 	}
 
-	for _, cw := range cloudwatchConfig {
-		namespace := cw["namespace"].(string)
+	// Get listMetricsTotal and namespaces from configuration
+	listMetricsTotal := []cloudwatch.Metric{}
+	namespaces := []string{}
+	for _, cloudwatchConfig := range cloudwatchConfigs {
+		namespace := cloudwatchConfig["namespace"].(string)
+		if cloudwatchConfig["metricname"] != nil {
+			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, namespace)
+			listMetricsTotal = append(listMetricsTotal, listMetricsOutput)
+		} else {
+			namespaces = append(namespaces, namespace)
+		}
+	}
+
+	// Use listMetricsTotal from config
+	svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+	err = createEvents(svcCloudwatch, listMetricsTotal, m.PeriodInSec, startTime, endTime, report)
+	if err != nil {
+		return errors.New("createEvents failed")
+	}
+
+	// Use namespaces from config
+	for _, namespace := range namespaces {
 		for _, regionName := range m.MetricSet.RegionsList {
 			m.MetricSet.AwsConfig.Region = regionName
 			svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
@@ -85,63 +107,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			// get identifiers from listMetrics
-			identifiers := getIdentifiers(listMetricsOutput)
-
-			// Construct metricDataQueries
-			metricDataQueries := constructMetricQueries(listMetricsOutput, int64(m.PeriodInSec))
-			if len(metricDataQueries) == 0 {
-				continue
-			}
-
-			// Use metricDataQueries to make GetMetricData API calls
-			metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
+			err = createEvents(svcCloudwatch, listMetricsOutput, m.PeriodInSec, startTime, endTime, report)
 			if err != nil {
-				err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-				m.Logger().Error(err.Error())
-				report.Error(err)
-				continue
-			}
-
-			// Initialize events map per region, which stores one event per identifierValue
-			events := map[string]mb.Event{}
-			for _, values := range identifiers {
-				for _, v := range values {
-					events[v] = initEvent(regionName)
-				}
-			}
-
-			// Find a timestamp for all metrics in output
-			timestamp := aws.FindTimestamp(metricDataResults)
-			if !timestamp.IsZero() {
-				for _, output := range metricDataResults {
-					if len(output.Values) == 0 {
-						continue
-					}
-
-					exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-					if exists {
-						labels := strings.Split(*output.Label, " ")
-						if len(labels) == 3 {
-							identifierValue := labels[2]
-							events[identifierValue] = insertMetricSetFields(events[identifierValue], namespace, output.Values[timestampIdx], labels)
-						} else {
-							eventNew := initEvent(regionName)
-							eventNew = insertMetricSetFields(eventNew, namespace, output.Values[timestampIdx], labels)
-							if reported := report.Event(eventNew); !reported {
-								return nil
-							}
-						}
-					}
-				}
-			}
-
-			for _, event := range events {
-				if len(event.MetricSetFields) != 0 {
-					if reported := report.Event(event); !reported {
-						return nil
-					}
-				}
+				return errors.New("createEvents failed for region " + regionName)
 			}
 		}
 	}
@@ -161,7 +129,7 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64)
 func constructLabel(metric cloudwatch.Metric) string {
 	metricDims := metric.Dimensions
 	metricName := *metric.MetricName
-	label := metricName
+	label := metricName + " " + *metric.Namespace
 	dimNames := ""
 	dimValues := ""
 	for i, dim := range metricDims {
@@ -238,21 +206,117 @@ func initEvent(regionName string) mb.Event {
 	event.RootFields = common.MapStr{}
 	event.MetricSetFields = common.MapStr{}
 	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
+	if regionName != "" {
+		event.RootFields.Put("cloud.region", regionName)
+	}
 	return event
 }
 
-func insertMetricSetFields(event mb.Event, namespace string, metricValue float64, labels []string) mb.Event {
-	event.MetricSetFields.Put("namespace", namespace)
+func insertMetricSetFields(event mb.Event, metricValue float64, labels []string) mb.Event {
+	event.MetricSetFields.Put("namespace", labels[1])
 	event.MetricSetFields.Put(labels[0], metricValue)
-	if len(labels) == 1 {
+	if len(labels) == 2 {
 		return event
 	}
 
-	dimNames := strings.Split(labels[1], ",")
-	dimValues := strings.Split(labels[2], ",")
+	dimNames := strings.Split(labels[2], ",")
+	dimValues := strings.Split(labels[3], ",")
 	for i := 0; i < len(dimNames); i++ {
 		event.MetricSetFields.Put(dimNames[i], dimValues[i])
 	}
 	return event
+}
+
+func convertConfigToListMetrics(cloudwatchConfig map[string]interface{}, namespace string) cloudwatch.Metric {
+	// convert config input to []cloudwatch.Metric
+	metricName := cloudwatchConfig["metricname"].(string)
+	dimensions := cloudwatchConfig["dimensions"].([]interface{})
+	cloudwatchDimensions := []cloudwatch.Dimension{}
+	for _, dim := range dimensions {
+		d := dim.(map[string]interface{})
+		cloudwatchDim := cloudwatch.Dimension{}
+		for n, v := range d {
+			if n == "name" {
+				name := v.(string)
+				cloudwatchDim.Name = &name
+			} else if n == "value" {
+				value := v.(string)
+				cloudwatchDim.Value = &value
+			}
+		}
+		cloudwatchDimensions = append(cloudwatchDimensions, cloudwatchDim)
+	}
+
+	listMetricsOutput := cloudwatch.Metric{
+		Namespace:  &namespace,
+		MetricName: &metricName,
+		Dimensions: cloudwatchDimensions,
+	}
+	return listMetricsOutput
+}
+
+func createEvents(svc cloudwatchiface.CloudWatchAPI, listMetricsTotal []cloudwatch.Metric, period int, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
+	identifiers := getIdentifiers(listMetricsTotal)
+	// Initialize events map per region, which stores one event per identifierValue
+	events := map[string]mb.Event{}
+	for _, values := range identifiers {
+		for _, v := range values {
+			events[v] = initEvent("")
+		}
+	}
+	// Initialize events for the ones without identifiers.
+	eventsNoIdentifier := []mb.Event{}
+
+	// Construct metricDataQueries
+	metricDataQueries := constructMetricQueries(listMetricsTotal, int64(period))
+	if len(metricDataQueries) == 0 {
+		return nil
+	}
+
+	// Use metricDataQueries to make GetMetricData API calls
+	metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svc, startTime, endTime)
+	if err != nil {
+		return errors.Wrap(err, "GetMetricDataResults failed")
+	}
+
+	// Find a timestamp for all metrics in output
+	timestamp := aws.FindTimestamp(metricDataResults)
+	if !timestamp.IsZero() {
+		for _, output := range metricDataResults {
+			if len(output.Values) == 0 {
+				continue
+			}
+
+			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, " ")
+				if len(labels) == 4 {
+					identifierValue := labels[3]
+					events[identifierValue] = insertMetricSetFields(events[identifierValue], output.Values[timestampIdx], labels)
+				} else {
+					eventNew := initEvent("")
+					eventNew = insertMetricSetFields(eventNew, output.Values[timestampIdx], labels)
+					eventsNoIdentifier = append(eventsNoIdentifier, eventNew)
+				}
+			}
+		}
+	}
+
+	for _, event := range events {
+		if len(event.MetricSetFields) != 0 {
+			if reported := report.Event(event); !reported {
+				return nil
+			}
+		}
+	}
+
+	for _, event := range eventsNoIdentifier {
+		if len(event.MetricSetFields) != 0 {
+			if reported := report.Event(event); !reported {
+				return nil
+			}
+		}
+	}
+
+	return nil
 }

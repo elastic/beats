@@ -1,6 +1,6 @@
 The cloudwatch metricset of aws module allows you to monitor varies services on
 AWS. `cloudwatch` metricset fetches metrics from given namespace periodically
-and sto
+by calling `GetMetricData` api.
 
 [float]
 === AWS Permissions
