@@ -59,7 +59,8 @@ func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {
 	assert.True(t, writeCount > 0)
 	assert.True(t, writeBytes > 0)
 	assert.True(t, writeTime > 0)
-
+	err := disablePerformanceCounters(`\\.\C:`)
+	assert.NoError(t, err)
 }
 
 func TestAllDrivesOnWindowsTestEnv(t *testing.T) {
@@ -72,4 +73,10 @@ func TestAllDrivesOnWindowsTestEnv(t *testing.T) {
 	data, errs := mbtest.ReportingFetchV2(f)
 	assert.Empty(t, errs)
 	assert.True(t, len(data) >= 1)
+	drives, err := getLogicalDriveStrings()
+	assert.NoError(t, err)
+	for _, drive := range drives {
+		err := disablePerformanceCounters(drive.UNCPath)
+		assert.NoError(t, err)
+	}
 }
