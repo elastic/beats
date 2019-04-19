@@ -109,7 +109,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			err = createEvents(svcCloudwatch, listMetricsOutput, m.PeriodInSec, startTime, endTime, report)
 			if err != nil {
-				return errors.New("createEvents failed for region " + regionName)
+				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
 		}
 	}

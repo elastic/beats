@@ -79,6 +79,10 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100-1]
 			}
 
+			if len(metricDataQueriesPartial) == 0 {
+				return getMetricDataOutput.MetricDataResults, nil
+			}
+
 			output, err := getMetricDataPerRegion(metricDataQueriesPartial, getMetricDataOutput.NextToken, svc, startTime, endTime)
 			if err != nil {
 				err = errors.Wrap(err, "getMetricDataPerRegion failed")
