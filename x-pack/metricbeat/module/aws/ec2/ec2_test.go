@@ -195,11 +195,12 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		},
 	}
 
-	event, _, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
+	events, _, err := createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
-	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
-	assert.Equal(t, expectedEvent.MetricSetFields["instance"], event.MetricSetFields["instance"])
+	assert.Equal(t, 1, len(events))
+	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
+	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], events[instanceID].MetricSetFields["cpu"])
+	assert.Equal(t, expectedEvent.MetricSetFields["instance"], events[instanceID].MetricSetFields["instance"])
 }
 
 func TestConstructMetricQueries(t *testing.T) {
