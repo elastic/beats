@@ -153,10 +153,11 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID st
 }
 
 func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, instanceOutput map[string]ec2.Instance, regionName string) (map[string]mb.Event, string, error) {
+	// Initialize events and metricSetFieldResults per instanceID
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
 	info := ""
-	for instanceID, _ := range instanceOutput {
+	for instanceID := range instanceOutput {
 		events[instanceID] = initEC2Event(regionName)
 		metricSetFieldResults[instanceID] = map[string]interface{}{}
 	}
@@ -287,9 +288,10 @@ func initEC2Event(regionName string) mb.Event {
 	event := mb.Event{}
 	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
+	event.MetricSetFields = common.MapStr{}
+
 	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.provider", "aws")
 	event.RootFields.Put("cloud.region", regionName)
-	event.MetricSetFields = common.MapStr{}
 	return event
 }
