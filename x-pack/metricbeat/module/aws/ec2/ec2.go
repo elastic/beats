@@ -14,7 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -96,13 +95,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		metricDataQueriesTotal := []cloudwatch.MetricDataQuery{}
+		var metricDataQueriesTotal []cloudwatch.MetricDataQuery
 		for _, instanceID := range instanceIDs {
 			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)...)
 		}
 
 		// If metricDataQueries, still needs to createCloudWatchEvents.
-		metricDataOutput := []cloudwatch.MetricDataResult{}
+		var metricDataOutput []cloudwatch.MetricDataResult
 		if len(metricDataQueriesTotal) != 0 {
 			// Use metricDataQueries to make GetMetricData API calls
 			metricDataOutput, err = aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
@@ -140,7 +139,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID string, periodInSec int) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, instanceID, i, periodInSec)
@@ -158,7 +157,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	metricSetFieldResults := map[string]map[string]interface{}{}
 	info := ""
 	for instanceID := range instanceOutput {
-		events[instanceID] = initEC2Event(regionName)
+		events[instanceID] = aws.InitEvent(metricsetName, regionName)
 		metricSetFieldResults[instanceID] = map[string]interface{}{}
 	}
 
@@ -219,16 +218,18 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	}
 
 	for instanceID, metricSetFieldsPerInstance := range metricSetFieldResults {
-		resultMetricsetFields, err := aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFields)
-		if err != nil {
-			return events, info, errors.Wrap(err, "EventMapping failed")
-		}
+		if len(metricSetFieldsPerInstance) != 0 {
+			resultMetricsetFields, err := aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFields)
+			if err != nil {
+				return events, info, errors.Wrap(err, "EventMapping failed")
+			}
 
-		events[instanceID].MetricSetFields.Update(resultMetricsetFields)
-		if len(events[instanceID].MetricSetFields) <= 11 {
-			info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for non-running instances or " +
-				"a new instance during the first data collection. If this shows up multiple times, please recheck the period " +
-				"setting in config."
+			events[instanceID].MetricSetFields.Update(resultMetricsetFields)
+			if len(events[instanceID].MetricSetFields) < 5 {
+				info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for non-running instances or " +
+					"a new instance during the first data collection. If this shows up multiple times, please recheck the period " +
+					"setting in config."
+			}
 		}
 	}
 
@@ -282,16 +283,4 @@ func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index in
 		}
 	}
 	return
-}
-
-func initEC2Event(regionName string) mb.Event {
-	event := mb.Event{}
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	event.MetricSetFields = common.MapStr{}
-
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.provider", "aws")
-	event.RootFields.Put("cloud.region", regionName)
-	return event
 }
