@@ -29,6 +29,19 @@
         The startup type of the service. The possible values are `Automatic`,
         `Boot`, `Disabled`, `Manual`, and `System`.
 
+    - name: start_name
+      type: keyword
+      example: NT AUTHORITY\LocalService
+      description: >
+        Account name under which a service runs.
+
+    - name: path_name
+      type: keyword
+      example: C:\WINDOWS\system32\svchost.exe -k LocalService -p
+      description: >
+        Fully qualified path to the file that implements the service,
+        including arguments.
+
     - name: state
       type: keyword
       description: >
