@@ -109,31 +109,38 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
+		// Get MetricDataQuery for all dbInstances per region
+		var metricDataQueriesTotal []cloudwatch.MetricDataQuery
 		for _, dbInstanceARN := range dbInstanceARNs {
-			metricDataQueries := constructMetricQueries(listMetricsOutput, dbInstanceARN, m.PeriodInSec)
-			// If metricDataQueries, still needs to createCloudWatchEvents.
-			metricDataOutput := []cloudwatch.MetricDataResult{}
-			if len(metricDataQueries) != 0 {
-				// Use metricDataQueries to make GetMetricData API calls
-				metricDataOutput, err = aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
-				if err != nil {
-					err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-					m.Logger().Error(err.Error())
-					report.Error(err)
-					continue
-				}
-			}
+			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, dbInstanceARN, m.PeriodInSec)...)
+		}
 
-			// Create Cloudwatch Events for RDS
-			event, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap[dbInstanceARN])
+		metricDataOutput := []cloudwatch.MetricDataResult{}
+		if len(metricDataQueriesTotal) != 0 {
+			// Use metricDataQueries to make GetMetricData API calls
+			metricDataOutput, err = aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
 			if err != nil {
+				err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
 				m.Logger().Error(err.Error())
 				report.Error(err)
 				continue
 			}
-			if reported := report.Event(event); !reported {
-				m.Logger().Debug("Fetch interrupted, failed to emit event")
-				return nil
+		}
+
+		// Create Cloudwatch Events for RDS
+		events, err := createCloudWatchEvents(metricDataOutput, regionName, dbDetailsMap)
+		if err != nil {
+			m.Logger().Error(err.Error())
+			report.Error(err)
+			continue
+		}
+
+		for _, event := range events {
+			if len(event.MetricSetFields) != 0 {
+				if reported := report.Event(event); !reported {
+					m.Logger().Debug("Fetch interrupted, failed to emit event")
+					return nil
+				}
 			}
 		}
 	}
@@ -150,9 +157,8 @@ func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetail
 		return nil, nil, err
 	}
 
-	dbInstanceARNs := []string{}
+	var dbInstanceARNs []string
 	dbDetailsMap := map[string]DBDetails{}
-
 	for _, dbInstance := range output.DBInstances {
 		dbInstanceARNs = append(dbInstanceARNs, *dbInstance.DBInstanceArn)
 		dbDetails := DBDetails{
@@ -168,7 +174,7 @@ func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetail
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn string, periodInSec int) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, i, dbInstanceArn, periodInSec)
@@ -211,17 +217,15 @@ func constructLabel(metricDimensions []cloudwatch.Dimension, dbInstanceARN strin
 	return label
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap DBDetails) (mb.Event, error) {
-	event := mb.Event{}
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
+func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string, dbInstanceMap map[string]DBDetails) (map[string]mb.Event, error) {
+	// Initialize events and metricSetFieldResults per dbInstance
+	events := map[string]mb.Event{}
+	metricSetFieldResults := map[string]map[string]interface{}{}
 
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.provider", "aws")
-	event.RootFields.Put("cloud.region", regionName)
-
-	// AWS RDS Metrics
-	mapOfMetricSetFieldResults := make(map[string]interface{})
+	for dbInstanceArn := range dbInstanceMap {
+		events[dbInstanceArn] = initRDSEvent(regionName)
+		metricSetFieldResults[dbInstanceArn] = map[string]interface{}{}
+	}
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(getMetricDataResults)
@@ -233,27 +237,42 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
 				labels := strings.Split(*output.Label, " ")
+				dbInstanceArn := labels[0]
+				events[dbInstanceArn].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbInstanceArn].dbAvailabilityZone)
+				events[dbInstanceArn].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbInstanceArn].dbArn)
+				events[dbInstanceArn].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbInstanceArn].dbClass)
+				events[dbInstanceArn].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbInstanceArn].dbIdentifier)
+				events[dbInstanceArn].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbInstanceArn].dbStatus)
 				if len(output.Values) > timestampIdx && len(labels) > 1 {
-					mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[timestampIdx])
+					metricSetFieldResults[dbInstanceArn][labels[1]] = fmt.Sprint(output.Values[timestampIdx])
 					for i := 1; i <= (len(labels)-2)/2; i++ {
-						mapOfMetricSetFieldResults[labels[i*2]] = labels[(i*2 + 1)]
+						metricSetFieldResults[dbInstanceArn][labels[i*2]] = labels[(i*2 + 1)]
 					}
 				}
 			}
 		}
 	}
 
-	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
-	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS RDS metricbeat module.")
-		return event, err
+	for dbInstanceArn, metricSetFieldsPerInstance := range metricSetFieldResults {
+		resultMetricsetFields, err := aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFields)
+		if err != nil {
+			return events, errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS RDS metricbeat module for dbInstance "+dbInstanceArn)
+		}
+
+		events[dbInstanceArn].MetricSetFields.Update(resultMetricsetFields)
 	}
 
-	event.MetricSetFields = resultMetricSetFields
-	event.RootFields.Put("cloud.availability_zone", dbInstanceMap.dbAvailabilityZone)
-	event.MetricSetFields.Put("db_instance.arn", dbInstanceMap.dbArn)
-	event.MetricSetFields.Put("db_instance.class", dbInstanceMap.dbClass)
-	event.MetricSetFields.Put("db_instance.identifier", dbInstanceMap.dbIdentifier)
-	event.MetricSetFields.Put("db_instance.status", dbInstanceMap.dbStatus)
-	return event, err
+	return events, nil
+}
+
+func initRDSEvent(regionName string) mb.Event {
+	event := mb.Event{}
+	event.Service = metricsetName
+	event.RootFields = common.MapStr{}
+	event.MetricSetFields = common.MapStr{}
+
+	event.RootFields.Put("service.name", metricsetName)
+	event.RootFields.Put("cloud.provider", "aws")
+	event.RootFields.Put("cloud.region", regionName)
+	return event
 }
