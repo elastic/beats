@@ -165,6 +165,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow module configurations to have variants {pull}9118[9118]
 - Add `timeseries.instance` field calculation. {pull}10293[10293]
 - Added new disk states and raid level to the system/raid metricset. {pull}11613[11613]
+- Add check on object name in the counter path if the instance name is missing {issue}6528[6528]
 
 *Packetbeat*
 
