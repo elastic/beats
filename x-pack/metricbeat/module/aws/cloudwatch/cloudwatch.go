@@ -72,17 +72,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Get listMetricsTotal and namespaces from configuration
-	listMetricsTotal := []cloudwatch.Metric{}
-	namespaces := []string{}
-	for _, cloudwatchConfig := range cloudwatchConfigs {
-		namespace := cloudwatchConfig["namespace"].(string)
-		if cloudwatchConfig["metricname"] != nil {
-			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, namespace)
-			listMetricsTotal = append(listMetricsTotal, listMetricsOutput)
-		} else {
-			namespaces = append(namespaces, namespace)
-		}
-	}
+	listMetricsTotal, namespacesTotal := readCloudwatchConfig(cloudwatchConfigs)
 
 	// Use listMetricsTotal from config
 	svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
@@ -92,7 +82,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	// Use namespaces from config
-	for _, namespace := range namespaces {
+	for _, namespace := range namespacesTotal {
 		for _, regionName := range m.MetricSet.RegionsList {
 			m.MetricSet.AwsConfig.Region = regionName
 			svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
@@ -115,6 +105,21 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+func readCloudwatchConfig(cloudwatchConfigs []map[string]interface{}) ([]cloudwatch.Metric, []string) {
+	listMetricsTotal := []cloudwatch.Metric{}
+	namespacesTotal := []string{}
+	for _, cloudwatchConfig := range cloudwatchConfigs {
+		namespace := cloudwatchConfig["namespace"].(string)
+		if cloudwatchConfig["metricname"] != nil {
+			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, namespace)
+			listMetricsTotal = append(listMetricsTotal, listMetricsOutput)
+		} else {
+			namespacesTotal = append(namespacesTotal, namespace)
+		}
+	}
+	return listMetricsTotal, namespacesTotal
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
@@ -185,7 +190,6 @@ func getIdentifiers(listMetricsOutputs []cloudwatch.Metric) map[string][]string 
 				identifierName += ","
 				identifierValue += ","
 			}
-
 		}
 
 		if identifiers[identifierName] != nil {
