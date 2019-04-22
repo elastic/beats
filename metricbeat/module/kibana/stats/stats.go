@@ -22,6 +22,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -56,6 +58,7 @@ type MetricSet struct {
 	statsHTTP            *helper.HTTP
 	settingsHTTP         *helper.HTTP
 	usageLastCollectedOn time.Time
+	kibanaVersion        *common.Version
 }
 
 // New create a new instance of the MetricSet
@@ -118,6 +121,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		statsHTTP,
 		settingsHTTP,
 		time.Time{},
+		kibanaVersion,
 	}, nil
 }
 
@@ -141,15 +145,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 	// Collect usage stats only once every usageCollectionPeriod
-	excludeUsage := "true"
-	if now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod {
-		m.usageLastCollectedOn = now
-		excludeUsage = "false"
-	}
-
 	origURI := m.statsHTTP.GetURI()
 	defer m.statsHTTP.SetURI(origURI)
-	m.statsHTTP.SetURI(origURI + "&exclude_usage=" + excludeUsage)
+
+	if kibana.IsExcludeUsageParamAvailable(m.kibanaVersion) && now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod {
+		m.usageLastCollectedOn = now
+		m.statsHTTP.SetURI(origURI + "&exclude_usage=true")
+	}
 
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {

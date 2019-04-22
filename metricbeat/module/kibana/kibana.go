@@ -39,6 +39,10 @@ var (
 
 	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
 	SettingsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+
+	// ExcludeUsageParamAvailableVersion is the version of Kibana since when the stats API supports the
+	// exclude_usage parameter
+	ExcludeUsageParamAvailableVersion = common.MustNewVersion("7.1.0")
 )
 
 // ReportErrorForMissingField reports and returns an error message for the given
@@ -79,6 +83,12 @@ func IsStatsAPIAvailable(currentKibanaVersion *common.Version) bool {
 // IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
 func IsSettingsAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
+}
+
+// IsExcludeUsageParamAvailable returns whether the stats API supports the exclude_usage parameter in the
+// given version of Kibana
+func IsExcludeUsageParamAvailable(currentKibanaVersion *common.Version) bool {
+	return elastic.IsFeatureAvailable(currentKibanaVersion, ExcludeUsageParamAvailableVersion)
 }
 
 func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
