@@ -19,6 +19,7 @@ package stats
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -148,9 +149,12 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 	origURI := m.statsHTTP.GetURI()
 	defer m.statsHTTP.SetURI(origURI)
 
-	if kibana.IsExcludeUsageParamAvailable(m.kibanaVersion) && now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod {
-		m.usageLastCollectedOn = now
-		m.statsHTTP.SetURI(origURI + "&exclude_usage=true")
+	if kibana.IsExcludeUsageParamAvailable(m.kibanaVersion) {
+		shouldCollectUsage := m.shouldCollectUsage(now)
+		if shouldCollectUsage {
+			m.usageLastCollectedOn = now
+		}
+		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
 	}
 
 	content, err := m.statsHTTP.FetchContent()
@@ -192,4 +196,8 @@ func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
 
 func (m *MetricSet) calculateIntervalMs() int64 {
 	return m.Module().Config().Period.Nanoseconds() / 1000 / 1000
+}
+
+func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
+	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod
 }
