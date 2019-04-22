@@ -85,9 +85,9 @@ func IsSettingsAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
 }
 
-// IsExcludeUsageParamAvailable returns whether the stats API supports the exclude_usage parameter in the
+// IsUsageExcludable returns whether the stats API supports the exclude_usage parameter in the
 // given version of Kibana
-func IsExcludeUsageParamAvailable(currentKibanaVersion *common.Version) bool {
+func IsUsageExcludable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, ExcludeUsageParamAvailableVersion)
 }
 
