@@ -668,7 +668,7 @@ output.logstash:
 
 Time to live for a connection to Logstash after which the connection will be re-established.
 Useful when Logstash hosts represent load balancers. Since the connections to Logstash hosts
-are sticky operating behind load balancers can lead to uneven load distribution between the instances.
+are sticky, operating behind load balancers can lead to uneven load distribution between the instances.
 Specifying a TTL on the connection allows to achieve equal connection distribution between the
 instances.  Specifying a TTL of 0 will disable this feature.
 
