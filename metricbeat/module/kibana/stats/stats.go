@@ -37,8 +37,9 @@ func init() {
 }
 
 const (
-	statsPath    = "api/stats"
-	settingsPath = "api/settings"
+	statsPath             = "api/stats"
+	settingsPath          = "api/settings"
+	usageCollectionPeriod = 24 * time.Hour
 )
 
 var (
@@ -52,8 +53,9 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	statsHTTP    *helper.HTTP
-	settingsHTTP *helper.HTTP
+	statsHTTP            *helper.HTTP
+	settingsHTTP         *helper.HTTP
+	usageLastCollectedOn time.Time
 }
 
 // New create a new instance of the MetricSet
@@ -115,6 +117,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms,
 		statsHTTP,
 		settingsHTTP,
+		time.Time{},
 	}, nil
 }
 
@@ -137,6 +140,17 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
+	// Collect usage stats only once every usageCollectionPeriod
+	excludeUsage := "true"
+	if now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod {
+		m.usageLastCollectedOn = now
+		excludeUsage = "false"
+	}
+
+	origURI := m.statsHTTP.GetURI()
+	defer m.statsHTTP.SetURI(origURI)
+	m.statsHTTP.SetURI(origURI + "&exclude_usage=" + excludeUsage)
+
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
 		return err
