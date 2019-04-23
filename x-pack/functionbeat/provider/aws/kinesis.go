@@ -166,7 +166,7 @@ func (k *Kinesis) Template() *cloudformation.Template {
 		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
 			BatchSize:        trigger.BatchSize,
 			EventSourceArn:   trigger.EventSourceArn,
-			FunctionName:     cloudformation.GetAtt("fnb"+k.config.Name, "Arn"),
+			FunctionName:     cloudformation.GetAtt(normalizeResourceName("fnb"+k.config.Name), "Arn"),
 			StartingPosition: trigger.StartingPosition.String(),
 		}
 	}
