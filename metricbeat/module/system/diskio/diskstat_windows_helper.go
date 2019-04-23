@@ -23,6 +23,8 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows/registry"
 
@@ -39,6 +41,7 @@ var (
 	modkernel32                 = syscall.NewLazyDLL("kernel32.dll")
 	procGetLogicalDriveStringsW = modkernel32.NewProc("GetLogicalDriveStringsW")
 	procGetDriveTypeW           = modkernel32.NewProc("GetDriveTypeW")
+	logger                      = logp.NewLogger("diskio")
 )
 
 type logicalDrive struct {
@@ -98,7 +101,7 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	return ret, nil
 }
 
-// i0Counter calls syscal func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics.
+// ioCounter calls syscal func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics.
 func ioCounter(path string) (diskPerformance, error) {
 	var diskPerformance diskPerformance
 	var diskPerformanceSize uint32
@@ -142,6 +145,7 @@ func enablePerformanceCounters() error {
 	if err = key.SetDWordValue("EnableCounterForIoctl", 1); err != nil {
 		return errors.Errorf("cannot create EnableCounterForIoctl key in the registry in order to enable the performance counters: %s", err)
 	}
+	logger.Info("The key with the name EnableCounterForIoctl has been added in the windows registry in order to enable the performance counters")
 	return nil
 }
 
