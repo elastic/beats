@@ -85,50 +85,17 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 	// Documentation: https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/Welcome.html
 	// Intrinsic function reference: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html
 
-	// Default policies to writes logs from the Lambda.
-	policies := []cloudformation.AWSIAMRole_Policy{
-		cloudformation.AWSIAMRole_Policy{
-			PolicyName: cloudformation.Join("-", []string{"fnb", "lambda", name}),
-			PolicyDocument: map[string]interface{}{
-				"Statement": []map[string]interface{}{
-					map[string]interface{}{
-						"Action": []string{"logs:CreateLogStream", "Logs:PutLogEvents"},
-						"Effect": "Allow",
-						"Resource": []string{
-							cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
-						},
-					},
-				},
-			},
-		},
-	}
-
-	// Merge any specific policies from the service.
-	policies = append(policies, function.Policies()...)
-
-	// Create the roles for the lambda.
 	template := cloudformation.NewTemplate()
-	// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
-	template.Resources[prefix("")+"IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
-		AssumeRolePolicyDocument: map[string]interface{}{
-			"Statement": []interface{}{
-				map[string]interface{}{
-					"Action": "sts:AssumeRole",
-					"Effect": "Allow",
-					"Principal": map[string]interface{}{
-						"Service": cloudformation.Join("", []string{
-							"lambda.",
-							cloudformation.Ref("AWS::URLSuffix"),
-						}),
-					},
-				},
-			},
-		},
-		Path:     "/",
-		RoleName: "functionbeat-lambda-" + name,
-		// Allow the lambda to write log to cloudwatch logs.
-		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
-		Policies: policies,
+
+	role := lambdaConfig.Role
+	dependsOn := make([]string, 0)
+	if lambdaConfig.Role == "" {
+		c.log.Infof("No role is configured for function %s, creating a custom role.", name)
+
+		roleRes := prefix("") + "IAMRoleLambdaExecution"
+		template.Resources[roleRes] = c.roleTemplate(function, name)
+		role = cloudformation.GetAtt(roleRes, "Arn")
+		dependsOn = []string{roleRes}
 	}
 
 	// Configure the Dead letter, any failed events will be send to the configured amazon resource name.
@@ -136,6 +103,15 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 	if lambdaConfig.DeadLetterConfig != nil && len(lambdaConfig.DeadLetterConfig.TargetArn) != 0 {
 		dlc = &cloudformation.AWSLambdaFunction_DeadLetterConfig{
 			TargetArn: lambdaConfig.DeadLetterConfig.TargetArn,
+		}
+	}
+
+	// Configure VPC
+	var vcpConf *cloudformation.AWSLambdaFunction_VpcConfig
+	if lambdaConfig.VPCConfig != nil && len(lambdaConfig.VPCConfig.SecurityGroupIDs) != 0 && len(lambdaConfig.VPCConfig.SubnetIDs) != 0 {
+		vcpConf = &cloudformation.AWSLambdaFunction_VpcConfig{
+			SecurityGroupIds: lambdaConfig.VPCConfig.SecurityGroupIDs,
+			SubnetIds:        lambdaConfig.VPCConfig.SubnetIDs,
 		}
 	}
 
@@ -156,15 +132,16 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 				},
 			},
 			DeadLetterConfig:             dlc,
+			VpcConfig:                    vcpConf,
 			FunctionName:                 name,
-			Role:                         cloudformation.GetAtt(prefix("")+"IAMRoleLambdaExecution", "Arn"),
+			Role:                         role,
 			Runtime:                      runtime,
 			Handler:                      handlerName,
 			MemorySize:                   lambdaConfig.MemorySize.Megabytes(),
 			ReservedConcurrentExecutions: lambdaConfig.Concurrency,
 			Timeout:                      int(lambdaConfig.Timeout.Seconds()),
 		},
-		DependsOn: []string{prefix("") + "IAMRoleLambdaExecution"},
+		DependsOn: dependsOn,
 	}
 
 	// Create the log group for the specific function lambda.
@@ -173,6 +150,53 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 	}
 
 	return template
+}
+
+func (c *CLIManager) roleTemplate(function installer, name string) *cloudformation.AWSIAMRole {
+	// Default policies to writes logs from the Lambda.
+	policies := []cloudformation.AWSIAMRole_Policy{
+		cloudformation.AWSIAMRole_Policy{
+			PolicyName: cloudformation.Join("-", []string{"fnb", "lambda", name}),
+			PolicyDocument: map[string]interface{}{
+				"Statement": []map[string]interface{}{
+					map[string]interface{}{
+						"Action": []string{"logs:CreateLogStream", "logs:PutLogEvents"},
+						"Effect": "Allow",
+						"Resource": []string{
+							cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Merge any specific policies from the service.
+	policies = append(policies, function.Policies()...)
+
+	// Create the roles for the lambda.
+	// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+	return &cloudformation.AWSIAMRole{
+		AssumeRolePolicyDocument: map[string]interface{}{
+			"Statement": []interface{}{
+				map[string]interface{}{
+					"Action": "sts:AssumeRole",
+					"Effect": "Allow",
+					"Principal": map[string]interface{}{
+						"Service": cloudformation.Join("", []string{
+							"lambda.",
+							cloudformation.Ref("AWS::URLSuffix"),
+						}),
+					},
+				},
+			},
+		},
+		Path:     "/",
+		RoleName: "functionbeat-lambda-" + name,
+		// Allow the lambda to write log to cloudwatch logs.
+		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
+		Policies: policies,
+	}
 }
 
 // stackName cloudformation stack are unique per function.

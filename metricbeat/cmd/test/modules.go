@@ -43,13 +43,7 @@ func GenTestModulesCmd(name, beatVersion string) *cobra.Command {
 				filter_metricset = args[1]
 			}
 
-			b, err := instance.NewBeat(name, "", beatVersion)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
-			}
-
-			err = b.Init()
+			b, err := instance.NewInitializedBeat(instance.Settings{Name: name, Version: beatVersion})
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
