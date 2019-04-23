@@ -3,6 +3,39 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.7.2]]
+=== Beats version 6.7.2
+https://github.com/elastic/beats/compare/v6.7.1...v6.7.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Fix OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
+- Fix false positives reported in the `host.containerized` field added by `add_host_metadata`. {pull}11494[11494]
+- Fix the add_host_metadata's `host.id` field on older Linux versions. {pull}11494[11494]
+
+*Auditbeat*
+
+- Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
+- Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+
+*Filebeat*
+
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
+
+*Metricbeat*
+
+- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
+
+==== Added
+
+*Auditbeat*
+
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+
 [[release-notes-6.7.1]]
 === Beats version 6.7.1
 https://github.com/elastic/beats/compare/v6.7.0...v6.7.1[View commits]
