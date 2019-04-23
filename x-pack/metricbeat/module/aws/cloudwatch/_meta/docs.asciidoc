@@ -1,4 +1,4 @@
-The cloudwatch metricset of aws module allows you to monitor varies services on
+The cloudwatch metricset of aws module allows you to monitor various services on
 AWS. `cloudwatch` metricset fetches metrics from given namespace periodically
 by calling `GetMetricData` api.
 

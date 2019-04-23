@@ -124,71 +124,71 @@ func TestConstructLabel(t *testing.T) {
 
 func TestReadCloudwatchConfig(t *testing.T) {
 	cases := []struct {
-		cloudwatchMetricsConfig []map[string]interface{}
+		cloudwatchMetricsConfig []CloudwatchConfig
 		expectedListMetric      []cloudwatch.Metric
 		expectedNamespace       []string
 	}{
 		{
-			[]map[string]interface{}{
+			[]CloudwatchConfig{
 				{
-					"namespace":  "AWS/EC2",
-					"metricname": "CPUUtilization",
-					"dimensions": []interface{}{
-						map[string]interface{}{
-							"name":  "InstanceId",
-							"value": instanceID1,
+					Namespace:  "AWS/EC2",
+					MetricName: "CPUUtilization",
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: instanceID1,
 						},
 					},
 				},
 			},
 			[]cloudwatch.Metric{listMetric1},
-			[]string{},
+			nil,
 		},
 		{
-			[]map[string]interface{}{
+			[]CloudwatchConfig{
 				{
-					"namespace":  "AWS/EC2",
-					"metricname": "CPUUtilization",
-					"dimensions": []interface{}{
-						map[string]interface{}{
-							"name":  "InstanceId",
-							"value": instanceID1,
+					Namespace:  "AWS/EC2",
+					MetricName: "CPUUtilization",
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: instanceID1,
 						},
 					},
 				},
 				{
-					"namespace": "AWS/EBS",
+					Namespace: "AWS/EBS",
 				},
 			},
 			[]cloudwatch.Metric{listMetric1},
 			[]string{"AWS/EBS"},
 		},
 		{
-			[]map[string]interface{}{
+			[]CloudwatchConfig{
 				{
-					"namespace":  "AWS/EC2",
-					"metricname": "CPUUtilization",
-					"dimensions": []interface{}{
-						map[string]interface{}{
-							"name":  "InstanceId",
-							"value": instanceID1,
+					Namespace:  "AWS/EC2",
+					MetricName: "CPUUtilization",
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: instanceID1,
 						},
 					},
 				},
 				{
-					"namespace": "AWS/EBS",
+					Namespace: "AWS/EBS",
 				},
 				{
-					"namespace":  "AWS/RDS",
-					"metricname": "CommitThroughput",
-					"dimensions": []interface{}{
-						map[string]interface{}{
-							"name":  "DBClusterIdentifier",
-							"value": "test1-cluster",
+					Namespace:  "AWS/RDS",
+					MetricName: "CommitThroughput",
+					Dimensions: []Dimension{
+						{
+							Name:  "DBClusterIdentifier",
+							Value: "test1-cluster",
 						},
-						map[string]interface{}{
-							"name":  "Role",
-							"value": "READER",
+						{
+							Name:  "Role",
+							Value: "READER",
 						},
 					},
 				},

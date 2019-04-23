@@ -20,22 +20,20 @@ import (
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period            string                   `config:"period"`
-	AccessKeyID       string                   `config:"access_key_id"`
-	SecretAccessKey   string                   `config:"secret_access_key"`
-	SessionToken      string                   `config:"session_token"`
-	DefaultRegion     string                   `config:"default_region"`
-	CloudwatchMetrics []map[string]interface{} `config:"cloudwatch_metrics"`
+	Period          string `config:"period"`
+	AccessKeyID     string `config:"access_key_id"`
+	SecretAccessKey string `config:"secret_access_key"`
+	SessionToken    string `config:"session_token"`
+	DefaultRegion   string `config:"default_region"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
 type MetricSet struct {
 	mb.BaseMetricSet
-	RegionsList       []string
-	DurationString    string
-	PeriodInSec       int
-	AwsConfig         *awssdk.Config
-	CloudwatchMetrics []map[string]interface{}
+	RegionsList    []string
+	DurationString string
+	PeriodInSec    int
+	AwsConfig      *awssdk.Config
 }
 
 // ModuleName is the name of this module.
@@ -97,12 +95,11 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Construct MetricSet
 	metricSet := MetricSet{
-		BaseMetricSet:     base,
-		RegionsList:       regionsList,
-		DurationString:    durationString,
-		PeriodInSec:       periodSec,
-		AwsConfig:         &awsConfig,
-		CloudwatchMetrics: config.CloudwatchMetrics,
+		BaseMetricSet:  base,
+		RegionsList:    regionsList,
+		DurationString: durationString,
+		PeriodInSec:    periodSec,
+		AwsConfig:      &awsConfig,
 	}
 	return &metricSet, nil
 }

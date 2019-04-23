@@ -39,7 +39,25 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	Namespace string
+	CloudwatchMetrics Configs
+}
+
+// Dimension holds name and value for cloudwatch metricset dimension config.
+type Dimension struct {
+	Name  string `config:"name" validate:"nonzero"`
+	Value string `config:"value" validate:"nonzero"`
+}
+
+// CloudwatchConfig holds a configuration specific for cloudwatch metricset.
+type Config struct {
+	Namespace  string      `config:"namespace" validate:"nonzero"`
+	MetricName string      `config:"metric_name"`
+	Dimensions []Dimension `config:"dimensions"`
+}
+
+// Configs is a set of CloudwatchConfig.
+type Configs struct {
+	CloudwatchConfigs []Config `config:"cloudwatch_metrics" validate:"nonzero,required"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -51,8 +69,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating aws metricset")
 	}
 
+	config := Configs{}
+	err = base.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+	}
+
+	if len(config.CloudwatchConfigs) == 0 {
+		return nil, errors.New("cloudwatch_metrics in config is missing")
+	}
+
 	return &MetricSet{
-		MetricSet: metricSet,
+		MetricSet:         metricSet,
+		CloudwatchMetrics: config,
 	}, nil
 }
 
@@ -60,25 +89,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	// Get CloudwatchMetrics Config
-	cloudwatchConfigs := m.CloudwatchMetrics
-	if len(cloudwatchConfigs) == 0 {
-		return errors.New("cloudwatch_metrics in config is missing")
-	}
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		return errors.Wrap(err, "Error ParseDuration")
+		return errors.Wrap(err, "error ParseDuration")
 	}
 
 	// Get listMetricsTotal and namespaces from configuration
-	listMetricsTotal, namespacesTotal := readCloudwatchConfig(cloudwatchConfigs)
+	listMetricsTotal, namespacesTotal := readCloudwatchConfig(m.CloudwatchMetrics.CloudwatchConfigs)
 
 	// Use listMetricsTotal from config
 	svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
 	err = createEvents(svcCloudwatch, listMetricsTotal, m.PeriodInSec, startTime, endTime, report)
 	if err != nil {
-		return errors.New("createEvents failed")
+		return errors.Wrap(err, "createEvents failed")
 	}
 
 	// Use namespaces from config
@@ -107,12 +131,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func readCloudwatchConfig(cloudwatchConfigs []map[string]interface{}) ([]cloudwatch.Metric, []string) {
-	listMetricsTotal := []cloudwatch.Metric{}
-	namespacesTotal := []string{}
+func readCloudwatchConfig(cloudwatchConfigs []Config) ([]cloudwatch.Metric, []string) {
+	var listMetricsTotal []cloudwatch.Metric
+	var namespacesTotal []string
 	for _, cloudwatchConfig := range cloudwatchConfigs {
-		namespace := cloudwatchConfig["namespace"].(string)
-		if cloudwatchConfig["metricname"] != nil {
+		namespace := cloudwatchConfig.Namespace
+		if cloudwatchConfig.MetricName != "" {
 			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, namespace)
 			listMetricsTotal = append(listMetricsTotal, listMetricsOutput)
 		} else {
@@ -123,7 +147,7 @@ func readCloudwatchConfig(cloudwatchConfigs []map[string]interface{}) ([]cloudwa
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, i, period)
 		metricDataQueries = append(metricDataQueries, metricDataQuery)
@@ -231,24 +255,18 @@ func insertMetricSetFields(event mb.Event, metricValue float64, labels []string)
 	return event
 }
 
-func convertConfigToListMetrics(cloudwatchConfig map[string]interface{}, namespace string) cloudwatch.Metric {
+func convertConfigToListMetrics(cloudwatchConfig Config, namespace string) cloudwatch.Metric {
 	// convert config input to []cloudwatch.Metric
-	metricName := cloudwatchConfig["metricname"].(string)
-	dimensions := cloudwatchConfig["dimensions"].([]interface{})
-	cloudwatchDimensions := []cloudwatch.Dimension{}
+	metricName := cloudwatchConfig.MetricName
+	dimensions := cloudwatchConfig.Dimensions
+	var cloudwatchDimensions []cloudwatch.Dimension
 	for _, dim := range dimensions {
-		d := dim.(map[string]interface{})
-		cloudwatchDim := cloudwatch.Dimension{}
-		for n, v := range d {
-			if n == "name" {
-				name := v.(string)
-				cloudwatchDim.Name = &name
-			} else if n == "value" {
-				value := v.(string)
-				cloudwatchDim.Value = &value
-			}
-		}
-		cloudwatchDimensions = append(cloudwatchDimensions, cloudwatchDim)
+		name := dim.Name
+		value := dim.Value
+		cloudwatchDimensions = append(cloudwatchDimensions, cloudwatch.Dimension{
+			Name:  &name,
+			Value: &value,
+		})
 	}
 
 	listMetricsOutput := cloudwatch.Metric{
