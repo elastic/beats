@@ -252,7 +252,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 		[]mapval.Validator{
 			mapval.Compose(
 				contJobValidator("http://foo.com", "1st"),
-				mapval.MustCompile(mapval.Map{eventext.EVENT_CANCELLED_META_KEY: true}),
+				mapval.MustCompile(mapval.Map{eventext.EventCancelledMetaKey: true}),
 			),
 			mapval.Compose(
 				contJobValidator("http://foo.com", "2nd"),
@@ -260,7 +260,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			),
 			mapval.Compose(
 				contJobValidator("http://bar.com", "1st"),
-				mapval.MustCompile(mapval.Map{eventext.EVENT_CANCELLED_META_KEY: true}),
+				mapval.MustCompile(mapval.Map{eventext.EventCancelledMetaKey: true}),
 			),
 			mapval.Compose(
 				contJobValidator("http://bar.com", "2nd"),
