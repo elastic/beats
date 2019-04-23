@@ -142,7 +142,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- Autodiscover metadata is now included in events by default. So, if you are using the docker provider for instance, you'll see the correct fields under the `docker` key. {pull}10258[10258]
 - Enable `add_observer_metadata` processor in default config. {pull}11394[11394]
 
 
