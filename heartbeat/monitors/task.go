@@ -20,6 +20,8 @@ package monitors
 import (
 	"fmt"
 
+	"github.com/elastic/beats/heartbeat/eventext"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
@@ -96,7 +98,7 @@ func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
 			logp.Err("Job %v failed with: ", err)
 		}
 
-		if event != nil && event.Fields != nil {
+		if event != nil && event.Fields != nil && !eventext.IsEventCancelled(event) {
 			// If continuations are present we defensively publish a clone of the event
 			// in the chance that the event shares underlying data with the events for continuations
 			// This prevents races where the pipeline publish could accidentally alter multiple events.

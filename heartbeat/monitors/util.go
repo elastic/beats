@@ -23,6 +23,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/eventext"
+
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
@@ -211,9 +213,9 @@ func makeByHostAllIPJob(
 			ipFields := resolveIPEvent(ip.String(), resolveRTT)
 			cont[i] = wrappers.WithFields(ipFields, pingFactory(addr))
 		}
-		firstIPJob := cont[0]
-		_, err = firstIPJob(event)
-		return cont[1 : len(ips)-1], err
+		eventext.CancelEvent(event)
+
+		return cont, err
 	}
 }
 

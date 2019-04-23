@@ -30,3 +30,20 @@ func MergeEventFields(e *beat.Event, merge common.MapStr) {
 		e.Fields = merge
 	}
 }
+
+// Marks the event as cancelled in the metadata.
+const EVENT_CANCELLED_META_KEY = "meta.__hb_evt_cancel__"
+
+func CancelEvent(event *beat.Event) {
+	if event != nil {
+		event.PutValue(EVENT_CANCELLED_META_KEY, true)
+	}
+}
+
+func IsEventCancelled(event *beat.Event) bool {
+	if event == nil {
+		return false
+	}
+	v, err := event.GetValue(EVENT_CANCELLED_META_KEY)
+	return err == nil && v == true
+}
