@@ -85,6 +85,9 @@ func (p *observerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	keyExists, _ := event.Fields.HasKey("observer")
 
 	if p.config.Overwrite || !keyExists {
+		if p.config.Overwrite {
+			event.Fields.Delete("observer")
+		}
 		event.Fields.DeepUpdate(p.data.Get().Clone())
 
 		if len(p.geoData) > 0 {
