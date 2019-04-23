@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/heartbeat/eventext"
-
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
@@ -213,6 +212,8 @@ func makeByHostAllIPJob(
 			ipFields := resolveIPEvent(ip.String(), resolveRTT)
 			cont[i] = wrappers.WithFields(ipFields, pingFactory(addr))
 		}
+		// Ideally we would test this invocation. This function however is really hard to to test given all the extra context it takes in
+		// In a future refactor we could perhaps test that this in correctly invoked.
 		eventext.CancelEvent(event)
 
 		return cont, err
