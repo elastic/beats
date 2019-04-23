@@ -211,7 +211,9 @@ func makeByHostAllIPJob(
 			ipFields := resolveIPEvent(ip.String(), resolveRTT)
 			cont[i] = wrappers.WithFields(ipFields, pingFactory(addr))
 		}
-		return cont, nil
+		firstIPJob := cont[0]
+		_, err = firstIPJob(event)
+		return cont[1 : len(ips)-1], err
 	}
 }
 
