@@ -46,7 +46,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Nats connections API response")
+		return errors.Wrap(err, "failure parsing NATS connections API response")
 	}
 	event.MetricSetFields, err = connectionsSchema.Apply(inInterface)
 	if err != nil {
