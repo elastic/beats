@@ -1174,7 +1174,7 @@ It has the following settings:
 
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
-The fields added to the event are look like following:
+The fields added to the event look like the following:
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -1266,7 +1266,7 @@ The fields added to the event look like the following:
     ],
     "mac" : [
       "dc:c1:02:6f:1b:ed",
-   ],
+    ],
     "geo": {
       "continent_name": "North America",
       "country_iso_code": "US",
