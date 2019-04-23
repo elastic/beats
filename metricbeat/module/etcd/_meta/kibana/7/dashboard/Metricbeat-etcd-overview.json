@@ -1,0 +1,1218 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "1",
+              "w": 30,
+              "x": 18,
+              "y": 15
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "title": "Bytes sent/received per second by node",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 29
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "title": "Current / Average Latency of Followers",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "3",
+              "w": 18,
+              "x": 0,
+              "y": 21
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "title": "Append requests sent / received",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 24,
+              "x": 0,
+              "y": 36
+            },
+            "panelIndex": "4",
+            "panelRefName": "panel_3",
+            "title": "Success / Failed Raft RPC Requests",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 14,
+              "x": 34,
+              "y": 0
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_4",
+            "title": "Store Watchers",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "6",
+              "w": 24,
+              "x": 24,
+              "y": 44
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_5",
+            "title": "Store Expires",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "7",
+              "w": 18,
+              "x": 0,
+              "y": 6
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_6",
+            "title": "Success store operations",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "8",
+              "w": 16,
+              "x": 18,
+              "y": 0
+            },
+            "panelIndex": "8",
+            "panelRefName": "panel_7",
+            "title": "Failed store operations",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 6,
+              "i": "9",
+              "w": 18,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "9",
+            "panelRefName": "panel_8",
+            "title": "Node selection",
+            "version": "7.0.0-SNAPSHOT"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat ETCD] Overview",
+        "version": 1
+      },
+      "id": "d4edb390-2949-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "dashboard": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "4c811bd0-2946-11e9-9303-89807bf647b5",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "78454a80-2945-11e9-9303-89807bf647b5",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "9c132260-2946-11e9-9303-89807bf647b5",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "1bfd2d10-2945-11e9-9303-89807bf647b5",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "11e78340-2948-11e9-9303-89807bf647b5",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "31597080-2948-11e9-9303-89807bf647b5",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "578128d0-2947-11e9-9303-89807bf647b5",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "f2b6bdb0-2947-11e9-9303-89807bf647b5",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "19539ea0-294a-11e9-9303-89807bf647b5",
+          "name": "panel_8",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzM3LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Bytes sent/received per second by node [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "ed07bba0-2945-11e9-b78e-ab9d109c5d39"
+              }
+            ],
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(115,216,255,1)",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Bytes received per second by node",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.self.recv.bandwidthrate",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_direction": "asc",
+                "terms_field": "etcd.self.id",
+                "value_template": "{{value}} received"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "a4aab050-2946-11e9-b78e-ab9d109c5d39",
+                "label": "Bytes sent per second by node",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.self.send.bandwidthrate",
+                    "id": "a4aab051-2946-11e9-b78e-ab9d109c5d39",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_direction": "asc",
+                "terms_field": "etcd.self.id",
+                "value_template": "{{value}} sent"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Bytes sent/received per second by node [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "4c811bd0-2946-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzI4LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Current / Average Latency of Followers [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Average Latency of followers",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.leader.followers.latency.followers.latency.average",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "4b988600-2945-11e9-b78e-ab9d109c5d39",
+                "label": "Current Latency of followers",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.leader.followers.latency.followers.latency.current",
+                    "id": "4b988601-2945-11e9-b78e-ab9d109c5d39",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Current / Average Latency of Followers [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "78454a80-2945-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzI5LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Append requests sent / received [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Append requests sent",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.self.send.appendrequest.count",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "70e97b70-2946-11e9-b78e-ab9d109c5d39",
+                "label": "Append requests received",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.self.recv.appendrequest.count",
+                    "id": "70e97b71-2946-11e9-b78e-ab9d109c5d39",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Append requests sent / received [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "9c132260-2946-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzMwLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Success / Failed Raft RPC Requests [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(244,78,59,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Failed Raft RPC Requests",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.leader.followers.counts.followers.counts.fail",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "38677b70-294c-11e9-8057-398017b56a04",
+                "label": "Success Raft RPC Requests",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.leader.followers.counts.followers.counts.success",
+                    "id": "38677b71-294c-11e9-8057-398017b56a04",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Success / Failed Raft RPC Requests [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "1bfd2d10-2945-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzMxLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Store Watchers [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Store watchers",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.watchers",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Store Watchers [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "11e78340-2948-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzMyLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Store Expires [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Store expires",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.expire.count",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Store Expires [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "31597080-2948-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzMzLDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Success store operations [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Create",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.create.success",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "b361eb90-298c-11e9-9307-ff4c19b5f88d",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(211,49,21,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "30d8eb50-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Delete",
+                "line_width": "1",
+                "metrics": [
+                  {
+                    "field": "etcd.store.delete.success",
+                    "id": "30d8eb51-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "30d8eb51-2947-11e9-b78e-ab9d109c5d39",
+                    "id": "bc7cda50-298c-11e9-9307-ff4c19b5f88d",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(115,216,255,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "38b8c200-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Get",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.gets.success",
+                    "id": "38b8c201-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "38b8c201-2947-11e9-b78e-ab9d109c5d39",
+                    "id": "c0bef0d0-298c-11e9-9307-ff4c19b5f88d",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(252,220,0,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "4136d480-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Set",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.sets.success",
+                    "id": "4136d481-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "4136d481-2947-11e9-b78e-ab9d109c5d39",
+                    "id": "cb82d4a0-298c-11e9-9307-ff4c19b5f88d",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(250,40,255,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "483747b0-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Update",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.update.success",
+                    "id": "483747b1-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "483747b1-2947-11e9-b78e-ab9d109c5d39",
+                    "id": "d0dc75a0-298c-11e9-9307-ff4c19b5f88d",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(102,102,102,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "595be6d0-2948-11e9-8e57-690446f55e3e",
+                "label": "Compare and Swap",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.compareandswap.success",
+                    "id": "595be6d1-2948-11e9-8e57-690446f55e3e",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "595be6d1-2948-11e9-8e57-690446f55e3e",
+                    "id": "d67ae7d0-298c-11e9-9307-ff4c19b5f88d",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(101,50,148,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "92254150-2948-11e9-8e57-690446f55e3e",
+                "label": "Compare And Delete",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.compareanddelete.success",
+                    "id": "92254151-2948-11e9-8e57-690446f55e3e",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "92254151-2948-11e9-8e57-690446f55e3e",
+                    "id": "dd795f30-298c-11e9-9307-ff4c19b5f88d",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Success store operations [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "578128d0-2947-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzM0LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Failed store operations [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Create",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.create.fail",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "fffc3390-2958-11e9-bfa3-b5a311f47405",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(211,49,21,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "aadedd60-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Delete",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.delete.fail",
+                    "id": "aadedd61-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "id": "229e5220-2959-11e9-bfa3-b5a311f47405",
+                    "type": "derivative"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(115,216,255,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "aec1e3f0-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Get",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.gets.fail",
+                    "id": "aec1e3f1-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "aec1e3f1-2947-11e9-b78e-ab9d109c5d39",
+                    "id": "1871cc50-2959-11e9-bfa3-b5a311f47405",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(252,220,0,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "b3dca730-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Set",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.sets.fail",
+                    "id": "b3dca731-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "b3dca731-2947-11e9-b78e-ab9d109c5d39",
+                    "id": "2a93aca0-2959-11e9-bfa3-b5a311f47405",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(250,40,255,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "b80da6b0-2947-11e9-b78e-ab9d109c5d39",
+                "label": "Update",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.update.fail",
+                    "id": "b80da6b1-2947-11e9-b78e-ab9d109c5d39",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "b80da6b1-2947-11e9-b78e-ab9d109c5d39",
+                    "id": "30778c40-2959-11e9-bfa3-b5a311f47405",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(102,102,102,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "6c706480-2948-11e9-8890-e9285ed9af8c",
+                "label": "Compare And Swap",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.compareandswap.fail",
+                    "id": "6c706481-2948-11e9-8890-e9285ed9af8c",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "6c706481-2948-11e9-8890-e9285ed9af8c",
+                    "id": "37aec6e0-2959-11e9-bfa3-b5a311f47405",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(101,50,148,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "7a70aea0-2948-11e9-8890-e9285ed9af8c",
+                "label": "Compare And Delete",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "etcd.store.compareanddelete.fail",
+                    "id": "7a70aea1-2948-11e9-8890-e9285ed9af8c",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "7a70aea1-2948-11e9-8890-e9285ed9af8c",
+                    "id": "3e9c4e50-2959-11e9-bfa3-b5a311f47405",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Failed store operations [Metricbeat ETCD]",
+          "type": "metrics"
+        }
+      },
+      "id": "f2b6bdb0-2947-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzM1LDFd"
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Node selection [Metricbeat ETCD]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "etcd.self.id",
+                "id": "1549373305494",
+                "indexPattern": "metricbeat-*",
+                "label": "Node",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": false
+          },
+          "title": "Node selection [Metricbeat ETCD]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "19539ea0-294a-11e9-9303-89807bf647b5",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-02-18T20:25:35.701Z",
+      "version": "WzM2LDFd"
+    }
+  ],
+  "version": "7.0.0-SNAPSHOT"
+}

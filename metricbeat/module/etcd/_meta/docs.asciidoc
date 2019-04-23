@@ -10,3 +10,10 @@ When using V2, metricsets available are `leader`, `self` and `store`.
 === Compatibility
 
 The etcd module is tested with etcd 3.2 and 3.3.
+
+[float]
+=== Dashboard
+
+ The ETCD module comes with a predefined dashboard:
+
+ image::./images/metricbeat-etcd.png[]
