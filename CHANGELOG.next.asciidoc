@@ -86,7 +86,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
-- Add backoff again. {pull}11861[11861]
+- Use backoff when no new events are found. {pull}11861[11861]
 
 *Metricbeat*
 
