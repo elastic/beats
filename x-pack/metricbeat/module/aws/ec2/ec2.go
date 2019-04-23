@@ -155,7 +155,6 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	// Initialize events and metricSetFieldResults per instanceID
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
-	info := ""
 	for instanceID := range instanceOutput {
 		events[instanceID] = aws.InitEvent(metricsetName, regionName)
 		metricSetFieldResults[instanceID] = map[string]interface{}{}
@@ -174,7 +173,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 				instanceID := labels[0]
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
 				if err != nil {
-					return events, info, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
+					return events, "", errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
 				}
 				events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
 				events[instanceID].RootFields.Put("cloud.machine.type", machineType)
@@ -186,12 +185,12 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 
 				instanceStateName, err := instanceOutput[instanceID].State.Name.MarshalValue()
 				if err != nil {
-					return events, info, errors.Wrap(err, "instance.State.Name.MarshalValue failed")
+					return events, "", errors.Wrap(err, "instance.State.Name.MarshalValue failed")
 				}
 
 				monitoringState, err := instanceOutput[instanceID].Monitoring.State.MarshalValue()
 				if err != nil {
-					return events, info, errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
+					return events, "", errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
 				}
 
 				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
@@ -217,23 +216,29 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 		}
 	}
 
+	infoPrefix := "Missing Cloudwatch data, this is expected for non-running instances" +
+		" or a new instance during the first data collection. If this shows up" +
+		" multiple times, please recheck the period setting in config. Instance ID: "
+	infoID := ""
 	for instanceID, metricSetFieldsPerInstance := range metricSetFieldResults {
 		if len(metricSetFieldsPerInstance) != 0 {
 			resultMetricsetFields, err := aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFields)
 			if err != nil {
-				return events, info, errors.Wrap(err, "EventMapping failed")
+				return events, "", errors.Wrap(err, "EventMapping failed")
 			}
 
 			events[instanceID].MetricSetFields.Update(resultMetricsetFields)
 			if len(events[instanceID].MetricSetFields) < 5 {
-				info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for non-running instances or " +
-					"a new instance during the first data collection. If this shows up multiple times, please recheck the period " +
-					"setting in config."
+				infoID += instanceID + " "
 			}
 		}
 	}
 
-	return events, info, nil
+	if infoID == "" {
+		return events, "", nil
+	}
+
+	return events, infoPrefix + infoID, nil
 }
 
 func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
