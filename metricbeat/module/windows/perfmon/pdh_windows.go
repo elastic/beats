@@ -248,9 +248,9 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 
 	// Extract the instance name from the counterPath for non-wildcard paths.
 	if !wildcard && instanceName == "" {
-		matchInstanceName(counterPath, &instanceName)
-		if instanceName == "" {
-			return errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
+		instanceName, err = matchInstanceName(counterPath)
+		if err != nil {
+			return err
 		}
 	}
 	q.counters[counterPath] = &Counter{
@@ -268,14 +268,15 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 }
 
 // matchInstanceName will check first for instance and then for any objects names
-func matchInstanceName(counterPath string, instanceName *string) {
+func matchInstanceName(counterPath string) (string, error) {
 	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
 	if len(matches) != 2 {
 		matches = objectNameRegexp.FindStringSubmatch(counterPath)
 	}
 	if len(matches) == 2 {
-		*instanceName = matches[1]
+		return matches[1], nil
 	}
+	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
 }
 
 func (q *Query) Execute() error {
