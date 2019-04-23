@@ -99,3 +99,20 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	_, m3Err := makeTestMon()
 	assert.NoError(t, m3Err)
 }
+
+func TestCheckInvalidConfig(t *testing.T) {
+	serverMonConf := mockInvalidPluginConf(t)
+	reg := mockPluginsReg()
+	pipelineConnector := &MockPipelineConnector{}
+
+	sched := scheduler.New(1)
+	err := sched.Start()
+	require.NoError(t, err)
+	defer sched.Stop()
+
+	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false, nil)
+	// This could change if we decide the contract for newMonitor should always return a monitor
+	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
+
+	require.Error(t, checkMonitorConfig(serverMonConf, reg, false))
+}
