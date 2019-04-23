@@ -4,92 +4,78 @@
 
 //TODO: Redirect beats-user-access to feature-roles to prevent 404s.
 
-// REVIEWERS: Our built-in roles don't provide enough granularity for some users,
-// and in some cases, the roles don't cover all the tasks that a single user
-// might perform (such as running the setup). Plus the roles don't grant access
-// to Beats indices. I list privileges here (rather than roles) so that the person
-// setting up security has more flexibility and the knowledge they need to
-// create their own roles, if necessary. Is this a likely scenario?
-
-You can use role-based access control to grant {beatname_uc} users access to
-secured resources. The roles that you set up depend on your organization's
-security requirements and the minimum privileges required to use specific
-features. 
+You can use role-based access control to grant users access to secured
+resources. The roles that you set up depend on your organization's security
+requirements and the minimum privileges required to use specific features. 
 
 {beatname_uc} users typically perform these main roles: they do the initial
 setup, publish monitoring information, and publish events. If they're using
 {kib}, they view and sometimes create visualizations that access {beatname_uc}
 indices.
 
-To assign the most restrictive privileges to users, create a role for each
-purpose. The easiest way to create roles is by using the
-*Management > Security > Roles* UI in {kib}.
+{security} provides pre-built roles that grant _some_ of the privileges needed
+by {beatname_uc} users. When possible, use the built-in roles to minimize the
+affect of future changes on your security strategy.
 
-Also consider using the <<built-in-beats-roles,built-in roles>> provided by
-{security}.
+For privileges not granted by existing roles, create new roles. At a minimum,
+create a role for setting up {beatname_uc}, a role for publishing events, and a
+role for reading {beatname_uc} indices. Assign these new roles, along with the
+pre-built roles, to grant the full set of privileges required by {beatname_uc}
+users.
 
-Want to learn more about creating users and roles? See
-{stack-ov}/elasticsearch-security.html[Securing the {stack}]. Also see
-{stack-ov}/security-privileges.html[Security privileges] for a description of
-available privileges.
-
-// REVIEWERS: I had to grant `monitor` to users to avoid errors, even though I
-// didn't enable monitoring. Is this expected? I've added `monitor` to the
-// privileges described below. Please let me know how I should handle this in
-// the docs.
+The following sections describe the privileges and roles required to perform
+specific job roles. 
 
 [[privileges-to-setup-beats]]
 ==== Privileges needed for initial setup
 
 Users who set up {beatname_uc} typically need to load mappings, dashboards, and
 other objects used to index data into {es} and visualize it in {kib}. The
-privileges required depend on the setup tasks users need to perform:
+privileges required depend on the setup tasks users need to perform.
+
+NOTE: These instructions assume that you are using the default name for
+{beatname_uc} indices. If you are using a custom name, modify the privileges to
+match your index naming pattern.
 
 [options="header"]
 |====
-|Task | Required privileges
+|Task | Required privileges and roles
 
-|Set up index templates
+.3+|Set up index templates
 |`manage_index_templates` and `monitor` on cluster
+|`manage_ilm` on cluster (if cluster supports index lifecycle management)
+|`manage` on +{beat_default_index_prefix}-*+ indices (if cluster supports index lifecycle management)
 
 ifndef::no_dashboards[]
-.2+|Set up example dashboards
-|`monitor` on cluster
-
-|`index` on `.kibana*` indices
+|Set up example dashboards
+|`kibana_user` role
 endif::no_dashboards[]
 
 ifdef::has_ml_jobs[]
 .3+|Set up machine learning job configurations 
 |`manage_ml` and `monitor` on cluster
-
 |`read` on +{beat_default_index_prefix}-*+ indices
-
-|`read` and `index` on `.kibana*` indices
+|`kibana_user` role
 endif::has_ml_jobs[]
 
 ifeval::["{beatname_lc}"=="filebeat"]
-|Set up ingest pipelines
-|`manage_ingest_pipelines` and `monitor` on cluster
+.2+|Set up ingest pipelines
+|`monitor` on cluster
+|`ingest_admin` role
 endif::[]
 
-ifndef::no_ilm[]
-|Set up index lifecycle policies
-|`manage_ilm` and `monitor` on cluster
-endif::no_ilm[]
+.2+|Set up index lifecycle policies
+|`manage_ilm`, `manage_index_templates`, and `monitor` on cluster
+|`manage` on +{beat_default_index_prefix}-*+ indices
 
 ifdef::has_central_config[]
 |Enroll and manage configurations in Beats central management
-|`all` on `.management-beats` index
+|`beats_admin` and `kibana_user` roles
 endif::has_central_config[]
 |====
 
-// REVIEWERS: We currently have manage_pipeline and
-// manage_ingest_pipelines. How are they different? Which is the correct one to
-// use here?
-
 [[privileges-to-publish-monitoring]]
-==== Privileges needed to publish monitoring information
+==== Privileges needed to publish and view monitoring information
 
 {security} provides the +{beat_default_index_prefix}_system+
 {stack-ov}/built-in-users.html[built-in user] and
@@ -101,13 +87,14 @@ If you use the +{beat_default_index_prefix}_system+ user, make sure you
 
 [options="header"]
 |====
-|Task | Required privileges
+|Task | Required privileges and roles
 
-|Send monitoring info | `monitor` on cluster
+|Send monitoring info
+|`monitor` on cluster
+
+|Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
+|`monitoring_user` and `kibana_user` roles
 |====
-
-// REVIEWERS: I don't have time to test the full monitoring set up. Is this
-// correct, or are additional privileges required?
 
 
 [[privileges-to-publish-events]]
@@ -119,92 +106,36 @@ need to perform:
 
 [options="header"]
 |====
-|Task | Required privileges
+|Task | Required privileges and roles
 
-.2+|Send data to a secured cluster
+.3+|Send data to a secured cluster without index lifecycle management
 |`monitor` on cluster
-
-|`create_index` and `index` on {beatname_uc} indices
-
-.2+|Send data to a secured cluster when automatic template loading is enabled
-footnote:[Automatic template loading is enabled by
-default. To disable it, set `setup.template.enabled: false`. Note that you
-cannot disable automatic template loading if you're using index lifecycle
-management.]
-
-|`monitor` and `manage_index_templates` on cluster
-
-|`create_index` and `index` on {beatname_uc} indices
-
 ifeval::["{beatname_lc}"=="filebeat"]
-.2+|Send data to a secured cluster when {beatname_uc} modules are enabled
-|`monitor` and `manage_ingest_pipelines` on cluster
-
-|`create_index` and `index` on {beatname_uc} indices
+(and `manage_pipeline` if {beatname_uc} modules are used)
 endif::[]
+|`create_index` and `index` on +{beat_default_index_prefix}-*+ indices
+|also requires privileges to <<privileges-to-setup-beats,set up index templates>>
+unless you've disabled automatic template loading
 
-.2+|Send data to a secured cluster when index lifecycle management is enabled
-|`manage_index_templates` and `monitor` on cluster
+.2+|Send data to a secured cluster that supports index lifecycle management
+|`manage_index_templates`,`manage_ilm` footnote:[Use `read_ilm` instead of
+`manage_ilm` if you pre-loaded the lifecycle policy], and `monitor`
+on cluster
+ifeval::["{beatname_lc}"=="filebeat"]
+(and `manage_pipeline` if {beatname_uc} modules are used)
+endif::[]
+| `index` and `manage` on +{beat_default_index_prefix}-*+ indices
 
-| `index` and `manage` on {beatname_uc} indices
 ifdef::has_central_config[]
 .2+|Read configurations from Beats central management
 | `monitor` on cluster
-
-|`all` on `.management-beats` index
+|`beats_admin` role
 endif::has_central_config[]
 |====
 
-//REVIEWERS: Some questions about the above info:
-//
-// 1 - When is `read_ilm` needed?
-// Also, do users need `index` and `manage` on `shrink-beatname-*`, too?
+// REVIEWERS: Do users need `index` and `manage` on `shrink-beatname-*`, too?
 // Are there other privileges that might be required as indices move through the
 // lifecycle stages?
-//
-// 2 - Is there a more restrictive privilege than `all` that we can assign to users who
-// need to read configs in central management, but not craete or manage configs? I tried
-// `read` on .management-beats but got "ERROR process/process.go:47 Error getting
-// process details. pid=35087: error getting process mem for pid=35087:
-// Could not read process info for pid 35087" Beats still sent events.
-
-// REVIEWERS: I have some concerns about how our default config settings affect
-// the privileges users need to assign:
-// In some cases, users either need to change the defaults that we've set, or
-// grant privileges that are less restrictive than they might want.
-// For example, on 6.7, I get the following
-// error when I run Filebeat (with the system module enabled)
-// when the user doesn't have the `manage_ingest_pipelines` cluster
-// privilege (this happens even if I load the pipeline in advance):
-//
-// ERROR	fileset/factory.go:142	Error loading pipeline: 1 error: Error loading
-// pipeline for fileset system/auth: couldn't load pipeline: couldn't load json
-// Error: 403 Forbidden: {"error":{"root_cause":[{"type":"security_exception",
-// "reason":"action [cluster:admin/ingest/pipeline/put] is unauthorized for user
-//[filebeat_writer]"}]
-//
-// I thought I would be able to load ingest pipelines as part of the setup
-// phase, and run the system module without granting this privilege. I tried
-// setting filebeat.overwrite_pipelines: false (even though it's supposedly the
-// default), but I still got the error. Is this a bug or expected behavior?
-//
-// Also note that the default behavior of auto loading the index template
-// means that users will need `manage_index_templates` unless they explicitly
-// disable automatic template loading. If they are using ILM, however, they 
-// CANNOT disable automatic template loading. They must grant the user 
-//`manage_index_templates`, or they will see the following error:
-//
-// ERROR pipeline/output.go:100	Failed to connect to
-// backoff(elasticsearch(http://localhost:9200)): Connection marked as failed
-// because the onConnect callback failed: Error loading Elasticsearch template:
-// could not load template. Elasticsearch returned: couldn't load template:
-// couldn't load json. Error: 403 Forbidden: {"error":{"root_cause"
-// [{"type":"security_exception","reason":"action [indices:admin/template/put]
-// is unauthorized for user [filebeat_writer]"}],"type":"security_exception",
-// "reason":"action [indices:admin/template/put] is unauthorized for user
-// [filebeat_writer]"},"status":403}
-//
-
 
 [[kibana-user-privileges]]
 ==== Privileges needed by {kib} users
@@ -222,74 +153,30 @@ perform:
 
 [options="header"]
 |====
-|Task | Required privileges
+|Task | Required privileges and roles
 
 .2+|View {beatname_uc} dashboards
-|`read` on {beatname_uc} indices
-
-|`read` on `.kibana*` indices 
+|`read` on +{beat_default_index_prefix}-*+ indices
+|`kibana_dashboard_only_user` role
 
 .2+|View and edit {beatname_uc} dashboards
-|`read` on {beatname_uc} indices
-
-|`manage`, `read`, `index`, and `delete` on `.kibana*` indices
+|`read` on +{beat_default_index_prefix}-*+ indices
+|`kibana_user` role
 
 ifdef::has_central_config[]
 .2+|Create and manage configurations in Beats central management
-|`all` on `.management-beats` index
-
-|`manage`, `read`, `index`, and `delete` on `.kibana*` indices
+|`beats_admin` role
+|`kibana_user` role
 endif::[]
 |====
 
-// REVIEWERS: Granting `read` on the .kibana* indices results
-// in the message "[warning][deprecated][security] username relies
-// on index privileges on the Kibana index. This is deprecated and will be
-// removed in Kibana 7.0".
-//
-// What should I use instead?
+[[learn-more-security]]
+==== Learn more about users and roles
 
-// REVIEWERS: It seems like the CM UI expects the user to have the beats_admin
-// role. Is that true? If so, then all users who define configs in central
-// management will need beats_admin and kibana_user roles. What if a user
-// wants to create a custom role that has all the privileges in a single role?
-// Is that possible?
+Want to learn more about creating users and roles? See
+{stack-ov}/elasticsearch-security.html[Securing the {stack}]. Also see:
 
-[[built-in-beats-roles]]
-==== Built-in roles for Beats users
-
-For your convenience, {security} provides built-in roles that you can assign to
-your users. These roles group related privileges, but they may not provide all
-the privileges required for your users. For example, the roles don't grant
-access to {beatname_uc} indices.
-
-Here's a list of roles you might want to assign to {beatname_uc} users. For a
-full description of these and other available roles, see
-{stack-ov}/built-in-roles.html[built-in roles].
-
-
-[options="header"]
-|====
-|Role | Uses
-
-ifdef::has_ml_jobs[]
-|`machine_learning_admin`
-|Set up and manage machine learning job configurations
-endif::has_ml_jobs[]
-
-ifeval::["{beatname_lc}"=="filebeat"]
-|`ingest_admin`
-|Set up ingest pipelines
-endif::[]
-
-ifdef::has_central_config[]
-|`beats_admin`
-|Create and manage configurations in Beats central management
-endif::has_central_config[]
-
-|`kibana_dashboard_only_user`
-|View dashboards (read-only view) in {kib}
-
-|`kibana_user`
-|View dashboards and use editing tools in {kib}
-|====
+* {stack-ov}/security-privileges.html[Security privileges] for a description of
+available privileges
+* {stack-ov}/built-in-roles.html[Built-in roles] for a description of roles that
+you can assign to users

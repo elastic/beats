@@ -7,12 +7,6 @@
 <titleabbrev>Use {security}</titleabbrev>
 ++++
 
-// REVIEWERS: I don't want to duplicate the content in the security docs like we
-// have in the past. By the time users are configuring security in Beats, they
-// should know their security strategy and how to set up users in the Management
-// UI. In the Beats docs, I just want to cover beats-specific requirements. Let
-// me know if I'm missing anything.
-
 If you want {beatname_uc} to connect to a cluster that has
 {stack-ov}/elasticsearch-security.html[{security}] enabled, there are extra
 configuration steps:
