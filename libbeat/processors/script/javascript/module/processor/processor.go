@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_locale"
+	"github.com/elastic/beats/libbeat/processors/add_observer_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	"github.com/elastic/beats/libbeat/processors/communityid"
 	"github.com/elastic/beats/libbeat/processors/dissect"
@@ -117,6 +118,7 @@ func Require(runtime *goja.Runtime, module *goja.Object) {
 	o.Set("AddHostMetadata", newConstructor(runtime, add_host_metadata.New))
 	o.Set("AddKubernetesMetadata", newConstructor(runtime, add_kubernetes_metadata.New))
 	o.Set("AddLocale", newConstructor(runtime, add_locale.New))
+	o.Set("AddObserverMetadata", newConstructor(runtime, add_observer_metadata.New))
 	o.Set("AddProcessMetadata", newConstructor(runtime, add_process_metadata.New))
 	o.Set("CommunityID", newConstructor(runtime, communityid.New))
 	o.Set("DecodeJSONFields", newConstructor(runtime, actions.NewDecodeJSONFields))

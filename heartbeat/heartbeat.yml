@@ -126,6 +126,11 @@ output.elasticsearch:
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
 
+#================================ Processors =====================================
+processors:
+  - add_observer_metadata: ~
+
+
 #================================ Logging =====================================
 
 # Sets log level. The default log level is info.
