@@ -100,7 +100,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)...)
 		}
 
-		// If metricDataQueries, still needs to createCloudWatchEvents.
 		var metricDataOutput []cloudwatch.MetricDataResult
 		if len(metricDataQueriesTotal) != 0 {
 			// Use metricDataQueries to make GetMetricData API calls
@@ -113,10 +112,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			// Create Cloudwatch Events for EC2
-			events, info, err := createCloudWatchEvents(metricDataOutput, instancesOutputs, regionName)
-			if info != "" {
-				m.Logger().Info(info)
-			}
+			events, err := m.createCloudWatchEvents(metricDataOutput, instancesOutputs, regionName)
 
 			if err != nil {
 				m.Logger().Error(err.Error())
@@ -151,7 +147,7 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID st
 	return metricDataQueries
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, instanceOutput map[string]ec2.Instance, regionName string) (map[string]mb.Event, string, error) {
+func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, instanceOutput map[string]ec2.Instance, regionName string) (map[string]mb.Event, error) {
 	// Initialize events and metricSetFieldResults per instanceID
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
@@ -173,7 +169,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 				instanceID := labels[0]
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
 				if err != nil {
-					return events, "", errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
+					return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
 				}
 				events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
 				events[instanceID].RootFields.Put("cloud.machine.type", machineType)
@@ -185,12 +181,12 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 
 				instanceStateName, err := instanceOutput[instanceID].State.Name.MarshalValue()
 				if err != nil {
-					return events, "", errors.Wrap(err, "instance.State.Name.MarshalValue failed")
+					return events, errors.Wrap(err, "instance.State.Name.MarshalValue failed")
 				}
 
 				monitoringState, err := instanceOutput[instanceID].Monitoring.State.MarshalValue()
 				if err != nil {
-					return events, "", errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
+					return events, errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
 				}
 
 				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
@@ -216,29 +212,23 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 		}
 	}
 
-	infoPrefix := "Missing Cloudwatch data, this is expected for non-running instances" +
-		" or a new instance during the first data collection. If this shows up" +
-		" multiple times, please recheck the period setting in config. Instance ID: "
-	infoID := ""
 	for instanceID, metricSetFieldsPerInstance := range metricSetFieldResults {
 		if len(metricSetFieldsPerInstance) != 0 {
 			resultMetricsetFields, err := aws.EventMapping(metricSetFieldsPerInstance, schemaMetricSetFields)
 			if err != nil {
-				return events, "", errors.Wrap(err, "EventMapping failed")
+				return events, errors.Wrap(err, "EventMapping failed")
 			}
 
 			events[instanceID].MetricSetFields.Update(resultMetricsetFields)
 			if len(events[instanceID].MetricSetFields) < 5 {
-				infoID += instanceID + " "
+				m.Logger().Info("Missing Cloudwatch data, this is expected for non-running instances" +
+					" or a new instance during the first data collection. If this shows up multiple times," +
+					" please recheck the period setting in config. Instance ID: " + instanceID)
 			}
 		}
 	}
 
-	if infoID == "" {
-		return events, "", nil
-	}
-
-	return events, infoPrefix + infoID, nil
+	return events, nil
 }
 
 func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
