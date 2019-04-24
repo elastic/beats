@@ -16,10 +16,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // MockEC2Client struct is used for unit tests.
@@ -195,7 +194,8 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		},
 	}
 
-	events, _, err := createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
+	metricSet := MetricSet{}
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
