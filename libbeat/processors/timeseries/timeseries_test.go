@@ -63,6 +63,11 @@ var (
 					Type:       "object",
 					ObjectType: "keyword",
 				},
+				mapping.Field{
+					Name:       "wildcard-object-of-keywords.*",
+					Type:       "object",
+					ObjectType: "keyword",
+				},
 				// todo: not supported
 				mapping.Field{
 					Name: "obj-type-params",
@@ -104,6 +109,7 @@ func TestTimesSeriesIsDimension(t *testing.T) {
 		{false, "overwritten-field1"},
 		{false, "overwritten-field2"},
 		{true, "nested-obj.object-of-keywords.third-level"},
+		{true, "nested-obj.wildcard-object-of-keywords.third-level"},
 		{false, "nested-obj.second-level"},
 		{true, "obj1.key1"},
 		{false, "obj1-but-not-a-child-of-obj1.key1"},
