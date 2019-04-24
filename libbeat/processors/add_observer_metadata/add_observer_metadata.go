@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package add_host_metadata
+package add_observer_metadata
 
 import (
 	"fmt"
@@ -27,17 +27,16 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/util"
 	"github.com/elastic/go-sysinfo"
 )
 
 func init() {
-	processors.RegisterPlugin("add_host_metadata", New)
+	processors.RegisterPlugin("add_observer_metadata", New)
 }
 
-type addHostMetadata struct {
+type observerMetadata struct {
 	lastUpdate struct {
 		time.Time
 		sync.Mutex
@@ -48,17 +47,17 @@ type addHostMetadata struct {
 }
 
 const (
-	processorName = "add_host_metadata"
+	processorName = "add_observer_metadata"
 )
 
-// New constructs a new add_host_metadata processor.
+// New creates a new instance of the add_observer_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	p := &addHostMetadata{
+	p := &observerMetadata{
 		config: config,
 		data:   common.NewMapStrPointer(nil),
 	}
@@ -69,28 +68,37 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		if err != nil {
 			return nil, err
 		}
-		p.geoData = common.MapStr{"host": common.MapStr{"geo": geoFields}}
+
+		p.geoData = common.MapStr{"observer": common.MapStr{"geo": geoFields}}
 	}
 
 	return p, nil
 }
 
-// Run enriches the given event with the host meta data
-func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
+// Run enriches the given event with the observer meta data
+func (p *observerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	err := p.loadData()
 	if err != nil {
 		return nil, err
 	}
 
-	event.Fields.DeepUpdate(p.data.Get().Clone())
+	keyExists, _ := event.Fields.HasKey("observer")
 
-	if len(p.geoData) > 0 {
-		event.Fields.DeepUpdate(p.geoData)
+	if p.config.Overwrite || !keyExists {
+		if p.config.Overwrite {
+			event.Fields.Delete("observer")
+		}
+		event.Fields.DeepUpdate(p.data.Get().Clone())
+
+		if len(p.geoData) > 0 {
+			event.Fields.DeepUpdate(p.geoData)
+		}
 	}
+
 	return event, nil
 }
 
-func (p *addHostMetadata) expired() bool {
+func (p *observerMetadata) expired() bool {
 	if p.config.CacheTTL <= 0 {
 		return true
 	}
@@ -105,7 +113,7 @@ func (p *addHostMetadata) expired() bool {
 	return true
 }
 
-func (p *addHostMetadata) loadData() error {
+func (p *observerMetadata) loadData() error {
 	if !p.expired() {
 		return nil
 	}
@@ -115,7 +123,12 @@ func (p *addHostMetadata) loadData() error {
 		return err
 	}
 
-	data := host.MapHostInfo(h.Info())
+	hostInfo := h.Info()
+	data := common.MapStr{
+		"observer": common.MapStr{
+			"hostname": hostInfo.Hostname,
+		},
+	}
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
@@ -124,21 +137,18 @@ func (p *addHostMetadata) loadData() error {
 		}
 
 		if len(ipList) > 0 {
-			data.Put("host.ip", ipList)
+			data.Put("observer.ip", ipList)
 		}
 		if len(hwList) > 0 {
-			data.Put("host.mac", hwList)
+			data.Put("observer.mac", hwList)
 		}
 	}
 
-	if p.config.Name != "" {
-		data.Put("host.name", p.config.Name)
-	}
 	p.data.Set(data)
 	return nil
 }
 
-func (p *addHostMetadata) String() string {
+func (p *observerMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
 		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
 }
