@@ -202,6 +202,7 @@ class Test(BaseTest):
             extra_args=["setup",
                         "--ilm-policy",
                         "-path.config", self.working_dir,
+                        "-E", "setup.ilm.policy_name=" + self.policy_name,
                         "-E", "output.elasticsearch.hosts=['" + self.get_elasticsearch_url() + "']"],
             config="libbeat.yml")
 

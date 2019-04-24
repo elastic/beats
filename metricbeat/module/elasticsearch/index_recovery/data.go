@@ -61,18 +61,14 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
 	}
 
 	var errs multierror.Errors
 	for indexName, d := range data {
 		shards, ok := d["shards"]
 		if !ok {
-			err = elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch)
-			r.Error(err)
-			errs = append(errs, err)
+			errs = append(errs, elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch))
 			continue
 		}
 		for _, data := range shards {
@@ -88,8 +84,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 			event.MetricSetFields, err = schema.Apply(data)
 			if err != nil {
-				event.Error = errors.Wrap(err, "failure applying shard schema")
-				errs = append(errs, event.Error)
+				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
+				continue
 			}
 
 			r.Event(event)

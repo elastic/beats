@@ -5,9 +5,7 @@
                 "dns": {
                     "request": {
                         "do": {
-                            "count": {
-                                "total": 113
-                            }
+                            "count": 113
                         }
                     }
                 },
