@@ -64,3 +64,7 @@ class TestMariadb102(Test):
 
 class TestMariadb103(Test):
     COMPOSE_SERVICES = ['mariadb_10_3']
+
+
+class TestMariadb103(Test):
+    COMPOSE_SERVICES = ['mariadb_10_4']
