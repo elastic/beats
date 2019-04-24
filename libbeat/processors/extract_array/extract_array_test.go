@@ -149,7 +149,6 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 					"b": 1,
 					"c": 1,
 				},
-				"fail_on_error": false,
 			},
 			input: beat.Event{
 				Fields: common.MapStr{
@@ -162,6 +161,32 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 					"a":     42,
 					"b":     42,
 					"c":     42,
+				},
+			},
+		},
+
+		"omit_empty": {
+			config: common.MapStr{
+				"field": "array",
+				"mappings": common.MapStr{
+					"a": 0,
+					"b": 1,
+					"c": 2,
+					"d": 3,
+					"e": 4,
+				},
+				"omit_empty": true,
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"array": []interface{}{0, "", []interface{}(nil), make(map[string]string), 0.0},
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"array": []interface{}{0, "", []interface{}(nil), make(map[string]string), 0.0},
+					"a":     0,
+					"e":     0.0,
 				},
 			},
 		},

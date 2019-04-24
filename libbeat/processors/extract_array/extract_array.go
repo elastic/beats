@@ -34,6 +34,7 @@ type extractArrayConfig struct {
 	Field         string        `config:"field"`
 	Mappings      common.MapStr `config:"mappings"`
 	IgnoreMissing bool          `config:"ignore_missing"`
+	OmitEmpty     bool          `config:"omit_empty"`
 	OverwriteKeys bool          `config:"overwrite_keys"`
 	FailOnError   bool          `config:"fail_on_error"`
 }
@@ -59,7 +60,7 @@ func init() {
 	processors.RegisterPlugin("extract_array",
 		checks.ConfigChecked(NewExtractArray,
 			checks.RequireFields("field", "mappings"),
-			checks.AllowedFields("field", "mappings", "ignore_missing", "overwrite_keys", "fail_on_error", "when")))
+			checks.AllowedFields("field", "mappings", "ignore_missing", "overwrite_keys", "fail_on_error", "when", "omit_empty")))
 }
 
 // NewExtractArray builds a new extract_array processor.
@@ -92,6 +93,18 @@ func NewExtractArray(c *common.Config) (processors.Processor, error) {
 	return p, nil
 }
 
+func isEmpty(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.String:
+		return v.Len() == 0
+	case reflect.Slice, reflect.Map:
+		return v.IsNil() || v.Len() == 0
+	case reflect.Interface:
+		return v.IsNil() || isEmpty(v.Elem())
+	}
+	return false
+}
+
 func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	iValue, err := event.GetValue(f.config.Field)
 	if err != nil {
@@ -101,8 +114,8 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, errors.Wrapf(err, "could not fetch value for field %s", f.config.Field)
 	}
 
-	v := reflect.ValueOf(iValue)
-	if t := v.Type(); t.Kind() != reflect.Slice {
+	array := reflect.ValueOf(iValue)
+	if t := array.Type(); t.Kind() != reflect.Slice {
 		if !f.config.FailOnError {
 			return event, nil
 		}
@@ -115,13 +128,20 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		saved.Meta = event.Meta.Clone()
 	}
 
-	n := v.Len()
+	n := array.Len()
 	for _, mapping := range f.mappings {
 		if mapping.from >= n {
 			if !f.config.FailOnError {
 				continue
 			}
 			return &saved, errors.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
+		}
+		cell := array.Index(mapping.from)
+		// checking for CanInterface() here is done to prevent .Interface() from
+		// panicking, but it can only happen when value points to a private
+		// field inside a struct.
+		if !cell.CanInterface() || (f.config.OmitEmpty && isEmpty(cell)) {
+			continue
 		}
 		if !f.config.OverwriteKeys {
 			if _, err = event.GetValue(mapping.to); err == nil {
@@ -131,7 +151,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 				return &saved, errors.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
 			}
 		}
-		if _, err = event.PutValue(mapping.to, clone(v.Index(mapping.from).Interface())); err != nil {
+		if _, err = event.PutValue(mapping.to, clone(cell.Interface())); err != nil {
 			if !f.config.FailOnError {
 				continue
 			}
