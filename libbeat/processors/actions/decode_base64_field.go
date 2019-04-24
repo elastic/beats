@@ -53,7 +53,7 @@ func init() {
 	processors.RegisterPlugin(processorName,
 		configChecked(NewDecodeBase64Field,
 			requireFields("field"),
-			allowedFields("field", "target")))
+			allowedFields("field", "target", "when")))
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
