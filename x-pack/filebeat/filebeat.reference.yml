@@ -156,6 +156,16 @@ filebeat.modules:
     #var.convert_timezone: false
 
 
+#------------------------------ Envoyproxy Module ------------------------------
+- module: envoyproxy
+  # Fileset for native deployment
+  log: 
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
   # All logs
@@ -561,6 +571,10 @@ filebeat.inputs:
   # All bytes after max_bytes are discarded and not sent. The default is 10MB.
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
+
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
 
   ### Recursive glob configuration
 
