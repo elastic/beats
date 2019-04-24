@@ -3,3 +3,20 @@
   description: >
     `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
   release: beta
+  fields:
+    - name: cloudwatch.namespace
+      type: keyword
+      description: >
+        The namespace specified when query cloudwatch api.
+    - name: cloudwatch.metrics.*
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        Metrics that returned from Cloudwatch api query.
+    - name: cloudwatch.dimensions.*
+      type: object
+      object_type: keyword
+      object_type_mapping_type: "*"
+      description: >
+        Cloudwatch metric dimensions.

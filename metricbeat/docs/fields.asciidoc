@@ -836,6 +836,37 @@ Total.
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
 
 
+
+*`aws.cloudwatch.cloudwatch.namespace`*::
++
+--
+type: keyword
+
+The namespace specified when query cloudwatch api.
+
+
+--
+
+*`aws.cloudwatch.cloudwatch.metrics.*`*::
++
+--
+type: object
+
+Metrics that returned from Cloudwatch api query.
+
+
+--
+
+*`aws.cloudwatch.cloudwatch.dimensions.*`*::
++
+--
+type: object
+
+Cloudwatch metric dimensions.
+
+
+--
+
 [float]
 == ec2 fields
 

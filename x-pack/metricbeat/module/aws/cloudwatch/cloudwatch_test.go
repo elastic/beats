@@ -81,6 +81,11 @@ var (
 		MetricName: &metricName5,
 		Namespace:  &namespaceRDS,
 	}
+
+	listMetric7 = cloudwatch.Metric{
+		MetricName: &metricName1,
+		Namespace:  &namespace,
+	}
 )
 
 func TestGetIdentifiers(t *testing.T) {
@@ -124,15 +129,17 @@ func TestConstructLabel(t *testing.T) {
 
 func TestReadCloudwatchConfig(t *testing.T) {
 	cases := []struct {
-		cloudwatchMetricsConfig []Config
-		expectedListMetric      []cloudwatch.Metric
-		expectedNamespace       []string
+		cloudwatchMetricsConfig         []Config
+		expectedListMetricWithRegion    map[string][]cloudwatch.Metric
+		expectedListMetricWithoutRegion []cloudwatch.Metric
+		expectedNamespace               []string
 	}{
 		{
 			[]Config{
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
+					Region:     "us-west-1",
 					Dimensions: []Dimension{
 						{
 							Name:  "InstanceId",
@@ -141,7 +148,10 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			[]cloudwatch.Metric{listMetric1},
+			map[string][]cloudwatch.Metric{
+				"us-west-1": {listMetric1},
+			},
+			nil,
 			nil,
 		},
 		{
@@ -160,6 +170,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace: "AWS/EBS",
 				},
 			},
+			map[string][]cloudwatch.Metric{},
 			[]cloudwatch.Metric{listMetric1},
 			[]string{"AWS/EBS"},
 		},
@@ -168,6 +179,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
+					Region:     "us-west-1",
 					Dimensions: []Dimension{
 						{
 							Name:  "InstanceId",
@@ -181,6 +193,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Namespace:  "AWS/RDS",
 					MetricName: "CommitThroughput",
+					Region:     "us-west-1",
 					Dimensions: []Dimension{
 						{
 							Name:  "DBClusterIdentifier",
@@ -193,13 +206,34 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			[]cloudwatch.Metric{listMetric1, listMetric6},
+			map[string][]cloudwatch.Metric{
+				"us-west-1": {listMetric1, listMetric6},
+			},
+			nil,
+			[]string{"AWS/EBS"},
+		},
+		{
+			[]Config{
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: "CPUUtilization",
+					Region:     "us-east-1",
+				},
+				{
+					Namespace: "AWS/EBS",
+				},
+			},
+			map[string][]cloudwatch.Metric{
+				"us-east-1": {listMetric7},
+			},
+			nil,
 			[]string{"AWS/EBS"},
 		},
 	}
 	for _, c := range cases {
-		listMetrics, namespaces := readCloudwatchConfig(c.cloudwatchMetricsConfig)
-		assert.Equal(t, c.expectedListMetric, listMetrics)
+		listMetricsWithRegion, listMetricsWithoutRegion, namespaces := readCloudwatchConfig(c.cloudwatchMetricsConfig)
+		assert.Equal(t, c.expectedListMetricWithRegion, listMetricsWithRegion)
+		assert.Equal(t, c.expectedListMetricWithoutRegion, listMetricsWithoutRegion)
 		assert.Equal(t, c.expectedNamespace, namespaces)
 	}
 }
