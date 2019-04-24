@@ -30,6 +30,7 @@ type Connector struct {
 	processors    *processors.Processors
 	eventMeta     common.EventMetadata
 	dynamicFields *common.MapStrPointer
+	timeSeries    bool
 }
 
 type connectorConfig struct {
