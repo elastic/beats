@@ -142,10 +142,13 @@ func enablePerformanceCounters() error {
 	if err != nil {
 		return errors.Errorf("cannot open new key in the registry in order to enable the performance counters: %s", err)
 	}
-	if err = key.SetDWordValue("EnableCounterForIoctl", 1); err != nil {
-		return errors.Errorf("cannot create EnableCounterForIoctl key in the registry in order to enable the performance counters: %s", err)
+	val, _, err := key.GetIntegerValue("EnableCounterForIoctl")
+	if val != 1 || err != nil {
+		if err = key.SetDWordValue("EnableCounterForIoctl", 1); err != nil {
+			return errors.Errorf("cannot create HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr\\EnableCounterForIoctl key in the registry in order to enable the performance counters: %s", err)
+		}
+		logger.Info("The registry key EnableCounterForIoctl at HKLM:SYSTEM\\CurrentControlSet\\Services\\Partmgr has been created in order to enable the performance counters")
 	}
-	logger.Info("The key with the name EnableCounterForIoctl has been added in the windows registry in order to enable the performance counters")
 	return nil
 }
 
