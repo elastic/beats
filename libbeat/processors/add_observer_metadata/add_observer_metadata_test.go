@@ -15,11 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package add_host_metadata
+package add_observer_metadata
 
 import (
-	"fmt"
-	"runtime"
 	"testing"
 	"time"
 
@@ -28,7 +26,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/go-sysinfo/types"
 )
 
 func TestConfigDefault(t *testing.T) {
@@ -40,36 +37,53 @@ func TestConfigDefault(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
-	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
-		assert.NoError(t, err)
-	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
-		return
-	}
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
-	v, err := newEvent.GetValue("host.os.family")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.os.kernel")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.os.name")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.ip")
+	v, err := newEvent.GetValue("observer.ip")
 	assert.Error(t, err)
 	assert.Nil(t, v)
 
-	v, err = newEvent.GetValue("host.mac")
+	v, err = newEvent.GetValue("observer.mac")
 	assert.Error(t, err)
 	assert.Nil(t, v)
+}
+
+func TestOverwriteFalse(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{"observer": common.MapStr{"foo": "bar"}},
+		Timestamp: time.Now(),
+	}
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	require.NoError(t, err)
+
+	p, err := New(testConfig)
+
+	newEvent, err := p.Run(event)
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("observer")
+	require.NoError(t, err)
+	assert.Equal(t, common.MapStr{"foo": "bar"}, v)
+}
+
+func TestOverwriteTrue(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{"observer": common.MapStr{"foo": "bar"}},
+		Timestamp: time.Now(),
+	}
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{"overwrite": true})
+	require.NoError(t, err)
+
+	p, err := New(testConfig)
+
+	newEvent, err := p.Run(event)
+	require.NoError(t, err)
+
+	v, err := newEvent.GetValue("observer.hostname")
+	require.NoError(t, err)
+	assert.NotNil(t, v)
 }
 
 func TestConfigNetInfoEnabled(t *testing.T) {
@@ -83,64 +97,17 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
-	switch runtime.GOOS {
-	case "windows", "darwin", "linux":
-		assert.NoError(t, err)
-	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
-		return
-	}
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
-	v, err := newEvent.GetValue("host.os.family")
+	v, err := newEvent.GetValue("observer.ip")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.os.kernel")
+	v, err = newEvent.GetValue("observer.mac")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.os.name")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.ip")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.mac")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-}
-
-func TestConfigName(t *testing.T) {
-	event := &beat.Event{
-		Fields:    common.MapStr{},
-		Timestamp: time.Now(),
-	}
-
-	config := map[string]interface{}{
-		"name": "my-host",
-	}
-
-	testConfig, err := common.NewConfigFrom(config)
-	assert.NoError(t, err)
-
-	p, err := New(testConfig)
-	require.NoError(t, err)
-
-	newEvent, err := p.Run(event)
-	assert.NoError(t, err)
-
-	for configKey, configValue := range config {
-		t.Run(fmt.Sprintf("Check of %s", configKey), func(t *testing.T) {
-			v, err := newEvent.GetValue(fmt.Sprintf("host.%s", configKey))
-			assert.NoError(t, err)
-			assert.Equal(t, configValue, v, "Could not find in %s", newEvent)
-		})
-	}
 }
 
 func TestConfigGeoEnabled(t *testing.T) {
@@ -168,7 +135,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
 
-	eventGeoField, err := newEvent.GetValue("host.geo")
+	eventGeoField, err := newEvent.GetValue("observer.geo")
 	require.NoError(t, err)
 
 	assert.Len(t, eventGeoField, len(config))
@@ -189,10 +156,9 @@ func TestConfigGeoDisabled(t *testing.T) {
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
-
 	require.NoError(t, err)
 
-	eventGeoField, err := newEvent.GetValue("host.geo")
+	eventGeoField, err := newEvent.GetValue("observer.geo")
 	assert.Error(t, err)
 	assert.Equal(t, nil, eventGeoField)
 }
