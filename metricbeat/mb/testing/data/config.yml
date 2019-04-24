@@ -5,3 +5,5 @@ omit_documented_fields_check:
   - "apache.status.hostname"
 remove_fields_from_comparison:
   - "apache.status.hostname"
+module:
+  namespace: test
