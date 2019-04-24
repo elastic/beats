@@ -48,10 +48,10 @@ type Dimension struct {
 	Value string `config:"value" validate:"nonzero"`
 }
 
-// CloudwatchConfig holds a configuration specific for cloudwatch metricset.
+// Config holds a configuration specific for cloudwatch metricset.
 type Config struct {
-	Namespace  string      `config:"namespace" validate:"nonzero"`
-	MetricName string      `config:"metric_name"`
+	Namespace  string      `config:"namespace" validate:"nonzero,required"`
+	MetricName string      `config:"metricname"`
 	Dimensions []Dimension `config:"dimensions"`
 }
 
@@ -92,7 +92,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		return errors.Wrap(err, "error ParseDuration")
+		return errors.Wrap(err, "error GetStartTimeEndTime")
 	}
 
 	// Get listMetricsTotal and namespaces from configuration
@@ -134,6 +134,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func readCloudwatchConfig(cloudwatchConfigs []Config) ([]cloudwatch.Metric, []string) {
 	var listMetricsTotal []cloudwatch.Metric
 	var namespacesTotal []string
+
 	for _, cloudwatchConfig := range cloudwatchConfigs {
 		namespace := cloudwatchConfig.Namespace
 		if cloudwatchConfig.MetricName != "" {

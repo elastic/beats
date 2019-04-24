@@ -5,7 +5,7 @@
 package aws
 
 import (
-	"strconv"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 
@@ -20,11 +20,11 @@ import (
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period          string `config:"period"`
-	AccessKeyID     string `config:"access_key_id"`
-	SecretAccessKey string `config:"secret_access_key"`
-	SessionToken    string `config:"session_token"`
-	DefaultRegion   string `config:"default_region"`
+	Period          time.Duration `config:"period" validate:"nonzero,required"`
+	AccessKeyID     string        `config:"access_key_id"`
+	SecretAccessKey string        `config:"secret_access_key"`
+	SessionToken    string        `config:"session_token"`
+	DefaultRegion   string        `config:"default_region"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
@@ -82,13 +82,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	// Calculate duration based on period
-	if config.Period == "" {
-		err = errors.New("period is not set in AWS module config")
-		return nil, err
-	}
-
-	durationString, periodSec, err := convertPeriodToDuration(config.Period)
+	durationString, periodSec := convertPeriodToDuration(config.Period)
 	if err != nil {
 		return nil, err
 	}
@@ -118,28 +112,12 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	return
 }
 
-func convertPeriodToDuration(period string) (string, int, error) {
+func convertPeriodToDuration(period time.Duration) (string, int) {
 	// Set starttime double the default frequency earlier than the endtime in order to make sure
 	// GetMetricDataRequest gets the latest data point for each metric.
-	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
-	if err != nil {
-		return "", 0, err
-	}
-
-	unitPeriod := period[len(period)-1:]
-	switch unitPeriod {
-	case "s":
-		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		return duration, numberPeriod, nil
-	case "m":
-		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		periodInSec := numberPeriod * 60
-		return duration, periodInSec, nil
-	default:
-		err = errors.New("invalid period in config. Please reset period in config")
-		duration := "-" + strconv.Itoa(numberPeriod*2) + "s"
-		return duration, numberPeriod, err
-	}
+	duration := "-" + (period * 2).String()
+	numberPeriod := int(period.Seconds())
+	return duration, numberPeriod
 }
 
 // StringInSlice checks if a string is already exists in list

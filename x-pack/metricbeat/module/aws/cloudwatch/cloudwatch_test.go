@@ -124,12 +124,12 @@ func TestConstructLabel(t *testing.T) {
 
 func TestReadCloudwatchConfig(t *testing.T) {
 	cases := []struct {
-		cloudwatchMetricsConfig []CloudwatchConfig
+		cloudwatchMetricsConfig []Config
 		expectedListMetric      []cloudwatch.Metric
 		expectedNamespace       []string
 	}{
 		{
-			[]CloudwatchConfig{
+			[]Config{
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
@@ -145,7 +145,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			nil,
 		},
 		{
-			[]CloudwatchConfig{
+			[]Config{
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
@@ -164,7 +164,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]string{"AWS/EBS"},
 		},
 		{
-			[]CloudwatchConfig{
+			[]Config{
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
