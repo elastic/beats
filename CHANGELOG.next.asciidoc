@@ -69,6 +69,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Fix NPE on some monitor configuration errors. {pull}11910[11910]
+
 *Journalbeat*
 
 *Metricbeat*
