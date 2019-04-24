@@ -38,7 +38,7 @@ be unique for every single item being monitored.
 
 [source,yaml]
 ----
-metricbeat.max_start_delay: 10s
+timeseries.enabled: true
 ----
 
 
