@@ -27,4 +27,5 @@ func init() {
 	RootCmd.AddCommand(genUpdateCmd())
 	RootCmd.AddCommand(genRemoveCmd())
 	RootCmd.AddCommand(genPackageCmd())
+	RootCmd.ExportCmd.AddCommand(genExportTemplateCmd())
 }
