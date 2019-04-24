@@ -47,9 +47,9 @@ func TestData(t *testing.T) {
 	}
 	defer c.Close()
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	for retries := 0; retries < 3; retries++ {
-		err = mbtest.WriteEventsReporterV2(ms, t, "")
+		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
 			return
 		}
