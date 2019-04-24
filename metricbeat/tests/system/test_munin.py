@@ -38,5 +38,4 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [self.compose_hosts()[0] + ':' +
-                os.getenv('MUNIN_PORT', '4949')]
+        return [self.compose_host()]

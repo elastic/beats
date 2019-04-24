@@ -97,3 +97,12 @@ class Test(BaseTest):
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
         assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
+
+    def get_elasticsearch_url(self):
+        return "http://" + self.compose_host("elasticsearch")
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://" + self.compose_host("kibana")

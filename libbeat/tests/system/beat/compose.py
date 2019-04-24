@@ -89,21 +89,47 @@ class ComposeMixin(object):
         """
         Stop all running containers
         """
+        if os.environ.get('NO_COMPOSE'):
+            return
+
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
             cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
-    def compose_hosts(cls):
+    def _private_host(cls, info, port):
+        networks = info['NetworkSettings']['Networks'].values()
+        port = port.split("/")[0]
+        for network in networks:
+            ip = network['IPAddress']
+            if ip:
+                return "%s:%s" % (ip, port)
+
+    @classmethod
+    def _public_host(cls, info, port):
+        hostPort = info['NetworkSettings']['Ports'][port][0]['HostPort']
+        return "localhost:%s" % hostPort
+
+    @classmethod
+    def compose_host(cls, service=None, port=None):
         if not INTEGRATION_TESTS or not cls.COMPOSE_SERVICES:
             return []
 
-        hosts = []
-        for container in cls.compose_project().containers(service_names=cls.COMPOSE_SERVICES):
-            network_settings = container.inspect()['NetworkSettings']
-            for network in network_settings['Networks'].values():
-                if network['IPAddress']:
-                    hosts.append(network['IPAddress'])
-        return hosts
+        if service is None:
+            service = cls.COMPOSE_SERVICES[0]
+
+        host_env = os.environ.get(service.upper() + "_HOST")
+        if host_env:
+            return host_env
+
+        container = cls.compose_project().containers(service_names=[service])[0]
+        info = container.inspect()
+        portsConfig = info['HostConfig']['PortBindings']
+        if len(portsConfig) == 0:
+            raise Exception("No exposed ports for service %s" % service)
+        if port is None:
+            port = portsConfig.keys()[0]
+
+        return cls._public_host(info, port)
 
     @classmethod
     def compose_project(cls):

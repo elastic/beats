@@ -22,5 +22,4 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("couchbase", metricset, self.get_hosts(), self.FIELDS)
 
     def get_hosts(self):
-        return [os.getenv('COUCHBASE_HOST', 'localhost') + ':' +
-                os.getenv('COUCHBASE_PORT', '8091')]
+        return [self.compose_host()]

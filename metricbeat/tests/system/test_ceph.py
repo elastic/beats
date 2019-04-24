@@ -24,5 +24,4 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("ceph", metricset, self.get_hosts(), self.FIELDS)
 
     def get_hosts(self):
-        return [os.getenv('CEPH_HOST', 'localhost') + ':' +
-                os.getenv('CEPH_PORT', '5000')]
+        return [self.compose_host()]

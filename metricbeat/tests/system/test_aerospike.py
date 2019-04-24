@@ -16,5 +16,4 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("aerospike", "namespace", self.get_hosts(), self.FIELDS)
 
     def get_hosts(self):
-        return [os.getenv('AEROSPIKE_HOST', 'localhost') + ':' +
-                os.getenv('AEROSPIKE_PORT', '3000')]
+        return [self.compose_host()]
