@@ -123,7 +123,7 @@ func TestGetInstanceIDs(t *testing.T) {
 
 func TestCreateCloudWatchEvents(t *testing.T) {
 	mockModuleConfig := aws.Config{
-		Period:        time.Duration(300) * time.Second,
+		Period:        300 * time.Second,
 		DefaultRegion: regionName,
 	}
 

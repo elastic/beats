@@ -141,6 +141,7 @@ metricbeat.modules:
   cloudwatch_metrics:
     - namespace: AWS/EC2
       metricname: CPUUtilization
+      region: us-east-1
       dimensions:
         - name: InstanceId
           value: i-0686946e22cf9494a

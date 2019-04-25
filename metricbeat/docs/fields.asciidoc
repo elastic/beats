@@ -837,7 +837,7 @@ Total.
 
 
 
-*`aws.cloudwatch.cloudwatch.namespace`*::
+*`aws.cloudwatch.namespace`*::
 +
 --
 type: keyword
@@ -847,7 +847,7 @@ The namespace specified when query cloudwatch api.
 
 --
 
-*`aws.cloudwatch.cloudwatch.metrics.*`*::
+*`aws.cloudwatch.metrics.*`*::
 +
 --
 type: object
@@ -857,7 +857,7 @@ Metrics that returned from Cloudwatch api query.
 
 --
 
-*`aws.cloudwatch.cloudwatch.dimensions.*`*::
+*`aws.cloudwatch.dimensions.*`*::
 +
 --
 type: object

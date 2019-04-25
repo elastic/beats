@@ -99,34 +99,37 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Get listMetricsTotal and namespaces from configuration
 	listMetricsWithRegion, listMetricsWithoutRegion, namespacesTotal := readCloudwatchConfig(m.CloudwatchConfigs)
-	if listMetricsWithoutRegion != nil {
-		m.Logger().Info("cloudwatch_metrics config is missing region name. " +
-			"To avoid extra costs, please make sure region is set in config.yml")
-	}
 
 	for regionName, listMetricsPerRegion := range listMetricsWithRegion {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		awsConfig := *m.MetricSet.AwsConfig
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
 		err := createEvents(svcCloudwatch, listMetricsPerRegion, regionName, m.PeriodInSec, startTime, endTime, report)
 		if err != nil {
 			return errors.Wrap(err, "createEvents failed")
 		}
 	}
 
-	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
-		err := createEvents(svcCloudwatch, listMetricsWithoutRegion, regionName, m.PeriodInSec, startTime, endTime, report)
-		if err != nil {
-			return errors.Wrap(err, "createEvents failed")
+	if listMetricsWithoutRegion != nil {
+		m.Logger().Info("cloudwatch_metrics config is missing region name. " +
+			"To avoid extra costs, please make sure region is set in config.yml")
+		for _, regionName := range m.MetricSet.RegionsList {
+			awsConfig := *m.MetricSet.AwsConfig
+			awsConfig.Region = regionName
+			svcCloudwatch := cloudwatch.New(awsConfig)
+			err := createEvents(svcCloudwatch, listMetricsWithoutRegion, regionName, m.PeriodInSec, startTime, endTime, report)
+			if err != nil {
+				return errors.Wrap(err, "createEvents failed")
+			}
 		}
 	}
 
 	// Use namespaces from config
 	for _, namespace := range namespacesTotal {
 		for _, regionName := range m.MetricSet.RegionsList {
-			m.MetricSet.AwsConfig.Region = regionName
-			svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+			awsConfig := *m.MetricSet.AwsConfig
+			awsConfig.Region = regionName
+			svcCloudwatch := cloudwatch.New(awsConfig)
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 			if err != nil {
 				m.Logger().Info(err.Error())
