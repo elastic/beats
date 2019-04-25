@@ -203,10 +203,10 @@ func installDependencies(arch string, pkgs ...string) error {
 
 	if arch == "i386" {
 		return sh.Run("./install_pkgs.sh", pkgs...)
-	} else {
-		params := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
-		return sh.Run("apt-get", params...)
 	}
+
+	params := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
+	return sh.Run("apt-get", params...)
 }
 
 func selectImage(platform string) (string, error) {
