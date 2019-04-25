@@ -76,8 +76,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcEC2 := ec2.New(*m.MetricSet.AwsConfig)
+		awsConfig := *m.MetricSet.AwsConfig
+		awsConfig.Region = regionName
+		svcEC2 := ec2.New(awsConfig)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
@@ -86,7 +87,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		svcCloudwatch := cloudwatch.New(awsConfig)
 		namespace := "AWS/EC2"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {

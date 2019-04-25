@@ -76,9 +76,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
-		svcSQS := sqs.New(*m.MetricSet.AwsConfig)
+		awsConfig := *m.MetricSet.AwsConfig
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcSQS := sqs.New(awsConfig)
 
 		// Get queueUrls for each region
 		queueURLs, err := getQueueUrls(svcSQS)

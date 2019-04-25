@@ -80,8 +80,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		awsConfig := *m.MetricSet.AwsConfig
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			m.Logger().Error(err.Error())
