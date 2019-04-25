@@ -88,7 +88,7 @@ services:
   elasticsearch:
     build: ./module/elasticsearch/_meta
     environment:
-      - "ES_JAVA_OPTS=-Xms105m -Xmx105m"
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host="
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
