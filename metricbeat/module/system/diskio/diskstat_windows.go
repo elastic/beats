@@ -42,9 +42,7 @@ func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCou
 }
 
 // CloseSampling stub for linux implementation.
-func (stat *DiskIOStat) CloseSampling() {
-	return
-}
+func (stat *DiskIOStat) CloseSampling() {}
 
 // IOCounters should map functionality to disk package for linux os.
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {

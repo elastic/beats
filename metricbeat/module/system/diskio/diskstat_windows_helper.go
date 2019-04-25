@@ -223,7 +223,7 @@ func containsDrive(devices []string, disk string) bool {
 	return false
 }
 
-// filterLogicalDrives should filter CD-ROM type drives based on https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-getdrivetypew
+// isValidLogicalDrive should filter CD-ROM type drives based on https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-getdrivetypew
 func isValidLogicalDrive(path string) bool {
 	utfPath, err := syscall.UTF16PtrFromString(path + `\`)
 	if err != nil {
