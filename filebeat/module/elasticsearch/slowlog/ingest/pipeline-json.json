@@ -95,15 +95,16 @@
             }
         },
         {
-            "set": {
-                "field": "elasticsearch.slowlog.source_query",
-                "value": "{{elasticsearch.slowlog.source}}",
-                "override": false
+            "convert": {
+                "field": "elasticsearch.slowlog.took_millis",
+                "type": "float",
+                "ignore_missing": true
             }
         },
         {
-            "remove": {
-                "field": "elasticsearch.slowlog.source",
+            "rename": {
+                "field": "elasticsearch.slowlog.took_millis",
+                "target_field": "elasticsearch.slowlog.duration",
                 "ignore_missing": true
             }
         },

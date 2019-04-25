@@ -5331,17 +5331,6 @@ example: 300ms
 
 --
 
-*`elasticsearch.slowlog.took_millis`*::
-+
---
-type: integer
-
-example: 300
-
-Time it took to execute the query, in milliseconds
-
---
-
 *`elasticsearch.slowlog.types`*::
 +
 --

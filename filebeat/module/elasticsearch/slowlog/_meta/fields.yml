@@ -11,10 +11,6 @@
     description: "Time it took to execute the query"
     example: "300ms"
     type: keyword
-  - name: took_millis
-    description: "Time it took to execute the query, in milliseconds"
-    example: 300
-    type: integer
   - name: types
     description: "Types"
     example: ""
