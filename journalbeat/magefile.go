@@ -40,6 +40,7 @@ func init() {
 
 const (
 	libsystemdDevPkgName = "libsystemd-dev"
+	libsystemdPkgName    = "libsystemd0"
 )
 
 // Build builds the Beat binary.
@@ -165,7 +166,7 @@ func installLinuxARMLE() error {
 }
 
 func installLinux386() error {
-	return installDependencies(libsystemdDevPkgName+":i386", "i386")
+	return installDependencies(libsystemdDevPkgName+":i386", libsystemdPkgName+":i386", "i386")
 }
 
 func installLinuxMIPS() error {
@@ -188,7 +189,7 @@ func installLinuxS390X() error {
 	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
 }
 
-func installDependencies(pkg, arch string) error {
+func installDependencies(arch string, pkgs ...string) error {
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
@@ -200,7 +201,11 @@ func installDependencies(pkg, arch string) error {
 		return err
 	}
 
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+	if arch == "i386" {
+		return sh.Run("echo", "'Yes, do as I say!'", "|", "apt-get", "install", "-y", "--force-yes", "--no-install-recommends", pkgs...)
+	} else {
+		return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkgs...)
+	}
 }
 
 func selectImage(platform string) (string, error) {
