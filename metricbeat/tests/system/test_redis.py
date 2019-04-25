@@ -160,9 +160,6 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
         self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
 
-    def get_hosts(self):
-        return [self.compose_host()]
-
 
 class TestRedis4(Test):
     COMPOSE_SERVICES = ['redis_4']

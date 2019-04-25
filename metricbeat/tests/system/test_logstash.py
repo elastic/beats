@@ -53,6 +53,3 @@ class Test(metricbeat.BaseTest):
         print(evt)
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return [self.compose_host()]

@@ -108,6 +108,3 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return [self.compose_host()]

@@ -48,6 +48,3 @@ class Test(metricbeat.BaseTest):
         print(evt)
 
         assert evt["jolokia"]["test"]["gc"]["collection_count"] >= 0
-
-    def get_hosts(self):
-        return [self.compose_host()]

@@ -100,6 +100,10 @@ class ComposeMixin(object):
             cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
+    def get_hosts(cls):
+        return [cls.compose_host()]
+
+    @classmethod
     def _private_host(cls, info, port):
         """
         Return the address of the container, it should be reachable from the

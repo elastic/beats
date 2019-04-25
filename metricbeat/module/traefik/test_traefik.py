@@ -23,6 +23,3 @@ class Test(metricbeat.BaseTest):
         traefik metricset tests
         """
         self.check_metricset("traefik", metricset, self.get_hosts(), self.FIELDS + ["service.name"])
-
-    def get_hosts(self):
-        return [self.compose_host()]

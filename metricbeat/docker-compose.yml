@@ -76,6 +76,8 @@ services:
 
   coredns:
     build: ./module/coredns/_meta
+    ports:
+      - 9153
 
   couchbase:
     build: ./module/couchbase/_meta

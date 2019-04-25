@@ -28,6 +28,3 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output_json()
         self.assertTrue(len(output) >= 1)
-
-    def get_hosts(self):
-        return [self.compose_host()]

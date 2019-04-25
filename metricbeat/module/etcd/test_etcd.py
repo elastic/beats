@@ -25,9 +25,6 @@ class Test(metricbeat.BaseTest):
         """
         self.check_metricset("etcd", metricset, self.get_hosts(), ['etcd.' + metricset])
 
-    def get_hosts(self):
-        return [self.compose_host()]
-
 
 class Test_3_2(Test):
     COMPOSE_SERVICES = ['etcd_3_2']

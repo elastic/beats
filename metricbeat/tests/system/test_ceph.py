@@ -22,6 +22,3 @@ class Test(metricbeat.BaseTest):
         ceph metricsets tests
         """
         self.check_metricset("ceph", metricset, self.get_hosts(), self.FIELDS)
-
-    def get_hosts(self):
-        return [self.compose_host()]
