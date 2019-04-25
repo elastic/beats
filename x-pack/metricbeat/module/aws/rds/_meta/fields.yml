@@ -10,11 +10,11 @@
       description: >
         The percentage of CPU utilization.
     - name: cpu.credit_usage
-      type: scaled_float
+      type: long
       description: >
         The number of CPU credits spent by the instance for CPU utilization.
     - name: cpu.credit_balance
-      type: scaled_float
+      type: long
       description: >
         The number of earned CPU credits that an instance has accrued since it was launched or started.
     - name: database_connections

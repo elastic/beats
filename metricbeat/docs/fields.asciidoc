@@ -1175,7 +1175,7 @@ The percentage of CPU utilization.
 *`aws.rds.cpu.credit_usage`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of CPU credits spent by the instance for CPU utilization.
 
@@ -1185,7 +1185,7 @@ The number of CPU credits spent by the instance for CPU utilization.
 *`aws.rds.cpu.credit_balance`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of earned CPU credits that an instance has accrued since it was launched or started.
 

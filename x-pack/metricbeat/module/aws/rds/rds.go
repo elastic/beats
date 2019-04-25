@@ -15,12 +15,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
-var metricsetName = "rds"
+var (
+	metricsetName    = "rds"
+	dbInstanceArnIdx = 0
+	metricNameIdx    = 1
+)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -81,8 +84,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svc := rds.New(*m.MetricSet.AwsConfig)
+		awsConfig := *m.MetricSet.AwsConfig
+		awsConfig.Region = regionName
+		svc := rds.New(awsConfig)
 		// Get DBInstance ARNs per region
 		dbInstanceARNs, dbDetailsMap, err := getDBInstancesPerRegion(svc)
 		if err != nil {
@@ -96,7 +100,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		svcCloudwatch := cloudwatch.New(awsConfig)
 		namespace := "AWS/RDS"
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
@@ -115,7 +119,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, dbInstanceARN, m.PeriodInSec)...)
 		}
 
-		metricDataOutput := []cloudwatch.MetricDataResult{}
+		var metricDataOutput []cloudwatch.MetricDataResult
 		if len(metricDataQueriesTotal) != 0 {
 			// Use metricDataQueries to make GetMetricData API calls
 			metricDataOutput, err = aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
@@ -189,7 +193,7 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn
 func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceARN string, periodInSec int) cloudwatch.MetricDataQuery {
 	statistic := "Average"
 	period := int64(periodInSec)
-	id := "rds" + strconv.Itoa(index)
+	id := metricsetName + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 
 	metricDataQuery := cloudwatch.MetricDataQuery{
@@ -223,7 +227,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	metricSetFieldResults := map[string]map[string]interface{}{}
 
 	for dbInstanceArn := range dbInstanceMap {
-		events[dbInstanceArn] = initRDSEvent(regionName)
+		events[dbInstanceArn] = aws.InitEvent(metricsetName, regionName)
 		metricSetFieldResults[dbInstanceArn] = map[string]interface{}{}
 	}
 
@@ -237,14 +241,14 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
 				labels := strings.Split(*output.Label, " ")
-				dbInstanceArn := labels[0]
+				dbInstanceArn := labels[dbInstanceArnIdx]
 				events[dbInstanceArn].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbInstanceArn].dbAvailabilityZone)
 				events[dbInstanceArn].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbInstanceArn].dbArn)
 				events[dbInstanceArn].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbInstanceArn].dbClass)
 				events[dbInstanceArn].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbInstanceArn].dbIdentifier)
 				events[dbInstanceArn].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbInstanceArn].dbStatus)
 				if len(output.Values) > timestampIdx && len(labels) > 1 {
-					metricSetFieldResults[dbInstanceArn][labels[1]] = fmt.Sprint(output.Values[timestampIdx])
+					metricSetFieldResults[dbInstanceArn][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
 					for i := 1; i <= (len(labels)-2)/2; i++ {
 						metricSetFieldResults[dbInstanceArn][labels[i*2]] = labels[(i*2 + 1)]
 					}
@@ -263,16 +267,4 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	}
 
 	return events, nil
-}
-
-func initRDSEvent(regionName string) mb.Event {
-	event := mb.Event{}
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	event.MetricSetFields = common.MapStr{}
-
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.provider", "aws")
-	event.RootFields.Put("cloud.region", regionName)
-	return event
 }
