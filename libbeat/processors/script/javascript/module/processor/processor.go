@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_locale"
+	"github.com/elastic/beats/libbeat/processors/add_observer_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	"github.com/elastic/beats/libbeat/processors/communityid"
 	"github.com/elastic/beats/libbeat/processors/dissect"
@@ -44,6 +45,7 @@ var constructors = map[string]processors.Constructor{
 	"AddFields":             actions.CreateAddFields,
 	"AddHostMetadata":       add_host_metadata.New,
 	"AddKubernetesMetadata": add_kubernetes_metadata.New,
+	"AddObserverMetadata":   add_observer_metadata.New,
 	"AddLocale":             add_locale.New,
 	"AddProcessMetadata":    add_process_metadata.New,
 	"CommunityID":           communityid.New,

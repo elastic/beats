@@ -44,6 +44,15 @@ metricbeat.max_start_delay: 10s
 #              period: 10s
 #              hosts: ["${host}:2379"]
 
+#=========================== Timeseries instance ===============================
+
+# Enabling this will add a `timeseries.instance` keyword field to all metric
+# events. For a given metricset, this field will be unique for every single item
+# being monitored.
+# This setting is experimental.
+
+#timeseries.enabled: false
+
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
