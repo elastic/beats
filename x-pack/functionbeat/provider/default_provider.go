@@ -74,6 +74,7 @@ func (d *DefaultProvider) CLIManager() (CLIManager, error) {
 	return d.managerFactory(nil, d.rawConfig, d)
 }
 
+// TemplateBuilder returns a TemplateBuilder returns a the type responsible to generate templates.
 func (d *DefaultProvider) TemplateBuilder() (TemplateBuilder, error) {
 	return d.templateFactory(d.log, d.rawConfig, d)
 }
@@ -90,8 +91,10 @@ func (*nullCLI) Deploy(_ string) error { return fmt.Errorf("deploy not implement
 func (*nullCLI) Update(_ string) error { return fmt.Errorf("update not implemented") }
 func (*nullCLI) Remove(_ string) error { return fmt.Errorf("remove not implemented") }
 
+// nullTemplateBuilder is used when a provider does not implement a template builder functionality.
 type nullTemplateBuilder struct{}
 
+// NewNullTemplateBuilder returns a NOOP TemplateBuilder.
 func NewNullTemplateBuilder(_ *logp.Logger, _ *common.Config, _ Provider) (TemplateBuilder, error) {
 	return (*nullTemplateBuilder)(nil), nil
 }
