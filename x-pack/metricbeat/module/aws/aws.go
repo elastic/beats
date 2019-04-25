@@ -7,6 +7,8 @@ package aws
 import (
 	"strconv"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -148,4 +150,18 @@ func StringInSlice(str string, list []string) bool {
 		}
 	}
 	return false
+}
+
+// InitEvent initialize mb.Event with basic information like service.name, cloud.provider
+func InitEvent(metricsetName string, regionName string) mb.Event {
+	event := mb.Event{}
+	event.Service = metricsetName
+	event.RootFields = common.MapStr{}
+	event.MetricSetFields = common.MapStr{}
+	event.RootFields.Put("service.name", metricsetName)
+	event.RootFields.Put("cloud.provider", "aws")
+	if regionName != "" {
+		event.RootFields.Put("cloud.region", regionName)
+	}
+	return event
 }
