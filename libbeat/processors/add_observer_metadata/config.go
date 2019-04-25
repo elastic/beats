@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package add_host_metadata
+package add_observer_metadata
 
 import (
 	"time"
@@ -25,10 +25,10 @@ import (
 
 // Config for add_host_metadata processor.
 type Config struct {
+	Overwrite      bool            `config:"overwrite"`       // Overwrite if observer fields already exist
 	NetInfoEnabled bool            `config:"netinfo.enabled"` // Add IP and MAC to event
 	CacheTTL       time.Duration   `config:"cache.ttl"`
 	Geo            *util.GeoConfig `config:"geo"`
-	Name           string          `config:"name"`
 }
 
 func defaultConfig() Config {

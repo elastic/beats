@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
+- Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
 
 *Auditbeat*
 
@@ -86,7 +87,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Fix NPE on some monitor configuration errors. {pull}11910[11910]
+
 *Journalbeat*
+
+- Use backoff when no new events are found. {pull}11861[11861]
 
 *Metricbeat*
 
@@ -103,6 +108,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- Fix function name reference for Kinesis streams in CloudFormation templates {pull}11646[11646]
+
 ==== Added
 
 *Affecting all Beats*
@@ -117,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New processor: `truncate_fields`. {pull}11297[11297]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring clsuter. {pull}9260[9260]
 - Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
+- Add `add_observer_metadata` processor. {pull}11394[11394]
 
 *Auditbeat*
 
@@ -138,8 +146,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added support for Cisco ASA fields to the netflow input. {pull}11201[11201]
 - Configurable line terminator. {pull}11015[11015]
 - Add Filebeat envoyproxy module. {pull}11700[11700]
+- Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
 
 *Heartbeat*
+
+- Enable `add_observer_metadata` processor in default config. {pull}11394[11394]
 
 *Journalbeat*
 
@@ -152,7 +163,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add SSL support for Metricbeat HTTP server. {pull}11482[11482] {issue}11457[11457]
 - The `elasticsearch.index` metricset (with `xpack.enabled: true`) now collects `refresh.external_total_time_in_millis` fields from Elasticsearch. {pull}11616[11616]
 - Allow module configurations to have variants {pull}9118[9118]
+- Add `timeseries.instance` field calculation. {pull}10293[10293]
 - Added new disk states and raid level to the system/raid metricset. {pull}11613[11613]
+- Add check on object name in the counter path if the instance name is missing {issue}6528[6528] {pull}11878[11878]
 
 *Packetbeat*
 
