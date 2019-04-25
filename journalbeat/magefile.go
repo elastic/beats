@@ -202,7 +202,7 @@ func installDependencies(arch string, pkgs ...string) error {
 	}
 
 	if arch == "i386" {
-		return sh.Run("echo", "'Yes, do as I say!'", "|", "apt-get", "install", "-y", "--force-yes", "--no-install-recommends", pkgs...)
+		return sh.Run("./install_pkgs.sh", pkgs...)
 	} else {
 		return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkgs...)
 	}
