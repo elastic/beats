@@ -208,13 +208,21 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.2.17
+        MYSQL_IMAGE: mariadb:10.2.23
 
   mariadb_10_3:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.3.12
+        MYSQL_IMAGE: mariadb:10.3.14
+
+  mariadb_10_4:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mariadb:10.4.4
+    ports:
+      - 3306
 
   nats:
     build: ./module/nats/_meta
