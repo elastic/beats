@@ -33,12 +33,14 @@ func WithFields(fields common.MapStr, origJob jobs.Job) jobs.Job {
 	return jobs.Wrap(origJob, Fields(fields))
 }
 
-// Fields is a JobWrapper that adds fields to a given event
+// Fields is a JobWrapper that adds fields to a given event.
 func Fields(fields common.MapStr) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
-			eventext.MergeEventFields(event, fields)
+			// Clone is necessary below for threadsafety since this may be invoked
+			// across continuations.
+			eventext.MergeEventFields(event, fields.Clone())
 			return cont, err
 		}
 	}
