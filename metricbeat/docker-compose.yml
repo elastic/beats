@@ -294,7 +294,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.2.23
+        MYSQL_IMAGE: mariadb:10.2.17
     ports:
       - 3306
 
@@ -302,15 +302,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.3.14
-    ports:
-      - 3306
-
-  mariadb_10_4:
-    build:
-      context: ./module/mysql/_meta
-      args:
-        MYSQL_IMAGE: mariadb:10.4.4
+        MYSQL_IMAGE: mariadb:10.3.12
     ports:
       - 3306
 
