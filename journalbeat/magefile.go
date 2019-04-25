@@ -150,43 +150,43 @@ var (
 )
 
 func installLinuxAMD64() error {
-	return installDependencies(libsystemdDevPkgName, "")
+	return installDependencies("", libsystemdDevPkgName)
 }
 
 func installLinuxARM64() error {
-	return installDependencies(libsystemdDevPkgName+":arm64", "arm64")
+	return installDependencies("arm64", libsystemdDevPkgName+":arm64")
 }
 
 func installLinuxARMHF() error {
-	return installDependencies(libsystemdDevPkgName+":armhf", "armhf")
+	return installDependencies("armhf", libsystemdDevPkgName+":armhf")
 }
 
 func installLinuxARMLE() error {
-	return installDependencies(libsystemdDevPkgName+":armel", "armel")
+	return installDependencies("armel", libsystemdDevPkgName+":armel")
 }
 
 func installLinux386() error {
-	return installDependencies(libsystemdDevPkgName+":i386", libsystemdPkgName+":i386", "i386")
+	return installDependencies("i386", libsystemdDevPkgName+":i386", libsystemdPkgName+":i386")
 }
 
 func installLinuxMIPS() error {
-	return installDependencies(libsystemdDevPkgName+":mips", "mips")
+	return installDependencies("mips", libsystemdDevPkgName+":mips")
 }
 
 func installLinuxMIPS64LE() error {
-	return installDependencies(libsystemdDevPkgName+":mips64el", "mips64el")
+	return installDependencies("mips64el", libsystemdDevPkgName+":mips64el")
 }
 
 func installLinuxMIPSLE() error {
-	return installDependencies(libsystemdDevPkgName+":mipsel", "mipsel")
+	return installDependencies("mipsel", libsystemdDevPkgName+":mipsel")
 }
 
 func installLinuxPPC64LE() error {
-	return installDependencies(libsystemdDevPkgName+":ppc64el", "ppc64el")
+	return installDependencies("ppc64el", libsystemdDevPkgName+":ppc64el")
 }
 
 func installLinuxS390X() error {
-	return installDependencies(libsystemdDevPkgName+":s390x", "s390x")
+	return installDependencies("s390x", libsystemdDevPkgName+":s390x")
 }
 
 func installDependencies(arch string, pkgs ...string) error {
