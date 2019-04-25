@@ -39,10 +39,10 @@ type Supporter interface {
 	Mode() Mode
 	Alias() Alias
 	Policy() Policy
-	Manager(h APIHandler) Manager
+	Manager(h ClientHandler) Manager
 }
 
-// Manager uses an APIHandler to install a policy.
+// Manager uses a ClientHandler to install a policy.
 type Manager interface {
 	Enabled() (bool, error)
 
@@ -53,17 +53,6 @@ type Manager interface {
 	// The created flag is set to true only if a new policy is created. `created`
 	// is false if an existing policy gets overwritten.
 	EnsurePolicy(overwrite bool) (created bool, err error)
-}
-
-// APIHandler defines the interface between a remote service and the Manager.
-type APIHandler interface {
-	ILMEnabled(Mode) (bool, error)
-
-	HasAlias(name string) (bool, error)
-	CreateAlias(alias Alias) error
-
-	HasILMPolicy(name string) (bool, error)
-	CreateILMPolicy(policy Policy) error
 }
 
 // Policy describes a policy to be loaded into Elasticsearch.

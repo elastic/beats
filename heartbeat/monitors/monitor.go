@@ -74,7 +74,9 @@ func (m *Monitor) String() string {
 
 func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
 	m, err := newMonitor(config, registrar, nil, nil, allowWatches, nil)
-	m.Stop() // Stop the monitor to free up the ID from uniqueness checks
+	if m != nil {
+		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
+	}
 	return err
 }
 

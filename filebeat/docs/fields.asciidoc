@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-envoyproxy>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
@@ -1047,6 +1048,15 @@ alias to: host.name
 type: alias
 
 alias to: agent.hostname
+
+--
+
+*`timeseries.instance`*::
++
+--
+type: keyword
+
+Time series instance id
 
 --
 
@@ -5354,6 +5364,82 @@ type: keyword
 example: doc
 
 Type
+
+--
+
+[[exported-fields-envoyproxy]]
+== Envoyproxy fields
+
+Module for handling logs produced by envoy
+
+
+
+[float]
+== envoyproxy fields
+
+Fields from envoy proxy logs after normalization
+
+
+
+*`envoyproxy.log_type`*::
++
+--
+type: keyword
+
+Envoy log type, normally ACCESS
+
+
+--
+
+*`envoyproxy.response_flags`*::
++
+--
+type: keyword
+
+Response flags
+
+
+--
+
+*`envoyproxy.upstream_service_time`*::
++
+--
+type: long
+
+format: duration
+
+Upstream service time in nanoseconds
+
+
+--
+
+*`envoyproxy.request_id`*::
++
+--
+type: keyword
+
+ID of the request
+
+
+--
+
+*`envoyproxy.authority`*::
++
+--
+type: keyword
+
+Envoy proxy authority field
+
+
+--
+
+*`envoyproxy.proxy_type`*::
++
+--
+type: keyword
+
+Envoy proxy type, tcp or http
+
 
 --
 

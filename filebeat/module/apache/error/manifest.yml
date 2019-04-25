@@ -4,6 +4,7 @@ var:
   - name: paths
     default:
       - /var/log/apache2/error.log*
+      - /var/log/httpd/error_log*
     os.darwin:
       - /usr/local/var/log/apache2/error_log*
     os.windows:

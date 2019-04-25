@@ -63,6 +63,8 @@ var (
 //  - "apache.status.hostname"
 // remove_fields_from_comparison:
 // - "apache.status.hostname"
+// module:
+//   namespace: test
 // ```
 // A test will be run for each file with the `plain` extension in the same directory
 // where a file with this configuration is placed.

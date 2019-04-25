@@ -11,10 +11,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Update to Golang 1.12.1. {pull}11330[11330]
+- Update to Golang 1.12.4. {pull}11782[11782]
 
 *Auditbeat*
 
 - Auditd module: Normalized value of `event.category` field from `user-login` to `authentication`. {pull}11432[11432]
+- Auditd module: Unset `auditd.session` and `user.audit.id` fields are removed from audit events. {issue}11431[11431] {pull}11815[11815]
 
 *Filebeat*
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
@@ -32,6 +34,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
+- system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 
 *Packetbeat*
 
@@ -61,8 +64,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix ILM policy always being overwritten. {pull}11671[11671]
 - Fix template always being overwritten. {pull}11671[11671]
 - Fix matching of string arrays in contains condition. {pull}11691[11691]
+- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
+- Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
 
 *Auditbeat*
 
@@ -78,10 +83,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
 - Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
+- Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
 
 *Heartbeat*
 
+- Fix NPE on some monitor configuration errors. {pull}11910[11910]
+
 *Journalbeat*
+
+- Use backoff when no new events are found. {pull}11861[11861]
 
 *Metricbeat*
 
@@ -98,6 +108,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- Fix function name reference for Kinesis streams in CloudFormation templates {pull}11646[11646]
+
 ==== Added
 
 *Affecting all Beats*
@@ -112,6 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New processor: `truncate_fields`. {pull}11297[11297]
 - Allow a beat to ship monitoring data directly to an Elasticsearch monitoring clsuter. {pull}9260[9260]
 - Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
+- Add `add_observer_metadata` processor. {pull}11394[11394]
 
 *Auditbeat*
 
@@ -132,8 +145,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New module for Cisco ASA logs. {issue}9200[9200] {pull}11171[11171]
 - Added support for Cisco ASA fields to the netflow input. {pull}11201[11201]
 - Configurable line terminator. {pull}11015[11015]
+- Add Filebeat envoyproxy module. {pull}11700[11700]
+- Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
 
 *Heartbeat*
+
+- Enable `add_observer_metadata` processor in default config. {pull}11394[11394]
 
 *Journalbeat*
 
@@ -146,10 +163,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add SSL support for Metricbeat HTTP server. {pull}11482[11482] {issue}11457[11457]
 - The `elasticsearch.index` metricset (with `xpack.enabled: true`) now collects `refresh.external_total_time_in_millis` fields from Elasticsearch. {pull}11616[11616]
 - Allow module configurations to have variants {pull}9118[9118]
+- Add `timeseries.instance` field calculation. {pull}10293[10293]
+- Added new disk states and raid level to the system/raid metricset. {pull}11613[11613]
 
 *Packetbeat*
 
 *Functionbeat*
+
+- New options to configure roles and VPC. {pull}11779[11779]
 
 *Winlogbeat*
 
