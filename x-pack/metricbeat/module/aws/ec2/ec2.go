@@ -18,7 +18,11 @@ import (
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
-var metricsetName = "ec2"
+var (
+	metricsetName = "ec2"
+	instanceIDIdx = 0
+	metricNameIdx = 1
+)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -166,7 +170,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 			if exists {
 				labels := strings.Split(*output.Label, " ")
-				instanceID := labels[0]
+				instanceID := labels[instanceIDIdx]
 				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
 				if err != nil {
 					return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
@@ -176,7 +180,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				events[instanceID].RootFields.Put("cloud.availability_zone", *instanceOutput[instanceID].Placement.AvailabilityZone)
 
 				if len(output.Values) > timestampIdx {
-					metricSetFieldResults[instanceID][labels[1]] = fmt.Sprint(output.Values[timestampIdx])
+					metricSetFieldResults[instanceID][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
 				}
 
 				instanceStateName, err := instanceOutput[instanceID].State.Name.MarshalValue()
