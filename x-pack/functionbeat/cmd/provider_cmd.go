@@ -20,12 +20,8 @@ var output string
 
 // TODO: Add List() subcommand.
 func handler() (*cliHandler, error) {
-	b, err := instance.NewBeat(Name, "", "")
+	b, err := instance.NewInitializedBeat(instance.Settings{Name: Name})
 	if err != nil {
-		return nil, err
-	}
-
-	if err = b.Init(); err != nil {
 		return nil, err
 	}
 

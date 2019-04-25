@@ -214,7 +214,7 @@ include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-Dashboards for heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
+Dashboards for Heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 
 [[heartbeat-starting]]
 === Step 5: Start Heartbeat
@@ -262,8 +262,9 @@ events to your defined output.
 === Step 6: View the sample Kibana dashboards
 
 To make it easier for you to visualize the status of your services, we have
-created example {beatname_uc} dashboards. You loaded the dashboards earlier when
-you ran the `setup` command.
+created example {beatname_uc} dashboards in the
+https://github.com/elastic/uptime-contrib[uptime-contrib] github repository. If
+you loaded them earlier, open them now.
 
 include::{libbeat-dir}/docs/opendashboards.asciidoc[]
 

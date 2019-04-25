@@ -194,7 +194,10 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Con
 		return h1 < h2
 	})
 
-	checkDocumented(t, data, config.OmitDocumentedFieldsCheck)
+	if err := checkDocumented(t, data, config.OmitDocumentedFieldsCheck); err != nil {
+		t.Errorf("'%v' check if fields are documented in `metricbeat/{module}/{metricset}/_meta/fields.yml` "+
+			"file or run 'make update' on Metricbeat folder to update root `metricbeat/fields.yml` in ", err)
+	}
 
 	// Overwrites the golden files if run with -generate
 	if *generateFlag {
@@ -259,15 +262,15 @@ func writeDataJSON(t *testing.T, data common.MapStr, module, metricSet string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
+func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) error {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
-		t.Fatal(err)
+		return err
 	}
 
 	fields, err := mapping.LoadFields(fieldsData)
 	if err != nil {
-		t.Fatal(err)
+		return err
 	}
 
 	documentedFields := fields.GetKeys()
@@ -280,9 +283,11 @@ func checkDocumented(t *testing.T, data []common.MapStr, omitFields []string) {
 	for _, d := range data {
 		flat := d.Flatten()
 		if err := documentedFieldCheck(flat, keys, omitFields); err != nil {
-			t.Fatal(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interface{}, omitFields []string) error {
@@ -300,7 +305,7 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 			if _, ok := knownKeys[prefix+".*"]; ok {
 				continue
 			}
-			return errors.Errorf("check if fields are documented error: key missing '%s'", foundKey)
+			return errors.Errorf("field missing '%s'", foundKey)
 		}
 	}
 

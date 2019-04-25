@@ -5,9 +5,7 @@
                 "dns": {
                     "response": {
                         "rcode": {
-                            "count": {
-                                "total": 440
-                            }
+                            "count": 440
                         }
                     }
                 },
