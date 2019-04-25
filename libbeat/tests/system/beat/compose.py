@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import os
+import sys
 import time
 
 
@@ -97,6 +98,12 @@ class ComposeMixin(object):
 
     @classmethod
     def _private_host(cls, info, port):
+        """
+        Return the address of the container, it should be reachable from the
+        host if docker is being run natively. To be used when the tests are
+        run from another container in the same network. It also works when
+        running from the host network if the docker daemon runs natively.
+        """
         networks = info['NetworkSettings']['Networks'].values()
         port = port.split("/")[0]
         for network in networks:
@@ -105,7 +112,11 @@ class ComposeMixin(object):
                 return "%s:%s" % (ip, port)
 
     @classmethod
-    def _public_host(cls, info, port):
+    def _exposed_host(cls, info, port):
+        """
+        Return the exposed address in the host, can be used when the test is
+        run from the host network. Recommended when using docker machines.
+        """
         hostPort = info['NetworkSettings']['Ports'][port][0]['HostPort']
         return "localhost:%s" % hostPort
 
@@ -129,7 +140,11 @@ class ComposeMixin(object):
         if port is None:
             port = portsConfig.keys()[0]
 
-        return cls._public_host(info, port)
+        # We can use _exposed_host for all platforms when we can use host network
+        # in the metricbeat container
+        if sys.platform.startswith('linux'):
+            return cls._private_host(info, port)
+        return cls._exposed_host(info, port)
 
     @classmethod
     def compose_project(cls):
