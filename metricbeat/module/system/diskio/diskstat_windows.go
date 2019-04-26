@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin,cgo freebsd
+// +build windows
 
 package diskio
 
@@ -38,7 +38,7 @@ func (stat *DiskIOStat) OpenSampling() error {
 
 // CalIOStatistics stub for linux implementation.
 func (stat *DiskIOStat) CalIOStatistics(result *DiskIOMetric, counter disk.IOCountersStat) error {
-	return errors.New("not implemented out of linux")
+	return errors.New("iostat is not implement for Windows")
 }
 
 // CloseSampling stub for linux implementation.
@@ -46,5 +46,5 @@ func (stat *DiskIOStat) CloseSampling() {}
 
 // IOCounters should map functionality to disk package for linux os.
 func IOCounters(names ...string) (map[string]disk.IOCountersStat, error) {
-	return disk.IOCounters(names...)
+	return ioCounters(names...)
 }

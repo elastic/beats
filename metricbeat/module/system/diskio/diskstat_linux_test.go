@@ -104,8 +104,8 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 		AvgReadAwaitTime:  1.2,
 		AvgWriteAwaitTime: 1,
 	}
-
-	got, err := stat.CalIOStatistics(counter)
+	var got DiskIOMetric
+	err := stat.CalIOStatistics(&got, counter)
 	if err != nil {
 		t.Fatal(err)
 	}
