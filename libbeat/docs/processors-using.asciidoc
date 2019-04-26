@@ -1782,15 +1782,15 @@ The following settings are supported:
                    an event if the specified field does not exist. Set it to
                    `true` to ignore this condition.
 `overwrite_keys`:: Whether the target fields specified in the mapping are
-                   overwritten if they already exist. The default is false,
-                   which will fail processing of a target field already exists.
-`fail_on_error`:: (Optional) If set to true, in case of an error, changes to
+                   overwritten if they already exist. The default is `false`,
+                   which will fail processing if a target field already exists.
+`fail_on_error`:: (Optional) If set to `true`, in case of an error, changes to
                   the event are reverted and the original event is returned. If
                   set to false, processing continues if an error happens
                   during processing. Default is `true`.
 `omit_empty`:: (Optional) Whether empty values are extracted from the array. If
                   set to `true`, instead of the target field being set to an
                   empty value, it is left unset. The empty string (`""`), an
-                  array with zero elements (`[]`) or an empty object (`{}`) are
-                  considered empty values. Default is `false`.
+                  empty array (`[]`) or an empty object (`{}`) are considered
+                  empty values. Default is `false`.
 endif::[]
