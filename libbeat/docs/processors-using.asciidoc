@@ -1751,7 +1751,6 @@ thrown.
 endif::[]
 
 ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
-* <<extract-array,`extract_array`>>
 [[extract-array]]
 === Extract array
 
