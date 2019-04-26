@@ -163,3 +163,14 @@ func mockPluginConf(t *testing.T, id string, schedule string, url string) *commo
 
 	return conf
 }
+
+func mockInvalidPluginConf(t *testing.T) *common.Config {
+	confMap := map[string]interface{}{
+		"hoeutnheou": "oueanthoue",
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}

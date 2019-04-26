@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Heartbeat*
 
+- Fix NPE on some monitor configuration errors. {pull}11910[11910]
+
 *Journalbeat*
 
 *Metricbeat*
