@@ -55,7 +55,6 @@ type Dimension struct {
 type Config struct {
 	Namespace  string      `config:"namespace" validate:"nonzero,required"`
 	MetricName string      `config:"metricname"`
-	Region     string      `config:"region"`
 	Dimensions []Dimension `config:"dimensions"`
 }
 
@@ -97,37 +96,22 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error GetStartTimeEndTime")
 	}
 
-	// Get listMetricsTotal and namespaces from configuration
-	listMetricsWithRegion, listMetricsWithoutRegion, namespacesTotal := readCloudwatchConfig(m.CloudwatchConfigs)
-
-	for regionName, listMetricsPerRegion := range listMetricsWithRegion {
-		awsConfig := *m.MetricSet.AwsConfig
+	// Get listMetrics and namespacesTotal from configuration
+	listMetrics, namespacesTotal := readCloudwatchConfig(m.CloudwatchConfigs)
+	for _, regionName := range m.MetricSet.RegionsList {
+		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(awsConfig)
-		err := createEvents(svcCloudwatch, listMetricsPerRegion, regionName, m.PeriodInSec, startTime, endTime, report)
+		err := createEvents(svcCloudwatch, listMetrics, regionName, m.PeriodInSec, startTime, endTime, report)
 		if err != nil {
 			return errors.Wrap(err, "createEvents failed")
-		}
-	}
-
-	if listMetricsWithoutRegion != nil {
-		m.Logger().Info("cloudwatch_metrics config is missing region name. " +
-			"To avoid extra costs, please make sure region is set in config.yml")
-		for _, regionName := range m.MetricSet.RegionsList {
-			awsConfig := *m.MetricSet.AwsConfig
-			awsConfig.Region = regionName
-			svcCloudwatch := cloudwatch.New(awsConfig)
-			err := createEvents(svcCloudwatch, listMetricsWithoutRegion, regionName, m.PeriodInSec, startTime, endTime, report)
-			if err != nil {
-				return errors.Wrap(err, "createEvents failed")
-			}
 		}
 	}
 
 	// Use namespaces from config
 	for _, namespace := range namespacesTotal {
 		for _, regionName := range m.MetricSet.RegionsList {
-			awsConfig := *m.MetricSet.AwsConfig
+			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
 			svcCloudwatch := cloudwatch.New(awsConfig)
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
@@ -150,29 +134,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func readCloudwatchConfig(cloudwatchConfigs []Config) (map[string][]cloudwatch.Metric, []cloudwatch.Metric, []string) {
-	listMetricsWithRegion := map[string][]cloudwatch.Metric{}
-	var listMetricsWithoutRegion []cloudwatch.Metric
+func readCloudwatchConfig(cloudwatchConfigs []Config) ([]cloudwatch.Metric, []string) {
+	var listMetrics []cloudwatch.Metric
 	var namespacesTotal []string
 
 	for _, cloudwatchConfig := range cloudwatchConfigs {
 		namespace := cloudwatchConfig.Namespace
 		if cloudwatchConfig.MetricName != "" {
 			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, namespace)
-			if cloudwatchConfig.Region != "" {
-				if listMetricsWithRegion[cloudwatchConfig.Region] != nil {
-					listMetricsWithRegion[cloudwatchConfig.Region] = append(listMetricsWithRegion[cloudwatchConfig.Region], listMetricsOutput)
-				} else {
-					listMetricsWithRegion[cloudwatchConfig.Region] = []cloudwatch.Metric{listMetricsOutput}
-				}
-			} else {
-				listMetricsWithoutRegion = append(listMetricsWithoutRegion, listMetricsOutput)
-			}
+			listMetrics = append(listMetrics, listMetricsOutput)
 		} else {
 			namespacesTotal = append(namespacesTotal, namespace)
 		}
 	}
-	return listMetricsWithRegion, listMetricsWithoutRegion, namespacesTotal
+	return listMetrics, namespacesTotal
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
@@ -185,6 +160,8 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64)
 }
 
 func constructLabel(metric cloudwatch.Metric) string {
+	// label = metricName + namespace + dimensionKey1 + dimensionValue1 +
+	// dimensionKey2 + dimensionValue2 + ...
 	label := *metric.MetricName + " " + *metric.Namespace
 	dimNames := ""
 	dimValues := ""
