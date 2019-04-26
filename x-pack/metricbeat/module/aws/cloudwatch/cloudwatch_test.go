@@ -129,10 +129,9 @@ func TestConstructLabel(t *testing.T) {
 
 func TestReadCloudwatchConfig(t *testing.T) {
 	cases := []struct {
-		cloudwatchMetricsConfig         []Config
-		expectedListMetricWithRegion    map[string][]cloudwatch.Metric
-		expectedListMetricWithoutRegion []cloudwatch.Metric
-		expectedNamespace               []string
+		cloudwatchMetricsConfig []Config
+		expectedListMetric      []cloudwatch.Metric
+		expectedNamespace       []string
 	}{
 		{
 			[]Config{
@@ -147,10 +146,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			map[string][]cloudwatch.Metric{
-				"us-west-1": {listMetric1},
-			},
-			nil,
+			[]cloudwatch.Metric{listMetric1},
 			nil,
 		},
 		{
@@ -169,7 +165,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace: "AWS/EBS",
 				},
 			},
-			map[string][]cloudwatch.Metric{},
 			[]cloudwatch.Metric{listMetric1},
 			[]string{"AWS/EBS"},
 		},
@@ -203,10 +198,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			map[string][]cloudwatch.Metric{
-				"us-west-1": {listMetric1, listMetric6},
-			},
-			nil,
+			[]cloudwatch.Metric{listMetric1, listMetric6},
 			[]string{"AWS/EBS"},
 		},
 		{
@@ -219,16 +211,13 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace: "AWS/EBS",
 				},
 			},
-			map[string][]cloudwatch.Metric{
-				"us-east-1": {listMetric7},
-			},
-			nil,
+			[]cloudwatch.Metric{listMetric7},
 			[]string{"AWS/EBS"},
 		},
 	}
 	for _, c := range cases {
 		listMetrics, namespaces := readCloudwatchConfig(c.cloudwatchMetricsConfig)
-		assert.Equal(t, c.expectedListMetricWithoutRegion, listMetrics)
+		assert.Equal(t, c.expectedListMetric, listMetrics)
 		assert.Equal(t, c.expectedNamespace, namespaces)
 	}
 }
