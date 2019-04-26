@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 
 *Auditbeat*
