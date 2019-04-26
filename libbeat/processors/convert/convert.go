@@ -39,6 +39,8 @@ func init() {
 type processor struct {
 	config
 	log *logp.Logger
+
+	converted []interface{} // Temporary storage for converted values.
 }
 
 // New constructs a new convert processor.
@@ -57,7 +59,7 @@ func newConvert(c config) (*processor, error) {
 		log = log.With("instance_id", c.Tag)
 	}
 
-	return &processor{config: c, log: log}, nil
+	return &processor{config: c, log: log, converted: make([]interface{}, len(c.Fields))}, nil
 }
 
 func (p *processor) String() string {
@@ -65,14 +67,26 @@ func (p *processor) String() string {
 		p.Fields, p.IgnoreFailure, p.IgnoreMissing, p.Tag, p.Mode)
 }
 
+var ignoredFailure = struct{}{}
+
+func resetValues(s []interface{}) {
+	for i := range s {
+		s[i] = nil
+	}
+}
+
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	for _, conv := range p.Fields {
-		v, _ := event.GetValue(conv.From)
-		if v == nil {
-			if !p.IgnoreMissing {
-				return event, annotateError(p.Tag, errors.Errorf("field [%v] is missing, cannot be converted to type [%v]", conv.From, conv.Type))
+	defer resetValues(p.converted)
+
+	// Validate the conversions.
+	for i, conv := range p.Fields {
+		v, err := event.GetValue(conv.From)
+		if err != nil {
+			if p.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+				p.converted[i] = ignoredFailure
+				continue
 			}
-			continue
+			return event, annotateError(p.Tag, errors.Errorf("field [%v] is missing, cannot be converted to type [%v]", conv.From, conv.Type))
 		}
 
 		if conv.Type > unset {
@@ -81,18 +95,44 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 				if !p.IgnoreFailure {
 					return event, annotateError(p.Tag, errors.Wrapf(err, "unable to convert field [%v] value [%v] to [%v]", conv.From, v, conv.Type))
 				}
+				p.converted[i] = ignoredFailure
 				continue
 			}
 			v = t
 		}
 
+		p.converted[i] = v
+	}
+
+	var clone = event.Fields
+	if len(p.Fields) > 1 && !p.IgnoreFailure {
+		// Clone the fields to allow the processor to undo the operation on
+		// failure (like a transaction). If there is only one conversion then
+		// cloning is unnecessary because there are no previous changes to
+		// rollback (so avoid the expensive clone operation).
+		clone = event.Fields.Clone()
+	}
+
+	for i, conv := range p.Fields {
+		v := p.converted[i]
+		if v == ignoredFailure {
+			continue
+		}
+
 		if conv.To != "" {
 			switch p.Mode {
 			case renameMode:
-				event.PutValue(conv.To, v)
-				event.Delete(conv.From)
+				if _, err := event.PutValue(conv.To, v); err != nil {
+					event.Fields = clone
+					return event, errors.Wrap(err, "")
+				} else {
+					event.Delete(conv.From)
+				}
 			case copyMode:
-				event.PutValue(conv.To, cloneValue(v))
+				if _, err := event.PutValue(conv.To, cloneValue(v)); err != nil {
+					event.Fields = clone
+					return event, errors.Wrap(err, "")
+				}
 			}
 		} else {
 			// In-place conversion.
