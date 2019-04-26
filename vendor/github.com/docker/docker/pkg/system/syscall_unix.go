@@ -2,12 +2,12 @@
 
 package system
 
-import "golang.org/x/sys/unix"
+import "syscall"
 
 // Unmount is a platform-specific helper function to call
 // the unmount syscall.
 func Unmount(dest string) error {
-	return unix.Unmount(dest, 0)
+	return syscall.Unmount(dest, 0)
 }
 
 // CommandLineToArgv should not be used on Unix.

@@ -428,7 +428,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/docker
-Revision: 1009e6a40b295187e038b67e184e9c0384d95538
+Version: master
+Revision: 51f27b1defad7418675567cba6aa6c95efebf739
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/docker/LICENSE:
 --------------------------------------------------------------------
@@ -470,6 +471,15 @@ Dependency: github.com/docker/go-units
 Revision: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/go-units/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: github.com/docker/libnetwork
+Revision: 9ff9b57c344df5cd47443ad9e65702ec85c5aeb0
+License type (autodetected): Apache-2.0
+./vendor/github.com/docker/libnetwork/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 
@@ -1447,6 +1457,48 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/gogo/protobuf
+Revision: 67e450fba6944c63d2f80b7553b0ef522d345962
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/gogo/protobuf/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2013, The GoGo Authors. All rights reserved.
+
+Protocol Buffers for Go with Gadgets
+
+Go support for Protocol Buffers - Google's data interchange format
+
+Copyright 2010 The Go Authors.  All rights reserved.
+https://github.com/golang/protobuf
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--------------------------------------------------------------------
+Dependency: github.com/gogo/protobuf
 Revision: 636bf0302bc95575d69441b25a2603156ffdddf1
 License type (autodetected): BSD-3-Clause
 ./metricbeat/vendor/github.com/gogo/protobuf/LICENSE:
@@ -1490,14 +1542,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/golang/protobuf
-Revision: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
+Revision: e91709a02e0e8ff8b86b7aa913fdc9ae9498e825
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/golang/protobuf/LICENSE:
 --------------------------------------------------------------------
-Go support for Protocol Buffers - Google's data interchange format
-
 Copyright 2010 The Go Authors.  All rights reserved.
-https://github.com/golang/protobuf
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -3282,6 +3331,24 @@ Dependency: google.golang.org/appengine
 Revision: e9657d882bb81064595ca3b56cbe2546bbabf7b1
 License type (autodetected): Apache-2.0
 ./metricbeat/module/mysql/vendor/google.golang.org/appengine/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/genproto
+Revision: 357c62f0e4bbba7e6cc403ae09edcf3e2b9028fe
+License type (autodetected): Apache-2.0
+./vendor/google.golang.org/genproto/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/grpc
+Revision: b78962e50338aee2188fb992dd6cc756c321cdba
+License type (autodetected): Apache-2.0
+./vendor/google.golang.org/grpc/LICENSE:
 --------------------------------------------------------------------
 Apache License 2.0
 

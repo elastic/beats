@@ -4,14 +4,12 @@ package system
 
 import (
 	"syscall"
-
-	"golang.org/x/sys/unix"
 )
 
 // IsProcessAlive returns true if process with a given pid is running.
 func IsProcessAlive(pid int) bool {
-	err := unix.Kill(pid, syscall.Signal(0))
-	if err == nil || err == unix.EPERM {
+	err := syscall.Kill(pid, syscall.Signal(0))
+	if err == nil || err == syscall.EPERM {
 		return true
 	}
 
@@ -20,5 +18,5 @@ func IsProcessAlive(pid int) bool {
 
 // KillProcess force-stops a process.
 func KillProcess(pid int) {
-	unix.Kill(pid, unix.SIGKILL)
+	syscall.Kill(pid, syscall.SIGKILL)
 }
