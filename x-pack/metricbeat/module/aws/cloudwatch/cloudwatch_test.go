@@ -139,7 +139,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
-					Region:     "us-west-1",
 					Dimensions: []Dimension{
 						{
 							Name:  "InstanceId",
@@ -179,7 +178,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
-					Region:     "us-west-1",
 					Dimensions: []Dimension{
 						{
 							Name:  "InstanceId",
@@ -193,7 +191,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Namespace:  "AWS/RDS",
 					MetricName: "CommitThroughput",
-					Region:     "us-west-1",
 					Dimensions: []Dimension{
 						{
 							Name:  "DBClusterIdentifier",
@@ -217,7 +214,6 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					Namespace:  "AWS/EC2",
 					MetricName: "CPUUtilization",
-					Region:     "us-east-1",
 				},
 				{
 					Namespace: "AWS/EBS",
@@ -231,9 +227,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		listMetricsWithRegion, listMetricsWithoutRegion, namespaces := readCloudwatchConfig(c.cloudwatchMetricsConfig)
-		assert.Equal(t, c.expectedListMetricWithRegion, listMetricsWithRegion)
-		assert.Equal(t, c.expectedListMetricWithoutRegion, listMetricsWithoutRegion)
+		listMetrics, namespaces := readCloudwatchConfig(c.cloudwatchMetricsConfig)
+		assert.Equal(t, c.expectedListMetricWithoutRegion, listMetrics)
 		assert.Equal(t, c.expectedNamespace, namespaces)
 	}
 }
