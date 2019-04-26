@@ -31,10 +31,10 @@ func NoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 
-func (*noopSupport) Mode() Mode                   { return ModeDisabled }
-func (*noopSupport) Alias() Alias                 { return Alias{} }
-func (*noopSupport) Policy() Policy               { return Policy{} }
-func (*noopSupport) Manager(_ APIHandler) Manager { return (*noopManager)(nil) }
+func (*noopSupport) Mode() Mode                      { return ModeDisabled }
+func (*noopSupport) Alias() Alias                    { return Alias{} }
+func (*noopSupport) Policy() Policy                  { return Policy{} }
+func (*noopSupport) Manager(_ ClientHandler) Manager { return (*noopManager)(nil) }
 
 func (*noopManager) Enabled() (bool, error)            { return false, nil }
 func (*noopManager) EnsureAlias() error                { return errOf(ErrOpNotAvailable) }

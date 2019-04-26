@@ -1490,6 +1490,15 @@ alias to: agent.hostname
 
 --
 
+*`timeseries.instance`*::
++
+--
+type: keyword
+
+Time series instance id
+
+--
+
 [[exported-fields-ceph]]
 == Ceph fields
 
@@ -18213,7 +18222,7 @@ MS SQL module
 [float]
 == mssql fields
 
-
+The root field containing all MSSQL fields
 
 
 [float]
@@ -25586,12 +25595,32 @@ Name of the device.
 
 --
 
-*`system.raid.activity_state`*::
+*`system.raid.status`*::
 +
 --
 type: keyword
 
 activity-state of the device.
+
+
+--
+
+*`system.raid.level`*::
++
+--
+type: keyword
+
+The raid level of the device
+
+
+--
+
+*`system.raid.sync_action`*::
++
+--
+type: keyword
+
+Current sync action, if the RAID array is redundant 
 
 
 --
@@ -25616,12 +25645,42 @@ Total number of disks the device consists of.
 
 --
 
+*`system.raid.disks.spare`*::
++
+--
+type: long
+
+Number of spared disks.
+
+
+--
+
+*`system.raid.disks.failed`*::
++
+--
+type: long
+
+Number of failed disks.
+
+
+--
+
+*`system.raid.disks.states.*`*::
++
+--
+type: object
+
+map of raw disk states
+
+
+--
+
 *`system.raid.blocks.total`*::
 +
 --
 type: long
 
-Number of blocks the device holds.
+Number of blocks the device holds, in 1024-byte blocks.
 
 
 --
@@ -25631,7 +25690,7 @@ Number of blocks the device holds.
 --
 type: long
 
-Number of blocks on the device that are in sync.
+Number of blocks on the device that are in sync, in 1024-byte blocks.
 
 
 --
