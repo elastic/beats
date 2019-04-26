@@ -151,6 +151,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Configurable line terminator. {pull}11015[11015]
 - Add Filebeat envoyproxy module. {pull}11700[11700]
 - Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
+- Add support to new MongoDB additional diagnostic information {pull}11952[11952]
 
 *Heartbeat*
 

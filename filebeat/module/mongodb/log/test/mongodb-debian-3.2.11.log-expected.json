@@ -246,7 +246,7 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 1947,
-        "message": "    distarch: x86_64",
+        "message": "distarch: x86_64",
         "mongodb.log.component": "CONTROL",
         "mongodb.log.context": "initandlisten",
         "service.type": "mongodb"
@@ -386,7 +386,7 @@
         "input.type": "log",
         "log.level": "I",
         "log.offset": 3199,
-        "message": "    target_arch: x86_64",
+        "message": "target_arch: x86_64",
         "mongodb.log.component": "CONTROL",
         "mongodb.log.context": "initandlisten",
         "service.type": "mongodb"
@@ -473,6 +473,20 @@
         "message": "closing listening socket: 6",
         "mongodb.log.component": "NETWORK",
         "mongodb.log.context": "signalProcessingThread",
+        "service.type": "mongodb"
+    },
+    {
+        "@timestamp": "2019-03-07T15:10:26.960Z",
+        "ecs.version": "1.0.0",
+        "event.dataset": "mongodb.log",
+        "event.module": "mongodb",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "I",
+        "log.offset": 3968,
+        "message": "Successfully connected to dbbox7:27017, took 10ms (1 connections now open to dbbox7:27017)",
+        "mongodb.log.component": "ASIO",
+        "mongodb.log.context": "NetworkInterfaceASIO-Replication-0",
         "service.type": "mongodb"
     }
 ]
