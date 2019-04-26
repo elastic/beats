@@ -391,7 +391,15 @@ func (ms *MetricSet) getSockets() ([]*Socket, error) {
 
 	sockets := make([]*Socket, 0, len(diags))
 	for _, diag := range diags {
-		sockets = append(sockets, newSocket(diag))
+		socket := newSocket(diag)
+
+		if !ms.config.IncludeLocalhost &&
+			(socket.LocalIP.IsLoopback() || socket.RemoteIP.IsLoopback()) {
+
+			continue
+		}
+
+		sockets = append(sockets, socket)
 	}
 
 	return sockets, nil
