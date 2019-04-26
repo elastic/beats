@@ -173,20 +173,14 @@ services:
       - 8778
 
   kafka:
-    extends:
-      file: ./module/kafka/docker-compose.yml
-      service: kafka
-    environment:
-      KAFKA_ADVERTISED_HOST: ""
+    build:
+      context: ./module/kafka/_meta
+      args:
+        KAFKA_VERSION: 2.1.1
     ports:
       - 9092
 
   kafka_1_1_0:
-    extends:
-      file: ./module/kafka/docker-compose.yml
-      service: kafka
-    environment:
-      KAFKA_ADVERTISED_HOST: ""
     build:
       context: ./module/kafka/_meta
       args:
@@ -195,11 +189,6 @@ services:
       - 9092
 
   kafka_0_10_2:
-    extends:
-      file: ./module/kafka/docker-compose.yml
-      service: kafka
-    environment:
-      KAFKA_ADVERTISED_HOST: ""
     build:
       context: ./module/kafka/_meta
       args:

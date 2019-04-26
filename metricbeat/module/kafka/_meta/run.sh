@@ -1,8 +1,6 @@
 #!/bin/bash
 
-if [ -z "$KAFKA_ADVERTISED_HOST" ]; then
-	KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME):9092
-fi
+KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME):9092
 
 wait_for_port() {
     count=20
