@@ -84,7 +84,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
-		awsConfig := *m.MetricSet.AwsConfig
+		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 		svc := rds.New(awsConfig)
 		// Get DBInstance ARNs per region
@@ -211,6 +211,8 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceARN st
 }
 
 func constructLabel(metricDimensions []cloudwatch.Dimension, dbInstanceARN string, metricName string) string {
+	// label = dbInstanceARN + metricName + dimensionKey1 + dimensionValue1
+	// + dimensionKey2 + dimensionValue2 + ...
 	label := dbInstanceARN + " " + metricName
 	if len(metricDimensions) != 0 {
 		for _, dim := range metricDimensions {
