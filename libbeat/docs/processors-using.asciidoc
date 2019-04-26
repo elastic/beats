@@ -198,12 +198,16 @@ The supported processors are:
  * <<add-docker-metadata,`add_docker_metadata`>>
  * <<add-fields, `add_fields`>>
  * <<add-host-metadata,`add_host_metadata`>>
+ * <<add-observer-metadata,`add_observer_metadata`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-labels, `add_labels`>>
  * <<add-locale,`add_locale`>>
  * <<add-process-metadata,`add_process_metadata`>>
  * <<add-tags, `add_tags`>>
  * <<community-id,`community_id`>>
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
+* <<decode-csv-fields,`decode_csv_fields`>>
+endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
  * <<dissect, `dissect`>>
  * <<processor-dns, `dns`>>
@@ -775,6 +779,51 @@ Adds the environment field to every event:
 }
 -------------------------------------------------------------------------------
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
+* <<decode-csv-fields,`decode_csv_fields`>>
+[[decode-csv-fields]]
+=== Decode CSV fields
+
+experimental[]
+
+The `decode_csv_fields` processor decodes fields containing records in
+comma-separated format (CSV). It will output the values as an array of strings.
+This processor is available for Filebeat and Journalbeat.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - decode_csv_fields:
+     fields:
+        message: decoded.csv
+     separator: ,
+     ignore_missing: false
+     overwrite_keys: true
+     trim_leading_whitespace: false
+     fail_on_error: true
+-----------------------------------------------------
+
+The `decode_csv_fields` has the following settings:
+
+`fields`:: This is a mapping from the source field containing the CSV data to
+           the destination field where the decoded array will be written.
+`separator`:: (Optional) Character to be used as a column separator.
+              The default is the comma character. For using a TAB character you
+              must set it to "\t".
+`ignore_missing`:: (Optional) Whether to ignore events which lack the source
+                   field. The default is false, which will fail processing of an
+                   event if `target` field is missing.
+`overwrite_keys`:: Whether the target field is overwritten if it
+                   already exists. The default is false, which will fail
+                   processing of an event when `target` already exists.
+`trim_leading_space`:: Whether extra space after the separator is trimmed from
+                       values. This works even if the separator is also a space.
+                       The default is false.
+`fail_on_error`:: (Optional) If set to true, in case of an error the changes to
+the event are reverted and the original event is returned. If set to false,
+processing continues also if an error happened during renaming. Default is `true`.
+
+endif::[]
 
 [[decode-json-fields]]
 === Decode JSON fields
@@ -1173,7 +1222,7 @@ It has the following settings:
 
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
-The fields added to the event are looking as following:
+The fields added to the event look like the following:
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -1202,6 +1251,80 @@ The fields added to the event are looking as following:
           "location": "40.7128, -74.0060"
         }
    }
+}
+-------------------------------------------------------------------------------
+
+[[add-observer-metadata]]
+=== Add Observer metadata
+
+beta[]
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_observer_metadata:
+    netinfo.enabled: false
+    cache.ttl: 5m
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields observer.ip and observer.mac
+
+`cache.ttl`:: (Optional) The processor uses an internal cache for the observer metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
+
+`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+
+`geo.location`:: Longitude and latitude in comma separated format.
+
+`geo.continent_name`:: Name of the continent.
+
+`geo.country_name`:: Name of the country.
+
+`geo.region_name`:: Name of the region.
+
+`geo.city_name`:: Name of the city.
+
+`geo.country_iso_code`:: ISO country code.
+
+`geo.region_iso_code`:: ISO region code.
+
+
+The `add_geo_metadata` processor annotates each event with relevant metadata from the observer machine.
+The fields added to the event look like the following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "observer" : {
+    "hostname" : "avce",
+    "type" : "heartbeat",
+    "vendor" : "elastic",
+    "ip" : [
+      "192.168.1.251",
+      "fe80::64b2:c3ff:fe5b:b974",
+    ],
+    "mac" : [
+      "dc:c1:02:6f:1b:ed",
+    ],
+    "geo": {
+      "continent_name": "North America",
+      "country_iso_code": "US",
+      "region_name": "New York",
+      "region_iso_code": "NY",
+      "city_name": "New York",
+      "name": "nyc-dc1-rack1",
+      "location": "40.7128, -74.0060"
+    }
+  }
 }
 -------------------------------------------------------------------------------
 

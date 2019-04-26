@@ -22,12 +22,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/go-ucfg/yaml"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/mapping"
-	"github.com/elastic/go-ucfg/yaml"
 )
 
 var (
