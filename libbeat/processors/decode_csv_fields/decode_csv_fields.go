@@ -59,7 +59,7 @@ func init() {
 	processors.RegisterPlugin("decode_csv_fields",
 		checks.ConfigChecked(NewDecodeCSVField,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "ignore_missing", "overwrite_keys", "separator", "trim_leading_space", "overwrite_keys", "fail_on_error")))
+			checks.AllowedFields("fields", "ignore_missing", "overwrite_keys", "separator", "trim_leading_space", "overwrite_keys", "fail_on_error", "when")))
 }
 
 // NewDecodeCSVField construct a new decode_csv_field processor.
