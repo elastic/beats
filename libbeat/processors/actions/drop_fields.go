@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type dropFields struct {
@@ -32,9 +33,9 @@ type dropFields struct {
 
 func init() {
 	processors.RegisterPlugin("drop_fields",
-		configChecked(newDropFields,
-			requireFields("fields"),
-			allowedFields("fields", "when")))
+		checks.ConfigChecked(newDropFields,
+			checks.RequireFields("fields"),
+			checks.AllowedFields("fields", "when")))
 }
 
 func newDropFields(c *common.Config) (processors.Processor, error) {
