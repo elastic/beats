@@ -83,8 +83,8 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 		if len(names) > 0 && !containsDrive(names, drive.Name) {
 			continue
 		}
-
-		counter, err := ioCounter(drive.UNCPath)
+		var counter diskPerformance
+		err = ioCounter(drive.UNCPath, &counter)
 		if err != nil {
 			return nil, err
 		}
@@ -101,13 +101,11 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	return ret, nil
 }
 
-// ioCounter calls syscal func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics.
-func ioCounter(path string) (diskPerformance, error) {
-	var diskPerformance diskPerformance
-	var diskPerformanceSize uint32
+// ioCounter calls syscall func CreateFile to generate a handler then executes the DeviceIoControl func in order to retrieve the metrics.
+func ioCounter(path string, diskPerformance *diskPerformance) error {
 	utfPath, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
-		return diskPerformance, err
+		return err
 	}
 	hFile, err := syscall.CreateFile(utfPath,
 		syscall.GENERIC_READ|syscall.GENERIC_WRITE,
@@ -118,22 +116,18 @@ func ioCounter(path string) (diskPerformance, error) {
 		0)
 
 	if err != nil {
-		return diskPerformance, err
+		return err
 	}
 	defer syscall.CloseHandle(hFile)
-
-	err = syscall.DeviceIoControl(hFile,
+	var diskPerformanceSize uint32
+	return syscall.DeviceIoControl(hFile,
 		ioctlDiskPerformance,
 		nil,
 		0,
-		(*byte)(unsafe.Pointer(&diskPerformance)),
-		uint32(unsafe.Sizeof(diskPerformance)),
+		(*byte)(unsafe.Pointer(diskPerformance)),
+		uint32(unsafe.Sizeof(*diskPerformance)),
 		&diskPerformanceSize,
 		nil)
-	if err != nil {
-		return diskPerformance, err
-	}
-	return diskPerformance, nil
 }
 
 // enablePerformanceCounters will enable performance counters by adding the EnableCounterForIoctl registry key
@@ -171,7 +165,7 @@ func disablePerformanceCounters(path string) error {
 	}
 	defer syscall.CloseHandle(hFile)
 	var diskPerformanceSize uint32
-	err = syscall.DeviceIoControl(hFile,
+	return syscall.DeviceIoControl(hFile,
 		ioctlDiskPerformanceOff,
 		nil,
 		0,
@@ -179,11 +173,6 @@ func disablePerformanceCounters(path string) error {
 		0,
 		&diskPerformanceSize,
 		nil)
-	if err != nil {
-		return err
-	}
-	return nil
-
 }
 
 // getLogicalDriveStrings calls the syscall GetLogicalDriveStrings in order to get the list of logical drives
