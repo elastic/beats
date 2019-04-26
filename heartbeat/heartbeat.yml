@@ -22,9 +22,15 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: http
-  urls: ["http://elastic.co:9200"]
-  mode: all
+
+  # List or urls to query
+  urls: ["http://localhost:9200"]
+
+  # Configure task schedule
   schedule: '@every 10s'
+
+  # Total test connection and data exchange timeout
+  #timeout: 16s
 
 #==================== Elasticsearch template setting ==========================
 
