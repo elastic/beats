@@ -412,7 +412,7 @@ provider and cache the instance metadata.
 
 The following cloud providers are supported:
 
-- Amazon Elastic Compute Cloud (EC2)
+- Amazon Web Services (AWS)
 - Digital Ocean
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
@@ -444,7 +444,7 @@ default).
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.
 
-_EC2_
+_AWS_
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -453,7 +453,7 @@ _EC2_
     "availability_zone": "us-east-1c",
     "instance_id": "i-4e123456",
     "machine_type": "t2.medium",
-    "provider": "ec2",
+    "provider": "aws",
     "region": "us-east-1"
   }
 }
@@ -472,7 +472,7 @@ _Digital Ocean_
 }
 -------------------------------------------------------------------------------
 
-_GCE_
+_GCP_
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -482,7 +482,7 @@ _GCE_
     "instance_id": "1234556778987654321",
     "machine_type": "f1-micro",
     "project_id": "my-dev",
-    "provider": "gce"
+    "provider": "gcp"
   }
 }
 -------------------------------------------------------------------------------

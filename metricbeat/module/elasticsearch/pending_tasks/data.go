@@ -47,7 +47,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 	err := json.Unmarshal(content, &tasksStruct)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
+		err = errors.Wrap(err, "failure parsing Elasticsearch Pending Tasks API response")
 		r.Error(err)
 		return err
 	}

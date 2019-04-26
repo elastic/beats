@@ -84,7 +84,7 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 			common.MapStr{},
 			common.MapStr{
 				"cloud": common.MapStr{
-					"provider": "ec2",
+					"provider": "aws",
 					"instance": common.MapStr{
 						"id": "i-11111111",
 					},
@@ -114,12 +114,12 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 		},
 		{
 			common.MapStr{
-				"provider": "ec2",
+				"provider": "aws",
 			},
 			common.MapStr{
-				"provider": "ec2",
+				"provider": "aws",
 				"cloud": common.MapStr{
-					"provider": "ec2",
+					"provider": "aws",
 					"instance": common.MapStr{
 						"id": "i-11111111",
 					},
@@ -133,15 +133,15 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 		},
 		{
 			common.MapStr{
-				"cloud.provider": "ec2",
+				"cloud.provider": "aws",
 			},
 			// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
 			// it won't detect cloud.provider as a cloud field. This is not the behavior we
 			// expect and will find a better solution later in issue 11697.
 			common.MapStr{
-				"cloud.provider": "ec2",
+				"cloud.provider": "aws",
 				"cloud": common.MapStr{
-					"provider": "ec2",
+					"provider": "aws",
 					"instance": common.MapStr{
 						"id": "i-11111111",
 					},
@@ -191,7 +191,7 @@ func TestRetrieveAWSMetadataOverwriteTrue(t *testing.T) {
 			common.MapStr{},
 			common.MapStr{
 				"cloud": common.MapStr{
-					"provider": "ec2",
+					"provider": "aws",
 					"instance": common.MapStr{
 						"id": "i-11111111",
 					},
@@ -213,7 +213,7 @@ func TestRetrieveAWSMetadataOverwriteTrue(t *testing.T) {
 			},
 			common.MapStr{
 				"cloud": common.MapStr{
-					"provider": "ec2",
+					"provider": "aws",
 					"instance": common.MapStr{
 						"id": "i-11111111",
 					},
@@ -227,12 +227,12 @@ func TestRetrieveAWSMetadataOverwriteTrue(t *testing.T) {
 		},
 		{
 			common.MapStr{
-				"cloud.provider": "ec2",
+				"cloud.provider": "aws",
 			},
 			common.MapStr{
-				"cloud.provider": "ec2",
+				"cloud.provider": "aws",
 				"cloud": common.MapStr{
-					"provider": "ec2",
+					"provider": "aws",
 					"instance": common.MapStr{
 						"id": "i-11111111",
 					},
