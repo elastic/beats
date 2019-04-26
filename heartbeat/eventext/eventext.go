@@ -31,7 +31,7 @@ func MergeEventFields(e *beat.Event, merge common.MapStr) {
 	}
 }
 
-// EventCalledMetaKey is the path to the @metadata key marking an event as cancelled.
+// EventCancelledMetaKey is the path to the @metadata key marking an event as cancelled.
 const EventCancelledMetaKey = "__hb_evt_cancel__"
 
 // CancelEvent marks the event as cancelled. Downstream consumers of it should not emit nor output this event.
