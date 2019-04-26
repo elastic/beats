@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
 - Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+- Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
 
 *Filebeat*
 
@@ -98,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
 - Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
 - Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
+- Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 
 *Packetbeat*
@@ -166,6 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow module configurations to have variants {pull}9118[9118]
 - Add `timeseries.instance` field calculation. {pull}10293[10293]
 - Added new disk states and raid level to the system/raid metricset. {pull}11613[11613]
+- Added `path_name` and `start_name` to service metricset on windows module {issue}8364[8364] {pull}11877[11877]
 - Add check on object name in the counter path if the instance name is missing {issue}6528[6528] {pull}11878[11878]
 
 *Packetbeat*
