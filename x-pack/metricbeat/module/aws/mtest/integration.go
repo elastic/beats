@@ -19,10 +19,6 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
 	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
 	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
-	defaultRegion, _ := os.LookupEnv("AWS_REGION")
-	if defaultRegion == "" {
-		defaultRegion = "us-west-1"
-	}
 
 	info := ""
 	config := map[string]interface{}{}
@@ -37,7 +33,6 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 			"metricsets":        []string{metricSetName},
 			"access_key_id":     accessKeyID,
 			"secret_access_key": secretAccessKey,
-			"default_region":    defaultRegion,
 		}
 
 		if okSessionToken && sessionToken != "" {
