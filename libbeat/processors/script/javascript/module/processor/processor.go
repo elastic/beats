@@ -20,6 +20,7 @@ package processor
 import (
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
+	"github.com/elastic/beats/libbeat/processors/extract_array"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/processors"
@@ -57,6 +58,7 @@ var constructors = map[string]processors.Constructor{
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
+	"ExtractArray":          extract_array.NewExtractArray,
 	"Rename":                actions.NewRenameFields,
 	"TruncateFields":        actions.NewTruncateFields,
 }
