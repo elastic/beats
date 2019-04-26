@@ -46,8 +46,8 @@ func TestData(t *testing.T) {
 
 	generateKafkaData(t, "metricbeat-generate-data")
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(""))
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -65,8 +65,8 @@ func TestTopic(t *testing.T) {
 	// Create initial topic
 	generateKafkaData(t, testTopic)
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic))
-	dataBefore, err := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(testTopic))
+	dataBefore, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -82,7 +82,7 @@ func TestTopic(t *testing.T) {
 		generateKafkaData(t, testTopic)
 	}
 
-	dataAfter, err := mbtest.ReportingFetchV2(f)
+	dataAfter, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}

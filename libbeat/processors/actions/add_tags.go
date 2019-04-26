@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type addTags struct {
@@ -33,9 +34,9 @@ type addTags struct {
 
 func init() {
 	processors.RegisterPlugin("add_tags",
-		configChecked(createAddTags,
-			requireFields("tags"),
-			allowedFields("tags", "target", "when")))
+		checks.ConfigChecked(createAddTags,
+			checks.RequireFields("tags"),
+			checks.AllowedFields("tags", "target", "when")))
 }
 
 func createAddTags(c *common.Config) (processors.Processor, error) {

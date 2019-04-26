@@ -5,6 +5,7 @@ var:
     default:
       - /var/log/apache2/access.log*
       - /var/log/apache2/other_vhosts_access.log*
+      - /var/log/httpd/access_log*
     os.darwin:
       - /usr/local/var/log/apache2/access_log*
     os.windows:

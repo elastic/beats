@@ -5,7 +5,7 @@
   fields:
     - name: mssql
       type: group
-      description: >
+      description: The root field containing all MSSQL fields
       fields:
         - name: database
           type: group
