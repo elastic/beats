@@ -7,8 +7,11 @@ The default metricsets are `ec2`, `sqs`, `s3_request`, `s3_daily_storage` and `c
 [float]
 === Module-specific configuration notes
 
-This module environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN` and `AWS_REGION`
-references in the config file to set values that need to be configurable during deployment.
+This module uses environment variable `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`
+that are referenced in the config file to set values that need to be configurable during deployment. It also
+accept optional configuration `regions` to specify what are the AWS regions to query metrics from. If `regions`
+parameter is not set in the config file, then by default, aws module will query metrics from all available
+AWS regions.
 
 There are two different kinds of AWS credentials can be used here: `access keys` and `temporary security credentials`.
 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are the two parts of `access keys`. They are long-term credentials for
@@ -16,7 +19,7 @@ an IAM user or the AWS account root user. Please see
 https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys[AWS Access Keys
  and Secret Access Keys] for more details. `temporary security credentials` has a limited lifetime and consists of an access key ID,
 a secret access key, and a security token which typically returned from `GetSessionToken`. MFA-enabled IAM users would
-need to submit an MFA code while calling `GetSessionToken`. `aws_default_region` is to set the region for SDK to use. Please
+need to submit an MFA code while calling `GetSessionToken`. Please
 see https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html[Temporary Security Credentials] for more details.
 `sts get-session-token` AWS CLI can be used to generate temporary credentials. For example. with MFA-enabled:
 
@@ -48,7 +51,16 @@ metricbeat.modules:
   access_key_id: '${AWS_ACCESS_KEY_ID}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
   session_token: '${AWS_SESSION_TOKEN}'
-  default_region: '${AWS_REGION:us-west-1}'
+- module: aws
+  period: 300s
+  metricsets:
+    - "s3_daily_storage"
+  access_key_id: '${AWS_ACCESS_KEY_ID}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
+  session_token: '${AWS_SESSION_TOKEN}'
+  regions:
+    - us-west-1
+    - us-east-1
 ----
 
 [float]

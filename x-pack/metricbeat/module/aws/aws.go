@@ -21,10 +21,11 @@ import (
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
 	Period          time.Duration `config:"period" validate:"nonzero,required"`
-	AccessKeyID     string        `config:"access_key_id"`
-	SecretAccessKey string        `config:"secret_access_key"`
+	AccessKeyID     string        `config:"access_key_id" validate:"nonzero,required"`
+	SecretAccessKey string        `config:"secret_access_key" validate:"nonzero,required"`
 	SessionToken    string        `config:"session_token"`
 	DefaultRegion   string        `config:"default_region"`
+	Regions         []string      `config:"regions"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
@@ -62,43 +63,50 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	awsConfig := defaults.Config()
-	awsCreds := awssdk.Credentials{
+	awsCredentials := awssdk.Credentials{
 		AccessKeyID:     config.AccessKeyID,
 		SecretAccessKey: config.SecretAccessKey,
 	}
 	if config.SessionToken != "" {
-		awsCreds.SessionToken = config.SessionToken
+		awsCredentials.SessionToken = config.SessionToken
 	}
 
 	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCreds,
+		Value: awsCredentials,
 	}
 
-	awsConfig.Region = config.DefaultRegion
-
-	svcEC2 := ec2.New(awsConfig)
-	regionsList, err := getRegions(svcEC2)
-	if err != nil {
-		return nil, err
-	}
+	awsConfig.Region = "us-east-1"
 
 	durationString, periodSec := convertPeriodToDuration(config.Period)
 	if err != nil {
 		return nil, err
 	}
 
-	// Construct MetricSet
 	metricSet := MetricSet{
 		BaseMetricSet:  base,
-		RegionsList:    regionsList,
 		DurationString: durationString,
 		PeriodInSec:    periodSec,
 		AwsConfig:      &awsConfig,
 	}
+
+	// Construct MetricSet with a full regions list
+	if config.Regions == nil {
+		svcEC2 := ec2.New(awsConfig)
+		completeRegionsList, err := getRegions(svcEC2)
+		if err != nil {
+			return nil, err
+		}
+
+		metricSet.RegionsList = completeRegionsList
+		return &metricSet, nil
+	}
+
+	// Construct MetricSet with specific regions list from config
+	metricSet.RegionsList = config.Regions
 	return &metricSet, nil
 }
 
-func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
+func getRegions(svc ec2iface.EC2API) (completeRegionsList []string, err error) {
 	input := &ec2.DescribeRegionsInput{}
 	req := svc.DescribeRegionsRequest(input)
 	output, err := req.Send()
@@ -107,7 +115,7 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 		return
 	}
 	for _, region := range output.Regions {
-		regionsList = append(regionsList, *region.RegionName)
+		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
 	return
 }
