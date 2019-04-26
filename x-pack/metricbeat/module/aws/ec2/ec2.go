@@ -76,7 +76,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
-		awsConfig := *m.MetricSet.AwsConfig
+		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 		svcEC2 := ec2.New(awsConfig)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
