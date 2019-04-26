@@ -10,7 +10,6 @@ import (
 	"os"
 	"runtime"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -38,7 +37,6 @@ func TestHomebrew(t *testing.T) {
 		assert.Equal(t, "Test package", pkg.Summary)
 		assert.Equal(t, "https://www.elastic.co/", pkg.URL)
 		assert.Equal(t, "1.0.0", pkg.Version)
-		assert.True(t, time.Date(2019, 4, 17, 13, 14, 57, 205133721, time.FixedZone("BST", 60*60)).Equal(pkg.InstallTime), "Time is not equal: %+v", pkg.InstallTime)
 	}
 
 	// Test whole dataset if on Darwin
@@ -57,7 +55,6 @@ func TestHomebrew(t *testing.T) {
 			checkFieldValue(t, event, "system.audit.package.summary", "Test package")
 			checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
 			checkFieldValue(t, event, "system.audit.package.version", "1.0.0")
-			checkFieldValue(t, event, "system.audit.package.installtime", time.Date(2019, 4, 17, 13, 14, 57, 205133721, time.FixedZone("BST", 60*60)))
 			checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
 		}
 	}
@@ -66,12 +63,7 @@ func TestHomebrew(t *testing.T) {
 func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValue interface{}) {
 	value, err := event.GetValue(fieldName)
 	if assert.NoError(t, err) {
-		switch v := value.(type) {
-		case time.Time:
-			assert.True(t, v.Equal(fieldValue.(time.Time)), "Time is not equal: %+v", v)
-		default:
-			assert.Equal(t, fieldValue, value)
-		}
+		assert.Equal(t, fieldValue, value)
 	}
 }
 
