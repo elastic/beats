@@ -72,6 +72,7 @@ func (c *client) handle() error {
 	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxMessageSize)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
+	scanner.Buffer(make([]byte, c.maxMessageSize), int(c.maxMessageSize))
 	scanner.Split(c.splitFunc)
 
 	for scanner.Scan() {
