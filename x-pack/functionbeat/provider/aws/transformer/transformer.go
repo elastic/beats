@@ -11,12 +11,32 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+
+	"bytes"
+	"compress/gzip"
+	"io"
 )
 
 // Centralize anything related to ECS into a common file.
 // TODO: Look at the fields to align them with ECS.
 // TODO: how to keep the fields in sync with AWS?
 // TODO: api gateway proxy a lot more information is available.
+
+// Custom decode for cloudwatch kinesis messages
+func DecodeByteMessage(message []byte) (decoded string) {
+	//Uncompress gzip message
+	b := bytes.NewBuffer(message)
+
+	var r io.Reader
+	r, _ = gzip.NewReader(b)
+
+	var resB bytes.Buffer
+	resB.ReadFrom(r)
+
+	decoded = string(resB.Bytes())
+
+	return
+}
 
 // CloudwatchLogs takes an CloudwatchLogsData and transform it into a beat event.
 func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
@@ -62,6 +82,7 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 func KinesisEvent(request events.KinesisEvent) []beat.Event {
 	events := make([]beat.Event, len(request.Records))
 	for idx, record := range request.Records {
+		decodedMessage := DecodeByteMessage(record.Kinesis.Data)
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
@@ -71,7 +92,7 @@ func KinesisEvent(request events.KinesisEvent) []beat.Event {
 				"event_source_arn":        record.EventSourceArn,
 				"event_version":           record.EventVersion,
 				"aws_region":              record.AwsRegion,
-				"message":                 string(record.Kinesis.Data),
+				"message":                 decodedMessage,
 				"kinesis_partition_key":   record.Kinesis.PartitionKey,
 				"kinesis_schema_version":  record.Kinesis.KinesisSchemaVersion,
 				"kinesis_sequence_number": record.Kinesis.SequenceNumber,
