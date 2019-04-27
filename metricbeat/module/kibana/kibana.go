@@ -42,7 +42,7 @@ var (
 
 	// ExcludeUsageParamAvailableVersion is the version of Kibana since when the stats API supports the
 	// exclude_usage parameter
-	ExcludeUsageParamAvailableVersion = common.MustNewVersion("7.1.0")
+	ExcludeUsageParamAvailableVersion = common.MustNewVersion("6.7.3")
 )
 
 // ReportErrorForMissingField reports and returns an error message for the given
