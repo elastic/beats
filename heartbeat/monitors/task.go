@@ -18,7 +18,9 @@
 package monitors
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 
@@ -134,6 +136,8 @@ func (t *configuredJob) Stop() {
 	}
 }
 
+var httpClient = &http.Client{}
+
 func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: common.MapStr{},
@@ -149,6 +153,7 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 		// If continuations are present we defensively publish a clone of the event
 		// in the chance that the event shares underlying data with the events for continuations
 		// This prevents races where the pipeline publish could accidentally alter multiple events.
+
 		if hasContinuations {
 			clone := beat.Event{
 				Timestamp: event.Timestamp,
@@ -161,6 +166,27 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 			client.Publish(*event)
 		}
 	}
+
+	b, err := json.Marshal(common.MapStr{
+		"scripted_upsert": true,
+		"script": common.MapStr{
+			"id":     "heartbeat-state-in",
+			"params": common.MapStr{"event": event.Fields},
+		},
+	})
+	if err != nil {
+		panic(fmt.Sprintf("MARSHAL ERR %v\n", err))
+	}
+
+	fmt.Sprintf(string(b) + "\n")
+
+	//id, _ := event.GetValue("monitor.id")
+	//url := fmt.Sprintf("http://localhost:9200/heartbeat-states/_update/%s", id)
+	//req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(b))
+	//if err != nil {
+	//		logp.Err("Error state index %s", err)
+	//}
+	//httpClient.Do(req)
 
 	if len(next) == 0 {
 		return nil

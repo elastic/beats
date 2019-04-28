@@ -22,15 +22,25 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: http
-
-  # List or urls to query
   urls: ["http://localhost:9200"]
+  id: local-es
+  name: Local Elasticsearch
+  mode: all
+  schedule: '@every 1s'
+- type: http
+  urls: ["http://www.andrewvc.com"]
+  id: andrewvc.com
+  Name: Andrew's Homepage
+  mode: all
+  schedule: '@every 1s'
+- type: http
+  urls: ["http://www.elastic.co"]
+  id: elastic.co
+  name: Elastic Homepage
+  mode: all
+  schedule: '@every 1s'
 
-  # Configure task schedule
-  schedule: '@every 10s'
 
-  # Total test connection and data exchange timeout
-  #timeout: 16s
 
 #==================== Elasticsearch template setting ==========================
 
@@ -135,7 +145,7 @@ processors:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-#logging.level: debug
+logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
