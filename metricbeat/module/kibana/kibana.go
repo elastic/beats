@@ -34,11 +34,17 @@ import (
 const ModuleName = "kibana"
 
 var (
+	v6_4_0 = common.MustNewVersion("6.4.0")
+	v6_5_0 = common.MustNewVersion("6.5.0")
+	v6_7_2 = common.MustNewVersion("6.7.2")
+	v7_0_0 = common.MustNewVersion("7.0.0")
+	v7_0_2 = common.MustNewVersion("7.0.2")
+
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
-	StatsAPIAvailableVersion = common.MustNewVersion("6.4.0")
+	StatsAPIAvailableVersion = v6_4_0
 
 	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
-	SettingsAPIAvailableVersion = common.MustNewVersion("6.5.0")
+	SettingsAPIAvailableVersion = v6_5_0
 )
 
 // ReportErrorForMissingField reports and returns an error message for the given
@@ -79,6 +85,14 @@ func IsStatsAPIAvailable(currentKibanaVersion *common.Version) bool {
 // IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
 func IsSettingsAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
+}
+
+// IsUsageExcludable returns whether the stats API supports the exclude_usage parameter in the
+// given version of Kibana
+func IsUsageExcludable(currentKibanaVersion *common.Version) bool {
+	// (6.7.2 <= currentKibamaVersion < 7.0.0) || (7.0.2 <= currentKibanaVersion)
+	return (v6_7_2.LessThanOrEqual(false, currentKibanaVersion) && currentKibanaVersion.LessThan(v7_0_0)) ||
+		v7_0_2.LessThanOrEqual(false, currentKibanaVersion)
 }
 
 func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
