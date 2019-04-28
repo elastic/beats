@@ -34,15 +34,17 @@ import (
 const ModuleName = "kibana"
 
 var (
-	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
-	StatsAPIAvailableVersion = common.MustNewVersion("6.4.0")
-
-	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
-	SettingsAPIAvailableVersion = common.MustNewVersion("6.5.0")
-
+	v6_4_0 = common.MustNewVersion("6.4.0")
+	v6_5_0 = common.MustNewVersion("6.5.0")
 	v6_7_2 = common.MustNewVersion("6.7.2")
 	v7_0_0 = common.MustNewVersion("7.0.0")
 	v7_0_1 = common.MustNewVersion("7.0.1")
+
+	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
+	StatsAPIAvailableVersion = v6_4_0
+
+	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
+	SettingsAPIAvailableVersion = v6_5_0
 )
 
 // ReportErrorForMissingField reports and returns an error message for the given
