@@ -19,6 +19,7 @@ package stats
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -38,8 +39,9 @@ func init() {
 }
 
 const (
-	statsPath    = "api/stats"
-	settingsPath = "api/settings"
+	statsPath             = "api/stats"
+	settingsPath          = "api/settings"
+	usageCollectionPeriod = 24 * time.Hour
 )
 
 var (
@@ -53,8 +55,10 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	statsHTTP    *helper.HTTP
-	settingsHTTP *helper.HTTP
+	statsHTTP            *helper.HTTP
+	settingsHTTP         *helper.HTTP
+	usageLastCollectedOn time.Time
+	isUsageExcludable    bool
 }
 
 // New create a new instance of the MetricSet
@@ -116,6 +120,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms,
 		statsHTTP,
 		settingsHTTP,
+		time.Time{},
+		kibana.IsUsageExcludable(kibanaVersion),
 	}, nil
 }
 
@@ -132,6 +138,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 }
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
+	// Collect usage stats only once every usageCollectionPeriod
+	if m.isUsageExcludable {
+		origURI := m.statsHTTP.GetURI()
+		defer m.statsHTTP.SetURI(origURI)
+
+		shouldCollectUsage := m.shouldCollectUsage(now)
+		if shouldCollectUsage {
+			m.usageLastCollectedOn = now
+		}
+		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
+	}
+
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
@@ -171,4 +189,8 @@ func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
 
 func (m *MetricSet) calculateIntervalMs() int64 {
 	return m.Module().Config().Period.Nanoseconds() / 1000 / 1000
+}
+
+func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
+	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod
 }
