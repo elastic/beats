@@ -54,6 +54,7 @@ that Metricbeat does it and with the same validations.
 package testing
 
 import (
+	"context"
 	"sync"
 	"testing"
 	"time"
@@ -301,7 +302,21 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
 	if !ok {
-		t.Fatal("MetricSet does not implement PushMetricSet")
+		t.Fatal("MetricSet does not implement PushMetricSetV2")
+	}
+
+	return pushMetricSet
+}
+
+// NewPushMetricSetV2WithContext instantiates a new PushMetricSetV2WithContext
+// using the given configuration. The ModuleFactory and MetricSetFactory are
+// obtained from the global Registry.
+func NewPushMetricSetV2WithContext(t testing.TB, config interface{}) mb.PushMetricSetV2WithContext {
+	metricSet := NewMetricSet(t, config)
+
+	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2WithContext)
+	if !ok {
+		t.Fatal("MetricSet does not implement PushMetricSetV2WithContext")
 	}
 
 	return pushMetricSet
@@ -345,7 +360,7 @@ func (r *capturingPushReporterV2) Done() <-chan struct{} {
 // time and returns all of the events and errors that occur during that period.
 func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
 	var (
-		r      = &capturingPushReporterV2{doneC: make(chan struct{}), eventsC: make(chan mb.Event)}
+		r      = &capturingPushReporterV2{eventsC: make(chan mb.Event)}
 		wg     sync.WaitGroup
 		events []mb.Event
 	)
@@ -385,5 +400,30 @@ func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.Push
 	}()
 
 	wg.Wait()
+	return events
+}
+
+// RunPushMetricSetV2WithContext run the given push metricset for the specific amount of
+// time and returns all of the events that occur during that period.
+func RunPushMetricSetV2WithContext(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2WithContext) []mb.Event {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	r := &capturingPushReporterV2{eventsC: make(chan mb.Event)}
+
+	go metricSet.Run(ctx, r)
+
+	var events []mb.Event
+	for {
+		select {
+		case <-ctx.Done():
+			// Timeout
+			return events
+		case e := <-r.eventsC:
+			events = append(events, e)
+			if len(events) >= waitEvents {
+				cancel()
+				return events
+			}
+		}
+	}
 	return events
 }

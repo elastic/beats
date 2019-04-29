@@ -18,6 +18,7 @@
 package module
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -191,6 +192,8 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
+	case mb.PushMetricSetV2WithContext:
+		ms.Run(&channelContext{done}, reporter.V2())
 	case mb.EventFetcher, mb.EventsFetcher,
 		mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error:
 		msw.startPeriodicFetching(reporter)
@@ -312,6 +315,23 @@ func (r *eventReporter) V1() mb.PushReporter {
 	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
 }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
+
+// channelContext implements context.Context by wrapping a channel
+type channelContext struct {
+	done <-chan struct{}
+}
+
+func (r *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (r *channelContext) Done() <-chan struct{}       { return r.done }
+func (r *channelContext) Err() error {
+	select {
+	case <-r.done:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+func (r *channelContext) Value(key interface{}) interface{} { return nil }
 
 // reporterV1 wraps V2 to provide a v1 interface.
 type reporterV1 struct {

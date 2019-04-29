@@ -244,6 +244,11 @@ func mustImplementFetcher(ms MetricSet) error {
 	if _, ok := ms.(PushMetricSetV2); ok {
 		ifcs = append(ifcs, "PushMetricSetV2")
 	}
+
+	if _, ok := ms.(PushMetricSetV2WithContext); ok {
+		ifcs = append(ifcs, "PushMetricSetV2WithContext")
+	}
+
 	switch len(ifcs) {
 	case 0:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement an event "+

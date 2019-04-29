@@ -76,8 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Run listens for docker events and reports them
-func (m *MetricSet) Run(reporter mb.PushReporterV2) {
-	ctx, cancel := context.WithCancel(context.Background())
+func (m *MetricSet) Run(ctx context.Context, reporter mb.ReporterV2) {
 	options := types.EventsOptions{
 		Since: fmt.Sprintf("%d", time.Now().Unix()),
 	}
@@ -100,16 +99,15 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 				time.Sleep(1 * time.Second)
 				break WATCH
 
-			case <-reporter.Done():
+			case <-ctx.Done():
 				m.logger.Debug("docker", "event watcher stopped")
-				cancel()
 				return
 			}
 		}
 	}
 }
 
-func (m *MetricSet) reportEvent(reporter mb.PushReporterV2, event events.Message) {
+func (m *MetricSet) reportEvent(reporter mb.ReporterV2, event events.Message) {
 	time := time.Unix(event.Time, 0)
 
 	attributes := make(map[string]string, len(event.Actor.Attributes))

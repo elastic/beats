@@ -22,6 +22,7 @@ to implement Modules and their associated MetricSets.
 package mb
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -215,6 +216,15 @@ type ReportingMetricSetV2Error interface {
 type PushMetricSetV2 interface {
 	MetricSet
 	Run(r PushReporterV2)
+}
+
+// PushMetricSetV2Context is a MetricSet that pushes events (rather than pulling them
+// periodically via a Fetch callback). Run is invoked to start the event
+// subscription and it should block until the MetricSet is ready to stop or
+// the context is closed.
+type PushMetricSetV2WithContext interface {
+	MetricSet
+	Run(ctx context.Context, r ReporterV2)
 }
 
 // HostData contains values parsed from the 'host' configuration. Other
