@@ -1900,6 +1900,10 @@ logging.files:
   # Unix epoch. Defaults to disabled.
   #interval: 0
 
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonopen: true
+
 # Set to true to log messages in JSON format.
 #logging.json: false
 
