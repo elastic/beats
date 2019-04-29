@@ -1321,6 +1321,8 @@ The average number of disk read I/O operations per second.
 --
 type: long
 
+format: duration
+
 The amount of time a Read Replica DB instance lags behind the source DB instance. Applies to MySQL, MariaDB, and PostgreSQL Read Replicas.
 
 
@@ -1390,10 +1392,12 @@ The amount of storage used by your Aurora DB instance, in bytes.
 
 --
 
-*`aws.rds.free_local_storage`*::
+*`aws.rds.free_local_storage.bytes`*::
 +
 --
 type: long
+
+format: bytes
 
 The amount of storage available for temporary tables and logs, in bytes.
 
@@ -1535,6 +1539,8 @@ The average number of bytes written to disk per second.
 --
 type: long
 
+format: duration
+
 The amount of latency for commit operations, in milliseconds.
 
 
@@ -1544,6 +1550,8 @@ The amount of latency for commit operations, in milliseconds.
 +
 --
 type: long
+
+format: duration
 
 The amount of latency for data definition language (DDL) requests, in milliseconds.
 
@@ -1555,6 +1563,8 @@ The amount of latency for data definition language (DDL) requests, in millisecon
 --
 type: long
 
+format: duration
+
 The amount of latency for inserts, updates, and deletes, in milliseconds.
 
 
@@ -1564,6 +1574,8 @@ The amount of latency for inserts, updates, and deletes, in milliseconds.
 +
 --
 type: long
+
+format: duration
 
 The amount of latency for insert queries, in milliseconds.
 
@@ -1575,6 +1587,8 @@ The amount of latency for insert queries, in milliseconds.
 --
 type: long
 
+format: duration
+
 The average amount of time taken per disk I/O operation.
 
 
@@ -1584,6 +1598,8 @@ The average amount of time taken per disk I/O operation.
 +
 --
 type: long
+
+format: duration
 
 The amount of latency for select queries, in milliseconds.
 
@@ -1595,6 +1611,8 @@ The amount of latency for select queries, in milliseconds.
 --
 type: long
 
+format: duration
+
 The amount of latency for update queries, in milliseconds.
 
 
@@ -1604,6 +1622,8 @@ The amount of latency for update queries, in milliseconds.
 +
 --
 type: long
+
+format: duration
 
 The average amount of time taken per disk I/O operation.
 
