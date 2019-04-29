@@ -102,7 +102,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Loading json template from file"))
-        self.wait_until(lambda: self.log_contains("Elasticsearch template with name 'bla' loaded"))
+        self.wait_until(lambda: self.log_contains("template with name 'bla' loaded"))
         proc.check_kill_and_wait()
 
         es = Elasticsearch([self.get_elasticsearch_url()])

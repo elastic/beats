@@ -84,7 +84,7 @@ func TestTemplate(t *testing.T) {
 	template, err := New(beatVersion, beatName, *ver, TemplateConfig{}, false)
 	assert.NoError(t, err)
 
-	data := template.Generate(nil, nil)
+	data := template.Generate(common.MapStr{}, nil)
 	assert.Equal(t, []string{"testbeat-6.6.0-*"}, data["index_patterns"])
 	meta, err := data.GetValue("mappings.doc._meta")
 	assert.NoError(t, err)

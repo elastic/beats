@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"io"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -81,6 +82,7 @@ func (e *eventLogger) run(
 	done <-chan struct{},
 	pipeline beat.Pipeline,
 	state checkpoint.EventLogState,
+	acker *eventACKer,
 ) {
 	api := e.source
 
@@ -118,7 +120,7 @@ func (e *eventLogger) run(
 
 	debugf("EventLog[%s] opened successfully", api.Name())
 
-	for {
+	for stop := false; !stop; {
 		select {
 		case <-done:
 			return
@@ -127,19 +129,23 @@ func (e *eventLogger) run(
 
 		// Read from the event.
 		records, err := api.Read()
-		if err != nil {
+		switch err {
+		case nil:
+		case io.EOF:
+			// Graceful stop.
+			stop = true
+		default:
 			logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
-			break
+			return
 		}
 
 		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
 		if len(records) == 0 {
-			// TODO: Consider implementing notifications using
-			// NotifyChangeEventLog instead of polling.
 			time.Sleep(time.Second)
 			continue
 		}
 
+		acker.Add(len(records))
 		for _, lr := range records {
 			client.Publish(lr.ToEvent())
 		}

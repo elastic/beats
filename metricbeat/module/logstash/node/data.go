@@ -50,24 +50,18 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		event.Error = errors.Wrap(err, "failure parsing Logstash Node API response")
-		r.Event(event)
-		return event.Error
+		return errors.Wrap(err, "failure parsing Logstash Node API response")
 	}
 
 	fields, err := schema.Apply(data)
 	if err != nil {
-		event.Error = errors.Wrap(err, "failure applying node schema")
-		r.Event(event)
-		return event.Error
+		return errors.Wrap(err, "failure applying node schema")
 	}
 
 	// Set service ID
 	serviceID, err := fields.GetValue("id")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("id", elastic.Logstash)
-		r.Event(event)
-		return event.Error
+		return elastic.MakeErrorForMissingField("id", elastic.Logstash)
 	}
 	event.RootFields.Put("service.id", serviceID)
 	fields.Delete("id")
@@ -75,9 +69,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set service hostname
 	host, err := fields.GetValue("host")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("host", elastic.Logstash)
-		r.Event(event)
-		return event.Error
+		return elastic.MakeErrorForMissingField("host", elastic.Logstash)
 	}
 	event.RootFields.Put("service.hostname", host)
 	fields.Delete("host")
@@ -85,9 +77,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set service version
 	version, err := fields.GetValue("version")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("version", elastic.Logstash)
-		r.Event(event)
-		return event.Error
+		return elastic.MakeErrorForMissingField("version", elastic.Logstash)
 	}
 	event.RootFields.Put("service.version", version)
 	fields.Delete("version")
@@ -95,9 +85,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set PID
 	pid, err := fields.GetValue("jvm.pid")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("jvm.pid", elastic.Logstash)
-		r.Event(event)
-		return event.Error
+		return elastic.MakeErrorForMissingField("jvm.pid", elastic.Logstash)
 	}
 	event.RootFields.Put("process.pid", pid)
 	fields.Delete("jvm.pid")

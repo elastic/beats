@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
 )
 
@@ -82,8 +83,9 @@ func TestReadLine(t *testing.T) {
 				MaxBackoff:    1 * time.Second,
 				BackoffFactor: 2,
 			},
-			BufferSize: 100,
-			MaxBytes:   1000,
+			BufferSize:     100,
+			MaxBytes:       1000,
+			LineTerminator: readfile.LineFeed,
 		},
 		source: source,
 	}

@@ -53,7 +53,3 @@ class Test(metricbeat.BaseTest):
         print(evt)
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return [os.getenv('LOGSTASH_HOST', 'localhost') + ':' +
-                os.getenv('LOGSTASH_PORT', '9600')]

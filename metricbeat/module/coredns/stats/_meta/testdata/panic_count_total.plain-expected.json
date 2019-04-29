@@ -3,9 +3,7 @@
         "coredns": {
             "stats": {
                 "panic": {
-                    "count": {
-                        "total": 42
-                    }
+                    "count": 42
                 }
             }
         },
