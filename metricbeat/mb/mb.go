@@ -225,7 +225,7 @@ type PushMetricSetV2 interface {
 	Run(r PushReporterV2)
 }
 
-// PushMetricSetV2Context is a MetricSet that pushes events (rather than pulling them
+// PushMetricSetV2WithContext is a MetricSet that pushes events (rather than pulling them
 // periodically via a Fetch callback). Run is invoked to start the event
 // subscription and it should block until the MetricSet is ready to stop or
 // the context is closed.
