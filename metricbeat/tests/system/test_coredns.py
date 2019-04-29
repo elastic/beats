@@ -31,9 +31,3 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             self.assertItemsEqual(self.de_dot(COREDNS_FIELDS), evt.keys(), evt)
-
-    def get_hosts(self):
-        return ["{}:{}".format(
-            os.getenv('COREDNS_HOST', 'localhost'),
-            os.getenv('COREDNS_PORT', '9153')
-        )]
