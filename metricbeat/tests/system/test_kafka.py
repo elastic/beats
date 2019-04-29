@@ -42,10 +42,6 @@ class KafkaTest(metricbeat.BaseTest):
                                  retries=20, retry_backoff_ms=500)
         producer.send('foobar', b'some_message_bytes')
 
-    def get_hosts(self):
-        return [self.compose_hosts()[0] + ':' +
-                os.getenv('KAFKA_PORT', '9092')]
-
 
 class Kafka_1_1_0_Test(KafkaTest):
     COMPOSE_SERVICES = ['kafka_1_1_0']
