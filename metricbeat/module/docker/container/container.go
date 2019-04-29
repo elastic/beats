@@ -63,9 +63,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch returns a list of all containers as events.
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
-func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	// Fetch a list of all containers.
-	containers, err := m.dockerClient.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := m.dockerClient.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get docker containers list")
 	}

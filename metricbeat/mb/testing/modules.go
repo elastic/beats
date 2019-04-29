@@ -182,6 +182,19 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 	return reportingMetricSetV2Error
 }
 
+// NewReportingMetricSetV2WithContext returns a new ReportingMetricSetV2WithContext instance. Then
+// you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
+func NewReportingMetricSetV2WithContext(t testing.TB, config interface{}) mb.ReportingMetricSetV2WithContext {
+	metricSet := NewMetricSet(t, config)
+
+	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSetV2WithContext)
+	if !ok {
+		t.Fatal("MetricSet does not implement ReportingMetricSetV2WithContext")
+	}
+
+	return reportingMetricSet
+}
+
 // CapturingReporterV2 is a reporter used for testing which stores all events and errors
 type CapturingReporterV2 struct {
 	events []mb.Event
@@ -223,6 +236,17 @@ func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
 func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, []error) {
 	r := &CapturingReporterV2{}
 	err := metricSet.Fetch(r)
+	if err != nil {
+		r.errs = append(r.errs, err)
+	}
+	return r.events, r.errs
+}
+
+// ReportingFetchV2WithContext runs the given reporting metricset and returns all of the
+// events and errors that occur during that period.
+func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) ([]mb.Event, []error) {
+	r := &CapturingReporterV2{}
+	err := metricSet.Fetch(context.Background(), r)
 	if err != nil {
 		r.errs = append(r.errs, err)
 	}
