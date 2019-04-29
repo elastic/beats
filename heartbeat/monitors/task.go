@@ -138,12 +138,13 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: common.MapStr{},
 	}
-	next, err := job(event)
-	hasContinuations := len(next) > 0
 
+	next, err := job(event)
 	if err != nil {
 		logp.Err("Job %v failed with: ", err)
 	}
+
+	hasContinuations := len(next) > 0
 
 	if event.Fields != nil && !eventext.IsEventCancelled(event) {
 		// If continuations are present we defensively publish a clone of the event
