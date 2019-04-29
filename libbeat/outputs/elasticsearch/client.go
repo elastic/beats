@@ -102,6 +102,10 @@ type bulkCreateAction struct {
 	Create bulkEventMeta `json:"create" struct:"create"`
 }
 
+type bulkUpdateAction struct {
+	Update bulkEventMeta `json:"update" struct:"update"`
+}
+
 type bulkEventMeta struct {
 	Index    string `json:"_index" struct:"_index"`
 	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`
@@ -395,6 +399,40 @@ func bulkEncodePublishRequest(
 			logp.Debug("elasticsearch", "Failed event: %v", event)
 			continue
 		}
+
+		updateMeta, err := createEventBulkUpdateMeta(index, pipeline, eventType, event)
+
+		evt := event.Fields.Clone()
+		evt.Put("@timestamp", event.Timestamp)
+
+		bulkBody := common.MapStr{
+			"scripted_upsert": true,
+			"upsert":          common.MapStr{},
+			"script": struct {
+				ID     string `json:"id" struct:"id"`
+				Params struct {
+					Event common.MapStr `json:"event" struct:"event"`
+				} `json:"params" struct:"params"`
+			}{
+				ID: "heartbeat-state-in",
+				Params: struct {
+					Event common.MapStr `json:"event" struct:"event"`
+				}{Event: evt},
+			},
+		}
+		if err != nil {
+			logp.Err("Failed to encode event update meta data: %s", err)
+		}
+
+		b, _ := json.Marshal(bulkBody)
+		logp.Debug("elasticsearch", "Bulk Body: %s\n", string(b))
+
+		if err := body.Add(updateMeta, bulkBody); err != nil {
+			logp.Err("Failed to encode event: %s", err)
+			logp.Debug("elasticsearch", "Failed event: %v", event)
+			continue
+		}
+
 		okEvents = append(okEvents, data[i])
 	}
 	return okEvents
@@ -440,6 +478,41 @@ func createEventBulkMeta(
 		return bulkCreateAction{meta}, nil
 	}
 	return bulkIndexAction{meta}, nil
+}
+
+func createEventBulkUpdateMeta(
+	indexSel outputs.IndexSelector,
+	pipelineSel *outil.Selector,
+	eventType string,
+	event *beat.Event,
+) (interface{}, error) {
+	pipeline, err := getPipeline(event, pipelineSel)
+	if err != nil {
+		err := fmt.Errorf("failed to select pipeline: %v", err)
+		return nil, err
+	}
+
+	var id string
+	if tmp, _ := event.GetValue("monitor.id"); tmp != nil {
+		if s, ok := tmp.(string); ok {
+			id = s
+		} else {
+			logp.Err("Event ID '%v' is no string value", id)
+		}
+	} else {
+		panic("No monitor ID!")
+	}
+
+	meta := bulkEventMeta{
+		Index:    "heartbeat-states",
+		DocType:  eventType,
+		Pipeline: pipeline,
+		ID:       id,
+	}
+
+	fmt.Printf("ACTION IS %#v\n", meta)
+
+	return bulkUpdateAction{meta}, nil
 }
 
 func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {

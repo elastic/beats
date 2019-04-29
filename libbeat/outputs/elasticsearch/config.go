@@ -39,6 +39,7 @@ type elasticsearchConfig struct {
 	MaxRetries       int               `config:"max_retries"`
 	Timeout          time.Duration     `config:"timeout"`
 	Backoff          Backoff           `config:"backoff"`
+	StatesEnabled    bool              `config:"states_enabled"`
 }
 
 type Backoff struct {
@@ -68,6 +69,7 @@ var (
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
+		StatesEnabled: true,
 	}
 )
 
