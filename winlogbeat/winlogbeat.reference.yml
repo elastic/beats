@@ -14,13 +14,18 @@
 # in the directory in which it was started.
 #winlogbeat.registry_file: .winlogbeat.yml
 
+# The maximum amount of time Winlogbeat should wait for events to finish
+# publishing when shutting down.
+#winlogbeat.shutdown_timeout: 0s
+
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
 #
 # The supported keys are name (required), tags, fields, fields_under_root,
-# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
-# visit the documentation for the complete details of each option.
+# forwarded, ignore_older, level, no_more_events, event_id, provider, and
+# include_xml. Please visit the documentation for the complete details of each
+# option.
 # https://go.es.io/WinlogbeatConfig
 winlogbeat.event_logs:
   - name: Application
@@ -1094,20 +1099,22 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# winlogbeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== Xpack Monitoring ===============================
+# winlogbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)

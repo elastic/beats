@@ -11,7 +11,7 @@ to retrieve the metrics from (`/metrics` by default) can be configured with `met
 -------------------------------------------------------------------------------------
 - module: prometheus
   period: 10s
-  hosts: ["localhost:9090"]
+  hosts: ["node:9100"]
   metrics_path: /metrics
 
   #username: "user"

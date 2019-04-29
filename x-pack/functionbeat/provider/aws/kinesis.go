@@ -158,15 +158,15 @@ func (k *Kinesis) LambdaConfig() *lambdaConfig {
 func (k *Kinesis) Template() *cloudformation.Template {
 	template := cloudformation.NewTemplate()
 	prefix := func(suffix string) string {
-		return normalizeResourceName("fnb" + k.config.Name + k.Name() + suffix)
+		return normalizeResourceName("fnb" + k.config.Name + suffix)
 	}
 
 	for _, trigger := range k.config.Triggers {
-		resourceName := prefix(trigger.EventSourceArn)
+		resourceName := prefix(k.Name() + trigger.EventSourceArn)
 		template.Resources[resourceName] = &cloudformation.AWSLambdaEventSourceMapping{
 			BatchSize:        trigger.BatchSize,
 			EventSourceArn:   trigger.EventSourceArn,
-			FunctionName:     cloudformation.GetAtt("fnb"+k.config.Name, "Arn"),
+			FunctionName:     cloudformation.GetAtt(prefix(""), "Arn"),
 			StartingPosition: trigger.StartingPosition.String(),
 		}
 	}

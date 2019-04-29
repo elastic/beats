@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type renameFields struct {
@@ -45,11 +46,12 @@ type fromTo struct {
 
 func init() {
 	processors.RegisterPlugin("rename",
-		configChecked(newRenameFields,
-			requireFields("fields")))
+		checks.ConfigChecked(NewRenameFields,
+			checks.RequireFields("fields")))
 }
 
-func newRenameFields(c *common.Config) (processors.Processor, error) {
+// NewRenameFields returns a new rename processor.
+func NewRenameFields(c *common.Config) (processors.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

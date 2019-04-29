@@ -33,7 +33,15 @@ image::./images/kibana-suricata.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
+This is an example of how to overwrite the default log file path.
+
+[source,yaml]
+----
+- module: suricata
+  eve:
+    enabled: true
+    var.paths: ["/my/path/suricata.json"]
+----
 
 :fileset_ex: eve
 

@@ -30,8 +30,8 @@ import (
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "nats")
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(metricSet, t, "./test_data.json")
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(metricSet, t, "./test_data.json")
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -42,7 +42,7 @@ func TestFetch(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])

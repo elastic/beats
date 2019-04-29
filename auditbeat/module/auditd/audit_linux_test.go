@@ -24,6 +24,8 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/user"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -50,7 +52,8 @@ var audit = flag.Bool("audit", false, "interact with the real audit framework")
 
 var (
 	userLoginFailMsg    = `type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=failed'`
-	userLoginSuccessMsg = `type=USER_LOGIN msg=audit(1492896303.915:19956): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=success'`
+	userLoginSuccessMsg = `type=USER_LOGIN msg=audit(1492896303.915:19956): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=61647269616E exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=success'`
+	userAuthMsg         = `type=USER_AUTH msg=audit(1552714590.571:21114): pid=11312 uid=0 auid=0 ses=62 msg='op=PAM:authentication acct="root" exe="/bin/su" hostname="test" addr="127.0.0.1" terminal=/dev/pts/0 res=success'`
 
 	execveMsgs = []string{
 		`type=SYSCALL msg=audit(1492752522.985:8972): arch=c000003e syscall=59 success=yes exit=0 a0=10812c8 a1=1070208 a2=1152008 a3=59a items=2 ppid=10027 pid=10043 auid=1001 uid=1001 gid=1002 euid=1001 suid=1001 fsuid=1001 egid=1002 sgid=1002 fsgid=1002 tty=pts0 ses=11 comm="uname" exe="/bin/uname" key="key=user_commands"`,
@@ -113,7 +116,8 @@ func TestLoginType(t *testing.T) {
 		returnACK().returnACK().returnACK().returnACK().returnACK().
 		// Send an authentication failure and a success.
 		returnMessage(userLoginFailMsg).
-		returnMessage(userLoginSuccessMsg)
+		returnMessage(userLoginSuccessMsg).
+		returnMessage(userAuthMsg)
 
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
@@ -121,29 +125,44 @@ func TestLoginType(t *testing.T) {
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
-	if len(events) != 2 {
-		t.Fatalf("expected 2 events, but received %d", len(events))
+	const expectedEvents = 3
+	events := mbtest.RunPushMetricSetV2(10*time.Second, expectedEvents, ms)
+	if len(events) != expectedEvents {
+		t.Fatalf("expected %d events, but received %d", expectedEvents, len(events))
 	}
 	assertNoErrors(t, events)
 
 	assertFieldsAreDocumented(t, events)
 
-	// Sometimes the events are received in reverse order.
-	if events[0].ModuleFields["sequence"].(uint32) > events[1].ModuleFields["sequence"].(uint32) {
-		events[0], events[1] = events[1], events[0]
-	}
+	sort.Slice(events,
+		func(i, j int) bool {
+			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32)
+		})
 
 	for idx, expected := range []common.MapStr{
 		{
 			"event.category": "authentication",
 			"event.type":     "authentication_failure",
 			"event.outcome":  "failure",
+			"user.name":      "(invalid user)",
+			"user.id":        nil,
+			"session":        nil,
 		},
 		{
 			"event.category": "authentication",
 			"event.type":     "authentication_success",
 			"event.outcome":  "success",
+			"user.name":      "adrian",
+			"user.audit.id":  nil,
+			"auditd.session": nil,
+		},
+		{
+			"event.category": "user-login",
+			"event.outcome":  "success",
+			"user.name":      "root",
+			"user.id":        "0",
+			"user.audit.id":  "0",
+			"auditd.session": "62",
 		},
 	} {
 		beatEvent := mbtest.StandardizeEvent(ms, events[idx], core.AddDatasetToEvent)
@@ -151,8 +170,13 @@ func TestLoginType(t *testing.T) {
 		for k, v := range expected {
 			msg := fmt.Sprintf("%s[%d]", k, idx)
 			cur, err := beatEvent.GetValue(k)
-			assert.NoError(t, err, msg)
-			assert.Equal(t, v, cur, msg)
+			if v != nil {
+				assert.NoError(t, err, msg)
+				assert.Equal(t, v, cur, msg)
+			} else {
+				_, err := beatEvent.GetValue(k)
+				assert.Equal(t, common.ErrKeyNotFound, err, msg)
+			}
 		}
 	}
 }
@@ -333,5 +357,33 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 		if e.Error != nil {
 			t.Errorf("received error: %+v", e.Error)
 		}
+	}
+}
+
+func BenchmarkResolveUsernameOrID(b *testing.B) {
+	for _, query := range []struct {
+		input string
+		name  string
+		id    string
+		err   bool
+	}{
+		{input: "0", name: "root", id: "0"},
+		{input: "root", name: "root", id: "0"},
+		{input: "vagrant", name: "vagrant", id: "1000"},
+		{input: "1000", name: "vagrant", id: "1000"},
+		{input: "nonexisting", err: true},
+		{input: "9987", err: true},
+	} {
+		b.Run(query.input, func(b *testing.B) {
+			var usr *user.User
+			var err error
+			for i := 0; i < b.N; i++ {
+				usr, err = resolveUsernameOrID(query.input)
+			}
+			if assert.Equal(b, query.err, err != nil, fmt.Sprintf("%v", err)) && !query.err {
+				assert.Equal(b, query.name, usr.Username)
+				assert.Equal(b, query.id, usr.Uid)
+			}
+		})
 	}
 }

@@ -156,6 +156,16 @@ filebeat.modules:
     #var.convert_timezone: false
 
 
+#------------------------------ Envoyproxy Module ------------------------------
+- module: envoyproxy
+  # Fileset for native deployment
+  log: 
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
   # All logs
@@ -562,6 +572,10 @@ filebeat.inputs:
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
 
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
+
   ### Recursive glob configuration
 
   # Expand "**" patterns into regular glob patterns.
@@ -722,6 +736,10 @@ filebeat.inputs:
 
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
+
+  # Size of the UDP read buffer in bytes
+  #read_buffer: 0
+
 
 #------------------------------ TCP input --------------------------------
 # Experimental: Config options for the TCP input
@@ -2002,20 +2020,22 @@ logging.files:
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# filebeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== Xpack Monitoring ===============================
+# filebeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
