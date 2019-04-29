@@ -20,10 +20,9 @@ package monitors
 import (
 	"fmt"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/heartbeat/scheduler/schedule"
