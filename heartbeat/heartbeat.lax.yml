@@ -147,8 +147,8 @@ output.elasticsearch:
 processors:
   - add_observer_metadata:
       geo:
-        name: nyc-dc1
-        location: 40.730610, -73.935242
+        name: lax-dc2
+        location: 33.942791, -118.410042
 
 
 #================================ Logging =====================================

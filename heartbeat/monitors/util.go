@@ -183,6 +183,8 @@ func makeByHostAllIPJob(
 	network := settings.IP.Network()
 	filter := makeIPFilter(network)
 
+	fmt.Printf("ALL IP JOB\n")
+
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
