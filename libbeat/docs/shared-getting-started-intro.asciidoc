@@ -19,4 +19,6 @@ Service for free].
 ==============
 
 After installing the {stack}, read the following topics to learn how to
-install, configure, and run {beatname_uc}:
+install, configure, and run {beatname_uc}. Upgrading to a new version of
+{beatname_uc}? Start by reading the Beats {beats-ref}/upgrading.html[upgrade
+documentation].
