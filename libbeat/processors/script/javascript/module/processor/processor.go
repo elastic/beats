@@ -20,7 +20,6 @@ package processor
 import (
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
-	"github.com/elastic/beats/libbeat/processors/extract_array"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/processors"
@@ -37,6 +36,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 	"github.com/elastic/beats/libbeat/processors/dissect"
 	"github.com/elastic/beats/libbeat/processors/dns"
+	"github.com/elastic/beats/libbeat/processors/extract_array"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 )
 
