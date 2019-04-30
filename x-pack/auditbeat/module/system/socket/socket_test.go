@@ -65,8 +65,9 @@ func testSocket() *Socket {
 }
 
 func TestOutbound(t *testing.T) {
-	// Consume first set of events - list of all currently open sockets
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+
+	// Consume first set of events - list of all currently open sockets
 	events, errs := mbtest.ReportingFetchV2(ms)
 	if errs != nil {
 		t.Fatal("fetch", errs)
@@ -110,8 +111,9 @@ func TestOutbound(t *testing.T) {
 }
 
 func TestListening(t *testing.T) {
-	// Consume first set of events - list of all currently open sockets
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+
+	// Consume first set of events - list of all currently open sockets
 	events, errs := mbtest.ReportingFetchV2(ms)
 	if errs != nil {
 		t.Fatal("fetch", errs)

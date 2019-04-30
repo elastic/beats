@@ -18,7 +18,6 @@ recommended to capture short-lived sockets.
 By default, sockets from or to `localhost` will be excluded. This can be controlled using
 the `socket.include_localhost` configuration parameter.
 
-
 [float]
 ==== Example dashboard
 
