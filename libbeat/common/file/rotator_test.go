@@ -171,8 +171,8 @@ func TestDailyRotation(t *testing.T) {
 	AssertDirContents(t, dir, logname+"-"+today+"-1", logname+"-"+today+"-2", logname)
 }
 
-// Tests the FileConfig.RotateOnOpen parameter
-func TestRotateOnOpen(t *testing.T) {
+// Tests the FileConfig.RotateOnStartup parameter
+func TestRotateOnStartup(t *testing.T) {
 	dir, err := ioutil.TempDir("", "rotate_on_open")
 	if err != nil {
 		t.Fatal(err)
@@ -185,7 +185,7 @@ func TestRotateOnOpen(t *testing.T) {
 	// Create an existing log file with this name.
 	CreateFile(t, filename)
 
-	r, err := file.NewFileRotator(filename, file.RotateOnOpen(false))
+	r, err := file.NewFileRotator(filename, file.RotateOnStartup(false))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,7 +195,7 @@ func TestRotateOnOpen(t *testing.T) {
 	// The line should have been appended to the existing file without rotation.
 	AssertDirContents(t, dir, logname)
 
-	// Create a second rotator with the default setting of rotateOnOpen=true
+	// Create a second rotator with the default setting of rotateOnStartup=true
 	r, err = file.NewFileRotator(filename)
 	if err != nil {
 		t.Fatal(err)

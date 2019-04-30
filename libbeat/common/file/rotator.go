@@ -67,7 +67,7 @@ type Rotator struct {
 	permissions     os.FileMode
 	log             Logger // Optional Logger (may be nil).
 	interval        time.Duration
-	rotateOnOpen    bool
+	rotateOnStartup bool
 	intervalRotator *intervalRotator // Optional, may be nil
 	redirectStderr  bool
 
@@ -125,11 +125,11 @@ func Interval(d time.Duration) RotatorOption {
 	}
 }
 
-// RotateOnOpen immediately rotates files on startup rather than appending to
+// RotateOnStartup immediately rotates files on startup rather than appending to
 // the existing file. The default is true.
-func RotateOnOpen(b bool) RotatorOption {
+func RotateOnStartup(b bool) RotatorOption {
 	return func(r *Rotator) {
-		r.rotateOnOpen = b
+		r.rotateOnStartup = b
 	}
 }
 
@@ -144,12 +144,12 @@ func RedirectStderr(redirect bool) RotatorOption {
 // NewFileRotator returns a new Rotator.
 func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error) {
 	r := &Rotator{
-		filename:     filename,
-		maxSizeBytes: 10 * 1024 * 1024, // 10 MiB
-		maxBackups:   7,
-		permissions:  0600,
-		interval:     0,
-		rotateOnOpen: true,
+		filename:        filename,
+		maxSizeBytes:    10 * 1024 * 1024, // 10 MiB
+		maxBackups:      7,
+		permissions:     0600,
+		interval:        0,
+		rotateOnStartup: true,
 	}
 
 	for _, opt := range options {
@@ -271,7 +271,7 @@ func (r *Rotator) dirMode() os.FileMode {
 }
 
 // openNew opens r's log file for the first time, creating it if it doesn't
-// exist, and performing an initial rotation if r.rotateOnOpen is set.
+// exist, and performing an initial rotation if r.rotateOnStartup is set.
 func (r *Rotator) openNew() error {
 	err := os.MkdirAll(r.dir(), r.dirMode())
 	if err != nil {
@@ -280,8 +280,8 @@ func (r *Rotator) openNew() error {
 
 	_, err = os.Stat(r.filename)
 	if err == nil {
-		if !r.rotateOnOpen {
-			// If the file exists and rotateOnOpen is false, then we just want to
+		if !r.rotateOnStartup {
+			// If the file exists and rotateOnStartup is false, then we just want to
 			// append to the existing file.
 			return r.appendToFile()
 		}
