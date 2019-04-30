@@ -18,10 +18,11 @@
 package osd_tree
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/pkg/errors"
 )
 
 const (
