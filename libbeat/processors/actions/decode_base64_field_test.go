@@ -20,148 +20,171 @@ package actions
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/libbeat/beat"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestDecodeBase64(t *testing.T) {
-	testCases := []struct {
-		desc        string
-		config      common.MapStr
-		input       *beat.Event
-		errExpected bool
-		expected    common.MapStr
+func TestDecodeBase64Run(t *testing.T) {
+	var testCases = []struct {
+		description string
+		config      base64Config
+		Input       common.MapStr
+		Output      common.MapStr
+		error       bool
 	}{
 		{
-			desc: "bad format",
-			config: common.MapStr{
-				"field": "field1",
-			},
-			input: &beat.Event{
-				Fields: common.MapStr{
-					"field1": "bad data",
+			description: "simple field base64 decode",
+			config: base64Config{
+				Fields: []fromTo{
+					{From: "field1", To: "field2"},
 				},
+				IgnoreMissing: false,
+				FailOnError:   true,
 			},
-			errExpected: true,
-			expected: common.MapStr{
-				"field1": "bad data",
-			},
-		},
-		{
-			desc: "bad format with fail_on_error false",
-			config: common.MapStr{
-				"field":         "field1",
-				"fail_on_error": false,
-			},
-			input: &beat.Event{
-				Fields: common.MapStr{
-					"field1": "bad data",
-				},
-			},
-			errExpected: false,
-			expected: common.MapStr{
-				"field1": "bad data",
-			},
-		},
-		{
-			desc: "correct format",
-			config: common.MapStr{
-				"field": "field1",
-			},
-			input: &beat.Event{
-				Fields: common.MapStr{
-					"field1": "Y29ycmVjdCBkYXRh",
-				},
-			},
-			expected: common.MapStr{
-				"field1": "correct data",
-			},
-		},
-		{
-			desc: "empty data",
-			config: common.MapStr{
-				"field": "field1",
-			},
-			input: &beat.Event{
-				Fields: common.MapStr{
-					"field1": "",
-				},
-			},
-			expected: common.MapStr{
-				"field1": "",
-			},
-		},
-		{
-			desc: "empty target",
-			config: common.MapStr{
-				"field":  "field1",
-				"target": "",
-			},
-			input: &beat.Event{
-				Fields: common.MapStr{
-					"field1": "Y29ycmVjdCBkYXRh",
-				},
-			},
-			expected: common.MapStr{
+			Input: common.MapStr{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
-		},
-		{
-			desc: "correct target",
-			config: common.MapStr{
-				"field":  "field1",
-				"target": "field2",
-			},
-			input: &beat.Event{
-				Fields: common.MapStr{
-					"field1": "Y29ycmVjdCBkYXRh",
-				},
-			},
-			expected: common.MapStr{
+			Output: common.MapStr{
 				"field1": "Y29ycmVjdCBkYXRh",
 				"field2": "correct data",
 			},
+			error: false,
 		},
 		{
-			desc: "ignore missing",
-			config: common.MapStr{
-				"field":          "field3",
-				"target":         "field2",
-				"ignore_missing": true,
-			},
-			input: &beat.Event{
-				Fields: common.MapStr{
-					"field1": "Y29ycmVjdCBkYXRh",
+			description: "simple field base64 decode To empty",
+			config: base64Config{
+				Fields: []fromTo{
+					{From: "field1", To: ""},
 				},
+				IgnoreMissing: false,
+				FailOnError:   true,
 			},
-			expected: common.MapStr{
+			Input: common.MapStr{
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
+			Output: common.MapStr{
+				"field1": "correct data",
+			},
+			error: false,
+		},
+		{
+			description: "simple field base64 decode from and to equals",
+			config: base64Config{
+				Fields: []fromTo{
+					{From: "field1", To: "field1"},
+				},
+				IgnoreMissing: false,
+				FailOnError:   true,
+			},
+			Input: common.MapStr{
+				"field1": "Y29ycmVjdCBkYXRh",
+			},
+			Output: common.MapStr{
+				"field1": "correct data",
+			},
+			error: false,
+		},
+		{
+			description: "simple field bad data - fail on error",
+			config: base64Config{
+				Fields: []fromTo{
+					{From: "field1", To: "field1"},
+				},
+				IgnoreMissing: false,
+				FailOnError:   true,
+			},
+			Input: common.MapStr{
+				"field1": "bad data",
+			},
+			Output: common.MapStr{
+				"field1": "bad data",
+				"error": common.MapStr{
+					"message": "failed to decode base64 fields in processor: error trying to unmarshal bad data: illegal base64 data at input byte 3",
+				},
+			},
+			error: true,
+		},
+		{
+			description: "simple field bad data fail on error false",
+			config: base64Config{
+				Fields: []fromTo{
+					{From: "field1", To: "field2"},
+				},
+				IgnoreMissing: false,
+				FailOnError:   false,
+			},
+			Input: common.MapStr{
+				"field1": "bad data",
+			},
+			Output: common.MapStr{
+				"field1": "bad data",
+			},
+			error: false,
+		},
+		{
+			description: "missing field",
+			config: base64Config{
+				Fields: []fromTo{
+					{From: "field2", To: "field3"},
+				},
+				IgnoreMissing: false,
+				FailOnError:   true,
+			},
+			Input: common.MapStr{
+				"field1": "Y29ycmVjdCBkYXRh",
+			},
+			Output: common.MapStr{
+				"field1": "Y29ycmVjdCBkYXRh",
+				"error": common.MapStr{
+					"message": "failed to decode base64 fields in processor: could not fetch value for key: field2, Error: key not found",
+				},
+			},
+			error: true,
+		},
+		{
+			description: "missing field ignore",
+			config: base64Config{
+				Fields: []fromTo{
+					{From: "field2", To: "field3"},
+				},
+				IgnoreMissing: true,
+				FailOnError:   true,
+			},
+			Input: common.MapStr{
+				"field1": "Y29ycmVjdCBkYXRh",
+			},
+			Output: common.MapStr{
+				"field1": "Y29ycmVjdCBkYXRh",
+			},
+			error: false,
 		},
 	}
 
 	for _, test := range testCases {
 		test := test
-		t.Run(test.desc, func(t *testing.T) {
-			//t.Parallel()
+		t.Run(test.description, func(t *testing.T) {
+			t.Parallel()
 
-			cfg, err := common.NewConfigFrom(test.config)
-			require.NoError(t, err)
-
-			processor, err := NewDecodeBase64Field(cfg)
-			require.NoError(t, err)
-
-			outputEvent, err := processor.Run(test.input)
-
-			if test.errExpected {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
+			f := &decodeBase64Fields{
+				log:    logp.NewLogger(processorName),
+				config: test.config,
 			}
-			assert.Equal(t, test.expected, outputEvent.Fields)
+
+			event := &beat.Event{
+				Fields: test.Input,
+			}
+
+			newEvent, err := f.Run(event)
+			if !test.error {
+				assert.Nil(t, err)
+			} else {
+				assert.NotNil(t, err)
+			}
+
+			assert.Equal(t, test.Output, newEvent.Fields)
 		})
 	}
 }
