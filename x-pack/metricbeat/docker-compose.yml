@@ -15,3 +15,5 @@ services:
   # Modules
   mssql:
     build: ./module/mssql/_meta
+    ports:
+      - 1433
