@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 - Add support for mongodb opcode 2013 (OP_MSG). {issue}6191[6191] {pull}8594[8594]
+- NFSv4: Always use opname `ILLEGAL` when failed to match request to a valid nfs operation. {pull}11503[11503]
 
 *Winlogbeat*
 
@@ -101,6 +102,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
 - Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
+- Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
 
 *Packetbeat*
 
