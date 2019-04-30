@@ -51,6 +51,22 @@ func TestDecodeBase64(t *testing.T) {
 			},
 		},
 		{
+			desc: "bad format with fail_on_error false",
+			config: common.MapStr{
+				"field":         "field1",
+				"fail_on_error": false,
+			},
+			input: &beat.Event{
+				Fields: common.MapStr{
+					"field1": "bad data",
+				},
+			},
+			errExpected: false,
+			expected: common.MapStr{
+				"field1": "bad data",
+			},
+		},
+		{
 			desc: "correct format",
 			config: common.MapStr{
 				"field": "field1",
@@ -109,12 +125,28 @@ func TestDecodeBase64(t *testing.T) {
 				"field2": "correct data",
 			},
 		},
+		{
+			desc: "ignore missing",
+			config: common.MapStr{
+				"field":          "field3",
+				"target":         "field2",
+				"ignore_missing": true,
+			},
+			input: &beat.Event{
+				Fields: common.MapStr{
+					"field1": "Y29ycmVjdCBkYXRh",
+				},
+			},
+			expected: common.MapStr{
+				"field1": "Y29ycmVjdCBkYXRh",
+			},
+		},
 	}
 
 	for _, test := range testCases {
 		test := test
 		t.Run(test.desc, func(t *testing.T) {
-			t.Parallel()
+			//t.Parallel()
 
 			cfg, err := common.NewConfigFrom(test.config)
 			require.NoError(t, err)
