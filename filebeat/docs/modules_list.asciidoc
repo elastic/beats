@@ -8,6 +8,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-elasticsearch>>
+  * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-haproxy>>
   * <<filebeat-module-icinga>>
   * <<filebeat-module-iis>>
@@ -38,6 +39,7 @@ include::modules/auditd.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
+include::modules/envoyproxy.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/icinga.asciidoc[]
 include::modules/iis.asciidoc[]

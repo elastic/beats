@@ -69,7 +69,7 @@ func (m *mockILMSupport) Policy() ilm.Policy {
 	return args.Get(0).(ilm.Policy)
 }
 
-func (m *mockILMSupport) Manager(_ ilm.APIHandler) ilm.Manager {
+func (m *mockILMSupport) Manager(_ ilm.ClientHandler) ilm.Manager {
 	return m
 }
 

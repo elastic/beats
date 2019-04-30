@@ -52,6 +52,7 @@ var (
 	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
 	wildcardRegexp            = regexp.MustCompile(`.*\(\*\).*`)
 	instanceNameRegexp        = regexp.MustCompile(`.*\((.*)\).*`)
+	objectNameRegexp          = regexp.MustCompile(`\\([^\\]+)\\`)
 )
 
 type PdhQueryHandle uintptr
@@ -247,13 +248,11 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 
 	// Extract the instance name from the counterPath for non-wildcard paths.
 	if !wildcard && instanceName == "" {
-		matches := instanceNameRegexp.FindStringSubmatch(counterPath)
-		if len(matches) != 2 {
-			return errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
+		instanceName, err = matchInstanceName(counterPath)
+		if err != nil {
+			return err
 		}
-		instanceName = matches[1]
 	}
-
 	q.counters[counterPath] = &Counter{
 		handle:       h,
 		instanceName: instanceName,
@@ -266,6 +265,18 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 		q.counters[counterPath].format = PdhFmtLarge
 	}
 	return nil
+}
+
+// matchInstanceName will check first for instance and then for any objects names
+func matchInstanceName(counterPath string) (string, error) {
+	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
+	if len(matches) != 2 {
+		matches = objectNameRegexp.FindStringSubmatch(counterPath)
+	}
+	if len(matches) == 2 {
+		return matches[1], nil
+	}
+	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
 }
 
 func (q *Query) Execute() error {

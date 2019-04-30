@@ -33,10 +33,11 @@ const FlagField = "log.flags"
 // The `Meta`-fields can be used to pass additional meta-data to the outputs.
 // Output can optionally publish a subset of Meta, or ignore Meta.
 type Event struct {
-	Timestamp time.Time
-	Meta      common.MapStr
-	Fields    common.MapStr
-	Private   interface{} // for beats private use
+	Timestamp  time.Time
+	Meta       common.MapStr
+	Fields     common.MapStr
+	Private    interface{} // for beats private use
+	TimeSeries bool        // true if the event contains timeseries data
 }
 
 var (

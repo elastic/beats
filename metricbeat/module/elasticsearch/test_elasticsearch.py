@@ -47,10 +47,6 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("elasticsearch", metricset, self.get_hosts(), self.FIELDS +
                              ["service"], extras={"index_recovery.active_only": "false"})
 
-    def get_hosts(self):
-        return [os.getenv('ES_HOST', 'localhost') + ':' +
-                os.getenv('ES_PORT', '9200')]
-
     def create_ml_job(self, es):
         es_version = self.get_version(es)
         if es_version["major"] < 7:

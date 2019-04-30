@@ -4,9 +4,7 @@
             "stats": {
                 "dns": {
                     "request": {
-                        "count": {
-                            "total": 440
-                        }
+                        "count": 440
                     }
                 },
                 "family": "1",

@@ -1490,6 +1490,15 @@ alias to: agent.hostname
 
 --
 
+*`timeseries.instance`*::
++
+--
+type: keyword
+
+Time series instance id
+
+--
+
 [[exported-fields-ceph]]
 == Ceph fields
 
@@ -2590,7 +2599,7 @@ Contains statistics related to the coreDNS service
 
 
 
-*`coredns.stats.panic.count.total`*::
+*`coredns.stats.panic.count`*::
 +
 --
 type: long
@@ -2600,7 +2609,7 @@ Total number of panics
 
 --
 
-*`coredns.stats.dns.request.count.total`*::
+*`coredns.stats.dns.request.count`*::
 +
 --
 type: long
@@ -2672,7 +2681,7 @@ Request Size histogram count
 
 --
 
-*`coredns.stats.dns.request.do.count.total`*::
+*`coredns.stats.dns.request.do.count`*::
 +
 --
 type: long
@@ -2682,7 +2691,7 @@ Number of queries that have the DO bit set
 
 --
 
-*`coredns.stats.dns.request.type.count.total`*::
+*`coredns.stats.dns.request.type.count`*::
 +
 --
 type: long
@@ -2702,7 +2711,7 @@ Holds the query type of the request
 
 --
 
-*`coredns.stats.dns.response.rcode.count.total`*::
+*`coredns.stats.dns.response.rcode.count`*::
 +
 --
 type: long
@@ -2788,6 +2797,26 @@ The zonename used for the request/response
 type: keyword
 
 The transport of the response ("udp" or "tcp")
+
+
+--
+
+*`coredns.stats.dns.cache.hits.count`*::
++
+--
+type: long
+
+Cache hits count for the cache plugin
+
+
+--
+
+*`coredns.stats.dns.cache.misses.count`*::
++
+--
+type: long
+
+Cache misses count for the cache plugin
 
 
 --
@@ -4205,7 +4234,8 @@ Various key/value attributes of the object, depending on its type
 [float]
 == healthcheck fields
 
-Docker container metrics.
+Docker healthcheck metrics.
+Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
 
 
 
@@ -18192,7 +18222,7 @@ MS SQL module
 [float]
 == mssql fields
 
-
+The root field containing all MSSQL fields
 
 
 [float]
@@ -25565,12 +25595,32 @@ Name of the device.
 
 --
 
-*`system.raid.activity_state`*::
+*`system.raid.status`*::
 +
 --
 type: keyword
 
 activity-state of the device.
+
+
+--
+
+*`system.raid.level`*::
++
+--
+type: keyword
+
+The raid level of the device
+
+
+--
+
+*`system.raid.sync_action`*::
++
+--
+type: keyword
+
+Current sync action, if the RAID array is redundant 
 
 
 --
@@ -25595,12 +25645,42 @@ Total number of disks the device consists of.
 
 --
 
+*`system.raid.disks.spare`*::
++
+--
+type: long
+
+Number of spared disks.
+
+
+--
+
+*`system.raid.disks.failed`*::
++
+--
+type: long
+
+Number of failed disks.
+
+
+--
+
+*`system.raid.disks.states.*`*::
++
+--
+type: object
+
+map of raw disk states
+
+
+--
+
 *`system.raid.blocks.total`*::
 +
 --
 type: long
 
-Number of blocks the device holds.
+Number of blocks the device holds, in 1024-byte blocks.
 
 
 --
@@ -25610,7 +25690,7 @@ Number of blocks the device holds.
 --
 type: long
 
-Number of blocks on the device that are in sync.
+Number of blocks on the device that are in sync, in 1024-byte blocks.
 
 
 --
@@ -25894,7 +25974,7 @@ All UDP connections
 --
 type: integer
 
-All open TCP connections
+All open UDP connections
 
 
 --
@@ -26648,6 +26728,30 @@ The startup type of the service. The possible values are `Automatic`, `Boot`, `D
 
 --
 
+*`windows.service.start_name`*::
++
+--
+type: keyword
+
+example: NT AUTHORITY\LocalService
+
+Account name under which a service runs.
+
+
+--
+
+*`windows.service.path_name`*::
++
+--
+type: keyword
+
+example: C:\WINDOWS\system32\svchost.exe -k LocalService -p
+
+Fully qualified path to the file that implements the service, including arguments.
+
+
+--
+
 *`windows.service.state`*::
 +
 --
@@ -26705,6 +26809,53 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 `zookeeper` contains the metrics reported by ZooKeeper commands.
 
 
+
+[float]
+== connection fields
+
+connections
+
+
+
+*`zookeeper.connection.interest_ops`*::
++
+--
+type: long
+
+Interest ops
+
+
+--
+
+*`zookeeper.connection.queued`*::
++
+--
+type: long
+
+Queued connections
+
+
+--
+
+*`zookeeper.connection.received`*::
++
+--
+type: long
+
+Received connections
+
+
+--
+
+*`zookeeper.connection.sent`*::
++
+--
+type: long
+
+Connections sent
+
+
+--
 
 [float]
 == mntr fields

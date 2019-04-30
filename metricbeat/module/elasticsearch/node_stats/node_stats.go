@@ -18,7 +18,6 @@
 package node_stats
 
 import (
-	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -53,30 +52,29 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Logger())
-		return
+		return err
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Logger())
-		return
+		return err
 	}
 
 	if m.XPack {
 		err = eventsMappingXPack(r, m, *info, content)
 		if err != nil {
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
 			m.Logger().Error(err)
-			return
+			return nil
 		}
 	} else {
-		err = eventsMapping(r, *info, content)
-		if err != nil {
-			elastic.ReportAndLogError(err, r, m.Logger())
-			return
-		}
+		return eventsMapping(r, *info, content)
 	}
+
+	return nil
 }

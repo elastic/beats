@@ -952,7 +952,7 @@
 		},
 		{
 			"path": "github.com/elastic/go-seccomp-bpf/cmd/seccomp-profile",
-			"revision": "",
+			"revision": "v1.1.0",
 			"tree": true,
 			"version": "v1.1.0",
 			"versionExact": "v1.1.0"
@@ -1246,44 +1246,44 @@
 			"revisionTime": "2018-08-31T13:10:45Z"
 		},
 		{
-			"checksumSHA1": "ux0d5xvItes2abrOlpEyQWeJeqM=",
+			"checksumSHA1": "SyDYkg4fXTa27fsNrjnEQBKoDEQ=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
-			"revisionTime": "2019-01-18T12:09:37Z",
-			"version": "v0.10.0",
-			"versionExact": "v0.10.0"
+			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
+			"revisionTime": "2019-04-24T11:51:21Z",
+			"version": "v0.10.1",
+			"versionExact": "v0.10.1"
 		},
 		{
-			"checksumSHA1": "TX9y4oPL5YmT4Gb/OU4GIPTdQB4=",
+			"checksumSHA1": "y4HBfgWAm5cwRN3Mn7S3Bn1/pDc=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
-			"revisionTime": "2019-01-18T12:09:37Z",
-			"version": "v0.10.0",
-			"versionExact": "v0.10.0"
+			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
+			"revisionTime": "2019-04-24T11:51:21Z",
+			"version": "v0.10.1",
+			"versionExact": "v0.10.1"
 		},
 		{
-			"checksumSHA1": "hPqGM3DENaGfipEODoyZ4mKogTQ=",
+			"checksumSHA1": "axEkf+eo2z5V+R0nvgr1z+rty4w=",
 			"path": "github.com/elastic/gosigar/sys",
-			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
-			"revisionTime": "2019-01-18T12:09:37Z",
-			"version": "v0.10.0",
-			"versionExact": "v0.10.0"
+			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
+			"revisionTime": "2019-04-24T11:51:21Z",
+			"version": "v0.10.1",
+			"versionExact": "v0.10.1"
 		},
 		{
-			"checksumSHA1": "mLq5lOyD0ZU39ysXuf1ETOLJ+f0=",
+			"checksumSHA1": "BtggD07yUvVppRyX4HTrRi6sqnQ=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
-			"revisionTime": "2019-01-18T12:09:37Z",
-			"version": "v0.10.0",
-			"versionExact": "v0.10.0"
+			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
+			"revisionTime": "2019-04-24T11:51:21Z",
+			"version": "v0.10.1",
+			"versionExact": "v0.10.1"
 		},
 		{
-			"checksumSHA1": "Xx3lvjjqPwlFQ2aBjxtXSeDmD4c=",
+			"checksumSHA1": "CbP36vKSgkQruWF8PODFN9+SANI=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
-			"revisionTime": "2019-01-18T12:09:37Z",
-			"version": "v0.10.0",
-			"versionExact": "v0.10.0"
+			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
+			"revisionTime": "2019-04-24T11:51:21Z",
+			"version": "v0.10.1",
+			"versionExact": "v0.10.1"
 		},
 		{
 			"checksumSHA1": "Klc34HULvwvY4cGA/D8HmqtXLqw=",
@@ -2613,10 +2613,6 @@
 			"path": "howett.net/plist",
 			"revision": "233df3c4f07b0c562da0e8a6fb850681ac49bb90",
 			"revisionTime": "2017-11-05T00:43:39Z"
-		},
-		{
-			"path": "plugin",
-			"revision": ""
 		}
 	],
 	"rootPath": "github.com/elastic/beats"

@@ -9,15 +9,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
-
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	s "github.com/elastic/beats/libbeat/common/schema"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -40,13 +39,13 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	logger *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(aws.ModuleName)
+	cfgwarn.Beta("The aws sqs metricset is beta.")
+
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
@@ -57,37 +56,35 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if remainder != 0 {
 		err := errors.New("period needs to be set to 300s (or a multiple of 300s). " +
 			"To avoid data missing or extra costs, please make sure period is set correctly in config.yml")
-		logger.Info(err)
+		base.Logger().Info(err)
 	}
 
 	return &MetricSet{
 		MetricSet: metricSet,
-		logger:    logger,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/SQS"
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		m.logger.Error(errors.Wrap(err, "Error ParseDuration"))
-		report.Error(err)
-		return
+		return errors.Wrap(err, "Error ParseDuration")
 	}
 
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
-		svcSQS := sqs.New(*m.MetricSet.AwsConfig)
+		awsConfig := m.MetricSet.AwsConfig.Copy()
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
+		svcSQS := sqs.New(awsConfig)
 
 		// Get queueUrls for each region
 		queueURLs, err := getQueueUrls(svcSQS)
 		if err != nil {
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -98,7 +95,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		// Get listMetrics output
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -116,14 +113,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
 
 		// Create Cloudwatch Events for SQS
-		createSQSEvents(queueURLs, metricDataResults, regionName, report)
+		err = createSQSEvents(queueURLs, metricDataResults, regionName, report)
+		if err != nil {
+			m.Logger().Debug("Error trying to emit event")
+			return nil
+		}
 	}
+
+	return nil
 }
 
 func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
@@ -139,7 +142,7 @@ func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, i, period)
 		metricDataQueries = append(metricDataQueries, metricDataQuery)
@@ -209,7 +212,7 @@ func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, que
 	return
 }
 
-func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) {
+func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) error {
 	for _, queueURL := range queueURLs {
 		queueURLParsed := strings.Split(queueURL, "/")
 		queueName := queueURLParsed[len(queueURLParsed)-1]
@@ -219,6 +222,11 @@ func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDa
 			report.Event(event)
 			continue
 		}
-		report.Event(event)
+
+		if reported := report.Event(event); !reported {
+			return errors.Wrap(err, "Fetch interrupted, failed to emit event")
+		}
 	}
+
+	return nil
 }

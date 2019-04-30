@@ -1,18 +1,14 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "aws": {
         "ec2": {
             "cpu": {
                 "credit_balance": 144,
-                "credit_usage": 0.001823,
+                "credit_usage": 0.005318,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.033333333333303
+                    "pct": 0.133333333333212
                 }
             },
             "diskio": {
@@ -51,12 +47,12 @@
             },
             "network": {
                 "in": {
-                    "bytes": 56,
-                    "packets": 1
+                    "bytes": 583,
+                    "packets": 4.8
                 },
                 "out": {
-                    "bytes": 88,
-                    "packets": 1.6
+                    "bytes": 746.4,
+                    "packets": 5
                 }
             },
             "status": {
