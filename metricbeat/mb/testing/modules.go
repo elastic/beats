@@ -431,6 +431,8 @@ func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.Push
 // time and returns all of the events that occur during that period.
 func RunPushMetricSetV2WithContext(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2WithContext) []mb.Event {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
 	r := &capturingPushReporterV2{eventsC: make(chan mb.Event)}
 
 	go metricSet.Run(ctx, r)
@@ -444,10 +446,8 @@ func RunPushMetricSetV2WithContext(timeout time.Duration, waitEvents int, metric
 		case e := <-r.eventsC:
 			events = append(events, e)
 			if len(events) >= waitEvents {
-				cancel()
 				return events
 			}
 		}
 	}
-	return events
 }
