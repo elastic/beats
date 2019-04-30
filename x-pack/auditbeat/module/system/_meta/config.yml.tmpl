@@ -23,7 +23,9 @@
   # current state of the system (e.g. all currently
   # running processes, all open sockets).
   state.period: 12h
-{{ if .Reference }}
+
+{{- if .Reference }}
+
   # The state.period can be overridden for any dataset.
   # host.state.period: 12h
   {{ if ne .GOOS "windows" -}}
@@ -33,24 +35,22 @@
   {{ if eq .GOOS "linux" -}}
   # socket.state.period: 12h
   # user.state.period: 12h
-  {{- end }}
-{{ end }}
-  {{ if eq .GOOS "linux" -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq .GOOS "linux" -}}
 
-{{ if .Reference -}}
+{{- if .Reference }}
+
   # Disabled by default. If enabled, the socket dataset will
   # report local connections.
   # socket.include_localhost: false
-
-{{ end -}}
+{{- end }}
 
   # Enabled by default. Auditbeat will read password fields in
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
-  {{- end }}
 
-  {{ if eq .GOOS "linux" -}}
   # File patterns of the login record files.
 {{- if .Reference }}
   # wtmp: History of successful logins, logouts, and system shutdowns and boots.
