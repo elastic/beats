@@ -88,8 +88,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	content, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return errors.Wrapf(err, "error reading response from %q",
-			m.FullyQualifiedName())
+		return errors.Wrapf(err, "error reading body response")
 	}
 
 	if res.StatusCode == http.StatusOK {
