@@ -39,10 +39,11 @@ type fields struct {
 }
 
 type testDef struct {
-	name   string
-	fields fields
-	jobs   []jobs.Job
-	want   []mapval.Validator
+	name     string
+	fields   fields
+	jobs     []jobs.Job
+	want     []mapval.Validator
+	metaWant []mapval.Validator
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {
@@ -57,6 +58,11 @@ func testCommonWrap(t *testing.T, tt testDef) {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
 				want := tt.want[idx]
 				mapval.Test(t, mapval.Strict(want), r.Fields)
+
+				if tt.metaWant != nil {
+					metaWant := tt.metaWant[idx]
+					mapval.Test(t, mapval.Strict(metaWant), r.Meta)
+				}
 			})
 		}
 	})
@@ -83,6 +89,7 @@ func TestSimpleJob(t *testing.T) {
 				}),
 				summaryValidator(1, 0),
 			)},
+		nil,
 	})
 }
 
@@ -116,6 +123,7 @@ func TestErrorJob(t *testing.T) {
 				errorJobValidator,
 				summaryValidator(0, 1),
 			)},
+		nil,
 	})
 }
 
@@ -146,6 +154,7 @@ func TestMultiJobNoConts(t *testing.T) {
 		fields,
 		[]jobs.Job{makeURLJob(t, "http://foo.com"), makeURLJob(t, "http://bar.com")},
 		[]mapval.Validator{validator("http://foo.com"), validator("http://bar.com")},
+		nil,
 	})
 }
 
@@ -203,6 +212,7 @@ func TestMultiJobConts(t *testing.T) {
 				summaryValidator(2, 0),
 			),
 		},
+		nil,
 	})
 }
 
@@ -245,6 +255,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 		)
 	}
 
+	metaCancelledValidator := mapval.MustCompile(mapval.Map{eventext.EventCancelledMetaKey: true})
 	testCommonWrap(t, testDef{
 		"multi-job-continuations",
 		fields,
@@ -252,7 +263,6 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 		[]mapval.Validator{
 			mapval.Compose(
 				contJobValidator("http://foo.com", "1st"),
-				mapval.MustCompile(mapval.Map{eventext.EventCancelledMetaKey: true}),
 			),
 			mapval.Compose(
 				contJobValidator("http://foo.com", "2nd"),
@@ -260,12 +270,17 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			),
 			mapval.Compose(
 				contJobValidator("http://bar.com", "1st"),
-				mapval.MustCompile(mapval.Map{eventext.EventCancelledMetaKey: true}),
 			),
 			mapval.Compose(
 				contJobValidator("http://bar.com", "2nd"),
 				summaryValidator(1, 0),
 			),
+		},
+		[]mapval.Validator{
+			metaCancelledValidator,
+			mapval.MustCompile(mapval.Map{}),
+			metaCancelledValidator,
+			mapval.MustCompile(mapval.Map{}),
 		},
 	})
 }
