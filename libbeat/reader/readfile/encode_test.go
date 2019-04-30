@@ -50,7 +50,12 @@ func TestEncodeLines(t *testing.T) {
 			codec, err := encFactory(r)
 			assert.Nil(t, err, "failed to initialize encoding: %v", err)
 
-			er, err := NewEncodeReader(r, codec, bufferSize)
+			config := Config{
+				Codec:      codec,
+				BufferSize: bufferSize,
+				Terminator: LineFeed,
+			}
+			er, err := NewEncodeReader(r, config)
 			assert.Nil(t, err, "failed to create new encoder: %v", err)
 
 			var output []string
