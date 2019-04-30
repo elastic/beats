@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 - Add support for mongodb opcode 2013 (OP_MSG). {issue}6191[6191] {pull}8594[8594]
+- NFSv4: Always use opname `ILLEGAL` when failed to match request to a valid nfs operation. {pull}11503[11503]
 
 *Winlogbeat*
 
