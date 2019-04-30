@@ -16,9 +16,6 @@ Elasticsearch Ingest Node.
 [float]
 === Compatibility
 
-This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
-Elasticsearch plugins.
-
 include::../include/running-modules.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
