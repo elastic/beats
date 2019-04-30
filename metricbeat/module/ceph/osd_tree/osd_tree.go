@@ -50,7 +50,7 @@ type MetricSet struct {
 	*helper.HTTP
 }
 
-// New creates a new instance of the docker memory MetricSet.
+// New creates a new instance of the osd_tree MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {

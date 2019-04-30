@@ -25,13 +25,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-//PgState represents placement group state
+// PgState represents placement group state
 type PgState struct {
 	Count     int64  `json:"count"`
 	StateName string `json:"state_name"`
 }
 
-//Pgmap represents data from a placement group
+// Pgmap represents data from a placement group
 type Pgmap struct {
 	AvailByte int64 `json:"bytes_avail"`
 	TotalByte int64 `json:"bytes_total"`
@@ -56,7 +56,7 @@ type Pgmap struct {
 	PgStates []PgState `json:"pgs_by_state"`
 }
 
-//Osdmap represents data from an OSD
+// Osdmap represents data from an OSD
 type Osdmap struct {
 	Epoch      int64 `json:"epoch"`
 	Full       bool  `json:"full"`
@@ -67,18 +67,18 @@ type Osdmap struct {
 	RemapedPgs int64 `json:"num_remapped_pgs"`
 }
 
-//Osdmap_ is a placeholder for the json parser
+// Osdmap_ is a placeholder for the json parser
 type Osdmap_ struct {
 	Osdmap Osdmap `json:"osdmap"`
 }
 
-//Output is the response body
+// Output is the response body
 type Output struct {
 	Pgmap  Pgmap   `json:"pgmap"`
 	Osdmap Osdmap_ `json:"osdmap"`
 }
 
-//HealthRequest represents the response to a health request
+// HealthRequest represents the response to a health request
 type HealthRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`

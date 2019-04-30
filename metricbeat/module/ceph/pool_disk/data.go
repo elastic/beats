@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-//Stats represents the statistics for a pool
+// Stats represents the statistics for a pool
 type Stats struct {
 	BytesUsed int64 `json:"bytes_used"`
 	MaxAvail  int64 `json:"max_avail"`
@@ -32,19 +32,19 @@ type Stats struct {
 	KbUsed    int64 `json:"kb_used"`
 }
 
-//Pool represents a given Ceph pool
+// Pool represents a given Ceph pool
 type Pool struct {
 	ID    int64  `json:"id"`
 	Name  string `json:"name"`
 	Stats Stats  `json:"stats"`
 }
 
-//Output is a list of pools from the response
+// Output is a list of pools from the response
 type Output struct {
 	Pools []Pool `json:"pools"`
 }
 
-//DfRequest is the df response object
+// DfRequest is the df response object
 type DfRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`
