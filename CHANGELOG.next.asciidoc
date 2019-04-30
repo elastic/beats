@@ -35,7 +35,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
-- Replace `default_region` with `regions` in aws module config. {issue}11932[11932] {pull}11956[11956]
 
 *Packetbeat*
 
@@ -178,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS cloudwatch metricset. {pull}11798[11798] {issue}11734[11734]
 - Replace `default_region` with `regions` in aws module config. {issue}11932[11932]
 - Replace `default_region` with `regions` in aws module config. {issue}11932[11932] {pull}11956[11956]
+- Add `regions` in aws module config to specify target regions for querying cloudwatch metrics. {issue}11932[11932] {pull}11956[11956]
 
 *Packetbeat*
 

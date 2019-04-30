@@ -75,7 +75,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		Value: awsCredentials,
 	}
 
-	awsConfig.Region = "us-east-1"
+	awsConfig.Region = config.DefaultRegion
 
 	durationString, periodSec := convertPeriodToDuration(config.Period)
 	if err != nil {
