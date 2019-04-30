@@ -135,7 +135,11 @@ auditbeat.modules:
   # socket.state.period: 12h
   # user.state.period: 12h
 
-  # Enabled by default. Auditbeat will read password fields in
+  # Disabled by default. If enabled, the socket dataset will
+  # report local connections.
+  # socket.include_localhost: false
+
+# Enabled by default. Auditbeat will read password fields in
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
