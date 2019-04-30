@@ -37,6 +37,10 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 		pipeline.Representation = pipeline.Graph
 		pipeline.Graph = nil
 
+		// Extract cluster_uuids
+		clusterUUIDs := pipeline.ClusterIDs
+		pipeline.ClusterIDs = nil
+
 		logstashState := map[string]logstash.PipelineState{
 			"pipeline": pipeline,
 		}
@@ -45,7 +49,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 			pipeline.ClusterIDs = []string{""}
 		}
 
-		for _, clusterUUID := range pipeline.ClusterIDs {
+		for _, clusterUUID := range clusterUUIDs {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{
 				"timestamp":      common.Time(time.Now()),
@@ -61,7 +65,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 			event.ID = pipeline.EphemeralID
 			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
 			r.Event(event)
-
 		}
 	}
 
