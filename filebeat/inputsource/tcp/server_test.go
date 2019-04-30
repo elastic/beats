@@ -53,6 +53,7 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 func TestReceiveEventsAndMetadata(t *testing.T) {
 	expectedMessages := generateMessages(5, 100)
 	largeMessages := generateMessages(10, 4096)
+	overlengthMessages := generateMessages(5, 64*1024+1)
 
 	tests := []struct {
 		name             string
@@ -139,6 +140,13 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			},
 			expectedMessages: []string{},
 			messageSent:      randomString(600000),
+		},
+		{
+			name:             "NewLineWithOverlengthMessages",
+			cfg:              map[string]interface{}{},
+			splitFunc:        SplitFunc([]byte("\n")),
+			expectedMessages: overlengthMessages,
+			messageSent:      strings.Join(overlengthMessages, "\n"),
 		},
 	}
 
