@@ -61,7 +61,9 @@ sample suggested configuration.
     - user
   period: 10s
   state.period: 12h
+
   socket.include_localhost: false
+
   user.detect_password_changes: true
 ----
 
@@ -100,6 +102,7 @@ so a longer polling interval can be used.
     - package
     - user
   period: 1m
+
   user.detect_password_changes: true
 
 - module: system
