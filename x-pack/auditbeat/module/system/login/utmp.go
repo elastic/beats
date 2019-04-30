@@ -146,11 +146,10 @@ func (r *UtmpFileReader) findFiles(filePattern string, utmpType UtmpType) ([]Utm
 		}
 
 		utmpFiles = append(utmpFiles, UtmpFile{
-			Inode:  Inode(fileInfo.Sys().(*syscall.Stat_t).Ino),
-			Path:   path,
-			Size:   fileInfo.Size(),
-			Offset: 0,
-			Type:   utmpType,
+			Inode: Inode(fileInfo.Sys().(*syscall.Stat_t).Ino),
+			Path:  path,
+			Size:  fileInfo.Size(),
+			Type:  utmpType,
 		})
 	}
 
@@ -178,6 +177,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 	if !isKnownFile {
 		r.log.Debugf("Found new file: %v (utmpFile=%+v)", utmpFile.Path, utmpFile)
 	}
+	utmpFile.Offset = savedUtmpFile.Offset
 
 	size := utmpFile.Size
 	oldSize := savedUtmpFile.Size
