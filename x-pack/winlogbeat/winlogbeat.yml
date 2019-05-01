@@ -24,7 +24,6 @@ winlogbeat.event_logs:
   - name: System
 
   - name: Security
-
 #==================== Elasticsearch template settings ==========================
 
 setup.template.settings:

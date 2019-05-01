@@ -15,22 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package build
 
 import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
-
-	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
-
-	// Import the script processor and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
+	"github.com/elastic/beats/dev-tools/mage"
 )
 
-// Name of this beat
-var Name = "winlogbeat"
+// Build builds the Beat binary.
+func Build() error {
+	return mage.Build(mage.DefaultBuildArgs())
+}
 
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// Do not use directly, use crossBuild instead.
+func GolangCrossBuild() error {
+	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+}
+
+// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
+func BuildGoDaemon() error {
+	return mage.BuildGoDaemon()
+}
+
+// CrossBuild cross-builds the beat for all target platforms.
+func CrossBuild() error {
+	return mage.CrossBuild()
+}
+
+// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
+func CrossBuildGoDaemon() error {
+	return mage.CrossBuildGoDaemon()
+}

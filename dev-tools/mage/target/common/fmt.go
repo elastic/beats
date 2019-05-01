@@ -15,22 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package common
 
 import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
+	"github.com/magefile/mage/mg"
 
-	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
-
-	// Import the script processor and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
+	"github.com/elastic/beats/dev-tools/mage"
 )
 
-// Name of this beat
-var Name = "winlogbeat"
-
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+// Fmt formats source code (.go and .py) and adds license headers.
+func Fmt() {
+	mg.Deps(mage.Format)
+}
