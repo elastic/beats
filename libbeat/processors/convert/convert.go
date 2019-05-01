@@ -94,6 +94,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 				}
 			}
 			p.converted[i] = ignoredFailure
+			continue
 		}
 		p.converted[i] = v
 	}
@@ -174,10 +175,12 @@ func transformType(typ dataType, value interface{}) (interface{}, error) {
 
 func toString(value interface{}) (string, error) {
 	switch v := value.(type) {
-	case string:
-		return v, nil
 	default:
 		return fmt.Sprintf("%v", value), nil
+	case string:
+		return v, nil
+	case nil:
+		return "", errors.New("invalid conversion of [null] to string")
 	}
 }
 
