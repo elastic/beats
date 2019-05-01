@@ -114,7 +114,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				return nil
 			}
 
-			return fmt.Errorf("fetching HTTP response for returned status code %d: %s",
+			return fmt.Errorf("fetching HTTP response returned status code %d: %s",
 				res.StatusCode, retMessage)
 		}
 	}
