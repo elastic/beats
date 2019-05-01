@@ -81,7 +81,8 @@ class Test(AuditbeatXPackTest):
         # errors_allowed=True - The socket metricset fills the `error` field if the process enrichment fails
         # (e.g. process has exited). This should not fail the test.
         # warnings_allowed=True - Metricset is beta and that generates a warning, TODO: remove later
-        self.check_metricset("system", "socket", COMMON_FIELDS + fields, errors_allowed=True, warnings_allowed=True)
+        self.check_metricset("system", "socket", COMMON_FIELDS + fields, extras={"socket.include_localhost": "true"},
+                             errors_allowed=True, warnings_allowed=True)
 
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
     def test_metricset_user(self):
