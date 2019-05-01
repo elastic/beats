@@ -20,8 +20,6 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Metricbeat*
 
-- Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
-
 *Packetbeat*
 
 *Winlogbeat*
@@ -32,9 +30,6 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
-- Fix initialization of the TCP input logger. {pull}11605[11605]
-
 *Auditbeat*
 
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
@@ -43,13 +38,9 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Heartbeat*
 
-- Fix NPE on some monitor configuration errors. {pull}11910[11910]
-
 *Journalbeat*
 
 *Metricbeat*
-
-- Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
 
 *Packetbeat*
 
@@ -62,8 +53,6 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 *Affecting all Beats*
 
 *Auditbeat*
-
-- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
 
 *Filebeat*
 
@@ -88,8 +77,6 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 *Journalbeat*
 
 *Metricbeat*
-
-- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
 
 *Packetbeat*
 
