@@ -92,10 +92,7 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 |<<package-command,`package`>> |{package-command-short-desc}.
 |<<remove-command,`remove`>> |{remove-command-short-desc}.
 endif::[]
-ifeval::["{beatname_lc}"=="filebeat"]
-|<<modules-command,`modules`>> |{modules-command-short-desc}.
-endif::[]
-ifeval::["{beatname_lc}"=="metricbeat"]
+ifdef::has_modules_command[]
 |<<modules-command,`modules`>> |{modules-command-short-desc}.
 endif::[]
 |<<run-command,`run`>> |{run-command-short-desc}.
