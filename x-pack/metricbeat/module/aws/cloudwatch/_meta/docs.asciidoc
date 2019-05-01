@@ -1,0 +1,12 @@
+The cloudwatch metricset of aws module allows you to monitor various services on
+AWS. `cloudwatch` metricset fetches metrics from given namespace periodically
+by calling `GetMetricData` api.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS SQS metrics.
+----
+ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+----
