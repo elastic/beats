@@ -35,15 +35,11 @@ func init() {
 	)
 }
 
-const (
-	nodeStatsPath = "/_node/stats"
-)
-
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		PathConfigKey: "path",
-		DefaultPath:   nodeStatsPath,
+		DefaultPath:   "_node/stats",
 	}.Build()
 )
 
