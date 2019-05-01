@@ -18,6 +18,7 @@
 package convert
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"strconv"
@@ -63,8 +64,8 @@ func newConvert(c config) (*processor, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("convert=[fields=%v, ignore_failure=%v, ignore_missing=%v, instance_id=%v, mode=%v]",
-		p.Fields, p.IgnoreFailure, p.IgnoreMissing, p.Tag, p.Mode)
+	json, _ := json.Marshal(p.config)
+	return "convert=" + string(json)
 }
 
 var ignoredFailure = struct{}{}
@@ -80,37 +81,31 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	// Validate the conversions.
 	for i, conv := range p.Fields {
-		v, err := event.GetValue(conv.From)
+		v, err := convertField(event, conv.From, conv.Type)
 		if err != nil {
-			if p.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
-				p.converted[i] = ignoredFailure
-				continue
-			}
-			return event, annotateError(p.Tag, errors.Errorf("field [%v] is missing, cannot be converted to type [%v]", conv.From, conv.Type))
-		}
-
-		if conv.Type > unset {
-			t, err := p.transformType(conv.Type, v)
-			if err != nil {
+			switch cause := errors.Cause(err); cause {
+			case common.ErrKeyNotFound:
+				if !p.IgnoreMissing {
+					return event, annotateError(p.Tag, errors.Errorf("field [%v] is missing, cannot be converted to type [%v]", conv.From, conv.Type))
+				}
+			default:
 				if !p.IgnoreFailure {
 					return event, annotateError(p.Tag, errors.Wrapf(err, "unable to convert field [%v] value [%v] to [%v]", conv.From, v, conv.Type))
 				}
-				p.converted[i] = ignoredFailure
-				continue
 			}
-			v = t
+			p.converted[i] = ignoredFailure
 		}
-
 		p.converted[i] = v
 	}
 
-	var clone = event.Fields
+	saved := *event
 	if len(p.Fields) > 1 && !p.IgnoreFailure {
 		// Clone the fields to allow the processor to undo the operation on
 		// failure (like a transaction). If there is only one conversion then
 		// cloning is unnecessary because there are no previous changes to
 		// rollback (so avoid the expensive clone operation).
-		clone = event.Fields.Clone()
+		saved.Fields = event.Fields.Clone()
+		saved.Meta = event.Meta.Clone()
 	}
 
 	for i, conv := range p.Fields {
@@ -123,15 +118,12 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 			switch p.Mode {
 			case renameMode:
 				if _, err := event.PutValue(conv.To, v); err != nil {
-					event.Fields = clone
-					return event, errors.Wrap(err, "")
-				} else {
-					event.Delete(conv.From)
+					return &saved, annotateError(p.Tag, errors.Wrapf(err, "failed to put field [%v]", conv.To))
 				}
+				event.Delete(conv.From)
 			case copyMode:
 				if _, err := event.PutValue(conv.To, cloneValue(v)); err != nil {
-					event.Fields = clone
-					return event, errors.Wrap(err, "")
+					return &saved, annotateError(p.Tag, errors.Wrapf(err, "failed to put field [%v]", conv.To))
 				}
 			}
 		} else {
@@ -143,7 +135,23 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *processor) transformType(typ dataType, value interface{}) (interface{}, error) {
+func convertField(event *beat.Event, from string, typ dataType) (interface{}, error) {
+	v, err := event.GetValue(from)
+	if err != nil {
+		return nil, err
+	}
+
+	if typ > unset {
+		v, err = transformType(typ, v)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return v, nil
+}
+
+func transformType(typ dataType, value interface{}) (interface{}, error) {
 	switch typ {
 	case String:
 		return toString(value)

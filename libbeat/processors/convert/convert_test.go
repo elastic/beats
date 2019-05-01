@@ -123,10 +123,100 @@ func TestConvert(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, "convert=[fields=[{from=source.address, to=source.ip, type=ip}], "+
-			"ignore_failure=false, ignore_missing=false, instance_id=convert_ip, mode=copy]",
+		assert.Equal(t, `convert={"Fields":`+
+			`[{"From":"source.address","To":"source.ip","Type":"ip"}],`+
+			`"Tag":"convert_ip","IgnoreMissing":false,"IgnoreFailure":false,"Mode":"copy"}`,
 			p.String())
 	})
+}
+
+func TestConvertRun(t *testing.T) {
+	tests := map[string]struct {
+		config   common.MapStr
+		input    beat.Event
+		expected beat.Event
+		fail     bool
+	}{
+		"missing field": {
+			config: common.MapStr{
+				"fields": []common.MapStr{
+					{"from": "port", "type": "integer"},
+					{"from": "address", "to": "ip", "type": "ip"},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"port": "80",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"port": "80",
+				},
+			},
+			fail: true,
+		},
+		"put error no clone": {
+			config: common.MapStr{
+				"fields": []common.MapStr{
+					{"from": "port", "to": "port.number", "type": "integer"},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"port": "80",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"port": "80",
+				},
+			},
+			fail: true,
+		},
+		"put error with clone": {
+			config: common.MapStr{
+				"fields": []common.MapStr{
+					{"from": "id", "to": "event.id", "type": "integer"},
+					{"from": "port", "to": "port.number", "type": "integer"},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"id":   "32",
+					"port": "80",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"id":   "32",
+					"port": "80",
+				},
+			},
+			fail: true,
+		},
+	}
+
+	for title, tt := range tests {
+		t.Run(title, func(t *testing.T) {
+			processor, err := New(common.MustNewConfigFrom(tt.config))
+			if err != nil {
+				t.Fatal(err)
+			}
+			result, err := processor.Run(&tt.input)
+			if tt.expected.Fields != nil {
+				assert.Equal(t, tt.expected.Fields.Flatten(), result.Fields.Flatten())
+				assert.Equal(t, tt.expected.Meta.Flatten(), result.Meta.Flatten())
+				assert.Equal(t, tt.expected.Timestamp, result.Timestamp)
+			}
+			if tt.fail {
+				assert.Error(t, err)
+				t.Log("got expected error", err)
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
 }
 
 type testCase struct {
