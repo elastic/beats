@@ -70,7 +70,7 @@ Example config:
 ----
   audit:
     var.paths:
-      - /var/log/elasticsearch/*_access.log
+      - /var/log/elasticsearch/*_audit.json
 ----
 
 [float]

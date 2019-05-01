@@ -81,8 +81,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		awsConfig := m.MetricSet.AwsConfig.Copy()
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			err = errors.Wrap(err, "GetListMetricsOutput failed, skipping region "+regionName)
@@ -142,7 +143,7 @@ func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []strin
 }
 
 func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, periodInSec int) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	metricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutputs {

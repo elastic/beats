@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package actions
+package checks
 
 import (
 	"testing"
@@ -82,7 +82,7 @@ func TestRequiredFields(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			runTest(t, requireFields, test.Config, test.Required, test.Valid)
+			runTest(t, RequireFields, test.Config, test.Required, test.Valid)
 		})
 	}
 }
@@ -127,7 +127,7 @@ func TestAllowedFields(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			runTest(t, allowedFields, test.Config, test.Allowed, test.Valid)
+			runTest(t, AllowedFields, test.Config, test.Allowed, test.Valid)
 		})
 	}
 }
@@ -173,7 +173,7 @@ func TestMutuallyExclusiveRequiredFields(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			runTest(t, mutuallyExclusiveRequiredFields, test.Config, test.MutuallyExclusive, test.Valid)
+			runTest(t, MutuallyExclusiveRequiredFields, test.Config, test.MutuallyExclusive, test.Valid)
 		})
 	}
 }
@@ -189,7 +189,7 @@ func runTest(
 	if err != nil {
 		t.Fatalf("Unexpected error while creating configuration: %+v\n", err)
 	}
-	factory := configChecked(newMock, check(fields...))
+	factory := ConfigChecked(newMock, check(fields...))
 	_, err = factory(cfg)
 
 	if err != nil && valid {

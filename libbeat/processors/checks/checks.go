@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package actions
+package checks
 
 import (
 	"fmt"
@@ -24,7 +24,9 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-func configChecked(
+// ConfigChecked returns a wrapper that will validate the configuration using
+// the passed checks before invoking the original constructor.
+func ConfigChecked(
 	constr processors.Constructor,
 	checks ...func(*common.Config) error,
 ) processors.Constructor {
@@ -50,7 +52,8 @@ func checkAll(checks ...func(*common.Config) error) func(*common.Config) error {
 	}
 }
 
-func requireFields(fields ...string) func(*common.Config) error {
+// RequireFields checks that the required fields are present in the configuration.
+func RequireFields(fields ...string) func(*common.Config) error {
 	return func(cfg *common.Config) error {
 		for _, field := range fields {
 			if !cfg.HasField(field) {
@@ -61,7 +64,8 @@ func requireFields(fields ...string) func(*common.Config) error {
 	}
 }
 
-func allowedFields(fields ...string) func(*common.Config) error {
+// AllowedFields checks that only allowed fields are used in the configuration.
+func AllowedFields(fields ...string) func(*common.Config) error {
 	return func(cfg *common.Config) error {
 		for _, field := range cfg.GetFields() {
 			found := false
@@ -80,7 +84,10 @@ func allowedFields(fields ...string) func(*common.Config) error {
 	}
 }
 
-func mutuallyExclusiveRequiredFields(fields ...string) func(*common.Config) error {
+// MutuallyExclusiveRequiredFields checks that only one of the given
+// fields is used at the same time. It is an error for none of the fields to be
+// present.
+func MutuallyExclusiveRequiredFields(fields ...string) func(*common.Config) error {
 	return func(cfg *common.Config) error {
 		var foundField string
 		for _, field := range cfg.GetFields() {
