@@ -27,6 +27,7 @@ import (
 	"hash"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/OneOfOne/xxhash"
@@ -45,7 +46,7 @@ type HashType string
 
 // Unpack unpacks a string to a HashType for config parsing.
 func (t *HashType) Unpack(v string) error {
-	*t = HashType(v)
+	*t = HashType(strings.ToLower(v))
 	return nil
 }
 
