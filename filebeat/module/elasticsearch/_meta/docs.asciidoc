@@ -36,7 +36,8 @@ Example config:
   server:
     enabled: true
     var.paths:
-      - /var/log/elasticsearch/*.log
+      - /var/log/elasticsearch/*.log          # Plaintext format path
+      - /var/log/elasticsearch/*_server.json  # JSON format path
 ----
 
 [float]
@@ -65,7 +66,9 @@ Example config:
 ----
   audit:
     var.paths:
-      - /var/log/elasticsearch/*_audit.json
+      - /var/log/elasticsearch/*_access.log  # Plaintext format path
+      - /var/log/elasticsearch/*_audit.log   # JSON format path
+      - /var/log/elasticsearch/*_audit.json  # JSON format path
 ----
 
 [float]
@@ -79,8 +82,10 @@ Example config:
 ----
   slowlog:
     var.paths:
-      - /var/log/elasticsearch/*_index_search_slowlog.log
-      - /var/log/elasticsearch/*_index_indexing_slowlog.log
+      - /var/log/elasticsearch/*_index_search_slowlog.log     # Plaintext format path
+      - /var/log/elasticsearch/*_index_indexing_slowlog.log   # Plaintext format path
+      - /var/log/elasticsearch/*_index_search_slowlog.json    # JSON format path
+      - /var/log/elasticsearch/*_index_indexing_slowlog.json  # JSON format path
 ----
 
 [float]
@@ -94,7 +99,8 @@ Example config:
 ----
   deprecation:
     var.paths:
-      - /var/log/elasticsearch/*_deprecation.log
+      - /var/log/elasticsearch/*_deprecation.log   # Plaintext format path
+      - /var/log/elasticsearch/*_deprecation.json  # JSON format path
 ----
 
 :has-dashboards!:
