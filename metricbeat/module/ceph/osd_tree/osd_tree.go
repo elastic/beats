@@ -79,7 +79,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, event := range events {
-		reporter.Event(mb.Event{MetricSetFields: event})
+		reported := reporter.Event(mb.Event{MetricSetFields: event})
+		if !reported {
+			return nil
+		}
 	}
 
 	return nil
