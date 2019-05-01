@@ -3,12 +3,13 @@
 /.idea
 /.vscode
 /build
-/*/data
-/*/logs
-/*/fields.yml
 /*/*.template*.json
 **/html_docs
-/*/_meta/kibana.generated
+*beat/fields.yml
+*beat/_meta/kibana.generated
+*beat/build
+*beat/logs
+*beat/data
 
 # Files
 .DS_Store
@@ -19,6 +20,7 @@ coverage.out
 .python-version
 beat.db
 *.keystore
+mage_output_file.go
 
 # Editor swap files
 *.swp
