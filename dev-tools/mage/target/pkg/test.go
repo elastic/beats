@@ -15,22 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package pkg
 
-import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
+import "github.com/elastic/beats/dev-tools/mage"
 
-	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
-
-	// Import the script processor and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
-)
-
-// Name of this beat
-var Name = "winlogbeat"
-
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+// PackageTest tests the generated packages in build/distributions. It checks
+// things like file ownership/mode, package attributes, etc.
+func PackageTest() error {
+	return mage.TestPackages()
+}

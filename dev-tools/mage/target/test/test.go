@@ -15,22 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package test
 
-import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
+import "github.com/magefile/mage/mg"
 
-	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
-
-	// Import the script processor and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
+var (
+	testDeps []interface{}
 )
 
-// Name of this beat
-var Name = "winlogbeat"
+// RegisterDeps registers dependencies of the Test target (register your targets
+// that execute tests).
+func RegisterDeps(deps ...interface{}) {
+	testDeps = append(testDeps, deps...)
+}
 
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+// Test runs all available tests (unitTest + integTest).
+func Test() {
+	mg.SerialDeps(testDeps...)
+}
