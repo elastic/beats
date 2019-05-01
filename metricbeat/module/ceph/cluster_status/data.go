@@ -25,11 +25,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// PgState represents placement group state
 type PgState struct {
 	Count     int64  `json:"count"`
 	StateName string `json:"state_name"`
 }
 
+// Pgmap represents data from a placement group
 type Pgmap struct {
 	AvailByte int64 `json:"bytes_avail"`
 	TotalByte int64 `json:"bytes_total"`
@@ -54,6 +56,7 @@ type Pgmap struct {
 	PgStates []PgState `json:"pgs_by_state"`
 }
 
+// Osdmap represents data from an OSD
 type Osdmap struct {
 	Epoch      int64 `json:"epoch"`
 	Full       bool  `json:"full"`
@@ -64,15 +67,18 @@ type Osdmap struct {
 	RemapedPgs int64 `json:"num_remapped_pgs"`
 }
 
+// Osdmap_ is a placeholder for the json parser
 type Osdmap_ struct {
 	Osdmap Osdmap `json:"osdmap"`
 }
 
+// Output is the response body
 type Output struct {
 	Pgmap  Pgmap   `json:"pgmap"`
 	Osdmap Osdmap_ `json:"osdmap"`
 }
 
+// HealthRequest represents the response to a health request
 type HealthRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`
@@ -122,26 +128,26 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	pg["used_bytes"] = pgmap.UsedByte
 	pg["data_bytes"] = pgmap.DataByte
 
-	state_event := common.MapStr{}
-	state_event["osd"] = osdState
-	state_event["traffic"] = traffic
-	state_event["misplace"] = misplace
-	state_event["degraded"] = degraded
-	state_event["pg"] = pg
-	state_event["version"] = pgmap.Version
+	stateEvent := common.MapStr{}
+	stateEvent["osd"] = osdState
+	stateEvent["traffic"] = traffic
+	stateEvent["misplace"] = misplace
+	stateEvent["degraded"] = degraded
+	stateEvent["pg"] = pg
+	stateEvent["version"] = pgmap.Version
 
 	events := []common.MapStr{}
-	events = append(events, state_event)
+	events = append(events, stateEvent)
 
 	//pg state info
 	for _, state := range pgmap.PgStates {
-		state_evn := common.MapStr{
+		stateEvn := common.MapStr{
 			"count":      state.Count,
 			"state_name": state.StateName,
 			"version":    pgmap.Version,
 		}
 		evt := common.MapStr{
-			"pg_state": state_evn,
+			"pg_state": stateEvn,
 		}
 		events = append(events, evt)
 	}
