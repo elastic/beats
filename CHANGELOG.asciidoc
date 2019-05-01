@@ -3,6 +3,47 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.0.1]]
+=== Beats version 7.0.1
+https://github.com/elastic/beats/compare/v7.0.0...v7.0.1[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
+- Fix initialization of the TCP input logger. {pull}11605[11605]
+
+*Auditbeat*
+
+- Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+
+*Heartbeat*
+
+- Fix NPE on some monitor configuration errors. {pull}11910[11910]
+
+*Metricbeat*
+
+- Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
+
+==== Added
+
+*Auditbeat*
+
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+
+==== Deprecated
+
+*Metricbeat*
+
+- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
+
 include::libbeat/docs/release-notes/7.0.0.asciidoc[]
 
 [[release-notes-7.0.0-ga]]
@@ -260,7 +301,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the 
 - The `elasticsearch/deprecation` fileset now indexes the `component` field under `elasticsearch` instead of `elasticsearch.server`. {pull}10445[10445]
 - Remove field `kafka.log.trace.full` from kafka.log fielset. {pull}10398[10398]
 - Change field `kafka.log.class` for kafka.log fileset from text to keyword. {pull}10398[10398]
-- Address add_kubernetes_metadata processor issue where old source field is 
+- Address add_kubernetes_metadata processor issue where old source field is
   still used for matcher. {issue}10505[10505] {pull}10506[10506]
 - Change type of haproxy.source from text to keyword. {pull}10506[10506]
 - Rename `event.type` to `suricata.eve.event_type` in Suricata module because event.type is reserved for future use by ECS. {pull}10575[10575]
