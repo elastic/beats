@@ -220,8 +220,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch collects the user information. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
-	if needsStateUpdate || ms.cache.IsEmpty() {
-		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+	if needsStateUpdate {
+		ms.log.Debug("Sending state")
 		err := ms.reportState(report)
 		if err != nil {
 			ms.log.Error(err)
