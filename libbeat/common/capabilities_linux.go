@@ -31,10 +31,18 @@ type CapData struct {
 	Inheritable uint64
 }
 
-type capData32 struct {
+type capData32 [2]struct {
 	effective   uint32
 	permitted   uint32
 	inheritable uint32
+}
+
+func (d capData32) to64() CapData {
+	return CapData{
+		Effective:   uint32to64(d[1].effective, d[0].effective),
+		Permitted:   uint32to64(d[1].permitted, d[0].permitted),
+		Inheritable: uint32to64(d[1].inheritable, d[0].inheritable),
+	}
 }
 
 func uint32to64(a, b uint32) uint64 {
@@ -61,16 +69,12 @@ func GetCapabilities() CapData {
 		header.version = capabilityVersion1
 	}
 
-	var data [2]capData32
+	var data capData32
 	_, _, e = unix.Syscall(unix.SYS_CAPGET, uintptr(unsafe.Pointer(&header)), uintptr(unsafe.Pointer(&data)), 0)
 	if e != 0 {
 		// If this fails, there are invalid arguments
 		panic(unix.ErrnoName(e))
 	}
 
-	return CapData{
-		Effective:   uint32to64(data[1].effective, data[0].effective),
-		Permitted:   uint32to64(data[1].permitted, data[0].permitted),
-		Inheritable: uint32to64(data[1].inheritable, data[0].inheritable),
-	}
+	return data.to64()
 }
