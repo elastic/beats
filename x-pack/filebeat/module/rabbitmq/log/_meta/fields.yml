@@ -7,3 +7,11 @@
       type: keyword
       description: The Erlang process id
       example: <0.222.0>
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
+    - name: message
+      type: alias
+      path: message
+      migration: true

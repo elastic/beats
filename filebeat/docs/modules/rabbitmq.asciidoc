@@ -1,0 +1,60 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-rabbitmq]]
+:modulename: rabbitmq
+:has-dashboards: true
+
+== rabbitmq module
+
+This is the module for parsing RabbitMQ log files https://www.rabbitmq.com/logging.html
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+Parses single file format introduced in 3.7.0. Tested with version 3.7.14.
+
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+TODO: include an image of a sample dashboard. If you do not include a dashboard,
+remove this section and set `:has-dashboards: false` at the top of this file.
+
+include::../include/configuring-intro.asciidoc[]
+
+TODO: provide an example configuration
+
+:fileset_ex: {fileset}
+
+include::../include/config-option-intro.asciidoc[]
+
+TODO: document the variables from each fileset. If you're describing a variable
+that's common to other modules, you can reuse shared descriptions by including
+the relevant file. For example:
+
+[float]
+==== `{fileset}` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-rabbitmq,exported fields>> section.
+
