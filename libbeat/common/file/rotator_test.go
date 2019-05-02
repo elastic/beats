@@ -185,17 +185,18 @@ func TestRotateOnStartup(t *testing.T) {
 	// Create an existing log file with this name.
 	CreateFile(t, filename)
 	AssertDirContents(t, dir, logname)
+
+	r, err := file.NewFileRotator(filename, file.RotateOnStartup(false))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	WriteMsg(t, r)
+
+	// The line should have been appended to the existing file without rotation.
+	AssertDirContents(t, dir, logname)
+
 	/*
-		r, err := file.NewFileRotator(filename, file.RotateOnStartup(false))
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer r.Close()
-		WriteMsg(t, r)
-
-		// The line should have been appended to the existing file without rotation.
-		AssertDirContents(t, dir, logname)
-
 		// Create a second rotator with the default setting of rotateOnStartup=true
 		r, err := file.NewFileRotator(filename)
 		if err != nil {
