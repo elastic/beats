@@ -263,7 +263,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index int, periodInSec int) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Average"
 	period := int64(periodInSec)
-	id := "ec2" + strconv.Itoa(index)
+	id := metricsetName + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 
 	for _, dim := range metricDims {
