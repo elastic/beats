@@ -95,19 +95,16 @@ func TestWtmp(t *testing.T) {
 	assert.True(t, events[0].Timestamp.Equal(time.Date(2019, 1, 24, 9, 51, 51, 367964000, time.UTC)),
 		"Timestamp is not equal: %+v", events[0].Timestamp)
 
-	// Append another login event to wtmp file and check that it's read
+	// Append logout event to wtmp file and check that it's read
 	wtmpFile, err := os.OpenFile(wtmpFilepath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		t.Fatalf("error opening %v: %v", wtmpFilepath, err)
 	}
 
 	loginUtmp := utmpC{
-		Type: USER_PROCESS,
-		Pid:  11111,
-		IP:   [4]int32{16777226, 0, 0, 0},
+		Type: DEAD_PROCESS,
 	}
-	copy(loginUtmp.Username[:], "elastic")
-	copy(loginUtmp.Device[:], "pts/99")
+	copy(loginUtmp.Device[:], "pts/2")
 
 	err = binary.Write(wtmpFile, byteOrder, loginUtmp)
 	if err != nil {
@@ -126,14 +123,11 @@ func TestWtmp(t *testing.T) {
 	}
 
 	checkFieldValue(t, events[0].RootFields, "event.kind", "event")
-	checkFieldValue(t, events[0].RootFields, "event.category", "authentication")
-	checkFieldValue(t, events[0].RootFields, "event.action", "user_login")
-	checkFieldValue(t, events[0].RootFields, "event.outcome", "success")
-	checkFieldValue(t, events[0].RootFields, "event.type", "authentication_success")
-	checkFieldValue(t, events[0].RootFields, "process.pid", 11111)
-	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.0.1")
-	checkFieldValue(t, events[0].RootFields, "user.name", "elastic")
-	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/99")
+	checkFieldValue(t, events[0].RootFields, "event.action", "user_logout")
+	checkFieldValue(t, events[0].RootFields, "process.pid", 14962)
+	checkFieldValue(t, events[0].RootFields, "source.ip", "10.0.2.2")
+	checkFieldValue(t, events[0].RootFields, "user.name", "vagrant")
+	checkFieldValue(t, events[0].RootFields, "user.terminal", "pts/2")
 }
 
 func TestBtmp(t *testing.T) {
