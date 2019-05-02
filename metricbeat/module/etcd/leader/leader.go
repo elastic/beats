@@ -59,7 +59,7 @@ func init() {
 	)
 }
 
-// Metricset for etcd.leader
+// MetricSet for etcd.leader
 type MetricSet struct {
 	mb.BaseMetricSet
 	http         *helper.HTTP
