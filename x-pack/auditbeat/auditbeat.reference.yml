@@ -135,15 +135,6 @@ auditbeat.modules:
   # socket.state.period: 12h
   # user.state.period: 12h
 
-  # Disabled by default. If enabled, the socket dataset will
-  # report sockets to and from localhost.
-  # socket.include_localhost: false
-
-  # Enabled by default. Auditbeat will read password fields in
-  # /etc/passwd and /etc/shadow and store a hash locally to
-  # detect any changes.
-  user.detect_password_changes: true
-
   # Average file read rate for hashing of the process executable. Default is "50 MiB".
   process.hash.scan_rate_per_sec: 50 MiB
 
@@ -155,6 +146,15 @@ auditbeat.modules:
   # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384, sha3_512, and xxh64.
   # Default is sha1.
   process.hash.hash_types: [sha1]
+
+  # Disabled by default. If enabled, the socket dataset will
+  # report sockets to and from localhost.
+  # socket.include_localhost: false
+
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
 
   # File patterns of the login record files.
   # wtmp: History of successful logins, logouts, and system shutdowns and boots.
