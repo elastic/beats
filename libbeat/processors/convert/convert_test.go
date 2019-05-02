@@ -39,12 +39,23 @@ func TestConvert(t *testing.T) {
 
 		evt := &beat.Event{Fields: common.MapStr{}}
 
+		// Defaults.
+		p.IgnoreMissing = false
+		p.FailOnError = true
 		_, err = p.Run(evt)
 		if assert.Error(t, err) {
 			assert.Contains(t, err.Error(), "field [src] is missing")
 		}
 
 		p.IgnoreMissing = true
+		p.FailOnError = true
+		_, err = p.Run(evt)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		p.IgnoreMissing = true
+		p.FailOnError = false
 		_, err = p.Run(evt)
 		if err != nil {
 			t.Fatal(err)
