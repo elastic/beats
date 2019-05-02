@@ -211,7 +211,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 		defer func() {
 			// Once we start reading a file, we update the file record even if something fails -
 			// otherwise we will just keep trying to re-read very frequently forever.
-			r.updateSavedUtmpFile(utmpFile, f)
+			err := r.updateSavedUtmpFile(utmpFile, f)
 			if err != nil {
 				errorC <- errors.Wrapf(err, "error updating file record for file %v", utmpFile.Path)
 			}
