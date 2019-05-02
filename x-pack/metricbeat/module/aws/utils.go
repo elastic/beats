@@ -16,14 +16,10 @@ import (
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
-func GetStartTimeEndTime(durationString string) (startTime time.Time, endTime time.Time, err error) {
+func GetStartTimeEndTime(duration time.Duration) (startTime time.Time, endTime time.Time) {
 	endTime = time.Now()
-	duration, err := time.ParseDuration(durationString)
-	if err != nil {
-		return
-	}
-	startTime = endTime.Add(duration)
-	return startTime, endTime, nil
+	startTime = endTime.Add(duration * -2)
+	return startTime, endTime
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.

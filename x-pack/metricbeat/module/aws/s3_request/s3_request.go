@@ -54,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// Check if period is set to be multiple of 60s
-	remainder := metricSet.PeriodInSec % 60
+	remainder := int(metricSet.Period.Seconds()) % 60
 	if remainder != 0 {
 		err := errors.New("period needs to be set to 60s (or a multiple of 60s). " +
 			"To avoid data missing or extra costs, please make sure period is set correctly " +
@@ -73,10 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
-	if err != nil {
-		return errors.Wrap(err, "Error ParseDuration")
-	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.MetricSet.RegionsList {
@@ -94,7 +91,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.PeriodInSec)
+		metricDataQueries := constructMetricQueries(listMetricsOutputs, int(m.Period.Seconds()))
 		// This happens when S3 cloudwatch request metrics are not enabled.
 		if len(metricDataQueries) == 0 {
 			continue

@@ -91,10 +91,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
-	if err != nil {
-		return errors.Wrap(err, "error GetStartTimeEndTime")
-	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
 
 	// Get listMetrics and namespacesTotal from configuration
 	listMetrics, namespacesTotal := readCloudwatchConfig(m.CloudwatchConfigs)
@@ -102,7 +99,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(awsConfig)
-		err := createEvents(svcCloudwatch, listMetrics, regionName, m.PeriodInSec, startTime, endTime, report)
+		err := createEvents(svcCloudwatch, listMetrics, regionName, int(m.Period.Seconds()), startTime, endTime, report)
 		if err != nil {
 			return errors.Wrap(err, "createEvents failed")
 		}
@@ -124,7 +121,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			err = createEvents(svcCloudwatch, listMetricsOutput, regionName, m.PeriodInSec, startTime, endTime, report)
+			err = createEvents(svcCloudwatch, listMetricsOutput, regionName, int(m.Period.Seconds()), startTime, endTime, report)
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}

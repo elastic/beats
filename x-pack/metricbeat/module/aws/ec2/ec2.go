@@ -51,8 +51,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
-	remainder300 := metricSet.PeriodInSec % 300
-	remainder60 := metricSet.PeriodInSec % 60
+	remainder300 := int(metricSet.Period.Seconds()) % 300
+	remainder60 := int(metricSet.Period.Seconds()) % 60
 	if remainder300 != 0 || remainder60 != 0 {
 		err := errors.New("period needs to be set to 60s (or a multiple of 60s) if detailed monitoring is " +
 			"enabled for EC2 instances or set to 300s (or a multiple of 300s) if EC2 instances has basic monitoring. " +
@@ -70,10 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
-	if err != nil {
-		return errors.Wrap(err, "Error ParseDuration")
-	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
 
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
@@ -102,7 +99,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		var metricDataQueriesTotal []cloudwatch.MetricDataQuery
 		for _, instanceID := range instanceIDs {
-			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)...)
+			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, instanceID, int(m.Period.Seconds()))...)
 		}
 
 		var metricDataOutput []cloudwatch.MetricDataResult
