@@ -56,23 +56,34 @@ func (t *HashType) IsValid() bool {
 	return valid
 }
 
-var validHashes = map[HashType]struct{}{
-	BLAKE2B_256: {},
-	BLAKE2B_384: {},
-	BLAKE2B_512: {},
-	MD5:         {},
-	SHA1:        {},
-	SHA224:      {},
-	SHA256:      {},
-	SHA384:      {},
-	SHA512:      {},
-	SHA512_224:  {},
-	SHA512_256:  {},
-	SHA3_224:    {},
-	SHA3_256:    {},
-	SHA3_384:    {},
-	SHA3_512:    {},
-	XXH64:       {},
+var validHashes = map[HashType](func() hash.Hash){
+	BLAKE2B_256: func() hash.Hash {
+		h, _ := blake2b.New256(nil)
+		return h
+	},
+	BLAKE2B_384: func() hash.Hash {
+		h, _ := blake2b.New384(nil)
+		return h
+	},
+	BLAKE2B_512: func() hash.Hash {
+		h, _ := blake2b.New512(nil)
+		return h
+	},
+	MD5:        md5.New,
+	SHA1:       sha1.New,
+	SHA224:     sha256.New224,
+	SHA256:     sha256.New,
+	SHA384:     sha512.New384,
+	SHA512:     sha512.New,
+	SHA512_224: sha512.New512_224,
+	SHA512_256: sha512.New512_256,
+	SHA3_224:   sha3.New224,
+	SHA3_256:   sha3.New256,
+	SHA3_384:   sha3.New384,
+	SHA3_512:   sha3.New512,
+	XXH64: func() hash.Hash {
+		return xxhash.New64()
+	},
 }
 
 // Enum of hash types.
@@ -191,45 +202,12 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 
 	var hashes []hash.Hash
 	for _, hashType := range hasher.config.HashTypes {
-		switch hashType {
-		case BLAKE2B_256:
-			h, _ := blake2b.New256(nil)
-			hashes = append(hashes, h)
-		case BLAKE2B_384:
-			h, _ := blake2b.New384(nil)
-			hashes = append(hashes, h)
-		case BLAKE2B_512:
-			h, _ := blake2b.New512(nil)
-			hashes = append(hashes, h)
-		case MD5:
-			hashes = append(hashes, md5.New())
-		case SHA1:
-			hashes = append(hashes, sha1.New())
-		case SHA224:
-			hashes = append(hashes, sha256.New224())
-		case SHA256:
-			hashes = append(hashes, sha256.New())
-		case SHA384:
-			hashes = append(hashes, sha512.New384())
-		case SHA3_224:
-			hashes = append(hashes, sha3.New224())
-		case SHA3_256:
-			hashes = append(hashes, sha3.New256())
-		case SHA3_384:
-			hashes = append(hashes, sha3.New384())
-		case SHA3_512:
-			hashes = append(hashes, sha3.New512())
-		case SHA512:
-			hashes = append(hashes, sha512.New())
-		case SHA512_224:
-			hashes = append(hashes, sha512.New512_224())
-		case SHA512_256:
-			hashes = append(hashes, sha512.New512_256())
-		case XXH64:
-			hashes = append(hashes, xxhash.New64())
-		default:
+		h, valid := validHashes[hashType]
+		if !valid {
 			return nil, errors.Errorf("unknown hash type '%v'", hashType)
 		}
+
+		hashes = append(hashes, h())
 	}
 
 	if len(hashes) > 0 {
