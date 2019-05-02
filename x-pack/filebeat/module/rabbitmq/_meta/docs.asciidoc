@@ -1,7 +1,7 @@
 :modulename: rabbitmq
 :has-dashboards: true
 
-== rabbitmq module
+== RabbitMQ module
 
 This is the module for parsing RabbitMQ log files https://www.rabbitmq.com/logging.html
 
@@ -10,7 +10,7 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
+Parses single file format introduced in 3.7.0. Tested with version 3.7.14.
 
 
 include::../include/running-modules.asciidoc[]

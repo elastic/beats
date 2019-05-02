@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 :modulename: rabbitmq
 :has-dashboards: true
 
-== rabbitmq module
+== RabbitMQ module
 
 This is the module for parsing RabbitMQ log files https://www.rabbitmq.com/logging.html
 
