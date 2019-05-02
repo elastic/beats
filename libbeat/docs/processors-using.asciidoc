@@ -215,9 +215,7 @@ ifdef::has_decode_csv_fields_processor[]
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
  * <<dissect, `dissect`>>
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
  * <<extract-array,`extract_array`>>
-endif::[]
  * <<processor-dns, `dns`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
@@ -1750,7 +1748,6 @@ thrown.
 |===
 endif::[]
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
 [[extract-array]]
 === Extract array
 
@@ -1793,4 +1790,3 @@ The following settings are supported:
                   empty value, it is left unset. The empty string (`""`), an
                   empty array (`[]`) or an empty object (`{}`) are considered
                   empty values. Default is `false`.
-endif::[]

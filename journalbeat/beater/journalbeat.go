@@ -35,7 +35,6 @@ import (
 
 	// Add dedicated processors
 	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
-	_ "github.com/elastic/beats/libbeat/processors/extract_array"
 )
 
 // Journalbeat instance
