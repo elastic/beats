@@ -173,7 +173,7 @@ func TestDailyRotation(t *testing.T) {
 
 // Tests the FileConfig.RotateOnStartup parameter
 func TestRotateOnStartup(t *testing.T) {
-	/*dir, err := ioutil.TempDir("", "rotate_on_open")
+	dir, err := ioutil.TempDir("", "rotate_on_open")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -184,29 +184,30 @@ func TestRotateOnStartup(t *testing.T) {
 
 	// Create an existing log file with this name.
 	CreateFile(t, filename)
-
-	r, err := file.NewFileRotator(filename, file.RotateOnStartup(false))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
-	WriteMsg(t, r)
-
-	// The line should have been appended to the existing file without rotation.
 	AssertDirContents(t, dir, logname)
+	/*
+		r, err := file.NewFileRotator(filename, file.RotateOnStartup(false))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Close()
+		WriteMsg(t, r)
 
-	// Create a second rotator with the default setting of rotateOnStartup=true
-	r, err := file.NewFileRotator(filename)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
+		// The line should have been appended to the existing file without rotation.
+		AssertDirContents(t, dir, logname)
 
-	// The directory contents shouldn't change until the first Write.
-	AssertDirContents(t, dir, logname)
+		// Create a second rotator with the default setting of rotateOnStartup=true
+		r, err := file.NewFileRotator(filename)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Close()
 
-	WriteMsg(t, r)
-	AssertDirContents(t, dir, logname, logname+".1")*/
+		// The directory contents shouldn't change until the first Write.
+		AssertDirContents(t, dir, logname)
+
+		WriteMsg(t, r)
+		AssertDirContents(t, dir, logname, logname+".1")*/
 }
 
 func CreateFile(t *testing.T, filename string) {
