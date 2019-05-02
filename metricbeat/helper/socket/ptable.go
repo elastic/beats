@@ -22,11 +22,11 @@ package socket
 import (
 	"strconv"
 	"strings"
-	"unsafe"
 
 	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
-	"golang.org/x/sys/unix"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // process tools
@@ -165,56 +165,6 @@ const requiredCapabilities = uint64(0x0000000000080004) // sys_ptrace & dac_read
 // isPrivileged checks if this process has privileges to read sockets
 // of all users
 func isPrivileged(mountpoint string) bool {
-	capabilities := getCapabilities()
-	return (capabilities.effective & requiredCapabilities) > 0
-}
-
-type capData64 struct {
-	effective   uint64
-	permitted   uint64
-	inheritable uint64
-}
-
-type capData32 struct {
-	effective   uint32
-	permitted   uint32
-	inheritable uint32
-}
-
-func uint32to64(a, b uint32) uint64 {
-	return uint64(a)<<32 | uint64(b)
-}
-
-const (
-	capabilityVersion1 = 0x19980330 // Version 1, 32-bit capabilities
-	capabilityVersion3 = 0x20080522 // Version 3 (replaced V2), 64-bit capabilities
-)
-
-func getCapabilities() capData64 {
-	header := struct {
-		version uint32
-		pid     int32
-	}{
-		version: capabilityVersion3,
-		pid:     0, // Self
-	}
-
-	// Check compatibility with version 3
-	_, _, e := unix.Syscall(unix.SYS_CAPGET, uintptr(unsafe.Pointer(&header)), 0, 0)
-	if e != 0 {
-		header.version = capabilityVersion1
-	}
-
-	var data [2]capData32
-	_, _, e = unix.Syscall(unix.SYS_CAPGET, uintptr(unsafe.Pointer(&header)), uintptr(unsafe.Pointer(&data)), 0)
-	if e != 0 {
-		// If this fails, there are invalid arguments
-		panic(unix.ErrnoName(e))
-	}
-
-	var data64 capData64
-	data64.effective = uint32to64(data[1].effective, data[0].effective)
-	data64.permitted = uint32to64(data[1].permitted, data[0].permitted)
-	data64.inheritable = uint32to64(data[1].inheritable, data[0].inheritable)
-	return data64
+	capabilities := common.GetCapabilities()
+	return (capabilities.Effective & requiredCapabilities) > 0
 }
