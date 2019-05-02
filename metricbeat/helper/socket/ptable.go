@@ -166,5 +166,5 @@ const requiredCapabilities = uint64(0x0000000000080004) // sys_ptrace & dac_read
 // of all users
 func isPrivileged(mountpoint string) bool {
 	capabilities := common.GetCapabilities()
-	return (capabilities.Effective & requiredCapabilities) > 0
+	return capabilities.Check(requiredCapabilities)
 }

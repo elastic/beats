@@ -25,10 +25,21 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-type CapData struct {
-	Effective   uint64
-	Permitted   uint64
+// CapabilitiesData contains the capability sets of a process
+type CapabilitiesData struct {
+	// Effective is the capability set used for permission checks
+	Effective uint64
+
+	// Permitted is the superset of effective capabilities that the thread may assume
+	Permitted uint64
+
+	// Inheritable is the set of capabilities inherited to child processes
 	Inheritable uint64
+}
+
+// Check performs a permission check for a given capabilities set
+func (d CapabilitiesData) Check(set uint64) bool {
+	return (d.Effective & set) > 0
 }
 
 type capData32 [2]struct {
@@ -37,8 +48,8 @@ type capData32 [2]struct {
 	inheritable uint32
 }
 
-func (d capData32) to64() CapData {
-	return CapData{
+func (d capData32) to64() CapabilitiesData {
+	return CapabilitiesData{
 		Effective:   uint32to64(d[1].effective, d[0].effective),
 		Permitted:   uint32to64(d[1].permitted, d[0].permitted),
 		Inheritable: uint32to64(d[1].inheritable, d[0].inheritable),
@@ -51,10 +62,12 @@ func uint32to64(a, b uint32) uint64 {
 
 const (
 	capabilityVersion1 = 0x19980330 // Version 1, 32-bit capabilities
-	capabilityVersion3 = 0x20080522 // Version 3 (replaced V2), 64-bit capabilities
+	capabilityVersion3 = 0x20080522 // Version 3, 64-bit capabilities (replaced version 2)
 )
 
-func GetCapabilities() CapData {
+// GetCapabilities gets the capabilities of this process using system calls to avoid
+// depending on procfs or library functions for permission checks
+func GetCapabilities() CapabilitiesData {
 	header := struct {
 		version uint32
 		pid     int32
@@ -72,7 +85,8 @@ func GetCapabilities() CapData {
 	var data capData32
 	_, _, e = unix.Syscall(unix.SYS_CAPGET, uintptr(unsafe.Pointer(&header)), uintptr(unsafe.Pointer(&data)), 0)
 	if e != 0 {
-		// If this fails, there are invalid arguments
+		// If this fails, there are invalid arguments, and all arguments are
+		// being created here.
 		panic(unix.ErrnoName(e))
 	}
 
