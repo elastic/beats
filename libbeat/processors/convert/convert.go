@@ -85,11 +85,11 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			switch cause := errors.Cause(err); cause {
 			case common.ErrKeyNotFound:
-				if !p.IgnoreMissing {
+				if !p.IgnoreMissing && p.FailOnError {
 					return event, annotateError(p.Tag, errors.Errorf("field [%v] is missing, cannot be converted to type [%v]", conv.From, conv.Type))
 				}
 			default:
-				if !p.IgnoreFailure {
+				if p.FailOnError {
 					return event, annotateError(p.Tag, errors.Wrapf(err, "unable to convert field [%v] value [%v] to [%v]", conv.From, v, conv.Type))
 				}
 			}
@@ -100,7 +100,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	saved := *event
-	if len(p.Fields) > 1 && !p.IgnoreFailure {
+	if len(p.Fields) > 1 && p.FailOnError {
 		// Clone the fields to allow the processor to undo the operation on
 		// failure (like a transaction). If there is only one conversion then
 		// cloning is unnecessary because there are no previous changes to
@@ -118,12 +118,12 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if conv.To != "" {
 			switch p.Mode {
 			case renameMode:
-				if _, err := event.PutValue(conv.To, v); err != nil {
+				if _, err := event.PutValue(conv.To, v); err != nil && p.FailOnError {
 					return &saved, annotateError(p.Tag, errors.Wrapf(err, "failed to put field [%v]", conv.To))
 				}
 				event.Delete(conv.From)
 			case copyMode:
-				if _, err := event.PutValue(conv.To, cloneValue(v)); err != nil {
+				if _, err := event.PutValue(conv.To, cloneValue(v)); err != nil && p.FailOnError {
 					return &saved, annotateError(p.Tag, errors.Wrapf(err, "failed to put field [%v]", conv.To))
 				}
 			}
@@ -175,12 +175,12 @@ func transformType(typ dataType, value interface{}) (interface{}, error) {
 
 func toString(value interface{}) (string, error) {
 	switch v := value.(type) {
-	default:
-		return fmt.Sprintf("%v", value), nil
-	case string:
-		return v, nil
 	case nil:
 		return "", errors.New("invalid conversion of [null] to string")
+	case string:
+		return v, nil
+	default:
+		return fmt.Sprintf("%v", value), nil
 	}
 }
 

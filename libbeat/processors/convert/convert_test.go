@@ -49,9 +49,16 @@ func TestConvert(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		p.IgnoreMissing = false
+		p.FailOnError = false
+		_, err = p.Run(evt)
+		if err != nil {
+			t.Fatal(err)
+		}
 	})
 
-	t.Run("ignore_failure", func(t *testing.T) {
+	t.Run("fail_on_error", func(t *testing.T) {
 		c := defaultConfig()
 		c.Fields = append(c.Fields, field{From: "source.address", To: "source.ip", Type: IP})
 
@@ -67,7 +74,7 @@ func TestConvert(t *testing.T) {
 			assert.Contains(t, err.Error(), "unable to convert")
 		}
 
-		p.IgnoreFailure = true
+		p.FailOnError = false
 		_, err = p.Run(evt)
 		if err != nil {
 			t.Fatal(err)
@@ -125,7 +132,7 @@ func TestConvert(t *testing.T) {
 
 		assert.Equal(t, `convert={"Fields":`+
 			`[{"From":"source.address","To":"source.ip","Type":"ip"}],`+
-			`"Tag":"convert_ip","IgnoreMissing":false,"IgnoreFailure":false,"Mode":"copy"}`,
+			`"Tag":"convert_ip","IgnoreMissing":false,"FailOnError":true,"Mode":"copy"}`,
 			p.String())
 	})
 }
@@ -227,11 +234,13 @@ type testCase struct {
 }
 
 var testCases = []testCase{
+	{String, nil, nil, true},
 	{String, "x", "x", false},
 	{String, 1, "1", false},
 	{String, 1.1, "1.1", false},
 	{String, true, "true", false},
 
+	{Long, nil, nil, true},
 	{Long, "x", nil, true},
 	{Long, true, nil, true},
 	{Long, "1", int64(1), false},
@@ -248,6 +257,7 @@ var testCases = []testCase{
 	{Long, float32(1), int64(1), false},
 	{Long, float64(1), int64(1), false},
 
+	{Integer, nil, nil, true},
 	{Integer, "x", nil, true},
 	{Integer, true, nil, true},
 	{Integer, "1", int32(1), false},
@@ -264,6 +274,7 @@ var testCases = []testCase{
 	{Integer, float32(1), int32(1), false},
 	{Integer, float64(1), int32(1), false},
 
+	{Float, nil, nil, true},
 	{Float, "x", nil, true},
 	{Float, true, nil, true},
 	{Float, "1", float32(1), false},
@@ -281,6 +292,7 @@ var testCases = []testCase{
 	{Float, float32(1), float32(1), false},
 	{Float, float64(1), float32(1), false},
 
+	{Double, nil, nil, true},
 	{Double, "x", nil, true},
 	{Double, true, nil, true},
 	{Double, "1", float64(1), false},
@@ -298,6 +310,7 @@ var testCases = []testCase{
 	{Double, float32(1), float64(1), false},
 	{Double, float64(1), float64(1), false},
 
+	{Boolean, nil, nil, true},
 	{Boolean, "x", nil, true},
 	{Boolean, 1, nil, true},
 	{Boolean, 0, nil, true},
@@ -317,6 +330,7 @@ var testCases = []testCase{
 	{Boolean, "false", false, false},
 	{Boolean, "False", false, false},
 
+	{IP, nil, nil, true},
 	{IP, "x", nil, true},
 	{IP, "365.0.0.0", "365.0.0.0", true},
 	{IP, "0.0.0.0", "0.0.0.0", false},

@@ -27,6 +27,7 @@ import (
 func defaultConfig() config {
 	return config{
 		IgnoreMissing: false,
+		FailOnError:   true,
 		Mode:          copyMode,
 	}
 }
@@ -35,7 +36,7 @@ type config struct {
 	Fields        []field `config:"fields" validate:"required"` // List of fields to convert.
 	Tag           string  `config:"tag"`                        // Processor ID for debug and metrics.
 	IgnoreMissing bool    `config:"ignore_missing"`             // Skip field when From field is missing.
-	IgnoreFailure bool    `config:"ignore_failure"`             // Ignore conversion errors.
+	FailOnError   bool    `config:"fail_on_error"`              // Ignore errors (missing fields / conversion failures).
 	Mode          mode    `config:"mode"`                       // Mode (copy vs rename).
 }
 
