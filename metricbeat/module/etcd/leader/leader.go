@@ -26,6 +26,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -39,6 +41,8 @@ const (
 	// returned JSON management
 	msgElement        = "message"
 	msgValueNonLeader = "not current leader"
+
+	logSelector = "etcd.leader"
 )
 
 var (
@@ -55,11 +59,15 @@ func init() {
 	)
 }
 
+// Metricset for etcd.leader
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http         *helper.HTTP
+	logger       *logp.Logger
+	debugEnabled bool
 }
 
+// New etcd.leader metricset object
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -73,6 +81,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
+		logp.NewLogger(logSelector),
+		logp.IsDebug(logSelector),
 	}, nil
 }
 
@@ -111,6 +121,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// do not report events since this is not a leader
 			if res.StatusCode == http.StatusForbidden &&
 				retMessage == msgValueNonLeader {
+				if m.debugEnabled {
+					m.logger.Debugf("skipping event for non leader member %q", m.Host())
+				}
 				return nil
 			}
 
