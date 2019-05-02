@@ -160,7 +160,7 @@ func (t *ProcTable) ProcessBySocketInode(inode uint32) *Proc {
 	return t.inodes[inode]
 }
 
-const requiredCapabilities = uint64(0x0000000000080004) // ptrace & dac_read_search
+const requiredCapabilities = uint64(0x0000000000080004) // sys_ptrace & dac_read_search
 
 // isPrivileged checks if this process has privileges to read sockets
 // of all users

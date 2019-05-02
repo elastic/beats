@@ -80,7 +80,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ptable.Privileged() {
 		logp.Info("socket process info will only be available for metricbeat process " +
 			"because it is running without enough privileges " +
-			"(ptrace and dac_read_search required)")
+			"(sys_ptrace and dac_read_search capabilities required)")
 	}
 
 	m := &MetricSet{
