@@ -77,9 +77,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	if os.Geteuid() != 0 {
-		logp.Info("socket process info will only be available for " +
-			"metricbeat because the process is running as a non-root user")
+	if !ptable.Privileged() {
+		logp.Info("socket process info will only be available for metricbeat process " +
+			"because it is running without enough privileges " +
+			"(ptrace and dac_read_search required)")
 	}
 
 	m := &MetricSet{
