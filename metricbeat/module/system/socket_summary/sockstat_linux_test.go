@@ -26,7 +26,6 @@ import (
 )
 
 func TestSockstat(t *testing.T) {
-
 	out, err := parseSockstat("./_meta/testdata/sockstat")
 	if err != nil {
 		t.Fatal(err)
