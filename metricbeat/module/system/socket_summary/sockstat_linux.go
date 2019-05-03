@@ -63,7 +63,6 @@ func applyEnhancements(data common.MapStr, m *MetricSet) (common.MapStr, error) 
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting sockstat data")
 	}
-	debugf("sockstat: %#v", stat)
 	data["tcp"].(common.MapStr)["orphan_sockets"] = stat.TCPOrphan
 	data["tcp"].(common.MapStr)["socket_memory"] = os.Getpagesize() * stat.TCPMem
 

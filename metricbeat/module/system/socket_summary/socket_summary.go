@@ -25,12 +25,9 @@ import (
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/system"
 )
-
-var debugf = logp.MakeDebug("socket_summary")
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
