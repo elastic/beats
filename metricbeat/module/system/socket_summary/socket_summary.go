@@ -138,7 +138,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error applying enhancements")
 	}
-	debugf("tcp %#v", newStats["tcp"])
 	report.Event(mb.Event{
 		MetricSetFields: newStats,
 	})
