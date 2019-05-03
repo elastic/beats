@@ -177,6 +177,13 @@ func clone(value interface{}) interface{} {
 		return v.Clone()
 	case map[string]interface{}:
 		return common.MapStr(v).Clone()
+	case []interface{}:
+		len := len(v)
+		newArr := make([]interface{}, len)
+		for idx, val := range v {
+			newArr[idx] = clone(val)
+		}
+		return newArr
 	}
 	return value
 }

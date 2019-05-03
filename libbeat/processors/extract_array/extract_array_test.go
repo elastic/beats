@@ -96,6 +96,32 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 		},
 
+		"modified array": {
+			config: common.MapStr{
+				"field": "array",
+				"mappings": common.MapStr{
+					"dest.one": 1,
+					"dest.two": 2,
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"array": []interface{}{"zero", 1, []interface{}{"a", "b"}},
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"array":    []interface{}{"zero", 1, []interface{}{"a", "b"}},
+					"dest.one": 1,
+					"dest.two": []interface{}{"a", "c"},
+				},
+			},
+			afterFn: func(e *beat.Event) {
+				val, _ := e.GetValue("dest.two")
+				val.([]interface{})[1] = "c"
+			},
+		},
+
 		"out of range mapping": {
 			config: common.MapStr{
 				"field": "array",
