@@ -196,19 +196,22 @@ func TestRotateOnStartup(t *testing.T) {
 	// The line should have been appended to the existing file without rotation.
 	AssertDirContents(t, dir, logname)
 
-	/*
-		// Create a second rotator with the default setting of rotateOnStartup=true
-		r, err := file.NewFileRotator(filename)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer r.Close()
+	// Close the first rotator early (the deferred close will be a no-op if
+	// we haven't hit an error by now), so it can't interfere with the second one.
+	r.Close()
 
-		// The directory contents shouldn't change until the first Write.
-		AssertDirContents(t, dir, logname)
+	// Create a second rotator with the default setting of rotateOnStartup=true
+	r, err = file.NewFileRotator(filename)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
 
-		WriteMsg(t, r)
-		AssertDirContents(t, dir, logname, logname+".1")*/
+	// The directory contents shouldn't change until the first Write.
+	AssertDirContents(t, dir, logname)
+
+	WriteMsg(t, r)
+	AssertDirContents(t, dir, logname, logname+".1")
 }
 
 func CreateFile(t *testing.T, filename string) {
