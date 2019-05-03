@@ -144,7 +144,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		// checking for CanInterface() here is done to prevent .Interface() from
 		// panicking, but it can only happen when value points to a private
 		// field inside a struct.
-		if !cell.CanInterface() || (f.config.OmitEmpty && isEmpty(cell)) {
+		if !cell.IsValid() || !cell.CanInterface() || (f.config.OmitEmpty && isEmpty(cell)) {
 			continue
 		}
 		if !f.config.OverwriteKeys {
