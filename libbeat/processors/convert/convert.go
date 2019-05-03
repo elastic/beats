@@ -360,6 +360,13 @@ func cloneValue(value interface{}) interface{} {
 		return v.Clone()
 	case map[string]interface{}:
 		return common.MapStr(v).Clone()
+	case []interface{}:
+		len := len(v)
+		newArr := make([]interface{}, len)
+		for idx, val := range v {
+			newArr[idx] = cloneValue(val)
+		}
+		return newArr
 	default:
 		return value
 	}
