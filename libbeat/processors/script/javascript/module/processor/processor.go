@@ -58,7 +58,7 @@ var constructors = map[string]processors.Constructor{
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
-	"ExtractArray":          extract_array.NewExtractArray,
+	"ExtractArray":          extract_array.New,
 	"Rename":                actions.NewRenameFields,
 	"TruncateFields":        actions.NewTruncateFields,
 }

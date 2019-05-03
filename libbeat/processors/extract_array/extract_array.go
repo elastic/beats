@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
-type extractArrayConfig struct {
+type config struct {
 	Field         string        `config:"field"`
 	Mappings      common.MapStr `config:"mappings"`
 	IgnoreMissing bool          `config:"ignore_missing"`
@@ -45,12 +45,12 @@ type fieldMapping struct {
 }
 
 type extractArrayProcessor struct {
-	config   extractArrayConfig
+	config
 	mappings []fieldMapping
 }
 
 var (
-	defaultExtractArrayConfig = extractArrayConfig{
+	defaultConfig = config{
 		FailOnError: true,
 	}
 	errNoMappings = errors.New("no mappings defined in extract_array processor")
@@ -58,38 +58,42 @@ var (
 
 func init() {
 	processors.RegisterPlugin("extract_array",
-		checks.ConfigChecked(NewExtractArray,
+		checks.ConfigChecked(New,
 			checks.RequireFields("field", "mappings"),
 			checks.AllowedFields("field", "mappings", "ignore_missing", "overwrite_keys", "fail_on_error", "when", "omit_empty")))
 }
 
-// NewExtractArray builds a new extract_array processor.
-func NewExtractArray(c *common.Config) (processors.Processor, error) {
-	config := defaultExtractArrayConfig
-
-	err := c.Unpack(&config)
+// Unpack unpacks the processor's configuration.
+func (p *extractArrayProcessor) Unpack(from *common.Config) error {
+	tmp := defaultConfig
+	err := from.Unpack(&tmp)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the extract_array configuration: %s", err)
+		return fmt.Errorf("failed to unpack the extract_array configuration: %s", err)
 	}
-
-	if len(config.Mappings) == 0 {
-		return nil, errNoMappings
-	}
-
-	p := &extractArrayProcessor{
-		config:   config,
-		mappings: make([]fieldMapping, 0, len(config.Mappings)),
-	}
-	for field, column := range config.Mappings.Flatten() {
+	p.config = tmp
+	for field, column := range p.Mappings.Flatten() {
 		colIdx, ok := common.TryToInt(column)
 		if !ok || colIdx < 0 {
-			return nil, fmt.Errorf("bad extract_array mapping for field %s: %+v is not a positive integer", field, column)
+			return fmt.Errorf("bad extract_array mapping for field %s: %+v is not a positive integer", field, column)
 		}
 		p.mappings = append(p.mappings, fieldMapping{from: colIdx, to: field})
 	}
 	sort.Slice(p.mappings, func(i, j int) bool {
 		return p.mappings[i].from < p.mappings[j].from
 	})
+	return nil
+}
+
+// New builds a new extract_array processor.
+func New(c *common.Config) (processors.Processor, error) {
+	p := &extractArrayProcessor{}
+	err := c.Unpack(p)
+	if err != nil {
+		return nil, err
+	}
+	if len(p.mappings) == 0 {
+		return nil, errNoMappings
+	}
 	return p, nil
 }
 

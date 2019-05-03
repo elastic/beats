@@ -27,7 +27,7 @@ import (
 )
 
 func TestExtractArrayProcessor_String(t *testing.T) {
-	p, err := NewExtractArray(common.MustNewConfigFrom(common.MapStr{
+	p, err := New(common.MustNewConfigFrom(common.MapStr{
 		"field": "csv",
 		"mappings": common.MapStr{
 			"source.ip":         0,
@@ -194,7 +194,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
 			cfg := common.MustNewConfigFrom(tt.config)
-			processor, err := NewExtractArray(cfg)
+			processor, err := New(cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
