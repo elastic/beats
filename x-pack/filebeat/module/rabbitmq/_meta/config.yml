@@ -1,6 +1,6 @@
 # - module: rabbitmq
   # All logs
-  # log:
+  #log:
     # enabled: true
 
     # Set custom paths for the log files. If left empty,
