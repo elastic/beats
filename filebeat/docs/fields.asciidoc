@@ -12227,24 +12227,6 @@ The Erlang process id
 
 --
 
-*`rabbitmq.log.level`*::
-+
---
-type: alias
-
-alias to: log.level
-
---
-
-*`rabbitmq.log.message`*::
-+
---
-type: alias
-
-alias to: message
-
---
-
 [[exported-fields-redis]]
 == Redis fields
 
