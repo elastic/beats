@@ -20,8 +20,8 @@ metricbeat.modules:
 `period` value than the other metricsets.
 
 The metricset reports the process that has the socket open. In order to provide
-this information, Metricbeat must be running as root. Root access is also
-required to read the file descriptor information of other processes.
+this information for all processes in the system, Metricbeat must be run with
+`sys_ptrace` and `dac_read_search` Linux capabilities or with full privileges.
 
 [float]
 === Configuration
