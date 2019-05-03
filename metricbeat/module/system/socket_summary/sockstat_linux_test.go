@@ -16,20 +16,16 @@
 // under the License.
 
 // +build linux
+
 package socket_summary
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestSockstat(t *testing.T) {
-	base := common.MapStr{
-		"tcp": common.MapStr{},
-	}
 
 	out, err := parseSockstat("./_meta/testdata/sockstat")
 	if err != nil {
