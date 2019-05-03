@@ -68,6 +68,8 @@ func TestPipeline(t *testing.T, evtx string, pipeline string, opts ...Option) {
 }
 
 func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
+	t.Helper()
+
 	path, err := filepath.Abs(evtx)
 	if err != nil {
 		t.Fatal(err)
@@ -113,7 +115,7 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 
 			evt, err := processor.Run(&beat.Event{Fields: fields})
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("%v while processing event:\n%v", err, fields.StringToPrint())
 			}
 
 			events = append(events, filterEvent(evt.Fields, p.ignoreFields))

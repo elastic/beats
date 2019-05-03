@@ -36,7 +36,7 @@ var security = (function () {
         ],
         mode: "rename",
         ignore_missing: true,
-        ignore_failure: true,
+        fail_on_error: false,
     });
 
     var setProcessNameUsingExe = function(evt) {

@@ -138,7 +138,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(splitProcessArgs)
@@ -161,7 +161,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -186,7 +186,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(addUser)
@@ -203,7 +203,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(removeEmptyEventData)
         .Build();
@@ -219,7 +219,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -234,7 +234,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(splitHashes)
         .Add(removeEmptyEventData)
@@ -252,7 +252,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(splitHashes)
@@ -270,7 +270,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -288,7 +288,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -306,7 +306,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -324,7 +324,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -341,7 +341,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -358,7 +358,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -375,7 +375,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -393,7 +393,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(splitHash)
@@ -408,7 +408,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(removeEmptyEventData)
         .Build();
@@ -425,7 +425,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -443,7 +443,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(setProcessNameUsingExe)
         .Add(removeEmptyEventData)
@@ -457,7 +457,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(addUser)
         .Add(removeEmptyEventData)
@@ -472,7 +472,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(addUser)
         .Add(setProcessNameUsingExe)
@@ -487,7 +487,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(addUser)
         .Add(removeEmptyEventData)
@@ -502,7 +502,7 @@ var sysmon = (function () {
             ],
             mode: "rename",
             ignore_missing: true,
-            ignore_failure: true,
+            fail_on_error: false,
         })
         .Add(removeEmptyEventData)
         .Build();
