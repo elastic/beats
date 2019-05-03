@@ -104,6 +104,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Check permissions in system socket metricset based on capabilities. {pull}12039[12039]
+- Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
 
 *Packetbeat*
 
