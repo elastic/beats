@@ -67,7 +67,11 @@ ifeval::["{beatname_lc}"=="filebeat"]
 :processor-scope: input
 endif::[]
 
-ifeval::["{beatname_lc}"=="auditbeat" or "{beatname_lc}"=="metricbeat"]
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
 :processor-scope: module
 endif::[]
 
@@ -205,7 +209,7 @@ The supported processors are:
  * <<add-process-metadata,`add_process_metadata`>>
  * <<add-tags, `add_tags`>>
  * <<community-id,`community_id`>>
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_decode_csv_fields_processor[]
 * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
@@ -215,7 +219,7 @@ endif::[]
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
  * <<rename-fields,`rename`>>
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
  * <<processor-script,`script`>>
 endif::[]
 
@@ -779,7 +783,7 @@ Adds the environment field to every event:
 }
 -------------------------------------------------------------------------------
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_decode_csv_fields_processor[]
 [[decode-csv-fields]]
 === Decode CSV fields
 
@@ -1525,7 +1529,7 @@ set to `true`, this condition will be ignored.
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
 [[processor-script]]
 === Script Processor
 

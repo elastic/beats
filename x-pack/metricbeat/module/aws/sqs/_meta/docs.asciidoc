@@ -7,6 +7,7 @@ CloudWatch metrics for Amazon SQS queues are automatically collected and pushed 
 Some specific AWS permissions are required for IAM user to collect AWS SQS metrics.
 ----
 cloudwatch:GetMetricData
+cloudwatch:ListMetrics
 ec2:DescribeRegions
 sqs:ListQueues
 ----
