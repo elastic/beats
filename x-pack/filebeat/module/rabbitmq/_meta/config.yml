@@ -1,4 +1,4 @@
-# - module: rabbitmq
+#- module: rabbitmq
   # All logs
   #log:
     # enabled: true
