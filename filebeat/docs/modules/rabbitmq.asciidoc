@@ -8,14 +8,14 @@ This file is generated! See scripts/docs_collector.py
 
 == RabbitMQ module
 
-This is the module for parsing RabbitMQ log files https://www.rabbitmq.com/logging.html
+This is the module for parsing https://www.rabbitmq.com/logging.html[RabbitMQ log files]
 
 include::../include/what-happens.asciidoc[]
 
 [float]
 === Compatibility
 
-Parses single file format introduced in 3.7.0. Tested with version 3.7.14.
+Parses https://www.rabbitmq.com/logging.html[single file format] introduced in 3.7.0. Tested with version 3.7.14.
 
 
 include::../include/running-modules.asciidoc[]
@@ -30,18 +30,32 @@ remove this section and set `:has-dashboards: false` at the top of this file.
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for RabbitMQ logs:
 
-:fileset_ex: {fileset}
+
+["source","yaml",subs="attributes"]
+-----
+- module: rabbitmq
+  log:
+    enabled: true
+    var.paths: ["/path/to/log/rabbitmq/*.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "rabbitmq.log.var.paths=[/path/to/log/rabbitmq/*.log*]"
+-----
+
+:fileset_ex: log
 
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
-
 [float]
-==== `{fileset}` log fileset settings
+==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
 
