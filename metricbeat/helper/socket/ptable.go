@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build linux
-
 package socket
 
 import (
@@ -25,8 +23,6 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // process tools
@@ -61,7 +57,12 @@ func NewProcTable(mountpoint string) (*ProcTable, error) {
 		return nil, err
 	}
 
-	p := &ProcTable{fs: fs, privileged: isPrivileged(mountpoint)}
+	privileged, err := isPrivileged()
+	if err != nil {
+		return nil, err
+	}
+
+	p := &ProcTable{fs: fs, privileged: privileged}
 	p.Refresh()
 	return p, nil
 }
@@ -158,13 +159,4 @@ func socketInodes(p *procfs.Proc) ([]uint32, error) {
 // inode.
 func (t *ProcTable) ProcessBySocketInode(inode uint32) *Proc {
 	return t.inodes[inode]
-}
-
-const requiredCapabilities = uint64(0x0000000000080004) // sys_ptrace & dac_read_search
-
-// isPrivileged checks if this process has privileges to read sockets
-// of all users
-func isPrivileged(mountpoint string) bool {
-	capabilities := common.GetCapabilities()
-	return capabilities.Check(requiredCapabilities)
 }
