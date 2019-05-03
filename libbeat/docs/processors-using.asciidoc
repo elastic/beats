@@ -816,16 +816,16 @@ The `decode_csv_fields` has the following settings:
               The default is the comma character. For using a TAB character you
               must set it to "\t".
 `ignore_missing`:: (Optional) Whether to ignore events which lack the source
-                   field. The default is false, which will fail processing of an
-                   event if a field is missing.
+                   field. The default is `false`, which will fail processing of
+                   an event if a field is missing.
 `overwrite_keys`:: Whether the target field is overwritten if it
                    already exists. The default is false, which will fail
                    processing of an event when `target` already exists.
 `trim_leading_space`:: Whether extra space after the separator is trimmed from
                        values. This works even if the separator is also a space.
-                       The default is false.
+                       The default is `false`.
 `fail_on_error`:: (Optional) If set to true, in case of an error the changes to
-the event are reverted and the original event is returned. If set to false,
+the event are reverted, and the original event is returned. If set to `false`,
 processing continues also if an error happens. Default is `true`.
 
 endif::[]
@@ -1755,8 +1755,8 @@ experimental[]
 
 The `extract_array` processor populates fields with values read from an array
 field. The following example will populate `source.ip` with the first element of
-the `my_array` field, `destination.ip` with the second element and
-`network.transport` using the third.
+the `my_array` field, `destination.ip` with the second element, and
+`network.transport` with the third.
 
 [source,yaml]
 -----------------------------------------------------
@@ -1772,19 +1772,19 @@ processors:
 The following settings are supported:
 
 `field`:: The array field whose elements are to be extracted.
-`mappings`:: A field name to array index mapping. Use 0 for the first element in
+`mappings`:: Maps each field name to an array index. Use 0 for the first element in
              the array. Multiple fields can be mapped to the same array element.
 `ignore_missing`:: (Optional) Whether to ignore events where the array field is
-                   missing. The default is false, which will fail processing of
-                   an event if the specified field does not exist. Set it to
+                   missing. The default is `false`, which will fail processing
+                   of an event if the specified field does not exist. Set it to
                    `true` to ignore this condition.
 `overwrite_keys`:: Whether the target fields specified in the mapping are
                    overwritten if they already exist. The default is `false`,
                    which will fail processing if a target field already exists.
-`fail_on_error`:: (Optional) If set to `true`, in case of an error, changes to
-                  the event are reverted and the original event is returned. If
-                  set to false, processing continues if an error happens
-                  during processing. Default is `true`.
+`fail_on_error`:: (Optional) If set to `true` and an error happens, changes to
+                  the event are reverted, and the original event is returned. If
+                  set to `false`, processing continues despite errors.
+                  Default is `true`.
 `omit_empty`:: (Optional) Whether empty values are extracted from the array. If
                   set to `true`, instead of the target field being set to an
                   empty value, it is left unset. The empty string (`""`), an
