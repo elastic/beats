@@ -1,0 +1,223 @@
+// This file contains tests to confirm that elasticsearch.Client uses proxy
+// settings following the intended precedence.
+
+package elasticsearch
+
+import (
+	"bytes"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"os/exec"
+	"strings"
+	"sync"
+	"testing"
+
+	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/stretchr/testify/assert"
+)
+
+// TestClientPing is a placeholder test that does nothing on a standard run,
+// but starts up a client and sends a ping when the environment variable
+// TEST_START_CLIENT is set to 1 as in execClient).
+func TestClientPing(t *testing.T) {
+	// If this is the child process, start up the client, otherwise do nothing.
+	if os.Getenv("TEST_START_CLIENT") == "1" {
+		doClientPing(t)
+		return
+	}
+}
+
+// TestBaseline makes sure we can have a client process ping the server that
+// we start, with no changes to the proxy settings. (This is really a
+// meta-test for the helpers that create the servers / client.)
+func TestBaseline(t *testing.T) {
+	listeners := testListeners{}
+	listeners.start(t)
+	defer listeners.close()
+
+	// Start a bare client with no proxy settings, pointed at the main server.
+	_, err := execClient("TEST_SERVER_URL=" + listeners.server.URL)
+	assert.NoError(t, err)
+	// We expect one server request and 0 proxy requests
+	listeners.checkFinalState(t, 1, 0)
+}
+
+// TestClientSettingsProxy confirms that we can control the proxy of a client
+// by setting its ClientSettings.Proxy value on creation. (The child process
+// uses the TEST_PROXY_URL environment variable to initialize the flag.)
+func TestClientSettingsProxy(t *testing.T) {
+	listeners := testListeners{}
+	listeners.start(t)
+	defer listeners.close()
+
+	// Start a client with ClientSettings.Proxy set to the proxy listener.
+	_, err := execClient(
+		"TEST_SERVER_URL="+listeners.server.URL,
+		"TEST_PROXY_URL="+listeners.proxy.URL)
+	assert.NoError(t, err)
+	// We expect one proxy request and 0 server requests
+	listeners.checkFinalState(t, 0, 1)
+}
+
+// TestEnvironmentProxy confirms that we can control the proxy of a client by
+// setting the HTTP_PROXY environment variable (see
+// https://golang.org/pkg/net/http/#ProxyFromEnvironment).
+func TestEnvironmentProxy(t *testing.T) {
+	listeners := testListeners{}
+	listeners.start(t)
+	defer listeners.close()
+
+	// Start a client with HTTP_PROXY set to the proxy listener.
+	// The server is set to a nonexistent URL because ProxyFromEnvironment
+	// always returns a nil proxy for local destination URLs. For this case, we
+	// confirm the intended destination by setting it in the http headers,
+	// triggered in doClientPing by the TEST_HEADER_URL environment variable.
+	_, err := execClient(
+		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
+		"TEST_HEADER_URL="+listeners.server.URL,
+		"HTTP_PROXY="+listeners.proxy.URL)
+	assert.NoError(t, err)
+	// We expect one proxy request and 0 server requests
+	listeners.checkFinalState(t, 0, 1)
+}
+
+// TestClientSettingsOverrideEnvironmentProxy confirms that when both
+// ClientSettings.Proxy and HTTP_PROXY are set, ClientSettings takes precedence.
+func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
+	listeners := testListeners{}
+	listeners.start(t)
+	defer listeners.close()
+
+	// Start a client with ClientSettings.Proxy set to the proxy listener and
+	// HTTP_PROXY set to the server listener. We expect that the former will
+	// override the latter and thus we will only see a ping to the proxy.
+	// As above, the fake URL is needed to ensure ProxyFromEnvironment gives a
+	// non-nil result.
+	_, err := execClient(
+		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
+		"TEST_HEADER_URL="+listeners.server.URL,
+		"TEST_PROXY_URL="+listeners.proxy.URL,
+		"HTTP_PROXY="+listeners.server.URL)
+	assert.NoError(t, err)
+	// We expect one proxy request and 0 server requests
+	listeners.checkFinalState(t, 0, 1)
+}
+
+// runClientTest executes the current test binary as a child process,
+// running only the TestClientPing, and calling it with the environment variable
+// TEST_START_CLIENT=1 (so the test can recognize that it is the child process),
+// and any additional environment settings specified in env.
+// This is helpful for testing proxy settings, since we need to have both a
+// proxy / server-side listener and a client that communicates with the server
+// using various proxy settings.
+func execClient(env ...string) (*bytes.Buffer, error) {
+	// The child process always runs only the TestClientPing test, which pings
+	// the server at TEST_SERVER_URL and then terminates.
+	cmd := exec.Command(os.Args[0], "-test.run=TestClientPing")
+	cmd.Env = append(append(os.Environ(),
+		"TEST_START_CLIENT=1"),
+		env...)
+	stderr := new(bytes.Buffer)
+	cmd.Stderr = stderr
+
+	err := cmd.Run()
+	return stderr, err
+}
+
+func doClientPing(t *testing.T) {
+	serverURL := os.Getenv("TEST_SERVER_URL")
+	proxy := os.Getenv("TEST_PROXY_URL")
+	headerURL := os.Getenv("TEST_HEADER_URL")
+	clientSettings := ClientSettings{
+		URL:     serverURL,
+		Index:   outil.MakeSelector(outil.ConstSelectorExpr("test")),
+		Headers: map[string]string{"X-Test-URL": serverURL},
+	}
+	if proxy != "" {
+		proxyURL, err := url.Parse(proxy)
+		assert.NoError(t, err)
+		clientSettings.Proxy = proxyURL
+	}
+	if headerURL != "" {
+		// Some tests point at an intentionally invalid server because golang's
+		// helpers never return a proxy for a request to the local host (see
+		// TestEnvironmentProxy), and in that case we still want to record the real
+		// server URL in the headers for verification.
+		clientSettings.Headers["X-Test-URL"] = headerURL
+	}
+	client, err := NewClient(clientSettings, nil)
+	assert.NoError(t, err)
+
+	// This ping won't succeed; we aren't testing end-to-end communication
+	// (which would require a lot more setup work), we just want to make sure
+	// the client is pointed at the right server or proxy.
+	client.Ping()
+}
+
+// testListeners is a wrapper that handles starting up http listeners
+// representing an elastic server and an intermediate proxy, confirming that
+// requests target the expected (server) URL, and counting how many requests
+// arrive at each endpoint.
+type testListeners struct {
+	server *httptest.Server
+	proxy  *httptest.Server
+
+	// T
+	mutex sync.Mutex
+
+	serverRequestCount int // Requests directly to the server
+	proxyRequestCount  int // Requests via the proxy
+
+	errors []string
+}
+
+func (tl *testListeners) start(t *testing.T) {
+	tl.server = httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tl.mutex.Lock()
+			defer tl.mutex.Unlock()
+			tl._assertEqual("server handler", tl.server.URL, r.Header.Get("X-Test-URL"))
+			fmt.Fprintln(w, "Hello, client")
+			tl.serverRequestCount++
+		}))
+	tl.proxy = httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tl.mutex.Lock()
+			defer tl.mutex.Unlock()
+			tl._assertEqual("proxy handler", tl.server.URL, r.Header.Get("X-Test-URL"))
+			fmt.Fprintln(w, "Hello, client")
+			tl.proxyRequestCount++
+		}))
+}
+
+func (tl *testListeners) close() {
+	tl.server.Close()
+	tl.proxy.Close()
+}
+
+func (tl *testListeners) checkFinalState(
+	t *testing.T, expectedServerCount int, expectedProxyCount int) {
+	assert.Equal(t, expectedServerCount, tl.serverRequestCount)
+	assert.Equal(t, expectedProxyCount, tl.proxyRequestCount)
+	if len(tl.errors) > 0 {
+		// One or more of the server requests had a problem
+		assert.Fail(t,
+			"Error(s) in server requests",
+			strings.Join(tl.errors, "\n"))
+	}
+}
+
+// _assertEqual compares the given strings and adds an error to
+// s.errors if they aren't equal. The caller must hold s.mutex.
+// We do this because testing.T is not thread safe, and we can't make
+// testing assertions directly from our http handlers.
+func (tl *testListeners) _assertEqual(
+	source string, expected string, got string) {
+	if expected != got {
+		tl.errors = append(tl.errors, fmt.Sprintf(
+			"Bad value in %v: expected [%v], got [%v]", source, expected, got))
+	}
+}
