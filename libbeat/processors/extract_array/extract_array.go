@@ -64,22 +64,22 @@ func init() {
 }
 
 // Unpack unpacks the processor's configuration.
-func (p *extractArrayProcessor) Unpack(from *common.Config) error {
+func (f *extractArrayProcessor) Unpack(from *common.Config) error {
 	tmp := defaultConfig
 	err := from.Unpack(&tmp)
 	if err != nil {
 		return fmt.Errorf("failed to unpack the extract_array configuration: %s", err)
 	}
-	p.config = tmp
-	for field, column := range p.Mappings.Flatten() {
+	f.config = tmp
+	for field, column := range f.Mappings.Flatten() {
 		colIdx, ok := common.TryToInt(column)
 		if !ok || colIdx < 0 {
 			return fmt.Errorf("bad extract_array mapping for field %s: %+v is not a positive integer", field, column)
 		}
-		p.mappings = append(p.mappings, fieldMapping{from: colIdx, to: field})
+		f.mappings = append(f.mappings, fieldMapping{from: colIdx, to: field})
 	}
-	sort.Slice(p.mappings, func(i, j int) bool {
-		return p.mappings[i].from < p.mappings[j].from
+	sort.Slice(f.mappings, func(i, j int) bool {
+		return f.mappings[i].from < f.mappings[j].from
 	})
 	return nil
 }
