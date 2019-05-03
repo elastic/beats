@@ -20,9 +20,10 @@
 package common
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
-	"github.com/pkg/errors"
 )
 
 // Capabilities contains the capability sets of a process
