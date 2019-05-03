@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -101,7 +102,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Construct metricDataQueries
-		metricDataQueries := constructMetricQueries(listMetricsOutput, int64(m.Period.Seconds()))
+		metricDataQueries := constructMetricQueries(listMetricsOutput, m.Period)
 		if len(metricDataQueries) == 0 {
 			continue
 		}
@@ -138,7 +139,7 @@ func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
 	return output.QueueUrls, nil
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, i, period)
@@ -147,8 +148,9 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64)
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Average"
+	periodInSec := int64(period.Seconds())
 	id := "sqs" + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 	metricName := *metric.MetricName
@@ -163,7 +165,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (m
 	metricDataQuery = cloudwatch.MetricDataQuery{
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
-			Period: &period,
+			Period: &periodInSec,
 			Stat:   &statistic,
 			Metric: &metric,
 		},
