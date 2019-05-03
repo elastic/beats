@@ -25925,6 +25925,26 @@ Summary metrics of open sockets in the host system
 
 
 
+*`system.socket.summary.tcp.orphan_sockets`*::
++
+--
+type: integer
+
+A count of all orphaned tcp sockets. Only available on Linux.
+
+
+--
+
+*`system.socket.summary.tcp.socket_memory`*::
++
+--
+type: integer
+
+Memory used by TCP sockets. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on linux. 
+
+
+--
+
 [float]
 == all fields
 

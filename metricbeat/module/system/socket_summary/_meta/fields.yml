@@ -23,6 +23,14 @@
       description: >
         All TCP connections
       fields:
+        - name: orphan_sockets
+          type: integer
+          description: >
+            A count of all orphaned tcp sockets. Only available on Linux.
+        - name: socket_memory
+          type: integer
+          description: >
+            Memory used by TCP sockets. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on linux. 
         - name: all
           type: group
           description: >

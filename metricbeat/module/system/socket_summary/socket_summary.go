@@ -18,13 +18,19 @@
 package socket_summary
 
 import (
+	"path/filepath"
 	"syscall"
 
+	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/system"
 )
+
+var debugf = logp.MakeDebug("socket_summary")
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -43,13 +49,20 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sockstat string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	systemModule, ok := base.Module().(*system.Module)
+	if !ok {
+		return nil, errors.New("unexpected module type")
+	}
+	dir := filepath.Join(systemModule.HostFS, "/proc/net/sockstat")
 	return &MetricSet{
 		BaseMetricSet: base,
+		sockstat:      dir,
 	}, nil
 }
 
@@ -114,17 +127,24 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// all network connections
 	conns, err := net.Connections("inet")
 
 	if err != nil {
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error getting connections")
 	}
 
+	stats := calculateConnStats(conns)
+	newStats, err := applyEnhancements(stats, m)
+	if err != nil {
+		return errors.Wrap(err, "error applying enhancements")
+	}
+	debugf("tcp %#v", newStats["tcp"])
 	report.Event(mb.Event{
-		MetricSetFields: calculateConnStats(conns),
+		MetricSetFields: newStats,
 	})
+
+	return nil
 }
