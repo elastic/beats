@@ -35,6 +35,8 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Auditbeat*
 
+- Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+
 *Filebeat*
 
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
