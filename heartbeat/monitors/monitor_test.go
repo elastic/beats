@@ -78,6 +78,7 @@ func TestMonitor(t *testing.T) {
 
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "@every 1ms", "http://example.net")
+	badConf := mockBadPluginConf(t, "custom", "@every 1ms")
 	reg := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
@@ -90,14 +91,19 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 		return newMonitor(serverMonConf, reg, pipelineConnector, sched, false, nil)
 	}
 
+	// Ensure that an error is returned on a bad config
+	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched, false, nil)
+	require.Error(t, m0Err)
+
+	// Would fail if the previous newMonitor didn't free the monitor.id
 	m1, m1Err := makeTestMon()
-	assert.NoError(t, m1Err)
+	require.NoError(t, m1Err)
 	_, m2Err := makeTestMon()
-	assert.Error(t, m2Err)
+	require.Error(t, m2Err)
 
 	m1.Stop()
 	_, m3Err := makeTestMon()
-	assert.NoError(t, m3Err)
+	require.NoError(t, m3Err)
 }
 
 func TestCheckInvalidConfig(t *testing.T) {
