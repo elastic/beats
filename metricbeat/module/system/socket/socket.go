@@ -78,9 +78,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	if !ptable.Privileged() {
-		logp.Info("socket process info will only be available for metricbeat process " +
-			"because it is running without enough privileges " +
-			"(sys_ptrace and dac_read_search capabilities required)")
+		logp.Info("socket process info will only be available for processes owned by the %v user "+
+			"because this Beat is not running with enough privileges", os.Geteuid())
 	}
 
 	m := &MetricSet{
@@ -213,7 +212,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 		c.Command = proc.Command
 		c.CmdLine = proc.CmdLine
 		c.Args = proc.Args
-	} else if m.euid == 0 {
+	} else if m.ptable.Privileged() {
 		if c.Inode == 0 {
 			c.ProcessError = fmt.Errorf("process has exited. inode=%v, tcp_state=%v",
 				c.Inode, c.State)

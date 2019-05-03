@@ -1,5 +1,3 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
 // this work for additional information regarding copyright
 // ownership. Elasticsearch B.V. licenses this file to you under
 // the Apache License, Version 2.0 (the "License"); you may
@@ -18,8 +16,10 @@
 package socket
 
 import (
+	"os"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
@@ -78,19 +78,9 @@ func (t *ProcTable) Privileged() bool {
 // If running as non-root, only information from the current process will be
 // collected.
 func (t *ProcTable) Refresh() error {
-	var err error
-	var procs []procfs.Proc
-	if t.privileged {
-		procs, err = t.fs.AllProcs()
-		if err != nil {
-			return err
-		}
-	} else {
-		proc, err := t.fs.Self()
-		if err != nil {
-			return err
-		}
-		procs = append(procs, proc)
+	procs, err := t.accessibleProcs()
+	if err != nil {
+		return err
 	}
 
 	var errs multierror.Errors
@@ -132,6 +122,35 @@ func (t *ProcTable) Refresh() error {
 	t.procs = cachedProcs
 	t.inodes = inodes
 	return errs.Err()
+}
+
+func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
+	procs, err := t.fs.AllProcs()
+	if err != nil {
+		return nil, err
+	}
+	if t.privileged {
+		return procs, nil
+	}
+
+	// Filter out not owned processes
+	k := 0
+	euid := uint32(os.Geteuid())
+	for i := 0; i < len(procs); i++ {
+		p := t.fs.Path(strconv.Itoa(procs[i].PID))
+		info, err := os.Stat(p)
+		if err != nil {
+			continue
+		}
+		stat, ok := info.Sys().(*syscall.Stat_t)
+		if !ok || stat.Uid != euid {
+			continue
+		}
+		procs[k] = procs[i]
+		k++
+	}
+
+	return procs[:k], nil
 }
 
 func socketInodes(p *procfs.Proc) ([]uint32, error) {
