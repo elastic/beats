@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Auditd module: Normalized value of `event.category` field from `user-login` to `authentication`. {pull}11432[11432]
 - Auditd module: Unset `auditd.session` and `user.audit.id` fields are removed from audit events. {issue}11431[11431] {pull}11815[11815]
+- Socket dataset: Exclude localhost by default {pull}11993[11993]
 
 *Filebeat*
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
@@ -175,6 +176,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new disk states and raid level to the system/raid metricset. {pull}11613[11613]
 - Added `path_name` and `start_name` to service metricset on windows module {issue}8364[8364] {pull}11877[11877]
 - Add check on object name in the counter path if the instance name is missing {issue}6528[6528] {pull}11878[11878]
+- Add AWS cloudwatch metricset. {pull}11798[11798] {issue}11734[11734]
+- Add `regions` in aws module config to specify target regions for querying cloudwatch metrics. {issue}11932[11932] {pull}11956[11956]
 
 *Packetbeat*
 

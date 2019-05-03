@@ -17,6 +17,7 @@ Test Harvesters
 
 class Test(BaseTest):
 
+    @unittest.skip('flaky test https://github.com/elastic/beats/issues/12037')
     def test_close_renamed(self):
         """
         Checks that a file is closed when its renamed / rotated
