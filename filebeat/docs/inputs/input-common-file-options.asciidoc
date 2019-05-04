@@ -227,6 +227,13 @@ from inode reuse on Linux. For more information, see <<inode-reuse-issue>>.
 NOTE: Every time a file is renamed, the file state is updated and the counter
 for `clean_inactive` starts at 0 again.
 
+TIP: During testing, you might notice that the registry contains state entries
+that should be removed based on the `clean_inactive` setting. This happens
+because {beatname_uc} doesn't remove the entries until it opens the registry
+again to read a different file. If you are testing the `clean_inactive` setting,
+make sure {beatname_uc} is configured to read from more than one file, or the
+file state will never be removed from the registry. 
+
 [float]
 [id="{beatname_lc}-input-{type}-clean-removed"]
 ===== `clean_removed`
