@@ -133,25 +133,31 @@ func (a *gapCountACK) ackLoop() {
 
 	acks, drop := a.acks, a.drop
 	closing := false
+	empty := false
 
 	for {
 		select {
 		case <-a.done:
 			closing = true
 			a.done = nil
+			if a.events.Load() == 0 {
+				// stop worker, if all events accounted for have been ACKed
+				return
+			}
 
 		case <-a.pipeline.ackDone:
 			return
 
 		case n := <-acks:
-			empty := a.handleACK(n)
+			empty = a.handleACK(n)
 			if empty && closing && a.events.Load() == 0 {
-				// stop worker, iff all events accounted for have been ACKed
+				// stop worker, if all events accounted for have been ACKed
 				return
 			}
 
 		case <-drop:
 			// TODO: accumulate multiple drop events + flush count with timer
+			a.events.Sub(1)
 			a.fn(1, 0)
 		}
 	}
