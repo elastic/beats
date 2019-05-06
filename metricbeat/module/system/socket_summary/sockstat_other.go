@@ -25,5 +25,4 @@ import "github.com/elastic/beats/libbeat/common"
 //get a list of platform-specific enhancements and apply them to our mapStr object.
 func applyEnhancements(data common.MapStr, m *MetricSet) (common.MapStr, error) {
 	return data, nil
-
 }

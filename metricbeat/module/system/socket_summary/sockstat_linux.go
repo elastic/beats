@@ -23,13 +23,15 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/module/system"
 )
 
-//SockStat contains data from /proc/net/sockstat
+// SockStat contains data from /proc/net/sockstat
 type SockStat struct {
 	//The count of all sockets in use on the system, in the most liberal definition. See `ss -s` and `ss -a` for more.
 	SocketsUsed int
@@ -57,20 +59,26 @@ type SockStat struct {
 	FragMemory int
 }
 
-//get a list of platform-specific enhancements and apply them to our mapStr object.
+// applyEnhancements gets a list of platform-specific enhancements and apply them to our mapStr object.
 func applyEnhancements(data common.MapStr, m *MetricSet) (common.MapStr, error) {
-	stat, err := parseSockstat(m.sockstat)
+	systemModule, ok := m.BaseMetricSet.Module().(*system.Module)
+	if !ok {
+		return nil, errors.New("unexpected module type")
+	}
+	dir := filepath.Join(systemModule.HostFS, "/proc/net/sockstat")
+
+	stat, err := parseSockstat(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting sockstat data")
 	}
-	data["tcp"].(common.MapStr)["orphan_sockets"] = stat.TCPOrphan
-	data["tcp"].(common.MapStr)["socket_memory"] = os.Getpagesize() * stat.TCPMem
+	data.Put("tcp.orphaned", stat.TCPOrphan)
+	data.Put("tcp.memory", os.Getpagesize()*stat.TCPMem)
 
 	return data, nil
 
 }
 
-//parse the ipv4 sockstat file
+// parseSockstat parses the ipv4 sockstat file
 //see net/ipv4/proc.c
 func parseSockstat(path string) (SockStat, error) {
 	fd, err := os.Open(path)
@@ -100,10 +108,9 @@ func parseSockstat(path string) (SockStat, error) {
 
 	iter := 0
 	for scanner.Scan() {
-
 		//bail if we've iterated more times than expected
 		if iter >= len(scanfLines) {
-			return ss, errors.New("too many lines in sockstat")
+			return ss, nil
 		}
 		txt := scanner.Text()
 		count, err := fmt.Sscanf(txt, scanfLines[iter], scanfOut[iter]...)
@@ -114,11 +121,11 @@ func parseSockstat(path string) (SockStat, error) {
 			return ss, fmt.Errorf("did not match fields in line %s", scanfLines[iter])
 		}
 
-		if err = scanner.Err(); err != nil {
-			return ss, errors.Wrap(err, "error in scan")
-		}
-
 		iter++
+	}
+
+	if err = scanner.Err(); err != nil {
+		return ss, errors.Wrap(err, "error in scan")
 	}
 
 	return ss, nil
