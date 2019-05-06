@@ -65,9 +65,22 @@ type Reload struct {
 
 type RunnerFactory interface {
 	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+}
+
+// ConfigChecker is usually combined with a RunnerFactory for implementations that can check a config
+// without a pipeline and metadata.
+type ConfigChecker interface {
 	CheckConfig(config *common.Config) error
 }
 
+// CheckableRunnerFactory is the union of RunnerFactory and ConfigChecker.
+type CheckableRunnerFactory interface {
+	RunnerFactory
+	ConfigChecker
+}
+
+// Runner is a simple interface providing a simple way to
+// Start and Stop Reloader
 type Runner interface {
 	// We include fmt.Stringer here because we do log debug messages that must print
 	// something for the given Runner. We need Runner implementers to consciously implement a
@@ -137,7 +150,13 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 		if !c.Config.Enabled() {
 			continue
 		}
-		_, err := runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
+
+		if checker, ok := runnerFactory.(ConfigChecker); ok {
+			err = checker.CheckConfig(c.Config)
+		} else {
+			_, err = runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
+		}
+
 		if err != nil {
 			return err
 		}
