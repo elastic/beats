@@ -140,7 +140,9 @@ func (a *gapCountACK) ackLoop() {
 			closing = true
 			a.done = nil
 			if a.events.Load() == 0 {
-				// stop worker, if all events accounted for have been ACKed
+				// stop worker, if all events accounted for have been ACKed.
+				// If new events are added after this acker won't handle them, which may
+				// result in duplicates
 				return
 			}
 
