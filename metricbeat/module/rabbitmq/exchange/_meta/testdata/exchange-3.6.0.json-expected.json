@@ -1,0 +1,202 @@
+[
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": false,
+                "name": "amq.fanout",
+                "type": "fanout"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": true,
+                "name": "amq.rabbitmq.trace",
+                "type": "topic"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": false,
+                "name": "amq.match",
+                "type": "headers"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": true,
+                "name": "amq.rabbitmq.log",
+                "type": "topic"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": false,
+                "name": "amq.topic",
+                "type": "topic"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": false,
+                "name": "amq.headers",
+                "type": "headers"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": false,
+                "name": "",
+                "type": "direct"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    },
+    {
+        "event": {
+            "dataset": "rabbitmq.exchange",
+            "duration": 115000,
+            "module": "rabbitmq"
+        },
+        "metricset": {
+            "name": "exchange"
+        },
+        "rabbitmq": {
+            "exchange": {
+                "arguments": {},
+                "auto_delete": false,
+                "durable": true,
+                "internal": false,
+                "name": "amq.direct",
+                "type": "direct"
+            },
+            "vhost": "/"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "rabbitmq"
+        }
+    }
+]
