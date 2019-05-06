@@ -21,7 +21,6 @@
 package elasticsearch
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -57,7 +56,7 @@ func TestBaseline(t *testing.T) {
 	defer listeners.close()
 
 	// Start a bare client with no proxy settings, pointed at the main server.
-	_, err := execClient("TEST_SERVER_URL=" + listeners.server.URL)
+	err := execClient("TEST_SERVER_URL=" + listeners.server.URL)
 	assert.NoError(t, err)
 	// We expect one server request and 0 proxy requests
 	listeners.checkFinalState(t, 1, 0)
@@ -72,7 +71,7 @@ func TestClientSettingsProxy(t *testing.T) {
 	defer listeners.close()
 
 	// Start a client with ClientSettings.Proxy set to the proxy listener.
-	_, err := execClient(
+	err := execClient(
 		"TEST_SERVER_URL="+listeners.server.URL,
 		"TEST_PROXY_URL="+listeners.proxy.URL)
 	assert.NoError(t, err)
@@ -93,7 +92,7 @@ func TestEnvironmentProxy(t *testing.T) {
 	// always returns a nil proxy for local destination URLs. For this case, we
 	// confirm the intended destination by setting it in the http headers,
 	// triggered in doClientPing by the TEST_HEADER_URL environment variable.
-	_, err := execClient(
+	err := execClient(
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
 		"TEST_HEADER_URL="+listeners.server.URL,
 		"HTTP_PROXY="+listeners.proxy.URL)
@@ -114,7 +113,7 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 	// override the latter and thus we will only see a ping to the proxy.
 	// As above, the fake URL is needed to ensure ProxyFromEnvironment gives a
 	// non-nil result.
-	_, err := execClient(
+	err := execClient(
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
 		"TEST_HEADER_URL="+listeners.server.URL,
 		"TEST_PROXY_URL="+listeners.proxy.URL,
@@ -131,18 +130,14 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 // This is helpful for testing proxy settings, since we need to have both a
 // proxy / server-side listener and a client that communicates with the server
 // using various proxy settings.
-func execClient(env ...string) (*bytes.Buffer, error) {
+func execClient(env ...string) error {
 	// The child process always runs only the TestClientPing test, which pings
 	// the server at TEST_SERVER_URL and then terminates.
 	cmd := exec.Command(os.Args[0], "-test.run=TestClientPing")
 	cmd.Env = append(append(os.Environ(),
 		"TEST_START_CLIENT=1"),
 		env...)
-	stderr := new(bytes.Buffer)
-	cmd.Stderr = stderr
-
-	err := cmd.Run()
-	return stderr, err
+	return cmd.Run()
 }
 
 func doClientPing(t *testing.T) {
