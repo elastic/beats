@@ -184,7 +184,8 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.cmd, "--template"])
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd, "--template"])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
@@ -200,7 +201,8 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.cmd])
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
@@ -216,7 +218,8 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.cmd,
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
@@ -233,7 +236,8 @@ class TestCommandSetupILMPolicy(BaseTest):
         policy_name = self.beat_name + "_foo"
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.cmd,
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.policy_name=" + policy_name])
 
         assert exit_code == 0
@@ -249,7 +253,8 @@ class TestCommandSetupILMPolicy(BaseTest):
         alias_name = self.beat_name + "_foo"
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.cmd,
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
 
         assert exit_code == 0

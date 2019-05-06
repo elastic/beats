@@ -26,13 +26,3 @@ class BaseTest(TestCase):
 
         self._es = Elasticsearch([self.get_elasticsearch_url()])
         return self._es
-
-    # stolen from filebeat/tests/system/filebeat.py
-    @property
-    def logs(self):
-        return self.log_access()
-
-    # stolen from filebeat/tests/system/filebeat.py
-    def log_access(self, file=None):
-        file = file if file else self.beat_name + ".log"
-        return LogState(os.path.join(self.working_dir, file))

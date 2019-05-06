@@ -219,7 +219,8 @@ class TestCommandSetupTemplate(BaseTest):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup"])
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup"])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
@@ -234,7 +235,8 @@ class TestCommandSetupTemplate(BaseTest):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd])
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
@@ -253,7 +255,8 @@ class TestCommandSetupTemplate(BaseTest):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
                                               "-E", "setup.template.enabled=false"])
 
         assert exit_code == 0
@@ -272,7 +275,8 @@ class TestCommandSetupTemplate(BaseTest):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
                                               "-E", "setup.ilm.enabled=false",
                                               "-E", "setup.template.settings.index.number_of_shards=2"])
 
@@ -294,7 +298,8 @@ class TestCommandSetupTemplate(BaseTest):
         self.renderConfig()
         alias_name = self.beat_name + "_foo"
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
 
         assert exit_code == 0
@@ -315,7 +320,8 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
 
         alias_name = self.beat_name + "_foo"
-        exit_code = self.run_beat(extra_args=["setup", "--template",
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", "--template",
                                               "-E", "setup.template.overwrite=false",
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
         assert exit_code == 0
