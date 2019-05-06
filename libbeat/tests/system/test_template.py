@@ -1,8 +1,9 @@
-from base import BaseTest
+from base import BaseTest, IndexAssertions
 import os
 from elasticsearch import Elasticsearch, TransportError
 from nose.plugins.attrib import attr
 import unittest
+import shutil
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -111,3 +112,266 @@ class Test(BaseTest):
 
     def get_host(self):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
+
+
+class TestRunTemplate(IndexAssertions):
+
+    def setUp(self):
+        super(TestRunTemplate, self).setUp()
+
+        # auto-derived default settings, if nothing else is set
+        self.index_name = self.beat_name + "-9.9.9"
+
+        self.clean()
+
+    def renderConfig(self, **kwargs):
+        self.render_config_template(
+            elasticsearch={"hosts": self.get_elasticsearch_url()},
+            **kwargs
+        )
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_template_default(self):
+        """
+        Test run cmd with default settings for template
+        """
+        self.renderConfig()
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("template with name 'mockbeat-9.9.9' loaded"))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        proc.check_kill_and_wait()
+
+        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.assert_alias_created(self.index_name)
+        self.assert_docs_written_to_alias(self.index_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_template_created_on_ilm_policy_created(self):
+        """
+        Test run cmd overwrites template when new ilm policy is created
+        """
+
+        self.renderConfig()
+
+        exit_code = self.run_beat(extra_args=["setup"])
+        assert exit_code == 0
+        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+
+        alias_name = "foo"
+        proc = self.start_beat(extra_args=["-E", "setup.template.overwrite=false",
+                                           "-E", "setup.ilm.rollover_alias=" + alias_name])
+
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains(alias_name))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        proc.check_kill_and_wait()
+
+        self.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_template_disabled(self):
+        """
+        Test run cmd when loading template is disabled
+        """
+        self.renderConfig()
+
+        proc = self.start_beat(extra_args=["-E", "setup.template.enabled=false"])
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        proc.check_kill_and_wait()
+
+        self.assert_index_template_not_loaded(self.index_name)
+
+
+class TestCommandSetupTemplate(IndexAssertions):
+    """
+    Test beat command `setup` related to template
+    """
+
+    def setUp(self):
+        super(TestCommandSetupTemplate, self).setUp()
+
+        # auto-derived default settings, if nothing else is set
+        self.index_name = self.beat_name + "-9.9.9"
+        self.setupCmd = "--template"
+
+        self.clean()
+
+    def renderConfig(self, **kwargs):
+        self.render_config_template(
+            elasticsearch={"hosts": self.get_elasticsearch_url()},
+            **kwargs
+        )
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup(self):
+        """
+        Test setup cmd with all subcommands
+        """
+        self.renderConfig()
+
+        exit_code = self.run_beat(extra_args=["setup"])
+
+        assert exit_code == 0
+        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.assert_alias_created(self.index_name)
+        self.assert_policy_created(self.index_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_template_default(self):
+        """
+        Test template setup with default config
+        """
+        self.renderConfig()
+
+        exit_code = self.run_beat(extra_args=["setup", self.setupCmd])
+
+        assert exit_code == 0
+        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
+
+        # when running `setup --template`
+        # write_alias and rollover_policy related to ILM are also created
+        self.assert_alias_created(self.index_name)
+        self.assert_policy_created(self.index_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_template_disabled(self):
+        """
+        Test template setup when ilm disabled
+        """
+        self.renderConfig()
+
+        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.template.enabled=false"])
+
+        assert exit_code == 0
+        self.assert_index_template_not_loaded(self.index_name)
+
+        # when running `setup --template` and `setup.template.enabled=false`
+        # write_alias and rollover_policy related to ILM are still created
+        self.assert_alias_created(self.index_name)
+        self.assert_policy_created(self.index_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_template_with_opts(self):
+        """
+        Test template setup with config options
+        """
+        self.renderConfig()
+
+        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.enabled=false",
+                                              "-E", "setup.template.settings.index.number_of_shards=2"])
+
+        assert exit_code == 0
+        self.assert_index_template_loaded(self.index_name)
+
+        # check that settings are overwritten
+        resp = self.es.transport.perform_request('GET', '/_template/' + self.index_name)
+        assert self.index_name in resp
+        index = resp[self.index_name]["settings"]["index"]
+        assert index["number_of_shards"] == "2", index["number_of_shards"]
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_template_with_ilm_changed_pattern(self):
+        """
+        Test template setup with changed ilm.rollover_alias config
+        """
+        self.renderConfig()
+        alias_name = "foo"
+
+        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.rollover_alias=" + alias_name])
+
+        assert exit_code == 0
+        self.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
+        self.assert_index_template_index_pattern(alias_name, [alias_name + "-*"])
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_template_created_on_ilm_policy_created(self):
+        """
+        Test run cmd overwrites template when new ilm policy is created
+        """
+
+        self.renderConfig()
+
+        exit_code = self.run_beat(extra_args=["setup"])
+        assert exit_code == 0
+        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+
+        alias_name = "foo"
+        exit_code = self.run_beat(extra_args=["setup", "--template",
+                                              "-E", "setup.template.overwrite=false",
+                                              "-E", "setup.ilm.rollover_alias=" + alias_name])
+        assert exit_code == 0
+
+        self.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
+
+
+class TestCommandExportTemplate(IndexAssertions):
+    """
+    Test beat command `export template`
+    """
+
+    def setUp(self):
+        super(TestCommandExportTemplate, self).setUp()
+
+        self.config = "libbeat.yml"
+        self.output = os.path.join(self.working_dir, self.config)
+        shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
+
+        self.template_name = self.beat_name + "-9.9.9"
+
+    def test_default(self):
+        """
+        Test export template works
+        """
+        self.render_config_template(self.beat_name, self.output,
+                                    fields=self.output)
+        exit_code = self.run_beat(
+            extra_args=["export", "template"],
+            config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_template(self.template_name, self.template_name + "-*")
+
+    def test_changed_index_pattern(self):
+        """
+        Test export template with changed index pattern
+        """
+        self.render_config_template(self.beat_name, self.output,
+                                    fields=self.output)
+        alias_name = "mockbeat-ilm-index-pattern"
+
+        exit_code = self.run_beat(
+            extra_args=["export", "template",
+                        "-E", "setup.ilm.rollover_alias=" + alias_name],
+            config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_template(self.template_name, alias_name + "-*")
+
+    def test_load_disabled(self):
+        """
+        Test template also exported when disabled in config
+        """
+        self.render_config_template(self.beat_name, self.output,
+                                    fields=self.output)
+        exit_code = self.run_beat(
+            extra_args=["export", "template", "-E", "setup.template.enabled=false"],
+            config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_template(self.template_name, self.template_name + "-*")
