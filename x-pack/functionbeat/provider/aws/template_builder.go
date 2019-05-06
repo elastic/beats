@@ -101,7 +101,7 @@ func (d *defaultTemplateBuilder) execute(name string) (templateData, error) {
 
 	templateChecksum := checksum(templateJSON)
 	templateKey := keyPrefix + name + "/" + templateChecksum + "/cloudformation-template-create.json"
-	templateURL := "https://s3.amazonaws.com/" + d.bucket + "/" + templateKey
+	templateURL := "https://" + d.bucket + "s3.amazonaws.com/" + templateKey
 
 	return templateData{
 		json:     templateJSON,
