@@ -216,6 +216,34 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 				},
 			},
 		},
+
+		"nil values": {
+			config: common.MapStr{
+				"field": "array",
+				"mappings": common.MapStr{
+					"a": 0,
+					"b": 1,
+					"c": 2,
+					"d": 3,
+					"e": 4,
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"array": []interface{}{nil, "", []interface{}(nil), map[string]string(nil), (*int)(nil)},
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"array": []interface{}{nil, "", []interface{}(nil), map[string]string(nil), (*int)(nil)},
+					"a":     nil,
+					"b":     "",
+					"c":     []interface{}{},
+					"d":     map[string]string(nil),
+					"e":     (*int)(nil),
+				},
+			},
+		},
 	}
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
