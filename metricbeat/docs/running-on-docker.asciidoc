@@ -19,7 +19,6 @@ docker run \
   --mount type=bind,source=/sys/fs/cgroup,target=/hostfs/sys/fs/cgroup,readonly \ <2>
   --mount type=bind,source=/,target=/hostfs,readonly \ <3>
   --net=host \ <4>
-  --user root --cap-add sys_ptrace --cap-add dac_read_search \ <5>
   {dockerimage} -e -system.hostfs=/hostfs
 ----
 
@@ -42,17 +41,25 @@ of the container. They can be mounted at any location.
 to make this file contain the host's network devices is to use the `--net=host`
 flag. This is due to Linux namespacing; simply bind mounting the host's `/proc`
 to `/hostfs/proc` is not sufficient.
-<5> The <<metricbeat-metricset-system-socket,system socket metricset>> needs to
-read files from `/proc` that belong to multiple users. In order to access these
-files Metricbeat must be run as root in a container with `sys_ptrace` and
-`dac_read_search` capabilities. These options are not needed if this metricset
-is not used.
 
 NOTE: The special filesystems +/proc+ and +/sys+ are only available if the
 host system is running Linux. Attempts to bind-mount these filesystems will
 fail on Windows and MacOS.
 
+
+If the <<metricbeat-metricset-system-socket,system socket metricset>>
+is being used on Linux, more privileges will need to be granted to Metricbeat.
+This metricset reads files from `/proc` that are an interface to internal
+objects owned by other users. The capabilities needed to read all these files
+(`sys_ptrace` and `dac_read_search`) are disabled by default on Docker. To
+grant these permissions these flags are needed too:
+
+["source","sh",subs="attributes"]
+----
+--user root --cap-add sys_ptrace --cap-add dac_read_search
+----
 [float]
+
 [[monitoring-service]]
 ==== Monitor a service in another container
 
