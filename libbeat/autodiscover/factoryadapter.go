@@ -28,11 +28,11 @@ import (
 
 // FactoryAdapter is an adapter that works with any cfgfile.RunnerFactory.
 type FactoryAdapter struct {
-	factory cfgfile.RunnerFactory
+	factory cfgfile.CheckableRunnerFactory
 }
 
 // NewFactoryAdapter builds and returns an autodiscover adapter that works with any cfgfile.RunnerFactory.
-func NewFactoryAdapter(factory cfgfile.RunnerFactory) *FactoryAdapter {
+func NewFactoryAdapter(factory cfgfile.CheckableRunnerFactory) *FactoryAdapter {
 	return &FactoryAdapter{
 		factory: factory,
 	}
