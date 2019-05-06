@@ -22,8 +22,8 @@ metricbeat.modules:
 The metricset reports the process that has the socket open. To provide this
 information on Linux for all processes, Metricbeat must be run with
 `sys_ptrace` and `dac_read_search` capabilities. These permissions are usually
-granted when running as root, but they can and may need to be explictly enabled
-when running metricbeat inside a container.
+granted when running as root, but they can and may need to be explictly added
+when running Metricbeat inside a container.
 
 [float]
 === Configuration
