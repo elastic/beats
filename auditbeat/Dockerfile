@@ -1,4 +1,4 @@
-FROM golang:1.11.5
+FROM golang:1.12.4
 
 RUN \
     apt-get update \

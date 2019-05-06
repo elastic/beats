@@ -161,6 +161,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	}
 
 	clusterStats := common.MapStr(data)
+	clusterStats.Delete("_nodes")
 
 	value, err := clusterStats.GetValue("cluster_name")
 	if err != nil {
@@ -170,6 +171,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if !ok {
 		return fmt.Errorf("cluster name is not a string")
 	}
+	clusterStats.Delete("cluster_name")
 
 	license, err := elasticsearch.GetLicense(m.HTTP, m.HTTP.GetURI())
 	if err != nil {
@@ -181,6 +183,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	if err != nil {
 		return errors.Wrap(err, "failed to get cluster state from Elasticsearch")
 	}
+	clusterState.Delete("cluster_name")
 
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterState); err != nil {
 		return errors.Wrap(err, "failed to pass through status field")

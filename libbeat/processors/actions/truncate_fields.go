@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type truncateFieldsConfig struct {
@@ -48,14 +49,15 @@ type truncater func(*truncateFields, []byte) ([]byte, bool, error)
 
 func init() {
 	processors.RegisterPlugin("truncate_fields",
-		configChecked(newTruncateFields,
-			requireFields("fields"),
-			mutuallyExclusiveRequiredFields("max_bytes", "max_characters"),
+		checks.ConfigChecked(NewTruncateFields,
+			checks.RequireFields("fields"),
+			checks.MutuallyExclusiveRequiredFields("max_bytes", "max_characters"),
 		),
 	)
 }
 
-func newTruncateFields(c *common.Config) (processors.Processor, error) {
+// NewTruncateFields returns a new truncate_fields processor.
+func NewTruncateFields(c *common.Config) (processors.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {

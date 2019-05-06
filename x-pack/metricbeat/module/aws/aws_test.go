@@ -9,6 +9,7 @@ package aws
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -49,33 +50,36 @@ func TestGetRegions(t *testing.T) {
 }
 
 func TestConvertPeriodToDuration(t *testing.T) {
-	period1 := "300s"
-	duration1, periodSec1, err := convertPeriodToDuration(period1)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-600s", duration1)
-	assert.Equal(t, 300, periodSec1)
+	cases := []struct {
+		period               time.Duration
+		expectedDuration     string
+		expectedPeriodNumber int
+	}{
+		{
+			period:               time.Duration(300) * time.Second,
+			expectedDuration:     "-10m0s",
+			expectedPeriodNumber: 300,
+		},
+		{
+			period:               time.Duration(10) * time.Minute,
+			expectedDuration:     "-20m0s",
+			expectedPeriodNumber: 600,
+		},
+		{
+			period:               time.Duration(30) * time.Second,
+			expectedDuration:     "-1m0s",
+			expectedPeriodNumber: 30,
+		},
+		{
+			period:               time.Duration(60) * time.Second,
+			expectedDuration:     "-2m0s",
+			expectedPeriodNumber: 60,
+		},
+	}
 
-	period2 := "30ss"
-	duration2, periodSec2, err := convertPeriodToDuration(period2)
-	assert.Error(t, err)
-	assert.Equal(t, "", duration2)
-	assert.Equal(t, 0, periodSec2)
-
-	period3 := "10m"
-	duration3, periodSec3, err := convertPeriodToDuration(period3)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-20m", duration3)
-	assert.Equal(t, 600, periodSec3)
-
-	period4 := "30s"
-	duration4, periodSec4, err := convertPeriodToDuration(period4)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-60s", duration4)
-	assert.Equal(t, 30, periodSec4)
-
-	period5 := "60s"
-	duration5, periodSec5, err := convertPeriodToDuration(period5)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-120s", duration5)
-	assert.Equal(t, 60, periodSec5)
+	for _, c := range cases {
+		duration, periodSec := convertPeriodToDuration(c.period)
+		assert.Equal(t, c.expectedDuration, duration)
+		assert.Equal(t, c.expectedPeriodNumber, periodSec)
+	}
 }

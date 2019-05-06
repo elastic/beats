@@ -48,8 +48,8 @@ func TestExitWithError(t *testing.T) {
 			RunWith(func(cmd *cobra.Command, args []string) error {
 				return fmt.Errorf("Something bad")
 			})(cmd, args)
-			return
 		}()
+		return
 	}
 
 	stderr, err := runCli("TestExitWithError")

@@ -1,0 +1,63 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "DBClusterIdentifier": "test1-cluster",
+                "Role": "WRITER"
+            },
+            "metrics": {
+                "ActiveTransactions": 0,
+                "AuroraBinlogReplicaLag": 0,
+                "AuroraReplicaLagMaximum": 19.964599990844725,
+                "AuroraReplicaLagMinimum": 19.964599990844725,
+                "BinLogDiskUsage": 0,
+                "BlockedTransactions": 0,
+                "BufferCacheHitRatio": 100,
+                "CPUUtilization": 3,
+                "CommitLatency": 7.4758933333333335,
+                "CommitThroughput": 0.4999718865659406,
+                "DDLLatency": 0,
+                "DDLThroughput": 0,
+                "DMLLatency": 0.16068,
+                "DMLThroughput": 0.4999718865659406,
+                "DatabaseConnections": 0,
+                "Deadlocks": 0,
+                "DeleteLatency": 0,
+                "DeleteThroughput": 0,
+                "EngineUptime": 1906152,
+                "FreeLocalStorage": 32210518016,
+                "FreeableMemory": 4688029286.4,
+                "InsertLatency": 0.16068,
+                "InsertThroughput": 0.4999718865659406,
+                "LoginFailures": 0,
+                "NetworkReceiveThroughput": 0.7000140072335472,
+                "NetworkThroughput": 1.4000280144670945,
+                "NetworkTransmitThroughput": 0.7000140072335472,
+                "Queries": 8.796634525053722,
+                "ResultSetCacheHitRatio": 0,
+                "SelectLatency": 0.17715786436043143,
+                "SelectThroughput": 3.086495583173847,
+                "UpdateLatency": 0,
+                "UpdateThroughput": 0
+            },
+            "namespace": "AWS/RDS"
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-east-2"
+    },
+    "event": {
+        "dataset": "aws.cloudwatch",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "cloudwatch"
+    },
+    "service": {
+        "name": "cloudwatch",
+        "type": "cloudwatch"
+    }
+}

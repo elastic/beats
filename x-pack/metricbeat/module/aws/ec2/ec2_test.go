@@ -16,10 +16,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // MockEC2Client struct is used for unit tests.
@@ -124,7 +123,7 @@ func TestGetInstanceIDs(t *testing.T) {
 
 func TestCreateCloudWatchEvents(t *testing.T) {
 	mockModuleConfig := aws.Config{
-		Period:        "300s",
+		Period:        300 * time.Second,
 		DefaultRegion: regionName,
 	}
 
@@ -195,11 +194,13 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		},
 	}
 
-	event, _, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
+	metricSet := MetricSet{}
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
-	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
-	assert.Equal(t, expectedEvent.MetricSetFields["instance"], event.MetricSetFields["instance"])
+	assert.Equal(t, 1, len(events))
+	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
+	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], events[instanceID].MetricSetFields["cpu"])
+	assert.Equal(t, expectedEvent.MetricSetFields["instance"], events[instanceID].MetricSetFields["instance"])
 }
 
 func TestConstructMetricQueries(t *testing.T) {
