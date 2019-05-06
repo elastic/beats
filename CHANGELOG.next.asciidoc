@@ -38,6 +38,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.1[Check the HEAD diff]
 
 *Heartbeat*
 
+- Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
+
 *Journalbeat*
 
 *Metricbeat*

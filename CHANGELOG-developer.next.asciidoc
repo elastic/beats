@@ -23,3 +23,5 @@ The list below covers the major changes between 7.1.0 and master only.
 ==== Bugfixes
 
 ==== Added
+
+Added new CheckableRunnerFactory to more clearly delineate which RunnerFactory impls have checkable configs. {pull}12117[12117]
