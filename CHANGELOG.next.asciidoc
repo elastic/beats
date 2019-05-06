@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Fix NPE on some monitor configuration errors. {pull}11910[11910]
+- Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
 
 *Journalbeat*
 
@@ -120,6 +121,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add an option to append to existing logs rather than always rotate on start. {pull}11953[11953]
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
 - Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
