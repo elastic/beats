@@ -133,7 +133,6 @@ func (a *gapCountACK) ackLoop() {
 
 	acks, drop := a.acks, a.drop
 	closing := false
-	empty := false
 
 	for {
 		select {
@@ -149,7 +148,7 @@ func (a *gapCountACK) ackLoop() {
 			return
 
 		case n := <-acks:
-			empty = a.handleACK(n)
+			empty := a.handleACK(n)
 			if empty && closing && a.events.Load() == 0 {
 				// stop worker, if all events accounted for have been ACKed
 				return
