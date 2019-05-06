@@ -68,6 +68,21 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{},
 		},
 		{
+			message: "Hints without matching port should return nothing",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9090,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "mockmoduledefaults",
+						"hosts":  "${data.host}:8888",
+					},
+				},
+			},
+			len:    0,
+			result: common.MapStr{},
+		},
+		{
 			message: "Only module hint should return all metricsets",
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -87,7 +102,7 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			message: "metricsets hint works",
+			message: "Metricsets hint works",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"hints": common.MapStr{

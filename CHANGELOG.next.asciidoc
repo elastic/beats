@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}[]
 
 *Packetbeat*
 
