@@ -1,0 +1,71 @@
+[
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "code": "200",
+                "le": "50"
+            },
+            "metrics": {
+                "hash_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "code": "200",
+                "le": "10"
+            },
+            "metrics": {
+                "hash_seconds_bucket": 2
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "code": "200"
+            },
+            "metrics": {
+                "hash_seconds_count": 0,
+                "hash_seconds_sum": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    }
+]

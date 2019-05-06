@@ -1,0 +1,7 @@
+# HELP hash_seconds Time taken to create hashes
+# TYPE hash_seconds histogram
+hash_seconds_bucket{code="200",le="1"} NaN
+hash_seconds_bucket{code="200",le="2.5"} +Inf
+hash_seconds_bucket{code="200",le="5"} -Inf
+hash_seconds_bucket{code="200",le="10"} 2
+hash_seconds_bucket{code="200",le="50"} 3

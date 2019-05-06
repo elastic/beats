@@ -19,7 +19,6 @@ package collector
 
 import (
 	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -29,6 +28,7 @@ import (
 const (
 	defaultScheme = "http"
 	defaultPath   = "/metrics"
+	nanInf        = 9223372036854775808
 )
 
 var (
@@ -77,6 +77,22 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		promEvents := getPromEventsFromMetricFamily(family)
 
 		for _, promEvent := range promEvents {
+			validValue := true
+			for k, v := range promEvent.data {
+				// Check if prometheus metric value is NaN, +Inf or -Inf.
+				// If it is, ignore this metric.
+				if vConverted, ok := v.(uint64); ok && vConverted == nanInf {
+					validValue = false
+					m.Logger().Debugf("prometheus metric %v has NaN/Inf value %v", k, v)
+					break
+				}
+			}
+
+			if !validValue {
+				continue
+			}
+
+			// If prometheus metric value is valid, then create the event.
 			labelsHash := promEvent.LabelsHash()
 			if _, ok := eventList[labelsHash]; !ok {
 				eventList[labelsHash] = common.MapStr{
