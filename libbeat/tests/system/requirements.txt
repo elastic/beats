@@ -10,7 +10,7 @@ dockerpty==0.4.1
 docopt==0.6.2
 elasticsearch==6.3.1
 enum34==1.1.6
-functools32==3.2.3.post2
+functools32==3.2.3-2
 idna==2.6
 ipaddress==1.0.19
 Jinja2==2.10.1
