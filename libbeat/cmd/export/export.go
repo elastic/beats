@@ -79,7 +79,7 @@ func (c *stdoutClient) GetVersion() common.Version {
 	return c.ver
 }
 
-func (c *stdoutClient) Write(_ string, _string, body string) error {
+func (c *stdoutClient) Write(_ string, _ string, body string) error {
 	_, err := c.f.WriteString(body)
 	return err
 }
