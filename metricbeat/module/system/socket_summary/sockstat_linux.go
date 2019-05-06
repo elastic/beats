@@ -73,6 +73,7 @@ func applyEnhancements(data common.MapStr, m *MetricSet) (common.MapStr, error) 
 	}
 	data.Put("tcp.orphaned", stat.TCPOrphan)
 	data.Put("tcp.memory", os.Getpagesize()*stat.TCPMem)
+	data.Put("udp.memory", os.Getpagesize()*stat.UDPMem)
 
 	return data, nil
 
