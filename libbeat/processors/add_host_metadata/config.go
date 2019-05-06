@@ -17,13 +17,23 @@
 
 package add_host_metadata
 
+import (
+	"time"
+
+	"github.com/elastic/beats/libbeat/processors/util"
+)
+
 // Config for add_host_metadata processor.
 type Config struct {
-	NetInfoEnabled bool `config:"netinfo.enabled"` // Add IP and MAC to event
+	NetInfoEnabled bool            `config:"netinfo.enabled"` // Add IP and MAC to event
+	CacheTTL       time.Duration   `config:"cache.ttl"`
+	Geo            *util.GeoConfig `config:"geo"`
+	Name           string          `config:"name"`
 }
 
 func defaultConfig() Config {
 	return Config{
 		NetInfoEnabled: false,
+		CacheTTL:       5 * time.Minute,
 	}
 }

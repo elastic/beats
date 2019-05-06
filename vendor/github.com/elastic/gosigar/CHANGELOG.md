@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.10.1]
+
+### Fixed
+- Replaced the WMI queries with win32 apis due to high CPU usage. #11840
+
+## [0.10.0]
+
+### Added
+- List filesystems on Windows that have an access path but not an assigned letter. #112
+
+### Fixed
+- Added missing runtime import for FreeBSD. #104
+- Handle nil command line in Windows processes. #110
+
 ## [0.9.0]
 
 ### Added

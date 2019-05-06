@@ -1,0 +1,11 @@
+- key: coredns
+  title: "coredns"
+  description: >
+    coredns Module
+  release: beta
+  fields:
+    - name: coredns
+      type: group
+      description: >
+        `coredns` contains statistics that were read from coreDNS
+      fields:

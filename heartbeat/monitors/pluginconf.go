@@ -28,6 +28,8 @@ var ErrPluginDisabled = errors.New("Monitor not loaded, plugin is disabled")
 
 // MonitorPluginInfo represents the generic configuration options around a monitor plugin.
 type MonitorPluginInfo struct {
+	ID      string `config:"id"`
+	Name    string `config:"name"`
 	Type    string `config:"type" validate:"required"`
 	Enabled bool   `config:"enabled"`
 }

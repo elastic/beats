@@ -26,88 +26,111 @@ import (
 	dto "github.com/prometheus/client_model/go"
 )
 
+// PromEvent stores a set of one or more metrics with the same labels
 type PromEvent struct {
-	key       string
-	value     common.MapStr
-	labels    common.MapStr
-	labelHash string
+	data   common.MapStr
+	labels common.MapStr
 }
 
-func GetPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
+// LabelsHash returns a repeatable string that is unique for the set of labels in this event
+func (p *PromEvent) LabelsHash() string {
+	return p.labels.String()
+}
+
+func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 	var events []PromEvent
 
 	name := *mf.Name
 	metrics := mf.Metric
 	for _, metric := range metrics {
-		event := PromEvent{
-			key:       name,
-			labelHash: "#",
-		}
-		value := common.MapStr{}
-		labels := metric.Label
+		labels := common.MapStr{}
 
-		if len(labels) != 0 {
-			tagsMap := common.MapStr{}
-			for _, label := range labels {
+		if len(metric.Label) != 0 {
+			for _, label := range metric.Label {
 				if label.GetName() != "" && label.GetValue() != "" {
-					tagsMap[label.GetName()] = label.GetValue()
+					labels[label.GetName()] = label.GetValue()
 				}
 			}
-			event.labels = tagsMap
-			event.labelHash = tagsMap.String()
-
 		}
 
 		counter := metric.GetCounter()
 		if counter != nil {
-			value["value"] = int64(counter.GetValue())
+			events = append(events, PromEvent{
+				data: common.MapStr{
+					name: counter.GetValue(),
+				},
+				labels: labels,
+			})
 		}
 
 		gauge := metric.GetGauge()
 		if gauge != nil {
-			value["value"] = gauge.GetValue()
+			events = append(events, PromEvent{
+				data: common.MapStr{
+					name: gauge.GetValue(),
+				},
+				labels: labels,
+			})
 		}
 
 		summary := metric.GetSummary()
 		if summary != nil {
-			value["sum"] = summary.GetSampleSum()
-			value["count"] = summary.GetSampleCount()
+			events = append(events, PromEvent{
+				data: common.MapStr{
+					name + "_sum":   summary.GetSampleSum(),
+					name + "_count": summary.GetSampleCount(),
+				},
+				labels: labels,
+			})
 
-			quantiles := summary.GetQuantile()
-
-			percentileMap := common.MapStr{}
-			for _, quantile := range quantiles {
-				key := strconv.FormatFloat((100 * quantile.GetQuantile()), 'f', -1, 64)
-
-				if math.IsNaN(quantile.GetValue()) == false {
-					percentileMap[key] = quantile.GetValue()
+			for _, quantile := range summary.GetQuantile() {
+				if math.IsNaN(quantile.GetValue()) {
+					continue
 				}
 
-			}
-
-			if len(percentileMap) != 0 {
-				value["percentile"] = percentileMap
+				quantileLabels := labels.Clone()
+				quantileLabels["quantile"] = strconv.FormatFloat(quantile.GetQuantile(), 'f', -1, 64)
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name: quantile.GetValue(),
+					},
+					labels: quantileLabels,
+				})
 			}
 		}
 
 		histogram := metric.GetHistogram()
 		if histogram != nil {
-			value["sum"] = histogram.GetSampleSum()
-			value["count"] = histogram.GetSampleCount()
-			buckets := histogram.GetBucket()
-			bucketMap := common.MapStr{}
-			for _, bucket := range buckets {
-				key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
-				bucketMap[key] = bucket.GetCumulativeCount()
-			}
+			events = append(events, PromEvent{
+				data: common.MapStr{
+					name + "_sum":   histogram.GetSampleSum(),
+					name + "_count": histogram.GetSampleCount(),
+				},
+				labels: labels,
+			})
 
-			value["bucket"] = bucketMap
+			for _, bucket := range histogram.GetBucket() {
+				bucketLabels := labels.Clone()
+				bucketLabels["le"] = strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
+
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name + "_bucket": bucket.GetCumulativeCount(),
+					},
+					labels: bucketLabels,
+				})
+			}
 		}
 
-		event.value = value
-
-		events = append(events, event)
-
+		untyped := metric.GetUntyped()
+		if untyped != nil {
+			events = append(events, PromEvent{
+				data: common.MapStr{
+					name: untyped.GetValue(),
+				},
+				labels: labels,
+			})
+		}
 	}
 	return events
 }

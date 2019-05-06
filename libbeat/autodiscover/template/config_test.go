@@ -20,10 +20,10 @@ package template
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestConfigsMapping(t *testing.T) {
@@ -55,6 +55,16 @@ func TestConfigsMapping(t *testing.T) {
     foo: 3
   config:
   - correct: config`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{config},
+		},
+		// No condition
+		{
+			mapping: `
+- config:
+    - correct: config`,
 			event: bus.Event{
 				"foo": 3,
 			},
@@ -98,5 +108,6 @@ func TestNilConditionConfig(t *testing.T) {
 	}
 
 	_, err = NewConfigMapper(mappings)
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.Nil(t, mappings[0].ConditionConfig)
 }

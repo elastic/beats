@@ -53,7 +53,7 @@ var procFiles = map[applayer.Transport]struct {
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.
-func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[uint16]int, err error) {
+func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
 	sourceFiles, ok := procFiles[transport]
 	if !ok {
 		return nil, fmt.Errorf("unsupported transport protocol id: %d", transport)
@@ -81,7 +81,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 		socksMap[s.inode] = s
 	}
 
-	ports = make(map[uint16]int)
+	ports = make(map[endpoint]int)
 	for _, pid := range pids.List {
 		inodes, err := findSocketsOfPid("", pid)
 		if err != nil {
@@ -91,7 +91,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 
 		for _, inode := range inodes {
 			if sockInfo, exists := socksMap[inode]; exists {
-				ports[sockInfo.srcPort] = pid
+				ports[endpoint{address: sockInfo.srcIP.String(), port: sockInfo.srcPort}] = pid
 			}
 		}
 	}

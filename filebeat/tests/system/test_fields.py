@@ -79,6 +79,6 @@ class Test(BaseTest):
 
         output = self.read_output()
         doc = output[0]
-        assert doc["beat.name"] == "testShipperName"
-        assert doc["beat.hostname"] == socket.gethostname()
+        assert doc["host.name"] == "testShipperName"
+        assert doc["agent.hostname"] == socket.gethostname()
         assert "fields" not in doc

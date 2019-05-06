@@ -32,7 +32,7 @@ func RegisterType(name string, fn Factory) {
 
 // FindFactory retrieves a queue types constructor. Returns nil if queue type is unknown
 func FindFactory(name string) Factory {
-	f, err := feature.Registry.Lookup(Namespace, name)
+	f, err := feature.GlobalRegistry().Lookup(Namespace, name)
 	if err != nil {
 		return nil
 	}

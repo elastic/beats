@@ -61,7 +61,7 @@ var (
 		Timeout:          90 * time.Second,
 		MaxRetries:       3,
 		CompressionLevel: 0,
-		EscapeHTML:       true,
+		EscapeHTML:       false,
 		TLS:              nil,
 		LoadBalance:      true,
 		Backoff: Backoff{

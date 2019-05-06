@@ -20,8 +20,6 @@ package index_recovery
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -40,13 +38,10 @@ const (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*elasticsearch.MetricSet
-	recoveryPath string
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
-
 	config := struct {
 		ActiveOnly bool `config:"index_recovery.active_only"`
 		XPack      bool `config:"xpack.enabled"`
@@ -67,36 +62,44 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{MetricSet: ms, recoveryPath: localRecoveryPath}, nil
+	return &MetricSet{MetricSet: ms}, nil
 }
 
 // Fetch gathers stats for each index from the _stats API
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
-
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+m.recoveryPath)
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
-		return
+		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "Trying to fetch index recovery stats from a non-master node.")
-		return
+		m.Logger().Debug("trying to fetch index recovery stats from a non-master node")
+		return nil
+	}
+
+	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return err
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
-		return
+		return err
 	}
 
 	if m.MetricSet.XPack {
-		eventsMappingXPack(r, m, content)
-	} else {
-		err = eventsMapping(r, content)
+		err = eventsMappingXPack(r, m, *info, content)
 		if err != nil {
-			r.Error(err)
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
+			m.Logger().Error(err)
+			return nil
 		}
+	} else {
+		return eventsMapping(r, *info, content)
 	}
+
+	return nil
 }

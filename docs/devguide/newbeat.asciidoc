@@ -50,12 +50,12 @@ git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beat
 ----------------------------------------------------------------------
 
 To build your beat
-on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
+on a specific version of libbeat, check out the specific branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
 cd ${GOPATH}/src/github.com/elastic/beats
-git checkout {doc-branch}
+git checkout {branch}
 ----
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
@@ -148,10 +148,10 @@ For the `github_name`, enter your github id. The `beat` and `beat_path` are set 
 
 [source,shell]
 ---------
-project_name [Examplebeat]: Countbeat
-github_name [your-github-name]: {username}
-beat_path [github.com/{github id}]:
-full_name [Firstname Lastname]: {Full Name}
+Beat Name [Examplebeat]: Countbeat
+Your Github Name [your-github-name]: {username}
+Beat Path [github.com/{github id}/{beat name}]:
+Firstname Lastname: {Full Name}
 ---------
 
 The Beat generator creates a directory called `countbeat` inside of your project folder (e.g. {project folder}/github.com/{github id}/countbeat).
@@ -184,7 +184,7 @@ To compile the Beat, make sure you are in the Beat directory (`$GOPATH/src/githu
 
 [source,shell]
 ---------
-make
+mage build
 ---------
 
 NOTE: we don't support the `-j` option for make at the moment.
@@ -477,11 +477,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 
 	"github.com/kimjmin/countbeat/beater"
 )
 
-var RootCmd = cmd.GenRootCmd("countbeat", "", beater.New)
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: "countbeat"})
 
 func main() {
 	if err := RootCmd.Execute(); err != nil {
@@ -494,4 +495,4 @@ func main() {
 === Sharing Your Beat with the Community
 
 When you're done with your new Beat, how about letting everyone know? Open
-a pull request to add your link to the {libbeat}/community-beats.html[Community Beats] list.
+a pull request to add your link to the {beats-ref}/community-beats.html[Community Beats] list.

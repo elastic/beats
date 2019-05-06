@@ -61,7 +61,7 @@ func eventMapping(content []byte) common.MapStr {
 	var d Data
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: ", err)
+		logp.Err("Error: %+v", err)
 	}
 
 	logp.Info("Printing Data:")

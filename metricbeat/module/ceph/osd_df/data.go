@@ -20,10 +20,12 @@ package osd_df
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Node represents a node object
 type Node struct {
 	ID          int64  `json:"id"`
 	Name        string `json:"name"`
@@ -34,10 +36,12 @@ type Node struct {
 	DeviceClass string `json:"device_class"`
 }
 
+// Output contains a node list from the df response
 type Output struct {
 	Nodes []Node `json:"nodes"`
 }
 
+// OsdDfRequest contains the df response
 type OsdDfRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`
@@ -47,8 +51,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var d OsdDfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: ", err)
-		return nil, err
+		return nil, errors.Wrap(err, "error getting data for OSD_DF")
 	}
 
 	nodeList := d.Output.Nodes

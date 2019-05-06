@@ -19,7 +19,6 @@ package ccr
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -42,48 +41,35 @@ var (
 			"shard": s.Object{
 				"number": c.Int("shard_id"),
 			},
-			"operations_indexed": c.Int("number_of_operations_indexed"),
-			"time_since_last_fetch": s.Object{
-				"ms": c.Int("time_since_last_fetch_millis"),
+			"operations_written": c.Int("operations_written"),
+			"time_since_last_read": s.Object{
+				"ms": c.Int("time_since_last_read_millis"),
 			},
 			"global_checkpoint": c.Int("follower_global_checkpoint"),
 		},
 	}
 )
 
+type response struct {
+	AutoFollowStats map[string]interface{} `json:"auto_follow_stats"`
+	FollowStats     struct {
+		Indices []struct {
+			Shards []map[string]interface{} `json:"shards"`
+		} `json:"indices"`
+	} `json:"follow_stats"`
+}
+
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
-	var data map[string]interface{}
+	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
 	}
 
-	var errors multierror.Errors
-	for _, followerShards := range data {
-
-		shards, ok := followerShards.([]interface{})
-		if !ok {
-			err := fmt.Errorf("shards is not an array")
-			errors = append(errors, err)
-			continue
-		}
-
-		for _, s := range shards {
-			shard, ok := s.(map[string]interface{})
-			if !ok {
-				err := fmt.Errorf("shard is not an object")
-				errors = append(errors, err)
-				continue
-			}
+	var errs multierror.Errors
+	for _, followerIndex := range data.FollowStats.Indices {
+		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
-			event.MetricSetFields, err = schema.Apply(shard)
-			if err != nil {
-				errors = append(errors, err)
-				continue
-			}
-
 			event.RootFields = common.MapStr{}
 			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
@@ -91,9 +77,15 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			event.ModuleFields.Put("cluster.name", info.ClusterName)
 			event.ModuleFields.Put("cluster.id", info.ClusterID)
 
+			event.MetricSetFields, err = schema.Apply(followerShard)
+			if err != nil {
+				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
+				continue
+			}
+
 			r.Event(event)
 		}
 	}
 
-	return errors.Err()
+	return errs.Err()
 }

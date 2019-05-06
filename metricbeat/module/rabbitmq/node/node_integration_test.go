@@ -28,13 +28,24 @@ import (
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "rabbitmq")
-
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
 	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
+}
+
+func TestFetch(t *testing.T) {
+	t.Skip("Skipping test as it was not stable. Probably first event is empty.")
+	compose.EnsureUp(t, "rabbitmq")
+
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
+	metricSet.Fetch(reporter)
+
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 
 func getConfig() map[string]interface{} {

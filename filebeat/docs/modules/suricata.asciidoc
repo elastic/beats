@@ -1,0 +1,69 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-suricata]]
+[role="xpack"]
+
+:modulename: suricata
+:has-dashboards: true
+
+== Suricata module
+
+This is a module to the Suricata IDS/IPS/NSM log. It parses logs that are in the
+https://suricata.readthedocs.io/en/latest/output/eve/eve-json-format.html[
+Suricata Eve JSON format].
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module has been developed against Suricata v4.0.4, but is expected to work
+with other versions of Suricata.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-suricata.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+This is an example of how to overwrite the default log file path.
+
+[source,yaml]
+----
+- module: suricata
+  eve:
+    enabled: true
+    var.paths: ["/my/path/suricata.json"]
+----
+
+:fileset_ex: eve
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `eve` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-suricata,exported fields>> section.
+

@@ -20,8 +20,6 @@ package index
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -31,6 +29,7 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index", New,
 		mb.WithHostParser(elasticsearch.HostParser),
+		mb.WithNamespace("elasticsearch.index"),
 	)
 }
 
@@ -46,8 +45,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
-
 	// TODO: This currently gets index data for all indices. Make it configurable.
 	ms, err := elasticsearch.NewMetricSet(base, statsPath)
 	if err != nil {
@@ -57,39 +54,41 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch gathers stats for each index from the _stats API
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
-		return
+		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "Trying to fetch index stats from a non-master node.")
-		return
+		m.Logger().Debug("trying to fetch index stats from a non-master node")
+		return nil
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
-		return
+		return err
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
-		return
+		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
 	if m.XPack {
-		eventsMappingXPack(r, m, *info, content)
-	} else {
-		err = eventsMapping(r, *info, content)
+		err = eventsMappingXPack(r, m, *info, content)
 		if err != nil {
-			r.Error(err)
-			return
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
+			m.Logger().Error(err)
+			return nil
 		}
+	} else {
+		return eventsMapping(r, *info, content)
 	}
+
+	return nil
 }

@@ -24,6 +24,9 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/user"
+	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -32,7 +35,9 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/auditbeat/core"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-libaudit"
@@ -46,7 +51,9 @@ import (
 var audit = flag.Bool("audit", false, "interact with the real audit framework")
 
 var (
-	userLoginMsg = `type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=failed'`
+	userLoginFailMsg    = `type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=failed'`
+	userLoginSuccessMsg = `type=USER_LOGIN msg=audit(1492896303.915:19956): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=61647269616E exe="/usr/sbin/sshd" hostname=? addr=179.38.151.221 terminal=sshd res=success'`
+	userAuthMsg         = `type=USER_AUTH msg=audit(1552714590.571:21114): pid=11312 uid=0 auid=0 ses=62 msg='op=PAM:authentication acct="root" exe="/bin/su" hostname="test" addr="127.0.0.1" terminal=/dev/pts/0 res=success'`
 
 	execveMsgs = []string{
 		`type=SYSCALL msg=audit(1492752522.985:8972): arch=c000003e syscall=59 success=yes exit=0 a0=10812c8 a1=1070208 a2=1152008 a3=59a items=2 ppid=10027 pid=10043 auid=1001 uid=1001 gid=1002 euid=1001 suid=1001 fsuid=1001 egid=1002 sgid=1002 fsgid=1002 tty=pts0 ses=11 comm="uname" exe="/bin/uname" key="key=user_commands"`,
@@ -75,8 +82,10 @@ func TestData(t *testing.T) {
 		returnACK().returnStatus().
 		// Send expected ACKs for initialization
 		returnACK().returnACK().returnACK().returnACK().returnACK().
-		// Send a single audit message from the kernel.
-		returnMessage(userLoginMsg)
+		// Send three auditd messages.
+		returnMessage(userLoginFailMsg).
+		returnMessage(execveMsgs...).
+		returnMessage(acceptMsgs...)
 
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2(t, getConfig())
@@ -84,21 +93,128 @@ func TestData(t *testing.T) {
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
-	events := mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
-	if len(events) == 0 {
-		t.Fatal("received no events")
+	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
+	if len(events) != 3 {
+		t.Fatalf("expected 3 events, but received %d", len(events))
 	}
 	assertNoErrors(t, events)
+
+	assertFieldsAreDocumented(t, events)
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, beatEvent, "")
 }
 
+func TestLoginType(t *testing.T) {
+	logp.TestingSetup()
+
+	// Create a mock netlink client that provides the expected responses.
+	mock := NewMock().
+		// Get Status response for initClient
+		returnACK().returnStatus().
+		// Send expected ACKs for initialization
+		returnACK().returnACK().returnACK().returnACK().returnACK().
+		// Send an authentication failure and a success.
+		returnMessage(userLoginFailMsg).
+		returnMessage(userLoginSuccessMsg).
+		returnMessage(userAuthMsg)
+
+	// Replace the default AuditClient with a mock.
+	ms := mbtest.NewPushMetricSetV2(t, getConfig())
+	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet.client.Close()
+	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
+
+	const expectedEvents = 3
+	events := mbtest.RunPushMetricSetV2(10*time.Second, expectedEvents, ms)
+	if len(events) != expectedEvents {
+		t.Fatalf("expected %d events, but received %d", expectedEvents, len(events))
+	}
+	assertNoErrors(t, events)
+
+	assertFieldsAreDocumented(t, events)
+
+	sort.Slice(events,
+		func(i, j int) bool {
+			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32)
+		})
+
+	for idx, expected := range []common.MapStr{
+		{
+			"event.category": "authentication",
+			"event.type":     "authentication_failure",
+			"event.outcome":  "failure",
+			"user.name":      "(invalid user)",
+			"user.id":        nil,
+			"session":        nil,
+		},
+		{
+			"event.category": "authentication",
+			"event.type":     "authentication_success",
+			"event.outcome":  "success",
+			"user.name":      "adrian",
+			"user.audit.id":  nil,
+			"auditd.session": nil,
+		},
+		{
+			"event.category": "user-login",
+			"event.outcome":  "success",
+			"user.name":      "root",
+			"user.id":        "0",
+			"user.audit.id":  "0",
+			"auditd.session": "62",
+		},
+	} {
+		beatEvent := mbtest.StandardizeEvent(ms, events[idx], core.AddDatasetToEvent)
+		mbtest.WriteEventToDataJSON(t, beatEvent, "")
+		for k, v := range expected {
+			msg := fmt.Sprintf("%s[%d]", k, idx)
+			cur, err := beatEvent.GetValue(k)
+			if v != nil {
+				assert.NoError(t, err, msg)
+				assert.Equal(t, v, cur, msg)
+			} else {
+				_, err := beatEvent.GetValue(k)
+				assert.Equal(t, common.ErrKeyNotFound, err, msg)
+			}
+		}
+	}
+}
+
+// assertFieldsAreDocumented mimics assert_fields_are_documented in Python system tests.
+func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
+	fieldsYml, err := mapping.LoadFieldsYaml("../../fields.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	documentedFields := fieldsYml.GetKeys()
+
+	for _, e := range events {
+		beatEvent := e.BeatEvent(moduleName, metricsetName, core.AddDatasetToEvent)
+		for eventFieldName := range beatEvent.Fields.Flatten() {
+			found := false
+			for _, documentedFieldName := range documentedFields {
+				// Have to use HasPrefix and not "==" since fields in auditd.paths.* get flattened
+				// to auditd.paths which does not exist in fields.yml.
+				if strings.HasPrefix(documentedFieldName, eventFieldName) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				assert.Fail(t, "Field not documented", "Key '%v' found in event is not documented.", eventFieldName)
+			}
+		}
+	}
+}
+
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":       "auditd",
-		"failure_mode": "log",
-		"socket_type":  "unicast",
+		"module":              "auditd",
+		"failure_mode":        "log",
+		"socket_type":         "unicast",
+		"include_warnings":    true,
+		"include_raw_message": true,
 	}
 }
 
@@ -222,7 +338,7 @@ func assertHasBinCatExecve(t *testing.T, events []mb.Event) {
 	t.Helper()
 
 	for _, e := range events {
-		v, err := e.RootFields.GetValue("process.exe")
+		v, err := e.RootFields.GetValue("process.executable")
 		if err == nil {
 			if exe, ok := v.(string); ok && exe == "/bin/cat" {
 				return
@@ -241,5 +357,33 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 		if e.Error != nil {
 			t.Errorf("received error: %+v", e.Error)
 		}
+	}
+}
+
+func BenchmarkResolveUsernameOrID(b *testing.B) {
+	for _, query := range []struct {
+		input string
+		name  string
+		id    string
+		err   bool
+	}{
+		{input: "0", name: "root", id: "0"},
+		{input: "root", name: "root", id: "0"},
+		{input: "vagrant", name: "vagrant", id: "1000"},
+		{input: "1000", name: "vagrant", id: "1000"},
+		{input: "nonexisting", err: true},
+		{input: "9987", err: true},
+	} {
+		b.Run(query.input, func(b *testing.B) {
+			var usr *user.User
+			var err error
+			for i := 0; i < b.N; i++ {
+				usr, err = resolveUsernameOrID(query.input)
+			}
+			if assert.Equal(b, query.err, err != nil, fmt.Sprintf("%v", err)) && !query.err {
+				assert.Equal(b, query.name, usr.Username)
+				assert.Equal(b, query.id, usr.Uid)
+			}
+		})
 	}
 }

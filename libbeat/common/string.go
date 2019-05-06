@@ -17,6 +17,8 @@
 
 package common
 
+import "strings"
+
 // NetString store the byte length of the data that follows, making it easier
 // to unambiguously pass text and byte data between programs that could be
 // sensitive to values that could be interpreted as delimiters or terminators
@@ -27,4 +29,26 @@ type NetString []byte
 // treat []byte as raw string by other encoders/serializers (e.g. JSON)
 func (n NetString) MarshalText() ([]byte, error) {
 	return n, nil
+}
+
+// RemoveChars takes a string candidate and a string of chars to remove from the candidate.
+func RemoveChars(s string, chars string) string {
+	buf := &strings.Builder{}
+	for len(s) > 0 {
+		idx := strings.IndexAny(s, chars)
+		if idx < 0 {
+			if buf.Len() > 0 {
+				buf.WriteString(s)
+			}
+			break
+		}
+
+		buf.WriteString(s[:idx])
+		s = s[idx+1:]
+	}
+
+	if buf.Len() == 0 {
+		return s
+	}
+	return buf.String()
 }

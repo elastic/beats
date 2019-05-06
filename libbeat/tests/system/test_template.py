@@ -21,7 +21,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
+            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
 
     def test_index_not_modified(self):
         """
@@ -48,7 +48,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
+            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
 
     def test_index_modified_no_name(self):
         """
@@ -63,7 +63,7 @@ class Test(BaseTest):
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified.") is True
+            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
 
     def test_index_with_pattern_name(self):
         """
@@ -102,7 +102,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Loading json template from file"))
-        self.wait_until(lambda: self.log_contains("Elasticsearch template with name 'bla' loaded"))
+        self.wait_until(lambda: self.log_contains("template with name 'bla' loaded"))
         proc.check_kill_and_wait()
 
         es = Elasticsearch([self.get_elasticsearch_url()])

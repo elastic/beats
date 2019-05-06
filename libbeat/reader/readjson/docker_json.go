@@ -20,13 +20,13 @@ package readjson
 import (
 	"bytes"
 	"encoding/json"
-	"strings"
+	"runtime"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/reader"
-
-	"github.com/pkg/errors"
 )
 
 // DockerJSONReader processor renames a given field
@@ -38,8 +38,13 @@ type DockerJSONReader struct {
 	// join partial lines
 	partial bool
 
+	// Force log format: json-file | cri
+	forceCRI bool
+
 	// parse CRI flags
 	criflags bool
+
+	stripNewLine func(msg *reader.Message)
 }
 
 type logLine struct {
@@ -52,13 +57,22 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, CRIFlags bool) *DockerJSONReader {
-	return &DockerJSONReader{
+func New(r reader.Reader, stream string, partial bool, forceCRI bool, CRIFlags bool) *DockerJSONReader {
+	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
+		forceCRI: forceCRI,
 		criflags: CRIFlags,
 	}
+
+	if runtime.GOOS == "windows" {
+		reader.stripNewLine = stripNewLineWin
+	} else {
+		reader.stripNewLine = stripNewLine
+	}
+
+	return &reader
 }
 
 // parseCRILog parses logs in CRI log format.
@@ -75,11 +89,11 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	i := 0
 
 	// timestamp
-	log := strings.SplitN(string(message.Content), " ", split)
+	log := bytes.SplitN(message.Content, []byte{' '}, split)
 	if len(log) < split {
 		return errors.New("invalid CRI log format")
 	}
-	ts, err := time.Parse(time.RFC3339, log[i])
+	ts, err := time.Parse(time.RFC3339, string(log[i]))
 	if err != nil {
 		return errors.Wrap(err, "parsing CRI timestamp")
 	}
@@ -87,16 +101,16 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	i++
 
 	// stream
-	msg.Stream = log[i]
+	msg.Stream = string(log[i])
 	i++
 
 	// tags
 	partial := false
 	if p.criflags {
 		// currently only P(artial) or F(ull) are available
-		tags := strings.Split(log[i], ":")
+		tags := bytes.Split(log[i], []byte{':'})
 		for _, tag := range tags {
-			if tag == "P" {
+			if len(tag) == 1 && tag[0] == 'P' {
 				partial = true
 			}
 		}
@@ -107,12 +121,10 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	message.AddFields(common.MapStr{
 		"stream": msg.Stream,
 	})
-	// Remove ending \n for partial messages
-	message.Content = []byte(log[i])
+	// Remove \n ending for partial messages
+	message.Content = log[i]
 	if partial {
-		message.Content = bytes.TrimRightFunc(message.Content, func(r rune) bool {
-			return r == '\n' || r == '\r'
-		})
+		p.stripNewLine(message)
 	}
 
 	return nil
@@ -154,7 +166,12 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 }
 
 func (p *DockerJSONReader) parseLine(message *reader.Message, msg *logLine) error {
-	if strings.HasPrefix(string(message.Content), "{") {
+	if p.forceCRI {
+		return p.parseCRILog(message, msg)
+	}
+
+	// If froceCRI isn't set, autodetect file type
+	if len(message.Content) > 0 && message.Content[0] == '{' {
 		return p.parseDockerJSONLog(message, msg)
 	}
 
@@ -163,8 +180,14 @@ func (p *DockerJSONReader) parseLine(message *reader.Message, msg *logLine) erro
 
 // Next returns the next line.
 func (p *DockerJSONReader) Next() (reader.Message, error) {
+	var bytes int
 	for {
 		message, err := p.reader.Next()
+
+		// keep the right bytes count even if we return an error
+		bytes += message.Bytes
+		message.Bytes = bytes
+
 		if err != nil {
 			return message, err
 		}
@@ -178,6 +201,11 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		// Handle multiline messages, join partial lines
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
+
+			// keep the right bytes count even if we return an error
+			bytes += next.Bytes
+			message.Bytes = bytes
+
 			if err != nil {
 				return message, err
 			}
@@ -186,7 +214,6 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 				return message, err
 			}
 			message.Content = append(message.Content, next.Content...)
-			message.Bytes += next.Bytes
 		}
 
 		if p.stream != "all" && p.stream != logLine.Stream {
@@ -195,4 +222,17 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 
 		return message, err
 	}
+}
+
+func stripNewLine(msg *reader.Message) {
+	l := len(msg.Content)
+	if l > 0 && msg.Content[l-1] == '\n' {
+		msg.Content = msg.Content[:l-1]
+	}
+}
+
+func stripNewLineWin(msg *reader.Message) {
+	msg.Content = bytes.TrimRightFunc(msg.Content, func(r rune) bool {
+		return r == '\n' || r == '\r'
+	})
 }

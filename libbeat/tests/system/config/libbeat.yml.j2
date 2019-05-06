@@ -22,6 +22,18 @@ setup.template.name: "{{setup_template_name}}"
 setup.template.pattern: "{{setup_template_pattern}}"
 {%- endif %}
 
+{% if ilm %}
+setup.ilm:
+  enabled: {{ ilm.enabled | default("auto") }}
+  policy_name: libbeat-test-default-policy
+  {% if ilm.pattern %}
+  pattern: {{ ilm.pattern }}
+  {% endif %}
+  {% if ilm.rollover_alias %}
+  rollover_alias: {{ ilm.rollover_alias }}
+  {% endif %}
+{% endif %}
+
 #================================ Processors =====================================
 
 {%- if processors %}
@@ -65,6 +77,9 @@ output:
   {% endif %}
   {% if elasticsearch.index %}
     index: {{elasticsearch.index}}
+  {% endif %}
+  {% if elasticsearch.ilm %}
+    ilm.enabled: {{elasticsearch.ilm}}
   {% endif %}
 {%- endif %}
 

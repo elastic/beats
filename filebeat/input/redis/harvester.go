@@ -23,7 +23,7 @@ import (
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -61,12 +61,17 @@ type log struct {
 }
 
 // NewHarvester creates a new harvester with the given connection
-func NewHarvester(conn rd.Conn) *Harvester {
+func NewHarvester(conn rd.Conn) (*Harvester, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	return &Harvester{
-		id:   uuid.NewV4(),
+		id:   id,
 		done: make(chan struct{}),
 		conn: conn,
-	}
+	}, nil
 }
 
 // Run starts a new redis harvester
@@ -150,7 +155,9 @@ func (h *Harvester) Run() error {
 				"redis": common.MapStr{
 					"slowlog": subEvent,
 				},
-				"read_timestamp": common.Time(time.Now().UTC()),
+				"event": common.MapStr{
+					"created": time.Now(),
+				},
 			},
 		}
 

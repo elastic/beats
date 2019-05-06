@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 func TestFetch(t *testing.T) {
@@ -44,21 +45,33 @@ func TestFetch(t *testing.T) {
 			assert.NoError(t, err)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json;")
-				w.Write([]byte(response))
-				assert.Equal(t, "/_nodes/_local", r.RequestURI)
+				switch r.RequestURI {
+				case "/_nodes/_local":
+					w.WriteHeader(200)
+					w.Header().Set("Content-Type", "application/json;")
+					w.Write([]byte(response))
+
+				case "/":
+					rootResponse := "{\"cluster_name\":\"es1\",\"cluster_uuid\":\"4heb1eiady103dxu71\",\"version\":{\"number\":\"7.0.0\"}}"
+					w.WriteHeader(200)
+					w.Header().Set("Content-Type", "application/json")
+					w.Write([]byte(rootResponse))
+
+				default:
+					t.FailNow()
+				}
+
 			}))
 			defer server.Close()
 
 			config := map[string]interface{}{
-				"module":     "elasticsearch",
+				"module":     elasticsearch.ModuleName,
 				"metricsets": []string{"node"},
 				"hosts":      []string{server.URL},
 			}
 			reporter := &mbtest.CapturingReporterV2{}
 
-			metricSet := mbtest.NewReportingMetricSetV2(t, config)
+			metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 			metricSet.Fetch(reporter)
 
 			e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])

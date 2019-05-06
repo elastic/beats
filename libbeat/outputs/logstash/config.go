@@ -20,13 +20,16 @@ package logstash
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/beat"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 type Config struct {
 	Index            string                `config:"index"`
-	Port             int                   `config:"port"`
 	LoadBalance      bool                  `config:"loadbalance"`
 	BulkMaxSize      int                   `config:"bulk_max_size"`
 	SlowStart        bool                  `config:"slow_start"`
@@ -46,24 +49,39 @@ type Backoff struct {
 	Max  time.Duration
 }
 
-var defaultConfig = Config{
-	Port:             5044,
-	LoadBalance:      false,
-	Pipelining:       2,
-	BulkMaxSize:      2048,
-	SlowStart:        false,
-	CompressionLevel: 3,
-	Timeout:          30 * time.Second,
-	MaxRetries:       3,
-	TTL:              0 * time.Second,
-	Backoff: Backoff{
-		Init: 1 * time.Second,
-		Max:  60 * time.Second,
-	},
-	EscapeHTML: true,
+func defaultConfig() Config {
+	return Config{
+		LoadBalance:      false,
+		Pipelining:       2,
+		BulkMaxSize:      2048,
+		SlowStart:        false,
+		CompressionLevel: 3,
+		Timeout:          30 * time.Second,
+		MaxRetries:       3,
+		TTL:              0 * time.Second,
+		Backoff: Backoff{
+			Init: 1 * time.Second,
+			Max:  60 * time.Second,
+		},
+		EscapeHTML: false,
+	}
 }
 
-func newConfig() *Config {
-	c := defaultConfig
-	return &c
+func readConfig(cfg *common.Config, info beat.Info) (*Config, error) {
+	c := defaultConfig()
+
+	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, err
+	}
+
+	if c.Index == "" {
+		c.Index = info.IndexPrefix
+	}
+
+	return &c, nil
 }

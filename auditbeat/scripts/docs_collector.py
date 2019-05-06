@@ -3,13 +3,16 @@ import argparse
 import yaml
 import six
 
-# Collects docs for all modules and metricset
+# Collects docs for all modules and datasets
 
 
-def collect(beat_name):
+def collect(base_paths):
 
-    base_dir = "module"
-    path = os.path.abspath("module")
+    # Always use the auditbeat/docs/ directory, regardless
+    # of where this script was called from.
+    docs_path = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir, "docs"))
+
+    beat_name = os.path.basename(base_paths[0])
 
     generated_note = """////
 This file is generated! See scripts/docs_collector.py
@@ -19,17 +22,26 @@ This file is generated! See scripts/docs_collector.py
 
     modules_list = {}
 
-    # Iterate over all modules
-    for module in sorted(os.listdir(base_dir)):
+    # Dict: module name -> module path
+    module_dirs = {}
+    for path in base_paths:
+        module_dir = os.path.join(path, "module")
+        for module_name in os.listdir(module_dir):
+            if os.path.isdir(os.path.join(module_dir, module_name)):
+                module_dirs[module_name] = os.path.join(module_dir, module_name)
 
-        module_doc = path + "/" + module + "/_meta/docs.asciidoc"
+    # Iterate over all modules
+    for module in sorted(module_dirs):
+        module_dir = module_dirs[module]
+
+        module_doc = os.path.join(module_dir, "_meta/docs.asciidoc")
 
         # Only check folders where docs.asciidoc exists
         if os.path.isfile(module_doc) == False:
             continue
 
         # Create directory for each module
-        os.mkdir(os.path.abspath("docs") + "/modules/" + module)
+        os.mkdir(os.path.join(module_docs_path(module_dir), "modules", module))
 
         module_file = generated_note
         module_file += "[id=\"{beatname_lc}-module-" + module + "\"]\n"
@@ -37,7 +49,7 @@ This file is generated! See scripts/docs_collector.py
         with open(module_doc) as f:
             module_file += f.read()
 
-        beat_path = path + "/" + module + "/_meta"
+        beat_path = os.path.join(module_dir, "_meta")
 
         # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:
@@ -49,7 +61,7 @@ This file is generated! See scripts/docs_collector.py
         config_file = beat_path + "/config.yml"
 
         # Add example config file
-        if os.path.isfile(config_file) == True:
+        if os.path.isfile(config_file):
 
             module_file += """
 
@@ -64,7 +76,7 @@ is an example configuration:
 ----
 """ + beat_name + ".modules:\n"
 
-            # Load metricset yaml
+            # Load dataset yaml
             with open(config_file) as f:
                 # Add 2 spaces for indentation in front of each line
                 for line in f:
@@ -75,65 +87,69 @@ is an example configuration:
         module_links = ""
         module_includes = ""
 
-        # Iterate over all metricsets
-        for metricset in sorted(os.listdir(base_dir + "/" + module)):
+        # Iterate over all datasets
+        for dataset in sorted(os.listdir(module_dir)):
 
-            metricset_docs = path + "/" + module + "/" + metricset + "/_meta/docs.asciidoc"
+            dataset_docs = os.path.join(module_dir, dataset, "_meta/docs.asciidoc")
 
             # Only check folders where fields.yml exists
-            if os.path.isfile(metricset_docs) == False:
+            if not os.path.isfile(dataset_docs):
                 continue
 
-            link_name = "{beatname_lc}-metricset-" + module + "-" + metricset
-            link = "<<" + link_name + "," + metricset + ">>"
+            link_name = "{beatname_lc}-dataset-" + module + "-" + dataset
+            link = "<<" + link_name + "," + dataset + ">>"
             reference = "[id=\"" + link_name + "\"]"
 
             module_links += "* " + link + "\n\n"
 
-            module_includes += "include::" + module + "/" + metricset + ".asciidoc[]\n\n"
+            module_includes += "include::" + module + "/" + dataset + ".asciidoc[]\n\n"
 
-            metricset_file = generated_note
+            dataset_file = generated_note
 
-            # Add reference to metricset file and include file
-            metricset_file += reference + "\n"
-            metricset_file += 'include::../../../module/' + module + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
+            # Add reference to dataset file and include file
+            dataset_file += reference + "\n"
 
-            # TODO: This should point directly to the exported fields of the metricset, not the whole module
-            metricset_file += """
+            # Create title out of module and dataset set name
+            dataset_file += "=== {} {} dataset\n\n".format(title, dataset)
+
+            dataset_file += 'include::../../../module/' + module + '/' + dataset + '/_meta/docs.asciidoc[]' + "\n"
+
+            # TODO: This should point directly to the exported fields of the dataset, not the whole module
+            dataset_file += """
 
 ==== Fields
 
-For a description of each field in the metricset, see the
+For a description of each field in the dataset, see the
 <<exported-fields-""" + module + """,exported fields>> section.
 
 """
 
-            data_file = path + "/" + module + "/" + metricset + "/_meta/data.json"
+            data_file = os.path.join(module_dir, dataset, "_meta/data.json")
 
             # Add data.json example json document
-            if os.path.isfile(data_file) == True:
-                metricset_file += "Here is an example document generated by this metricset:"
-                metricset_file += "\n\n"
+            if os.path.isfile(data_file):
+                dataset_file += "Here is an example document generated by this dataset:"
+                dataset_file += "\n\n"
 
-                metricset_file += "[source,json]\n"
-                metricset_file += "----\n"
-                metricset_file += "include::../../../module/" + module + "/" + metricset + "/_meta/data.json[]\n"
-                metricset_file += "----\n"
+                dataset_file += "[source,json]\n"
+                dataset_file += "----\n"
+                dataset_file += "include::../../../module/" + module + "/" + dataset + "/_meta/data.json[]\n"
+                dataset_file += "----\n"
 
-            # Write metricset docs
-            with open(os.path.abspath("docs") + "/modules/" + module + "/" + metricset + ".asciidoc", 'w') as f:
-                f.write(metricset_file)
+            # Write dataset docs
+            with open(os.path.join(module_docs_path(module_dir), "modules", module, dataset + ".asciidoc"), 'w') as f:
+                f.write(dataset_file)
 
         if len(module_links) > 0:
             module_file += "[float]\n"
-            module_file += "=== Metricsets\n\n"
-            module_file += "The following metricsets are available:\n\n"
+            module_file += "=== Datasets\n\n"
+            module_file += "The following datasets are available:\n\n"
 
             module_file += module_links
             module_file += module_includes
 
         # Write module docs
-        with open(os.path.abspath("docs") + "/modules/" + module + ".asciidoc", 'w') as f:
+        with open(os.path.join(module_docs_path(module_dir), "modules", module + ".asciidoc"), 'w') as f:
             f.write(module_file)
 
     module_list_output = generated_note
@@ -141,20 +157,30 @@ For a description of each field in the metricset, see the
         module_list_output += "  * <<{beatname_lc}-module-" + m + "," + title + ">>\n"
 
     module_list_output += "\n\n--\n\n"
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "include::modules/" + m + ".asciidoc[]\n"
+    for module_name, module_path in sorted(six.iteritems(module_dirs)):
+        rel_path_to_module_docs = os.path.relpath(module_docs_path(module_path), docs_path)
+        module_list_output += "include::" + \
+            os.path.join(rel_path_to_module_docs, "modules", module_name + ".asciidoc") + "[]\n"
 
     # Write module link list
-    with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
+    with open(os.path.join(docs_path, "modules_list.asciidoc"), 'w') as f:
         f.write(module_list_output)
+
+
+def module_docs_path(module_path):
+    """
+    Returns the docs path for a module.
+    E.g. modules in x-pack/auditbeat/modules are put in x-pack/auditbeat/docs
+    (but linked to from beats/auditbeat/docs/modules_list.asciidoc)
+    """
+    return os.path.abspath(os.path.join(module_path, os.pardir, os.pardir, "docs"))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Collects modules docs")
-    parser.add_argument("--beat", help="Beat name")
+    parser.add_argument("--base-paths", dest='base_paths', nargs='+', help="Base paths")
 
     args = parser.parse_args()
-    beat_name = args.beat
 
-    collect(beat_name)
+    collect(args.base_paths)

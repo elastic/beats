@@ -10,6 +10,7 @@
     - network
     - process
     - process_summary
+    - socket_summary
     #- core
     #- diskio
     #- socket

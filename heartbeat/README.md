@@ -44,11 +44,10 @@ make update
 
 ### Cleanup
 
-To clean  Heartbeat source code, run the following commands:
+To clean  Heartbeat source code, run the following command:
 
 ```
 make fmt
-make simplify
 ```
 
 To clean up the build directory and generated artifacts, run:

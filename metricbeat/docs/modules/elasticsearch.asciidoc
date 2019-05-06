@@ -5,9 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-elasticsearch]]
 == Elasticsearch module
 
-beta[]
-
-The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[monitoring] feature.
+The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {stack-ov}/xpack-monitoring.html[monitoring] feature.
 
 The default metricsets are `node` and `node_stats`.
 
@@ -38,9 +36,16 @@ metricbeat.modules:
     #- ml_job
   period: 10s
   hosts: ["http://localhost:9200"]
+  #username: "elastic"
+  #password: "changeme"
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Set to false to fetch all entries
   #index_recovery.active_only: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

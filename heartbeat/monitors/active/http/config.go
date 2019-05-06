@@ -22,6 +22,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/conditions"
+
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 
@@ -29,8 +31,6 @@ import (
 )
 
 type Config struct {
-	Name string `config:"name"`
-
 	URLs         []string      `config:"urls" validate:"required"`
 	ProxyURL     string        `config:"proxy_url"`
 	Timeout      time.Duration `config:"timeout"`
@@ -68,9 +68,15 @@ type requestParameters struct {
 
 type responseParameters struct {
 	// expected HTTP response configuration
-	Status      uint16            `config:"status" verify:"min=0, max=699"`
-	RecvHeaders map[string]string `config:"headers"`
-	RecvBody    []match.Matcher   `config:"body"`
+	Status      uint16               `config:"status" verify:"min=0, max=699"`
+	RecvHeaders map[string]string    `config:"headers"`
+	RecvBody    []match.Matcher      `config:"body"`
+	RecvJSON    []*jsonResponseCheck `config:"json"`
+}
+
+type jsonResponseCheck struct {
+	Description string             `config:"description"`
+	Condition   *conditions.Config `config:"condition"`
 }
 
 type compressionConfig struct {
@@ -79,7 +85,6 @@ type compressionConfig struct {
 }
 
 var defaultConfig = Config{
-	Name:         "http",
 	Timeout:      16 * time.Second,
 	MaxRedirects: 10,
 	Mode:         monitors.DefaultIPSettings,
@@ -93,6 +98,7 @@ var defaultConfig = Config{
 			Status:      0,
 			RecvHeaders: nil,
 			RecvBody:    []match.Matcher{},
+			RecvJSON:    nil,
 		},
 	},
 }

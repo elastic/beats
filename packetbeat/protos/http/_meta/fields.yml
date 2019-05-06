@@ -10,10 +10,6 @@
           description: HTTP request
           type: group
           fields:
-            - name: params
-              description: >
-                The query parameters or form values. The query parameters are available in the Request-URI
-                and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
             - name: headers
               type: object
               object_type: keyword
@@ -22,21 +18,19 @@
                 Which headers to capture is configurable. If headers with the same
                 header name are present in the message, they will be separated by
                 commas.
-            - name: body
-              type: text
-              description: The body of the HTTP request.
+
+            - name: params
+              type: alias
+              migration: true
+              path: url.query
 
         - name: response
           description: HTTP response
           type: group
           fields:
-            - name: code
-              description: The HTTP status code.
-              example: 404
-
-            - name: phrase
+            - name: status_phrase
               description: The HTTP status phrase.
-              example: Not found.
+              example: Not Found
 
             - name: headers
               type: object
@@ -46,3 +40,13 @@
                 Which headers to capture is configurable. If headers with the
                 same header name are present in the message, they will be separated
                 by commas.
+
+            - name: code
+              type: alias
+              migration: true
+              path: http.response.status_code
+
+            - name: phrase
+              type: alias
+              migration: true
+              path: http.response.status_phrase

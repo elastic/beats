@@ -1,0 +1,20 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+{{ if .community_id }}
+processors:
+  - community_id:
+      fields:
+        source_ip: json.src_ip
+        source_port: json.src_port
+        destination_ip: json.dest_ip
+        destination_port: json.dest_port
+        transport: json.proto
+{{ end }}

@@ -42,7 +42,7 @@ func GetEnvPort() string {
 // GetConfig for Logstash
 func GetConfig(metricset string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "logstash",
+		"module":     ModuleName,
 		"metricsets": []string{metricset},
 		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
 	}

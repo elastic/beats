@@ -19,10 +19,8 @@ package ccr
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -32,43 +30,49 @@ import (
 )
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
-	var data map[string]interface{}
+	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
 	}
 
-	var errors multierror.Errors
-	for _, followerShards := range data {
+	now := common.Time(time.Now())
+	intervalMS := m.Module().Config().Period / time.Millisecond
+	index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 
-		shards, ok := followerShards.([]interface{})
-		if !ok {
-			err := fmt.Errorf("shards is not an array")
-			errors = append(errors, err)
-			continue
-		}
+	indexCCRStats(r, data, info, now, intervalMS, index)
+	indexCCRAutoFollowStats(r, data, info, now, intervalMS, index)
+	return nil
+}
 
-		for _, s := range shards {
-			shard, ok := s.(map[string]interface{})
-			if !ok {
-				err := fmt.Errorf("shard is not an object")
-				errors = append(errors, err)
-				continue
-			}
+func indexCCRStats(r mb.ReporterV2, ccrData response, esInfo elasticsearch.Info, now common.Time, intervalMS time.Duration, indexName string) {
+	for _, followerIndex := range ccrData.FollowStats.Indices {
+		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{
-				"cluster_uuid": info.ClusterID,
-				"timestamp":    common.Time(time.Now()),
-				"interval_ms":  m.Module().Config().Period / time.Millisecond,
+				"cluster_uuid": esInfo.ClusterID,
+				"timestamp":    now,
+				"interval_ms":  intervalMS,
 				"type":         "ccr_stats",
-				"ccr_stats":    shard,
+				"ccr_stats":    followerShard,
 			}
 
-			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = indexName
 			r.Event(event)
 		}
 	}
-	return errors.Err()
+}
+
+func indexCCRAutoFollowStats(r mb.ReporterV2, ccrData response, esInfo elasticsearch.Info, now common.Time, intervalMS time.Duration, indexName string) {
+	event := mb.Event{}
+	event.RootFields = common.MapStr{
+		"cluster_uuid":          esInfo.ClusterID,
+		"timestamp":             now,
+		"interval_ms":           intervalMS,
+		"type":                  "ccr_auto_follow_stats",
+		"ccr_auto_follow_stats": ccrData.AutoFollowStats,
+	}
+
+	event.Index = indexName
+	r.Event(event)
 }

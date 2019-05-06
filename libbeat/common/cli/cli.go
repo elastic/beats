@@ -45,3 +45,14 @@ func RunWith(
 		}
 	}
 }
+
+// GetEnvOr return the value of the environment variable if the value is set, if its not set it will
+// return the default value.
+//
+// Note: if the value is set but it is an empty string we will return the empty string.
+func GetEnvOr(name, def string) string {
+	if env, ok := os.LookupEnv(name); ok {
+		return env
+	}
+	return def
+}

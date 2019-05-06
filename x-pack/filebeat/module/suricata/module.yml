@@ -1,0 +1,5 @@
+dashboards:
+- id: 78289c40-86da-11e8-b59d-21efb914e65c
+  file: Filebeat-Suricata-Overview.json
+- id: 05268ee0-86d1-11e8-b59d-21efb914e65c
+  file: Filebeat-Suricata-Alert-Overview.json

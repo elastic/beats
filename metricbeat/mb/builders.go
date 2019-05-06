@@ -21,11 +21,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
-	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -175,21 +176,26 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 	for _, name := range metricSetNames {
 		name = strings.ToLower(name)
 		for _, host := range hosts {
-			id := uuid.NewV4().String()
+			id, err := uuid.NewV4()
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to generate ID for metricset")
+			}
+			msID := id.String()
 			metrics := monitoring.NewRegistry()
 			monitoring.NewString(metrics, "module").Set(m.Name())
 			monitoring.NewString(metrics, "metricset").Set(name)
 			if host != "" {
 				monitoring.NewString(metrics, "host").Set(host)
 			}
-			monitoring.NewString(metrics, "id").Set(id)
+			monitoring.NewString(metrics, "id").Set(msID)
 
 			metricsets = append(metricsets, BaseMetricSet{
-				id:      id,
+				id:      msID,
 				name:    name,
 				module:  m,
 				host:    host,
 				metrics: metrics,
+				logger:  logp.NewLogger(m.Name() + "." + name),
 			})
 		}
 	}
@@ -231,15 +237,18 @@ func mustImplementFetcher(ms MetricSet) error {
 		ifcs = append(ifcs, "ReportingMetricSetV2")
 	}
 
+	if _, ok := ms.(ReportingMetricSetV2Error); ok {
+		ifcs = append(ifcs, "ReportingMetricSetV2Error")
+	}
+
 	if _, ok := ms.(PushMetricSetV2); ok {
 		ifcs = append(ifcs, "PushMetricSetV2")
 	}
-
 	switch len(ifcs) {
 	case 0:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement an event "+
 			"producing interface (EventFetcher, EventsFetcher, "+
-			"ReportingMetricSet, ReportingMetricSetV2, PushMetricSet, or "+
+			"ReportingMetricSet, ReportingMetricSetV2, ReportingMetricSetV2Error, PushMetricSet, or "+
 			"PushMetricSetV2)",
 			ms.Module().Name(), ms.Name())
 	case 1:

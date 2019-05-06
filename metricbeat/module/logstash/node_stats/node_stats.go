@@ -18,24 +18,19 @@
 package node_stats
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
-const (
-	metricsetName = "node_stats"
-	namespace     = "logstash.node.stats"
-)
-
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(logstash.ModuleName, metricsetName, New,
+	mb.Registry.MustAddMetricSet(logstash.ModuleName, "node_stats", New,
 		mb.WithHostParser(hostParser),
-		mb.WithNamespace(namespace),
+		mb.WithNamespace("logstash.node.stats"),
 		mb.DefaultMetricSet(),
 	)
 }
@@ -50,20 +45,23 @@ var (
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
+	*logstash.MetricSet
 	http *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The logstash node_stats metricset is beta")
+	ms, err := logstash.NewMetricSet(base)
+	if err != nil {
+		return nil, err
+	}
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
 	return &MetricSet{
-		base,
+		ms,
 		http,
 	}, nil
 }
@@ -71,12 +69,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		r.Error(err)
-		return
+		return err
 	}
 
-	eventMapping(r, content)
+	return eventMapping(r, content)
 }

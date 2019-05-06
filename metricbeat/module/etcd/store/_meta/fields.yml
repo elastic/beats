@@ -2,7 +2,7 @@
   type: group
   description: >
     The store statistics include information about the operations that this node has handled.
-  release: beta
+  release: ga
   fields:
     - name: gets.success
       type: integer

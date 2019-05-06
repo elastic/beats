@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -75,7 +77,7 @@ func (p Product) String() string {
 // MakeXPackMonitoringIndexName method returns the name of the monitoring index for
 // a given product { elasticsearch, kibana, logstash, beats }
 func MakeXPackMonitoringIndexName(product Product) string {
-	const version = "6"
+	const version = "7"
 
 	return fmt.Sprintf(".monitoring-%v-%v-mb", product.xPackMonitoringIndexString(), version)
 }
@@ -95,16 +97,12 @@ func MakeErrorForMissingField(field string, product Product) error {
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
-func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion string) (bool, error) {
-	currentVersion, err := common.NewVersion(currentProductVersion)
-	if err != nil {
-		return false, err
-	}
+func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *common.Version) bool {
+	return !currentProductVersion.LessThan(featureAvailableInProductVersion)
+}
 
-	wantVersion, err := common.NewVersion(featureAvailableInProductVersion)
-	if err != nil {
-		return false, err
-	}
-
-	return !currentVersion.LessThan(wantVersion), nil
+// ReportAndLogError reports and logs the given error
+func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
+	r.Error(err)
+	l.Error(err)
 }

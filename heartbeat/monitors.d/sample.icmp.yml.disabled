@@ -1,0 +1,47 @@
+# These files contain a list of monitor configurations identical
+# to the heartbeat.monitors section in heartbeat.yml
+# The .example extension on this file must be removed for it to
+# be loaded.
+
+- type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
+  # configured hosts
+
+  # Monitor name used for job name and document type.
+  #name: icmp
+
+  # Enable/Disable monitor
+  #enabled: true
+
+  # Configure task schedule using cron-like syntax
+  schedule: '*/5 * * * * * *' # exactly every 5 seconds like 10:00:00, 10:00:05, ...
+
+  # List of hosts to ping
+  hosts: ["localhost"]
+
+  # Configure IP protocol types to ping on if hostnames are configured.
+  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
+  ipv4: true
+  ipv6: true
+  mode: any
+
+  # Total running time per ping test.
+  timeout: 16s
+
+  # Waiting duration until another ICMP Echo Request is emitted.
+  wait: 1s
+
+  # The tags of the monitors are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
+
+  # Optional fields that you can specify to add additional information to the
+  # monitor output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
+
+  # If this option is set to true, the custom fields are stored as top-level
+  # fields in the output document instead of being grouped under a fields
+  # sub-dictionary. Default is false.
+  #fields_under_root: false

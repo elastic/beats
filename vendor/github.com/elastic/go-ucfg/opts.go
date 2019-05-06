@@ -33,6 +33,7 @@ type options struct {
 	env          []*Config
 	resolvers    []func(name string) (string, error)
 	varexp       bool
+	noParse      bool
 
 	configValueHandling configHandling
 
@@ -123,8 +124,21 @@ func doResolveEnv(o *options) {
 	})
 }
 
+// ResolveNOOP option add a resolver that will not search the value but instead will return the
+// provided key wrap with the field reference syntax. This is useful if you don't to expose values
+// from envionment variable or other resolvers.
+//
+// Example: "mysecret" => ${mysecret}"
+var ResolveNOOP Option = doResolveNOOP
+
+func doResolveNOOP(o *options) {
+	o.resolvers = append(o.resolvers, func(name string) (string, error) {
+		return "${" + name + "}", nil
+	})
+}
+
 var (
-	// ReplacesValues option configures all merging and unpacking operations to
+	// ReplaceValues option configures all merging and unpacking operations to
 	// replace old dictionaries and arrays while merging. Value merging can be
 	// overwritten in unpack by using struct tags.
 	ReplaceValues = makeOptValueHandling(cfgReplaceValue)
@@ -157,7 +171,7 @@ func makeOptions(opts []Option) *options {
 		validatorTag: "validate",
 		pathSep:      "", // no separator by default
 		parsed:       map[string]spliceValue{},
-		activeFields: NewFieldSet(nil),
+		activeFields: newFieldSet(nil),
 	}
 	for _, opt := range opts {
 		opt(&o)

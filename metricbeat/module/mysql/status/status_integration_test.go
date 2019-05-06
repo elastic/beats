@@ -33,12 +33,13 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "mysql")
 
-	f := mbtest.NewEventFetcher(t, getConfig(false))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(false))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
 	}
-
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
@@ -57,12 +58,13 @@ func TestFetch(t *testing.T) {
 func TestFetchRaw(t *testing.T) {
 	compose.EnsureUp(t, "mysql")
 
-	f := mbtest.NewEventFetcher(t, getConfig(true))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(true))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
 	}
-
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
@@ -81,9 +83,9 @@ func TestFetchRaw(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig(false))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(false))
 
-	err := mbtest.WriteEvent(f, t)
+	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

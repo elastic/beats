@@ -21,7 +21,6 @@ package elasticsearch
 
 import (
 	"math/rand"
-	"strings"
 	"testing"
 	"time"
 
@@ -29,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch/internal"
@@ -92,8 +92,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	client.Delete(index, "", "", nil)
 
 	// Check version
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	if client.Connection.version.Major < 5 {
+		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
 	publish := func(event beat.Event) {
@@ -173,8 +173,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	})
 	client.Delete(index, "", "", nil)
 
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	if client.Connection.version.Major < 5 {
+		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
 	publish := func(events ...beat.Event) {
@@ -263,7 +263,9 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 		t.Fatal(err)
 	}
 
-	output, err := makeES(beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), config)
+	info := beat.Info{Beat: "libbeat"}
+	im, _ := idxmgmt.DefaultSupport(nil, info, nil)
+	output, err := makeES(im, info, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatal(err)
 	}

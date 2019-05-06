@@ -25,12 +25,16 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
 var (
 	schema = s.Schema{
+		"id":      c.Str("id"),
+		"host":    c.Str("host"),
+		"version": c.Str("version"),
 		"events": c.Dict("events", s.Schema{
 			"in":       c.Int("in"),
 			"out":      c.Int("out"),
@@ -40,22 +44,44 @@ var (
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
+	event := mb.Event{}
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", logstash.ModuleName)
+
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Logstash Node Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Logstash Node Stats API response")
 	}
 
 	fields, err := schema.Apply(data)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failure applying node stats schema"))
+		return errors.Wrap(err, "failure applying node stats schema")
 	}
 
-	event := mb.Event{}
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", logstash.ModuleName)
+	// Set service ID
+	serviceID, err := fields.GetValue("id")
+	if err != nil {
+		return elastic.MakeErrorForMissingField("id", elastic.Logstash)
+	}
+	event.RootFields.Put("service.id", serviceID)
+	fields.Delete("id")
+
+	// Set service hostname
+	host, err := fields.GetValue("host")
+	if err != nil {
+		return elastic.MakeErrorForMissingField("host", elastic.Logstash)
+	}
+	event.RootFields.Put("service.hostname", host)
+	fields.Delete("host")
+
+	// Set service version
+	version, err := fields.GetValue("version")
+	if err != nil {
+		return elastic.MakeErrorForMissingField("version", elastic.Logstash)
+	}
+	event.RootFields.Put("service.version", version)
+	fields.Delete("version")
 
 	event.MetricSetFields = fields
 

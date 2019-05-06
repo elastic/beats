@@ -16,11 +16,7 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-This module requires the
-{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
-{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
-
-The IIS module was tested with logs from version 10.
+The IIS module was tested with logs from version 7.5 and version 10.
 
 include::../include/running-modules.asciidoc[]
 

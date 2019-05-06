@@ -17,25 +17,30 @@ Beats.
 These options are in the `filebeat` namespace.
 
 [float]
-==== `registry_file`
+==== `registry.path`
 
-The name of the registry file. If a relative path is used, it is considered relative to the
-data path. See the <<directory-layout>> section for details. The default is `${path.data}/registry`.
+The root path of the registry.  If a relative path is used, it is considered
+relative to the data path. See the <<directory-layout>> section for details.
+The default is `${path.data}/registry`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat.registry_file: registry
+filebeat.registry.path: registry
 -------------------------------------------------------------------------------------
 
-It is not possible to use a symlink as registry file.
-
-NOTE: The registry file is only updated when new events are flushed and not on a predefined period.
+NOTE: The registry is only updated when new events are flushed and not on a predefined period.
 That means in case there are some states where the TTL expired, these are only removed when new event are processed.
 
-[float]
-==== `registry_file_permissions`
+NOTE: The registry stores it's data in the subdirectory filebeat/data.json. It
+also contains a meta data file named filebeat/meta.json. The meta file contains
+the file format version number.
 
-The permissions mask to apply on registry file. The default value is 0600. The permissions option must be a valid Unix-style file permissions mask expressed in octal notation. In Go, numbers in octal notation must start with 0.
+NOTE: The content stored in filebeat/data.json is compatible to the old registry file data format.
+
+[float]
+==== `registry.file_permissions`
+
+The permissions mask to apply on registry data file. The default value is 0600. The permissions option must be a valid Unix-style file permissions mask expressed in octal notation. In Go, numbers in octal notation must start with 0.
 
 This option is not supported on Windows.
 
@@ -47,8 +52,45 @@ Examples:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat.registry_file_permissions: 0600
+filebeat.registry.file_permissions: 0600
 -------------------------------------------------------------------------------------
+
+[float]
+==== `registry.flush`
+
+
+The timeout value that controls when registry entries are written to disk
+(flushed). When an unwritten update exceeds this value, it triggers a write to
+disk. When `registry.flush` is set to 0s, the registry is written to disk after
+each batch of events has been published successfully. The default value is 0s.
+
+NOTE: The registry is always updated when Filebeat shuts down normally. After an
+abnormal shutdown, the registry will not be up-to-date if the `registry.flush`
+value is >0s. Filebeat will send published events again (depending on values in
+the last updated registry file).
+
+NOTE: Filtering out a huge number of logs can cause many registry updates, slowing
+down processing. Setting `registry.flush` to a value >0s reduces write operations,
+helping Filebeat process more events.
+
+[float]
+==== `registry.migrate_file`
+
+Prior to Filebeat 7.0 the registry is stored in a single file. When you upgrade
+to 7.0, Filebeat will automatically migrate the old Filebeat 6.x registry file
+to use the new directory format. Filebeat looks for the file in the location
+specified by `filebeat.registry.path`. If you changed the path while upgrading,
+set `filebeat.registry.migrate_file` to point to the old registry file.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.registry.path: ${path.data}/registry
+filebeat.registry.migrate_file: /path/to/old/registry_file
+-------------------------------------------------------------------------------------
+
+The registry will be migrated to the new location only if a registry using the
+directory format does not already exist.
+
 
 [float]
 ==== `config_dir`
@@ -99,4 +141,4 @@ Example configuration:
 filebeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
 
-include::../../libbeat/docs/generalconfig.asciidoc[]
+include::{libbeat-dir}/docs/generalconfig.asciidoc[]

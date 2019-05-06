@@ -18,7 +18,6 @@
 package cfgfile
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -34,7 +33,6 @@ var (
 	// be called prior to flags.Parse().
 	configfiles = common.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
 	overwrites  = common.SettingFlag(nil, "E", "Configuration overwrite")
-	testConfig  = flag.Bool("configtest", false, "Test configuration and exit.")
 
 	// Additional default settings, that must be available for variable expansion
 	defaults = common.MustNewConfigFrom(map[string]interface{}{
@@ -68,6 +66,22 @@ func init() {
 func ChangeDefaultCfgfileFlag(beatName string) error {
 	configfiles.SetDefault(beatName + ".yml")
 	return nil
+}
+
+// GetDefaultCfgfile gets the full path of the default config file. Understood
+// as the first value for the `-c` flag. By default this will be `<beatname>.yml`
+func GetDefaultCfgfile() string {
+	if len(configfiles.List()) == 0 {
+		return ""
+	}
+
+	cfg := configfiles.List()[0]
+	cfgpath := GetPathConfig()
+
+	if !filepath.IsAbs(cfg) {
+		return filepath.Join(cfgpath, cfg)
+	}
+	return cfg
 }
 
 // HandleFlags adapts default config settings based on command line flags.
@@ -182,9 +196,4 @@ func GetPathConfig() string {
 	}
 	// TODO: Do we need this or should we always return *homePath?
 	return ""
-}
-
-// IsTestConfig returns whether or not this is configuration used for testing
-func IsTestConfig() bool {
-	return *testConfig
 }

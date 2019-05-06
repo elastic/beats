@@ -1,0 +1,21 @@
+[id="{beatname_lc}-overview"]
+== {beatname_uc} overview
+
+++++
+<titleabbrev>Overview</titleabbrev>
+++++
+
+{beatname_uc} is a lightweight shipper for forwarding and centralizing log data
+from https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html[systemd journals].
+Installed as an agent on your servers, {beatname_uc} monitors the journal
+locations that you specify, collects log events, and forwards them to either to
+https://www.elastic.co/products/elasticsearch[Elasticsearch] or
+https://www.elastic.co/products/logstash[Logstash].
+
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
+
+[float]
+=== Compatibility
+
+{beatname_uc} requires systemd v233 or later. Versions prior to systemd v233
+have a defect that prevents {beatname_uc} from reading rotated journals.

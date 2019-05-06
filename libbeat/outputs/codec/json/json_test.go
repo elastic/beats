@@ -26,7 +26,7 @@ import (
 
 func TestJsonCodec(t *testing.T) {
 	type testCase struct {
-		config   config
+		config   Config
 		in       common.MapStr
 		expected string
 	}
@@ -35,30 +35,30 @@ func TestJsonCodec(t *testing.T) {
 		"default json": testCase{
 			config:   defaultConfig,
 			in:       common.MapStr{"msg": "message"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"doc","version":"1.2.3"},"msg":"message"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 		"pretty enabled": testCase{
-			config: config{Pretty: true},
+			config: Config{Pretty: true},
 			in:     common.MapStr{"msg": "message"},
 			expected: `{
   "@timestamp": "0001-01-01T00:00:00.000Z",
   "@metadata": {
     "beat": "test",
-    "type": "doc",
+    "type": "_doc",
     "version": "1.2.3"
   },
   "msg": "message"
 }`,
 		},
 		"html escaping enabled": testCase{
-			config:   config{EscapeHTML: true},
+			config:   Config{EscapeHTML: true},
 			in:       common.MapStr{"msg": "<hello>world</hello>"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"doc","version":"1.2.3"},"msg":"\u003chello\u003eworld\u003c/hello\u003e"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"\u003chello\u003eworld\u003c/hello\u003e"}`,
 		},
 		"html escaping disabled": testCase{
-			config:   config{EscapeHTML: false},
+			config:   Config{EscapeHTML: false},
 			in:       common.MapStr{"msg": "<hello>world</hello>"},
-			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"doc","version":"1.2.3"},"msg":"<hello>world</hello>"}`,
+			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"<hello>world</hello>"}`,
 		},
 	}
 
@@ -66,7 +66,7 @@ func TestJsonCodec(t *testing.T) {
 		cfg, fields, expected := test.config, test.in, test.expected
 
 		t.Run(name, func(t *testing.T) {
-			codec := New(cfg.Pretty, cfg.EscapeHTML, "1.2.3")
+			codec := New("1.2.3", cfg)
 			actual, err := codec.Encode("test", &beat.Event{Fields: fields})
 
 			if err != nil {

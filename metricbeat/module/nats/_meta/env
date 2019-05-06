@@ -1,0 +1,2 @@
+NATS_HOST=nats
+NATS_PORT=8222

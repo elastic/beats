@@ -30,7 +30,9 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/management"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -82,6 +84,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	if b.ConfigManager.Enabled() {
+		bt.RunCentralMgmtMonitors(b)
+	}
+
 	if bt.config.ConfigMonitors.Enabled() {
 		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
 		defer bt.monitorReloader.Stop()
@@ -127,11 +133,17 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	return nil
 }
 
+// RunCentralMgmtMonitors loads any central management configured configs.
+func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
+	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
+}
+
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
-		return err
+		logp.Error(errors.Wrap(err, "error loading reloadable monitors"))
 	}
 
 	// Execute the monitor

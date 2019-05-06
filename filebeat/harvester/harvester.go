@@ -18,7 +18,7 @@
 package harvester
 
 import (
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 )
 
 // Harvester contains all methods which must be supported by each harvester

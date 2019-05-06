@@ -7,13 +7,11 @@ class Test(BaseTest):
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])
 
-        # bytes_in present for all. bytes_out present for
+        # source.bytes present for all. destination.bytes present for
         # all except the zip async calls.
-        assert all([o["bytes_in"] > 0 for o in objs])
-        assert all([o["bytes_out"] > 0 for o in objs[0:14]])
-        assert all([o["bytes_out"] > 0 for o in objs[16:]])
-        assert objs[14]["bytes_out"] == 0
-        assert objs[15]["bytes_out"] == 0
+        assert all([o["source.bytes"] > 0 for o in objs])
+        assert all([o["destination.bytes"] > 0 for o in objs[0:14]])
+        assert all([o["destination.bytes"] > 0 for o in objs[16:]])
 
         assert objs[0]["method"] == "ping"
         assert objs[0]["thrift.params"] == "()"
@@ -62,7 +60,7 @@ class Test(BaseTest):
         assert objs[0]["request"] == "ping()"
         assert objs[11]["response"] == "Exceptions: (1: (1: 4, 2: " + \
             "\"Cannot divide by 0\"))"
-        assert all([o["port"] == 9090 for o in objs])
+        assert all([o["server.port"] == 9090 for o in objs])
 
     def test_send_options_default(self):
         """
@@ -175,7 +173,6 @@ class Test(BaseTest):
         assert objs[17]["method"] == "testOneway"
         assert objs[17]["thrift.params"] == "(secondsToSleep: 1)"
         assert "thrift.return_value" not in objs[17]
-        assert objs[17]["bytes_out"] == 0
 
         assert objs[21]["method"] == "testString"
         assert objs[21]["thrift.params"] == "(thing: \"" + \

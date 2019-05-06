@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -53,36 +52,24 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, content []byte) error {
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch Cluster Stats API response")
-		r.Error(err)
-		return err
-	}
-
-	metricSetFields, err := schema.Apply(data)
-	if err != nil {
-		err = errors.Wrap(err, "failure applying cluster stats schema")
-		r.Error(err)
-		return err
-	}
-
-	clusterName, ok := data["cluster_name"]
-	if !ok {
-		return elastic.ReportErrorForMissingField("cluster_name", elastic.Elasticsearch, r)
-	}
-
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	var event mb.Event
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 	event.ModuleFields = common.MapStr{}
-	event.ModuleFields.Put("cluster.name", clusterName)
-	clusterUUID, ok := data["cluster_uuid"]
-	if ok {
-		event.ModuleFields.Put("cluster.id", clusterUUID)
+	event.ModuleFields.Put("cluster.name", info.ClusterName)
+	event.ModuleFields.Put("cluster.id", info.ClusterID)
+
+	var data map[string]interface{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Elasticsearch Cluster Stats API response")
+	}
+
+	metricSetFields, err := schema.Apply(data)
+	if err != nil {
+		return errors.Wrap(err, "failure applying cluster stats schema")
 	}
 
 	event.MetricSetFields = metricSetFields

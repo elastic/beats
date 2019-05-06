@@ -1,0 +1,453 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
+                "title": "Memory Usage [Metricbeat RabbitMQ] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Used memory", 
+                                "field": "rabbitmq.node.mem.used.bytes", 
+                                "json": ""
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customInterval": "30s", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "custom", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "Node name", 
+                                "field": "rabbitmq.node.name", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "group", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "listeners": {}, 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "defaultYExtents": true, 
+                        "drawLinesBetweenPoints": true, 
+                        "interpolate": "linear", 
+                        "legendPosition": "top", 
+                        "radiusRatio": 9, 
+                        "scale": "linear", 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "showCircles": false, 
+                        "smoothLines": true, 
+                        "times": [], 
+                        "yAxis": {}
+                    }, 
+                    "title": "RabbitMQ Memory Usage ECS", 
+                    "type": "line"
+                }
+            }, 
+            "id": "RabbitMQ-Memory-Usage-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
+                "title": "Number of Nodes [Metricbeat RabbitMQ] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "RabbitMQ Nodes", 
+                                "field": "rabbitmq.node.name"
+                            }, 
+                            "schema": "metric", 
+                            "type": "cardinality"
+                        }
+                    ], 
+                    "listeners": {}, 
+                    "params": {
+                        "fontSize": 60, 
+                        "handleNoResults": true
+                    }, 
+                    "title": "Rabbitmq Number of Nodes ECS",
+                    "type": "metric"
+                }
+            }, 
+            "id": "Rabbitmq-Number-of-Nodes-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
+                "title": "Erlang Process Usage [Metricbeat RabbitMQ] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Used Process", 
+                                "field": "rabbitmq.node.proc.used"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customInterval": "30s", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "custom", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "Node name", 
+                                "field": "rabbitmq.node.name", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "group", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "listeners": {}, 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "defaultYExtents": false, 
+                        "drawLinesBetweenPoints": true, 
+                        "interpolate": "linear", 
+                        "legendPosition": "top", 
+                        "radiusRatio": 9, 
+                        "scale": "linear", 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "showCircles": false, 
+                        "smoothLines": true, 
+                        "times": [], 
+                        "yAxis": {}
+                    }, 
+                    "title": "RabbitMQ Erlang Process Usage ECS", 
+                    "type": "line"
+                }
+            }, 
+            "id": "RabbitMQ-Erlang-Process-Usage-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
+                "title": "Queue Index Operations [Metricbeat RabbitMQ] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Queue Index Read", 
+                                "field": "rabbitmq.node.queue.index.read.count"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "30s", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "custom", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Queue Index Jornal Write", 
+                                "field": "rabbitmq.node.queue.index.journal_write.count"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "Queue Index Write", 
+                                "field": "rabbitmq.node.queue.index.write.count"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "drawLinesBetweenPoints": true, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "interpolate": "linear", 
+                        "legendPosition": "top", 
+                        "radiusRatio": 9, 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "mode": "normal", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "line", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "showCircles": false, 
+                        "smoothLines": false, 
+                        "times": [], 
+                        "type": "line", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Queue Index Operations [Metricbeat RabbitMQ] ECS", 
+                    "type": "line"
+                }
+            }, 
+            "id": "RabbitMQ-Queue-Index-Operations-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlight": {
+                            "fields": {
+                                "*": {}
+                            }, 
+                            "fragment_size": 2147483647, 
+                            "post_tags": [
+                                "@/kibana-highlighted-field@"
+                            ], 
+                            "pre_tags": [
+                                "@kibana-highlighted-field@"
+                            ], 
+                            "require_field_match": false
+                        }, 
+                        "index": "metricbeat-*", 
+                        "query": {
+                            "language": "kuery",
+                                "query": "event.module:rabbitmq"
+                            }
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "Metricbeat Rabbitmq ECS",
+                "version": 1
+            }, 
+            "id": "Metricbeat-Rabbitmq-ecs", 
+            "type": "search", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Overview of RabbitMQ status",
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "col": 1, 
+                        "id": "RabbitMQ-Memory-Usage-ecs", 
+                        "panelIndex": 8, 
+                        "row": 1, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 8, 
+                        "id": "Rabbitmq-Number-of-Nodes-ecs", 
+                        "panelIndex": 2, 
+                        "row": 1, 
+                        "size_x": 3, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "RabbitMQ-Erlang-Process-Usage-ecs", 
+                        "panelIndex": 10, 
+                        "row": 4, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 7, 
+                        "id": "RabbitMQ-Queue-Index-Operations-ecs", 
+                        "panelIndex": 9, 
+                        "row": 4, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Metricbeat RabbitMQ] Overview ECS", 
+                "uiStateJSON": {
+                    "P-2": {
+                        "vis": {
+                            "defaultColors": {
+                                "0 - 100": "rgb(0,104,55)"
+                            }
+                        }
+                    }
+                }, 
+                "version": 1
+            }, 
+            "id": "AV4YobKIge1VCbKU_qVo-ecs", 
+            "type": "dashboard", 
+            "version": 2
+        }
+    ], 
+    "version": "6.0.0-beta1-SNAPSHOT"
+}

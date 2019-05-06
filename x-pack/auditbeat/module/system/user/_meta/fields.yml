@@ -1,0 +1,60 @@
+- name: user
+  type: group
+  description: >
+    `user` contains information about the users on a system.
+  release: beta
+  fields:
+    - name: name
+      type: keyword
+      description: >
+          User name.
+    - name: uid
+      type: keyword
+      description: >
+          User ID.
+    - name: gid
+      type: keyword
+      description: >
+          Group ID.
+    - name: dir
+      type: keyword
+      description: >
+          User's home directory.
+    - name: shell
+      type: keyword
+      description: >
+          Program to run at login.
+    - name: user_information
+      type: keyword
+      description: >
+          General user information. On Linux, this is the gecos field.
+    - name: group
+      type: object
+      description: >
+        `group` contains information about any groups the user is part of (beyond the user's primary group).
+      fields:
+        - name: name
+          type: keyword
+          description: >
+              Group name.
+        - name: gid
+          type: integer
+          description: >
+              Group ID.
+    - name: password
+      type: group
+      description: >
+        `password` contains information about a user's password (not the password itself).
+      fields:
+        - name: type
+          type: keyword
+          description: >
+              A user's password type. Possible values are `shadow_password`
+              (the password hash is in the shadow file), `password_disabled`,
+              `no_password` (this is dangerous as anyone can log in), and
+              `crypt_password` (when the password field in /etc/passwd seems
+              to contain an encrypted password).
+        - name: last_changed
+          type: date
+          description: >
+              The day the user's password was last changed.

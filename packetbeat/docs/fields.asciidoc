@@ -25,12 +25,14 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
+* <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-memcache>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nfs>>
 * <<exported-fields-pgsql>>
+* <<exported-fields-process>>
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
 * <<exported-fields-thrift>>
@@ -447,59 +449,21 @@ Contains common beat fields available in all event types.
 
 
 
-*`beat.name`*::
+*`agent.hostname`*::
 +
 --
-The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
+type: keyword
 
-
---
-
-*`beat.hostname`*::
-+
---
-The hostname as returned by the operating system on which the Beat is running.
-
+Hostname of the agent.
 
 --
 
 *`beat.timezone`*::
 +
 --
-The timezone as returned by the operating system on which the Beat is running.
+type: alias
 
-
---
-
-*`beat.version`*::
-+
---
-The version of the beat that generated this event.
-
-
---
-
-*`@timestamp`*::
-+
---
-type: date
-
-example: August 26th 2016, 12:35:53.332
-
-format: date
-
-required: True
-
-The timestamp when the event log record was generated.
-
-
---
-
-*`tags`*::
-+
---
-Arbitrary tags that can be set per Beat and per transaction type.
-
+alias to: event.timezone
 
 --
 
@@ -530,17 +494,63 @@ Error type.
 
 --
 
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
+
+--
+
+*`timeseries.instance`*::
++
+--
+type: keyword
+
+Time series instance id
+
+--
+
 [[exported-fields-cassandra]]
 == Cassandra fields
 
 Cassandra v4/3 specific event fields.
 
 
+*`no_request`*::
++
+--
+type: alias
+
+alias to: cassandra.no_request
+
+--
+
 [float]
 == cassandra fields
 
 Information about the Cassandra request and response.
 
+
+*`cassandra.no_request`*::
++
+--
+type: boolean
+
+Indicates that there is no request because this is a PUSH message.
+
+
+--
 
 [float]
 == request fields
@@ -1275,53 +1285,7 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
-*`meta.cloud.provider`*::
-+
---
-example: ec2
-
-Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
-
-
---
-
-*`meta.cloud.instance_id`*::
-+
---
-Instance ID of the host machine.
-
-
---
-
-*`meta.cloud.instance_name`*::
-+
---
-Instance name of the host machine.
-
-
---
-
-*`meta.cloud.machine_type`*::
-+
---
-example: t2.medium
-
-Machine type of the host machine.
-
-
---
-
-*`meta.cloud.availability_zone`*::
-+
---
-example: us-east-1c
-
-Availability zone in which this host is running.
-
-
---
-
-*`meta.cloud.project_id`*::
+*`cloud.project.id`*::
 +
 --
 example: project-x
@@ -1331,11 +1295,66 @@ Name of the project in Google Cloud.
 
 --
 
+*`meta.cloud.provider`*::
++
+--
+type: alias
+
+alias to: cloud.provider
+
+--
+
+*`meta.cloud.instance_id`*::
++
+--
+type: alias
+
+alias to: cloud.instance.id
+
+--
+
+*`meta.cloud.instance_name`*::
++
+--
+type: alias
+
+alias to: cloud.instance.name
+
+--
+
+*`meta.cloud.machine_type`*::
++
+--
+type: alias
+
+alias to: cloud.machine.type
+
+--
+
+*`meta.cloud.availability_zone`*::
++
+--
+type: alias
+
+alias to: cloud.availability_zone
+
+--
+
+*`meta.cloud.project_id`*::
++
+--
+type: alias
+
+alias to: cloud.project.id
+
+--
+
 *`meta.cloud.region`*::
 +
 --
-Region in which this host is running.
+type: alias
 
+alias to: cloud.region
 
 --
 
@@ -1345,99 +1364,6 @@ Region in which this host is running.
 These fields contain data about the environment in which the transaction or flow was captured.
 
 
-
-*`server`*::
-+
---
-The name of the server that served the transaction.
-
-
---
-
-*`client_server`*::
-+
---
-The name of the server that initiated the transaction.
-
-
---
-
-*`client_service`*::
-+
---
-The name of the logical service that initiated the transaction.
-
-
---
-
-*`ip`*::
-+
---
-format: dotted notation.
-
-The IP address of the server that served the transaction.
-
-
---
-
-*`client_ip`*::
-+
---
-format: dotted notation.
-
-The IP address of the server that initiated the transaction.
-
-
---
-
-*`real_ip`*::
-+
---
-format: Dotted notation.
-
-If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`.
-Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
-
-
---
-
-[float]
-== client_geoip fields
-
-The GeoIP information of the client.
-
-
-*`client_geoip.location`*::
-+
---
-type: geo_point
-
-example: {'lat': 51, 'lon': 9}
-
-The GeoIP location of the `client_ip` address. This field is available only if you define a https://www.elastic.co/guide/en/elasticsearch/plugins/master/using-ingest-geoip.html[GeoIP Processor] as a pipeline in the https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Ingest GeoIP processor plugin] or using Logstash.
-
-
---
-
-*`client_port`*::
-+
---
-format: dotted notation.
-
-The layer 4 port of the process that initiated the transaction.
-
-
---
-
-*`transport`*::
-+
---
-example: udp
-
-The transport protocol used for the transaction. If not specified, then tcp is assumed.
-
-
---
 
 *`type`*::
 +
@@ -1449,17 +1375,7 @@ The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" 
 
 --
 
-*`port`*::
-+
---
-format: dotted notation.
-
-The layer 4 port of the process that served the transaction.
-
-
---
-
-*`proc`*::
+*`server.process.name`*::
 +
 --
 The name of the process that served the transaction.
@@ -1467,7 +1383,7 @@ The name of the process that served the transaction.
 
 --
 
-*`cmdline`*::
+*`server.process.args`*::
 +
 --
 The command-line of the process that served the transaction.
@@ -1475,7 +1391,31 @@ The command-line of the process that served the transaction.
 
 --
 
-*`client_proc`*::
+*`server.process.executable`*::
++
+--
+Absolute path to the server process executable.
+
+
+--
+
+*`server.process.working_directory`*::
++
+--
+The working directory of the server process.
+
+
+--
+
+*`server.process.start`*::
++
+--
+The time the server process started.
+
+
+--
+
+*`client.process.name`*::
 +
 --
 The name of the process that initiated the transaction.
@@ -1483,7 +1423,7 @@ The name of the process that initiated the transaction.
 
 --
 
-*`client_cmdline`*::
+*`client.process.args`*::
 +
 --
 The command-line of the process that initiated the transaction.
@@ -1491,10 +1431,51 @@ The command-line of the process that initiated the transaction.
 
 --
 
-*`release`*::
+*`client.process.executable`*::
 +
 --
-The software release of the service serving the transaction. This can be the commit id or a semantic version.
+Absolute path to the client process executable.
+
+
+--
+
+*`client.process.working_directory`*::
++
+--
+The working directory of the client process.
+
+
+--
+
+*`client.process.start`*::
++
+--
+The time the client process started.
+
+
+--
+
+*`real_ip`*::
++
+--
+type: alias
+
+alias to: network.forwarded_ip
+
+If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`.
+Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
+
+
+--
+
+*`transport`*::
++
+--
+type: alias
+
+alias to: network.transport
+
+The transport protocol used for the transaction. If not specified, then tcp is assumed.
 
 
 --
@@ -2235,30 +2216,27 @@ Docker stats collected from Docker.
 *`docker.container.id`*::
 +
 --
-type: keyword
+type: alias
 
-Unique container id.
-
+alias to: container.id
 
 --
 
 *`docker.container.image`*::
 +
 --
-type: keyword
+type: alias
 
-Name of the image the container was built on.
-
+alias to: container.image.name
 
 --
 
 *`docker.container.name`*::
 +
 --
-type: keyword
+type: alias
 
-Container name.
-
+alias to: container.name
 
 --
 
@@ -2275,38 +2253,78 @@ Image labels.
 [[exported-fields-ecs]]
 == ECS fields
 
-ECS fields.
+ECS Fields.
 
 
+*`@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+This is the date/time extracted from the event, typically representing when the event was generated by the source.
+If the event source has no original timestamp, this value is typically populated by the first time the event was received by the pipeline.
+Required field for all events.
+
+--
+
+*`labels`*::
++
+--
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
+
+Custom key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+--
+
+*`message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message, optimized for viewing in a log viewer.
+For structured logs without an original message field, other fields can be concatenated to form a human-readable summary of the event.
+If multiple messages exist, they can be combined into one message.
+
+--
+
+*`tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+--
 
 [float]
 == agent fields
 
-The agent fields contain the data about the agent/client/shipper that created the event.
+The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host.
+Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
 
 
-
-*`agent.version`*::
+*`agent.ephemeral_id`*::
 +
 --
 type: keyword
 
-example: 6.0.0-rc2
+example: 8a4f500f
 
-Version of the agent.
-
-
---
-
-*`agent.name`*::
-+
---
-type: keyword
-
-example: filebeat
-
-Name of the agent.
-
+Ephemeral identifier of this agent (if one exists).
+This id normally changes across restarts, but `agent.id` does not.
 
 --
 
@@ -2320,81 +2338,278 @@ example: 8a4f500d
 Unique identifier of this agent (if one exists).
 Example: For Beats this would be beat.id.
 
-
 --
 
-*`agent.ephemeral_id`*::
+*`agent.name`*::
 +
 --
 type: keyword
 
-example: 8a4f500f
+example: foo
 
-Ephemeral identifier of this agent (if one exists).
-This id normally changes across restarts, but `agent.id` does not.
+Custom name of the agent.
+This is a name that can be given to an agent. This can be helpful if for example two Filebeat instances are running on the same host but a human readable separation is needed on which Filebeat instance data is coming from.
+If no name is given, the name is often left empty.
 
+--
+
+*`agent.type`*::
++
+--
+type: keyword
+
+example: filebeat
+
+Type of the agent.
+The agent type stays always the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
+
+--
+
+*`agent.version`*::
++
+--
+type: keyword
+
+example: 6.0.0-rc2
+
+Version of the agent.
 
 --
 
 [float]
-== base fields
+== client fields
 
-The base set contains all fields which are on the top level. These fields are common across all types of events.
-
-
-
-*`base.@timestamp`*::
-+
---
-type: date
-
-example: 2016-05-23T08:05:34.853Z
-
-required: True
-
-Date/time when the event originated.
-For log events this is the date/time when the event was generated, and not when it was read.
-Required field for all events.
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
---
-
-*`base.tags`*::
+*`client.address`*::
 +
 --
 type: keyword
 
-example: ["production", "env2"]
-
-List of keywords used to tag each event.
-
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 --
 
-*`base.labels`*::
+*`client.bytes`*::
 +
 --
-type: object
+type: long
 
-example: {'key2': 'value2', 'key1': 'value1'}
+example: 184
 
-Key/value pairs.
-Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
-Example: `docker` and `k8s` labels.
+format: bytes
 
+Bytes sent from the client to the server.
 
 --
 
-*`base.message`*::
+*`client.domain`*::
 +
 --
-type: text
+type: keyword
 
-example: Hello World
+Client domain.
 
-For log events the message field contains the log message.
-In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+--
 
+*`client.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+--
+
+*`client.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+--
+
+*`client.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+--
+
+*`client.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+--
+
+*`client.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+--
+
+*`client.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+--
+
+*`client.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+--
+
+*`client.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+--
+
+*`client.ip`*::
++
+--
+type: ip
+
+IP address of the client.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+--
+
+*`client.mac`*::
++
+--
+type: keyword
+
+MAC address of the client.
+
+--
+
+*`client.packets`*::
++
+--
+type: long
+
+example: 12
+
+Packets sent from the client to the server.
+
+--
+
+*`client.port`*::
++
+--
+type: long
+
+Port of the client.
+
+--
+
+*`client.user.email`*::
++
+--
+type: keyword
+
+User email address.
+
+--
+
+*`client.user.full_name`*::
++
+--
+type: keyword
+
+example: Albert Einstein
+
+User's full name, if available.
+
+--
+
+*`client.user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+--
+
+*`client.user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+--
+
+*`client.user.hash`*::
++
+--
+type: keyword
+
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+--
+
+*`client.user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+--
+
+*`client.user.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
 
 --
 
@@ -2404,16 +2619,15 @@ In other use cases the message field can be used to concatenate different values
 Fields related to the cloud or infrastructure the events are coming from.
 
 
-
-*`cloud.provider`*::
+*`cloud.account.id`*::
 +
 --
 type: keyword
 
-example: ec2
+example: 666777888999
 
-Name of the cloud provider. Example values are ec2, gce, or digitalocean.
-
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
 
 --
 
@@ -2426,19 +2640,6 @@ example: us-east-1c
 
 Availability zone in which this host is running.
 
-
---
-
-*`cloud.region`*::
-+
---
-type: keyword
-
-example: us-east-1
-
-Region in which this host is running.
-
-
 --
 
 *`cloud.instance.id`*::
@@ -2450,7 +2651,6 @@ example: i-1234567890abcdef0
 
 Instance ID of the host machine.
 
-
 --
 
 *`cloud.instance.name`*::
@@ -2459,7 +2659,6 @@ Instance ID of the host machine.
 type: keyword
 
 Instance name of the host machine.
-
 
 --
 
@@ -2472,40 +2671,36 @@ example: t2.medium
 
 Machine type of the host machine.
 
-
 --
 
-*`cloud.account.id`*::
+*`cloud.provider`*::
 +
 --
 type: keyword
 
-example: 666777888999
+example: aws
 
-The cloud account or organization id used to identify different entities in a multi-tenant environment.
-Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
 
+--
+
+*`cloud.region`*::
++
+--
+type: keyword
+
+example: us-east-1
+
+Region in which this host is running.
 
 --
 
 [float]
 == container fields
 
-Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information.
+These fields help correlate data based containers from any runtime.
 
-
-
-*`container.runtime`*::
-+
---
-type: keyword
-
-example: docker
-
-Runtime managing this container.
-
-
---
 
 *`container.id`*::
 +
@@ -2513,7 +2708,6 @@ Runtime managing this container.
 type: keyword
 
 Unique container id.
-
 
 --
 
@@ -2524,7 +2718,6 @@ type: keyword
 
 Name of the image the container was built on.
 
-
 --
 
 *`container.image.tag`*::
@@ -2533,17 +2726,6 @@ Name of the image the container was built on.
 type: keyword
 
 Container image tag.
-
-
---
-
-*`container.name`*::
-+
---
-type: keyword
-
-Container name.
-
 
 --
 
@@ -2554,6 +2736,25 @@ type: object
 
 Image labels.
 
+--
+
+*`container.name`*::
++
+--
+type: keyword
+
+Container name.
+
+--
+
+*`container.runtime`*::
++
+--
+type: keyword
+
+example: docker
+
+Runtime managing this container.
 
 --
 
@@ -2561,47 +2762,29 @@ Image labels.
 == destination fields
 
 Destination fields describe details about the destination of a packet/event.
+Destination fields are usually populated in conjunction with source fields.
 
 
-
-*`destination.ip`*::
-+
---
-type: ip
-
-IP address of the destination.
-Can be one or multiple IPv4 or IPv6 addresses.
-
-
---
-
-*`destination.hostname`*::
+*`destination.address`*::
 +
 --
 type: keyword
 
-Hostname of the destination.
-
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 --
 
-*`destination.port`*::
+*`destination.bytes`*::
 +
 --
 type: long
 
-Port of the destination.
+example: 184
 
+format: bytes
 
---
-
-*`destination.mac`*::
-+
---
-type: keyword
-
-MAC address of the destination.
-
+Bytes sent from the destination to the source.
 
 --
 
@@ -2612,118 +2795,240 @@ type: keyword
 
 Destination domain.
 
-
 --
 
-*`destination.subdomain`*::
+*`destination.geo.city_name`*::
 +
 --
 type: keyword
 
-Destination subdomain.
+example: Montreal
 
+City name.
 
 --
 
-[float]
-== device fields
-
-Device fields are used to provide additional information about the device that is the source of the information. This could be a firewall, network device, etc.
-
-
-
-*`device.mac`*::
+*`destination.geo.continent_name`*::
 +
 --
 type: keyword
 
-MAC address of the device
+example: North America
 
+Name of the continent.
 
 --
 
-*`device.ip`*::
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+--
+
+*`destination.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+--
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+--
+
+*`destination.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+--
+
+*`destination.ip`*::
 +
 --
 type: ip
 
-IP address of the device.
-
+IP address of the destination.
+Can be one or multiple IPv4 or IPv6 addresses.
 
 --
 
-*`device.hostname`*::
+*`destination.mac`*::
 +
 --
 type: keyword
 
-Hostname of the device.
-
-
---
-
-*`device.vendor`*::
-+
---
-type: text
-
-Device vendor information.
-
+MAC address of the destination.
 
 --
 
-*`device.version`*::
-+
---
-type: keyword
-
-Device version.
-
-
---
-
-*`device.serial_number`*::
-+
---
-type: keyword
-
-Device serial number.
-
-
---
-
-*`device.timezone.offset.sec`*::
+*`destination.packets`*::
 +
 --
 type: long
 
-example: -5400
+example: 12
 
-Timezone offset of the host in seconds.
-Number of seconds relative to UTC. If the offset is -01:30 the value will be -5400.
-
+Packets sent from the destination to the source.
 
 --
 
-*`device.type`*::
+*`destination.port`*::
++
+--
+type: long
+
+Port of the destination.
+
+--
+
+*`destination.user.email`*::
 +
 --
 type: keyword
 
-example: firewall
+User email address.
 
-The type of the device the data is coming from.
-There is no predefined list of device types. Some examples are `endpoint`, `firewall`, `ids`, `ips`, `proxy`.
+--
 
+*`destination.user.full_name`*::
++
+--
+type: keyword
+
+example: Albert Einstein
+
+User's full name, if available.
+
+--
+
+*`destination.user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+--
+
+*`destination.user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+--
+
+*`destination.user.hash`*::
++
+--
+type: keyword
+
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+--
+
+*`destination.user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+--
+
+*`destination.user.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+--
+
+[float]
+== ecs fields
+
+Meta-information specific to ECS.
+
+
+*`ecs.version`*::
++
+--
+type: keyword
+
+example: 1.0.0
+
+required: True
+
+ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
+When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
 
 --
 
 [float]
 == error fields
 
-These fields can represent errors of any kind. Use them for errors that happen while fetching events or in cases where the event itself contains an error.
+These fields can represent errors of any kind.
+Use them for errors that happen while fetching events or in cases where the event itself contains an error.
 
 
+*`error.code`*::
++
+--
+type: keyword
+
+Error code describing the error.
+
+--
 
 *`error.id`*::
 +
@@ -2731,7 +3036,6 @@ These fields can represent errors of any kind. Use them for errors that happen w
 type: keyword
 
 Unique identifier for the error.
-
 
 --
 
@@ -2742,35 +3046,24 @@ type: text
 
 Error message.
 
-
---
-
-*`error.code`*::
-+
---
-type: keyword
-
-Error code describing the error.
-
-
 --
 
 [float]
 == event fields
 
-The event fields are used for context information about the data itself.
+The event fields are used for context information about the log or metric event itself.
+A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
 
 
-
-*`event.id`*::
+*`event.action`*::
 +
 --
 type: keyword
 
-example: 8a4f500d
+example: user-password-change
 
-Unique ID to describe the event.
-
+The action captured by the event.
+This describes the information in the event. It is more specific than `event.category`. Examples are `group-add`, `process-started`, `file-created`. The value is normally defined by the implementer.
 
 --
 
@@ -2779,50 +3072,22 @@ Unique ID to describe the event.
 --
 type: keyword
 
-example: metrics
+example: user-management
 
 Event category.
-This can be a user defined category.
-
+This contains high-level information about the contents of the event. It is more generic than `event.action`, in the sense that typically a category contains multiple actions. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
 
 --
 
-*`event.type`*::
+*`event.created`*::
 +
 --
-type: keyword
+type: date
 
-example: nginx-stats-metrics
-
-A type given to this kind of event which can be used for grouping.
-This is normally defined by the user.
-
-
---
-
-*`event.action`*::
-+
---
-type: keyword
-
-example: reject
-
-The action captured by the event. The type of action will vary from system to system but is likely to include actions by security services, such as blocking or quarantining; as well as more generic actions such as login events, file i/o or proxy forwarding events.
-The value is normally defined by the user.
-
-
---
-
-*`event.module`*::
-+
---
-type: keyword
-
-example: mysql
-
-Name of the module this data is coming from.
-This information is coming from the modules used in Beats or Logstash.
-
+event.created contains the date/time when the event was first read by an agent, or by your pipeline.
+This field is distinct from @timestamp in that @timestamp typically contain the time extracted from the original event.
+In most situations, these two timestamps will be slightly different. The difference can be used to calculate the delay between your source generating an event, and the time when your agent first processed it. This can be used to monitor your agent's or pipeline's ability to keep up with your event source.
+In case the two timestamps are identical, @timestamp should be used.
 
 --
 
@@ -2836,18 +3101,72 @@ example: stats
 Name of the dataset.
 The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
 
-
 --
 
-*`event.severity`*::
+*`event.duration`*::
 +
 --
 type: long
 
-example: 7
+format: duration
 
-Severity describes the severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+Duration of the event in nanoseconds.
+If event.start and event.end are known this value should be the difference between the end and start time.
 
+--
+
+*`event.end`*::
++
+--
+type: date
+
+event.end contains the date when the event ended or when the activity was last observed.
+
+--
+
+*`event.hash`*::
++
+--
+type: keyword
+
+example: 123456789012345678901234567890ABCD
+
+Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
+
+--
+
+*`event.id`*::
++
+--
+type: keyword
+
+example: 8a4f500d
+
+Unique ID to describe the event.
+
+--
+
+*`event.kind`*::
++
+--
+type: keyword
+
+example: state
+
+The kind of the event.
+This gives information about what type of information the event contains, without being specific to the contents of the event.  Examples are `event`, `state`, `alarm`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+--
+
+*`event.module`*::
++
+--
+type: keyword
+
+example: mysql
+
+Name of the module this data is coming from.
+This information is coming from the modules used in Beats or Logstash.
 
 --
 
@@ -2861,59 +3180,17 @@ example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#
 Raw text message of entire event. Used to demonstrate log integrity.
 This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
 
-
-Field is not indexed.
-
 --
 
-*`event.hash`*::
+*`event.outcome`*::
 +
 --
 type: keyword
 
-example: 123456789012345678901234567890ABCD
+example: success
 
-Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
-
-
---
-
-*`event.version`*::
-+
---
-type: keyword
-
-example: 0.1.0
-
-required: True
-
-The version field contains the version an event for ECS adheres to.
-This field should be provided as part of each event to make it possible to detect to which ECS version an event belongs.
-event.version is a required field and must exist in all events. It describes which ECS version the event adheres to.
-The current version is 0.1.0.
-
-
---
-
-*`event.duration`*::
-+
---
-type: long
-
-Duration of the event in nanoseconds.
-
-
---
-
-*`event.created`*::
-+
---
-type: date
-
-event.created contains the date when the event was created.
-This timestamp is distinct from @timestamp in that @timestamp contains the processed timestamp. For logs these two timestamps can be different as the timestamp in the log line and when the event is read for example by Filebeat are not identical. `@timestamp` must contain the timestamp extracted from the log line, event.created when the log line is read. The same could apply to package capturing where @timestamp contains the timestamp extracted from the network package and event.created when the event was created.
-In case the two timestamps are identical, @timestamp should be used.
-
+The outcome of the event.
+If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
 
 --
 
@@ -2923,7 +3200,6 @@ In case the two timestamps are identical, @timestamp should be used.
 type: float
 
 Risk score or priority of the event (e.g. security solutions). Use your system's original value here.
-
 
 --
 
@@ -2935,73 +3211,61 @@ type: float
 Normalized risk score or priority of the event, on a scale of 0 to 100.
 This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
 
+--
+
+*`event.severity`*::
++
+--
+type: long
+
+example: 7
+
+Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+
+--
+
+*`event.start`*::
++
+--
+type: date
+
+event.start contains the date when the event started or when the activity was first observed.
+
+--
+
+*`event.timezone`*::
++
+--
+type: keyword
+
+This field should be populated when the event's timestamp does not include timezone information already (e.g. default Syslog timestamps). It's optional otherwise.
+Acceptable timezone formats are: a canonical ID (e.g. "Europe/Amsterdam"), abbreviated (e.g. "EST") or an HH:mm differential (e.g. "-05:00").
+
+--
+
+*`event.type`*::
++
+--
+type: keyword
+
+Reserved for future usage.
+Please avoid using this field for user data.
 
 --
 
 [float]
 == file fields
 
-File fields provide details about each file.
+A file is defined as a set of information that has been created on, or has existed on a filesystem.
+File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
 
 
-
-*`file.path`*::
+*`file.ctime`*::
 +
 --
-type: text
+type: date
 
-Path to the file.
-
-*`file.path.raw`*::
-+
---
-type: keyword
-
-Path to the file. This is a non-analyzed field that is useful for aggregations.
-
-
---
-
---
-
-*`file.target_path`*::
-+
---
-type: text
-
-Target path for symlinks.
-
-*`file.target_path.raw`*::
-+
---
-type: keyword
-
-Path to the file. This is a non-analyzed field that is useful for aggregations.
-
-
---
-
---
-
-*`file.extension`*::
-+
---
-type: keyword
-
-example: png
-
-File extension.
-This should allow easy filtering by file extensions.
-
-
---
-
-*`file.type`*::
-+
---
-type: keyword
-
-File type (file, dir, or symlink).
+Last time file metadata changed.
 
 --
 
@@ -3014,31 +3278,15 @@ Device that is the source of the file.
 
 --
 
-*`file.inode`*::
+*`file.extension`*::
 +
 --
 type: keyword
 
-Inode representing the file in the filesystem.
+example: png
 
---
-
-*`file.uid`*::
-+
---
-type: keyword
-
-The user ID (UID) or security identifier (SID) of the file owner.
-
-
---
-
-*`file.owner`*::
-+
---
-type: keyword
-
-File owner's username.
+File extension.
+This should allow easy filtering by file extensions.
 
 --
 
@@ -3060,6 +3308,15 @@ Primary group name of the file.
 
 --
 
+*`file.inode`*::
++
+--
+type: keyword
+
+Inode representing the file in the filesystem.
+
+--
+
 *`file.mode`*::
 +
 --
@@ -3068,15 +3325,6 @@ type: keyword
 example: 416
 
 Mode of the file in octal representation.
-
---
-
-*`file.size`*::
-+
---
-type: long
-
-File size in bytes (field is only added when `type` is `file`).
 
 --
 
@@ -3089,29 +3337,86 @@ Last time file content was modified.
 
 --
 
-*`file.ctime`*::
+*`file.owner`*::
 +
 --
-type: date
+type: keyword
 
-Last time file metadata changed.
+File owner's username.
+
+--
+
+*`file.path`*::
++
+--
+type: keyword
+
+Path to the file.
+
+--
+
+*`file.size`*::
++
+--
+type: long
+
+File size in bytes (field is only added when `type` is `file`).
+
+--
+
+*`file.target_path`*::
++
+--
+type: keyword
+
+Target path for symlinks.
+
+--
+
+*`file.type`*::
++
+--
+type: keyword
+
+File type (file, dir, or symlink).
+
+--
+
+*`file.uid`*::
++
+--
+type: keyword
+
+The user ID (UID) or security identifier (SID) of the file owner.
 
 --
 
 [float]
 == geo fields
 
-Geo fields can carry data about a specific location related to an event or geo information for an IP field.
+Geo fields can carry data about a specific location related to an event.
+This geolocation information can be derived from techniques such as Geo IP, or be user-supplied.
 
 
+*`geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+--
 
 *`geo.continent_name`*::
 +
 --
 type: keyword
 
-Name of the continent.
+example: North America
 
+Name of the continent.
 
 --
 
@@ -3120,8 +3425,20 @@ Name of the continent.
 --
 type: keyword
 
+example: CA
+
 Country ISO code.
 
+--
+
+*`geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
 
 --
 
@@ -3130,8 +3447,33 @@ Country ISO code.
 --
 type: geo_point
 
+example: { "lon": -73.614830, "lat": 45.505918 }
+
 Longitude and latitude.
 
+--
+
+*`geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+--
+
+*`geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
 
 --
 
@@ -3140,50 +3482,151 @@ Longitude and latitude.
 --
 type: keyword
 
-Region name.
+example: Quebec
 
+Region name.
 
 --
 
-*`geo.city_name`*::
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+*`group.id`*::
 +
 --
 type: keyword
 
-City name.
+Unique identifier for the group on the system/platform.
 
+--
+
+*`group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 --
 
 [float]
 == host fields
 
-Host fields provide information related to a host. A host can be a physical machine, a virtual machine, or a Docker container.
-Normally the host information is related to the machine on which the event was generated/collected, but they can be used differently if needed.
+A host is defined as a general computing instance.
+ECS host.* fields should be populated with details about the host on which the event happened, or from which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
 
 
-
-*`host.timezone.offset.sec`*::
-+
---
-type: long
-
-example: -5400
-
-Timezone offset of the host in seconds.
-Number of seconds relative to UTC. If the offset is -01:30 the value will be -5400.
-
-
---
-
-*`host.name`*::
+*`host.architecture`*::
 +
 --
 type: keyword
 
-host.name is the hostname of the host.
-It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
+example: x86_64
 
+Operating system architecture.
+
+--
+
+*`host.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+--
+
+*`host.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+--
+
+*`host.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+--
+
+*`host.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+--
+
+*`host.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+--
+
+*`host.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+--
+
+*`host.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+--
+
+*`host.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+--
+
+*`host.hostname`*::
++
+--
+type: keyword
+
+Hostname of the host.
+It normally contains what the `hostname` command returns on the host machine.
 
 --
 
@@ -3196,7 +3639,6 @@ Unique host id.
 As hostname is not always unique, use values that are meaningful in your environment.
 Example: The current usage of `beat.name`.
 
-
 --
 
 *`host.ip`*::
@@ -3205,7 +3647,6 @@ Example: The current usage of `beat.name`.
 type: ip
 
 Host ip address.
-
 
 --
 
@@ -3216,6 +3657,81 @@ type: keyword
 
 Host mac address.
 
+--
+
+*`host.name`*::
++
+--
+type: keyword
+
+Name of the host.
+It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
+
+--
+
+*`host.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+--
+
+*`host.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
+
+--
+
+*`host.os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+--
+
+*`host.os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name, without the version.
+
+--
+
+*`host.os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+--
+
+*`host.os.version`*::
++
+--
+type: keyword
+
+example: 10.14.1
+
+Operating system version as a raw string.
 
 --
 
@@ -3227,85 +3743,176 @@ type: keyword
 Type of host.
 For Cloud providers this can be the machine type like `t2.medium`. If vm, this could be the container, for example, or other information meaningful in your environment.
 
-
 --
 
-*`host.os.platform`*::
+*`host.user.email`*::
 +
 --
 type: keyword
 
-example: darwin
-
-Operating system platform (centos, ubuntu, windows, etc.)
-
+User email address.
 
 --
 
-*`host.os.name`*::
+*`host.user.full_name`*::
 +
 --
 type: keyword
 
-example: Mac OS X
+example: Albert Einstein
 
-Operating system name.
-
+User's full name, if available.
 
 --
 
-*`host.os.family`*::
+*`host.user.group.id`*::
 +
 --
 type: keyword
 
-example: debian
-
-OS family (redhat, debian, freebsd, windows, etc.)
-
+Unique identifier for the group on the system/platform.
 
 --
 
-*`host.os.version`*::
+*`host.user.group.name`*::
 +
 --
 type: keyword
 
-example: 10.12.6
-
-Operating system version.
-
+Name of the group.
 
 --
 
-*`host.architecture`*::
+*`host.user.hash`*::
 +
 --
 type: keyword
 
-example: x86_64
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
 
-Operating system architecture.
+--
 
+*`host.user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+--
+
+*`host.user.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
 
 --
 
 [float]
 == http fields
 
-Fields related to HTTP requests and responses.
+Fields related to HTTP activity. Use the `url` field set to store the url of the request.
 
 
+*`http.request.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+format: bytes
+
+Size in bytes of the request body.
+
+--
+
+*`http.request.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full HTTP request body.
+
+--
+
+*`http.request.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+format: bytes
+
+Total size in bytes of the request (body and headers).
+
+--
 
 *`http.request.method`*::
 +
 --
 type: keyword
 
-example: GET, POST, PUT
+example: get, post, put
 
-Http request method.
+HTTP request method.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
+--
+
+*`http.request.referrer`*::
++
+--
+type: keyword
+
+example: https://blog.example.com/
+
+Referrer for this HTTP request.
+
+--
+
+*`http.response.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+format: bytes
+
+Size in bytes of the response body.
+
+--
+
+*`http.response.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full HTTP response body.
+
+--
+
+*`http.response.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+format: bytes
+
+Total size in bytes of the response (body and headers).
 
 --
 
@@ -3316,20 +3923,7 @@ type: long
 
 example: 404
 
-Http response status code.
-
-
---
-
-*`http.response.body`*::
-+
---
-type: text
-
-example: Hello world
-
-The full http response body.
-
+HTTP response status code.
 
 --
 
@@ -3340,8 +3934,7 @@ type: keyword
 
 example: 1.1
 
-Http version.
-
+HTTP version.
 
 --
 
@@ -3351,17 +3944,15 @@ Http version.
 Fields which are specific to log events.
 
 
-
 *`log.level`*::
 +
 --
 type: keyword
 
-example: ERR
+example: err
 
-Log level of the log event.
-Some examples are `WARN`, `ERR`, `INFO`.
-
+Original log level of the log event.
+Some examples are `warn`, `error`, `i`.
 
 --
 
@@ -3372,54 +3963,54 @@ type: keyword
 
 example: Sep 19 08:26:10 localhost My log
 
-
 This is the original log message and contains the full log message before splitting it up in multiple parts.
 In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
 This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
-
-
-Field is not indexed.
 
 --
 
 [float]
 == network fields
 
-Fields related to network data.
+The network is defined as the communication path over which a host or network event happens.
+The network.* fields should be populated with details about the network activity associated with an event.
 
 
-
-*`network.name`*::
-+
---
-type: text
-
-example: Guest Wifi
-
-Name given by operators to sections of their network.
-
-
-*`network.name.raw`*::
+*`network.application`*::
 +
 --
 type: keyword
 
-Name given by operators to sections of their network.
+example: aim
 
+A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
 
+*`network.bytes`*::
++
+--
+type: long
+
+example: 368
+
+format: bytes
+
+Total bytes transferred in both directions.
+If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
+
 --
 
-*`network.protocol`*::
+*`network.community_id`*::
 +
 --
 type: keyword
 
-example: http
+example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
 
-Network protocol name.
-
+A hash of source and destination IPs and ports, as well as the protocol used in a communication. This is a tool-agnostic standard to identify flows.
+Learn more at https://github.com/corelight/community-id-spec.
 
 --
 
@@ -3434,8 +4025,12 @@ Direction of the network traffic.
 Recommended values are:
   * inbound
   * outbound
+  * internal
+  * external
   * unknown
 
+When mapping events from a host-based monitoring context, populate this field from the host's point of view.
+When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
 
 --
 
@@ -3448,116 +4043,247 @@ example: 192.1.1.2
 
 Host IP address when the source IP address is the proxy.
 
-
 --
 
-*`network.inbound.bytes`*::
+*`network.iana_number`*::
 +
 --
-type: long
+type: keyword
 
-example: 184
+example: 6
 
-Network inbound bytes.
-
+IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). Standardized list of protocols. This aligns well with NetFlow and sFlow related logs which use the IANA Protocol Number.
 
 --
 
-*`network.inbound.packets`*::
+*`network.name`*::
 +
 --
-type: long
+type: keyword
 
-example: 12
+example: Guest Wifi
 
-Network inbound packets.
-
-
---
-
-*`network.outbound.bytes`*::
-+
---
-type: long
-
-example: 184
-
-Network outbound bytes.
-
+Name given by operators to sections of their network.
 
 --
 
-*`network.outbound.packets`*::
-+
---
-type: long
-
-example: 12
-
-Network outbound packets.
-
-
---
-
-*`network.total.bytes`*::
-+
---
-type: long
-
-example: 368
-
-Network total bytes. The sum of inbound.bytes + outbound.bytes.
-
-
---
-
-*`network.total.packets`*::
+*`network.packets`*::
 +
 --
 type: long
 
 example: 24
 
-Network outbound packets. The sum of inbound.packets + outbound.packets
-
-
---
-
-[float]
-== organization fields
-
-The organization fields enrich data with information about the company or entity the data is associated with. These fields help you arrange or filter data stored in an index by one or multiple organizations.
-
-
-
-*`organization.name`*::
-+
---
-type: text
-
-Organization name.
-
+Total packets transferred in both directions.
+If `source.packets` and `destination.packets` are known, `network.packets` is their sum.
 
 --
 
-*`organization.id`*::
+*`network.protocol`*::
 +
 --
 type: keyword
 
-Unique identifier for the organization.
+example: http
 
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
+--
+
+*`network.transport`*::
++
+--
+type: keyword
+
+example: tcp
+
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
+--
+
+*`network.type`*::
++
+--
+type: keyword
+
+example: ipv4
+
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
 
 [float]
-== os fields
+== observer fields
 
-The OS fields contain information about the operating system. These fields are often used inside other prefixes, such as `host.os.*` or `user_agent.os.*`.
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
+This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
+*`observer.geo.city_name`*::
++
+--
+type: keyword
 
-*`os.platform`*::
+example: Montreal
+
+City name.
+
+--
+
+*`observer.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+--
+
+*`observer.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+--
+
+*`observer.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+--
+
+*`observer.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+--
+
+*`observer.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+--
+
+*`observer.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+--
+
+*`observer.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+--
+
+*`observer.hostname`*::
++
+--
+type: keyword
+
+Hostname of the observer.
+
+--
+
+*`observer.ip`*::
++
+--
+type: ip
+
+IP address of the observer.
+
+--
+
+*`observer.mac`*::
++
+--
+type: keyword
+
+MAC address of the observer
+
+--
+
+*`observer.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+--
+
+*`observer.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
+
+--
+
+*`observer.os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+--
+
+*`observer.os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name, without the version.
+
+--
+
+*`observer.os.platform`*::
 +
 --
 type: keyword
@@ -3566,20 +4292,88 @@ example: darwin
 
 Operating system platform (such centos, ubuntu, windows).
 
-
 --
 
-*`os.name`*::
+*`observer.os.version`*::
 +
 --
 type: keyword
 
-example: Mac OS X
+example: 10.14.1
 
-Operating system name.
-
+Operating system version as a raw string.
 
 --
+
+*`observer.serial_number`*::
++
+--
+type: keyword
+
+Observer serial number.
+
+--
+
+*`observer.type`*::
++
+--
+type: keyword
+
+example: firewall
+
+The type of the observer the data is coming from.
+There is no predefined list of observer types. Some examples are `forwarder`, `firewall`, `ids`, `ips`, `proxy`, `poller`, `sensor`, `APM server`.
+
+--
+
+*`observer.vendor`*::
++
+--
+type: keyword
+
+observer vendor information.
+
+--
+
+*`observer.version`*::
++
+--
+type: keyword
+
+Observer version.
+
+--
+
+[float]
+== organization fields
+
+The organization fields enrich data with information about the company or entity the data is associated with.
+These fields help you arrange or filter data stored in an index by one or multiple organizations.
+
+
+*`organization.id`*::
++
+--
+type: keyword
+
+Unique identifier for the organization.
+
+--
+
+*`organization.name`*::
++
+--
+type: keyword
+
+Organization name.
+
+--
+
+[float]
+== os fields
+
+The OS fields contain information about the operating system.
+
 
 *`os.family`*::
 +
@@ -3590,18 +4384,16 @@ example: debian
 
 OS family (such as redhat, debian, freebsd, windows).
 
-
 --
 
-*`os.version`*::
+*`os.full`*::
 +
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: Mac OS Mojave
 
-Operating system version as a raw string.
-
+Operating system name, including the version or code name.
 
 --
 
@@ -3614,14 +4406,46 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
+--
+
+*`os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name, without the version.
+
+--
+
+*`os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+--
+
+*`os.version`*::
++
+--
+type: keyword
+
+example: 10.14.1
+
+Operating system version as a raw string.
 
 --
 
 [float]
 == process fields
 
-These fields contain information about a process. These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
-
+These fields contain information about a process.
+These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
 
 
 *`process.args`*::
@@ -3629,11 +4453,21 @@ These fields contain information about a process. These fields can help you corr
 --
 type: keyword
 
-example: ['-l', 'user', '10.0.0.16']
+example: ['ssh', '-l', 'user', '10.0.0.16']
 
-Process arguments.
+Array of process arguments.
 May be filtered to protect sensitive information.
 
+--
+
+*`process.executable`*::
++
+--
+type: keyword
+
+example: /usr/bin/ssh
+
+Absolute path to the process executable.
 
 --
 
@@ -3647,7 +4481,6 @@ example: ssh
 Process name.
 Sometimes called program name or similar.
 
-
 --
 
 *`process.pid`*::
@@ -3656,7 +4489,6 @@ Sometimes called program name or similar.
 type: long
 
 Process id.
-
 
 --
 
@@ -3667,6 +4499,27 @@ type: long
 
 Process parent id.
 
+--
+
+*`process.start`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+The time the process started.
+
+--
+
+*`process.thread.id`*::
++
+--
+type: long
+
+example: 4242
+
+Thread ID.
 
 --
 
@@ -3676,17 +4529,293 @@ Process parent id.
 type: keyword
 
 Process title.
-The proctitle, often the same as process name.
+The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
+--
+
+*`process.working_directory`*::
++
+--
+type: keyword
+
+example: /home/alice
+
+The working directory of the process.
+
+--
+
+[float]
+== related fields
+
+This field set is meant to facilitate pivoting around a piece of data.
+Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
+A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+
+
+*`related.ip`*::
++
+--
+type: ip
+
+All of the IPs seen on your event.
+
+--
+
+[float]
+== server fields
+
+A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records.
+For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
+
+
+*`server.address`*::
++
+--
+type: keyword
+
+Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+--
+
+*`server.bytes`*::
++
+--
+type: long
+
+example: 184
+
+format: bytes
+
+Bytes sent from the server to the client.
+
+--
+
+*`server.domain`*::
++
+--
+type: keyword
+
+Server domain.
+
+--
+
+*`server.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+--
+
+*`server.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+--
+
+*`server.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+--
+
+*`server.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+--
+
+*`server.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+--
+
+*`server.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+--
+
+*`server.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+--
+
+*`server.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+--
+
+*`server.ip`*::
++
+--
+type: ip
+
+IP address of the server.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+--
+
+*`server.mac`*::
++
+--
+type: keyword
+
+MAC address of the server.
+
+--
+
+*`server.packets`*::
++
+--
+type: long
+
+example: 12
+
+Packets sent from the server to the client.
+
+--
+
+*`server.port`*::
++
+--
+type: long
+
+Port of the server.
+
+--
+
+*`server.user.email`*::
++
+--
+type: keyword
+
+User email address.
+
+--
+
+*`server.user.full_name`*::
++
+--
+type: keyword
+
+example: Albert Einstein
+
+User's full name, if available.
+
+--
+
+*`server.user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+--
+
+*`server.user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+--
+
+*`server.user.hash`*::
++
+--
+type: keyword
+
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+--
+
+*`server.user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+--
+
+*`server.user.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
 
 --
 
 [float]
 == service fields
 
-The service fields describe the service for or from which the data was collected. These fields help you find and correlate logs for a specific service and version.
+The service fields describe the service for or from which the data was collected.
+These fields help you find and correlate logs for a specific service and version.
 
 
+*`service.ephemeral_id`*::
++
+--
+type: keyword
+
+example: 8a4f500f
+
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+--
 
 *`service.id`*::
 +
@@ -3699,7 +4828,6 @@ Unique identifier of the running service.
 This id should uniquely identify this service. This makes it possible to correlate logs and metrics for one specific service.
 Example: If you are experiencing issues with one redis instance, you can filter on that id to see metrics and logs for that single instance.
 
-
 --
 
 *`service.name`*::
@@ -3707,22 +4835,12 @@ Example: If you are experiencing issues with one redis instance, you can filter 
 --
 type: keyword
 
-example: elasticsearch
+example: elasticsearch-metrics
 
 Name of the service data is collected from.
-The name can be used to group and correlate logs and metrics from one service.
-Example: If logs or metrics are collected from Redis, `service.name` would be `redis`.
-
-
---
-
-*`service.type`*::
-+
---
-type: keyword
-
-Service type.
-
+The name of the service is normally user given. This allows if two instances of the same service are running on the same machine they can be differentiated by the `service.name`.
+Also it allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the service.name could contain the cluster name. For Beats the service.name is by default a copy of the `service.type` field if no name is specified.
 
 --
 
@@ -3733,6 +4851,18 @@ type: keyword
 
 Current state of the service.
 
+--
+
+*`service.type`*::
++
+--
+type: keyword
+
+example: elasticsearch
+
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
 
 --
 
@@ -3746,50 +4876,332 @@ example: 3.2.4
 Version of the service the data was collected from.
 This allows to look at a data set only for a specific version of a service.
 
-
 --
 
-*`service.ephemeral_id`*::
+[float]
+== source fields
+
+Source fields describe details about the source of a packet/event.
+Source fields are usually populated in conjunction with destination fields.
+
+
+*`source.address`*::
 +
 --
 type: keyword
 
-example: 8a4f500f
+Some event source addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
-Ephemeral identifier of this service (if one exists).
-This id normally changes across restarts, but `service.id` does not.
+--
 
+*`source.bytes`*::
++
+--
+type: long
+
+example: 184
+
+format: bytes
+
+Bytes sent from the source to the destination.
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+--
+
+*`source.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+--
+
+*`source.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+--
+
+*`source.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+--
+
+*`source.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+--
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+--
+
+*`source.packets`*::
++
+--
+type: long
+
+example: 12
+
+Packets sent from the source to the destination.
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+--
+
+*`source.user.email`*::
++
+--
+type: keyword
+
+User email address.
+
+--
+
+*`source.user.full_name`*::
++
+--
+type: keyword
+
+example: Albert Einstein
+
+User's full name, if available.
+
+--
+
+*`source.user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+--
+
+*`source.user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+--
+
+*`source.user.hash`*::
++
+--
+type: keyword
+
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+--
+
+*`source.user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+--
+
+*`source.user.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
 
 --
 
 [float]
 == url fields
 
-URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
+URL fields provide support for complete or partial URLs, and supports the breaking down into scheme, domain, path, and so on.
 
 
-
-*`url.href`*::
-+
---
-type: text
-
-example: https://elastic.co:443/search?q=elasticsearch#top
-
-Full url. The field is stored as keyword.
-`url.href` is a [multi field](https://www.elastic.co/guide/en/ elasticsearch/reference/6.2/ multi-fields.html#_multi_fields_with_multiple_analyzers). The data is stored as keyword `url.href` and test `url.href.analyzed`. These fields enable you to run a query against part of the url still works splitting up the URL at ingest time.
-`href` is an analyzed field so the parsed information can be accessed through `href.analyzed` in queries.
-
-
-*`url.href.raw`*::
+*`url.domain`*::
 +
 --
 type: keyword
 
-The full URL. This is a non-analyzed field that is useful for aggregations.
+example: www.elastic.co
 
+Domain of the url, such as "www.elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
 
 --
+
+*`url.fragment`*::
++
+--
+type: keyword
+
+Portion of the url after the `#`, such as "top".
+The `#` is not part of the fragment.
+
+--
+
+*`url.full`*::
++
+--
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top
+
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+--
+
+*`url.original`*::
++
+--
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
+
+Unmodified original url as seen in the event source.
+Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
+This field is meant to represent the URL as it was observed, complete or not.
+
+--
+
+*`url.password`*::
++
+--
+type: keyword
+
+Password of the request.
+
+--
+
+*`url.path`*::
++
+--
+type: keyword
+
+Path of the request, such as "/search".
+
+--
+
+*`url.port`*::
++
+--
+type: long
+
+example: 443
+
+Port of the request, such as 443.
+
+--
+
+*`url.query`*::
++
+--
+type: keyword
+
+The query field describes the query string of the request, such as "q=elasticsearch".
+The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
 
 --
 
@@ -3803,84 +5215,6 @@ example: https
 Scheme of the request, such as "https".
 Note: The `:` is not part of the scheme.
 
-
---
-
-*`url.host.name`*::
-+
---
-type: keyword
-
-example: elastic.co
-
-Hostname of the request, such as "example.com".
-For correlation the this field can be copied into the `host.name` field.
-
-
---
-
-*`url.port`*::
-+
---
-type: integer
-
-example: 443
-
-Port of the request, such as 443.
-
-
---
-
-*`url.path`*::
-+
---
-type: text
-
-Path of the request, such as "/search".
-
-
-*`url.path.raw`*::
-+
---
-type: keyword
-
-URL path. A non-analyzed field that is useful for aggregations.
-
-
---
-
---
-
-*`url.query`*::
-+
---
-type: text
-
-The query field describes the query string of the request, such as "q=elasticsearch".
-The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
-
-
-*`url.query.raw`*::
-+
---
-type: keyword
-
-URL query part. A non-analyzed field that is useful for aggregations.
-
-
---
-
---
-
-*`url.fragment`*::
-+
---
-type: keyword
-
-Portion of the url after the `#`, such as "top".
-The `#` is not part of the fragment.
-
-
 --
 
 *`url.username`*::
@@ -3890,46 +5224,14 @@ type: keyword
 
 Username of the request.
 
-
---
-
-*`url.password`*::
-+
---
-type: keyword
-
-Password of the request.
-
-
 --
 
 [float]
 == user fields
 
-The user fields describe information about the user that is relevant to  the event. Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
+The user fields describe information about the user that is relevant to the event.
+Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
-
-
-*`user.id`*::
-+
---
-type: keyword
-
-One or multiple unique identifiers of the user.
-
-
---
-
-*`user.name`*::
-+
---
-type: keyword
-
-Name of the user.
-The field is a keyword, and will not be tokenized.
-
-
---
 
 *`user.email`*::
 +
@@ -3938,6 +5240,34 @@ type: keyword
 
 User email address.
 
+--
+
+*`user.full_name`*::
++
+--
+type: keyword
+
+example: Albert Einstein
+
+User's full name, if available.
+
+--
+
+*`user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 --
 
@@ -3949,73 +5279,43 @@ type: keyword
 Unique user hash to correlate information for a user in anonymized form.
 Useful if `user.id` or `user.name` contain confidential information and cannot be used.
 
+--
+
+*`user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+--
+
+*`user.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
 
 --
 
 [float]
 == user_agent fields
 
-The user_agent fields normally come from a browser request. They often show up in web service logs coming from the parsed user agent string.
+The user_agent fields normally come from a browser request.
+They often show up in web service logs coming from the parsed user agent string.
 
 
-
-*`user_agent.original`*::
-+
---
-type: text
-
-Unparsed version of the user_agent.
-
-
---
-
-*`user_agent.device`*::
+*`user_agent.device.name`*::
 +
 --
 type: keyword
 
-Name of the physical device.
+example: iPhone
 
-
---
-
-*`user_agent.version`*::
-+
---
-type: keyword
-
-Version of the physical device.
-
-
---
-
-*`user_agent.major`*::
-+
---
-type: long
-
-Major version of the user agent.
-
-
---
-
-*`user_agent.minor`*::
-+
---
-type: long
-
-Minor version of the user agent.
-
-
---
-
-*`user_agent.patch`*::
-+
---
-type: keyword
-
-Patch version of the user agent.
-
+Name of the device.
 
 --
 
@@ -4024,10 +5324,53 @@ Patch version of the user agent.
 --
 type: keyword
 
-example: Chrome
+example: Safari
 
 Name of the user agent.
 
+--
+
+*`user_agent.original`*::
++
+--
+type: keyword
+
+example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
+
+Unparsed version of the user_agent.
+
+--
+
+*`user_agent.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+--
+
+*`user_agent.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
+
+--
+
+*`user_agent.os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
 
 --
 
@@ -4036,8 +5379,20 @@ Name of the user agent.
 --
 type: keyword
 
-Name of the operating system.
+example: Mac OS X
 
+Operating system name, without the version.
+
+--
+
+*`user_agent.os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
 
 --
 
@@ -4046,28 +5401,20 @@ Name of the operating system.
 --
 type: keyword
 
-Version of the operating system.
+example: 10.14.1
 
+Operating system version as a raw string.
 
 --
 
-*`user_agent.os.major`*::
+*`user_agent.version`*::
 +
 --
-type: long
+type: keyword
 
-Major version of the operating system.
+example: 12.0
 
-
---
-
-*`user_agent.os.minor`*::
-+
---
-type: long
-
-Minor version of the operating system.
-
+Version of the user agent.
 
 --
 
@@ -4078,42 +5425,30 @@ These fields contain data about the flow itself.
 
 
 
-*`start_time`*::
+*`flow.final`*::
 +
 --
-type: date
+type: boolean
 
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The time, the first packet for the flow has been seen.
-
-
---
-
-*`last_time`*::
-+
---
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The time, the most recent processed packet for the flow has been seen.
-
-
---
-
-*`final`*::
-+
---
 Indicates if event is last event in flow. If final is false, the event reports an intermediate flow state only.
+
+
+--
+
+*`flow.id`*::
++
+--
+Internal flow ID based on connection meta data and address.
+
+
+--
+
+*`flow.vlan`*::
++
+--
+type: long
+
+VLAN identifier from the 802.1q frame. In case of a multi-tagged frame this field will be an array with the outer tag's VLAN identifier listed first.
 
 
 --
@@ -4121,300 +5456,63 @@ Indicates if event is last event in flow. If final is false, the event reports a
 *`flow_id`*::
 +
 --
-Internal flow id based on connection meta data and address.
+type: alias
 
+alias to: flow.id
+
+--
+
+*`final`*::
++
+--
+type: alias
+
+alias to: flow.final
 
 --
 
 *`vlan`*::
 +
 --
-Innermost VLAN address used in network packets.
+type: alias
 
-
---
-
-*`outer_vlan`*::
-+
---
-Second innermost VLAN address used in network packets.
-
-
---
-
-[float]
-== source fields
-
-Properties of the source host
-
-
-
-*`source.mac`*::
-+
---
-Source MAC address as indicated by first packet seen for the current flow.
-
-
---
-
-*`source.ip`*::
-+
---
-Innermost IPv4 source address as indicated by first packet seen for the current flow.
-
-
---
-
-*`source.ip_location`*::
-+
---
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`source.outer_ip`*::
-+
---
-Second innermost IPv4 source address as indicated by first packet seen for the current flow.
-
-
---
-
-*`source.outer_ip_location`*::
-+
---
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `outer_ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`source.ipv6`*::
-+
---
-Innermost IPv6 source address as indicated by first packet seen for the current flow.
-
-
---
-
-*`source.ipv6_location`*::
-+
---
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`source.outer_ipv6`*::
-+
---
-Second innermost IPv6 source address as indicated by first packet seen for the current flow.
-
-
---
-
-*`source.outer_ipv6_location`*::
-+
---
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`source.port`*::
-+
---
-Source port number as indicated by first packet seen for the current flow.
-
-
---
-
-[float]
-== stats fields
-
-Object with source to destination flow measurements.
-
-
-
-*`source.stats.net_packets_total`*::
-+
---
-type: long
-
-Total number of packets
-
+alias to: flow.vlan
 
 --
 
 *`source.stats.net_bytes_total`*::
 +
 --
-type: long
+type: alias
 
-Total number of bytes
-
+alias to: source.bytes
 
 --
 
-[float]
-== dest fields
-
-Properties of the destination host
-
-
-
-*`dest.mac`*::
+*`source.stats.net_packets_total`*::
 +
 --
-Destination MAC address as indicated by first packet seen for the current flow.
+type: alias
 
-
---
-
-*`dest.ip`*::
-+
---
-Innermost IPv4 destination address as indicated by first packet seen for the current flow.
-
-
---
-
-*`dest.ip_location`*::
-+
---
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`dest.outer_ip`*::
-+
---
-Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
-
-
---
-
-*`dest.outer_ip_location`*::
-+
---
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `outer_ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`dest.ipv6`*::
-+
---
-Innermost IPv6 destination address as indicated by first packet seen for the current flow.
-
-
---
-
-*`dest.ipv6_location`*::
-+
---
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`dest.outer_ipv6`*::
-+
---
-Second innermost IPv6 destination address as indicated by first packet seen for the current flow.
-
-
---
-
-*`dest.outer_ipv6_location`*::
-+
---
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `outer_ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
---
-
-*`dest.port`*::
-+
---
-Destination port number as indicated by first packet seen for the current flow.
-
-
---
-
-[float]
-== stats fields
-
-Object with destination to source flow measurements.
-
-
-
-*`dest.stats.net_packets_total`*::
-+
---
-type: long
-
-Total number of packets
-
+alias to: source.packets
 
 --
 
 *`dest.stats.net_bytes_total`*::
 +
 --
-type: long
+type: alias
 
-Total number of bytes
-
+alias to: destination.bytes
 
 --
 
-*`icmp_id`*::
+*`dest.stats.net_packets_total`*::
 +
 --
-ICMP id used in ICMP based flow.
+type: alias
 
-
---
-
-*`connection_id`*::
-+
---
-optional TCP connection id
-
+alias to: destination.packets
 
 --
 
@@ -4426,12 +5524,24 @@ Info collected for the host machine.
 
 
 
-*`host.os.kernel`*::
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
+*`host.os.build`*::
 +
 --
 type: keyword
 
-The operating system's kernel version.
+example: 18D109
+
+OS build information.
 
 
 --
@@ -4454,14 +5564,6 @@ Information about the HTTP request and response.
 HTTP request
 
 
-*`http.request.params`*::
-+
---
-The query parameters or form values. The query parameters are available in the Request-URI and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
-
-
---
-
 *`http.request.headers`*::
 +
 --
@@ -4472,12 +5574,12 @@ A map containing the captured header fields from the request. Which headers to c
 
 --
 
-*`http.request.body`*::
+*`http.request.params`*::
 +
 --
-type: text
+type: alias
 
-The body of the HTTP request.
+alias to: url.query
 
 --
 
@@ -4487,19 +5589,10 @@ The body of the HTTP request.
 HTTP response
 
 
-*`http.response.code`*::
+*`http.response.status_phrase`*::
 +
 --
-example: 404
-
-The HTTP status code.
-
---
-
-*`http.response.phrase`*::
-+
---
-example: Not found.
+example: Not Found
 
 The HTTP status phrase.
 
@@ -4512,6 +5605,24 @@ type: object
 
 A map containing the captured header fields from the response. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
+
+--
+
+*`http.response.code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`http.response.phrase`*::
++
+--
+type: alias
+
+alias to: http.response.status_phrase
 
 --
 
@@ -4584,6 +5695,83 @@ The response code.
 
 --
 
+[[exported-fields-jolokia-autodiscover]]
+== Jolokia Discovery autodiscover provider fields
+
+Metadata from Jolokia Discovery added by the jolokia provider.
+
+
+
+*`jolokia.agent.version`*::
++
+--
+type: keyword
+
+Version number of jolokia agent.
+
+
+--
+
+*`jolokia.agent.id`*::
++
+--
+type: keyword
+
+Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+
+
+--
+
+*`jolokia.server.product`*::
++
+--
+type: keyword
+
+The container product if detected.
+
+
+--
+
+*`jolokia.server.version`*::
++
+--
+type: keyword
+
+The container's version (if detected).
+
+
+--
+
+*`jolokia.server.vendor`*::
++
+--
+type: keyword
+
+The vendor of the container the agent is running in.
+
+
+--
+
+*`jolokia.url`*::
++
+--
+type: keyword
+
+The URL how this agent can be contacted.
+
+
+--
+
+*`jolokia.secured`*::
++
+--
+type: boolean
+
+Whether the agent was configured for authentication or not.
+
+
+--
+
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
@@ -4648,6 +5836,36 @@ Kubernetes labels map
 type: object
 
 Kubernetes annotations map
+
+
+--
+
+*`kubernetes.replicaset.name`*::
++
+--
+type: keyword
+
+Kubernetes replicaset name
+
+
+--
+
+*`kubernetes.deployment.name`*::
++
+--
+type: keyword
+
+Kubernetes deployment name
+
+
+--
+
+*`kubernetes.statefulset.name`*::
++
+--
+type: keyword
+
+Kubernetes statefulset name
 
 
 --
@@ -5205,108 +6423,6 @@ The cursor identifier returned in the OP_REPLY. This must be the value that was 
 
 --
 
-[float]
-== rpc fields
-
-OncRPC specific event fields.
-
-
-*`rpc.xid`*::
-+
---
-RPC message transaction identifier.
-
---
-
-*`rpc.call_size`*::
-+
---
-type: long
-
-RPC call size with argument.
-
---
-
-*`rpc.reply_size`*::
-+
---
-type: long
-
-RPC reply size with argument.
-
---
-
-*`rpc.status`*::
-+
---
-RPC message reply status.
-
---
-
-*`rpc.time`*::
-+
---
-type: long
-
-RPC message processing time.
-
---
-
-*`rpc.time_str`*::
-+
---
-RPC message processing time in human readable form.
-
---
-
-*`rpc.auth_flavor`*::
-+
---
-RPC authentication flavor.
-
---
-
-*`rpc.cred.uid`*::
-+
---
-type: long
-
-RPC caller's user id, in case of auth-unix.
-
---
-
-*`rpc.cred.gid`*::
-+
---
-type: long
-
-RPC caller's group id, in case of auth-unix.
-
---
-
-*`rpc.cred.gids`*::
-+
---
-RPC caller's secondary group ids, in case of auth-unix.
-
---
-
-*`rpc.cred.stamp`*::
-+
---
-type: long
-
-Arbitrary ID which the caller machine may generate.
-
---
-
-*`rpc.cred.machinename`*::
-+
---
-The name of the caller's machine.
-
---
-
 [[exported-fields-mysql]]
 == MySQL fields
 
@@ -5314,16 +6430,6 @@ MySQL-specific event fields.
 
 
 
-
-*`mysql.iserror`*::
-+
---
-type: boolean
-
-If the MySQL query returns an error, this field is set to true.
-
-
---
 
 *`mysql.affected_rows`*::
 +
@@ -5432,6 +6538,96 @@ NFS operation reply status.
 
 --
 
+[float]
+== rpc fields
+
+ONC RPC specific event fields.
+
+
+*`rpc.xid`*::
++
+--
+RPC message transaction identifier.
+
+--
+
+*`rpc.status`*::
++
+--
+RPC message reply status.
+
+--
+
+*`rpc.auth_flavor`*::
++
+--
+RPC authentication flavor.
+
+--
+
+*`rpc.cred.uid`*::
++
+--
+type: long
+
+RPC caller's user id, in case of auth-unix.
+
+--
+
+*`rpc.cred.gid`*::
++
+--
+type: long
+
+RPC caller's group id, in case of auth-unix.
+
+--
+
+*`rpc.cred.gids`*::
++
+--
+RPC caller's secondary group ids, in case of auth-unix.
+
+--
+
+*`rpc.cred.stamp`*::
++
+--
+type: long
+
+Arbitrary ID which the caller machine may generate.
+
+--
+
+*`rpc.cred.machinename`*::
++
+--
+The name of the caller's machine.
+
+--
+
+*`rpc.call_size`*::
++
+--
+type: alias
+
+alias to: source.bytes
+
+RPC call size with argument.
+
+--
+
+*`rpc.reply_size`*::
++
+--
+type: alias
+
+alias to: destination.bytes
+
+RPC reply size with argument.
+
+--
+
 [[exported-fields-pgsql]]
 == PostgreSQL fields
 
@@ -5439,24 +6635,6 @@ PostgreSQL-specific event fields.
 
 
 
-
-*`pgsql.query`*::
-+
---
-The row pgsql query as read from the transaction's request.
-
-
---
-
-*`pgsql.iserror`*::
-+
---
-type: boolean
-
-If the PgSQL query returns an error, this field is set to true.
-
-
---
 
 *`pgsql.error_code`*::
 +
@@ -5494,6 +6672,23 @@ If the SELECT query if successful, this field is set to the number of fields ret
 --
 If the SELECT query if successful, this field is set to the number of rows returned.
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 
@@ -5594,6 +6789,18 @@ TLS-specific event fields.
 
 
 
+
+*`tls.version`*::
++
+--
+type: keyword
+
+example: TLS 1.3
+
+The version of the TLS protocol used.
+
+
+--
 
 *`tls.handshake_completed`*::
 +
@@ -5701,6 +6908,56 @@ Length of the session ticket, if provided, or an empty string to advertise suppo
 
 --
 
+*`tls.client_hello.extensions.supported_versions`*::
++
+--
+type: keyword
+
+List of TLS versions that the client is willing to use.
+
+
+--
+
+*`tls.client_hello.extensions.supported_groups`*::
++
+--
+type: keyword
+
+List of Elliptic Curve Cryptography (ECC) curve groups supported by the client.
+
+
+--
+
+*`tls.client_hello.extensions.signature_algorithms`*::
++
+--
+type: keyword
+
+List of signature algorithms that may be use in digital signatures.
+
+
+--
+
+*`tls.client_hello.extensions.ec_points_formats`*::
++
+--
+type: keyword
+
+List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the client can parse.
+
+
+--
+
+*`tls.client_hello.extensions._unparsed_`*::
++
+--
+type: keyword
+
+List of extensions that were left unparsed by Packetbeat.
+
+
+--
+
 
 *`tls.server_hello.version`*::
 +
@@ -5732,6 +6989,16 @@ The compression method selected by the server from the list provided in the clie
 
 --
 
+*`tls.server_hello.session_id`*::
++
+--
+type: keyword
+
+Unique number to identify the session for the corresponding connection with the client.
+
+
+--
+
 [float]
 == extensions fields
 
@@ -5753,6 +7020,36 @@ Negotiated application layer protocol
 type: keyword
 
 Used to announce that a session ticket will be provided by the server. Always an empty string.
+
+
+--
+
+*`tls.server_hello.extensions.supported_versions`*::
++
+--
+type: keyword
+
+Negotiated TLS version to be used.
+
+
+--
+
+*`tls.server_hello.extensions.ec_points_formats`*::
++
+--
+type: keyword
+
+List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the server can parse.
+
+
+--
+
+*`tls.server_hello.extensions._unparsed_`*::
++
+--
+type: keyword
+
+List of extensions that were left unparsed by Packetbeat.
 
 
 --
@@ -6262,16 +7559,6 @@ These fields contain data about the transaction itself.
 
 
 
-*`direction`*::
-+
---
-required: True
-
-Indicates whether the transaction is inbound (emitted by server) or outbound (emitted by the client). Values can be in or out. No defaults.
-
-
---
-
 *`status`*::
 +
 --
@@ -6331,6 +7618,10 @@ The request parameters. For HTTP, these are the POST or GET parameters. For Thri
 *`notes`*::
 +
 --
+type: alias
+
+alias to: error.message
+
 Messages from Packetbeat itself. This field usually contains error messages for interpreting the raw data. This information can be helpful for troubleshooting.
 
 
@@ -6343,31 +7634,12 @@ These fields contain measurements related to the transaction.
 
 
 
-*`responsetime`*::
-+
---
-type: long
-
-The wall clock time it took to complete the transaction. The precision is in milliseconds.
-
-
---
-
-*`cpu_time`*::
-+
---
-type: long
-
-The CPU time it took to complete the transaction.
-
---
-
 *`bytes_in`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
+alias to: source.bytes
 
 The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
@@ -6377,51 +7649,11 @@ The number of bytes of the request. Note that this size is the application layer
 *`bytes_out`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
+alias to: destination.bytes
 
 The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
-
-
---
-
-*`dnstime`*::
-+
---
-type: long
-
-The time it takes to query the name server for a given request. This is typically used for RUM (real-user-monitoring) but can also have values for server-to-server communication when DNS is used for service discovery. The precision is in microseconds.
-
-
---
-
-*`connecttime`*::
-+
---
-type: long
-
-The time it takes for the TCP connection to be established for the given transaction. The precision is in microseconds.
-
-
---
-
-*`loadtime`*::
-+
---
-type: long
-
-The time it takes for the content to be loaded. This is typically used for RUM (real-user-monitoring) but it can make sense in other cases as well. The precision is in microseconds.
-
-
---
-
-*`domloadtime`*::
-+
---
-type: long
-
-In RUM (real-user-monitoring), the total time it takes for the DOM to be loaded. In terms of the W3 Navigation Timing API, this is the difference between `domContentLoadedEnd` and `domContentLoadedStart`.
 
 
 --

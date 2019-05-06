@@ -1,0 +1,29 @@
+#------------------------------ NetFlow input --------------------------------
+# Experimental: Config options for the Netflow/IPFIX collector over UDP input
+#- type: netflow
+  #enabled: false
+
+  # Address where the NetFlow Collector will bind
+  #host: ":2055"
+
+  # Maximum size of the message received over UDP
+  #max_message_size: 10KiB
+
+  # List of enabled protocols.
+  # Valid values are 'v1', 'v5', 'v6', 'v7', 'v8', 'v9' and 'ipfix'
+  #protocols: [ v5, v9, ipfix ]
+
+  # Expiration timeout
+  # This is the time before an idle session or unused template is expired.
+  # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
+  #expiration_timeout: 30m
+
+  # Queue size limits the number of netflow packets that are queued awaiting
+  # processing.
+  #queue_size: 8192
+
+  # Custom field definitions for NetFlow V9 / IPFIX.
+  # List of files with YAML fields definition.
+  #custom_definitions:
+  #- path/to/ipfix.yaml
+  #- path/to/netflow.yaml

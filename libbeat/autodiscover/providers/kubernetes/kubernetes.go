@@ -18,7 +18,10 @@
 package kubernetes
 
 import (
+	"fmt"
 	"time"
+
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
@@ -39,15 +42,16 @@ func init() {
 type Provider struct {
 	config    *Config
 	bus       bus.Bus
+	uuid      uuid.UUID
 	watcher   kubernetes.Watcher
 	metagen   kubernetes.MetaGenerator
-	templates *template.Mapper
+	templates template.Mapper
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The kubernetes autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
@@ -73,7 +77,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
+		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 
@@ -95,6 +99,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	p := &Provider{
 		config:    config,
 		bus:       bus,
+		uuid:      uuid,
 		templates: mapper,
 		builders:  builders,
 		appenders: appenders,
@@ -140,12 +145,16 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 	containerstatuses []*kubernetes.PodContainerStatus) {
 	host := pod.Status.GetPodIP()
 
-	// Do not emit events without host (container is still being configured)
-	if host == "" {
+	// If the container doesn't exist in the runtime or its network
+	// is not configured, it won't have an IP. Skip it as we cannot
+	// generate configs without host, and an update will arrive when
+	// the container is ready.
+	// If stopping, emit the event in any case to ensure cleanup.
+	if host == "" && flag != "stop" {
 		return
 	}
 
-	// Collect all container IDs and runtimes from status information.
+	// Collect all runtimes from status information.
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
@@ -156,13 +165,18 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 	// Emit container and port information
 	for _, c := range containers {
+		// If it doesn't have an ID, container doesn't exist in
+		// the runtime, emit only an event if we are stopping, so
+		// we are sure of cleaning up configurations.
 		cid := containerIDs[c.GetName()]
-
-		// If there is a container ID that is empty then ignore it. It either means that the container is still starting
-		// up or the container is shutting down.
-		if cid == "" {
+		if cid == "" && flag != "stop" {
 			continue
 		}
+
+		// This must be an id that doesn't depend on the state of the container
+		// so it works also on `stop` if containers have been already deleted.
+		eventID := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
+
 		cmeta := common.MapStr{
 			"id":      cid,
 			"name":    c.GetName(),
@@ -185,6 +199,8 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
 			event := bus.Event{
+				"provider":   p.uuid,
+				"id":         eventID,
 				flag:         true,
 				"host":       host,
 				"kubernetes": kubemeta,
@@ -197,6 +213,8 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 		for _, port := range c.Ports {
 			event := bus.Event{
+				"provider":   p.uuid,
+				"id":         eventID,
 				flag:         true,
 				"host":       host,
 				"port":       port.GetContainerPort(),
@@ -257,12 +275,13 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	}
 
 	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
+	hints := builder.GenerateHints(annotations, cname, p.config.Prefix, p.config.DefaultDisable)
+	logp.Debug("kubernetes", "Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
 
-	logp.Debug("kubernetes", "Generated builder event %v", event)
+	logp.Debug("kubernetes", "Generated builder event %+v", e)
 
 	return e
 }

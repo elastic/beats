@@ -24,6 +24,8 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
@@ -70,6 +72,36 @@ func TestData(t *testing.T) {
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], mb.AddMetricSetInfo)
 	mbtest.WriteEventToDataJSON(t, beatEvent, "")
+}
+
+func TestCounterWithNoInstanceName(t *testing.T) {
+	config := map[string]interface{}{
+		"module":     "windows",
+		"metricsets": []string{"perfmon"},
+		"perfmon.counters": []map[string]string{
+			{
+				"instance_label":    "processor.name",
+				"measurement_label": "processor.time.total.pct",
+				"query":             `\UDPv4\Datagrams Sent/sec`,
+			},
+		},
+	}
+
+	ms := mbtest.NewReportingMetricSetV2(t, config)
+	mbtest.ReportingFetchV2(ms)
+	time.Sleep(60 * time.Millisecond)
+
+	events, errs := mbtest.ReportingFetchV2(ms)
+	if len(errs) > 0 {
+		t.Fatal(errs)
+	}
+	if len(events) == 0 {
+		t.Fatal("no events received")
+	}
+	process := events[0].MetricSetFields["processor"].(common.MapStr)
+	// Check values
+	assert.EqualValues(t, "UDPv4", process["name"])
+
 }
 
 func TestQuery(t *testing.T) {
@@ -329,6 +361,65 @@ func TestWildcardQuery(t *testing.T) {
 	}
 
 	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	t.Log(values)
+}
+
+func TestGroupByInstance(t *testing.T) {
+	config := Config{
+		CounterConfig:     make([]CounterConfig, 3),
+		GroupMeasurements: true,
+	}
+	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].MeasurementLabel = "processor.time.pct"
+	config.CounterConfig[0].Query = `\Processor Information(_Total)\% Processor Time`
+	config.CounterConfig[0].Format = "float"
+
+	config.CounterConfig[1].InstanceLabel = "processor.name"
+	config.CounterConfig[1].MeasurementLabel = "processor.time.user.pct"
+	config.CounterConfig[1].Query = `\Processor Information(_Total)\% User Time`
+	config.CounterConfig[1].Format = "float"
+
+	config.CounterConfig[2].InstanceLabel = "processor.name"
+	config.CounterConfig[2].MeasurementLabel = "processor.time.idle.average.ns"
+	config.CounterConfig[2].Query = `\Processor Information(_Total)\Average Idle Time`
+	config.CounterConfig[2].Format = "float"
+
+	handle, err := NewPerfmonReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.query.Close()
+
+	values, _ := handle.Read()
+
+	time.Sleep(time.Millisecond * 1000)
+
+	values, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, 1, len(values)) // Assert all metrics have been grouped into a single event
+
+	// Test all keys exist in the event
+	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.user.pct")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.idle.average.ns")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
@@ -275,44 +276,37 @@ func (redis *redisPlugin) correlate(conn *redisConnectionData) {
 }
 
 func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
-	error := common.OK_STATUS
-	if resp.isError {
-		error = common.ERROR_STATUS
-	}
-
-	var returnValue map[string]common.NetString
-	if resp.isError {
-		returnValue = map[string]common.NetString{
-			"error": resp.message,
-		}
-	} else {
-		returnValue = map[string]common.NetString{
-			"return_value": resp.message,
-		}
-	}
-
 	source, destination := common.MakeEndpointPair(requ.tcpTuple.BaseTuple, requ.cmdlineTuple)
 	src, dst := &source, &destination
 	if requ.direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}
 
-	// resp_time in milliseconds
-	responseTime := int32(resp.ts.Sub(requ.ts).Nanoseconds() / 1e6)
+	evt, pbf := pb.NewBeatEvent(requ.ts)
+	pbf.SetSource(src)
+	pbf.SetDestination(dst)
+	pbf.Source.Bytes = int64(requ.size)
+	pbf.Destination.Bytes = int64(resp.size)
+	pbf.Event.Dataset = "redis"
+	pbf.Event.Start = requ.ts
+	pbf.Event.End = resp.ts
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = pbf.Event.Dataset
 
-	fields := common.MapStr{
-		"type":         "redis",
-		"status":       error,
-		"responsetime": responseTime,
-		"redis":        returnValue,
-		"method":       common.NetString(bytes.ToUpper(requ.method)),
-		"resource":     requ.path,
-		"query":        requ.message,
-		"bytes_in":     uint64(requ.size),
-		"bytes_out":    uint64(resp.size),
-		"src":          src,
-		"dst":          dst,
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
+	fields["method"] = common.NetString(bytes.ToUpper(requ.method))
+	fields["resource"] = requ.path
+	fields["query"] = requ.message
+
+	if resp.isError {
+		evt.PutValue("status", common.ERROR_STATUS)
+		evt.PutValue("redis.error", resp.message)
+	} else {
+		evt.PutValue("status", common.OK_STATUS)
+		evt.PutValue("redis.return_value", resp.message)
 	}
+
 	if redis.sendRequest {
 		fields["request"] = requ.message
 	}
@@ -320,10 +314,7 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 		fields["response"] = resp.message
 	}
 
-	return beat.Event{
-		Timestamp: requ.ts,
-		Fields:    fields,
-	}
+	return evt
 }
 
 func (redis *redisPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,

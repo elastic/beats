@@ -1,0 +1,3 @@
+dashboards:
+- id: 0c610510-5cbd-11e9-8477-077ec9664dbd
+  file: Filebeat-Envoyproxy-Overview.json
