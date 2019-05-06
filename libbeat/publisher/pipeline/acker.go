@@ -152,7 +152,7 @@ func (a *gapCountACK) ackLoop() {
 		case n := <-acks:
 			empty := a.handleACK(n)
 			if empty && closing && a.events.Load() == 0 {
-				// stop worker, if all events accounted for have been ACKed
+				// stop worker, if and only if all events accounted for have been ACKed
 				return
 			}
 
