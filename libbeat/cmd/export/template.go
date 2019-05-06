@@ -37,7 +37,8 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 
 			if noILM {
 				settings.ILM = ilm.NoopSupport
-			} else {
+			}
+			if settings.ILM == nil {
 				settings.ILM = ilm.StdSupport
 			}
 

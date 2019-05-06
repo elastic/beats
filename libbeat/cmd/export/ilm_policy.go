@@ -34,7 +34,9 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 			version, _ := cmd.Flags().GetString("es.version")
 			dir, _ := cmd.Flags().GetString("dir")
 
-			settings.ILM = ilm.StdSupport
+			if settings.ILM == nil {
+				settings.ILM = ilm.StdSupport
+			}
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
 				fatalfInitCmd(err)
