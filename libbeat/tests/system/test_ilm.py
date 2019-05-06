@@ -1,4 +1,5 @@
-from base import BaseTest, IndexAssertions
+from base import BaseTest
+from idxmgmt import IdxMgmt
 import os
 from nose.plugins.attrib import attr
 import unittest
@@ -8,7 +9,7 @@ import datetime
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
-class TestRunILM(IndexAssertions):
+class TestRunILM(BaseTest):
 
     def setUp(self):
         super(TestRunILM, self).setUp()
@@ -18,7 +19,9 @@ class TestRunILM(IndexAssertions):
         self.alias_name = self.index_name
         self.policy_name = self.alias_name
 
-        self.clean()
+        self.es = self.esClient()
+        self.idxmgmt = IdxMgmt(self.es)
+        self.idxmgmt.clean(self.beat_name)
 
     def renderConfig(self, **kwargs):
         self.render_config_template(
@@ -41,10 +44,10 @@ class TestRunILM(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.assert_alias_created(self.alias_name)
-        self.assert_policy_created(self.policy_name)
-        self.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -60,9 +63,9 @@ class TestRunILM(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_index_template_loaded(self.index_name)
-        self.assert_alias_not_created(self.alias_name)
-        self.assert_policy_not_created(self.policy_name)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_alias_not_created(self.alias_name)
+        self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -71,7 +74,7 @@ class TestRunILM(IndexAssertions):
         Test set ilm policy name
         """
 
-        policy_name = "foo"
+        policy_name = self.beat_name + "_foo"
         self.renderConfig(ilm={"enabled": True, "policy_name": policy_name})
 
         proc = self.start_beat()
@@ -80,9 +83,9 @@ class TestRunILM(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_ilm_template_loaded(self.alias_name, policy_name, self.alias_name)
-        self.assert_docs_written_to_alias(self.alias_name)
-        self.assert_policy_created(policy_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, policy_name, self.alias_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_policy_created(policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -91,7 +94,7 @@ class TestRunILM(IndexAssertions):
         Test ilm rollover alias setting
         """
 
-        alias_name = "foo"
+        alias_name = self.beat_name + "_foo"
         self.renderConfig(ilm={"enabled": True, "rollover_alias": alias_name})
 
         proc = self.start_beat()
@@ -100,9 +103,9 @@ class TestRunILM(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_ilm_template_loaded(alias_name, self.policy_name, alias_name)
-        self.assert_docs_written_to_alias(alias_name)
-        self.assert_alias_created(alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.policy_name, alias_name)
+        self.idxmgmt.assert_docs_written_to_alias(alias_name)
+        self.idxmgmt.assert_alias_created(alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -120,9 +123,9 @@ class TestRunILM(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.assert_alias_created(self.alias_name, pattern=pattern)
-        self.assert_docs_written_to_alias(self.alias_name, pattern=pattern)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name, pattern=pattern)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=pattern)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -142,12 +145,12 @@ class TestRunILM(IndexAssertions):
 
         resolved_pattern = datetime.datetime.now().strftime("%Y.%m.%d")
 
-        self.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.assert_alias_created(self.alias_name, pattern=resolved_pattern)
-        self.assert_docs_written_to_alias(self.alias_name, pattern=resolved_pattern)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name, pattern=resolved_pattern)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=resolved_pattern)
 
 
-class TestCommandSetupILMPolicy(IndexAssertions):
+class TestCommandSetupILMPolicy(BaseTest):
     """
     Test beat command `setup` related to ILM policy
     Copies behavior from `setup --ilm
@@ -156,13 +159,15 @@ class TestCommandSetupILMPolicy(IndexAssertions):
     def setUp(self):
         super(TestCommandSetupILMPolicy, self).setUp()
 
+        self.cmd = "ilm-policy"
         # auto-derived default settings, if nothing else is set
         self.index_name = self.beat_name + "-9.9.9"
         self.alias_name = self.index_name
         self.policy_name = self.alias_name
-        self.setupCmd = "--ilm-policy"
 
-        self.clean()
+        self.es = self.esClient()
+        self.idxmgmt = IdxMgmt(self.es)
+        self.idxmgmt.clean(self.beat_name)
 
     def renderConfig(self, **kwargs):
         self.render_config_template(
@@ -179,13 +184,13 @@ class TestCommandSetupILMPolicy(IndexAssertions):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd, "--template"])
+        exit_code = self.run_beat(extra_args=["setup", self.cmd, "--template"])
 
         assert exit_code == 0
-        self.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.assert_docs_written_to_alias(self.alias_name)
-        self.assert_alias_created(self.alias_name)
-        self.assert_policy_created(self.policy_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -195,13 +200,13 @@ class TestCommandSetupILMPolicy(IndexAssertions):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd])
+        exit_code = self.run_beat(extra_args=["setup", self.cmd])
 
         assert exit_code == 0
-        self.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.assert_docs_written_to_alias(self.alias_name)
-        self.assert_alias_created(self.alias_name)
-        self.assert_policy_created(self.policy_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -211,13 +216,13 @@ class TestCommandSetupILMPolicy(IndexAssertions):
         """
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+        exit_code = self.run_beat(extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
-        self.assert_index_template_loaded(self.index_name)
-        self.assert_alias_not_created(self.alias_name)
-        self.assert_policy_not_created(self.policy_name)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_alias_not_created(self.alias_name)
+        self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -225,15 +230,15 @@ class TestCommandSetupILMPolicy(IndexAssertions):
         """
         Test ilm policy setup when policy_name is configured
         """
-        policy_name = "foo"
+        policy_name = self.beat_name + "_foo"
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+        exit_code = self.run_beat(extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.policy_name=" + policy_name])
 
         assert exit_code == 0
-        self.assert_ilm_template_loaded(self.alias_name, policy_name, self.alias_name)
-        self.assert_policy_created(policy_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, policy_name, self.alias_name)
+        self.idxmgmt.assert_policy_created(policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -241,19 +246,19 @@ class TestCommandSetupILMPolicy(IndexAssertions):
         """
         Test ilm policy setup when rollover_alias is configured
         """
-        alias_name = "foo"
+        alias_name = self.beat_name + "_foo"
         self.renderConfig()
 
-        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
+        exit_code = self.run_beat(extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
 
         assert exit_code == 0
-        self.assert_ilm_template_loaded(alias_name, self.policy_name, alias_name)
-        self.assert_docs_written_to_alias(alias_name)
-        self.assert_alias_created(alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.policy_name, alias_name)
+        self.idxmgmt.assert_docs_written_to_alias(alias_name)
+        self.idxmgmt.assert_alias_created(alias_name)
 
 
-class TestCommandExportILMPolicy(IndexAssertions):
+class TestCommandExportILMPolicy(BaseTest):
     """
     Test beat command `export ilm-policy`
     """
@@ -264,15 +269,27 @@ class TestCommandExportILMPolicy(IndexAssertions):
         self.config = "libbeat.yml"
         self.output = os.path.join(self.working_dir, self.config)
         shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
-
         self.policy_name = self.beat_name + "-9.9.9"
+        self.cmd = "ilm-policy"
+
+        self.es = self.esClient()
+        self.idxmgmt = IdxMgmt(self.es)
+
+    def assert_log_contains_policy(self, policy):
+        assert self.log_contains('ILM policy successfully loaded.')
+        assert self.log_contains(policy)
+        assert self.log_contains('"max_age": "30d"')
+        assert self.log_contains('"max_size": "50gb"')
+
+    def assert_log_contains_write_alias(self):
+        assert self.log_contains('Write alias successfully generated.')
 
     def test_default(self):
         """
         Test default ilm-policy export
         """
 
-        exit_code = self.run_beat(extra_args=["export", "ilm-policy"],
+        exit_code = self.run_beat(extra_args=["export", self.cmd],
                                   config=self.config)
 
         assert exit_code == 0
@@ -284,7 +301,7 @@ class TestCommandExportILMPolicy(IndexAssertions):
         Test ilm-policy export when ilm disabled in config
         """
 
-        exit_code = self.run_beat(extra_args=["export", "ilm-policy", "-E", "setup.ilm.enabled=false"],
+        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.enabled=false"],
                                   config=self.config)
 
         assert exit_code == 0
@@ -299,7 +316,7 @@ class TestCommandExportILMPolicy(IndexAssertions):
         """
         policy_name = "foo"
 
-        exit_code = self.run_beat(extra_args=["export", "ilm-policy", "-E", "setup.ilm.policy_name=" + policy_name],
+        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.policy_name=" + policy_name],
                                   config=self.config)
 
         assert exit_code == 0

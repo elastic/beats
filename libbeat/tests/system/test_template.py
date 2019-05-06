@@ -1,6 +1,6 @@
-from base import BaseTest, IndexAssertions
+from base import BaseTest
+from idxmgmt import IdxMgmt
 import os
-from elasticsearch import Elasticsearch, TransportError
 from nose.plugins.attrib import attr
 import unittest
 import shutil
@@ -106,7 +106,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains("template with name 'bla' loaded"))
         proc.check_kill_and_wait()
 
-        es = Elasticsearch([self.get_elasticsearch_url()])
+        es = self.esClient()
         result = es.transport.perform_request('GET', '/_template/bla')
         assert len(result) == 1
 
@@ -114,15 +114,16 @@ class Test(BaseTest):
         return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
 
 
-class TestRunTemplate(IndexAssertions):
+class TestRunTemplate(BaseTest):
 
     def setUp(self):
         super(TestRunTemplate, self).setUp()
-
         # auto-derived default settings, if nothing else is set
         self.index_name = self.beat_name + "-9.9.9"
 
-        self.clean()
+        self.es = self.esClient()
+        self.idxmgmt = IdxMgmt(self.es)
+        self.idxmgmt.clean(self.beat_name)
 
     def renderConfig(self, **kwargs):
         self.render_config_template(
@@ -144,9 +145,9 @@ class TestRunTemplate(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
-        self.assert_alias_created(self.index_name)
-        self.assert_docs_written_to_alias(self.index_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.idxmgmt.assert_alias_created(self.index_name)
+        self.idxmgmt.assert_docs_written_to_alias(self.index_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -159,7 +160,7 @@ class TestRunTemplate(IndexAssertions):
 
         exit_code = self.run_beat(extra_args=["setup"])
         assert exit_code == 0
-        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
 
         alias_name = "foo"
         proc = self.start_beat(extra_args=["-E", "setup.template.overwrite=false",
@@ -170,7 +171,7 @@ class TestRunTemplate(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -185,10 +186,10 @@ class TestRunTemplate(IndexAssertions):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.assert_index_template_not_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_not_loaded(self.index_name)
 
 
-class TestCommandSetupTemplate(IndexAssertions):
+class TestCommandSetupTemplate(BaseTest):
     """
     Test beat command `setup` related to template
     """
@@ -200,7 +201,9 @@ class TestCommandSetupTemplate(IndexAssertions):
         self.index_name = self.beat_name + "-9.9.9"
         self.setupCmd = "--template"
 
-        self.clean()
+        self.es = self.esClient()
+        self.idxmgmt = IdxMgmt(self.es)
+        self.idxmgmt.clean(self.beat_name)
 
     def renderConfig(self, **kwargs):
         self.render_config_template(
@@ -219,9 +222,9 @@ class TestCommandSetupTemplate(IndexAssertions):
         exit_code = self.run_beat(extra_args=["setup"])
 
         assert exit_code == 0
-        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
-        self.assert_alias_created(self.index_name)
-        self.assert_policy_created(self.index_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.idxmgmt.assert_alias_created(self.index_name)
+        self.idxmgmt.assert_policy_created(self.index_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -234,13 +237,13 @@ class TestCommandSetupTemplate(IndexAssertions):
         exit_code = self.run_beat(extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
-        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
-        self.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
+        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
 
         # when running `setup --template`
         # write_alias and rollover_policy related to ILM are also created
-        self.assert_alias_created(self.index_name)
-        self.assert_policy_created(self.index_name)
+        self.idxmgmt.assert_alias_created(self.index_name)
+        self.idxmgmt.assert_policy_created(self.index_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -254,12 +257,12 @@ class TestCommandSetupTemplate(IndexAssertions):
                                               "-E", "setup.template.enabled=false"])
 
         assert exit_code == 0
-        self.assert_index_template_not_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_not_loaded(self.index_name)
 
         # when running `setup --template` and `setup.template.enabled=false`
         # write_alias and rollover_policy related to ILM are still created
-        self.assert_alias_created(self.index_name)
-        self.assert_policy_created(self.index_name)
+        self.idxmgmt.assert_alias_created(self.index_name)
+        self.idxmgmt.assert_policy_created(self.index_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -274,7 +277,7 @@ class TestCommandSetupTemplate(IndexAssertions):
                                               "-E", "setup.template.settings.index.number_of_shards=2"])
 
         assert exit_code == 0
-        self.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
 
         # check that settings are overwritten
         resp = self.es.transport.perform_request('GET', '/_template/' + self.index_name)
@@ -289,14 +292,14 @@ class TestCommandSetupTemplate(IndexAssertions):
         Test template setup with changed ilm.rollover_alias config
         """
         self.renderConfig()
-        alias_name = "foo"
+        alias_name = self.beat_name + "_foo"
 
         exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
 
         assert exit_code == 0
-        self.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
-        self.assert_index_template_index_pattern(alias_name, [alias_name + "-*"])
+        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
+        self.idxmgmt.assert_index_template_index_pattern(alias_name, [alias_name + "-*"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -309,18 +312,18 @@ class TestCommandSetupTemplate(IndexAssertions):
 
         exit_code = self.run_beat(extra_args=["setup"])
         assert exit_code == 0
-        self.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
 
-        alias_name = "foo"
+        alias_name = self.beat_name + "_foo"
         exit_code = self.run_beat(extra_args=["setup", "--template",
                                               "-E", "setup.template.overwrite=false",
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
         assert exit_code == 0
 
-        self.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
 
 
-class TestCommandExportTemplate(IndexAssertions):
+class TestCommandExportTemplate(BaseTest):
     """
     Test beat command `export template`
     """
@@ -331,8 +334,15 @@ class TestCommandExportTemplate(IndexAssertions):
         self.config = "libbeat.yml"
         self.output = os.path.join(self.working_dir, self.config)
         shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
-
         self.template_name = self.beat_name + "-9.9.9"
+
+        self.es = self.esClient()
+        self.idxmgmt = IdxMgmt(self.es)
+
+    def assert_log_contains_template(self, template, index_pattern):
+        assert self.log_contains('Loaded index template')
+        assert self.log_contains(template)
+        assert self.log_contains(index_pattern)
 
     def test_default(self):
         """
