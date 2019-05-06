@@ -260,14 +260,15 @@ func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
 	h.CreateILMPolicy(ilm.Policy{Name: name, Body: body})
 
 	assert.Equal(t, name, c.name)
+	assert.Equal(t, "policy", c.kind)
 	var out common.MapStr
 	json.Unmarshal([]byte(c.body), &out)
 	assert.Equal(t, common.MapStr{name: body}, out)
 }
 
 type mockClient struct {
-	v          common.Version
-	name, body string
+	v                common.Version
+	kind, name, body string
 }
 
 func newMockClient(v string) *mockClient {
@@ -281,7 +282,7 @@ func (c *mockClient) GetVersion() common.Version {
 	return c.v
 }
 
-func (c *mockClient) Write(name string, body string) error {
-	c.name, c.body = name, body
+func (c *mockClient) Write(kind string, name string, body string) error {
+	c.kind, c.name, c.body = kind, name, body
 	return nil
 }
