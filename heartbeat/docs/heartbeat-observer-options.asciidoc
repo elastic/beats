@@ -1,0 +1,5 @@
+[[configuration-observer-options]]
+== Specify Observer and Geo Options
+
+It is often useful to report the geographic location from which the check was performed, as well as other information about the heartbeat instance from which the check was performed. This data is attached to events via the <<add-observer-metadata,`add_observer_metadata`>> processor. Please see the documentation for this processor for more information on its use.
+
