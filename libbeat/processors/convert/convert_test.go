@@ -150,10 +150,11 @@ func TestConvert(t *testing.T) {
 
 func TestConvertRun(t *testing.T) {
 	tests := map[string]struct {
-		config   common.MapStr
-		input    beat.Event
-		expected beat.Event
-		fail     bool
+		config      common.MapStr
+		input       beat.Event
+		expected    beat.Event
+		fail        bool
+		errContains string
 	}{
 		"missing field": {
 			config: common.MapStr{
@@ -213,6 +214,25 @@ func TestConvertRun(t *testing.T) {
 			},
 			fail: true,
 		},
+		"invalid conversion": {
+			config: common.MapStr{
+				"fields": []common.MapStr{
+					{"from": "address", "to": "ip", "type": "ip"},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"address": "-",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"address": "-",
+				},
+			},
+			fail:        true,
+			errContains: "unable to convert value [-]: value is not a valid IP address",
+		},
 	}
 
 	for title, tt := range tests {
@@ -230,6 +250,9 @@ func TestConvertRun(t *testing.T) {
 			if tt.fail {
 				assert.Error(t, err)
 				t.Log("got expected error", err)
+				if tt.errContains != "" {
+					assert.Contains(t, err.Error(), tt.errContains)
+				}
 				return
 			}
 			assert.NoError(t, err)
