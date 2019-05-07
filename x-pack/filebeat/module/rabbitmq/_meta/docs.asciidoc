@@ -1,5 +1,5 @@
 :modulename: rabbitmq
-:has-dashboards: true
+:has-dashboards: false
 
 == RabbitMQ module
 
@@ -15,14 +15,6 @@ Parses https://www.rabbitmq.com/logging.html[single file format] introduced in 3
 Tested with version 3.7.14 on MacOS 10.14.4.
 
 include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
 
 include::../include/configuring-intro.asciidoc[]
 
