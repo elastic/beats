@@ -1,0 +1,35 @@
+{
+    "description": "Pipeline to parse MSSQL logs",
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": ["%{MSSQL_DATE:date} %{DATA:mssql.log.source} [ ]*%{GREEDYDATA:mssql.log.msg}"],
+                "pattern_definitions": {
+                    "MSSQL_DATE":"%{DATA} %{DATA}"
+                }
+            }
+        },
+        {
+            "date": {
+                "field": "date",
+                "target_field": "@timestamp",
+                "formats": ["yyyy-MM-dd HH:mm:ss.SS"]
+            }
+        },
+        {
+            "remove": {
+                "field":"date",
+                "ignore_missing": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

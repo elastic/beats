@@ -197,6 +197,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add RabbitMQ module. {pull}12032[12032]
 - Add new `container` input. {pull}12162[12162]
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
+- Add MSSQL module {pull}12079[12079]
 
 *Heartbeat*
 
