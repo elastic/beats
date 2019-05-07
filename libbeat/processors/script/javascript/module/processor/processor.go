@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/add_observer_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	"github.com/elastic/beats/libbeat/processors/communityid"
+	"github.com/elastic/beats/libbeat/processors/convert"
 	"github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 	"github.com/elastic/beats/libbeat/processors/dissect"
 	"github.com/elastic/beats/libbeat/processors/dns"
@@ -50,6 +51,7 @@ var constructors = map[string]processors.Constructor{
 	"AddLocale":             add_locale.New,
 	"AddProcessMetadata":    add_process_metadata.New,
 	"CommunityID":           communityid.New,
+	"Convert":               convert.New,
 	"CopyFields":            actions.NewCopyFields,
 	"DecodeCSVField":        decode_csv_fields.NewDecodeCSVField,
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
