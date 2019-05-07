@@ -42,6 +42,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.1[Check the HEAD diff]
 
 *Metricbeat*
 
+- Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+
 *Packetbeat*
 
 *Winlogbeat*
