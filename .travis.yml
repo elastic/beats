@@ -158,6 +158,20 @@ jobs:
 
     # Kubernetes
     - os: linux
+      before_script:
+        # install dind kubernetes
+        - wget https://github.com/kubernetes-sigs/kubeadm-dind-cluster/releases/download/v0.1.0/dind-cluster-v1.13.sh
+        - chmod +x dind-cluster-v1.10.sh
+        - ./dind-cluster-v1.10.sh up
+        # Add Kubectl directory to the PATH.
+        - export PATH="$HOME/.kubeadm-dind-cluster:$PATH"
+        # Wait for Kubernetes to be up and ready.
+        - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
+      stage: test
+      env:
+        - TARGETS="-C deploy/kubernetes test"
+
+    - os: linux
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
