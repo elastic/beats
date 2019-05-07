@@ -81,9 +81,6 @@ metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 
 	promHistogramKeyLabel = `
 # TYPE metrics_one_midichlorians histogram
-metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="100"} NaN
-metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="500"} +Inf
-metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="1000"} -Inf
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="2000"} 52
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="4000"} 70
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="8000"} 78
