@@ -19,11 +19,12 @@ package collector
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"math"
 )
 
 const (
