@@ -20,7 +20,7 @@ class BaseTest(TestCase):
         self._es = None
         super(BaseTest, self).setUpClass()
 
-    def esClient(self):
+    def es_client(self):
         if self._es:
             return self._es
 

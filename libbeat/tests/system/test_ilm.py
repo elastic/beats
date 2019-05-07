@@ -5,6 +5,7 @@ from nose.plugins.attrib import attr
 import unittest
 import shutil
 import datetime
+import logging
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -19,11 +20,11 @@ class TestRunILM(BaseTest):
         self.alias_name = self.index_name
         self.policy_name = self.alias_name
 
-        self.es = self.esClient()
+        self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es)
         self.idxmgmt.clean(self.beat_name)
 
-    def renderConfig(self, **kwargs):
+    def render_config(self, **kwargs):
         self.render_config_template(
             elasticsearch={"hosts": self.get_elasticsearch_url()},
             es_template_name=self.index_name,
@@ -34,9 +35,9 @@ class TestRunILM(BaseTest):
     @attr('integration')
     def test_ilm_default(self):
         """
-        Test default settings: load ilm policy, write alias and ilm template
+        Test ilm default settings to load ilm policy, write alias and ilm template
         """
-        self.renderConfig()
+        self.render_config()
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -53,10 +54,10 @@ class TestRunILM(BaseTest):
     @attr('integration')
     def test_ilm_disabled(self):
         """
-        Test respect config setting for loading ilm
+        Test ilm disabled to not load ilm related components
         """
 
-        self.renderConfig(ilm={"enabled": False})
+        self.render_config(ilm={"enabled": False})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -71,11 +72,11 @@ class TestRunILM(BaseTest):
     @attr('integration')
     def test_policy_name(self):
         """
-        Test set ilm policy name
+        Test setting ilm policy name
         """
 
         policy_name = self.beat_name + "_foo"
-        self.renderConfig(ilm={"enabled": True, "policy_name": policy_name})
+        self.render_config(ilm={"enabled": True, "policy_name": policy_name})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -91,11 +92,11 @@ class TestRunILM(BaseTest):
     @attr('integration')
     def test_rollover_alias(self):
         """
-        Test ilm rollover alias setting
+        Test settings ilm rollover alias
         """
 
         alias_name = self.beat_name + "_foo"
-        self.renderConfig(ilm={"enabled": True, "rollover_alias": alias_name})
+        self.render_config(ilm={"enabled": True, "rollover_alias": alias_name})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -111,11 +112,11 @@ class TestRunILM(BaseTest):
     @attr('integration')
     def test_pattern(self):
         """
-        Test ilm pattern setting
+        Test setting ilm pattern
         """
 
         pattern = "1"
-        self.renderConfig(ilm={"enabled": True, "pattern": pattern})
+        self.render_config(ilm={"enabled": True, "pattern": pattern})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -131,11 +132,11 @@ class TestRunILM(BaseTest):
     @attr('integration')
     def test_pattern_date(self):
         """
-        Test ilm pattern with date inside
+        Test setting ilm pattern with date
         """
 
         pattern = "'{now/d}'"
-        self.renderConfig(ilm={"enabled": True, "pattern": pattern})
+        self.render_config(ilm={"enabled": True, "pattern": pattern})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -153,7 +154,6 @@ class TestRunILM(BaseTest):
 class TestCommandSetupILMPolicy(BaseTest):
     """
     Test beat command `setup` related to ILM policy
-    Copies behavior from `setup --ilm
     """
 
     def setUp(self):
@@ -165,11 +165,13 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.alias_name = self.index_name
         self.policy_name = self.alias_name
 
-        self.es = self.esClient()
+        self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es)
         self.idxmgmt.clean(self.beat_name)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
-    def renderConfig(self, **kwargs):
+    def render_config(self, **kwargs):
         self.render_config_template(
             elasticsearch={"hosts": self.get_elasticsearch_url()},
             es_template_name=self.index_name,
@@ -180,9 +182,9 @@ class TestCommandSetupILMPolicy(BaseTest):
     @attr('integration')
     def test_setup_ilm_policy_and_template(self):
         """
-        Test ilm policy and template setup
+        Test combination of ilm policy and template setup
         """
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd, "--template"])
@@ -199,7 +201,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         Test ilm policy setup with default config
         """
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd])
@@ -216,7 +218,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         Test ilm policy setup when ilm disabled
         """
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd,
@@ -234,7 +236,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         Test ilm policy setup when policy_name is configured
         """
         policy_name = self.beat_name + "_foo"
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd,
@@ -251,7 +253,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         Test ilm policy setup when rollover_alias is configured
         """
         alias_name = self.beat_name + "_foo"
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd,
@@ -277,9 +279,6 @@ class TestCommandExportILMPolicy(BaseTest):
         self.policy_name = self.beat_name + "-9.9.9"
         self.cmd = "ilm-policy"
 
-        self.es = self.esClient()
-        self.idxmgmt = IdxMgmt(self.es)
-
     def assert_log_contains_policy(self, policy):
         assert self.log_contains('ILM policy successfully loaded.')
         assert self.log_contains(policy)
@@ -291,7 +290,7 @@ class TestCommandExportILMPolicy(BaseTest):
 
     def test_default(self):
         """
-        Test default ilm-policy export
+        Test ilm-policy export with default config
         """
 
         exit_code = self.run_beat(extra_args=["export", self.cmd],
@@ -315,8 +314,7 @@ class TestCommandExportILMPolicy(BaseTest):
 
     def test_changed_policy_name(self):
         """
-        Test ilm-policy export when ilm disabled in config
-
+        Test ilm-policy export when policy name is changed
 
         """
         policy_name = "foo"

@@ -4,6 +4,7 @@ import os
 from nose.plugins.attrib import attr
 import unittest
 import shutil
+import logging
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -106,7 +107,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains("template with name 'bla' loaded"))
         proc.check_kill_and_wait()
 
-        es = self.esClient()
+        es = self.es_client()
         result = es.transport.perform_request('GET', '/_template/bla')
         assert len(result) == 1
 
@@ -115,17 +116,20 @@ class Test(BaseTest):
 
 
 class TestRunTemplate(BaseTest):
+    """
+    Test run cmd with focus on template setup
+    """
 
     def setUp(self):
         super(TestRunTemplate, self).setUp()
         # auto-derived default settings, if nothing else is set
         self.index_name = self.beat_name + "-9.9.9"
 
-        self.es = self.esClient()
+        self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es)
         self.idxmgmt.clean(self.beat_name)
 
-    def renderConfig(self, **kwargs):
+    def render_config(self, **kwargs):
         self.render_config_template(
             elasticsearch={"hosts": self.get_elasticsearch_url()},
             **kwargs
@@ -137,7 +141,7 @@ class TestRunTemplate(BaseTest):
         """
         Test run cmd with default settings for template
         """
-        self.renderConfig()
+        self.render_config()
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -151,35 +155,11 @@ class TestRunTemplate(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
-    def test_template_created_on_ilm_policy_created(self):
-        """
-        Test run cmd overwrites template when new ilm policy is created
-        """
-
-        self.renderConfig()
-
-        exit_code = self.run_beat(extra_args=["setup"])
-        assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
-
-        alias_name = "foo"
-        proc = self.start_beat(extra_args=["-E", "setup.template.overwrite=false",
-                                           "-E", "setup.ilm.rollover_alias=" + alias_name])
-
-        self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains(alias_name))
-        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
-        proc.check_kill_and_wait()
-
-        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
     def test_template_disabled(self):
         """
-        Test run cmd when loading template is disabled
+        Test run cmd does not load template when disabled in config
         """
-        self.renderConfig()
+        self.render_config()
 
         proc = self.start_beat(extra_args=["-E", "setup.template.enabled=false"])
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -191,7 +171,7 @@ class TestRunTemplate(BaseTest):
 
 class TestCommandSetupTemplate(BaseTest):
     """
-    Test beat command `setup` related to template
+    Test beat command `setup` with focus on template
     """
 
     def setUp(self):
@@ -201,11 +181,13 @@ class TestCommandSetupTemplate(BaseTest):
         self.index_name = self.beat_name + "-9.9.9"
         self.setupCmd = "--template"
 
-        self.es = self.esClient()
+        self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es)
         self.idxmgmt.clean(self.beat_name)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
-    def renderConfig(self, **kwargs):
+    def render_config(self, **kwargs):
         self.render_config_template(
             elasticsearch={"hosts": self.get_elasticsearch_url()},
             **kwargs
@@ -217,7 +199,7 @@ class TestCommandSetupTemplate(BaseTest):
         """
         Test setup cmd with all subcommands
         """
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup"])
@@ -233,7 +215,7 @@ class TestCommandSetupTemplate(BaseTest):
         """
         Test template setup with default config
         """
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd])
@@ -253,7 +235,7 @@ class TestCommandSetupTemplate(BaseTest):
         """
         Test template setup when ilm disabled
         """
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd,
@@ -273,7 +255,7 @@ class TestCommandSetupTemplate(BaseTest):
         """
         Test template setup with config options
         """
-        self.renderConfig()
+        self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd,
@@ -295,7 +277,7 @@ class TestCommandSetupTemplate(BaseTest):
         """
         Test template setup with changed ilm.rollover_alias config
         """
-        self.renderConfig()
+        self.render_config()
         alias_name = self.beat_name + "_foo"
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
@@ -310,23 +292,36 @@ class TestCommandSetupTemplate(BaseTest):
     @attr('integration')
     def test_template_created_on_ilm_policy_created(self):
         """
-        Test run cmd overwrites template when new ilm policy is created
+        Test template setup overwrites template when new ilm policy is created
         """
 
-        self.renderConfig()
-
-        exit_code = self.run_beat(extra_args=["setup"])
-        assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)
-
+        # ensure template with ilm rollover_alias name is created, but ilm policy not yet
         alias_name = self.beat_name + "_foo"
+        self.render_config()
+
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", "--template",
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.enabled=false",
+                                              "-E", "setup.template.name=" + alias_name,
+                                              "-E", "setup.template.pattern=" + alias_name + "*"])
+        assert exit_code == 0
+        self.idxmgmt.assert_index_template_loaded(alias_name)
+        self.idxmgmt.assert_policy_not_created(self.index_name)
+
+        # ensure ilm policy is created, triggering overwriting existing template
+        alias_name = self.beat_name + "_foo"
+        exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
                                               "-E", "setup.template.overwrite=false",
+                                              "-E", "setup.template.settings.index.number_of_shards=2",
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
         assert exit_code == 0
-
         self.idxmgmt.assert_ilm_template_loaded(alias_name, self.index_name, alias_name)
+        self.idxmgmt.assert_policy_created(self.index_name)
+        # check that template was overwritten
+        resp = self.es.transport.perform_request('GET', '/_template/' + alias_name)
+        assert alias_name in resp
+        index = resp[alias_name]["settings"]["index"]
+        assert index["number_of_shards"] == "2", index["number_of_shards"]
 
 
 class TestCommandExportTemplate(BaseTest):
@@ -341,9 +336,6 @@ class TestCommandExportTemplate(BaseTest):
         self.output = os.path.join(self.working_dir, self.config)
         shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
         self.template_name = self.beat_name + "-9.9.9"
-
-        self.es = self.esClient()
-        self.idxmgmt = IdxMgmt(self.es)
 
     def assert_log_contains_template(self, template, index_pattern):
         assert self.log_contains('Loaded index template')
