@@ -20,6 +20,7 @@
 package collector
 
 import (
+	"math"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -186,6 +187,111 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 						"http_request_duration_microseconds": float64(10),
 					},
 					labels: labels,
+				},
+			},
+		},
+		{
+			Family: &dto.MetricFamily{
+				Name: proto.String("http_request_duration_seconds"),
+				Help: proto.String("request duration histogram"),
+				Type: dto.MetricType_HISTOGRAM.Enum(),
+				Metric: []*dto.Metric{
+					{
+						Histogram: &dto.Histogram{
+							SampleCount: proto.Uint64(3),
+							SampleSum:   proto.Float64(6),
+							Bucket: []*dto.Bucket{
+								{
+									UpperBound:      proto.Float64(0.1),
+									CumulativeCount: proto.Uint64(uint64(math.Inf(0))),
+								},
+								{
+									UpperBound:      proto.Float64(0.2),
+									CumulativeCount: proto.Uint64(uint64(math.Inf(1))),
+								},
+								{
+									UpperBound:      proto.Float64(0.5),
+									CumulativeCount: proto.Uint64(uint64(math.NaN())),
+								},
+								{
+									UpperBound:      proto.Float64(1),
+									CumulativeCount: proto.Uint64(1),
+								},
+								{
+									UpperBound:      proto.Float64(2),
+									CumulativeCount: proto.Uint64(2),
+								},
+								{
+									UpperBound:      proto.Float64(3),
+									CumulativeCount: proto.Uint64(3),
+								}, {
+									UpperBound:      proto.Float64(5),
+									CumulativeCount: proto.Uint64(3),
+								},
+								{
+									UpperBound:      proto.Float64(float64(math.Inf(1))),
+									CumulativeCount: proto.Uint64(3),
+								},
+							},
+						},
+					},
+				},
+			},
+			Event: []PromEvent{
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_count": uint64(3),
+						"http_request_duration_seconds_sum":   float64(6),
+					},
+					labels: common.MapStr{},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(math.Inf(0)),
+					},
+					labels: common.MapStr{"le": "0.1"},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(math.Inf(1)),
+					},
+					labels: common.MapStr{"le": "0.2"},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(math.NaN()),
+					},
+					labels: common.MapStr{"le": "0.5"},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(1),
+					},
+					labels: common.MapStr{"le": "1"},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(2),
+					},
+					labels: common.MapStr{"le": "2"},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(3),
+					},
+					labels: common.MapStr{"le": "3"},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(3),
+					},
+					labels: common.MapStr{"le": "5"},
+				},
+				{
+					data: common.MapStr{
+						"http_request_duration_seconds_bucket": uint64(3),
+					},
+					labels: common.MapStr{"le": "+Inf"},
 				},
 			},
 		},

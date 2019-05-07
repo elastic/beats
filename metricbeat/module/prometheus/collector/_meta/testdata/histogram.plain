@@ -1,7 +1,12 @@
-# HELP hash_seconds Time taken to create hashes
-# TYPE hash_seconds histogram
-hash_seconds_bucket{code="200",le="1"} NaN
-hash_seconds_bucket{code="200",le="2.5"} +Inf
-hash_seconds_bucket{code="200",le="5"} -Inf
-hash_seconds_bucket{code="200",le="10"} 2
-hash_seconds_bucket{code="200",le="50"} 3
+# HELP http_request_duration_seconds request duration histogram
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le="0.1"} +Inf
+http_request_duration_seconds_bucket{le="0.2"} -Inf
+http_request_duration_seconds_bucket{le="0.5"} NaN
+http_request_duration_seconds_bucket{le="1"} 1
+http_request_duration_seconds_bucket{le="2"} 2
+http_request_duration_seconds_bucket{le="3"} 3
+http_request_duration_seconds_bucket{le="5"} 3
+http_request_duration_seconds_bucket{le="+Inf"} 3
+http_request_duration_seconds_sum 6
+http_request_duration_seconds_count 3

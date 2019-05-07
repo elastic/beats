@@ -23,12 +23,12 @@ import (
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"math"
 )
 
 const (
 	defaultScheme = "http"
 	defaultPath   = "/metrics"
-	nanInf        = 9223372036854775808
 )
 
 var (
@@ -81,7 +81,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			for k, v := range promEvent.data {
 				// Check if prometheus metric value is NaN, +Inf or -Inf.
 				// If it is, ignore this metric.
-				if vConverted, ok := v.(uint64); ok && vConverted == nanInf {
+				if vConverted, ok := v.(uint64); ok && (vConverted == uint64(math.NaN()) || vConverted == uint64(math.Inf(0)) || vConverted == uint64(math.Inf(1))) {
 					validValue = false
 					m.Logger().Debugf("prometheus metric %v has NaN/Inf value %v", k, v)
 					break

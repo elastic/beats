@@ -20,6 +20,7 @@ package prometheus
 import (
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 
 	dto "github.com/prometheus/client_model/go"
@@ -165,7 +166,20 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 
 				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				update := common.MapStr{}
-				update.Put(field, value)
+				if valueMapStr, ok := value.(common.MapStr); ok {
+					filteredValue := common.MapStr{}
+					for k, v := range valueMapStr.Flatten() {
+						if vConverted, ok := v.(uint64); ok && (vConverted == uint64(math.NaN()) || vConverted == uint64(math.Inf(0)) || vConverted == uint64(math.Inf(1))) {
+							continue
+						}
+						filteredValue.Put(k, v)
+					}
+					update.Put(field, filteredValue)
+				} else {
+					// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
+					update.Put(field, value)
+				}
+
 				event.DeepUpdate(update)
 
 				event.DeepUpdate(labels)
