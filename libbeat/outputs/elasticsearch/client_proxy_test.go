@@ -218,6 +218,11 @@ func (tl *testListeners) close() {
 
 func (tl *testListeners) checkFinalState(
 	t *testing.T, expectedServerCount int, expectedProxyCount int) {
+	// The lock here should be superfluous, since we only call checkFinalState
+	// after the clients have terminated, but golang still detects it as a data
+	// race, so we lock here anyway.
+	tl.mutex.Lock()
+	defer tl.mutex.Unlock()
 	assert.Equal(t, expectedServerCount, tl.serverRequestCount)
 	assert.Equal(t, expectedProxyCount, tl.proxyRequestCount)
 	if len(tl.errors) > 0 {
