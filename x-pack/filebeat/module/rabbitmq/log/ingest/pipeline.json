@@ -18,7 +18,8 @@
       "date" : {
         "field" : "timestamp",
         "formats" : ["yy-MM-dd HH:mm:ss.SSS"],
-        "timezone" : "{{ event.timezone }}"
+        {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+        "ignore_failure": true
       }
     },
     {

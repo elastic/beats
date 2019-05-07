@@ -1,10 +1,9 @@
 [
     {
-        "@timestamp": "2019-04-03T11:13:15.076-04:00",
+        "@timestamp": "2019-04-03T11:13:15.076Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -14,11 +13,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-03T11:13:15.510-04:00",
+        "@timestamp": "2019-04-03T11:13:15.510Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -31,11 +29,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-03T11:13:15.512-04:00",
+        "@timestamp": "2019-04-03T11:13:15.512Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -48,11 +45,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:53.458-04:00",
+        "@timestamp": "2019-04-12T10:00:53.458Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -62,11 +58,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:53.550-04:00",
+        "@timestamp": "2019-04-12T10:00:53.550Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -79,11 +74,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:53.550-04:00",
+        "@timestamp": "2019-04-12T10:00:53.550Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -93,11 +87,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.553-04:00",
+        "@timestamp": "2019-04-12T10:00:54.553Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "warning",
@@ -107,11 +100,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.555-04:00",
+        "@timestamp": "2019-04-12T10:00:54.555Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -121,11 +113,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.567-04:00",
+        "@timestamp": "2019-04-12T10:00:54.567Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -135,11 +126,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.567-04:00",
+        "@timestamp": "2019-04-12T10:00:54.567Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -149,11 +139,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.568-04:00",
+        "@timestamp": "2019-04-12T10:00:54.568Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -163,11 +152,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.569-04:00",
+        "@timestamp": "2019-04-12T10:00:54.569Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -177,11 +165,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.579-04:00",
+        "@timestamp": "2019-04-12T10:00:54.579Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -191,11 +178,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.588-04:00",
+        "@timestamp": "2019-04-12T10:00:54.588Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -205,11 +191,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.589-04:00",
+        "@timestamp": "2019-04-12T10:00:54.589Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -219,11 +204,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.598-04:00",
+        "@timestamp": "2019-04-12T10:00:54.598Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -233,11 +217,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.606-04:00",
+        "@timestamp": "2019-04-12T10:00:54.606Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -247,11 +230,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.615-04:00",
+        "@timestamp": "2019-04-12T10:00:54.615Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -261,11 +243,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:00:54.615-04:00",
+        "@timestamp": "2019-04-12T10:00:54.615Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -278,11 +259,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:01:01.031-04:00",
+        "@timestamp": "2019-04-12T10:01:01.031Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -295,11 +275,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:11:15.094-04:00",
+        "@timestamp": "2019-04-12T10:11:15.094Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -309,11 +288,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:11:15.101-04:00",
+        "@timestamp": "2019-04-12T10:11:15.101Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -323,11 +301,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:19:14.450-04:00",
+        "@timestamp": "2019-04-12T10:19:14.450Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -340,11 +317,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:19:14.450-04:00",
+        "@timestamp": "2019-04-12T10:19:14.450Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
@@ -354,11 +330,10 @@
         "service.type": "rabbitmq"
     },
     {
-        "@timestamp": "2019-04-12T10:19:14.451-04:00",
+        "@timestamp": "2019-04-12T10:19:14.451Z",
         "ecs.version": "1.0.0",
         "event.dataset": "rabbitmq.log",
         "event.module": "rabbitmq",
-        "event.timezone": "-04:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "info",
