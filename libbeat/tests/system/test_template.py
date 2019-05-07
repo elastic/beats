@@ -197,12 +197,12 @@ class TestCommandSetupTemplate(BaseTest):
     @attr('integration')
     def test_setup(self):
         """
-        Test setup cmd with all subcommands
+        Test setup cmd with template and ilm-policy subcommands
         """
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup"])
+                                  extra_args=["setup", self.setupCmd, "--ilm-policy"])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.index_name, self.index_name)

@@ -159,7 +159,7 @@ class TestCommandSetupILMPolicy(BaseTest):
     def setUp(self):
         super(TestCommandSetupILMPolicy, self).setUp()
 
-        self.cmd = "ilm-policy"
+        self.setupCmd = "--ilm-policy"
         # auto-derived default settings, if nothing else is set
         self.index_name = self.beat_name + "-9.9.9"
         self.alias_name = self.index_name
@@ -187,7 +187,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.cmd, "--template"])
+                                  extra_args=["setup", self.setupCmd, "--template"])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
@@ -204,7 +204,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.cmd])
+                                  extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
@@ -221,7 +221,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.cmd,
+                                  extra_args=["setup", self.setupCmd,
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
@@ -239,7 +239,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.cmd,
+                                  extra_args=["setup", self.setupCmd,
                                               "-E", "setup.ilm.policy_name=" + policy_name])
 
         assert exit_code == 0
@@ -256,7 +256,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.cmd,
+                                  extra_args=["setup", self.setupCmd,
                                               "-E", "setup.ilm.rollover_alias=" + alias_name])
 
         assert exit_code == 0
