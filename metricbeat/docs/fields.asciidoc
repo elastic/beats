@@ -25978,7 +25978,7 @@ All TCP connections
 
 
 
-*`system.socket.summary.tcp.all.orphaned`*::
+*`system.socket.summary.tcp.all.orphan`*::
 +
 --
 type: integer

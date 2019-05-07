@@ -33,7 +33,7 @@
           description: >
             All TCP connections
           fields:
-            - name: orphaned
+            - name: orphan
               type: integer
               description: >
                 A count of all orphaned tcp sockets. Only available on Linux.

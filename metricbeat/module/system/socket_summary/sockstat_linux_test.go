@@ -33,4 +33,5 @@ func TestSockstat(t *testing.T) {
 
 	assert.Equal(t, out.TCPMem, 1)
 	assert.Equal(t, out.TCPOrphan, 0)
+	assert.Equal(t, out.UDPMem, 11)
 }
