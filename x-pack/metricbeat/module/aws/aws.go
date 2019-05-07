@@ -31,10 +31,9 @@ type Config struct {
 // MetricSet is the base metricset for all aws metricsets
 type MetricSet struct {
 	mb.BaseMetricSet
-	RegionsList    []string
-	DurationString string
-	PeriodInSec    int
-	AwsConfig      *awssdk.Config
+	RegionsList []string
+	Period      time.Duration
+	AwsConfig   *awssdk.Config
 }
 
 // ModuleName is the name of this module.
@@ -77,16 +76,10 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	awsConfig.Region = config.DefaultRegion
 
-	durationString, periodSec := convertPeriodToDuration(config.Period)
-	if err != nil {
-		return nil, err
-	}
-
 	metricSet := MetricSet{
-		BaseMetricSet:  base,
-		DurationString: durationString,
-		PeriodInSec:    periodSec,
-		AwsConfig:      &awsConfig,
+		BaseMetricSet: base,
+		Period:        config.Period,
+		AwsConfig:     &awsConfig,
 	}
 
 	// Construct MetricSet with a full regions list
@@ -118,14 +111,6 @@ func getRegions(svc ec2iface.EC2API) (completeRegionsList []string, err error) {
 		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
 	return
-}
-
-func convertPeriodToDuration(period time.Duration) (string, int) {
-	// Set starttime double the default frequency earlier than the endtime in order to make sure
-	// GetMetricDataRequest gets the latest data point for each metric.
-	duration := "-" + (period * 2).String()
-	numberPeriod := int(period.Seconds())
-	return duration, numberPeriod
 }
 
 // StringInSlice checks if a string is already exists in list
