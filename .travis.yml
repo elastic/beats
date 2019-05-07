@@ -63,7 +63,6 @@ jobs:
       env:
         - TARGETS="-C deploy/kubernetes test"
 
-
 addons:
   apt:
     update: true
@@ -92,20 +91,3 @@ install: true
 
 script:
   - make $TARGETS
-
-notifications:
-  slack:
-    on_success: change
-    on_failure: always
-    on_pull_requests: false
-    rooms:
-      secure: "e25J5puEA31dOooTI4T+K+zrTs8XeWIGq2cgmiPt9u/g7eqWeQj1UJnVsr8GOu1RPDyuJZJHXqfrvuOYJTdHzXbwjD0JTbwwVVZMkkZW2SWZHG46HCXPiucjWXEr3hXJKBJDDpIx6VxrN7r17dejv1biQ8QuEFZfiB1H8kbH/ho="
-
-after_success:
-  # Copy full.cov to coverage.txt because codecov.io requires this file
-  - test -f auditbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f auditbeat/build/coverage/full.cov
-  - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
-  - test -f heartbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f heartbeat/build/coverage/full.cov
-  - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
-  - test -f metricbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f metricbeat/build/coverage/full.cov
-  - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov
