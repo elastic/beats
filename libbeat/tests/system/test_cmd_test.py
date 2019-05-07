@@ -1,5 +1,8 @@
 from base import BaseTest
 import os
+import logging
+import unittest
+from nose.plugins.attrib import attr
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
@@ -37,16 +40,19 @@ class TestCommandTest(BaseTest):
         assert exit_code == 1
         assert self.log_contains("Config OK") is False
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_output(self):
         """
         Test test output works
         """
 
-        host = os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
+        self.es_client()
+        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
+
         self.render_config_template("mockbeat",
-                                    os.path.join(self.working_dir,
-                                                 "mockbeat.yml"),
-                                    elasticsearch={"hosts": '["{}"]'.format(host)})
+                                    os.path.join(self.working_dir, "mockbeat.yml"),
+                                    elasticsearch={"hosts": self.get_elasticsearch_url()})
         exit_code = self.run_beat(
             extra_args=["test", "output"],
             config="mockbeat.yml")
