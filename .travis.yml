@@ -64,7 +64,6 @@ jobs:
         - TARGETS="-C deploy/kubernetes test"
 
 
-
 addons:
   apt:
     update: true
