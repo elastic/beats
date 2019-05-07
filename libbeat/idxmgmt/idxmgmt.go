@@ -39,8 +39,7 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // A manager instantiated via Supporter is responsible for instantiating/configuring
 // the index throughout the Elastic Stack.
 type Supporter interface {
-	// Enalbed checks if index management is configured to configure templates,
-	// ILM, or aliases.
+	// Enabled checks if index management is configured to setup templates or ILM
 	Enabled() bool
 
 	// BuildSelector create an index selector.
@@ -62,6 +61,7 @@ type Asseter interface {
 // Manager is used to initialize indices, ILM policies, and aliases within the
 // Elastic Stack.
 type Manager interface {
+	VerifySetup(template, ilm LoadMode) (bool, string)
 	Setup(template, ilm LoadMode) error
 }
 

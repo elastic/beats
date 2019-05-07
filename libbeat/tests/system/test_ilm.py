@@ -6,6 +6,7 @@ import unittest
 import shutil
 import datetime
 import logging
+import json
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -217,6 +218,7 @@ class TestCommandSetupILMPolicy(BaseTest):
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
@@ -321,7 +323,6 @@ class TestCommandExportILMPolicy(BaseTest):
     def test_changed_policy_name(self):
         """
         Test ilm-policy export when policy name is changed
-
         """
         policy_name = "foo"
 
@@ -331,3 +332,42 @@ class TestCommandExportILMPolicy(BaseTest):
         assert exit_code == 0
         self.assert_log_contains_policy()
         self.assert_log_contains_write_alias()
+
+    def test_export_to_file_absolute_path(self):
+        """
+        Test export ilm policy to file with absolute file path
+        """
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        exit_code = self.run_beat(
+            extra_args=["export", self.cmd, "--dir=" + base_path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        file = os.path.join(base_path, "policy", self.policy_name + '.json')
+        with open(file) as f:
+            policy = json.load(f)
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
+
+        os.remove(file)
+
+    def test_export_to_file_relative_path(self):
+        """
+        Test export ilm policy to file with relative file path
+        """
+        path = os.path.join(os.path.dirname(__file__), "export")
+        exit_code = self.run_beat(
+            extra_args=["export", self.cmd, "--dir=" + path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        file = os.path.join(base_path, "policy", self.policy_name + '.json')
+        with open(file) as f:
+            policy = json.load(f)
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
+
+        os.remove(file)
