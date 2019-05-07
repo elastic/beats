@@ -15,46 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build windows
+
 package winlogbeat
 
 import (
+	"syscall"
+	"unsafe"
+
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
 )
 
-// SplitCommandLine splits string in a list of space separated arguments.
-// Double-quoted arguments are kept together even if it contains spaces.
+// SplitCommandLine splits a string into a list of space separated arguments.
+// See Window's CommandLineToArgvW for more details.
 func SplitCommandLine(cmd string) []string {
-	var args []string
-	var insideQuotes bool
-	var tokenStart = 0
-
-	for i := 0; i < len(cmd); i++ {
-		c := cmd[i]
-
-		switch {
-		case c == '"':
-			if !insideQuotes {
-				tokenStart = i + 1
-			} else {
-				if i-tokenStart > 0 {
-					args = append(args, cmd[tokenStart:i])
-				}
-				tokenStart = i + 1
-			}
-			insideQuotes = !insideQuotes
-		case c == ' ' && !insideQuotes:
-			if i-tokenStart > 0 {
-				args = append(args, cmd[tokenStart:i])
-			}
-			tokenStart = i + 1
-		}
-	}
-	if len(cmd)-tokenStart > 0 {
-		args = append(args, cmd[tokenStart:])
+	args, err := commandLineToArgvW(cmd)
+	if err != nil {
+		panic(err)
 	}
 
 	return args
+}
+
+func commandLineToArgvW(in string) ([]string, error) {
+	ptr, err := syscall.UTF16PtrFromString(in)
+	if err != nil {
+		return nil, err
+	}
+
+	var numArgs int32
+	argsWide, err := syscall.CommandLineToArgv(ptr, &numArgs)
+	if err != nil {
+		return nil, err
+	}
+
+	// Free memory allocated for CommandLineToArgvW arguments.
+	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(argsWide)))
+
+	args := make([]string, numArgs)
+	for idx := range args {
+		args[idx] = syscall.UTF16ToString(argsWide[idx][:])
+	}
+	return args, nil
 }
 
 // Require registers the winlogbeat module that has utilities specific to
