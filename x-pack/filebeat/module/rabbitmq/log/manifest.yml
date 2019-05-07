@@ -2,12 +2,10 @@ module_version: 1.0
 
 var:
   - name: paths
-  # TODO: ideally, respect ENV values from https://www.rabbitmq.com/relocate.html#locations
-  # at least RABBITMQ_LOGS. Could do RABBITMQ_ -> rabbitmq.
     default:
-      - /var/log/rabbitmq/rabbit@localhost.log*
+      - ${RABBITMQ_LOGS:/var/log/rabbitmq/rabbit@localhost.log*}
     os.darwin:
-      - /usr/local/var/log/rabbitmq/rabbit@localhost.log*
+      - ${RABBITMQ_LOGS:/usr/local/var/log/rabbitmq/rabbit@localhost.log*}
     os.windows:
       #- '%APPDATA%\RabbitMQ\log\rabbit@localhost.log*'
   - name: convert_timezone
