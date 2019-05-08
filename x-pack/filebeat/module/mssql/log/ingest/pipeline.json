@@ -4,7 +4,7 @@
         {
             "grok": {
                 "field": "message",
-                "patterns": ["%{MSSQL_DATE:date} %{DATA:mssql.log.source} [ ]*%{GREEDYDATA:mssql.log.msg}"],
+                "patterns": ["%{MSSQL_DATE:date} %{DATA:mssql.log.source} [ ]*%{GREEDYDATA:msg_temp}"],
                 "pattern_definitions": {
                     "MSSQL_DATE":"%{DATA} %{DATA}"
                 }
@@ -14,12 +14,33 @@
             "date": {
                 "field": "date",
                 "target_field": "@timestamp",
-                "formats": ["yyyy-MM-dd HH:mm:ss.SS"]
+                "formats": ["yyyy-MM-dd HH:mm:ss.SS"],
+                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                "ignore_failure": true
             }
         },
         {
             "remove": {
                 "field":"date",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "message",
+                "target_field": "log.original"
+            }
+        },
+        {
+            "rename": {
+                "field": "msg_temp",
+                "target_field": "message",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "msg_temp",
                 "ignore_missing": true
             }
         }

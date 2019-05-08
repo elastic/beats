@@ -327,6 +327,9 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
   # Error logs

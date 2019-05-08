@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-mssql>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-netflow>>
@@ -7655,6 +7656,42 @@ alias to: log.level
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-mssql]]
+== mssql fields
+
+MS SQL Filebeat Module
+
+
+[float]
+== mssql fields
+
+Fields from the MSSQL log files
+
+
+[float]
+== log fields
+
+Common log fields
+
+
+*`mssql.log.source`*::
++
+--
+type: text
+
+Origin of the message, usually the server but it can also be a recovery process
+
+--
+
+*`mssql.log.msg`*::
++
+--
+type: text
+
+Text of the message
 
 --
 
