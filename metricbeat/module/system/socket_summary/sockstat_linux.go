@@ -71,7 +71,7 @@ func applyEnhancements(data common.MapStr, m *MetricSet) (common.MapStr, error) 
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting sockstat data")
 	}
-	data.Put("tcp.orphan", stat.TCPOrphan)
+	data.Put("tcp.all.orphan", stat.TCPOrphan)
 	data.Put("tcp.memory", os.Getpagesize()*stat.TCPMem)
 	data.Put("udp.memory", os.Getpagesize()*stat.UDPMem)
 
