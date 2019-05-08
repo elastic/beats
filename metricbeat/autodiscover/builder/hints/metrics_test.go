@@ -83,6 +83,50 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{},
 		},
 		{
+			message: "Hints with multiple hosts return only the matching one",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9090,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "mockmoduledefaults",
+						"hosts":  "${data.host}:8888,${data.host}:9090",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"metricsets": []string{"default"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+				"hosts":      []interface{}{"1.2.3.4:9090"},
+			},
+		},
+		{
+			message: "Hints with multiple hosts return only the one with the template",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9090,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "mockmoduledefaults",
+						"hosts":  "${data.host}:8888,${data.host}:${data.port}",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"metricsets": []string{"default"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+				"hosts":      []interface{}{"1.2.3.4:9090"},
+			},
+		},
+		{
 			message: "Only module hint should return all metricsets",
 			event: bus.Event{
 				"host": "1.2.3.4",
