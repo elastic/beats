@@ -48,6 +48,8 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Metricbeat*
 
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+
 *Packetbeat*
 
 *Winlogbeat*
