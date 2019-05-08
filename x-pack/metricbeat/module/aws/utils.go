@@ -16,14 +16,11 @@ import (
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
-func GetStartTimeEndTime(durationString string) (startTime time.Time, endTime time.Time, err error) {
-	endTime = time.Now()
-	duration, err := time.ParseDuration(durationString)
-	if err != nil {
-		return
-	}
-	startTime = endTime.Add(duration)
-	return startTime, endTime, nil
+func GetStartTimeEndTime(period time.Duration) (time.Time, time.Time) {
+	endTime := time.Now()
+	// Set startTime double the period earlier than the endtime in order to
+	// make sure GetMetricDataRequest gets the latest data point for each metric.
+	return endTime.Add(period * -2), endTime
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
@@ -36,8 +33,7 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	// List metrics of a given namespace for each region
 	listMetricsOutput, err := reqListMetrics.Send()
 	if err != nil {
-		err = errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
-		return nil, err
+		return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
 	}
 
 	if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
@@ -58,8 +54,7 @@ func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, next
 	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
 	getMetricDataOutput, err := reqGetMetricData.Send()
 	if err != nil {
-		err = errors.Wrap(err, "Error GetMetricDataInput")
-		return nil, err
+		return nil, errors.Wrap(err, "Error GetMetricDataInput")
 	}
 	return getMetricDataOutput, nil
 }
@@ -70,12 +65,26 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 	for init || getMetricDataOutput.NextToken != nil {
 		init = false
-		output, err := getMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svc, startTime, endTime)
-		if err != nil {
-			err = errors.Wrap(err, "getMetricDataPerRegion failed")
-			return getMetricDataOutput.MetricDataResults, err
+		// Split metricDataQueries into smaller slices that length no longer than 100.
+		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
+		iter := len(metricDataQueries) / 100
+		for i := 0; i <= iter; i++ {
+			metricDataQueriesPartial := metricDataQueries[iter*100:]
+			if i != iter {
+				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100-1]
+			}
+
+			if len(metricDataQueriesPartial) == 0 {
+				return getMetricDataOutput.MetricDataResults, nil
+			}
+
+			output, err := getMetricDataPerRegion(metricDataQueriesPartial, getMetricDataOutput.NextToken, svc, startTime, endTime)
+			if err != nil {
+				return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "getMetricDataPerRegion failed")
+			}
+
+			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 		}
-		getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 	}
 	return getMetricDataOutput.MetricDataResults, nil
 }

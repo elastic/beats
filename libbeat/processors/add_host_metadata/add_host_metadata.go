@@ -19,12 +19,9 @@ package add_host_metadata
 
 import (
 	"fmt"
-	"net"
-	"regexp"
 	"sync"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -32,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/util"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -67,40 +65,9 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	p.loadData()
 
 	if config.Geo != nil {
-		if len(config.Geo.Location) > 0 {
-			// Regexp matching a number with an optional decimal component
-			// Valid numbers: '123', '123.23', etc.
-			latOrLon := `\-?\d+(\.\d+)?`
-
-			// Regexp matching a pair of lat lon coordinates.
-			// e.g. 40.123, -92.929
-			locRegexp := `^\s*` + // anchor to start of string with optional whitespace
-				latOrLon + // match the latitude
-				`\s*\,\s*` + // match the separator. optional surrounding whitespace
-				latOrLon + // match the longitude
-				`\s*$` //optional whitespace then end anchor
-
-			if m, _ := regexp.MatchString(locRegexp, config.Geo.Location); !m {
-				return nil, errors.New(fmt.Sprintf("Invalid lat,lon  string for add_host_metadata: %s", config.Geo.Location))
-			}
-		}
-
-		geoFields := common.MapStr{
-			"name":             config.Geo.Name,
-			"location":         config.Geo.Location,
-			"continent_name":   config.Geo.ContinentName,
-			"country_iso_code": config.Geo.CountryISOCode,
-			"region_name":      config.Geo.RegionName,
-			"region_iso_code":  config.Geo.RegionISOCode,
-			"city_name":        config.Geo.CityName,
-		}
-		// Delete any empty values
-		blankStringMatch := regexp.MustCompile(`^\s*$`)
-		for k, v := range geoFields {
-			vStr := v.(string)
-			if blankStringMatch.MatchString(vStr) {
-				delete(geoFields, k)
-			}
+		geoFields, err := util.GeoConfigToMap(*config.Geo)
+		if err != nil {
+			return nil, err
 		}
 		p.geoData = common.MapStr{"host": common.MapStr{"geo": geoFields}}
 	}
@@ -151,7 +118,7 @@ func (p *addHostMetadata) loadData() error {
 	data := host.MapHostInfo(h.Info())
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
-		var ipList, hwList, err = p.getNetInfo()
+		var ipList, hwList, err = util.GetNetInfo()
 		if err != nil {
 			logp.Info("Error when getting network information %v", err)
 		}
@@ -169,51 +136,6 @@ func (p *addHostMetadata) loadData() error {
 	}
 	p.data.Set(data)
 	return nil
-}
-
-func (p *addHostMetadata) getNetInfo() ([]string, []string, error) {
-	var ipList []string
-	var hwList []string
-
-	// Get all interfaces and loop through them
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Keep track of all errors
-	var errs multierror.Errors
-
-	for _, i := range ifaces {
-		// Skip loopback interfaces
-		if i.Flags&net.FlagLoopback == net.FlagLoopback {
-			continue
-		}
-
-		hw := i.HardwareAddr.String()
-		// Skip empty hardware addresses
-		if hw != "" {
-			hwList = append(hwList, hw)
-		}
-
-		addrs, err := i.Addrs()
-		if err != nil {
-			// If we get an error, keep track of it and continue with the next interface
-			errs = append(errs, err)
-			continue
-		}
-
-		for _, addr := range addrs {
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ipList = append(ipList, v.IP.String())
-			case *net.IPAddr:
-				ipList = append(ipList, v.IP.String())
-			}
-		}
-	}
-
-	return ipList, hwList, errs.Err()
 }
 
 func (p *addHostMetadata) String() string {

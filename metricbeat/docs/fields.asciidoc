@@ -831,6 +831,43 @@ Total.
 
 
 [float]
+== cloudwatch fields
+
+`cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
+
+
+
+*`aws.cloudwatch.namespace`*::
++
+--
+type: keyword
+
+The namespace specified when query cloudwatch api.
+
+
+--
+
+*`aws.cloudwatch.metrics.*`*::
++
+--
+type: object
+
+Metrics that returned from Cloudwatch api query.
+
+
+--
+
+*`aws.cloudwatch.dimensions.*`*::
++
+--
+type: object
+
+Cloudwatch metric dimensions.
+
+
+--
+
+[float]
 == ec2 fields
 
 `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
@@ -1487,6 +1524,15 @@ alias to: host.name
 type: alias
 
 alias to: agent.hostname
+
+--
+
+*`timeseries.instance`*::
++
+--
+type: keyword
+
+Time series instance id
 
 --
 
@@ -18213,7 +18259,7 @@ MS SQL module
 [float]
 == mssql fields
 
-
+The root field containing all MSSQL fields
 
 
 [float]
@@ -26715,6 +26761,30 @@ The display name of the service.
 type: keyword
 
 The startup type of the service. The possible values are `Automatic`, `Boot`, `Disabled`, `Manual`, and `System`.
+
+
+--
+
+*`windows.service.start_name`*::
++
+--
+type: keyword
+
+example: NT AUTHORITY\LocalService
+
+Account name under which a service runs.
+
+
+--
+
+*`windows.service.path_name`*::
++
+--
+type: keyword
+
+example: C:\WINDOWS\system32\svchost.exe -k LocalService -p
+
+Fully qualified path to the file that implements the service, including arguments.
 
 
 --

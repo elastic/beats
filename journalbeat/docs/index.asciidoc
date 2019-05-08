@@ -13,10 +13,13 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
+:has_decode_csv_fields_processor:
+:has_script_processor:
 :deb_os:
 :rpm_os:
 :linux_os:
 :docker_platform:
+:no_dashboards:
 
 include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
