@@ -194,7 +194,7 @@ func (s serverState) proxyRequestCount() int {
 	return s._proxyRequestCount.Load()
 }
 
-// startServers starts endpoints representing a backend sefrver and a proxy,
+// startServers starts endpoints representing a backend server and a proxy,
 // and returns the corresponding serverState and a teardown function that
 // should be called to shut them down at the end of the test.
 func startServers(t *testing.T) (*serverState, func()) {
