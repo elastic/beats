@@ -490,10 +490,10 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 				var tmplLoadMode, ilmLoadMode = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
 				if setup.Template {
-					tmplLoadMode = idxmgmt.LoadModeForce
+					tmplLoadMode = idxmgmt.LoadModeOverwrite
 				}
 				if setup.ILMPolicy {
-					ilmLoadMode = idxmgmt.LoadModeForce
+					ilmLoadMode = idxmgmt.LoadModeOverwrite
 				}
 
 				err = m.Setup(tmplLoadMode, ilmLoadMode)
