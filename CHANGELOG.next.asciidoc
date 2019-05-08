@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
 - Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
 
 *Filebeat*
 
@@ -107,6 +108,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
 
 *Packetbeat*
 
