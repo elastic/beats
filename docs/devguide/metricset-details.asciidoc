@@ -217,8 +217,7 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":           "{module}",
 		"metricsets":       []string{"{metricset}"},
-    "hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
-		<1>
+                "hosts":      []string{GetEnvHost() + ":" + GetEnvPort()}, <1>
 	}
 }
 
@@ -268,9 +267,7 @@ func TestFetch(t *testing.T) {
 		t.Fatalf("Expected 0 errord, had %d. %v\n", len(errs), errs)
 	}
 
-	assert.NotEmpty(t, events)
-
-  <2>
+	assert.NotEmpty(t, events) <2>
 
 }
 
