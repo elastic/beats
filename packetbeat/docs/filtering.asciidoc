@@ -164,10 +164,10 @@ than or equal to 30ms:
 In Kibana, you can also filter transactions by clicking on elements within a
 visualization. For example, to filter for all the HTTP redirects that are coming
 from a specific IP and port, click the *Filter for value*
-image::./images/filterforval_icon.png[] icon next to the `client.ip`
+image:./images/filterforval_icon.png[] icon next to the `client.ip`
 and `client.port` fields in the transaction detail table. To exclude the HTTP
 redirects coming from the IP and port, click the *Filter out value*
-image::./images/filteroutval_icon.png[] icon instead.
+image:./images/filteroutval_icon.png[] icon instead.
 
 [role="screenshot"]
 image::./images/filter_from_context.png[Filter from context]
