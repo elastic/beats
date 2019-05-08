@@ -55,15 +55,15 @@ processors:
  - convert: { type: long, ignore_missing: true, field: network.packets }
  - convert: { type: long, ignore_missing: true, field: event.duration }
  - convert: { type: long, ignore_missing: true, field: _temp_.labels }
- - convert: { type: long, ignore_missing: true, field: palo_alto.sequence_number }
- - convert: { type: long, ignore_missing: true, field: palo_alto.source.nat.port }
- - convert: { type: long, ignore_missing: true, field: palo_alto.destination.nat.port }
+ - convert: { type: long, ignore_missing: true, field: palo_alto.pan_os.sequence_number }
+ - convert: { type: long, ignore_missing: true, field: palo_alto.pan_os.source.nat.port }
+ - convert: { type: long, ignore_missing: true, field: palo_alto.pan_os.destination.nat.port }
 
 # Remove PCAP ID when zero (no packet capture).
  - remove:
-     if: 'ctx?.palo_alto?.network?.pcap_id == "0"'
+     if: 'ctx?.palo_alto?.pan_os?.network?.pcap_id == "0"'
      field:
-       - palo_alto.network.pcap_id
+       - palo_alto.pan_os.network.pcap_id
 
 # Extract 'flags' bitfield into labels.
  - script:
@@ -113,23 +113,23 @@ processors:
  - set:
      field: network.direction
      value: inbound
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.source?.zone == "untrust" && ctx?.palo_alto?.destination?.zone == "trust"'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.pan_os?.source?.zone == "untrust" && ctx?.palo_alto?.pan_os?.destination?.zone == "trust"'
  - set:
      field: network.direction
      value: outbound
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.source?.zone == "trust" && ctx?.palo_alto?.destination?.zone == "untrust"'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.pan_os?.source?.zone == "trust" && ctx?.palo_alto?.pan_os?.destination?.zone == "untrust"'
  - set:
      field: network.direction
      value: internal
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.source?.zone == "trust" && ctx?.palo_alto?.destination?.zone == "trust"'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.pan_os?.source?.zone == "trust" && ctx?.palo_alto?.pan_os?.destination?.zone == "trust"'
  - set:
      field: network.direction
      value: external
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.source?.zone == "untrust" && ctx?.palo_alto?.destination?.zone == "untrust"'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.palo_alto?.pan_os?.source?.zone == "untrust" && ctx?.palo_alto?.pan_os?.destination?.zone == "untrust"'
  - set:
      field: network.direction
      value: unknown
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ((ctx?.palo_alto?.source?.zone != "trust" && ctx?.palo_alto?.source?.zone != "untrust") || (ctx?.palo_alto?.destination?.zone != "trust" && ctx?.palo_alto?.destination?.zone != "untrust"))'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ((ctx?.palo_alto?.pan_os?.source?.zone != "trust" && ctx?.palo_alto?.pan_os?.source?.zone != "untrust") || (ctx?.palo_alto?.pan_os?.destination?.zone != "trust" && ctx?.palo_alto?.pan_os?.destination?.zone != "untrust"))'
 
 # Set network.direction from threat direction (Threat logs).
  - set:
@@ -278,15 +278,15 @@ processors:
      value:
        - '{{destination.ip}}'
  - append:
-     if: 'ctx?.palo_alto?.source?.nat?.ip != null'
+     if: 'ctx?.palo_alto?.pan_os?.source?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{palo_alto.source.nat.ip}}'
+       - '{{palo_alto.pan_os.source.nat.ip}}'
  - append:
-     if: 'ctx?.palo_alto?.destination?.nat?.ip != null'
+     if: 'ctx?.palo_alto?.pan_os?.destination?.nat?.ip != null'
      field: related.ip
      value:
-       - '{{palo_alto.destination.nat.ip}}'
+       - '{{palo_alto.pan_os.destination.nat.ip}}'
 
 # Geolocation for source.
  - geoip:
