@@ -23,18 +23,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"path/filepath"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch/estest"
 	"github.com/elastic/beats/libbeat/version"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 type testTemplate struct {
 	t      *testing.T
@@ -42,192 +49,143 @@ type testTemplate struct {
 	common.MapStr
 }
 
-var (
-	beatInfo = beat.Info{
-		Beat:        "testbeat",
-		IndexPrefix: "testbeatidx",
-		Version:     version.GetDefaultVersion(),
+type testSetup struct {
+	t      *testing.T
+	client ESClient
+	loader *ESLoader
+	config TemplateConfig
+}
+
+func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
+	if cfg.Name == "" {
+		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-
-	templateName = "testbeatidx-" + version.GetDefaultVersion()
-)
-
-func testEsLoader(t *testing.T) *ESLoader {
 	client := estest.GetTestingElasticsearch(t)
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
-
-	return NewESLoader(client)
+	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
+	client.Request("DELETE", "/_template/"+cfg.Name, "", nil, nil)
+	require.False(t, s.loader.templateExists(cfg.Name))
+	return &s
+}
+func (ts *testSetup) loadFromFile(fileElems []string) error {
+	ts.config.Fields = path(ts.t, fileElems)
+	beatInfo := beat.Info{Version: version.GetDefaultVersion()}
+	return ts.loader.Load(ts.config, beatInfo, nil, false)
 }
 
-func testFields(t *testing.T, name string) []byte {
-	file, err := filepath.Abs(filepath.Join("testdata", "default_fields.yml"))
-	require.NoError(t, err)
-	fields, err := ioutil.ReadFile(file)
-	require.NoError(t, err)
-	return fields
+func (ts *testSetup) load(fields []byte) error {
+	beatInfo := beat.Info{Version: version.GetDefaultVersion()}
+	return ts.loader.Load(ts.config, beatInfo, fields, false)
+}
+
+func (ts *testSetup) mustLoad(fields []byte) {
+	require.NoError(ts.t, ts.load(fields))
+	require.True(ts.t, ts.loader.templateExists(ts.config.Name))
 }
 
 func TestESLoader_Load(t *testing.T) {
-	// Setup ES
-	loader := testEsLoader(t)
-	client := loader.client
+	t.Run("failure", func(t *testing.T) {
+		t.Run("loading disabled", func(t *testing.T) {
+			setup := newTestSetup(t, TemplateConfig{Enabled: false})
 
-	name := "testbeat"
-	fields := testFields(t, name)
+			setup.load(nil)
+			assert.False(t, setup.loader.templateExists(setup.config.Name))
+		})
 
-	pathTestdata, err := filepath.Abs(filepath.Join("testdata"))
-	require.NoError(t, err)
-	fieldsYamlPath := filepath.Join(pathTestdata, "fields.yml")
-	fieldsJSONPath := filepath.Join(pathTestdata, "fields.json")
+		t.Run("invalid version", func(t *testing.T) {
+			setup := newTestSetup(t, TemplateConfig{Enabled: true})
 
-	t.Run("load template failure", func(t *testing.T) {
-		for run, data := range map[string]struct {
-			cfg    TemplateConfig
-			info   beat.Info
-			fields []byte
-			err    string
-		}{
-			"loading disabled": {
-				cfg:  TemplateConfig{Enabled: false, Name: name},
-				info: beatInfo,
-			},
-			"invalid version": {
-				cfg:  TemplateConfig{Enabled: true, Name: name},
-				info: beat.Info{Version: "invalid", Beat: "testbeat", IndexPrefix: "testbeatidx"},
-				err:  "version",
-			},
-		} {
-			t.Run(run, func(t *testing.T) {
-				// Ensure template is not loaded
-				client.Request("DELETE", "/_template/"+name, "", nil, nil)
-				assert.False(t, loader.templateExists(name))
-
-				err := loader.Load(data.cfg, data.info, data.fields, false)
-				if data.err != "" {
-					if assert.Error(t, err) {
-						assert.Contains(t, err.Error(), data.err)
-					}
-				} else {
-					assert.NoError(t, err)
-				}
-
-				// Make sure template was not loaded
-				assert.False(t, loader.templateExists(name))
-			})
-		}
+			beatInfo := beat.Info{Version: "invalid"}
+			err := setup.loader.Load(setup.config, beatInfo, nil, false)
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), "version is not semver")
+			}
+		})
 	})
 
-	t.Run("template already exists", func(t *testing.T) {
-		cfg := TemplateConfig{Enabled: true, Name: name}
+	t.Run("overwrite", func(t *testing.T) {
+		// Setup create template with source enabled
+		setup := newTestSetup(t, TemplateConfig{Enabled: true})
+		setup.mustLoad(nil)
 
-		// Ensure template is not loaded
-		client.Request("DELETE", "/_template/"+name, "", nil, nil)
-		assert.False(t, loader.templateExists(name))
+		// Add custom settings
+		setup.config.Settings = TemplateSettings{Source: map[string]interface{}{"enabled": false}}
 
-		// Load Template and check it exists
-		err := loader.Load(cfg, beatInfo, nil, false)
-		assert.NoError(t, err)
-		assert.True(t, loader.templateExists(name))
-		// check that source is enabled
-		tmpl := getTemplate(t, client, name)
-		assert.Equal(t, true, tmpl.SourceEnabled())
+		t.Run("disabled", func(t *testing.T) {
+			setup.load(nil)
+			tmpl := getTemplate(t, setup.client, setup.config.Name)
+			assert.Equal(t, true, tmpl.SourceEnabled())
+		})
 
-		// Load template again, this time with custom settings
-		cfg.Settings = TemplateSettings{
-			Source: map[string]interface{}{
-				"enabled": false,
-			},
-		}
-		// Do not overwrite template as overwrite is not set to true
-		err = loader.Load(cfg, beatInfo, nil, false)
-		assert.NoError(t, err)
-		// check that template was not overwritten, by checking source is enabled
-		tmpl = getTemplate(t, client, name)
-		assert.Equal(t, true, tmpl.SourceEnabled())
-
-		// Do overwrite template
-		cfg.Overwrite = true
-		err = loader.Load(cfg, beatInfo, nil, false)
-		assert.NoError(t, err)
-		// check that template was not overwritten, by checking source is enabled
-		tmpl = getTemplate(t, client, name)
-		assert.Equal(t, false, tmpl.SourceEnabled())
+		t.Run("enabled", func(t *testing.T) {
+			setup.config.Overwrite = true
+			setup.load(nil)
+			tmpl := getTemplate(t, setup.client, setup.config.Name)
+			assert.Equal(t, false, tmpl.SourceEnabled())
+		})
 	})
 
-	t.Run("template exists for `name` but not for `json.name`", func(t *testing.T) {
-		// Load Template with name `name`
-		cfg := TemplateConfig{Enabled: true, Name: name}
-		err := loader.Load(cfg, beatInfo, nil, false)
-		assert.NoError(t, err)
-		assert.True(t, loader.templateExists(name))
+	t.Run("json.name", func(t *testing.T) {
+		nameJSON := "bar"
 
-		// Load Template with same name, but different JSON.name and ensure it is loaded
-		nameJSON := "json-test"
-		cfgJSON := TemplateConfig{Enabled: true, Name: name, JSON: struct {
+		setup := newTestSetup(t, TemplateConfig{Enabled: true})
+		setup.mustLoad(nil)
+
+		// Load Template with same name, but different JSON.name and ensure it is used
+		setup.config.JSON = struct {
 			Enabled bool   `config:"enabled"`
 			Path    string `config:"path"`
 			Name    string `config:"name"`
-		}{Enabled: true, Path: fieldsJSONPath, Name: nameJSON}}
-		err = loader.Load(cfgJSON, beatInfo, nil, false)
-		assert.NoError(t, err)
-		assert.True(t, loader.templateExists(name))
-		assert.True(t, loader.templateExists(nameJSON))
+		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON}
+		setup.load(nil)
+		assert.True(t, setup.loader.templateExists(nameJSON))
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
-
+		fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+		require.NoError(t, err)
 		for run, data := range map[string]struct {
 			cfg        TemplateConfig
 			fields     []byte
-			name       string
+			fieldsPath string
 			properties []string
 		}{
 			"default config with fields": {
-				cfg:        TemplateConfig{Enabled: true, Name: name},
+				cfg:        TemplateConfig{Enabled: true},
 				fields:     fields,
-				name:       name,
 				properties: []string{"foo", "bar"},
 			},
 			"minimal template": {
-				cfg:    TemplateConfig{Enabled: true, Name: name},
+				cfg:    TemplateConfig{Enabled: true},
 				fields: nil,
-				name:   name,
 			},
 			"fields from file": {
-				cfg:        TemplateConfig{Enabled: true, Name: name, Fields: fieldsYamlPath},
+				cfg:        TemplateConfig{Enabled: true, Fields: path(t, []string{"testdata", "fields.yml"})},
 				fields:     fields,
-				name:       name,
 				properties: []string{"object", "keyword", "alias", "migration_alias_false", "object_disabled"},
 			},
 			"fields from json": {
-				cfg: TemplateConfig{Enabled: true, Name: name, JSON: struct {
+				cfg: TemplateConfig{Enabled: true, Name: "json-template", JSON: struct {
 					Enabled bool   `config:"enabled"`
 					Path    string `config:"path"`
 					Name    string `config:"name"`
-				}{Enabled: true, Path: fieldsJSONPath, Name: "json-template"}},
+				}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: "json-template"}},
 				fields:     fields,
-				name:       "json-template",
 				properties: []string{"host_name"},
 			},
 		} {
 			t.Run(run, func(t *testing.T) {
-				// Ensure template is not loaded
-				client.Request("DELETE", "/_template/"+data.name, "", nil, nil)
-				assert.False(t, loader.templateExists(data.name))
-
-				// Load Template according to config and given fields
-				err := loader.Load(data.cfg, beatInfo, data.fields, false)
-				assert.NoError(t, err)
-
-				// Make sure template was loaded
-				assert.True(t, loader.templateExists(data.name))
+				setup := newTestSetup(t, data.cfg)
+				setup.mustLoad(data.fields)
 
 				// Fetch properties
-				tmpl := getTemplate(t, client, data.name)
+				tmpl := getTemplate(t, setup.client, setup.config.Name)
 				val, err := tmpl.GetValue("mappings.properties")
-				if data.properties != nil {
+				if data.properties == nil {
+					assert.Error(t, err)
+				} else {
 					require.NoError(t, err)
 					p, ok := val.(map[string]interface{})
 					require.True(t, ok)
@@ -235,10 +193,7 @@ func TestESLoader_Load(t *testing.T) {
 					for k := range p {
 						properties = append(properties, k)
 					}
-					fmt.Println(properties)
 					assert.ElementsMatch(t, properties, data.properties)
-				} else {
-					assert.Error(t, err)
 				}
 			})
 		}
@@ -246,49 +201,19 @@ func TestESLoader_Load(t *testing.T) {
 }
 
 func TestTemplate_LoadFile(t *testing.T) {
-	// Setup ES
-	loader := testEsLoader(t)
-	client := loader.client
-
-	absPath, err := filepath.Abs("../")
-	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
-	fieldsPath := absPath + "/fields.yml"
-	index := "testbeat"
-
-	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{}, false)
-	require.NoError(t, err)
-
-	// Ensure clean state
-	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
-	assert.False(t, loader.templateExists(tmpl.GetName()))
-
-	// Load template
-	content, err := tmpl.LoadFile(fieldsPath)
-	require.NoError(t, err)
-	err = loader.loadTemplate(tmpl.GetName(), content)
-	require.NoError(t, err)
-
-	// Make sure template was loaded
-	assert.True(t, loader.templateExists(tmpl.GetName()))
+	setup := newTestSetup(t, TemplateConfig{})
+	assert.NoError(t, setup.loadFromFile([]string{"..", "fields.yml"}))
+	assert.True(t, setup.loader.templateExists(setup.config.Name))
 }
 
 func TestLoadInvalidTemplate(t *testing.T) {
-	// Invalid Template
-	template := map[string]interface{}{
-		"json": "invalid",
-	}
-	templateName := "invalidtemplate"
-
-	// Setup ES
-	loader := testEsLoader(t)
+	setup := newTestSetup(t, TemplateConfig{})
 
 	// Try to load invalid template
-	err := loader.loadTemplate(templateName, template)
+	template := map[string]interface{}{"json": "invalid"}
+	err := setup.loader.loadTemplate(setup.config.Name, template)
 	assert.Error(t, err)
-
-	// Make sure template was not loaded
-	assert.False(t, loader.templateExists(templateName))
+	assert.False(t, setup.loader.templateExists(setup.config.Name))
 }
 
 // Tests loading the templates for each beat
@@ -298,74 +223,22 @@ func TestLoadBeatsTemplate_fromFile(t *testing.T) {
 	}
 
 	for _, beat := range beats {
-		// Load template
-		absPath, err := filepath.Abs("../../" + beat)
-		assert.NotNil(t, absPath)
-		assert.Nil(t, err)
-
-		// Setup ES
-		loader := testEsLoader(t)
-		client := loader.client
-
-		fieldsPath := absPath + "/fields.yml"
-		index := beat
-
-		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{}, false)
-		assert.NoError(t, err)
-		content, err := tmpl.LoadFile(fieldsPath)
-		assert.NoError(t, err)
-
-		// Ensure clean state
-		client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
-		assert.False(t, loader.templateExists(tmpl.GetName()))
-
-		// Load template
-		err = loader.loadTemplate(tmpl.GetName(), content)
-		assert.Nil(t, err)
-
-		// Make sure template was loaded
-		assert.True(t, loader.templateExists(tmpl.GetName()))
+		setup := newTestSetup(t, TemplateConfig{Name: beat})
+		assert.NoError(t, setup.loadFromFile([]string{"..", "..", beat, "fields.yml"}))
+		assert.True(t, setup.loader.templateExists(setup.config.Name))
 	}
 }
 
 func TestTemplateSettings(t *testing.T) {
-	// Setup ES
-	loader := testEsLoader(t)
-	client := loader.client
-
-	// Load template
-	absPath, err := filepath.Abs("../")
-	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
-
-	fieldsPath := absPath + "/fields.yml"
-
 	settings := TemplateSettings{
-		Index: common.MapStr{
-			"number_of_shards": 1,
-		},
-		Source: common.MapStr{
-			"enabled": false,
-		},
+		Index:  common.MapStr{"number_of_shards": 1},
+		Source: common.MapStr{"enabled": false},
 	}
-	config := TemplateConfig{
-		Settings: settings,
-	}
-	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config, false)
-	assert.NoError(t, err)
-	content, err := tmpl.LoadFile(fieldsPath)
-	assert.NoError(t, err)
-
-	// Ensure clean state
-	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
-	assert.False(t, loader.templateExists(tmpl.GetName()))
-
-	// Load template
-	err = loader.loadTemplate(tmpl.GetName(), content)
-	assert.Nil(t, err)
+	setup := newTestSetup(t, TemplateConfig{Settings: settings})
+	require.NoError(t, setup.loadFromFile([]string{"..", "fields.yml"}))
 
 	// Check that it contains the mapping
-	templateJSON := getTemplate(t, client, tmpl.GetName())
+	templateJSON := getTemplate(t, setup.client, setup.config.Name)
 	assert.Equal(t, 1, templateJSON.NumberOfShards())
 	assert.Equal(t, false, templateJSON.SourceEnabled())
 }
@@ -414,35 +287,12 @@ var dataTests = []struct {
 
 // Tests if data can be loaded into elasticsearch with right types
 func TestTemplateWithData(t *testing.T) {
-	fieldsPath, err := filepath.Abs("./testdata/fields.yml")
-	assert.NotNil(t, fieldsPath)
-	assert.Nil(t, err)
-
-	// Setup ES
-	client := estest.GetTestingElasticsearch(t)
-	if err := client.Connect(); err != nil {
-		t.Fatal(err)
-	}
-	loader := NewESLoader(client)
-
-	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{}, false)
-	assert.NoError(t, err)
-	content, err := tmpl.LoadFile(fieldsPath)
-	assert.NoError(t, err)
-
-	// Ensure clean state
-	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
-	assert.False(t, loader.templateExists(tmpl.GetName()))
-
-	// Load template
-	err = loader.loadTemplate(tmpl.GetName(), content)
-	assert.Nil(t, err)
-
-	// Make sure template was loaded
-	assert.True(t, loader.templateExists(tmpl.GetName()))
-
+	setup := newTestSetup(t, TemplateConfig{})
+	require.NoError(t, setup.loadFromFile([]string{"testdata", "fields.yml"}))
+	require.True(t, setup.loader.templateExists(setup.config.Name))
+	esClient := setup.client.(*elasticsearch.Client)
 	for _, test := range dataTests {
-		_, _, err = client.Index(tmpl.GetName(), "_doc", "", nil, test.data)
+		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
 			assert.NotNil(t, err)
 
@@ -493,4 +343,10 @@ func (tt *testTemplate) NumberOfShards() int {
 	i, err := strconv.Atoi(val.(string))
 	require.NoError(tt.t, err)
 	return i
+}
+
+func path(t *testing.T, fileElems []string) string {
+	fieldsPath, err := filepath.Abs(filepath.Join(fileElems...))
+	require.NoError(t, err)
+	return fieldsPath
 }
