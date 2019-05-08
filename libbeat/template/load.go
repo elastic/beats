@@ -176,6 +176,9 @@ func buildBody(tmpl *Template, config TemplateConfig, fields []byte) (common.Map
 	if config.Fields != "" {
 		return buildBodyFromFile(tmpl, config)
 	}
+	if fields == nil {
+		return buildMinimalTemplate(tmpl)
+	}
 	return buildBodyFromFields(tmpl, fields)
 }
 
@@ -213,6 +216,15 @@ func buildBodyFromFields(tmpl *Template, fields []byte) (common.MapStr, error) {
 	body, err := tmpl.LoadBytes(fields)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template: %v", err)
+	}
+	return body, nil
+}
+
+func buildMinimalTemplate(tmpl *Template) (common.MapStr, error) {
+	logp.Debug("template", "Load minimal template")
+	body, err := tmpl.LoadMinimal()
+	if err != nil {
+		return nil, fmt.Errorf("error creating mimimal template: %v", err)
 	}
 	return body, nil
 }
