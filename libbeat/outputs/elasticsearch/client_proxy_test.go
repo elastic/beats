@@ -27,12 +27,12 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"strings"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
@@ -59,7 +59,8 @@ func TestBaseline(t *testing.T) {
 	err := execClient("TEST_SERVER_URL=" + listeners.server.URL)
 	assert.NoError(t, err)
 	// We expect one server request and 0 proxy requests
-	listeners.checkFinalState(t, 1, 0)
+	assert.Equal(t, 1, listeners.serverRequestCount())
+	assert.Equal(t, 0, listeners.proxyRequestCount())
 }
 
 // TestClientSettingsProxy confirms that we can control the proxy of a client
@@ -76,7 +77,8 @@ func TestClientSettingsProxy(t *testing.T) {
 		"TEST_PROXY_URL="+listeners.proxy.URL)
 	assert.NoError(t, err)
 	// We expect one proxy request and 0 server requests
-	listeners.checkFinalState(t, 0, 1)
+	assert.Equal(t, 0, listeners.serverRequestCount())
+	assert.Equal(t, 1, listeners.proxyRequestCount())
 }
 
 // TestEnvironmentProxy confirms that we can control the proxy of a client by
@@ -98,7 +100,8 @@ func TestEnvironmentProxy(t *testing.T) {
 		"HTTP_PROXY="+listeners.proxy.URL)
 	assert.NoError(t, err)
 	// We expect one proxy request and 0 server requests
-	listeners.checkFinalState(t, 0, 1)
+	assert.Equal(t, 0, listeners.serverRequestCount())
+	assert.Equal(t, 1, listeners.proxyRequestCount())
 }
 
 // TestClientSettingsOverrideEnvironmentProxy confirms that when both
@@ -120,7 +123,8 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 		"HTTP_PROXY="+listeners.server.URL)
 	assert.NoError(t, err)
 	// We expect one proxy request and 0 server requests
-	listeners.checkFinalState(t, 0, 1)
+	assert.Equal(t, 0, listeners.serverRequestCount())
+	assert.Equal(t, 1, listeners.proxyRequestCount())
 }
 
 // runClientTest executes the current test binary as a child process,
@@ -151,7 +155,7 @@ func doClientPing(t *testing.T) {
 	}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		clientSettings.Proxy = proxyURL
 	}
 	if headerURL != "" {
@@ -162,7 +166,7 @@ func doClientPing(t *testing.T) {
 		clientSettings.Headers["X-Test-URL"] = headerURL
 	}
 	client, err := NewClient(clientSettings, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// This ping won't succeed; we aren't testing end-to-end communication
 	// (which would require a lot more setup work), we just want to make sure
@@ -178,36 +182,23 @@ type testListeners struct {
 	server *httptest.Server
 	proxy  *httptest.Server
 
-	// This mutex must be held in order to modify the structure.
-	// Using a mutex for servers that are expected to receive ~1 request in
-	// their lifetime might be pedantic, but I really dislike race conditions.
-	mutex sync.Mutex
-
-	serverRequestCount int // Requests directly to the server
-	proxyRequestCount  int // Requests via the proxy
-
-	errors []string
+	_serverRequestCount atomic.Int // Requests directly to the server
+	_proxyRequestCount  atomic.Int // Requests via the proxy
 }
 
 // start creates and starts the server and proxy listeners.
 func (tl *testListeners) start(t *testing.T) {
-	tl.mutex.Lock()
-	defer tl.mutex.Unlock()
 	tl.server = httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			tl.mutex.Lock()
-			defer tl.mutex.Unlock()
-			tl._assertEqual("server handler", tl.server.URL, r.Header.Get("X-Test-URL"))
+			assert.Equal(t, tl.server.URL, r.Header.Get("X-Test-URL"))
 			fmt.Fprintln(w, "Hello, client")
-			tl.serverRequestCount++
+			tl._serverRequestCount.Inc()
 		}))
 	tl.proxy = httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			tl.mutex.Lock()
-			defer tl.mutex.Unlock()
-			tl._assertEqual("proxy handler", tl.server.URL, r.Header.Get("X-Test-URL"))
+			assert.Equal(t, tl.server.URL, r.Header.Get("X-Test-URL"))
 			fmt.Fprintln(w, "Hello, client")
-			tl.proxyRequestCount++
+			tl._proxyRequestCount.Inc()
 		}))
 }
 
@@ -216,31 +207,11 @@ func (tl *testListeners) close() {
 	tl.proxy.Close()
 }
 
-func (tl *testListeners) checkFinalState(
-	t *testing.T, expectedServerCount int, expectedProxyCount int) {
-	// The lock here should be superfluous, since we only call checkFinalState
-	// after the clients have terminated, but golang still detects it as a data
-	// race, so we lock here anyway.
-	tl.mutex.Lock()
-	defer tl.mutex.Unlock()
-	assert.Equal(t, expectedServerCount, tl.serverRequestCount)
-	assert.Equal(t, expectedProxyCount, tl.proxyRequestCount)
-	if len(tl.errors) > 0 {
-		// One or more of the server requests had a problem
-		assert.Fail(t,
-			"Error(s) in server requests",
-			strings.Join(tl.errors, "\n"))
-	}
+// Convenience functions to unwrap the atomic primitives
+func (tl testListeners) serverRequestCount() int {
+	return tl._serverRequestCount.Load()
 }
 
-// _assertEqual compares the given strings and adds an error to
-// s.errors if they aren't equal. The caller must hold s.mutex.
-// We do this because testing.T is not thread safe, and we can't make
-// testing assertions directly from our http handlers.
-func (tl *testListeners) _assertEqual(
-	source string, expected string, got string) {
-	if expected != got {
-		tl.errors = append(tl.errors, fmt.Sprintf(
-			"Bad value in %v: expected [%v], got [%v]", source, expected, got))
-	}
+func (tl testListeners) proxyRequestCount() int {
+	return tl._proxyRequestCount.Load()
 }
