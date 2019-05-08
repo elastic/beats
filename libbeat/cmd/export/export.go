@@ -88,8 +88,8 @@ func (c *fileClient) GetVersion() common.Version {
 	return c.ver
 }
 
-func (c *fileClient) Write(kind string, name string, body string) error {
-	path := filepath.Join(c.dir, kind)
+func (c *fileClient) Write(component string, name string, body string) error {
+	path := filepath.Join(c.dir, component)
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return err
 	}

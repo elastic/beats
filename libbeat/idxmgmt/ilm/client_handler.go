@@ -63,7 +63,7 @@ type FileClientHandler struct {
 // prepare a policy and write alias.
 type FileClient interface {
 	GetVersion() common.Version
-	Write(kind string, name string, body string) error
+	Write(component string, name string, body string) error
 }
 
 const (

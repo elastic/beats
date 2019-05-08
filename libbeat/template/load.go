@@ -55,7 +55,7 @@ type FileLoader struct {
 // FileClient defines the minimal interface required for the FileLoader
 type FileClient interface {
 	GetVersion() common.Version
-	Write(kind string, name string, body string) error
+	Write(component string, name string, body string) error
 }
 
 // NewESLoader creates a new template loader for ES

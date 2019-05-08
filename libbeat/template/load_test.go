@@ -88,7 +88,7 @@ func (c *fileClient) GetVersion() common.Version {
 	return c.ver
 }
 
-func (c *fileClient) Write(kind string, name string, body string) error {
-	c.kind, c.name, c.body = kind, name, body
+func (c *fileClient) Write(component string, name string, body string) error {
+	c.kind, c.name, c.body = component, name, body
 	return nil
 }
