@@ -47,8 +47,10 @@ processors:
       mappings:
         client.ip: 7
         source.ip: 7
+        source.address: 7
         server.ip: 8
         destination.ip: 8
+        destination.address: 8
         palo_alto.pan_os.source.nat.ip: 9
         palo_alto.pan_os.destination.nat.ip: 10
         palo_alto.pan_os.ruleset: 11
@@ -98,8 +100,10 @@ processors:
       mappings:
         client.ip: 7
         source.ip: 7
+        source.address: 7
         server.ip: 8
         destination.ip: 8
+        destination.address: 8
         palo_alto.pan_os.source.nat.ip: 9
         palo_alto.pan_os.destination.nat.ip: 10
         palo_alto.pan_os.ruleset: 11
