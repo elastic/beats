@@ -55,33 +55,39 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 		counter := metric.GetCounter()
 		if counter != nil {
-			events = append(events, PromEvent{
-				data: common.MapStr{
-					name: counter.GetValue(),
-				},
-				labels: labels,
-			})
+			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 1) && !math.IsInf(counter.GetValue(), 0) {
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name: counter.GetValue(),
+					},
+					labels: labels,
+				})
+			}
 		}
 
 		gauge := metric.GetGauge()
 		if gauge != nil {
-			events = append(events, PromEvent{
-				data: common.MapStr{
-					name: gauge.GetValue(),
-				},
-				labels: labels,
-			})
+			if !math.IsNaN(gauge.GetValue()) && !math.IsInf(gauge.GetValue(), 1) && !math.IsInf(gauge.GetValue(), 0) {
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name: gauge.GetValue(),
+					},
+					labels: labels,
+				})
+			}
 		}
 
 		summary := metric.GetSummary()
 		if summary != nil {
-			events = append(events, PromEvent{
-				data: common.MapStr{
-					name + "_sum":   summary.GetSampleSum(),
-					name + "_count": summary.GetSampleCount(),
-				},
-				labels: labels,
-			})
+			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 1) && !math.IsInf(summary.GetSampleSum(), 0) {
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name + "_sum":   summary.GetSampleSum(),
+						name + "_count": summary.GetSampleCount(),
+					},
+					labels: labels,
+				})
+			}
 
 			for _, quantile := range summary.GetQuantile() {
 				if math.IsNaN(quantile.GetValue()) {

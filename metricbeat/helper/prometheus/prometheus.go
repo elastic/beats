@@ -166,6 +166,15 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 
 				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				update := common.MapStr{}
+				if valueFloat64, ok := value.(float64); ok {
+					if math.IsNaN(valueFloat64) || math.IsInf(valueFloat64, 1) || math.IsInf(valueFloat64, 0) {
+						// Remove the event if value is NaN or +Inf or -Inf
+						delete(eventsMap, keyLabels.String())
+						continue
+					}
+				}
+				update.Put(field, value)
+
 				if valueMapStr, ok := value.(common.MapStr); ok {
 					filteredValue := common.MapStr{}
 					for k, v := range valueMapStr.Flatten() {
