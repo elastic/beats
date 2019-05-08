@@ -22,16 +22,21 @@ import (
 	"testing"
 )
 
+// GoroutinesChecker keeps the count of goroutines when it was created
+// so later it can check if this number has increased
 type GoroutinesChecker struct {
 	before int
 }
 
+// NewGoroutinesChecker creates a new GoroutinesChecker
 func NewGoroutinesChecker() GoroutinesChecker {
 	return GoroutinesChecker{
 		before: runtime.NumGoroutine(),
 	}
 }
 
+// Check if the number of goroutines has increased since the checker
+// was created
 func (c GoroutinesChecker) Check(t testing.TB) {
 	t.Helper()
 	runtime.GC()
@@ -41,7 +46,9 @@ func (c GoroutinesChecker) Check(t testing.TB) {
 	}
 }
 
-func CheckGoroutines(t testing.TB, f func()) {
+// CallAndCheckGoroutines calls a function and checks if it has increased
+// the number of goroutines
+func CallAndCheckGoroutines(t testing.TB, f func()) {
 	t.Helper()
 	c := NewGoroutinesChecker()
 	f()
