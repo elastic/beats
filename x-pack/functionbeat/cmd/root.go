@@ -33,5 +33,5 @@ func init() {
 
 func addBeatSpecificSubcommands() {
 	RootCmd.ExportCmd.Short = "Export current config, index template or function"
-	RootCmd.ExportCmd.AddCommand(genExportTemplateCmd())
+	RootCmd.ExportCmd.AddCommand(genExportFunctionCmd())
 }

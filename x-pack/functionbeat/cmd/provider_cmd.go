@@ -105,7 +105,7 @@ func genPackageCmd() *cobra.Command {
 	return cmd
 }
 
-func genExportTemplateCmd() *cobra.Command {
+func genExportFunctionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "function",
 		Short: "Export function template",
