@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type ilmSupport struct {
+type stdSupport struct {
 	log *logp.Logger
 
 	mode        Mode
@@ -34,8 +34,8 @@ type ilmSupport struct {
 	policy Policy
 }
 
-type singlePolicyManager struct {
-	*ilmSupport
+type stdManager struct {
+	*stdSupport
 	client ClientHandler
 
 	// cached info
@@ -49,15 +49,15 @@ type infoCache struct {
 
 var defaultCacheDuration = 5 * time.Minute
 
-// NewDefaultSupport creates an instance of default ILM support implementation.
-func NewDefaultSupport(
+// NewStdSupport creates an instance of default ILM support implementation.
+func NewStdSupport(
 	log *logp.Logger,
 	mode Mode,
 	alias Alias,
 	policy Policy,
 	overwrite, checkExists bool,
 ) Supporter {
-	return &ilmSupport{
+	return &stdSupport{
 		log:         log,
 		mode:        mode,
 		overwrite:   overwrite,
@@ -67,18 +67,18 @@ func NewDefaultSupport(
 	}
 }
 
-func (s *ilmSupport) Mode() Mode     { return s.mode }
-func (s *ilmSupport) Alias() Alias   { return s.alias }
-func (s *ilmSupport) Policy() Policy { return s.policy }
+func (s *stdSupport) Mode() Mode     { return s.mode }
+func (s *stdSupport) Alias() Alias   { return s.alias }
+func (s *stdSupport) Policy() Policy { return s.policy }
 
-func (s *ilmSupport) Manager(h ClientHandler) Manager {
-	return &singlePolicyManager{
+func (s *stdSupport) Manager(h ClientHandler) Manager {
+	return &stdManager{
 		client:     h,
-		ilmSupport: s,
+		stdSupport: s,
 	}
 }
 
-func (m *singlePolicyManager) Enabled() (bool, error) {
+func (m *stdManager) Enabled() (bool, error) {
 	if m.mode == ModeDisabled {
 		return false, nil
 	}
@@ -101,7 +101,7 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 	return enabled, nil
 }
 
-func (m *singlePolicyManager) EnsureAlias() error {
+func (m *stdManager) EnsureAlias() error {
 	b, err := m.client.HasAlias(m.alias.Name)
 	if err != nil {
 		return err
@@ -114,7 +114,7 @@ func (m *singlePolicyManager) EnsureAlias() error {
 	return m.client.CreateAlias(m.alias)
 }
 
-func (m *singlePolicyManager) EnsurePolicy(overwrite bool) (bool, error) {
+func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
 	overwrite = overwrite || m.overwrite
 
