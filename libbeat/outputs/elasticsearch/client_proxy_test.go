@@ -52,41 +52,38 @@ func TestClientPing(t *testing.T) {
 // we start, with no changes to the proxy settings. (This is really a
 // meta-test for the helpers that create the servers / client.)
 func TestBaseline(t *testing.T) {
-	listeners := testListeners{}
-	listeners.start(t)
-	defer listeners.close()
+	servers, teardown := startServers(t)
+	defer teardown()
 
 	// Start a bare client with no proxy settings, pointed at the main server.
-	execClient(t, "TEST_SERVER_URL="+listeners.server.URL)
+	execClient(t, "TEST_SERVER_URL="+servers.serverURL)
 	// We expect one server request and 0 proxy requests
-	assert.Equal(t, 1, listeners.serverRequestCount())
-	assert.Equal(t, 0, listeners.proxyRequestCount())
+	assert.Equal(t, 1, servers.serverRequestCount())
+	assert.Equal(t, 0, servers.proxyRequestCount())
 }
 
 // TestClientSettingsProxy confirms that we can control the proxy of a client
 // by setting its ClientSettings.Proxy value on creation. (The child process
 // uses the TEST_PROXY_URL environment variable to initialize the flag.)
 func TestClientSettingsProxy(t *testing.T) {
-	listeners := testListeners{}
-	listeners.start(t)
-	defer listeners.close()
+	servers, teardown := startServers(t)
+	defer teardown()
 
 	// Start a client with ClientSettings.Proxy set to the proxy listener.
 	execClient(t,
-		"TEST_SERVER_URL="+listeners.server.URL,
-		"TEST_PROXY_URL="+listeners.proxy.URL)
+		"TEST_SERVER_URL="+servers.serverURL,
+		"TEST_PROXY_URL="+servers.proxyURL)
 	// We expect one proxy request and 0 server requests
-	assert.Equal(t, 0, listeners.serverRequestCount())
-	assert.Equal(t, 1, listeners.proxyRequestCount())
+	assert.Equal(t, 0, servers.serverRequestCount())
+	assert.Equal(t, 1, servers.proxyRequestCount())
 }
 
 // TestEnvironmentProxy confirms that we can control the proxy of a client by
 // setting the HTTP_PROXY environment variable (see
 // https://golang.org/pkg/net/http/#ProxyFromEnvironment).
 func TestEnvironmentProxy(t *testing.T) {
-	listeners := testListeners{}
-	listeners.start(t)
-	defer listeners.close()
+	servers, teardown := startServers(t)
+	defer teardown()
 
 	// Start a client with HTTP_PROXY set to the proxy listener.
 	// The server is set to a nonexistent URL because ProxyFromEnvironment
@@ -95,19 +92,18 @@ func TestEnvironmentProxy(t *testing.T) {
 	// triggered in doClientPing by the TEST_HEADER_URL environment variable.
 	execClient(t,
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
-		"TEST_HEADER_URL="+listeners.server.URL,
-		"HTTP_PROXY="+listeners.proxy.URL)
+		"TEST_HEADER_URL="+servers.serverURL,
+		"HTTP_PROXY="+servers.proxyURL)
 	// We expect one proxy request and 0 server requests
-	assert.Equal(t, 0, listeners.serverRequestCount())
-	assert.Equal(t, 1, listeners.proxyRequestCount())
+	assert.Equal(t, 0, servers.serverRequestCount())
+	assert.Equal(t, 1, servers.proxyRequestCount())
 }
 
 // TestClientSettingsOverrideEnvironmentProxy confirms that when both
 // ClientSettings.Proxy and HTTP_PROXY are set, ClientSettings takes precedence.
 func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
-	listeners := testListeners{}
-	listeners.start(t)
-	defer listeners.close()
+	servers, teardown := startServers(t)
+	defer teardown()
 
 	// Start a client with ClientSettings.Proxy set to the proxy listener and
 	// HTTP_PROXY set to the server listener. We expect that the former will
@@ -116,12 +112,12 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 	// non-nil result.
 	execClient(t,
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
-		"TEST_HEADER_URL="+listeners.server.URL,
-		"TEST_PROXY_URL="+listeners.proxy.URL,
-		"HTTP_PROXY="+listeners.server.URL)
+		"TEST_HEADER_URL="+servers.serverURL,
+		"TEST_PROXY_URL="+servers.proxyURL,
+		"HTTP_PROXY="+servers.serverURL)
 	// We expect one proxy request and 0 server requests
-	assert.Equal(t, 0, listeners.serverRequestCount())
-	assert.Equal(t, 1, listeners.proxyRequestCount())
+	assert.Equal(t, 0, servers.serverRequestCount())
+	assert.Equal(t, 1, servers.proxyRequestCount())
 }
 
 // runClientTest executes the current test binary as a child process,
@@ -179,44 +175,46 @@ func doClientPing(t *testing.T) {
 	client.Ping()
 }
 
-// testListeners is a wrapper that handles starting up http listeners
-// representing an elastic server and an intermediate proxy, confirming that
-// requests target the expected (server) URL, and counting how many requests
-// arrive at each endpoint.
-type testListeners struct {
-	server *httptest.Server
-	proxy  *httptest.Server
+// serverState contains the state of the http listeners for proxy tests,
+// including the endpoint URLs and the observed request count for each one.
+type serverState struct {
+	serverURL string
+	proxyURL  string
 
 	_serverRequestCount atomic.Int // Requests directly to the server
 	_proxyRequestCount  atomic.Int // Requests via the proxy
 }
 
-// start creates and starts the server and proxy listeners.
-func (tl *testListeners) start(t *testing.T) {
-	tl.server = httptest.NewServer(
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, tl.server.URL, r.Header.Get("X-Test-URL"))
-			fmt.Fprintln(w, "Hello, client")
-			tl._serverRequestCount.Inc()
-		}))
-	tl.proxy = httptest.NewServer(
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, tl.server.URL, r.Header.Get("X-Test-URL"))
-			fmt.Fprintln(w, "Hello, client")
-			tl._proxyRequestCount.Inc()
-		}))
-}
-
-func (tl *testListeners) close() {
-	tl.server.Close()
-	tl.proxy.Close()
-}
-
 // Convenience functions to unwrap the atomic primitives
-func (tl testListeners) serverRequestCount() int {
-	return tl._serverRequestCount.Load()
+func (s serverState) serverRequestCount() int {
+	return s._serverRequestCount.Load()
 }
 
-func (tl testListeners) proxyRequestCount() int {
-	return tl._proxyRequestCount.Load()
+func (s serverState) proxyRequestCount() int {
+	return s._proxyRequestCount.Load()
+}
+
+// startServers starts endpoints representing a backend sefrver and a proxy,
+// and returns the corresponding serverState and a teardown function that
+// should be called to shut them down at the end of the test.
+func startServers(t *testing.T) (*serverState, func()) {
+	state := serverState{}
+	server := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, state.serverURL, r.Header.Get("X-Test-URL"))
+			fmt.Fprintln(w, "Hello, client")
+			state._serverRequestCount.Inc()
+		}))
+	proxy := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, state.serverURL, r.Header.Get("X-Test-URL"))
+			fmt.Fprintln(w, "Hello, client")
+			state._proxyRequestCount.Inc()
+		}))
+	state.serverURL = server.URL
+	state.proxyURL = proxy.URL
+	return &state, func() {
+		server.Close()
+		proxy.Close()
+	}
 }
