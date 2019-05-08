@@ -101,7 +101,11 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
-	hsts := m.getHostsWithPort(hints, port)
+	hosts, ok := m.getHostsWithPort(hints, port)
+	if !ok {
+		return config
+	}
+
 	ns := m.getNamespace(hints)
 	msets := m.getMetricSets(hints, mod)
 	tout := m.getTimeout(hints)
@@ -112,7 +116,7 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	moduleConfig := common.MapStr{
 		"module":     mod,
 		"metricsets": msets,
-		"hosts":      hsts,
+		"hosts":      hosts,
 		"timeout":    tout,
 		"period":     ival,
 		"enabled":    true,
@@ -161,7 +165,7 @@ func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string
 	return msets
 }
 
-func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) []string {
+func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string, bool) {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
@@ -175,7 +179,12 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) []string {
 		}
 	}
 
-	return result
+	if len(thosts) > 0 && len(result) == 0 {
+		logp.Debug("hints.builder", "no hosts selected for port %d with hints: %+v", port, thosts)
+		return nil, false
+	}
+
+	return result, true
 }
 
 func (m *metricHints) getNamespace(hints common.MapStr) string {
