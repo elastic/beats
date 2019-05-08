@@ -65,12 +65,6 @@ Contains user configurable fields.
 
 --
 
-[float]
-== error fields
-
-Error fields containing additional info in case of errors.
-
-
 
 *`error.type`*::
 +
@@ -205,12 +199,6 @@ alias to: cloud.region
 None
 
 
-[float]
-== monitor fields
-
-Common monitor fields.
-
-
 
 *`monitor.type`*::
 +
@@ -241,11 +229,6 @@ The monitors full job ID as used by heartbeat.
 
 
 --
-
-[float]
-== duration fields
-
-Total monitoring test duration
 
 
 *`monitor.duration.us`*::
@@ -417,12 +400,6 @@ List of keywords used to tag each event.
 
 --
 
-[float]
-== agent fields
-
-The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host.
-Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
-
 
 *`agent.ephemeral_id`*::
 +
@@ -484,6 +461,7 @@ Version of the agent.
 
 --
 
+<<<<<<< HEAD
 [float]
 == client fields
 
@@ -491,6 +469,8 @@ A client is defined as the initiator of a network connection for events regardin
 For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
 Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
+=======
+>>>>>>> [Docs] Remove extraneous section levels from field docs
 
 *`client.address`*::
 +
@@ -723,11 +703,6 @@ Short name or login of the user.
 
 --
 
-[float]
-== cloud fields
-
-Fields related to the cloud or infrastructure the events are coming from.
-
 
 *`cloud.account.id`*::
 +
@@ -805,12 +780,6 @@ Region in which this host is running.
 
 --
 
-[float]
-== container fields
-
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
-
 
 *`container.id`*::
 +
@@ -867,12 +836,6 @@ example: docker
 Runtime managing this container.
 
 --
-
-[float]
-== destination fields
-
-Destination fields describe details about the destination of a packet/event.
-Destination fields are usually populated in conjunction with source fields.
 
 
 *`destination.address`*::
@@ -1106,11 +1069,6 @@ Short name or login of the user.
 
 --
 
-[float]
-== ecs fields
-
-Meta-information specific to ECS.
-
 
 *`ecs.version`*::
 +
@@ -1125,12 +1083,6 @@ ECS version this event conforms to. `ecs.version` is a required field and must e
 When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
 
 --
-
-[float]
-== error fields
-
-These fields can represent errors of any kind.
-Use them for errors that happen while fetching events or in cases where the event itself contains an error.
 
 
 *`error.code`*::
@@ -1159,12 +1111,6 @@ type: text
 Error message.
 
 --
-
-[float]
-== event fields
-
-The event fields are used for context information about the log or metric event itself.
-A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
 
 
 *`event.action`*::
@@ -1367,12 +1313,6 @@ Please avoid using this field for user data.
 
 --
 
-[float]
-== file fields
-
-A file is defined as a set of information that has been created on, or has existed on a filesystem.
-File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
-
 
 *`file.ctime`*::
 +
@@ -1505,12 +1445,6 @@ The user ID (UID) or security identifier (SID) of the file owner.
 
 --
 
-[float]
-== geo fields
-
-Geo fields can carry data about a specific location related to an event.
-This geolocation information can be derived from techniques such as Geo IP, or be user-supplied.
-
 
 *`geo.city_name`*::
 +
@@ -1602,11 +1536,6 @@ Region name.
 
 --
 
-[float]
-== group fields
-
-The group fields are meant to represent groups that are relevant to the event.
-
 
 *`group.id`*::
 +
@@ -1625,12 +1554,6 @@ type: keyword
 Name of the group.
 
 --
-
-[float]
-== host fields
-
-A host is defined as a general computing instance.
-ECS host.* fields should be populated with details about the host on which the event happened, or from which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
 
 
 *`host.architecture`*::
@@ -1927,11 +1850,6 @@ Short name or login of the user.
 
 --
 
-[float]
-== http fields
-
-Fields related to HTTP activity. Use the `url` field set to store the url of the request.
-
 
 *`http.request.body.bytes`*::
 +
@@ -2054,11 +1972,6 @@ HTTP version.
 
 --
 
-[float]
-== log fields
-
-Fields which are specific to log events.
-
 
 *`log.level`*::
 +
@@ -2084,12 +1997,6 @@ In contrast to the `message` field which can contain an extracted part of the lo
 This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
 
 --
-
-[float]
-== network fields
-
-The network is defined as the communication path over which a host or network event happens.
-The network.* fields should be populated with details about the network activity associated with an event.
 
 
 *`network.application`*::
@@ -2230,12 +2137,6 @@ In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
 The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
-
-[float]
-== observer fields
-
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
-This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 *`observer.geo.city_name`*::
@@ -2460,12 +2361,6 @@ Observer version.
 
 --
 
-[float]
-== organization fields
-
-The organization fields enrich data with information about the company or entity the data is associated with.
-These fields help you arrange or filter data stored in an index by one or multiple organizations.
-
 
 *`organization.id`*::
 +
@@ -2484,11 +2379,6 @@ type: keyword
 Organization name.
 
 --
-
-[float]
-== os fields
-
-The OS fields contain information about the operating system.
 
 
 *`os.family`*::
@@ -2556,12 +2446,6 @@ example: 10.14.1
 Operating system version as a raw string.
 
 --
-
-[float]
-== process fields
-
-These fields contain information about a process.
-These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
 
 
 *`process.args`*::
@@ -2670,13 +2554,6 @@ The working directory of the process.
 
 --
 
-[float]
-== related fields
-
-This field set is meant to facilitate pivoting around a piece of data.
-Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
-A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
-
 
 *`related.ip`*::
 +
@@ -2686,13 +2563,6 @@ type: ip
 All of the IPs seen on your event.
 
 --
-
-[float]
-== server fields
-
-A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records.
-For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
-Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
 *`server.address`*::
@@ -2926,12 +2796,6 @@ Short name or login of the user.
 
 --
 
-[float]
-== service fields
-
-The service fields describe the service for or from which the data was collected.
-These fields help you find and correlate logs for a specific service and version.
-
 
 *`service.ephemeral_id`*::
 +
@@ -3005,12 +2869,6 @@ Version of the service the data was collected from.
 This allows to look at a data set only for a specific version of a service.
 
 --
-
-[float]
-== source fields
-
-Source fields describe details about the source of a packet/event.
-Source fields are usually populated in conjunction with destination fields.
 
 
 *`source.address`*::
@@ -3244,11 +3102,6 @@ Short name or login of the user.
 
 --
 
-[float]
-== url fields
-
-URL fields provide support for complete or partial URLs, and supports the breaking down into scheme, domain, path, and so on.
-
 
 *`url.domain`*::
 +
@@ -3358,12 +3211,6 @@ Username of the request.
 
 --
 
-[float]
-== user fields
-
-The user fields describe information about the user that is relevant to the event.
-Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
-
 
 *`user.email`*::
 +
@@ -3432,12 +3279,6 @@ example: albert
 Short name or login of the user.
 
 --
-
-[float]
-== user_agent fields
-
-The user_agent fields normally come from a browser request.
-They often show up in web service logs coming from the parsed user agent string.
 
 
 *`user_agent.device.name`*::
@@ -3598,12 +3439,6 @@ OS codename, if any.
 None
 
 
-[float]
-== http fields
-
-HTTP related fields.
-
-
 
 *`http.url`*::
 +
@@ -3617,24 +3452,6 @@ Service url used by monitor.
 
 --
 
-[float]
-== rtt fields
-
-HTTP layer round trip times.
-
-
-
-[float]
-== validate fields
-
-Duration between first byte of HTTP request being written and
-response being processed by validator. Duration based on already
-available network connection.
-
-Note: if validator is not reading body or only a prefix, this
-      number does not fully represent the total time needed
-      to read the body.
-
 
 
 *`http.rtt.validate.us`*::
@@ -3646,17 +3463,6 @@ Duration in microseconds
 
 --
 
-[float]
-== validate_body fields
-
-Duration of validator required to read and validate the response
-body.
-
-Note: if validator is not reading body or only a prefix, this
-      number does not fully represent the total time needed
-      to read the body.
-
-
 
 *`http.rtt.validate_body.us`*::
 +
@@ -3667,11 +3473,6 @@ Duration in microseconds
 
 --
 
-[float]
-== write_request fields
-
-Duration of sending the complete HTTP request. Duration based on already available network connection.
-
 
 *`http.rtt.write_request.us`*::
 +
@@ -3681,11 +3482,6 @@ type: long
 Duration in microseconds
 
 --
-
-[float]
-== response_header fields
-
-Time required between sending the start of sending the HTTP request and first byte from HTTP response being read. Duration based on already available network connection.
 
 
 *`http.rtt.response_header.us`*::
@@ -3706,17 +3502,6 @@ Time required to retrieved the content in micro seconds.
 
 --
 
-[float]
-== total fields
-
-Duration required to process the HTTP transaction. Starts with
-the initial TCP connection attempt. Ends with after validator
-did check the response.
-
-Note: if validator is not reading body or only a prefix, this
-      number does not fully represent the total time needed.
-
-
 
 *`http.rtt.total.us`*::
 +
@@ -3733,12 +3518,6 @@ Duration in microseconds
 None
 
 
-[float]
-== icmp fields
-
-IP ping fields.
-
-
 
 *`icmp.requests`*::
 +
@@ -3749,11 +3528,6 @@ Number if ICMP EchoRequests send.
 
 
 --
-
-[float]
-== rtt fields
-
-ICMP Echo Request and Reply round trip time
 
 
 *`icmp.rtt.us`*::
@@ -3983,12 +3757,6 @@ alias to: process.executable
 None
 
 
-[float]
-== resolve fields
-
-Host lookup fields.
-
-
 
 *`resolve.host`*::
 +
@@ -4012,11 +3780,6 @@ IP address found for the given host.
 
 --
 
-[float]
-== rtt fields
-
-Duration required to resolve an IP from hostname.
-
 
 *`resolve.rtt.us`*::
 +
@@ -4033,24 +3796,6 @@ Duration in microseconds
 None
 
 
-[float]
-== socks5 fields
-
-SOCKS5 proxy related fields:
-
-
-
-[float]
-== rtt fields
-
-TLS layer round trip times.
-
-
-
-[float]
-== connect fields
-
-Time required to establish a connection via SOCKS5 to endpoint based on available connection to SOCKS5 proxy.
 
 
 
@@ -4064,11 +3809,10 @@ Duration in microseconds
 --
 
 [[exported-fields-summary]]
+== Monitor summary fields
 
-[float]
-== summary fields
+None
 
-Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`.
 
 
 *`summary.up`*::
@@ -4097,12 +3841,6 @@ The number of endpoints that failed
 None
 
 
-[float]
-== tcp fields
-
-TCP network layer related fields.
-
-
 
 *`tcp.port`*::
 +
@@ -4116,18 +3854,6 @@ Service port number.
 
 --
 
-[float]
-== rtt fields
-
-TCP layer round trip times.
-
-
-
-[float]
-== connect fields
-
-Duration required to establish a TCP connection based on already available IP address.
-
 
 
 *`tcp.rtt.connect.us`*::
@@ -4138,12 +3864,6 @@ type: long
 Duration in microseconds
 
 --
-
-[float]
-== validate fields
-
-Duration of validation step based on existing TCP connection.
-
 
 
 *`tcp.rtt.validate.us`*::
@@ -4159,12 +3879,6 @@ Duration in microseconds
 == TLS encryption layer fields
 
 None
-
-
-[float]
-== tls fields
-
-TLS layer related fields.
 
 
 
@@ -4185,18 +3899,6 @@ type: date
 Latest time at which the connection's certificates are valid.
 
 --
-
-[float]
-== rtt fields
-
-TLS layer round trip times.
-
-
-
-[float]
-== handshake fields
-
-Time required to finish TLS handshake based on already available network connection.
 
 
 

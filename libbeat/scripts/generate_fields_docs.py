@@ -6,17 +6,8 @@ import yaml
 
 
 def document_fields(output, section, sections, path):
-    if "anchor" in section:
+    if "anchor" in section and "description" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
-
-    if "prefix" in section:
-        output.write("{}\n".format(section["prefix"]))
-
-    # Intermediate level titles
-    if "description" in section and "prefix" not in section and "anchor" not in section:
-        output.write("[float]\n")
-
-    if "description" in section:
         output.write("== {} fields\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
