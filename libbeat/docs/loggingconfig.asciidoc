@@ -207,6 +207,13 @@ unix epoch. Defaults to disabled.
 endif::serverless[]
 
 [float]
+==== `logging.files.rotateonstartup`
+
+If the log file already exists on startup, immediately rotate it and start
+writing to a new file instead of appending to the existing one. Defaults to
+true.
+
+[float]
 ==== `logging.json`
 
 When true, logs messages in JSON format. The default is false.
