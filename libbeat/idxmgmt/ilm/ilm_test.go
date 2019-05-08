@@ -65,7 +65,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		))
 		require.NoError(t, err)
 
-		s := tmp.(*ilmSupport)
+		s := tmp.(*stdSupport)
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
