@@ -65,7 +65,7 @@ This command does initial setup of the environment:
  * ML jobs (where available).
 
 Usage:
-  filebeat setup [flags]
+  metricbeat setup [flags]
 
 Flags:
       --dashboards         Setup dashboards only
