@@ -3,7 +3,7 @@ module_version: "1.0"
 var:
   - name: paths
     default:
-      - /var/log/iptables.log
+      - /var/log/pan-os.log
   - name: tags
     default: [pan-os]
   - name: syslog_host

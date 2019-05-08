@@ -133,24 +133,24 @@ it can also be configured to read logs from a file. See the following example.
 ["source","yaml",subs="attributes"]
 -----
 - module: palo_alto
-  log:
+  pan_os:
     enabled: true
     var.paths: ["/var/log/pan-os.log"]
     var.input: "file"
 -----
 
-:fileset_ex: log
+:fileset_ex: pan_os
 
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `log` fileset settings
+==== `pan_os` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
-  log:
+  pan_os:
     var.syslog_host: 0.0.0.0
     var.syslog_port: 514
 ----

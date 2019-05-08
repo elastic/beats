@@ -405,7 +405,7 @@ filebeat.modules:
 
 #------------------------------ Palo_alto Module ------------------------------
 - module: palo_alto
-  log:
+  pan_os:
     enabled: true
 
     # Set which input to use between syslog (default) or file.
