@@ -30,6 +30,6 @@ class TestCommandVersion(BaseTest):
             extra_args=["version"], logging_args=["-v", "-d", "*"])
         assert exit_code == 0
 
-        assert self.log_contains("mockbeat") is True
-        assert self.log_contains("version") is True
-        assert self.log_contains("9.9.9") is True
+        assert self.log_contains("mockbeat")
+        assert self.log_contains("version")
+        assert self.log_contains("9.9.9")

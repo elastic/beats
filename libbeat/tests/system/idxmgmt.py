@@ -5,31 +5,50 @@ import datetime
 
 class IdxMgmt(object):
 
-    def __init__(self, client):
+    def __init__(self, client, index):
         self._client = client
+        if index == "":
+            index == "mockbeat"
+        self._index = index
 
-    def clean(self, prefix):
+    def needs_init(self, s):
+        return s == '' or s == '*'
 
-        # Delete existing indices and aliases
+    def delete(self, index="", template="", policy=""):
+        self.delete_index_and_alias(index=index)
+        self.delete_template(template=template)
+        self.delete_policy(policy=policy)
+
+    def delete_index_and_alias(self, index=""):
+        if self.needs_init(index):
+            index = self._index
+
         try:
-            self._client.transport.perform_request('DELETE', "/" + prefix + "*")
-        except:
+            self._client.transport.perform_request('DELETE', "/" + index + "*")
+        except NotFoundError:
             pass
 
-        # Delete templates
+    def delete_template(self, template=""):
+        if self.needs_init(template):
+            template = self._index
+
         try:
-            self._client.transport.perform_request('DELETE', "/_template/" + prefix + "*")
-        except:
+            self._client.transport.perform_request('DELETE', "/_template/" + template + "*")
+        except NotFoundError:
             pass
 
-        # Delete any existing policy
+    def delete_policy(self, policy=""):
+        if self.needs_init(policy):
+            policy = self._index
+
+        # Delete any existing policy starting with given policy
         policies = self._client.transport.perform_request('GET', "/_ilm/policy")
-        for policy, _ in policies.items():
-            if not policy.startswith(prefix):
+        for p, _ in policies.items():
+            if not p.startswith(policy):
                 continue
             try:
-                self._client.transport.perform_request('DELETE', "/_ilm/policy/" + policy)
-            except:
+                self._client.transport.perform_request('DELETE', "/_ilm/policy/" + p)
+            except NotFoundError:
                 pass
 
     @raises(NotFoundError)
@@ -86,3 +105,8 @@ class IdxMgmt(object):
     def default_pattern(self):
         d = datetime.datetime.now().strftime("%Y.%m.%d")
         return d + "-000001"
+
+    def index_for(self, alias, pattern=None):
+        if pattern is None:
+            pattern = self.default_pattern()
+        return "{}-{}".format(alias, pattern)

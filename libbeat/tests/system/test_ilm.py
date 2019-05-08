@@ -15,14 +15,19 @@ class TestRunILM(BaseTest):
     def setUp(self):
         super(TestRunILM, self).setUp()
 
-        # auto-derived default settings, if nothing else is set
-        self.index_name = self.beat_name + "-9.9.9"
-        self.alias_name = self.index_name
-        self.policy_name = self.alias_name
-
+        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.custom_alias = self.beat_name + "_foo"
+        self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
-        self.idxmgmt = IdxMgmt(self.es)
-        self.idxmgmt.clean(self.beat_name)
+        self.idxmgmt = IdxMgmt(self.es, self.index_name)
+        self.idxmgmt.delete(index=self.custom_alias)
+        self.idxmgmt.delete(index=self.custom_policy)
+        self.idxmgmt.delete(index=self.index_name)
+
+    def tearDown(self):
+        self.idxmgmt.delete(index=self.custom_alias)
+        self.idxmgmt.delete(index=self.custom_policy)
+        self.idxmgmt.delete(index=self.index_name)
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -38,7 +43,6 @@ class TestRunILM(BaseTest):
         Test ilm default settings to load ilm policy, write alias and ilm template
         """
         self.render_config()
-
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("ILM policy successfully loaded"))
@@ -58,7 +62,6 @@ class TestRunILM(BaseTest):
         """
 
         self.render_config(ilm={"enabled": False})
-
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
@@ -95,8 +98,7 @@ class TestRunILM(BaseTest):
         Test settings ilm rollover alias
         """
 
-        alias_name = self.beat_name + "_foo"
-        self.render_config(ilm={"enabled": True, "rollover_alias": alias_name})
+        self.render_config(ilm={"enabled": True, "rollover_alias": self.custom_alias})
 
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -104,9 +106,9 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.policy_name, alias_name)
-        self.idxmgmt.assert_docs_written_to_alias(alias_name)
-        self.idxmgmt.assert_alias_created(alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
+        self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -160,16 +162,23 @@ class TestCommandSetupILMPolicy(BaseTest):
         super(TestCommandSetupILMPolicy, self).setUp()
 
         self.setupCmd = "--ilm-policy"
-        # auto-derived default settings, if nothing else is set
-        self.index_name = self.beat_name + "-9.9.9"
-        self.alias_name = self.index_name
-        self.policy_name = self.alias_name
 
+        self.alias_name = self.policy_name = self.index_name = self.beat_name + "-9.9.9"
+        self.custom_alias = self.beat_name + "_foo"
+        self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
-        self.idxmgmt = IdxMgmt(self.es)
-        self.idxmgmt.clean(self.beat_name)
+        self.idxmgmt = IdxMgmt(self.es, self.index_name)
+        self.idxmgmt.delete(index=self.custom_alias)
+        self.idxmgmt.delete(index=self.custom_policy)
+        self.idxmgmt.delete(index=self.index_name)
+
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
+
+    def tearDown(self):
+        self.idxmgmt.delete(index=self.custom_alias)
+        self.idxmgmt.delete(index=self.custom_policy)
+        self.idxmgmt.delete(index=self.index_name)
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -235,16 +244,15 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         Test ilm policy setup when policy_name is configured
         """
-        policy_name = self.beat_name + "_foo"
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd,
-                                              "-E", "setup.ilm.policy_name=" + policy_name])
+                                              "-E", "setup.ilm.policy_name=" + self.custom_policy])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, policy_name, self.alias_name)
-        self.idxmgmt.assert_policy_created(policy_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
+        self.idxmgmt.assert_policy_created(self.custom_policy)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -252,17 +260,16 @@ class TestCommandSetupILMPolicy(BaseTest):
         """
         Test ilm policy setup when rollover_alias is configured
         """
-        alias_name = self.beat_name + "_foo"
         self.render_config()
 
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd,
-                                              "-E", "setup.ilm.rollover_alias=" + alias_name])
+                                              "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(alias_name, self.policy_name, alias_name)
-        self.idxmgmt.assert_docs_written_to_alias(alias_name)
-        self.idxmgmt.assert_alias_created(alias_name)
+        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
+        self.idxmgmt.assert_alias_created(self.custom_alias)
 
 
 class TestCommandExportILMPolicy(BaseTest):
