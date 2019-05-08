@@ -21,13 +21,18 @@ package log
 
 import (
 	"os"
+	"path"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/filebeat/channel"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/libbeat/tests/resources"
 )
 
 func TestInputFileExclude(t *testing.T) {
@@ -79,6 +84,49 @@ func TestIsCleanInactive(t *testing.T) {
 
 		assert.Equal(t, test.result, l.isCleanInactive(state))
 	}
+}
+
+func TestInputLifecycle(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	tmpdir := os.TempDir()
+	defer os.RemoveAll(tmpdir)
+
+	config, _ := common.NewConfigFrom(common.MapStr{
+		"paths": path.Join(tmpdir, "*"),
+	})
+
+	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+		return TestOutlet{}, nil
+	}
+
+	context := input.Context{}
+
+	input, err := NewInput(config, connector, context)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	input.Run()
+	input.Stop()
+}
+
+func TestNewInputError(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	config := common.NewConfig()
+
+	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+		return TestOutlet{}, nil
+	}
+
+	context := input.Context{}
+
+	_, err := NewInput(config, connector, context)
+	assert.Error(t, err)
 }
 
 func TestMatchesMeta(t *testing.T) {
