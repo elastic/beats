@@ -1921,7 +1921,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/lib/pq
-Revision: 2704adc878c21e1329f46f6e56a1c387d788ff94
+Revision: 2ff3cb3adc01768e0a552b3a02575a6df38a9bea
 License type (autodetected): MIT
 ./metricbeat/module/postgresql/vendor/github.com/lib/pq/LICENSE.md:
 --------------------------------------------------------------------
