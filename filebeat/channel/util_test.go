@@ -29,37 +29,41 @@ func (o *dummyOutletter) Done() <-chan struct{} {
 }
 
 func TestCloseOnSignal(t *testing.T) {
-	resources.CheckGoroutines(t, func() {
-		o := &dummyOutletter{c: make(chan struct{})}
-		sig := make(chan struct{})
-		CloseOnSignal(o, sig)
-		close(sig)
-	})
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	o := &dummyOutletter{c: make(chan struct{})}
+	sig := make(chan struct{})
+	CloseOnSignal(o, sig)
+	close(sig)
 }
 
 func TestCloseOnSignalClosed(t *testing.T) {
-	resources.CheckGoroutines(t, func() {
-		o := &dummyOutletter{c: make(chan struct{})}
-		sig := make(chan struct{})
-		c := CloseOnSignal(o, sig)
-		c.Close()
-	})
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	o := &dummyOutletter{c: make(chan struct{})}
+	sig := make(chan struct{})
+	c := CloseOnSignal(o, sig)
+	c.Close()
 }
 
 func TestSubOutlet(t *testing.T) {
-	resources.CheckGoroutines(t, func() {
-		o := &dummyOutletter{c: make(chan struct{})}
-		so := SubOutlet(o)
-		so.Close()
-		assert.False(t, o.closed)
-	})
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	o := &dummyOutletter{c: make(chan struct{})}
+	so := SubOutlet(o)
+	so.Close()
+	assert.False(t, o.closed)
 }
 
 func TestCloseOnSignalSubOutlet(t *testing.T) {
-	resources.CheckGoroutines(t, func() {
-		o := &dummyOutletter{c: make(chan struct{})}
-		c := CloseOnSignal(SubOutlet(o), make(chan struct{}))
-		o.Close()
-		c.Close()
-	})
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	o := &dummyOutletter{c: make(chan struct{})}
+	c := CloseOnSignal(SubOutlet(o), make(chan struct{}))
+	o.Close()
+	c.Close()
 }
