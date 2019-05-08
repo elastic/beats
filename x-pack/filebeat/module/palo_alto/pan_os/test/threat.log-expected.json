@@ -24,7 +24,10 @@
         "log.offset": 0,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28191,1,52984,443,37679,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7726,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:mDxnuNGkonQEEYcMT0Dur/FCt/I=",
+        "network.community_id": [
+            "1:mDxnuNGkonQEEYcMT0Dur/FCt/I=",
+            "1:qjpdroY6VaRSEUbSXzSWtUX00kc="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -85,7 +88,10 @@
         "log.offset": 546,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28219,1,52983,443,28249,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7727,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:svoGHRUXQeOT1QlGYhMbEalRiPU=",
+        "network.community_id": [
+            "1:svoGHRUXQeOT1QlGYhMbEalRiPU=",
+            "1:j6so5fl9DGKhDhaNmjI+6ipOFyc="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -146,7 +152,10 @@
         "log.offset": 1092,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,27723,1,52986,443,63898,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7728,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:cl1ZW9fCG1bKgQuAww26hYqxyq0=",
+        "network.community_id": [
+            "1:cl1ZW9fCG1bKgQuAww26hYqxyq0=",
+            "1:c4Xs8aAPhIYB760P+BLmrzOvjv4="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -207,7 +216,10 @@
         "log.offset": 1638,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28172,1,52985,443,7515,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7729,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:0KdQcz2+OQg8Kuyqn3tvtzrtAtk=",
+        "network.community_id": [
+            "1:0KdQcz2+OQg8Kuyqn3tvtzrtAtk=",
+            "1:RU/nMZByVkBbsckJ18XtpXhQlPg="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -268,7 +280,10 @@
         "log.offset": 2183,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28151,1,52987,443,3225,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7730,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:ZuULYSnnlQSsdqWsfJBHQTPqbJo=",
+        "network.community_id": [
+            "1:ZuULYSnnlQSsdqWsfJBHQTPqbJo=",
+            "1:FTVZK5v5Nqts17X+FJm/bQk1rwM="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -329,7 +344,10 @@
         "log.offset": 2728,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28076,1,52988,443,60449,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7731,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:ovf/7i/MclKhY1UKalpHzmmlthk=",
+        "network.community_id": [
+            "1:ovf/7i/MclKhY1UKalpHzmmlthk=",
+            "1:iHTY/vpQo2TsRYJW2n+lqb0w5f4="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -390,7 +408,10 @@
         "log.offset": 3274,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28173,1,52990,443,60559,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7732,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:K7vLQF60EynWhcmrB6/wjEG8qzI=",
+        "network.community_id": [
+            "1:K7vLQF60EynWhcmrB6/wjEG8qzI=",
+            "1:f+u5A73xp5gqmRCSN2kCCSbvBRg="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -451,7 +472,10 @@
         "log.offset": 3820,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28186,1,52989,443,47414,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7733,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:nMc/XZ2HhyrMMpTfW7UK0Q7QRJM=",
+        "network.community_id": [
+            "1:nMc/XZ2HhyrMMpTfW7UK0Q7QRJM=",
+            "1:v4+MIeqiGJJ9Z3SUTNLFEoYtw74="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -512,7 +536,10 @@
         "log.offset": 4366,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28192,1,52992,443,37673,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7734,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:UDkY52oWrSsYAqwPSTAKyKhwzvQ=",
+        "network.community_id": [
+            "1:UDkY52oWrSsYAqwPSTAKyKhwzvQ=",
+            "1:BilmVEwf9nQIXodvin3X6lZuVAc="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -573,7 +600,10 @@
         "log.offset": 4912,
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,27011,1,52991,443,8232,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7735,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:pWCQCkwDKmw2APwAJ2GcT6QNXQg=",
+        "network.community_id": [
+            "1:pWCQCkwDKmw2APwAJ2GcT6QNXQg=",
+            "1:CmZ6KkZzaxpkJHXJn0lNskvvZLA="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -634,7 +664,10 @@
         "log.offset": 5457,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28240,1,52994,443,32982,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7736,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:3V7ODANn0gD6PFiGWb7LVZcr3TY=",
+        "network.community_id": [
+            "1:3V7ODANn0gD6PFiGWb7LVZcr3TY=",
+            "1:Xy6vXuBmLPx1/PDpu/KMI1ZPnW0="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -695,7 +728,10 @@
         "log.offset": 6003,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28143,1,52993,443,10473,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7737,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:7WQBEq/QCPNFLId7r93vN98nPHQ=",
+        "network.community_id": [
+            "1:7WQBEq/QCPNFLId7r93vN98nPHQ=",
+            "1:nmxmtIja0z/MV5rgbBnScsKtW0U="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -756,7 +792,10 @@
         "log.offset": 6549,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28272,1,52995,443,20446,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7738,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:r3rve3ghPTa/BACcRlan0FEgZFw=",
+        "network.community_id": [
+            "1:r3rve3ghPTa/BACcRlan0FEgZFw=",
+            "1:XNlHvX7cDGGCkvSS/aFHGg/RnAk="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -817,7 +856,10 @@
         "log.offset": 7095,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28146,1,52996,443,34699,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7739,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:2A2PtRAEa2EIbgp0B+6pQMVyM1o=",
+        "network.community_id": [
+            "1:2A2PtRAEa2EIbgp0B+6pQMVyM1o=",
+            "1:DqCF4BufQU/spPG8UYok6IrChWo="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -878,7 +920,10 @@
         "log.offset": 7641,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28278,1,52997,443,22820,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7740,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:ttgSlbqHs+GKueSexHsquCbfjCk=",
+        "network.community_id": [
+            "1:ttgSlbqHs+GKueSexHsquCbfjCk=",
+            "1:lJHLfl+/x95GohXozN52zokIxvA="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -939,7 +984,10 @@
         "log.offset": 8187,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:37,012801096514,THREAT,url,2049,2018/11/30 16:44:37,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:37,28185,1,52998,443,41060,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7741,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:h4Yhxi4lfeFiizTNiugYzEk9CM4=",
+        "network.community_id": [
+            "1:h4Yhxi4lfeFiizTNiugYzEk9CM4=",
+            "1:OVE3ctnTt5X1L6qNDr4QILL0dFg="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1000,7 +1048,10 @@
         "log.offset": 8733,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:37,012801096514,THREAT,url,2049,2018/11/30 16:44:37,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:37,28201,1,52999,443,9058,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7742,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:SsYXkesHdCi9Tx1qsjfCIH8mHm4=",
+        "network.community_id": [
+            "1:SsYXkesHdCi9Tx1qsjfCIH8mHm4=",
+            "1:bzhUSIQYpz+jY7TA+j8UmFOdJ08="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1061,7 +1112,10 @@
         "log.offset": 9278,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:37,012801096514,THREAT,url,2049,2018/11/30 16:44:37,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:37,28148,1,53001,443,54846,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7743,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:84WYKtahMlLwf+ZletWf/DNnE30=",
+        "network.community_id": [
+            "1:84WYKtahMlLwf+ZletWf/DNnE30=",
+            "1:NRiTxPYsIvfOnUXhwuF5KPucNf8="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1122,7 +1176,10 @@
         "log.offset": 9824,
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:37,012801096514,THREAT,url,2049,2018/11/30 16:44:37,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:37,28121,1,53002,443,52731,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7744,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:X4Zvg9D/bP0EYECRSLna3za4r68=",
+        "network.community_id": [
+            "1:X4Zvg9D/bP0EYECRSLna3za4r68=",
+            "1:9noBCzeHKSZpuQWETkS7W5mOTT0="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1183,7 +1240,10 @@
         "log.offset": 10370,
         "log.original": "Nov 30 16:44:38 PA-220 1,2018/11/30 16:44:38,012801096514,THREAT,url,2049,2018/11/30 16:44:38,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:38,28228,1,53003,443,15165,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7745,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:greC2ffRfw5diAvjZvd+je5rhrk=",
+        "network.community_id": [
+            "1:greC2ffRfw5diAvjZvd+je5rhrk=",
+            "1:NQ3UU1pIt7hTJ2TYkbe6yjIVIsw="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1244,7 +1304,10 @@
         "log.offset": 10916,
         "log.original": "Nov 30 16:44:38 PA-220 1,2018/11/30 16:44:38,012801096514,THREAT,url,2049,2018/11/30 16:44:38,192.168.15.224,23.72.137.131,192.168.1.63,23.72.137.131,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:38,28196,1,53004,443,53918,443,0x403000,tcp,block-url,\"b.scorecardresearch.com/\",(9999),business-and-economy,informational,client-to-server,7746,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:EcYXcH6rGmgtHGDCjUQcmM+hR0c=",
+        "network.community_id": [
+            "1:EcYXcH6rGmgtHGDCjUQcmM+hR0c=",
+            "1:pzcUv98hFdzW07/5bQ15jcEOAAM="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1305,7 +1368,10 @@
         "log.offset": 11463,
         "log.original": "Nov 30 16:44:38 PA-220 1,2018/11/30 16:44:38,012801096514,THREAT,url,2049,2018/11/30 16:44:38,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:38,28007,1,53000,443,40792,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7747,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:OX20k3mW9JzBo4RmzVjTtvOawu4=",
+        "network.community_id": [
+            "1:OX20k3mW9JzBo4RmzVjTtvOawu4=",
+            "1:iHNZW72XqbNDDHf4ziF4MHkPsq8="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1366,7 +1432,10 @@
         "log.offset": 12009,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28117,1,53006,443,54044,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7748,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:oWKucHrzLhzCpDmWJPLBELyMrzw=",
+        "network.community_id": [
+            "1:oWKucHrzLhzCpDmWJPLBELyMrzw=",
+            "1:WmnET8BZufXJpdVk04PIVGj+Kgk="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1427,7 +1496,10 @@
         "log.offset": 12555,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28109,1,53007,443,19544,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7749,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:63h3SPrH4/pr2GMJEkpg++zeJMU=",
+        "network.community_id": [
+            "1:63h3SPrH4/pr2GMJEkpg++zeJMU=",
+            "1:qCp/BEY5ANYRj3J+xhPpjW00kTA="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1488,7 +1560,10 @@
         "log.offset": 13101,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28260,1,53008,443,13462,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7750,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:MpnxD3AYYy43RYm8rBQmgxv2NQ0=",
+        "network.community_id": [
+            "1:MpnxD3AYYy43RYm8rBQmgxv2NQ0=",
+            "1:QTdF07Qsc5riXT20oN+YWQ2Yt6U="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1549,7 +1624,10 @@
         "log.offset": 13647,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28275,1,53010,443,44892,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7752,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:kibVei9WSdxBMV8iUIg8nZMCiss=",
+        "network.community_id": [
+            "1:kibVei9WSdxBMV8iUIg8nZMCiss=",
+            "1:v9tvyVPSkJni3/nd8jUVgcsqqQk="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1610,7 +1688,10 @@
         "log.offset": 14193,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28266,1,53011,443,16487,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7753,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:l33FK2i+ASkvlnDYQYRCH4evHcI=",
+        "network.community_id": [
+            "1:l33FK2i+ASkvlnDYQYRCH4evHcI=",
+            "1:00oN9bToRGtVdpy+GQ742sbkpfI="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1671,7 +1752,10 @@
         "log.offset": 14739,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28294,1,53012,443,23952,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7754,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:cSD3ZfDTv0BFEStL/v2rRm0wow0=",
+        "network.community_id": [
+            "1:cSD3ZfDTv0BFEStL/v2rRm0wow0=",
+            "1:AmJtkqyAyzgRUMxNGxjT3hhwb8c="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1732,7 +1816,10 @@
         "log.offset": 15285,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28248,1,53013,443,2810,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7755,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:l8cnTJWO0qdKrXtvCBWHbQUpvgE=",
+        "network.community_id": [
+            "1:l8cnTJWO0qdKrXtvCBWHbQUpvgE=",
+            "1:CzGrIa22/gNrIvkcJMIh6eWNjFI="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1793,7 +1880,10 @@
         "log.offset": 15830,
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28274,1,53014,443,13272,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7756,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:2dLIQC1NuJw/6kPkSukOc7rN5UE=",
+        "network.community_id": [
+            "1:2dLIQC1NuJw/6kPkSukOc7rN5UE=",
+            "1:b3MpSidntZseAvCtO89765ETlyI="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1854,7 +1944,10 @@
         "log.offset": 16376,
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28285,1,53022,443,8663,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7762,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:39KkS/Y1cEc0OLIWR3+26TPoFhQ=",
+        "network.community_id": [
+            "1:39KkS/Y1cEc0OLIWR3+26TPoFhQ=",
+            "1:wug3mTERsDOMF1R52vDi6SpWbMc="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1915,7 +2008,10 @@
         "log.offset": 16921,
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28306,1,53023,443,55738,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7763,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:IFLzwMkLmz8UfCYPFfRgTIBIzSI=",
+        "network.community_id": [
+            "1:IFLzwMkLmz8UfCYPFfRgTIBIzSI=",
+            "1:ktdKYACJa2q76tdS55sj5QaeMBs="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -1976,7 +2072,10 @@
         "log.offset": 17467,
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28116,1,53024,443,10650,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7764,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:spPQtp0F92JeXKXtvGndU6vymNo=",
+        "network.community_id": [
+            "1:spPQtp0F92JeXKXtvGndU6vymNo=",
+            "1:sWvGFBOOisURcvYe5nB5HUSa6B8="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2037,7 +2136,10 @@
         "log.offset": 18013,
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28214,1,53025,443,44087,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7765,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:xBwOt7zrEs9oyuV1oEHKLKXdg1Q=",
+        "network.community_id": [
+            "1:xBwOt7zrEs9oyuV1oEHKLKXdg1Q=",
+            "1:LHZawFx+zgZPTd01rJqX/31kNmE="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2098,7 +2200,10 @@
         "log.offset": 18559,
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28080,1,53026,443,15915,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7766,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:z5jHjldbSP1U0TqDWR9Uox2k3Js=",
+        "network.community_id": [
+            "1:z5jHjldbSP1U0TqDWR9Uox2k3Js=",
+            "1:XcghkvaiKIQS/KgINx7Mb5Vvn3M="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2159,7 +2264,10 @@
         "log.offset": 19105,
         "log.original": "Nov 30 16:44:53 PA-220 1,2018/11/30 16:44:53,012801096514,THREAT,url,2049,2018/11/30 16:44:53,192.168.15.224,151.101.2.2,192.168.1.63,151.101.2.2,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:53,28318,1,53041,443,41165,443,0x403000,tcp,block-url,\"cdn.taboola.com/\",(9999),business-and-economy,informational,client-to-server,7768,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:tQxUFWF1PJh9XS+U53oZgNQELoA=",
+        "network.community_id": [
+            "1:tQxUFWF1PJh9XS+U53oZgNQELoA=",
+            "1:XdO4yHx+1HZM4GcutRTyur9ixdM="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2223,7 +2331,10 @@
         "log.offset": 19640,
         "log.original": "Nov 30 16:44:54 PA-220 1,2018/11/30 16:44:54,012801096514,THREAT,url,2049,2018/11/30 16:44:54,192.168.15.224,54.192.7.152,192.168.1.63,54.192.7.152,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:54,28300,1,53040,443,54133,443,0x403000,tcp,block-url,\"rules.quantcount.com/\",(9999),business-and-economy,informational,client-to-server,7769,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:J9ymoylt3wkbcwWFUbTc1FK8W6k=",
+        "network.community_id": [
+            "1:J9ymoylt3wkbcwWFUbTc1FK8W6k=",
+            "1:kCzU3MoZUMh7VlhTewngoP1twbw="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2287,7 +2398,10 @@
         "log.offset": 20182,
         "log.original": "Nov 30 16:44:59 PA-220 1,2018/11/30 16:44:58,012801096514,THREAT,url,2049,2018/11/30 16:44:58,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:58,28339,1,53093,443,8485,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7770,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:DDpR8PTbIvvnd+7Hcre+jZQVtaY=",
+        "network.community_id": [
+            "1:DDpR8PTbIvvnd+7Hcre+jZQVtaY=",
+            "1:fj3W3hxHPqT4snZlcRibDiqLNvs="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2351,7 +2465,10 @@
         "log.offset": 20739,
         "log.original": "Nov 30 16:44:59 PA-220 1,2018/11/30 16:44:58,012801096514,THREAT,url,2049,2018/11/30 16:44:58,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:58,28299,1,53094,443,12496,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7771,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:1dccHKUcnMkeYh68uGS1Jhl6+Hk=",
+        "network.community_id": [
+            "1:1dccHKUcnMkeYh68uGS1Jhl6+Hk=",
+            "1:HLMiinoD9jzLzaYU394wqKksBUE="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2415,7 +2532,10 @@
         "log.offset": 21297,
         "log.original": "Nov 30 16:44:59 PA-220 1,2018/11/30 16:44:58,012801096514,THREAT,url,2049,2018/11/30 16:44:58,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:58,28303,1,53095,443,17029,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7772,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:URFNGbFKOwT3Iaugo33D1mB/ndw=",
+        "network.community_id": [
+            "1:URFNGbFKOwT3Iaugo33D1mB/ndw=",
+            "1:pNMLPgDpZv2+S840jW/Ggq8ng2I="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2479,7 +2599,10 @@
         "log.offset": 21855,
         "log.original": "Nov 30 16:44:59 PA-220 1,2018/11/30 16:44:58,012801096514,THREAT,url,2049,2018/11/30 16:44:58,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:58,28390,1,53096,443,23696,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7773,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:/KMTfFetIlydTraxch89t5PYve0=",
+        "network.community_id": [
+            "1:/KMTfFetIlydTraxch89t5PYve0=",
+            "1:l6AkSmB92aDAHpLhiSCR28J+ANI="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2543,7 +2666,10 @@
         "log.offset": 22413,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:44:59,012801096514,THREAT,url,2049,2018/11/30 16:44:59,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:59,28433,1,53097,443,34769,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7774,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:Z8gFtZEJJ5xho2+kyaSyoXp1O/I=",
+        "network.community_id": [
+            "1:Z8gFtZEJJ5xho2+kyaSyoXp1O/I=",
+            "1:33ah/rOB1xL3Yy0FUH0sEGuRvx8="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2607,7 +2733,10 @@
         "log.offset": 22971,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:44:59,012801096514,THREAT,url,2049,2018/11/30 16:44:59,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:59,28380,1,53099,443,22486,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7775,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:dS0Vb9L/suztc58TuCJc5kLrnd4=",
+        "network.community_id": [
+            "1:dS0Vb9L/suztc58TuCJc5kLrnd4=",
+            "1:zOzoB9ZSg+/QZ7bt4sM6/I2TOXc="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2671,7 +2800,10 @@
         "log.offset": 23529,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:44:59,012801096514,THREAT,url,2049,2018/11/30 16:44:59,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:59,28363,1,53100,443,12894,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7776,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:ZWPOx8XRihDI9+WqUDIHe1OyInQ=",
+        "network.community_id": [
+            "1:ZWPOx8XRihDI9+WqUDIHe1OyInQ=",
+            "1:l+VVTNzHKEhzOIqE/8PVt4xidPQ="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2735,7 +2867,10 @@
         "log.offset": 24087,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:45:00,012801096514,THREAT,url,2049,2018/11/30 16:45:00,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:00,28349,1,53101,443,62348,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7777,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:T7UcACShDtZytIaufQKjiQ8jkhM=",
+        "network.community_id": [
+            "1:T7UcACShDtZytIaufQKjiQ8jkhM=",
+            "1:/GTSxrH684FoBXpyEBepCy2M81Q="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2799,7 +2934,10 @@
         "log.offset": 24645,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:45:00,012801096514,THREAT,url,2049,2018/11/30 16:45:00,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:00,28411,1,53104,443,6224,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7778,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:v2q2MvHECPCP6FDhZOfU9EhWDmw=",
+        "network.community_id": [
+            "1:v2q2MvHECPCP6FDhZOfU9EhWDmw=",
+            "1:z/innn6bIUB0vbGtF+NoTKxtaCQ="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2863,7 +3001,10 @@
         "log.offset": 25202,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:45:00,012801096514,THREAT,url,2049,2018/11/30 16:45:00,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:00,28397,1,53107,443,44120,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7779,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:/FL+10fyEBLqVR4oJrH3NBEx/pg=",
+        "network.community_id": [
+            "1:/FL+10fyEBLqVR4oJrH3NBEx/pg=",
+            "1:7H4lb05cbTOpCa4pIgruj3M2WrY="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2927,7 +3068,10 @@
         "log.offset": 25760,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:45:00,012801096514,THREAT,url,2049,2018/11/30 16:45:00,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:00,28347,1,53108,443,44228,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7780,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:abQPCp6V8x2Fumiz5x/+vZnuNfM=",
+        "network.community_id": [
+            "1:abQPCp6V8x2Fumiz5x/+vZnuNfM=",
+            "1:G3GfJYWnCjo8Ato/aBgr49UKGTI="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -2991,7 +3135,10 @@
         "log.offset": 26318,
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:45:00,012801096514,THREAT,url,2049,2018/11/30 16:45:00,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:00,28443,1,53109,443,31322,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7781,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:Ix3Fldb6W5hQx30Bw7Vd5/lm8hw=",
+        "network.community_id": [
+            "1:Ix3Fldb6W5hQx30Bw7Vd5/lm8hw=",
+            "1:Ni0ZlLTDuNH8F3hFm9nLZkj/SKI="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3055,7 +3202,10 @@
         "log.offset": 26876,
         "log.original": "Nov 30 16:45:14 PA-220 1,2018/11/30 16:45:13,012801096514,THREAT,url,2049,2018/11/30 16:45:13,192.168.15.224,216.58.194.98,192.168.1.63,216.58.194.98,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:13,28439,1,53118,443,1672,443,0x403000,tcp,block-url,\"www.googleadservices.com/\",(9999),business-and-economy,informational,client-to-server,7782,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:iBwlaPm6awPJaLJMdMMVOH9f5RU=",
+        "network.community_id": [
+            "1:iBwlaPm6awPJaLJMdMMVOH9f5RU=",
+            "1:WQC21tSR1QNUhWYgrcbgaLyTkos="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3116,7 +3266,10 @@
         "log.offset": 27423,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:15,012801096514,THREAT,url,2049,2018/11/30 16:45:15,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:15,25958,1,53126,443,20801,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7783,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:0TIOUPyQekmpFSgX6VlMP7asdJs=",
+        "network.community_id": [
+            "1:0TIOUPyQekmpFSgX6VlMP7asdJs=",
+            "1:hYoXMUwV0cAKhYUb4hSHsLUSo1s="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3177,7 +3330,10 @@
         "log.offset": 27968,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:15,012801096514,THREAT,url,2049,2018/11/30 16:45:15,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:15,28429,1,53127,443,24533,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7784,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:5CeaDtLLJAW4qpNe5rR3zJ3u1KM=",
+        "network.community_id": [
+            "1:5CeaDtLLJAW4qpNe5rR3zJ3u1KM=",
+            "1:al192CljLcXBQ5a9fXhiLM+uAKg="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3238,7 +3394,10 @@
         "log.offset": 28513,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:15,012801096514,THREAT,url,2049,2018/11/30 16:45:15,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:15,28465,1,53128,443,30150,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7785,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:HYgrk1tiJGzjAjdHLQJ54QqqEH0=",
+        "network.community_id": [
+            "1:HYgrk1tiJGzjAjdHLQJ54QqqEH0=",
+            "1:qI8dj7I/HOk1zkz/wkZBjQ/igsw="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3299,7 +3458,10 @@
         "log.offset": 29058,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:15,012801096514,THREAT,url,2049,2018/11/30 16:45:15,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:15,28504,1,53129,443,36305,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7786,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:8k83tpdWoK7nNJrq4t81UXuScHA=",
+        "network.community_id": [
+            "1:8k83tpdWoK7nNJrq4t81UXuScHA=",
+            "1:NTrpQ6lfrWcfRCXSB/tQ49z7sOQ="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3360,7 +3522,10 @@
         "log.offset": 29603,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28458,1,53130,443,42682,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7787,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:Ob0VEjF8YeGq1hR7SbX0pZ+5/EI=",
+        "network.community_id": [
+            "1:Ob0VEjF8YeGq1hR7SbX0pZ+5/EI=",
+            "1:93oplAL+YibXq75Qng9iomHp97k="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3421,7 +3586,10 @@
         "log.offset": 30148,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28491,1,53131,443,22530,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7788,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:WlDGM7WbDrN83JffZtwB6PNK3Y8=",
+        "network.community_id": [
+            "1:WlDGM7WbDrN83JffZtwB6PNK3Y8=",
+            "1:uhEHJXnnMaxBL0QYfNxS8lxZkls="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3482,7 +3650,10 @@
         "log.offset": 30693,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28520,1,53132,443,43713,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7789,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:U5qBRasQ13RQONeFOyA2+9QbWK8=",
+        "network.community_id": [
+            "1:U5qBRasQ13RQONeFOyA2+9QbWK8=",
+            "1:KtlZO5BbsoCg/ymqE05xAvw/iIA="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3543,7 +3714,10 @@
         "log.offset": 31238,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28335,1,53133,443,60608,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7790,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:S99EiT3uXg1VHeNM5TVPoeW1Zrk=",
+        "network.community_id": [
+            "1:S99EiT3uXg1VHeNM5TVPoeW1Zrk=",
+            "1:4MqfykfAOpIQmtvXcxzLNXqgyTs="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3604,7 +3778,10 @@
         "log.offset": 31783,
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28414,1,53134,443,9302,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7791,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:IMZ08eMrtDP/qCq8+cruyYo5r98=",
+        "network.community_id": [
+            "1:IMZ08eMrtDP/qCq8+cruyYo5r98=",
+            "1:Qj+AYB26PhFUPHkeHTP+u0XmR3A="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3665,7 +3842,10 @@
         "log.offset": 32327,
         "log.original": "Nov 30 16:45:17 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28488,1,53135,443,11634,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7792,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:Z6zBvBoA+0NQryjJ96nYaFcOuXw=",
+        "network.community_id": [
+            "1:Z6zBvBoA+0NQryjJ96nYaFcOuXw=",
+            "1:BQw3RXiNvT4NW4kw0J5Ol6rFN5A="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3729,7 +3909,10 @@
         "log.offset": 32872,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:26,012801096514,THREAT,url,2049,2018/11/30 16:45:26,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:26,28469,1,53152,443,30818,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7793,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:Qo8vSWzvn9QN5ADlmHxjJft+bxA=",
+        "network.community_id": [
+            "1:Qo8vSWzvn9QN5ADlmHxjJft+bxA=",
+            "1:1XJhGS1EujYy5wSCA64wjjK7hwA="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3793,7 +3976,10 @@
         "log.offset": 33417,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:26,012801096514,THREAT,url,2049,2018/11/30 16:45:26,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:26,28556,1,53155,443,64260,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7794,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:N2DPhwTnklulMwYKpcc4j0nLwu4=",
+        "network.community_id": [
+            "1:N2DPhwTnklulMwYKpcc4j0nLwu4=",
+            "1:YHN6cU700Mp7622M1rIzbnPQ+ik="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3857,7 +4043,10 @@
         "log.offset": 33962,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:26,012801096514,THREAT,url,2049,2018/11/30 16:45:26,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:26,28558,1,53158,443,7071,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7795,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:j5m21kfahBuP4jLMiqVnsVTJZ+Q=",
+        "network.community_id": [
+            "1:j5m21kfahBuP4jLMiqVnsVTJZ+Q=",
+            "1:o5UB5uvp2ThXPXChyc7lgvBMH0s="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3921,7 +4110,10 @@
         "log.offset": 34506,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:26,012801096514,THREAT,url,2049,2018/11/30 16:45:26,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:26,28531,1,53160,443,4512,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7796,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:8jQcqVCl+Q8N6jDNJlJwuydmDsA=",
+        "network.community_id": [
+            "1:8jQcqVCl+Q8N6jDNJlJwuydmDsA=",
+            "1:RRfOKybSMc/qYj1QHLEpuh+r0Eg="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -3985,7 +4177,10 @@
         "log.offset": 35050,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:26,012801096514,THREAT,url,2049,2018/11/30 16:45:26,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:26,28580,1,53161,443,3422,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7797,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:zcJ3HhZj3urz6vGwVhseviLv7kY=",
+        "network.community_id": [
+            "1:zcJ3HhZj3urz6vGwVhseviLv7kY=",
+            "1:KhCfFcRk3sovsTfN9pRRfgjsP84="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4049,7 +4244,10 @@
         "log.offset": 35594,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28477,1,53162,443,4651,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7798,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:DJHoN3ahXiIF4S4aGocL7KS/AhY=",
+        "network.community_id": [
+            "1:DJHoN3ahXiIF4S4aGocL7KS/AhY=",
+            "1:hZhkH3fz7n30Q+zsXnQejsna14Q="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4113,7 +4311,10 @@
         "log.offset": 36138,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28484,1,53163,443,19068,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7799,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:oQCUvcNDUq8NlFsOiIljRD/md2E=",
+        "network.community_id": [
+            "1:oQCUvcNDUq8NlFsOiIljRD/md2E=",
+            "1:lFuLGvzKiGz77tAPKRWLQ7eIBNw="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4177,7 +4378,10 @@
         "log.offset": 36683,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28609,1,53164,443,5831,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7800,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:DjIyvY/MLQ8U4RrMwFVhfq30m6g=",
+        "network.community_id": [
+            "1:DjIyvY/MLQ8U4RrMwFVhfq30m6g=",
+            "1:lXgqW6uer7QCnFv+5qVbgX4vM6E="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4241,7 +4445,10 @@
         "log.offset": 37227,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28564,1,53165,443,7084,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7801,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:fsi7g4zFbrFG09Mvo8P/WofCEKc=",
+        "network.community_id": [
+            "1:fsi7g4zFbrFG09Mvo8P/WofCEKc=",
+            "1:SDf7YJ4JLx2oja8SY0iCD/f9ZYk="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4305,7 +4512,10 @@
         "log.offset": 37771,
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28542,1,53166,443,18633,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7802,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:wICcAfDG87s8YdjIhDgBqv6mTws=",
+        "network.community_id": [
+            "1:wICcAfDG87s8YdjIhDgBqv6mTws=",
+            "1:/wf94ECkqPez+fxVgk+3KErtaBQ="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4369,7 +4579,10 @@
         "log.offset": 38316,
         "log.original": "Nov 30 16:45:28 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28590,1,53167,443,25557,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7803,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:L9I6mLjr15WmWcGfC1vPrN0NmY0=",
+        "network.community_id": [
+            "1:L9I6mLjr15WmWcGfC1vPrN0NmY0=",
+            "1:lGMn2sEJLK3qbOX02axD1srH/FY="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4433,7 +4646,10 @@
         "log.offset": 38861,
         "log.original": "Nov 30 16:45:28 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28455,1,53150,443,20661,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7804,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:pvzPjqjqA6kLTjxiRDVSDxuidwg=",
+        "network.community_id": [
+            "1:pvzPjqjqA6kLTjxiRDVSDxuidwg=",
+            "1:O1zDnt5d52xTreiMgL/sHMRHiXA="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4497,7 +4713,10 @@
         "log.offset": 39406,
         "log.original": "Nov 30 16:45:29 PA-220 1,2018/11/30 16:45:28,012801096514,THREAT,url,2049,2018/11/30 16:45:28,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:28,28585,1,53185,443,65438,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7805,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:hu8p8gkxiimZqTLhIkgVfSePEqk=",
+        "network.community_id": [
+            "1:hu8p8gkxiimZqTLhIkgVfSePEqk=",
+            "1:CwNRTMQumfdoC3msd4z5PIYkKLU="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4561,7 +4780,10 @@
         "log.offset": 39951,
         "log.original": "Nov 30 16:45:29 PA-220 1,2018/11/30 16:45:28,012801096514,THREAT,url,2049,2018/11/30 16:45:28,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:28,28462,1,53187,443,53101,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7806,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:z12wzV1bKYppHPfC9LypWH+RtE4=",
+        "network.community_id": [
+            "1:z12wzV1bKYppHPfC9LypWH+RtE4=",
+            "1:0YBp8myYbHSoKWG2HvxutMfose0="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4625,7 +4847,10 @@
         "log.offset": 40496,
         "log.original": "Nov 30 16:45:29 PA-220 1,2018/11/30 16:45:28,012801096514,THREAT,url,2049,2018/11/30 16:45:28,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:28,28839,1,53188,443,35463,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7807,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:eJYKKiIqzYxe5ja/6/hDB3CgzSI=",
+        "network.community_id": [
+            "1:eJYKKiIqzYxe5ja/6/hDB3CgzSI=",
+            "1:CQrsQ2CJN8/aVtRj6kkSqGiLA4w="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",
@@ -4689,7 +4914,10 @@
         "log.offset": 41041,
         "log.original": "Nov 30 16:45:30 PA-220 1,2018/11/30 16:45:29,012801096514,THREAT,url,2049,2018/11/30 16:45:29,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:29,28400,1,53178,443,45769,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7808,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
-        "network.community_id": "1:f+00RNTWn2IGrM2JmEAnEPoRwDg=",
+        "network.community_id": [
+            "1:f+00RNTWn2IGrM2JmEAnEPoRwDg=",
+            "1:vbknc+k7pE33+aNpIggpIzlC7MY="
+        ],
         "network.direction": "inbound",
         "network.transport": "tcp",
         "observer.hostname": "PA-220",

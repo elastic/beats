@@ -300,6 +300,13 @@ processors:
      field: destination.ip
      target_field: destination.geo
 
+# Append NAT community_id to network.community_id
+ - append:
+     if: 'ctx?.palo_alto?.pan_os?.network?.nat?.community_id != null && ctx.palo_alto.pan_os.network.nat.community_id != ctx?.network?.community_id'
+     field: network.community_id
+     value:
+      - '{{palo_alto.pan_os.network.nat.community_id}}'
+
 # Remove temporary fields.
  - remove:
      field:
