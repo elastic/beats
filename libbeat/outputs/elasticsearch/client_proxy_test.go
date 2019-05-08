@@ -37,6 +37,13 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 )
 
+// These constants are inserted into client http request headers and confirmed
+// by the server listeners.
+const (
+	headerTestField = "X-Test-Value"
+	headerTestValue = "client_proxy_test test value"
+)
+
 // TestClientPing is a placeholder test that does nothing on a standard run,
 // but starts up a client and sends a ping when the environment variable
 // TEST_START_CLIENT is set to 1 as in execClient).
@@ -87,12 +94,9 @@ func TestEnvironmentProxy(t *testing.T) {
 
 	// Start a client with HTTP_PROXY set to the proxy listener.
 	// The server is set to a nonexistent URL because ProxyFromEnvironment
-	// always returns a nil proxy for local destination URLs. For this case, we
-	// confirm the intended destination by setting it in the http headers,
-	// triggered in doClientPing by the TEST_HEADER_URL environment variable.
+	// always returns a nil proxy for local destination URLs.
 	execClient(t,
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
-		"TEST_HEADER_URL="+servers.serverURL,
 		"HTTP_PROXY="+servers.proxyURL)
 	// We expect one proxy request and 0 server requests
 	assert.Equal(t, 0, servers.serverRequestCount())
@@ -112,7 +116,6 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 	// non-nil result.
 	execClient(t,
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
-		"TEST_HEADER_URL="+servers.serverURL,
 		"TEST_PROXY_URL="+servers.proxyURL,
 		"HTTP_PROXY="+servers.serverURL)
 	// We expect one proxy request and 0 server requests
@@ -148,23 +151,15 @@ func doClientPing(t *testing.T) {
 	serverURL := os.Getenv("TEST_SERVER_URL")
 	require.NotEqual(t, serverURL, "")
 	proxy := os.Getenv("TEST_PROXY_URL")
-	headerURL := os.Getenv("TEST_HEADER_URL")
 	clientSettings := ClientSettings{
 		URL:     serverURL,
 		Index:   outil.MakeSelector(outil.ConstSelectorExpr("test")),
-		Headers: map[string]string{"X-Test-URL": serverURL},
+		Headers: map[string]string{headerTestField: headerTestValue},
 	}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)
 		require.NoError(t, err)
 		clientSettings.Proxy = proxyURL
-	}
-	if headerURL != "" {
-		// Some tests point at an intentionally invalid server because golang's
-		// helpers never return a proxy for a request to the local host (see
-		// TestEnvironmentProxy), and in that case we still want to record the real
-		// server URL in the headers for verification.
-		clientSettings.Headers["X-Test-URL"] = headerURL
 	}
 	client, err := NewClient(clientSettings, nil)
 	require.NoError(t, err)
@@ -201,13 +196,13 @@ func startServers(t *testing.T) (*serverState, func()) {
 	state := serverState{}
 	server := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, state.serverURL, r.Header.Get("X-Test-URL"))
+			assert.Equal(t, headerTestValue, r.Header.Get(headerTestField))
 			fmt.Fprintln(w, "Hello, client")
 			state._serverRequestCount.Inc()
 		}))
 	proxy := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, state.serverURL, r.Header.Get("X-Test-URL"))
+			assert.Equal(t, headerTestValue, r.Header.Get(headerTestField))
 			fmt.Fprintln(w, "Hello, client")
 			state._proxyRequestCount.Inc()
 		}))
