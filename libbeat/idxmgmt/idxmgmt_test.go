@@ -268,6 +268,24 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 			loadTemplate: LoadModeEnabled,
 			tmplCfg:      &defaultCfg,
 		},
+		"template default loadMode Overwrite, ilm disabled": {
+			cfg: common.MapStr{
+				"setup.ilm.enabled": false,
+			},
+			loadTemplate: LoadModeOverwrite,
+			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+				"overwrite": "true",
+			}),
+		},
+		"template default loadMode Force, ilm disabled": {
+			cfg: common.MapStr{
+				"setup.ilm.enabled": false,
+			},
+			loadTemplate: LoadModeForce,
+			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+				"overwrite": "true",
+			}),
+		},
 		"template loadMode disabled, ilm disabled": {
 			cfg: common.MapStr{
 				"setup.ilm.enabled": false,
@@ -280,6 +298,22 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 			},
 			alias:  "test-9.9.9",
 			policy: "test-9.9.9",
+		},
+		"template disabled, ilm disabled, loadMode Overwrite": {
+			cfg: common.MapStr{
+				"setup.template.enabled": false,
+				"setup.ilm.enabled":      false,
+			},
+			loadILM: LoadModeOverwrite,
+		},
+		"template disabled, ilm disabled, loadMode Force": {
+			cfg: common.MapStr{
+				"setup.template.enabled": false,
+				"setup.ilm.enabled":      false,
+			},
+			loadILM: LoadModeForce,
+			alias:   "test-9.9.9",
+			policy:  "test-9.9.9",
 		},
 		"template loadmode disabled, ilm loadMode enabled": {
 			loadTemplate: LoadModeDisabled,
@@ -304,7 +338,7 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			info := beat.Info{Beat: "test", Version: "9.9.9"}
-			factory := MakeDefaultSupport(nil)
+			factory := MakeDefaultSupport(ilm.StdSupport)
 			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
 

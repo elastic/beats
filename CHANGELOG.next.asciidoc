@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
 - Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
 
 *Filebeat*
 
@@ -87,6 +88,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
 - Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
 - Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
 
 *Heartbeat*
 
@@ -105,6 +107,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
 
 *Packetbeat*
 
@@ -134,6 +138,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
 - Add `add_observer_metadata` processor. {pull}11394[11394]
 - Add `decode_csv_fields` processor. {pull}11753[11753]
+- Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
 
 *Auditbeat*
 
