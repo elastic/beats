@@ -21,6 +21,7 @@
 package elasticsearch
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -56,8 +57,7 @@ func TestBaseline(t *testing.T) {
 	defer listeners.close()
 
 	// Start a bare client with no proxy settings, pointed at the main server.
-	err := execClient("TEST_SERVER_URL=" + listeners.server.URL)
-	assert.NoError(t, err)
+	execClient(t, "TEST_SERVER_URL="+listeners.server.URL)
 	// We expect one server request and 0 proxy requests
 	assert.Equal(t, 1, listeners.serverRequestCount())
 	assert.Equal(t, 0, listeners.proxyRequestCount())
@@ -72,10 +72,9 @@ func TestClientSettingsProxy(t *testing.T) {
 	defer listeners.close()
 
 	// Start a client with ClientSettings.Proxy set to the proxy listener.
-	err := execClient(
+	execClient(t,
 		"TEST_SERVER_URL="+listeners.server.URL,
 		"TEST_PROXY_URL="+listeners.proxy.URL)
-	assert.NoError(t, err)
 	// We expect one proxy request and 0 server requests
 	assert.Equal(t, 0, listeners.serverRequestCount())
 	assert.Equal(t, 1, listeners.proxyRequestCount())
@@ -94,11 +93,10 @@ func TestEnvironmentProxy(t *testing.T) {
 	// always returns a nil proxy for local destination URLs. For this case, we
 	// confirm the intended destination by setting it in the http headers,
 	// triggered in doClientPing by the TEST_HEADER_URL environment variable.
-	err := execClient(
+	execClient(t,
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
 		"TEST_HEADER_URL="+listeners.server.URL,
 		"HTTP_PROXY="+listeners.proxy.URL)
-	assert.NoError(t, err)
 	// We expect one proxy request and 0 server requests
 	assert.Equal(t, 0, listeners.serverRequestCount())
 	assert.Equal(t, 1, listeners.proxyRequestCount())
@@ -116,12 +114,11 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 	// override the latter and thus we will only see a ping to the proxy.
 	// As above, the fake URL is needed to ensure ProxyFromEnvironment gives a
 	// non-nil result.
-	err := execClient(
+	execClient(t,
 		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
 		"TEST_HEADER_URL="+listeners.server.URL,
 		"TEST_PROXY_URL="+listeners.proxy.URL,
 		"HTTP_PROXY="+listeners.server.URL)
-	assert.NoError(t, err)
 	// We expect one proxy request and 0 server requests
 	assert.Equal(t, 0, listeners.serverRequestCount())
 	assert.Equal(t, 1, listeners.proxyRequestCount())
@@ -134,18 +131,26 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 // This is helpful for testing proxy settings, since we need to have both a
 // proxy / server-side listener and a client that communicates with the server
 // using various proxy settings.
-func execClient(env ...string) error {
+func execClient(t *testing.T, env ...string) {
 	// The child process always runs only the TestClientPing test, which pings
 	// the server at TEST_SERVER_URL and then terminates.
 	cmd := exec.Command(os.Args[0], "-test.run=TestClientPing")
 	cmd.Env = append(append(os.Environ(),
 		"TEST_START_CLIENT=1"),
 		env...)
-	return cmd.Run()
+	cmdOutput := new(bytes.Buffer)
+	cmd.Stderr = cmdOutput
+	cmd.Stdout = cmdOutput
+
+	err := cmd.Run()
+	if err != nil {
+		t.Error("Error executing client:\n" + cmdOutput.String())
+	}
 }
 
 func doClientPing(t *testing.T) {
 	serverURL := os.Getenv("TEST_SERVER_URL")
+	require.NotEqual(t, serverURL, "")
 	proxy := os.Getenv("TEST_PROXY_URL")
 	headerURL := os.Getenv("TEST_HEADER_URL")
 	clientSettings := ClientSettings{
