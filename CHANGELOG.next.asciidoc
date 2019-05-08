@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0...7.1[Check the HEAD diff]
 *Metricbeat*
 
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 
 *Packetbeat*
 
