@@ -80,7 +80,7 @@ func TestESLoader_Load(t *testing.T) {
 	pathTestdata, err := filepath.Abs(filepath.Join("testdata"))
 	require.NoError(t, err)
 	fieldsYamlPath := filepath.Join(pathTestdata, "fields.yml")
-	fieldsJsonPath := filepath.Join(pathTestdata, "fields.json")
+	fieldsJSONPath := filepath.Join(pathTestdata, "fields.json")
 
 	t.Run("load template failure", func(t *testing.T) {
 		for run, data := range map[string]struct {
@@ -164,16 +164,16 @@ func TestESLoader_Load(t *testing.T) {
 		assert.True(t, loader.templateExists(name))
 
 		// Load Template with same name, but different JSON.name and ensure it is loaded
-		nameJson := "json-test"
-		cfgJson := TemplateConfig{Enabled: true, Name: name, JSON: struct {
+		nameJSON := "json-test"
+		cfgJSON := TemplateConfig{Enabled: true, Name: name, JSON: struct {
 			Enabled bool   `config:"enabled"`
 			Path    string `config:"path"`
 			Name    string `config:"name"`
-		}{Enabled: true, Path: fieldsJsonPath, Name: nameJson}}
-		err = loader.Load(cfgJson, beatInfo, nil, false)
+		}{Enabled: true, Path: fieldsJSONPath, Name: nameJSON}}
+		err = loader.Load(cfgJSON, beatInfo, nil, false)
 		assert.NoError(t, err)
 		assert.True(t, loader.templateExists(name))
-		assert.True(t, loader.templateExists(nameJson))
+		assert.True(t, loader.templateExists(nameJSON))
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
@@ -206,7 +206,7 @@ func TestESLoader_Load(t *testing.T) {
 					Enabled bool   `config:"enabled"`
 					Path    string `config:"path"`
 					Name    string `config:"name"`
-				}{Enabled: true, Path: fieldsJsonPath, Name: "json-template"}},
+				}{Enabled: true, Path: fieldsJSONPath, Name: "json-template"}},
 				fields:     fields,
 				name:       "json-template",
 				properties: []string{"host_name"},
@@ -232,7 +232,7 @@ func TestESLoader_Load(t *testing.T) {
 					p, ok := val.(map[string]interface{})
 					require.True(t, ok)
 					var properties []string
-					for k, _ := range p {
+					for k := range p {
 						properties = append(properties, k)
 					}
 					fmt.Println(properties)
