@@ -62,7 +62,6 @@ jobs:
     chmod +x kubectl && sudo mv kubectl /usr/local/bin/
       env:
         - TARGETS="-C deploy/kubernetes test"
-
 addons:
   apt:
     update: true
