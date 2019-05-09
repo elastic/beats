@@ -286,9 +286,8 @@ class TestCommandExportILMPolicy(BaseTest):
         self.policy_name = self.beat_name + "-9.9.9"
         self.cmd = "ilm-policy"
 
-    def assert_log_contains_policy(self, policy):
+    def assert_log_contains_policy(self):
         assert self.log_contains('ILM policy successfully loaded.')
-        assert self.log_contains(policy)
         assert self.log_contains('"max_age": "30d"')
         assert self.log_contains('"max_size": "50gb"')
 
@@ -304,7 +303,7 @@ class TestCommandExportILMPolicy(BaseTest):
                                   config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_policy(self.policy_name)
+        self.assert_log_contains_policy()
         self.assert_log_contains_write_alias()
 
     def test_load_disabled(self):
@@ -316,7 +315,7 @@ class TestCommandExportILMPolicy(BaseTest):
                                   config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_policy(self.policy_name)
+        self.assert_log_contains_policy()
         self.assert_log_contains_write_alias()
 
     def test_changed_policy_name(self):
@@ -330,5 +329,5 @@ class TestCommandExportILMPolicy(BaseTest):
                                   config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_policy(policy_name)
+        self.assert_log_contains_policy()
         self.assert_log_contains_write_alias()
