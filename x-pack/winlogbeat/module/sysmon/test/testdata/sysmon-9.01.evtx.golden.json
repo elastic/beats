@@ -26,10 +26,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 1,
       "user": {
-        "domain": "VAGRANT-2012-R2",
-        "identifier": "S-1-5-21-3541430928-2051711210-1391384369-1001",
-        "name": "vagrant",
-        "type": "User"
+        "identifier": "S-1-5-21-3541430928-2051711210-1391384369-1001"
       },
       "version": 3
     }

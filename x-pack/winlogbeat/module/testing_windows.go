@@ -109,8 +109,16 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 
 		for _, r := range records {
 			record := r.ToEvent()
-			record.Fields.Delete("event.created")
-			record.Fields.Delete("log.file")
+			record.Delete("event.created")
+			record.Delete("log.file")
+
+			// Enrichment based on user.identifier varies based on the host
+			// where this is execute so remove it.
+			if userType, _ := record.GetValue("winlog.user.type"); userType != "Well Known Group" {
+				record.Delete("winlog.user.type")
+				record.Delete("winlog.user.name")
+				record.Delete("winlog.user.domain")
+			}
 
 			evt, err := processor.Run(&record)
 			if err != nil {
