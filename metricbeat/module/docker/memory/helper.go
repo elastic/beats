@@ -43,8 +43,9 @@ func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool)
 	for _, containerStats := range containers {
 		//There appears to be a race where a container will report with a stat object before it actually starts
 		//during this time, there doesn't appear to be any meaningful data,
-		// and Limit will never be 0 unless the container is not running & there's no cgroup data
-		if containerStats.Stats.MemoryStats.Limit == 0 {
+		// and Limit will never be 0 unless the container is not running
+		//and there's no cgroup data, and CPU usage should be greater than 0 for any running container.
+		if containerStats.Stats.MemoryStats.Limit == 0 && containerStats.Stats.PreCPUStats.CPUUsage.TotalUsage == 0 {
 			continue
 		}
 		formattedStats = append(formattedStats, s.getMemoryStats(containerStats, dedot))
