@@ -20,7 +20,6 @@
 package collector
 
 import (
-	"math"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
