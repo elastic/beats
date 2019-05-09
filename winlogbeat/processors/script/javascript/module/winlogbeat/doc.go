@@ -15,23 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
-
-import (
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/winlogbeat/beater"
-
-	// Register fields.
-	_ "github.com/elastic/beats/winlogbeat/include"
-
-	// Import the script processor and supporting modules.
-	_ "github.com/elastic/beats/libbeat/processors/script"
-	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
-)
-
-// Name of this beat
-var Name = "winlogbeat"
-
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+// Package winlogbeat registers the winlogbeat module with the javascript script
+// processor. The module has utilities specific to Winlogbeat like parsing
+// Windows command lines.
+package winlogbeat
