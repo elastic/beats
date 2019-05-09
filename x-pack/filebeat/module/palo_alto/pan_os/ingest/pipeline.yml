@@ -10,9 +10,9 @@ processors:
  - date:
      field: "_temp_.generated_time"
      ignore_failure: true
-     {< if .convert_timezone >}
+     #{< if .convert_timezone >}
      timezone: "{{ event.timezone }}"
-     {< end >}
+     #{< end >}
      formats:
        - "yyyy/MM/dd HH:mm:ss"
 
@@ -21,9 +21,9 @@ processors:
      field: "event.created"
      target_field: "event.created"
      ignore_failure: true
-     {< if .convert_timezone >}
+     #{< if .convert_timezone >}
      timezone: "{{ event.timezone }}"
-     {< end >}
+     #{< end >}
      formats:
        - "yyyy/MM/dd HH:mm:ss"
 
@@ -32,9 +32,9 @@ processors:
      field: "event.start"
      target_field: "event.start"
      ignore_failure: true
-     {< if .convert_timezone >}
+     #{< if .convert_timezone >}
      timezone: "{{ event.timezone }}"
-     {< end >}
+     #{< end >}
      formats:
        - "yyyy/MM/dd HH:mm:ss"
 
