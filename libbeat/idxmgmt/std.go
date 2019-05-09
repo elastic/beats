@@ -197,12 +197,12 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		}
 	}
 
-	if withILM && loadILM.Enabled() {
+	if loadILM == LoadModeForce || withILM && loadILM.Enabled() {
 		// mark ILM as enabled in indexState if withILM is true
 		m.support.st.withILM.CAS(false, true)
 
 		// install ilm policy
-		policyCreated, err := m.ilm.EnsurePolicy(loadILM == LoadModeForce)
+		policyCreated, err := m.ilm.EnsurePolicy(loadILM >= LoadModeOverwrite)
 		if err != nil {
 			return err
 		}
@@ -210,7 +210,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 
 		// The template should be updated if a new policy is created.
 		if policyCreated && loadTemplate.Enabled() {
-			loadTemplate = LoadModeForce
+			loadTemplate = LoadModeOverwrite
 		}
 
 		// create alias
@@ -225,7 +225,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	}
 
 	// create and install template
-	if m.support.templateCfg.Enabled && loadTemplate.Enabled() {
+	if loadTemplate == LoadModeForce || m.support.templateCfg.Enabled && loadTemplate.Enabled() {
 		tmplCfg := m.support.templateCfg
 
 		if withILM {
@@ -237,11 +237,12 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		}
 
 		if loadTemplate == LoadModeForce {
+			tmplCfg.Enabled = true
+		}
+		if loadTemplate >= LoadModeOverwrite {
 			tmplCfg.Overwrite = true
 		}
-
 		fields := m.assets.Fields(m.support.info.Beat)
-
 		err = m.clientHandler.Load(tmplCfg, m.support.info, fields, m.support.migration)
 		if err != nil {
 			return fmt.Errorf("error loading template: %v", err)

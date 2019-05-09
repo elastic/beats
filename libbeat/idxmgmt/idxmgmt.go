@@ -74,12 +74,14 @@ const (
 	// LoadModeUnset indicates that no specific mode is set.
 	// Instead the decision about loading data will be derived from the config or their respective default values.
 	LoadModeUnset LoadMode = iota //unset
-	// LoadModeEnabled indicates loading if not already available
-	LoadModeEnabled //enabled
-	// LoadModeForce indicates loading in any case.
-	LoadModeForce //force
 	// LoadModeDisabled indicates no loading
 	LoadModeDisabled //disabled
+	// LoadModeEnabled indicates loading if not already available
+	LoadModeEnabled //enabled
+	// LoadModeOverwrite indicates overwriting existing components, if loading is not generally disabled.
+	LoadModeOverwrite //overwrite
+	// LoadModeForce indicates forcing to load components in any case, independent of general loading configurations.
+	LoadModeForce //force
 )
 
 // Enabled returns whether or not the LoadMode should be considered enabled

@@ -329,4 +329,4 @@ TIP: To populate the client locations map in the overview dashboard, follow the
 steps described in <<{beatname_lc}-geoip>>.
 
 [role="screenshot"]
-image:./images/packetbeat-statistics.png[Packetbeat statistics]
+image::./images/packetbeat-statistics.png[Packetbeat statistics]
