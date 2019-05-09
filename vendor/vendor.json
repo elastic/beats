@@ -1246,44 +1246,44 @@
 			"revisionTime": "2018-08-31T13:10:45Z"
 		},
 		{
-			"checksumSHA1": "SyDYkg4fXTa27fsNrjnEQBKoDEQ=",
+			"checksumSHA1": "c1rU7WNZ+1AwZcRPBWhPBHcbZjg=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
-			"revisionTime": "2019-04-24T11:51:21Z",
-			"version": "v0.10.1",
-			"versionExact": "v0.10.1"
+			"revision": "1227b9d6877d126ad640087e44439d70dba2df4f",
+			"revisionTime": "2019-05-08T13:07:01Z",
+			"version": "v0.10.2",
+			"versionExact": "v0.10.2"
 		},
 		{
-			"checksumSHA1": "y4HBfgWAm5cwRN3Mn7S3Bn1/pDc=",
+			"checksumSHA1": "TX9y4oPL5YmT4Gb/OU4GIPTdQB4=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
-			"revisionTime": "2019-04-24T11:51:21Z",
-			"version": "v0.10.1",
-			"versionExact": "v0.10.1"
+			"revision": "1227b9d6877d126ad640087e44439d70dba2df4f",
+			"revisionTime": "2019-05-08T13:07:01Z",
+			"version": "v0.10.2",
+			"versionExact": "v0.10.2"
 		},
 		{
-			"checksumSHA1": "axEkf+eo2z5V+R0nvgr1z+rty4w=",
+			"checksumSHA1": "hPqGM3DENaGfipEODoyZ4mKogTQ=",
 			"path": "github.com/elastic/gosigar/sys",
-			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
-			"revisionTime": "2019-04-24T11:51:21Z",
-			"version": "v0.10.1",
-			"versionExact": "v0.10.1"
+			"revision": "1227b9d6877d126ad640087e44439d70dba2df4f",
+			"revisionTime": "2019-05-08T13:07:01Z",
+			"version": "v0.10.2",
+			"versionExact": "v0.10.2"
 		},
 		{
-			"checksumSHA1": "BtggD07yUvVppRyX4HTrRi6sqnQ=",
+			"checksumSHA1": "mLq5lOyD0ZU39ysXuf1ETOLJ+f0=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
-			"revisionTime": "2019-04-24T11:51:21Z",
-			"version": "v0.10.1",
-			"versionExact": "v0.10.1"
+			"revision": "1227b9d6877d126ad640087e44439d70dba2df4f",
+			"revisionTime": "2019-05-08T13:07:01Z",
+			"version": "v0.10.2",
+			"versionExact": "v0.10.2"
 		},
 		{
-			"checksumSHA1": "CbP36vKSgkQruWF8PODFN9+SANI=",
+			"checksumSHA1": "R70u1XUHH/t1pquvHEFDeUFtkFk=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736",
-			"revisionTime": "2019-04-24T11:51:21Z",
-			"version": "v0.10.1",
-			"versionExact": "v0.10.1"
+			"revision": "1227b9d6877d126ad640087e44439d70dba2df4f",
+			"revisionTime": "2019-05-08T13:07:01Z",
+			"version": "v0.10.2",
+			"versionExact": "v0.10.2"
 		},
 		{
 			"checksumSHA1": "Klc34HULvwvY4cGA/D8HmqtXLqw=",

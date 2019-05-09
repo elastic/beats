@@ -59,7 +59,7 @@ type Manager interface {
 // See: [Policy phases and actions documentation](https://www.elastic.co/guide/en/elasticsearch/reference/master/ilm-policy-definition.html).
 type Policy struct {
 	Name string
-	Body map[string]interface{}
+	Body common.MapStr
 }
 
 // Alias describes the alias to be created in Elasticsearch.

@@ -63,14 +63,14 @@ func TestFileLoader_Load(t *testing.T) {
 			require.NoError(t, err)
 			body, err := buildBody(tmpl, test.cfg, test.fields)
 			require.NoError(t, err)
-			assert.Equal(t, common.MapStr{test.name: body}.StringToPrint()+"\n", fc.body)
+			assert.Equal(t, body.StringToPrint()+"\n", fc.body)
 		})
 	}
 }
 
 type fileClient struct {
-	ver  common.Version
-	body string
+	ver              common.Version
+	kind, name, body string
 }
 
 func newFileClient(ver string) (*fileClient, error) {
@@ -88,7 +88,7 @@ func (c *fileClient) GetVersion() common.Version {
 	return c.ver
 }
 
-func (c *fileClient) Write(name string, body string) error {
-	c.body = body
+func (c *fileClient) Write(component string, name string, body string) error {
+	c.kind, c.name, c.body = component, name, body
 	return nil
 }
