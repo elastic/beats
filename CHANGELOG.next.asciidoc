@@ -30,9 +30,12 @@ https://github.com/elastic/beats/compare/v7.0.0...7.1[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+
 *Auditbeat*
 
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
 
 *Filebeat*
 
@@ -45,6 +48,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.1[Check the HEAD diff]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
 
 *Packetbeat*
+
+- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
 
 *Winlogbeat*
 
