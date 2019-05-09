@@ -77,6 +77,11 @@ func NewInput(
 	context input.Context,
 ) (input.Input, error) {
 	cleanupNeeded := true
+	cleanupIfNeeded := func(f func() error) {
+		if cleanupNeeded {
+			f()
+		}
+	}
 
 	// Note: underlying output.
 	//  The input and harvester do have different requirements
@@ -88,21 +93,13 @@ func NewInput(
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if cleanupNeeded {
-			out.Close()
-		}
-	}()
+	defer cleanupIfNeeded(out.Close)
 
 	// stateOut will only be unblocked if the beat is shut down.
 	// otherwise it can block on a full publisher pipeline, so state updates
 	// can be forwarded correctly to the registrar.
 	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
-	defer func() {
-		if cleanupNeeded {
-			stateOut.Close()
-		}
-	}()
+	defer cleanupIfNeeded(stateOut.Close)
 
 	meta := context.Meta
 	if len(meta) == 0 {
