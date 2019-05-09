@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.1[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+
 *Heartbeat*
 
 *Journalbeat*
