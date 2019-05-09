@@ -272,4 +272,4 @@ The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 [role="screenshot"]
-image:./images/heartbeat-statistics.png[Heartbeat statistics]
+image::./images/heartbeat-statistics.png[Heartbeat statistics]

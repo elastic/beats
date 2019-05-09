@@ -170,4 +170,4 @@ The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 [role="screenshot"]
-image:./images/winlogbeat-dashboard.png[Winlogbeat statistics]
+image::./images/winlogbeat-dashboard.png[Winlogbeat statistics]
