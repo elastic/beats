@@ -15,7 +15,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/winlogbeat/checkpoint"
@@ -109,14 +108,18 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 		}
 
 		for _, r := range records {
-			fields := r.ToEvent().Fields
-			fields.Delete("event.created")
-			fields.Delete("log.file")
+			record := r.ToEvent()
+			record.Fields.Delete("event.created")
+			record.Fields.Delete("log.file")
 
-			evt, err := processor.Run(&beat.Event{Fields: fields})
+			evt, err := processor.Run(&record)
 			if err != nil {
-				t.Fatalf("%v while processing event:\n%v", err, fields.StringToPrint())
+				t.Fatalf("%v while processing event:\n%v", err, record.Fields.StringToPrint())
 			}
+
+			// Ensure timezone is UTC. In the normal Beats output this is handled
+			// by the encoder (go-structform).
+			evt.PutValue("@timestamp", evt.Timestamp.UTC())
 
 			events = append(events, filterEvent(evt.Fields, p.ignoreFields))
 		}
