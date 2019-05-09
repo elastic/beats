@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 
 *Packetbeat*
 
@@ -71,12 +72,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
 - Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
 - Fix queue.spool.write.flush.events config type. {pull}12080[12080]
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 
 *Auditbeat*
 
 - Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
 - Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
 - Login dataset: Fix re-read of utmp files. {pull}12028[12028]
 
 *Filebeat*
@@ -90,6 +93,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
 - Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
 - Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
 
 *Heartbeat*
 
@@ -108,6 +112,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Check permissions in system socket metricset based on capabilities. {pull}12039[12039]
+- Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
 
@@ -115,6 +121,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
+- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
 
 *Winlogbeat*
 
@@ -140,6 +147,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `add_observer_metadata` processor. {pull}11394[11394]
 - Add `decode_csv_fields` processor. {pull}11753[11753]
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
+- New `extract_array` processor. {pull}11761[11761]
 
 *Auditbeat*
 
