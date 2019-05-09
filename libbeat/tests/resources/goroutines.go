@@ -18,20 +18,28 @@
 package resources
 
 import (
+	"fmt"
 	"runtime"
 	"testing"
+	"time"
 )
+
+const defaultFinalizationTimeout = 5 * time.Second
 
 // GoroutinesChecker keeps the count of goroutines when it was created
 // so later it can check if this number has increased
 type GoroutinesChecker struct {
 	before int
+
+	// FinalizationTimeout is the time to wait till goroutines have finished
+	FinalizationTimeout time.Duration
 }
 
 // NewGoroutinesChecker creates a new GoroutinesChecker
 func NewGoroutinesChecker() GoroutinesChecker {
 	return GoroutinesChecker{
-		before: runtime.NumGoroutine(),
+		before:              runtime.NumGoroutine(),
+		FinalizationTimeout: defaultFinalizationTimeout,
 	}
 }
 
@@ -39,11 +47,23 @@ func NewGoroutinesChecker() GoroutinesChecker {
 // was created
 func (c GoroutinesChecker) Check(t testing.TB) {
 	t.Helper()
-	runtime.GC()
-	after := runtime.NumGoroutine()
-	if after > c.before {
-		t.Errorf("Possible goroutines leak, before: %d, after: %d", c.before, after)
+	err := c.check(t)
+	if err != nil {
+		t.Error(err)
 	}
+}
+
+func (c GoroutinesChecker) check(t testing.TB) error {
+	timeout := time.Now().Add(c.FinalizationTimeout)
+	var after int
+	for time.Now().Before(timeout) {
+		after = runtime.NumGoroutine()
+		if after <= c.before {
+			return nil
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	return fmt.Errorf("Possible goroutines leak, before: %d, after: %d", c.before, after)
 }
 
 // CallAndCheckGoroutines calls a function and checks if it has increased
