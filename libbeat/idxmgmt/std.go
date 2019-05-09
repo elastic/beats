@@ -197,7 +197,9 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		}
 	}
 
-	if loadILM == LoadModeForce || withILM && loadILM.Enabled() {
+	ilmEnabled := loadILM == LoadModeForce || withILM && loadILM.Enabled()
+
+	if ilmEnabled {
 		// mark ILM as enabled in indexState if withILM is true
 		m.support.st.withILM.CAS(false, true)
 
@@ -211,16 +213,6 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		// The template should be updated if a new policy is created.
 		if policyCreated && loadTemplate.Enabled() {
 			loadTemplate = LoadModeOverwrite
-		}
-
-		// create alias
-		if err := m.ilm.EnsureAlias(); err != nil {
-			if ilm.ErrReason(err) != ilm.ErrAliasAlreadyExists {
-				return err
-			}
-			log.Info("Write alias exists already")
-		} else {
-			log.Info("Write alias successfully generated.")
 		}
 	}
 
@@ -249,6 +241,18 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		}
 
 		log.Info("Loaded index template.")
+	}
+
+	if ilmEnabled {
+		// create alias
+		if err := m.ilm.EnsureAlias(); err != nil {
+			if ilm.ErrReason(err) != ilm.ErrAliasAlreadyExists {
+				return err
+			}
+			log.Info("Write alias exists already")
+		} else {
+			log.Info("Write alias successfully generated.")
+		}
 	}
 
 	return nil
