@@ -4,7 +4,6 @@ import os
 import unittest
 import glob
 import subprocess
-import time
 
 from elasticsearch import Elasticsearch
 import json
