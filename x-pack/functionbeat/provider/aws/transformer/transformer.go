@@ -22,7 +22,7 @@ import (
 // TODO: how to keep the fields in sync with AWS?
 // TODO: api gateway proxy a lot more information is available.
 
-// Custom decode for cloudwatch kinesis messages
+// DecodeByteMessage for cloudwatch kinesis messages
 func DecodeByteMessage(message []byte) (decoded string) {
 	//Uncompress gzip message
 	b := bytes.NewBuffer(message)
