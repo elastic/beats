@@ -212,6 +212,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		st:    &s.st,
 	}, nil
 }
+
 func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
 	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), false, loadILM)
 
