@@ -76,18 +76,48 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
+	cleanupNeeded := true
+
+	// Note: underlying output.
+	//  The input and harvester do have different requirements
+	//  on the timings the outlets must be closed/unblocked.
+	//  The outlet generated here is the underlying outlet, only closed
+	//  once all workers have been shut down.
+	//  For state updates and events, separate sub-outlets will be used.
+	out, err := outlet(cfg, context.DynamicFields)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if cleanupNeeded {
+			out.Close()
+		}
+	}()
+
+	// stateOut will only be unblocked if the beat is shut down.
+	// otherwise it can block on a full publisher pipeline, so state updates
+	// can be forwarded correctly to the registrar.
+	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
+	defer func() {
+		if cleanupNeeded {
+			stateOut.Close()
+		}
+	}()
+
 	meta := context.Meta
 	if len(meta) == 0 {
 		meta = nil
 	}
 
 	p := &Input{
-		config:     defaultConfig,
-		cfg:        cfg,
-		harvesters: harvester.NewRegistry(),
-		states:     file.NewStates(),
-		done:       context.Done,
-		meta:       meta,
+		config:      defaultConfig,
+		cfg:         cfg,
+		harvesters:  harvester.NewRegistry(),
+		outlet:      out,
+		stateOutlet: stateOut,
+		states:      file.NewStates(),
+		done:        context.Done,
+		meta:        meta,
 	}
 
 	if err := cfg.Unpack(&p.config); err != nil {
@@ -102,7 +132,7 @@ func NewInput(
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err := p.createHarvester(file.State{}, nil)
+	_, err = p.createHarvester(file.State{}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -116,27 +146,9 @@ func NewInput(
 		return nil, err
 	}
 
-	// Note: underlying output.
-	//  The input and harvester do have different requirements
-	//  on the timings the outlets must be closed/unblocked.
-	//  The outlet generated here is the underlying outlet, only closed
-	//  once all workers have been shut down.
-	//  For state updates and events, separate sub-outlets will be used.
-	out, err := outlet(cfg, context.DynamicFields)
-	if err != nil {
-		return nil, err
-	}
-
-	// stateOut will only be unblocked if the beat is shut down.
-	// otherwise it can block on a full publisher pipeline, so state updates
-	// can be forwarded correctly to the registrar.
-	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
-
-	p.outlet = out
-	p.stateOutlet = stateOut
-
 	logp.Info("Configured paths: %v", p.config.Paths)
 
+	cleanupNeeded = false
 	return p, nil
 }
 
