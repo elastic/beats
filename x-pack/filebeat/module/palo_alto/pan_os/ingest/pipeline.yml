@@ -105,8 +105,7 @@ processors:
        ctx['event']['duration'] = nanos;
        def start = ctx.event?.start;
        if (start != null) {
-          ctx.event['end'] = ZonedDateTime.ofInstant(
-            Instant.parse(start).plusNanos(nanos), ZoneOffset.UTC);
+          ctx.event['end'] = ZonedDateTime.parse(start).plusNanos(nanos);
        }
 
 # Set network.direction using src/dst zone (traffic logs).
