@@ -25,15 +25,20 @@ import (
 // DecodeByteMessage for cloudwatch kinesis messages
 func DecodeByteMessage(message []byte) (decoded string) {
 	//Uncompress gzip message
+	var err error
 	b := bytes.NewBuffer(message)
 
 	var r io.Reader
-	r, _ = gzip.NewReader(b)
+	r, err = gzip.NewReader(b)
 
-	var resB bytes.Buffer
-	resB.ReadFrom(r)
+	if err == nil {
+		var resB bytes.Buffer
+		resB.ReadFrom(r)
 
-	decoded = string(resB.Bytes())
+		decoded = string(resB.Bytes())
+	} else {
+		decoded = string(message)
+	}
 
 	return
 }
