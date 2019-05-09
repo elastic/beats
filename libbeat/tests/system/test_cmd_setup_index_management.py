@@ -196,7 +196,6 @@ class TestCommandSetupIndexManagement(BaseTest):
 
         # ensure template with ilm rollover_alias name is created, but ilm policy not yet
         self.render_config()
-
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.enabled=false",
@@ -204,7 +203,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.pattern=" + self.custom_alias + "*"])
         assert exit_code == 0
         self.idxmgmt.assert_index_template_loaded(self.custom_alias)
-        self.idxmgmt.assert_policy_not_created(self.custom_alias)
+        self.idxmgmt.assert_policy_not_created(self.index_name)
 
         # ensure ilm policy is created, triggering overwriting existing template
         exit_code = self.run_beat(extra_args=["setup", self.cmd,
@@ -216,5 +215,6 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_policy_created(self.index_name)
         # check that template was overwritten
         resp = self.es.transport.perform_request('GET', '/_template/' + self.custom_alias)
-        index = resp[self.custom_alias]["settings"]["index"], resp
+        assert self.custom_alias in resp
+        index = resp[self.custom_alias]["settings"]["index"]
         assert index["number_of_shards"] == "2", index["number_of_shards"]

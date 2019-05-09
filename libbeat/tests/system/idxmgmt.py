@@ -14,10 +14,10 @@ class IdxMgmt(object):
     def needs_init(self, s):
         return s == '' or s == '*'
 
-    def delete(self, index="", template="", policy=""):
+    def delete(self, index=""):
         self.delete_index_and_alias(index=index)
-        self.delete_template(template=template)
-        self.delete_policy(policy=policy)
+        self.delete_template(template=index)
+        self.delete_policy(policy=index)
 
     def delete_index_and_alias(self, index=""):
         if self.needs_init(index):
