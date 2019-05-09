@@ -35,25 +35,6 @@ func TestKinesis(t *testing.T) {
 		},
 	}
 
-	events := KinesisEvent(request)
-	assert.Equal(t, 1, len(events))
-
-	fields := common.MapStr{
-		"event_id":                "1234",
-		"event_name":              "connect",
-		"event_source":            "web",
-		"event_source_arn":        "arn:aws:iam::00000000:role/functionbeat",
-		"event_version":           "1.0",
-		"aws_region":              "us-east-1",
-		"message":                 "hello world",
-		"kinesis_partition_key":   "abc123",
-		"kinesis_schema_version":  "1.0",
-		"kinesis_sequence_number": "12345",
-		"kinesis_encryption_type": "test",
-	}
-
-	assert.Equal(t, fields, events[0].Fields)
-
 	// Test compressed Kinesis data message
 	requestCompressed := events.KinesisEvent{
 		Records: []events.KinesisEventRecord{
@@ -74,6 +55,25 @@ func TestKinesis(t *testing.T) {
 			},
 		},
 	}
+
+	events := KinesisEvent(request)
+	assert.Equal(t, 1, len(events))
+
+	fields := common.MapStr{
+		"event_id":                "1234",
+		"event_name":              "connect",
+		"event_source":            "web",
+		"event_source_arn":        "arn:aws:iam::00000000:role/functionbeat",
+		"event_version":           "1.0",
+		"aws_region":              "us-east-1",
+		"message":                 "hello world",
+		"kinesis_partition_key":   "abc123",
+		"kinesis_schema_version":  "1.0",
+		"kinesis_sequence_number": "12345",
+		"kinesis_encryption_type": "test",
+	}
+
+	assert.Equal(t, fields, events[0].Fields)
 
 	eventsCompressed := KinesisEvent(requestCompressed)
 	assert.Equal(t, 1, len(eventsCompressed))
