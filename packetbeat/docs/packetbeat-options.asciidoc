@@ -226,7 +226,7 @@ For example, in the following scenario, you see a 3-server architecture
 where a Beat is installed on each server. t1 is the transaction exchanged between
 Server1 and Server2, and t2 is the transaction between Server2 and Server3.
 
-image:./images/option_ignore_outgoing.png[Beats Architecture]
+image::./images/option_ignore_outgoing.png[Beats Architecture]
 
 By default, each transaction is indexed twice because Beat2
 sees both transactions. So you would see the following published transactions
@@ -265,7 +265,7 @@ data.
 
 Here's an example of flow events visualized in the Flows dashboard:
 
-image:./images/flows.png[]
+image::./images/flows.png[]
 
 To configure flows, use the `packetbeat.flows` option in the +{beatname_lc}.yml+
 config file. Flows are enabled by default. If this section is missing
@@ -1007,7 +1007,7 @@ analytics and find the slow RPC calls.
 
 Here is an example performance dashboard:
 
-image:./images/thrift-dashboard.png[Thrift-RPC dashboard]
+image::./images/thrift-dashboard.png[Thrift-RPC dashboard]
 
 
 Thrift supports multiple http://en.wikipedia.org/wiki/Apache_Thrift[transport
