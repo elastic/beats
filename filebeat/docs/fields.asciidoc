@@ -7356,6 +7356,16 @@ alias to: event.created
 
 --
 
+*`docker.attrs`*::
++
+--
+type: object
+
+docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
+
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 
