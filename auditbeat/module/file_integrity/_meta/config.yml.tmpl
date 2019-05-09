@@ -11,23 +11,22 @@
   - /sbin
   - /usr/sbin
   - /usr/local/sbin
-  {{- else if eq .GOOS "windows" }}
+{{ else if eq .GOOS "windows" }}
   paths:
   - C:/windows
   - C:/windows/system32
   - C:/Program Files
   - C:/Program Files (x86)
-  {{- else }}
+{{ else }}
   paths:
   - /bin
   - /usr/bin
   - /sbin
   - /usr/sbin
   - /etc
-  {{- end }}
+{{ end -}}
 
 {{- if .Reference }}
-
   # List of regular expressions to filter out notifications for unwanted files.
   # Wrap in single quotes to workaround YAML escaping rules. By default no files
   # are ignored.
