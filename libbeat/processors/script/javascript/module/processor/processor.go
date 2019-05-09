@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 	"github.com/elastic/beats/libbeat/processors/dissect"
 	"github.com/elastic/beats/libbeat/processors/dns"
+	"github.com/elastic/beats/libbeat/processors/extract_array"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 )
 
@@ -57,6 +58,7 @@ var constructors = map[string]processors.Constructor{
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
+	"ExtractArray":          extract_array.New,
 	"Rename":                actions.NewRenameFields,
 	"TruncateFields":        actions.NewTruncateFields,
 }
