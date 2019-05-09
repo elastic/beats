@@ -4,6 +4,7 @@ import os
 import unittest
 import glob
 import subprocess
+import time
 
 from elasticsearch import Elasticsearch
 import json
@@ -113,6 +114,9 @@ class Test(BaseTest):
         except:
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
+
+        os.environ['TZ'] = 'Etc/UTC'
+        time.tzset()
 
         cmd = [
             self.filebeat, "-systemTest",
