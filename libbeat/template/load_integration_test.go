@@ -201,7 +201,7 @@ func TestESLoader_Load(t *testing.T) {
 }
 
 func TestTemplate_LoadFile(t *testing.T) {
-	setup := newTestSetup(t, TemplateConfig{})
+	setup := newTestSetup(t, TemplateConfig{Enabled: true})
 	assert.NoError(t, setup.loadFromFile([]string{"..", "fields.yml"}))
 	assert.True(t, setup.loader.templateExists(setup.config.Name))
 }
@@ -223,7 +223,7 @@ func TestLoadBeatsTemplate_fromFile(t *testing.T) {
 	}
 
 	for _, beat := range beats {
-		setup := newTestSetup(t, TemplateConfig{Name: beat})
+		setup := newTestSetup(t, TemplateConfig{Name: beat, Enabled: true})
 		assert.NoError(t, setup.loadFromFile([]string{"..", "..", beat, "fields.yml"}))
 		assert.True(t, setup.loader.templateExists(setup.config.Name))
 	}
@@ -234,7 +234,7 @@ func TestTemplateSettings(t *testing.T) {
 		Index:  common.MapStr{"number_of_shards": 1},
 		Source: common.MapStr{"enabled": false},
 	}
-	setup := newTestSetup(t, TemplateConfig{Settings: settings})
+	setup := newTestSetup(t, TemplateConfig{Settings: settings, Enabled: true})
 	require.NoError(t, setup.loadFromFile([]string{"..", "fields.yml"}))
 
 	// Check that it contains the mapping
@@ -287,7 +287,7 @@ var dataTests = []struct {
 
 // Tests if data can be loaded into elasticsearch with right types
 func TestTemplateWithData(t *testing.T) {
-	setup := newTestSetup(t, TemplateConfig{})
+	setup := newTestSetup(t, TemplateConfig{Enabled: true})
 	require.NoError(t, setup.loadFromFile([]string{"testdata", "fields.yml"}))
 	require.True(t, setup.loader.templateExists(setup.config.Name))
 	esClient := setup.client.(*elasticsearch.Client)
