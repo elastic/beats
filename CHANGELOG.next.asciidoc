@@ -20,6 +20,11 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
+- Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
+- system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
+
 *Packetbeat*
 
 *Winlogbeat*
