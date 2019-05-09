@@ -115,9 +115,6 @@ class Test(BaseTest):
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
 
-        os.environ['TZ'] = 'Etc/UTC'
-        time.tzset()
-
         cmd = [
             self.filebeat, "-systemTest",
             "-e", "-d", "*", "-once",
