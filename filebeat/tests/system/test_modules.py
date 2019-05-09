@@ -167,8 +167,7 @@ class Test(BaseTest):
             else:
                 self.assert_fields_are_documented(obj)
 
-        if os.path.exists(test_file + "-expected.json"):
-            self._test_expected_events(test_file, objects)
+        self._test_expected_events(test_file, objects)
 
     def _test_expected_events(self, test_file, objects):
 
