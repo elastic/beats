@@ -76,6 +76,7 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
+	cleanupNeeded := true
 
 	// Note: underlying output.
 	//  The input and harvester do have different requirements
@@ -87,11 +88,21 @@ func NewInput(
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if cleanupNeeded {
+			out.Close()
+		}
+	}()
 
 	// stateOut will only be unblocked if the beat is shut down.
 	// otherwise it can block on a full publisher pipeline, so state updates
 	// can be forwarded correctly to the registrar.
 	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
+	defer func() {
+		if cleanupNeeded {
+			stateOut.Close()
+		}
+	}()
 
 	meta := context.Meta
 	if len(meta) == 0 {
@@ -137,6 +148,7 @@ func NewInput(
 
 	logp.Info("Configured paths: %v", p.config.Paths)
 
+	cleanupNeeded = false
 	return p, nil
 }
 
