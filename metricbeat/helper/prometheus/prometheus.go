@@ -20,7 +20,6 @@ package prometheus
 import (
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 
 	dto "github.com/prometheus/client_model/go"
@@ -162,12 +161,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
-				if valueFloat64, ok := value.(float64); ok {
-					if math.IsNaN(valueFloat64) || math.IsInf(valueFloat64, 0) {
-						continue
-					}
-				}
-
 				event := getEvent(eventsMap, keyLabels)
 				update := common.MapStr{}
 				update.Put(field, value)

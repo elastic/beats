@@ -1,7 +1,0 @@
-# HELP kafka_consumer_records_lag_records The latest lag of the partition
-# TYPE kafka_consumer_records_lag_records gauge
-kafka_consumer_records_lag_records{client_id="consumer1",} NaN
-kafka_consumer_records_lag_records{client_id="consumer2",} +Inf
-kafka_consumer_records_lag_records{client_id="consumer3",} -Inf
-kafka_consumer_records_lag_records{client_id="consumer4",} 5
-

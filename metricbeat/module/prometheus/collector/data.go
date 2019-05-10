@@ -79,7 +79,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 		summary := metric.GetSummary()
 		if summary != nil {
-			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 1) && !math.IsInf(summary.GetSampleSum(), 0) {
+			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 				events = append(events, PromEvent{
 					data: common.MapStr{
 						name + "_sum":   summary.GetSampleSum(),
@@ -90,7 +90,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 			}
 
 			for _, quantile := range summary.GetQuantile() {
-				if math.IsNaN(quantile.GetValue()) {
+				if math.IsNaN(quantile.GetValue()) || math.IsInf(quantile.GetValue(), 0) {
 					continue
 				}
 
