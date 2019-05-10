@@ -4,6 +4,19 @@
     Memory metrics.
   release: ga
   fields:
+    
+    - name: commit
+      type: long
+      description: >
+        Committed bytes
+    - name: commit_peak
+      type: long
+      description: >
+        Peak committed bytes
+    - name: private_working_set
+      type: long
+      description: >
+        private working set
 
     - name: fail.count
       type: scaled_float
@@ -49,20 +62,4 @@
           format: bytes
           description: >
             Total memory usage.
-    - name: windows
-      type: group
-      description: >
-        Windows memory statistics 
-      fields:
-        - name: commit
-          type: long
-          description: >
-            Committed bytes
-        - name: commit_peak
-          type: long
-          description: >
-            Peak committed bytes
-        - name: private_working_set
-          type: long
-          description: >
-            private working set
+

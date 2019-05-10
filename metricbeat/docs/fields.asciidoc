@@ -4539,6 +4539,36 @@ Memory metrics.
 
 
 
+*`docker.memory.commit`*::
++
+--
+type: long
+
+Committed bytes
+
+
+--
+
+*`docker.memory.commit_peak`*::
++
+--
+type: long
+
+Peak committed bytes
+
+
+--
+
+*`docker.memory.private_working_set`*::
++
+--
+type: long
+
+private working set
+
+
+--
+
 *`docker.memory.fail.count`*::
 +
 --
@@ -4631,43 +4661,6 @@ type: long
 format: bytes
 
 Total memory usage.
-
-
---
-
-[float]
-== windows fields
-
-Windows memory statistics 
-
-
-
-*`docker.memory.windows.commit`*::
-+
---
-type: long
-
-Committed bytes
-
-
---
-
-*`docker.memory.windows.commit_peak`*::
-+
---
-type: long
-
-Peak committed bytes
-
-
---
-
-*`docker.memory.windows.private_working_set`*::
-+
---
-type: long
-
-private working set
 
 
 --
