@@ -20,8 +20,10 @@
 package log
 
 import (
+	"io/ioutil"
 	"os"
 	"path"
+	"sync"
 	"testing"
 	"time"
 
@@ -30,6 +32,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/tests/resources"
@@ -86,19 +89,33 @@ func TestIsCleanInactive(t *testing.T) {
 	}
 }
 
+// TestInputLifecycle performs blackbock testing of the log input
 func TestInputLifecycle(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	tmpdir := os.TempDir()
+	// Prepare a log file
+	tmpdir, err := ioutil.TempDir(os.TempDir(), "input-test")
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer os.RemoveAll(tmpdir)
+	logs := []byte("some log line\nother log line\n")
+	err = ioutil.WriteFile(path.Join(tmpdir, "some.log"), logs, 0644)
+	assert.NoError(t, err)
 
+	// Setup the input
 	config, _ := common.NewConfigFrom(common.MapStr{
-		"paths": path.Join(tmpdir, "*"),
+		"paths":     path.Join(tmpdir, "*.log"),
+		"close_eof": true,
 	})
 
+	events := make(chan *util.Data, 100)
+	defer close(events)
+	capturer := NewEventCapturer(events)
+	defer capturer.Close()
 	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
-		return TestOutlet{}, nil
+		return channel.SubOutlet(capturer), nil
 	}
 
 	context := input.Context{}
@@ -109,8 +126,27 @@ func TestInputLifecycle(t *testing.T) {
 		return
 	}
 
+	// Run the input and wait for finalization
 	input.Run()
-	input.Stop()
+
+	timeout := time.After(30 * time.Second)
+	done := make(chan struct{})
+	for {
+		select {
+		case event := <-events:
+			if state := event.GetState(); state.Finished {
+				assert.Equal(t, len(logs), int(state.Offset), "file has not been fully read")
+				go func() {
+					input.Wait()
+					close(done)
+				}()
+			}
+		case <-done:
+			return
+		case <-timeout:
+			t.Fatal("timeout waiting for closed state")
+		}
+	}
 }
 
 func TestNewInputError(t *testing.T) {
@@ -194,3 +230,34 @@ func (t TestFileInfo) Mode() os.FileMode  { return 0 }
 func (t TestFileInfo) ModTime() time.Time { return t.time }
 func (t TestFileInfo) IsDir() bool        { return false }
 func (t TestFileInfo) Sys() interface{}   { return nil }
+
+type eventCapturer struct {
+	closed    bool
+	c         chan struct{}
+	closeOnce sync.Once
+	events    chan *util.Data
+}
+
+func NewEventCapturer(events chan *util.Data) channel.Outleter {
+	return &eventCapturer{
+		c:      make(chan struct{}),
+		events: events,
+	}
+}
+
+func (o *eventCapturer) OnEvent(event *util.Data) bool {
+	o.events <- event
+	return true
+}
+
+func (o *eventCapturer) Close() error {
+	o.closeOnce.Do(func() {
+		o.closed = true
+		close(o.c)
+	})
+	return nil
+}
+
+func (o *eventCapturer) Done() <-chan struct{} {
+	return o.c
+}
