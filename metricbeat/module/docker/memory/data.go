@@ -43,6 +43,11 @@ func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 			"pct":   memoryData.UsageP,
 			"max":   memoryData.MaxUsage,
 		},
+		"windows": common.MapStr{
+			"commit":              memoryData.Commit,
+			"commit_peak":         memoryData.CommitPeak,
+			"private_working_set": memoryData.PrivateWorkingSet,
+		},
 	}
 
 	r.Event(mb.Event{
