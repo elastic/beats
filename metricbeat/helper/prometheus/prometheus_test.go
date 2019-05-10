@@ -72,6 +72,8 @@ metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 `
 
 	promGaugeKeyLabelWithNaNInf = `
+# TYPE metrics_one_count_errors gauge
+metrics_one_count_errors{name="jane",surname="foster"} 0
 # TYPE metrics_one_count_total gauge
 metrics_one_count_total{name="jane",surname="foster"} NaN
 metrics_one_count_total{name="foo",surname="bar"} +Inf
@@ -510,7 +512,8 @@ func TestPrometheusKeyLabels(t *testing.T) {
 			prometheusResponse: promGaugeKeyLabelWithNaNInf,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"metrics_one_count_total": Metric("metrics.one.count"),
+					"metrics_one_count_errors": Metric("metrics.one.count"),
+					"metrics_one_count_total":  Metric("metrics.one.count"),
 				},
 				Labels: map[string]LabelMap{
 					"name":    KeyLabel("metrics.one.labels.name"),
@@ -519,6 +522,17 @@ func TestPrometheusKeyLabels(t *testing.T) {
 				},
 			},
 			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 0.0,
+							"labels": common.MapStr{
+								"name":    "jane",
+								"surname": "foster",
+							},
+						},
+					},
+				},
 				common.MapStr{
 					"metrics": common.MapStr{
 						"one": common.MapStr{

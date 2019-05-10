@@ -162,19 +162,16 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
-				event := getEvent(eventsMap, keyLabels)
-
-				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
-				update := common.MapStr{}
 				if valueFloat64, ok := value.(float64); ok {
-					if math.IsNaN(valueFloat64) || math.IsInf(valueFloat64, 1) || math.IsInf(valueFloat64, 0) {
-						// Remove the event if value is NaN or +Inf or -Inf
-						delete(eventsMap, keyLabels.String())
+					if math.IsNaN(valueFloat64) || math.IsInf(valueFloat64, 0) {
 						continue
 					}
 				}
 
+				event := getEvent(eventsMap, keyLabels)
+				update := common.MapStr{}
 				update.Put(field, value)
+				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				event.DeepUpdate(update)
 
 				event.DeepUpdate(labels)

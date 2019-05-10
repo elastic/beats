@@ -55,7 +55,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 		counter := metric.GetCounter()
 		if counter != nil {
-			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 1) && !math.IsInf(counter.GetValue(), 0) {
+			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
 				events = append(events, PromEvent{
 					data: common.MapStr{
 						name: counter.GetValue(),
