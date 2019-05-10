@@ -8,4 +8,12 @@ Some specific AWS permissions are required for IAM user to collect AWS s3_reques
 ----
 ec2:DescribeRegions
 cloudwatch:GetMetricData
+cloudwatch:ListMetrics
 ----
+
+[float]
+=== Dashboard
+
+The aws s3 metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-s3-overview.png[]

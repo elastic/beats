@@ -17,9 +17,6 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
-Elasticsearch plugin.
-
 include::../include/running-modules.asciidoc[]
 
 [float]

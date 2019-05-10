@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/disk"
 )
 
 func init() {
@@ -60,7 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches disk IO metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	stats, err := disk.IOCounters(m.includeDevices...)
+	stats, err := IOCounters(m.includeDevices...)
 	if err != nil {
 		r.Error(errors.Wrap(err, "disk io counters"))
 		return
@@ -89,8 +88,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				"time": counters.IoTime,
 			},
 		}
-
-		extraMetrics, err := m.statistics.CalIOStatistics(counters)
+		var extraMetrics DiskIOMetric
+		err := m.statistics.CalIOStatistics(&extraMetrics, counters)
 		if err == nil {
 			event["iostat"] = common.MapStr{
 				"read": common.MapStr{

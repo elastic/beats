@@ -71,10 +71,7 @@ func newFileClient(dir string, ver string) (*fileClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
+	fmt.Println(fmt.Sprintf("Writing to directory %s", path))
 	return &fileClient{ver: *common.MustNewVersion(ver), dir: path}, nil
 }
 
@@ -82,7 +79,7 @@ func (c *stdoutClient) GetVersion() common.Version {
 	return c.ver
 }
 
-func (c *stdoutClient) Write(_ string, body string) error {
+func (c *stdoutClient) Write(_ string, _ string, body string) error {
 	_, err := c.f.WriteString(body)
 	return err
 }
@@ -91,8 +88,12 @@ func (c *fileClient) GetVersion() common.Version {
 	return c.ver
 }
 
-func (c *fileClient) Write(name string, body string) error {
-	f, err := os.Create(filepath.Join(c.dir, fmt.Sprintf("%s.json", name)))
+func (c *fileClient) Write(component string, name string, body string) error {
+	path := filepath.Join(c.dir, component)
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		return err
+	}
+	f, err := os.Create(filepath.Join(path, fmt.Sprintf("%s.json", name)))
 	defer f.Close()
 	if err != nil {
 		return err
