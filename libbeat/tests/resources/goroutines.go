@@ -19,7 +19,9 @@ package resources
 
 import (
 	"fmt"
+	"os"
 	"runtime"
+	"runtime/pprof"
 	"testing"
 	"time"
 )
@@ -63,6 +65,8 @@ func (c GoroutinesChecker) check(t testing.TB) error {
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
+	profile := pprof.Lookup("goroutine")
+	profile.WriteTo(os.Stdout, 2)
 	return fmt.Errorf("Possible goroutines leak, before: %d, after: %d", c.before, after)
 }
 
