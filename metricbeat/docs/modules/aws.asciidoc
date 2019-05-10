@@ -73,6 +73,10 @@ metricbeat.modules:
     - us-east-1
 ----
 
+The aws module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-overview.png[]
+
 [float]
 == Metricsets
 
