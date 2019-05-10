@@ -37,6 +37,8 @@ https://github.com/elastic/beats/compare/v6.7.2...6.x[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+
 *Heartbeat*
 
 *Journalbeat*
