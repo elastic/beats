@@ -207,7 +207,6 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			// no file changes
 			if !updated && !overwriteUpdate {
-				overwriteUpdate = false
 				continue
 			}
 
@@ -219,7 +218,9 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			if err := list.Reload(configs); err != nil {
 				// Make sure the next run also updates because some runners were not properly loaded
 				overwriteUpdate = true
-			}
+			} else {
+				overwriteUpdate = false
+                        }
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
