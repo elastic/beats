@@ -25,7 +25,7 @@
   },{
     "rename": {
       "field": "@timestamp",
-      "target_field": "read_timestamp"
+      "target_field": "event.created"
     }
   },{
     "grok": {
@@ -44,7 +44,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "Process\\(%{DATA:ibmmq.errorlog.process}\\) User\\(%{WORD:ibmmq.errorlog.user}\\) Program\\(%{DATA:ibmmq.errorlog.program}\\) Host\\(%{DATA:ibmmq.errorlog.hostname}\\) Installation\\(%{WORD:ibmmq.errorlog.installation}\\) VRMF\\(%{DATA:ibmmq.errorlog.vrmf}\\)( QMgr\\(%{DATA:ibmmq.errorlog.qmgr}\\))?( Time\\(%{TIMESTAMP_ISO8601:ibmmq.errorlog.iso8601_timestamp}\\))?( RemoteHost\\(%{DATA:ibmmq.errorlog.remotehost}\\))?( ArithInsert1\\(%{DATA:ibmmq.errorlog.arithinsert1}\\))?( ArithInsert2\\(%{DATA:ibmmq.errorlog.arithinsert2}\\))?( CommentInsert1\\(%{DATA:ibmmq.errorlog.commentinsert1}\\))?( CommentInsert2\\(%{DATA:ibmmq.errorlog.commentinsert2}\\))?( CommentInsert3\\(%{DATA:ibmmq.errorlog.commentinsert3}\\))? (?=AMQ[0-9]{4})%{DATA:ibmmq.errorlog.errorcode}((?<=AMQ[0-9]{4}[A-Z])%{DATA:severity})?: %{DATA:ibmmq.errorlog.errordescription} EXPLANATION: %{DATA:ibmmq.errorlog.explanation} ACTION: %{DATA:ibmmq.errorlog.action}$"
+        "Process\\(%{DATA:ibmmq.errorlog.process}\\) User\\(%{WORD:ibmmq.errorlog.user}\\) Program\\(%{DATA:ibmmq.errorlog.program}\\) Host\\(%{DATA:ibmmq.errorlog.hostname}\\) Installation\\(%{WORD:ibmmq.errorlog.installation}\\) VRMF\\(%{DATA:ibmmq.errorlog.vrmf}\\)( QMgr\\(%{DATA:ibmmq.errorlog.qmgr}\\))?( Time\\(%{TIMESTAMP_ISO8601:ibmmq.errorlog.iso8601_timestamp}\\))?( RemoteHost\\(%{DATA:ibmmq.errorlog.remotehost}\\))?( ArithInsert1\\(%{DATA:ibmmq.errorlog.arithinsert1}\\))?( ArithInsert2\\(%{DATA:ibmmq.errorlog.arithinsert2}\\))?( CommentInsert1\\(%{DATA:ibmmq.errorlog.commentinsert1}\\))?( CommentInsert2\\(%{DATA:ibmmq.errorlog.commentinsert2}\\))?( CommentInsert3\\(%{DATA:ibmmq.errorlog.commentinsert3}\\))? (?=AMQ[0-9]{4})%{DATA:ibmmq.errorlog.errorcode}((?<=AMQ[0-9]{4}[A-Z])%{DATA:log.level})?: %{DATA:ibmmq.errorlog.errordescription} EXPLANATION: %{DATA:ibmmq.errorlog.explanation} ACTION: %{DATA:ibmmq.errorlog.action}$"
         ]
     }
   },{
