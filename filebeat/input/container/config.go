@@ -15,26 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package harvester
+package container
 
-import "github.com/elastic/beats/libbeat/common/match"
+var defaultConfig = config{
+	Stream: "all",
+	Format: "auto",
+}
 
-// Contains available input types
-const (
-	LogType       = "log"
-	StdinType     = "stdin"
-	RedisType     = "redis"
-	UdpType       = "udp"
-	DockerType    = "docker"
-	ContainerType = "container"
-)
+type config struct {
+	// Stream can be all, stdout or stderr
+	Stream string `config:"stream"`
 
-// MatchAny checks if the text matches any of the regular expressions
-func MatchAny(matchers []match.Matcher, text string) bool {
-	for _, m := range matchers {
-		if m.MatchString(text) {
-			return true
-		}
-	}
-	return false
+	// Fore CRI format (don't perform autodetection)
+	// TODO remove in favor of format, below
+	CRIForce bool `config:"cri.force"`
+
+	// TODO Format can be auto, cri, json-file
+	Format string `config:"format"`
 }
