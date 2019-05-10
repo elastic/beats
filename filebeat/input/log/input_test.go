@@ -89,8 +89,45 @@ func TestIsCleanInactive(t *testing.T) {
 	}
 }
 
-// TestInputLifecycle performs blackbock testing of the log input
 func TestInputLifecycle(t *testing.T) {
+	cases := []struct {
+		title  string
+		closer func(input.Context, *Input)
+	}{
+		{
+			title: "explicitly closed",
+			closer: func(_ input.Context, input *Input) {
+				input.Wait()
+			},
+		},
+		{
+			title: "context done",
+			closer: func(ctx input.Context, _ *Input) {
+				close(ctx.Done)
+			},
+		},
+		{
+			title: "beat context done",
+			closer: func(ctx input.Context, _ *Input) {
+				close(ctx.Done)
+				close(ctx.BeatDone)
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			context := input.Context{
+				Done:     make(chan struct{}),
+				BeatDone: make(chan struct{}),
+			}
+			testInputLifecycle(t, context, c.closer)
+		})
+	}
+}
+
+// TestInputLifecycle performs blackbock testing of the log input
+func testInputLifecycle(t *testing.T, context input.Context, closer func(input.Context, *Input)) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
@@ -118,8 +155,6 @@ func TestInputLifecycle(t *testing.T) {
 		return channel.SubOutlet(capturer), nil
 	}
 
-	context := input.Context{}
-
 	input, err := NewInput(config, connector, context)
 	if err != nil {
 		t.Error(err)
@@ -137,7 +172,7 @@ func TestInputLifecycle(t *testing.T) {
 			if state := event.GetState(); state.Finished {
 				assert.Equal(t, len(logs), int(state.Offset), "file has not been fully read")
 				go func() {
-					input.Wait()
+					closer(context, input.(*Input))
 					close(done)
 				}()
 			}
@@ -147,6 +182,28 @@ func TestInputLifecycle(t *testing.T) {
 			t.Fatal("timeout waiting for closed state")
 		}
 	}
+}
+
+func TestNewInputDone(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	config, _ := common.NewConfigFrom(common.MapStr{
+		"paths": path.Join(os.TempDir(), "logs", "*.log"),
+	})
+
+	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+		return TestOutlet{}, nil
+	}
+
+	context := input.Context{
+		Done: make(chan struct{}),
+	}
+
+	_, err := NewInput(config, connector, context)
+	assert.NoError(t, err)
+
+	close(context.Done)
 }
 
 func TestNewInputError(t *testing.T) {
