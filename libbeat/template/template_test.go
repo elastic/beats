@@ -87,8 +87,8 @@ func TestTemplate(t *testing.T) {
 
 	data := template.Generate(common.MapStr{}, nil)
 	assert.Equal(t, []string{"testbeat-6.6.0-*"}, data["index_patterns"])
-	meta, err := data.GetValue("mappings.doc._meta")
-	assert.NoError(t, err)
-	assert.Equal(t, common.MapStr{"beat": "testbeat", "version": "6.6.0"}, meta)
 	assert.Equal(t, 1, data["order"])
+	meta, err := data.GetValue("mappings.doc._meta")
+	require.NoError(t, err)
+	assert.Equal(t, common.MapStr{"beat": "testbeat", "version": "6.6.0"}, meta)
 }
