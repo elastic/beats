@@ -39,3 +39,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update urllib3 version to 1.24.2 {pull}11930[11930]
 - Add libbeat/common/cleanup package. {pull}12134[12134]
 - New helper to check for leaked goroutines on tests. {pull}12106[12106]
+- Only Load minimal template if no fields are provided. {pull}12103[12103]
