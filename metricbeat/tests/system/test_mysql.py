@@ -43,7 +43,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return ['root:test@tcp({}:3306)/'.format(self.compose_hosts()[0])]
+        return ['root:test@tcp({})/'.format(self.compose_host())]
 
 
 class TestMysql80(Test):
@@ -64,3 +64,7 @@ class TestMariadb102(Test):
 
 class TestMariadb103(Test):
     COMPOSE_SERVICES = ['mariadb_10_3']
+
+
+class TestMariadb104(Test):
+    COMPOSE_SERVICES = ['mariadb_10_4']

@@ -50,7 +50,37 @@ ifndef::no_dashboards[]
 endif::no_dashboards[]
 and machine learning jobs.  Run this command:
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat") or ("{beatname_lc}"=="journalbeat")]
+ifeval::["{beatname_lc}"=="filebeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+{dockerimage} \
+setup -E setup.kibana.host=kibana:5601 \
+-E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="journalbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run \
@@ -117,7 +147,7 @@ curl -L -O {dockerconfig}
 One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.docker.yml+ via a volume mount.
 With +docker run+, the volume mount can be specified like this.
 
-ifeval::[("{beatname_lc}"=="filebeat")]
+ifeval::["{beatname_lc}"=="filebeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run -d \
@@ -131,7 +161,7 @@ docker run -d \
 --------------------------------------------
 endif::[]
 
-ifeval::[("{beatname_lc}"=="journalbeat")]
+ifeval::["{beatname_lc}"=="journalbeat"]
 Make sure you include the path to the host's journal. The path might be
 `/var/log/journal` or `/run/log/journal`.
 
@@ -197,7 +227,20 @@ docker run -d \
 --------------------------------------------
 endif::[]
 
-ifeval::[("{beatname_lc}"=="heartbeat") or ("{beatname_lc}"=="apm-server")]
+ifeval::["{beatname_lc}"=="heartbeat"]
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run -d \
+  --name={beatname_lc} \
+  --user={beatname_lc} \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
+  {dockerimage} \
+  --strict.perms=false -e \
+  -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
+--------------------------------------------
+endif::[]
+
+ifeval::["{beatname_lc}"=="apm-server"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run -d \
@@ -217,8 +260,7 @@ using the syntax shown earlier.
 
 ===== Customize your configuration
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat")]
-
+ifdef::has_docker_label_ex[]
 The +{beatname_lc}.docker.yml+ file you downloaded earlier is configured to deploy Beats modules based on the Docker labels applied to your containers.  See <<configuration-autodiscover-hints>> for more details. Add labels to your application Docker containers, and they will be picked up by the Beats autodiscover feature when they are deployed.  Here is an example command for an Apache HTTP Server container with labels to configure the Filebeat and Metricbeat modules for the Apache HTTP Server:
 
 ["source", "sh", subs="attributes"]
@@ -235,11 +277,9 @@ docker run \
   -p 8080:80 \
   httpd:2.4
 --------------------------------------------
-
 endif::[]
 
-ifeval::[("{beatname_lc}"!="filebeat") and ("{beatname_lc}"!="metricbeat")]
-
+ifndef::has_docker_label_ex[]
 The +{beatname_lc}.docker.yml+ downloaded earlier should be customized for your environment. See <<configuring-howto-{beatname_lc}>> for more details. Edit the configuration file and customize it to match your environment then re-deploy your {beatname_uc} container.
 endif::[]
 

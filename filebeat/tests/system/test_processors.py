@@ -249,6 +249,57 @@ class Test(BaseTest):
             u"This is OK",
         ])
 
+    def test_decode_csv_fields_defaults(self):
+        """
+        Check CSV decoding using defaults
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "csv"
+                    }
+                },
+            }]
+        )
+
+        self._init_and_read_test_input([
+            u"42,\"string with \"\"quotes\"\"\"\n",
+            u",\n"
+        ])
+
+        self._assert_expected_lines([
+            ["42", "string with \"quotes\""],
+            ["", ""]
+        ], field="csv")
+
+    def test_decode_csv_fields_all_options(self):
+        """
+        Check CSV decoding with options
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test.log",
+            processors=[{
+                "decode_csv_fields": {
+                    "fields": {
+                        "message": "message"
+                    },
+                    "overwrite_keys": True,
+                    "separator": "\"\t\"",
+                    "trim_leading_space": True,
+                },
+            }]
+        )
+
+        self._init_and_read_test_input([
+            u" 42\t hello world\t  \"string\twith tabs and \"broken\" quotes\"\n",
+        ])
+
+        self._assert_expected_lines([
+            ["42", "hello world", "string\twith tabs and \"broken\" quotes"],
+        ])
+
     def _init_and_read_test_input(self, input_lines):
         with io.open(self.working_dir + "/test.log", "w", encoding="utf-8") as f:
             for line in input_lines:
@@ -258,10 +309,10 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=len(input_lines)))
         filebeat.check_kill_and_wait()
 
-    def _assert_expected_lines(self, expected_lines):
+    def _assert_expected_lines(self, expected_lines, field="message"):
         output = self.read_output()
 
         assert len(output) == len(expected_lines)
 
         for i in range(len(expected_lines)):
-            assert output[i]["message"] == expected_lines[i]
+            assert output[i][field] == expected_lines[i]

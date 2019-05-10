@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Stats represents the statistics for a pool
 type Stats struct {
 	BytesUsed int64 `json:"bytes_used"`
 	MaxAvail  int64 `json:"max_avail"`
@@ -31,16 +32,19 @@ type Stats struct {
 	KbUsed    int64 `json:"kb_used"`
 }
 
+// Pool represents a given Ceph pool
 type Pool struct {
-	Id    int64  `json:"id"`
+	ID    int64  `json:"id"`
 	Name  string `json:"name"`
 	Stats Stats  `json:"stats"`
 }
 
+// Output is a list of pools from the response
 type Output struct {
 	Pools []Pool `json:"pools"`
 }
 
+// DfRequest is the df response object
 type DfRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`
@@ -58,7 +62,7 @@ func eventsMapping(content []byte) []common.MapStr {
 	for _, Pool := range d.Output.Pools {
 		event := common.MapStr{
 			"name": Pool.Name,
-			"id":   Pool.Id,
+			"id":   Pool.ID,
 			"stats": common.MapStr{
 				"used": common.MapStr{
 					"bytes": Pool.Stats.BytesUsed,
