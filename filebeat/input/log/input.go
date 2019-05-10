@@ -753,5 +753,5 @@ func (p *Input) stopWhenDone() {
 	case <-p.outlet.Done():
 	}
 
-	p.Stop()
+	p.Wait()
 }
