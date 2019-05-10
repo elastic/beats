@@ -1121,11 +1121,7 @@ Hostname of the agent.
 *`beat.timezone`*::
 +
 --
-type: long
-
-format: bytes
-
-The amount of data in bytes stored in a bucket.
+type: alias
 
 alias to: event.timezone
 
@@ -1134,7 +1130,7 @@ alias to: event.timezone
 *`fields`*::
 +
 --
-type: long
+type: object
 
 Contains user configurable fields.
 
@@ -1243,13 +1239,7 @@ cluster_health
 *`ceph.cluster_health.overall_status`*::
 +
 --
-<<<<<<< HEAD
 type: keyword
-=======
-type: long
-
-format: bytes
->>>>>>> 1b2613eb6... Change type from scaled_float to long and add format (#11982)
 
 Overall status of the cluster
 
@@ -1260,11 +1250,6 @@ Overall status of the cluster
 +
 --
 type: long
-<<<<<<< HEAD
-=======
-
-format: bytes
->>>>>>> 1b2613eb6... Change type from scaled_float to long and add format (#11982)
 
 Map version
 
@@ -1284,13 +1269,7 @@ timecheck round
 *`ceph.cluster_health.timechecks.round.status`*::
 +
 --
-<<<<<<< HEAD
 type: keyword
-=======
-type: long
-
-format: bytes
->>>>>>> 1b2613eb6... Change type from scaled_float to long and add format (#11982)
 
 Status of the round
 
@@ -1308,11 +1287,6 @@ cluster_status
 +
 --
 type: long
-<<<<<<< HEAD
-=======
-
-format: bytes
->>>>>>> 1b2613eb6... Change type from scaled_float to long and add format (#11982)
 
 Ceph Status version
 
@@ -1348,13 +1322,7 @@ Cluster write throughput per second
 --
 type: long
 
-<<<<<<< HEAD
 Cluster read iops per second
-=======
-format: duration
-
-The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
->>>>>>> 1b2613eb6... Change type from scaled_float to long and add format (#11982)
 
 
 --
@@ -1364,13 +1332,7 @@ The per-request time from the complete request being received by an Amazon S3 bu
 --
 type: long
 
-<<<<<<< HEAD
 Cluster write iops per second
-=======
-format: duration
-
-The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
->>>>>>> 1b2613eb6... Change type from scaled_float to long and add format (#11982)
 
 
 --
@@ -1390,13 +1352,7 @@ Cluster misplace pg number
 --
 type: long
 
-<<<<<<< HEAD
 Cluster misplace objects number
-=======
-format: duration
-
-The approximate age of the oldest non-deleted message in the queue.
->>>>>>> 1b2613eb6... Change type from scaled_float to long and add format (#11982)
 
 
 --
