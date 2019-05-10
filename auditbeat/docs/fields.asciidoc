@@ -6542,6 +6542,157 @@ ID uniquely identifying the process. It is computed as a SHA-256 hash of the hos
 
 --
 
+[float]
+== hash fields
+
+Hashes of the executable. The keys are algorithm names and the values are the hex encoded digest values.
+
+
+
+*`process.hash.blake2b_256`*::
++
+--
+type: keyword
+
+BLAKE2b-256 hash of the executable.
+
+--
+
+*`process.hash.blake2b_384`*::
++
+--
+type: keyword
+
+BLAKE2b-384 hash of the executable.
+
+--
+
+*`process.hash.blake2b_512`*::
++
+--
+type: keyword
+
+BLAKE2b-512 hash of the executable.
+
+--
+
+*`process.hash.md5`*::
++
+--
+type: keyword
+
+MD5 hash of the executable.
+
+--
+
+*`process.hash.sha1`*::
++
+--
+type: keyword
+
+SHA1 hash of the executable.
+
+--
+
+*`process.hash.sha224`*::
++
+--
+type: keyword
+
+SHA224 hash of the executable.
+
+--
+
+*`process.hash.sha256`*::
++
+--
+type: keyword
+
+SHA256 hash of the executable.
+
+--
+
+*`process.hash.sha384`*::
++
+--
+type: keyword
+
+SHA384 hash of the executable.
+
+--
+
+*`process.hash.sha3_224`*::
++
+--
+type: keyword
+
+SHA3_224 hash of the executable.
+
+--
+
+*`process.hash.sha3_256`*::
++
+--
+type: keyword
+
+SHA3_256 hash of the executable.
+
+--
+
+*`process.hash.sha3_384`*::
++
+--
+type: keyword
+
+SHA3_384 hash of the executable.
+
+--
+
+*`process.hash.sha3_512`*::
++
+--
+type: keyword
+
+SHA3_512 hash of the executable.
+
+--
+
+*`process.hash.sha512`*::
++
+--
+type: keyword
+
+SHA512 hash of the executable.
+
+--
+
+*`process.hash.sha512_224`*::
++
+--
+type: keyword
+
+SHA512/224 hash of the executable.
+
+--
+
+*`process.hash.sha512_256`*::
++
+--
+type: keyword
+
+SHA512/256 hash of the executable.
+
+--
+
+*`process.hash.xxh64`*::
++
+--
+type: keyword
+
+XX64 hash of the executable.
+
+--
+
 
 *`socket.entity_id`*::
 +

@@ -36,7 +36,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
-- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 
 *Packetbeat*
 
@@ -116,6 +115,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 
 *Packetbeat*
 
@@ -148,12 +148,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `decode_csv_fields` processor. {pull}11753[11753]
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
 - New `extract_array` processor. {pull}11761[11761]
+- Add number of goroutines to reported metrics. {pull}12135[12135]
 
 *Auditbeat*
 
 - Auditd module: Add `event.outcome` and `event.type` for ECS. {pull}11432[11432]
 - Package: Enable suse. {pull}11634[11634]
 - Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+- Process: Add file hash of process executable. {pull}11722[11722]
 
 *Filebeat*
 
