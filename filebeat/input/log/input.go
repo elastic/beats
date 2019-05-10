@@ -148,7 +148,7 @@ func NewInput(
 	logp.Info("Configured paths: %v", p.config.Paths)
 
 	cleanupNeeded = false
-	p.stopWhenDone()
+	go p.stopWhenDone()
 
 	return p, nil
 }
@@ -747,13 +747,11 @@ func (p *Input) Stop() {
 
 // stopWhenDone takes care of stopping the input if some of the contexts are done
 func (p *Input) stopWhenDone() {
-	go func() {
-		select {
-		case <-p.done:
-		case <-p.stateOutlet.Done():
-		case <-p.outlet.Done():
-		}
+	select {
+	case <-p.done:
+	case <-p.stateOutlet.Done():
+	case <-p.outlet.Done():
+	}
 
-		p.Stop()
-	}()
+	p.Stop()
 }
