@@ -21,10 +21,10 @@ class TestRunILM(BaseTest):
         self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.custom_policy, self.index_name])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.custom_policy, self.index_name])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -165,13 +165,13 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.custom_policy, self.index_name])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
 
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.custom_policy, self.index_name])
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy])
 
     def render_config(self, **kwargs):
         self.render_config_template(
