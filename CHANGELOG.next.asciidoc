@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
 
 *Heartbeat*
 
