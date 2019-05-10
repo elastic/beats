@@ -116,14 +116,14 @@ in ECS that are added under the `palo_alto` prefix:
 | Device Name | observer.hostname |
 |==============
 
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard:
-
-(TODO)
-[role="screenshot"]
-image::./images/kibana-cisco-asa.png[]
+// [float]
+// === Example dashboard
+//
+// This module comes with a sample dashboard:
+//
+// (TODO)
+// [role="screenshot"]
+// image::./images/kibana-cisco-asa.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
