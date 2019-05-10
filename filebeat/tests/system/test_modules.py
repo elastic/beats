@@ -138,7 +138,12 @@ class Test(BaseTest):
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
+
+        local_env = os.environ.copy()
+        local_env["TZ"] = 'Etc/UTC'
+
         subprocess.Popen(cmd,
+                         env=local_env,
                          stdin=None,
                          stdout=output,
                          stderr=subprocess.STDOUT,
