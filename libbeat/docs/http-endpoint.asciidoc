@@ -95,6 +95,9 @@ curl -XGET 'localhost:5066/stats?pretty'
       "memory_alloc": 9433384,
       "memory_total": 492478864,
       "rss": 50405376
+    },
+    "runtime": {
+      "goroutines": 22
     }
   },
   "libbeat": {
