@@ -240,6 +240,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 	return warn == "", warn
 }
 
+//
 func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	log := m.support.log
 
@@ -267,16 +268,6 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		if policyCreated && templateComponent.enabled {
 			templateComponent.overwrite = true
 		}
-
-		// create alias
-		if err := m.ilm.EnsureAlias(); err != nil {
-			if ilm.ErrReason(err) != ilm.ErrAliasAlreadyExists {
-				return err
-			}
-			log.Info("Write alias exists already")
-		} else {
-			log.Info("Write alias successfully generated.")
-		}
 	}
 
 	if templateComponent.load {
@@ -296,6 +287,18 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		}
 
 		log.Info("Loaded index template.")
+	}
+
+	if ilmComponent.load {
+		// ensure alias is created after the template is created
+		if err := m.ilm.EnsureAlias(); err != nil {
+			if ilm.ErrReason(err) != ilm.ErrAliasAlreadyExists {
+				return err
+			}
+			log.Info("Write alias exists already")
+		} else {
+			log.Info("Write alias successfully generated.")
+		}
 	}
 
 	return nil

@@ -62,6 +62,8 @@ type Asseter interface {
 // Elastic Stack.
 type Manager interface {
 	VerifySetup(template, ilm LoadMode) (bool, string)
+	// When supporting index lifecycle management, ensure templates and policies
+	// are created before write aliases, to ensure templates are applied to the indices.
 	Setup(template, ilm LoadMode) error
 }
 

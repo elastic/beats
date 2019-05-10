@@ -3,9 +3,9 @@ from idxmgmt import IdxMgmt
 import os
 from nose.plugins.attrib import attr
 import unittest
-import shutil
-import datetime
 import logging
+from nose.tools import raises
+from elasticsearch import RequestError
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -28,17 +28,13 @@ class TestCommandSetupIndexManagement(BaseTest):
 
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(index=self.custom_policy)
-        self.idxmgmt.delete(index=self.custom_alias)
-        self.idxmgmt.delete(index=self.index_name)
+        self.idxmgmt.delete(indices=[self.custom_alias, self.custom_policy, self.index_name])
 
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(index=self.custom_alias)
-        self.idxmgmt.delete(index=self.custom_policy)
-        self.idxmgmt.delete(index=self.index_name)
+        self.idxmgmt.delete(indices=[self.custom_alias, self.custom_policy, self.index_name])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -63,6 +59,26 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    @raises(RequestError)
+    def test_setup_default(self):
+        """
+        Test setup --index-management with default config
+        """
+        self.render_config()
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
+        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
+        self.idxmgmt.assert_alias_created(self.alias_name)
+        self.idxmgmt.assert_policy_created(self.policy_name)
+        # try deleting policy needs to raise an error as it is in use
+        self.idxmgmt.delete_policy(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
