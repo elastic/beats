@@ -240,7 +240,8 @@ func GetEnvPort() string { <2>
 
 ----
 <1> Add any additional config options your metricset needs here.
-<2> The endpoint used by the metricset needs to be configurable for manual and automated testing.
+<2> The endpoint used by the metricset needs to be configurable for manual and automated testing. 
+Environment variables should be defined in the module under `_meta/env` and included in the `docker-compose.yml` file.
 
 The `TestFetch` integration test will return a single event from your metricset, which you can use to test the validity of the data.
 `TestData` will (re)generate the `_meta/data.json` file that documents the data reported by the metricset.
