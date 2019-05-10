@@ -1,3 +1,0 @@
-dashboards:
-- id: Filebeat-rabbitmq-log-Dashboard
-  file: Filebeat-rabbitmq-log.json
