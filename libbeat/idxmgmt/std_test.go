@@ -32,14 +32,32 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
+type mockClientHandler struct {
+	alias, policy string
+	expectsPolicy bool
+
+	tmplCfg   *template.TemplateConfig
+	tmplForce bool
+
+	operations []mockCreateOp
+}
+
+type mockCreateOp uint8
+
+const (
+	mockCreatePolicy mockCreateOp = iota
+	mockCreateTemplate
+	mockCreateAlias
+)
+
 func TestDefaultSupport_Enabled(t *testing.T) {
 	cases := map[string]struct {
 		ilmCalls []onCall
 		cfg      map[string]interface{}
-		want     bool
+		enabled  bool
 	}{
 		"templates and ilm disabled": {
-			want: false,
+			enabled: false,
 			ilmCalls: []onCall{
 				onMode().Return(ilm.ModeDisabled),
 			},
@@ -48,7 +66,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			},
 		},
 		"templates only": {
-			want: true,
+			enabled: true,
 			ilmCalls: []onCall{
 				onMode().Return(ilm.ModeDisabled),
 			},
@@ -57,7 +75,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			},
 		},
 		"ilm only": {
-			want: true,
+			enabled: true,
 			ilmCalls: []onCall{
 				onMode().Return(ilm.ModeEnabled),
 			},
@@ -66,7 +84,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			},
 		},
 		"ilm tentatively": {
-			want: true,
+			enabled: true,
 			ilmCalls: []onCall{
 				onMode().Return(ilm.ModeAuto),
 			},
@@ -81,7 +99,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 			factory := MakeDefaultSupport(makeMockILMSupport(test.ilmCalls...))
 			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
-			assert.Equal(t, test.want, im.Enabled())
+			assert.Equal(t, test.enabled, im.Enabled())
 		})
 	}
 }
@@ -197,7 +215,61 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 	}
 }
 
-func TestDefaultSupport_TemplateHandling(t *testing.T) {
+func TestIndexManager_VerifySetup(t *testing.T) {
+	for name, setup := range map[string]struct {
+		tmpl, ilm         bool
+		loadTmpl, loadILM LoadMode
+		ok                bool
+		warn              string
+	}{
+		"load template with ilm without loading ilm": {
+			ilm: true, tmpl: true, loadILM: LoadModeDisabled,
+			warn: "whithout loading ILM policy and alias",
+		},
+		"load ilm without template": {
+			ilm: true, loadILM: LoadModeUnset,
+			warn: "without loading template is not recommended",
+		},
+		"template disabled but loading enabled": {
+			loadTmpl: LoadModeEnabled,
+			warn:     "loading not enabled",
+		},
+		"ilm disabled but loading enabled": {
+			loadILM: LoadModeEnabled, tmpl: true,
+			warn: "loading not enabled",
+		},
+		"ilm enabled but loading disabled": {
+			ilm: true, loadILM: LoadModeDisabled,
+			warn: "loading not enabled",
+		},
+		"template enabled but loading disabled": {
+			tmpl: true, loadTmpl: LoadModeDisabled,
+			warn: "loading not enabled",
+		},
+		"everything enabled": {
+			tmpl: true, loadTmpl: LoadModeUnset, ilm: true, loadILM: LoadModeUnset,
+			ok: true,
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := common.NewConfigFrom(common.MapStr{
+				"setup.ilm.enabled":      setup.ilm,
+				"setup.template.enabled": setup.tmpl,
+			})
+			require.NoError(t, err)
+			support, err := MakeDefaultSupport(ilm.StdSupport)(nil, beat.Info{}, cfg)
+			require.NoError(t, err)
+			clientHandler := newMockClientHandler()
+			manager := support.Manager(clientHandler, nil)
+			ok, warn := manager.VerifySetup(setup.loadTmpl, setup.loadILM)
+			assert.Equal(t, setup.ok, ok)
+			assert.Contains(t, warn, setup.warn)
+			clientHandler.assertInvariants(t)
+		})
+	}
+}
+
+func TestIndexManager_Setup(t *testing.T) {
 	cloneCfg := func(c template.TemplateConfig) template.TemplateConfig {
 		if c.AppendFields != nil {
 			tmp := make(mapping.Fields, len(c.AppendFields))
@@ -235,7 +307,7 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 		tmplCfg       *template.TemplateConfig
 		alias, policy string
 	}{
-		"template default, ilm default": {
+		"template default ilm default": {
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
@@ -246,7 +318,7 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 			alias:  "test-9.9.9",
 			policy: "test-9.9.9",
 		},
-		"template default, ilm default with alias and policy changed": {
+		"template default ilm default with alias and policy changed": {
 			cfg: common.MapStr{
 				"setup.ilm.rollover_alias": "mocktest",
 				"setup.ilm.policy_name":    "policy-keep",
@@ -261,14 +333,14 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 			alias:  "mocktest",
 			policy: "policy-keep",
 		},
-		"template default, ilm disabled": {
+		"template default ilm disabled": {
 			cfg: common.MapStr{
 				"setup.ilm.enabled": false,
 			},
 			loadTemplate: LoadModeEnabled,
 			tmplCfg:      &defaultCfg,
 		},
-		"template default loadMode Overwrite, ilm disabled": {
+		"template default loadMode Overwrite ilm disabled": {
 			cfg: common.MapStr{
 				"setup.ilm.enabled": false,
 			},
@@ -277,7 +349,7 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 				"overwrite": "true",
 			}),
 		},
-		"template default loadMode Force, ilm disabled": {
+		"template default loadMode Force ilm disabled": {
 			cfg: common.MapStr{
 				"setup.ilm.enabled": false,
 			},
@@ -286,27 +358,27 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 				"overwrite": "true",
 			}),
 		},
-		"template loadMode disabled, ilm disabled": {
+		"template loadMode disabled ilm disabled": {
 			cfg: common.MapStr{
 				"setup.ilm.enabled": false,
 			},
 			loadTemplate: LoadModeDisabled,
 		},
-		"template disabled, ilm default": {
+		"template disabled ilm default": {
 			cfg: common.MapStr{
 				"setup.template.enabled": false,
 			},
 			alias:  "test-9.9.9",
 			policy: "test-9.9.9",
 		},
-		"template disabled, ilm disabled, loadMode Overwrite": {
+		"template disabled ilm disabled, loadMode Overwrite": {
 			cfg: common.MapStr{
 				"setup.template.enabled": false,
 				"setup.ilm.enabled":      false,
 			},
 			loadILM: LoadModeOverwrite,
 		},
-		"template disabled, ilm disabled, loadMode Force": {
+		"template disabled ilm disabled loadMode Force": {
 			cfg: common.MapStr{
 				"setup.template.enabled": false,
 				"setup.ilm.enabled":      false,
@@ -315,13 +387,13 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 			alias:   "test-9.9.9",
 			policy:  "test-9.9.9",
 		},
-		"template loadmode disabled, ilm loadMode enabled": {
+		"template loadmode disabled ilm loadMode enabled": {
 			loadTemplate: LoadModeDisabled,
 			loadILM:      LoadModeEnabled,
 			alias:        "test-9.9.9",
 			policy:       "test-9.9.9",
 		},
-		"template default, ilm loadMode disabled": {
+		"template default ilm loadMode disabled": {
 			loadILM: LoadModeDisabled,
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"name":                          "test-9.9.9",
@@ -330,7 +402,7 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 		},
-		"template loadmode disabled, ilm loadmode disabled": {
+		"template loadmode disabled ilm loadmode disabled": {
 			loadTemplate: LoadModeDisabled,
 			loadILM:      LoadModeDisabled,
 		},
@@ -345,69 +417,77 @@ func TestDefaultSupport_TemplateHandling(t *testing.T) {
 			clientHandler := newMockClientHandler()
 			manager := im.Manager(clientHandler, BeatsAssets([]byte("testbeat fields")))
 			err = manager.Setup(test.loadTemplate, test.loadILM)
+			clientHandler.assertInvariants(t)
 			if test.err {
 				assert.Error(t, err)
 			} else {
 				require.NoError(t, err)
 				if test.tmplCfg == nil {
-					assert.Nil(t, clientHandler.tl.tmplCfg)
+					assert.Nil(t, clientHandler.tmplCfg)
+
 				} else {
-					assert.Equal(t, test.tmplCfg, clientHandler.tl.tmplCfg)
+					assert.Equal(t, test.tmplCfg, clientHandler.tmplCfg)
 				}
-				assert.Equal(t, test.alias, clientHandler.il.alias)
-				assert.Equal(t, test.policy, clientHandler.il.policy)
+				assert.Equal(t, test.alias, clientHandler.alias)
+				assert.Equal(t, test.policy, clientHandler.policy)
 			}
 		})
 	}
 }
 
+func (op mockCreateOp) String() string {
+	names := []string{"create-policy", "create-template", "create-alias"}
+	if int(op) > len(names) {
+		return "unknown"
+	}
+	return names[op]
+}
+
 func newMockClientHandler() *mockClientHandler {
-	tl := mockTemplateLoader{}
-	il := mockILMClientHandler{}
-	return &mockClientHandler{&il, &tl, &tl, &il}
+	return &mockClientHandler{}
 }
 
-type mockClientHandler struct {
-	ilm.ClientHandler
-	template.Loader
-
-	tl *mockTemplateLoader
-	il *mockILMClientHandler
-}
-
-type mockTemplateLoader struct {
-	tmplCfg *template.TemplateConfig
-	force   bool
-}
-
-func (l *mockTemplateLoader) Load(config template.TemplateConfig, _ beat.Info, fields []byte, migration bool) error {
-	l.force = config.Overwrite
-	l.tmplCfg = &config
+func (h *mockClientHandler) Load(config template.TemplateConfig, _ beat.Info, fields []byte, migration bool) error {
+	h.recordOp(mockCreateTemplate)
+	h.tmplForce = config.Overwrite
+	h.tmplCfg = &config
 	return nil
 }
 
-type mockILMClientHandler struct {
-	alias, policy string
-}
-
-func (ch *mockILMClientHandler) CheckILMEnabled(m ilm.Mode) (bool, error) {
+func (h *mockClientHandler) CheckILMEnabled(m ilm.Mode) (bool, error) {
 	return m == ilm.ModeEnabled || m == ilm.ModeAuto, nil
 }
 
-func (ch *mockILMClientHandler) HasAlias(name string) (bool, error) {
-	return ch.alias == name, nil
+func (h *mockClientHandler) HasAlias(name string) (bool, error) {
+	return h.alias == name, nil
 }
 
-func (ch *mockILMClientHandler) CreateAlias(alias ilm.Alias) error {
-	ch.alias = alias.Name
+func (h *mockClientHandler) CreateAlias(alias ilm.Alias) error {
+	h.recordOp(mockCreateAlias)
+	h.alias = alias.Name
 	return nil
 }
 
-func (ch *mockILMClientHandler) HasILMPolicy(name string) (bool, error) {
-	return ch.policy == name, nil
+func (h *mockClientHandler) HasILMPolicy(name string) (bool, error) {
+	return h.policy == name, nil
 }
 
-func (ch *mockILMClientHandler) CreateILMPolicy(policy ilm.Policy) error {
-	ch.policy = policy.Name
+func (h *mockClientHandler) CreateILMPolicy(policy ilm.Policy) error {
+	h.recordOp(mockCreatePolicy)
+	h.policy = policy.Name
 	return nil
+}
+
+func (h *mockClientHandler) recordOp(op mockCreateOp) {
+	h.operations = append(h.operations, op)
+}
+
+func (h *mockClientHandler) assertInvariants(t *testing.T) {
+	for i, op := range h.operations {
+		for _, older := range h.operations[:i] {
+			if older > op {
+				t.Errorf("Operation: '%v' has been executed before '%v'", older, op)
+			}
+		}
+	}
 }
