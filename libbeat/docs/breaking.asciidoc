@@ -20,6 +20,7 @@ See the following topics for a description of breaking changes:
 This section discusses the main changes that you should be aware of if you
 upgrade the Beats to version 7.0. {see-relnotes}
 
+[float]
 ==== HTML escaping is disabled by default
 
 Starting with verion 7.0, embedded HTML or special symbols like `<` and `>` are
@@ -28,6 +29,7 @@ To configure the old behavior of escaping HTML, set `escape_html:
 true` in the output configuration.
 
 //tag::notable-breaking-changes[]
+[float]
 ==== Filebeat registry
 
 Starting with version 7.0, Filebeat stores the registry in a sub-directory.
@@ -41,6 +43,7 @@ have been renamed to `filebeat.registry.flush` and
 
 //end::notable-breaking-changes[]
 
+[float]
 ==== ILM support
 
 Support for Index Lifecycle Management is GA with Beats version 7.0. This
@@ -61,6 +64,7 @@ include::./field-name-changes.asciidoc[]
 
 //end::notable-breaking-changes[]
 
+[float]
 ==== Auditbeat type changes
 
 The Auditbeat JSON data types produced by the output have been changed to align
