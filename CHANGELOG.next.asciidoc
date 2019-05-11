@@ -122,6 +122,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 - Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
+- Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
 
 *Winlogbeat*
 
@@ -148,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `decode_csv_fields` processor. {pull}11753[11753]
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
 - New `extract_array` processor. {pull}11761[11761]
+- Add number of goroutines to reported metrics. {pull}12135[12135]
 
 *Auditbeat*
 
