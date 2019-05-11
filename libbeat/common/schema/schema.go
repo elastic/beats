@@ -61,7 +61,7 @@ func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{
 			err.Required = conv.Required
 		}
 		if conv.IgnoreAllErrors {
-			logp.Debug("libbeat.common", "ignoring error for key %q: %s", key, err)
+			logp.Debug("libbeat.common.schema", "ignoring error for key %q: %s", key, err)
 			return nil
 		}
 		return multierror.Errors{err}
