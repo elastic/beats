@@ -139,6 +139,12 @@ func (a *gapCountACK) ackLoop() {
 		case <-a.done:
 			closing = true
 			a.done = nil
+			if a.events.Load() == 0 {
+				// stop worker, if all events accounted for have been ACKed.
+				// If new events are added after this acker won't handle them, which may
+				// result in duplicates
+				return
+			}
 
 		case <-a.pipeline.ackDone:
 			return
@@ -146,12 +152,13 @@ func (a *gapCountACK) ackLoop() {
 		case n := <-acks:
 			empty := a.handleACK(n)
 			if empty && closing && a.events.Load() == 0 {
-				// stop worker, iff all events accounted for have been ACKed
+				// stop worker, if and only if all events accounted for have been ACKed
 				return
 			}
 
 		case <-drop:
 			// TODO: accumulate multiple drop events + flush count with timer
+			a.events.Sub(1)
 			a.fn(1, 0)
 		}
 	}

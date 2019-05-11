@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
+	"github.com/elastic/beats/auditbeat/helper/hasher"
 	abtest "github.com/elastic/beats/auditbeat/testing"
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -43,8 +44,12 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"process"},
+		"module":   "system",
+		"datasets": []string{"process"},
+
+		// To speed things up during testing, we effectively
+		// disable hashing.
+		"process.hash.max_file_size": 1,
 	}
 }
 
@@ -71,6 +76,7 @@ func TestProcessEvent(t *testing.T) {
 		"process.executable": "/bin/zsh",
 		"process.args":       []string{"zsh"},
 		"process.start":      "2019-01-01 00:00:01 +0000 UTC",
+		"process.hash.sha1":  "3de6a0a1cf514d15a61d3c873e2a710977c1103d",
 
 		"user.id":                 "1000",
 		"user.name":               "elastic",
@@ -87,6 +93,8 @@ func TestProcessEvent(t *testing.T) {
 			switch v := value.(type) {
 			case time.Time:
 				assert.Equalf(t, expFieldValue, v.String(), "Unexpected value for field %v.", expFieldName)
+			case hasher.Digest:
+				assert.Equalf(t, expFieldValue, string(v), "Unexpected value for field %v.", expFieldName)
 			default:
 				assert.Equalf(t, expFieldValue, value, "Unexpected value for field %v.", expFieldName)
 			}
@@ -120,6 +128,9 @@ func testProcess() *Process {
 		Group: &user.Group{
 			Gid:  "1000",
 			Name: "elastic",
+		},
+		Hashes: map[hasher.HashType]hasher.Digest{
+			hasher.SHA1: []byte("3de6a0a1cf514d15a61d3c873e2a710977c1103d"),
 		},
 	}
 }

@@ -37,12 +37,14 @@ func init() {
 }
 
 type linuxSystem struct {
-	procFS procfs.FS
+	procFS procFS
 }
 
 func newLinuxSystem(hostFS string) linuxSystem {
+	mountPoint := filepath.Join(hostFS, procfs.DefaultMountPoint)
+	fs, _ := procfs.NewFS(mountPoint)
 	return linuxSystem{
-		procFS: procfs.FS(filepath.Join(hostFS, procfs.DefaultMountPoint)),
+		procFS: procFS{FS: fs, mountPoint: mountPoint},
 	}
 }
 
@@ -51,7 +53,7 @@ func (s linuxSystem) Host() (types.Host, error) {
 }
 
 type host struct {
-	procFS procfs.FS
+	procFS procFS
 	stat   procfs.Stat
 	info   types.HostInfo
 }
@@ -61,7 +63,7 @@ func (h *host) Info() types.HostInfo {
 }
 
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
-	content, err := ioutil.ReadFile(h.procFS.Path("meminfo"))
+	content, err := ioutil.ReadFile(h.procFS.path("meminfo"))
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +89,7 @@ func (h *host) CPUTime() (types.CPUTimes, error) {
 	}, nil
 }
 
-func newHost(fs procfs.FS) (*host, error) {
+func newHost(fs procFS) (*host, error) {
 	stat, err := fs.NewStat()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read proc stat")
@@ -137,7 +139,7 @@ func (r *reader) architecture(h *host) {
 }
 
 func (r *reader) bootTime(h *host) {
-	v, err := bootTime(h.procFS)
+	v, err := bootTime(h.procFS.FS)
 	if r.addErr(err) {
 		return
 	}
@@ -195,4 +197,14 @@ func (r *reader) uniqueID(h *host) {
 		return
 	}
 	h.info.UniqueID = v
+}
+
+type procFS struct {
+	procfs.FS
+	mountPoint string
+}
+
+func (fs *procFS) path(p ...string) string {
+	elem := append([]string{fs.mountPoint}, p...)
+	return filepath.Join(elem...)
 }
