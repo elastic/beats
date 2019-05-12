@@ -62,6 +62,33 @@ type ilmIndexSelector struct {
 	st    *indexState
 }
 
+type componentType uint8
+
+//go:generate stringer -linecomment -type componentType
+const (
+	componentTemplate componentType = iota //template
+	componentILM                           //ilm
+)
+
+type feature struct {
+	component                componentType
+	enabled, overwrite, load bool
+}
+
+func newFeature(c componentType, enabled, overwrite bool, mode LoadMode) feature {
+	if mode == LoadModeUnset && !enabled {
+		mode = LoadModeDisabled
+	}
+	if mode >= LoadModeOverwrite {
+		overwrite = true
+	}
+	if mode == LoadModeForce {
+		enabled = true
+	}
+	load := mode.Enabled() && enabled
+	return feature{component: c, enabled: enabled, overwrite: overwrite, load: load}
+}
+
 func newIndexSupport(
 	log *logp.Logger,
 	info beat.Info,
@@ -74,7 +101,7 @@ func newIndexSupport(
 		ilmFactory = ilm.DefaultSupport
 	}
 
-	ilm, err := ilmFactory(log, info, ilmConfig)
+	ilmSupporter, err := ilmFactory(log, info, ilmConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +113,7 @@ func newIndexSupport(
 
 	return &indexSupport{
 		log:          log,
-		ilm:          ilm,
+		ilm:          ilmSupporter,
 		info:         info,
 		templateCfg:  tmplCfg,
 		migration:    migration,
@@ -95,17 +122,26 @@ func newIndexSupport(
 }
 
 func (s *indexSupport) Enabled() bool {
-	return s.templateCfg.Enabled || (s.ilm.Mode() != ilm.ModeDisabled)
+	return s.enabled(componentTemplate) || s.enabled(componentILM)
+}
+
+func (s *indexSupport) enabled(c componentType) bool {
+	switch c {
+	case componentTemplate:
+		return s.templateCfg.Enabled
+	case componentILM:
+		return s.ilm.Mode() != ilm.ModeDisabled
+	}
+	return false
 }
 
 func (s *indexSupport) Manager(
 	clientHandler ClientHandler,
 	assets Asseter,
 ) Manager {
-	ilm := s.ilm.Manager(clientHandler)
 	return &indexManager{
 		support:       s,
-		ilm:           ilm,
+		ilm:           s.ilm.Manager(clientHandler),
 		clientHandler: clientHandler,
 		assets:        assets,
 	}
@@ -177,70 +213,72 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 	}, nil
 }
 
+func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
+	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), false, loadILM)
+
+	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
+		m.support.templateCfg.Overwrite, loadTemplate)
+
+	if ilmComponent.load && !templateComponent.load {
+		return false, "Loading ILM policy and write alias without loading template " +
+			"is not recommended. Check your configuration."
+	}
+
+	if templateComponent.load && !ilmComponent.load && ilmComponent.enabled {
+		return false, "Loading template with ILM settings whithout loading ILM " +
+			"policy and alias can lead to issues and is not recommended. " +
+			"Check your configuration."
+	}
+
+	var warn string
+	if !ilmComponent.load {
+		warn += "ILM policy and write alias loading not enabled. "
+	}
+	if !templateComponent.load {
+		warn += "Template loading not enabled."
+	}
+	return warn == "", warn
+}
+
+//
 func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
-	var err error
 	log := m.support.log
 
-	withILM := m.support.st.withILM.Load()
-	if !withILM {
-		withILM, err = m.ilm.Enabled()
-		if err != nil {
-			return err
-		}
+	withILM, err := m.setupWithILM()
+	if err != nil {
+		return err
 	}
-	if loadILM == LoadModeUnset {
-		if withILM {
-			loadILM = LoadModeEnabled
-			log.Info("Auto ILM enable success.")
-		} else {
-			loadILM = LoadModeDisabled
-		}
+	if withILM && loadILM.Enabled() {
+		log.Info("Auto ILM enable success.")
 	}
 
-	if loadILM == LoadModeForce || withILM && loadILM.Enabled() {
-		// mark ILM as enabled in indexState if withILM is true
-		m.support.st.withILM.CAS(false, true)
+	ilmComponent := newFeature(componentILM, withILM, false, loadILM)
+	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
+		m.support.templateCfg.Overwrite, loadTemplate)
 
+	if ilmComponent.load {
 		// install ilm policy
-		policyCreated, err := m.ilm.EnsurePolicy(loadILM >= LoadModeOverwrite)
+		policyCreated, err := m.ilm.EnsurePolicy(ilmComponent.overwrite)
 		if err != nil {
 			return err
 		}
 		log.Info("ILM policy successfully loaded.")
 
 		// The template should be updated if a new policy is created.
-		if policyCreated && loadTemplate.Enabled() {
-			loadTemplate = LoadModeOverwrite
-		}
-
-		// create alias
-		if err := m.ilm.EnsureAlias(); err != nil {
-			if ilm.ErrReason(err) != ilm.ErrAliasAlreadyExists {
-				return err
-			}
-			log.Info("Write alias exists already")
-		} else {
-			log.Info("Write alias successfully generated.")
+		if policyCreated && templateComponent.enabled {
+			templateComponent.overwrite = true
 		}
 	}
 
-	// create and install template
-	if loadTemplate == LoadModeForce || m.support.templateCfg.Enabled && loadTemplate.Enabled() {
+	if templateComponent.load {
 		tmplCfg := m.support.templateCfg
+		tmplCfg.Overwrite, tmplCfg.Enabled = templateComponent.overwrite, templateComponent.enabled
 
-		if withILM {
-			ilm := m.support.ilm
-			tmplCfg, err = applyILMSettings(log, tmplCfg, ilm.Policy(), ilm.Alias())
+		if ilmComponent.enabled {
+			tmplCfg, err = applyILMSettings(log, tmplCfg, m.support.ilm.Policy(), m.support.ilm.Alias())
 			if err != nil {
 				return err
 			}
-		}
-
-		if loadTemplate == LoadModeForce {
-			tmplCfg.Enabled = true
-		}
-		if loadTemplate >= LoadModeOverwrite {
-			tmplCfg.Overwrite = true
 		}
 		fields := m.assets.Fields(m.support.info.Beat)
 		err = m.clientHandler.Load(tmplCfg, m.support.info, fields, m.support.migration)
@@ -251,7 +289,35 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		log.Info("Loaded index template.")
 	}
 
+	if ilmComponent.load {
+		// ensure alias is created after the template is created
+		if err := m.ilm.EnsureAlias(); err != nil {
+			if ilm.ErrReason(err) != ilm.ErrAliasAlreadyExists {
+				return err
+			}
+			log.Info("Write alias exists already")
+		} else {
+			log.Info("Write alias successfully generated.")
+		}
+	}
+
 	return nil
+}
+
+func (m *indexManager) setupWithILM() (bool, error) {
+	var err error
+	withILM := m.support.st.withILM.Load()
+	if !withILM {
+		withILM, err = m.ilm.Enabled()
+		if err != nil {
+			return false, err
+		}
+		if withILM {
+			// mark ILM as enabled in indexState
+			m.support.st.withILM.CAS(false, true)
+		}
+	}
+	return withILM, nil
 }
 
 func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
