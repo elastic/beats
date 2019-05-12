@@ -1,0 +1,67 @@
+[[breaking-changes-7.0]]
+
+=== Breaking changes in 7.0
+
+This section discusses the main changes that you should be aware of if you
+upgrade the Beats to version 7.0. {see-relnotes}
+
+[float]
+==== HTML escaping is disabled by default
+
+Starting with verion 7.0, embedded HTML or special symbols like `<` and `>` are
+no longer escaped by default when publishing events.
+To configure the old behavior of escaping HTML, set `escape_html:
+true` in the output configuration.
+
+//tag::notable-breaking-changes[]
+[float]
+==== Filebeat registry
+
+Starting with version 7.0, Filebeat stores the registry in a sub-directory.
+The directory is configured using the `filebeat.registry.path` setting.
+If Filebeat finds an old registry file at the configured location, it will
+automatically migrate the registry file to the new format.
+
+The settings `filebeat.registry_flush` and `filebeat.registry_file_permission`
+have been renamed to `filebeat.registry.flush` and
+`filebeat.registry.file_permission`.
+
+//end::notable-breaking-changes[]
+
+[float]
+==== ILM support
+
+Support for Index Lifecycle Management is GA with Beats version 7.0. This
+release moved most ILM settings from the `output.elasticsearch.ilm` namespace to
+the `setup.ilm` namespace.
+
+//tag::notable-breaking-changes[]
+
+[float]
+==== Filebeat apache2 module renamed
+
+The Filebeat `apache2` module is renamed to `apache` in 7.0. 
+
+[float]
+==== Field name changes
+
+include::./field-name-changes.asciidoc[]
+
+//end::notable-breaking-changes[]
+
+[float]
+==== Auditbeat type changes
+
+The Auditbeat JSON data types produced by the output have been changed to align
+with the data types used in the Elasticsearch index template.
+
+.Auditbeat Type Changes in 7.0
+[frame="topbot",options="header"]
+|======================
+|Field|Old Type|New Type
+|`file.gid`     |number |string
+|`file.uid`     |number |string
+|`process.pid`  |string |number
+|`process.ppid` |string |number
+|======================
+
