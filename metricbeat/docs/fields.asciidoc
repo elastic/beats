@@ -4539,32 +4539,12 @@ Memory metrics.
 
 
 
-*`docker.memory.commit`*::
-+
---
-type: long
-
-Committed bytes
-
-
---
-
-*`docker.memory.commit_peak`*::
-+
---
-type: long
-
-Peak committed bytes
-
-
---
-
 *`docker.memory.private_working_set`*::
 +
 --
 type: long
 
-private working set
+private working sets
 
 
 --
@@ -4628,6 +4608,26 @@ Memory resident set size percentage.
 Usage memory stats.
 
 
+
+*`docker.memory.usage.commit`*::
++
+--
+type: bytes
+
+Committed bytes on Windows
+
+
+--
+
+*`docker.memory.usage.commit_peak`*::
++
+--
+type: long
+
+Peak committed bytes on Windows
+
+
+--
 
 *`docker.memory.usage.max`*::
 +
