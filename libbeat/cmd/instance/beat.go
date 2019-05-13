@@ -168,7 +168,6 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "version").Set(b.Info.Version)
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
-		monitoring.NewString(registry, "uuid").Set(b.Info.ID.String())
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
 
 		// Add additional info to state registry. This is also reported to monitoring
@@ -176,7 +175,6 @@ func Run(settings Settings, bt beat.Creator) error {
 		serviceRegistry := stateRegistry.NewRegistry("service")
 		monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
 		monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-		monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
 		beatRegistry := stateRegistry.NewRegistry("beat")
 		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
@@ -368,14 +366,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	// Reset Beat ID in registry vars, in case it was loaded from meta file
+	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
-	infoUUID := infoRegistry.Get("uuid").(*monitoring.String)
-	infoUUID.Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
 
 	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
-	serviceID := serviceRegistry.Get("id").(*monitoring.String)
-	serviceID.Set(b.Info.ID.String())
+	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
 
 	svc.BeforeRun()
 	defer svc.Cleanup()
