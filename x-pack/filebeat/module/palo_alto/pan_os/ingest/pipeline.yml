@@ -146,7 +146,17 @@ processors:
      value: unknown
      if: 'ctx?._temp_?.message_type == "THREAT" && ctx?.network?.direction == null'
 
-# Set event.category depending on log type.
+# Set network.type for TRAFFIC.
+ - set:
+     field: network.type
+     value: 'ipv4'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session == null'
+ - set:
+     field: network.type
+     value: 'ipv6'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session != null'
+
+  # Set event.category depending on log type.
  - set:
      field: event.category
      value: network_traffic
