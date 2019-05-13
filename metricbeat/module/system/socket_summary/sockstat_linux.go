@@ -66,14 +66,15 @@ func applyEnhancements(data common.MapStr, m *MetricSet) (common.MapStr, error) 
 		return nil, errors.New("unexpected module type")
 	}
 	dir := filepath.Join(systemModule.HostFS, "/proc/net/sockstat")
+	pageSize := os.Getpagesize()
 
 	stat, err := parseSockstat(dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting sockstat data")
 	}
 	data.Put("tcp.all.orphan", stat.TCPOrphan)
-	data.Put("tcp.memory", os.Getpagesize()*stat.TCPMem)
-	data.Put("udp.memory", os.Getpagesize()*stat.UDPMem)
+	data.Put("tcp.memory", pageSize*stat.TCPMem)
+	data.Put("udp.memory", pageSize*stat.UDPMem)
 
 	return data, nil
 
