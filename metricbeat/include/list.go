@@ -30,6 +30,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/aerospike/namespace"
 	_ "github.com/elastic/beats/metricbeat/module/apache"
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
+	_ "github.com/elastic/beats/metricbeat/module/beats"
+	_ "github.com/elastic/beats/metricbeat/module/beats/stats"
 	_ "github.com/elastic/beats/metricbeat/module/ceph"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/cluster_disk"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/cluster_health"

@@ -1,0 +1,9 @@
+- module: beats
+  metricsets:
+    - stats
+  period: 10s
+  hosts: ["http://localhost:5066"]
+  #username: "user"
+  #password: "secret"
+  xpack.enabled: true
+
