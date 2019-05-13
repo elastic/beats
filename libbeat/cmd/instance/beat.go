@@ -368,6 +368,15 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
+	// Reset Beat ID in registry vars, in case it was loaded from meta file
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	infoUUID := infoRegistry.Get("uuid").(*monitoring.String)
+	infoUUID.Set(b.Info.ID.String())
+
+	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
+	serviceID := serviceRegistry.Get("id").(*monitoring.String)
+	serviceID.Set(b.Info.ID.String())
+
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
