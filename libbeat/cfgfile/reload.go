@@ -220,7 +220,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 				overwriteUpdate = true
 			} else {
 				overwriteUpdate = false
-                        }
+			}
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
