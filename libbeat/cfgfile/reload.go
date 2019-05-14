@@ -186,7 +186,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 		rl.config.Reload.Period = 0
 	}
 
-	overwriteUpdate := true
+	overwriteUpdate := false
 
 	for {
 		select {
@@ -207,6 +207,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			// no file changes
 			if !updated && !overwriteUpdate {
+				overwriteUpdate = false
 				continue
 			}
 
@@ -218,8 +219,6 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			if err := list.Reload(configs); err != nil {
 				// Make sure the next run also updates because some runners were not properly loaded
 				overwriteUpdate = true
-			} else {
-				overwriteUpdate = false
 			}
 		}
 
