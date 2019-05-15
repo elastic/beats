@@ -14,6 +14,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/envoyproxy"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/iptables"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/netflow"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/palo_alto"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/zeek"
 )

@@ -116,3 +116,4 @@ https://github.com/phenomenes/varnishstatbeat[varnishstatbeat]:: Reads stats dat
 https://gitlab.com/msvechla/vaultbeat[vaultbeat]:: Collects performance metrics and statistics from Hashicorp's Vault.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
 https://github.com/IBM/yarnbeat[yarnbeat]:: Polls YARN and MapReduce APIs for cluster and application metrics.
+https://github.com/maireanu/zfsbeat[zfsbeat]:: Querying ZFS Storage and Pool Status
