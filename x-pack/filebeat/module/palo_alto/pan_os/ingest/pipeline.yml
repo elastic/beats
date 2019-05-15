@@ -146,7 +146,17 @@ processors:
      value: unknown
      if: 'ctx?._temp_?.message_type == "THREAT" && ctx?.network?.direction == null'
 
-# Set event.category depending on log type.
+# Set network.type for TRAFFIC.
+ - set:
+     field: network.type
+     value: 'ipv4'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session == null'
+ - set:
+     field: network.type
+     value: 'ipv6'
+     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session != null'
+
+  # Set event.category depending on log type.
  - set:
      field: event.category
      value: network_traffic
@@ -305,6 +315,18 @@ processors:
      field: network.community_id
      value:
       - '{{palo_alto.pan_os.network.nat.community_id}}'
+
+ - grok:
+     if: 'ctx?.palo_alto?.pan_os?.threat?.name != null'
+     field: palo_alto.pan_os.threat.name
+     ignore_failure: true
+     patterns:
+       - '%{GREEDYDATA:palo_alto.pan_os.threat.name}\(\s*%{GREEDYDATA:palo_alto.pan_os.threat.id}\s*\)'
+
+ - set:
+     field: palo_alto.pan_os.threat.name
+     value: 'URL-filtering'
+     if: 'ctx?.palo_alto?.pan_os?.threat?.id == "9999"'
 
 # Remove temporary fields.
  - remove:

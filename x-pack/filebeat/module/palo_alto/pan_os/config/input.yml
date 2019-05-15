@@ -126,9 +126,9 @@ processors:
         _temp_.labels: 28
         network.transport: 29
         event.outcome: 30
-        palo_alto.pan_os.threat_file_or_url: 31
+        palo_alto.pan_os.threat.resource: 31
         url.original: 31
-        palo_alto.pan_os.threat_id: 32
+        palo_alto.pan_os.threat.name: 32
         palo_alto.pan_os.url.category: 33
         log.level: 34
         _temp_.direction: 35

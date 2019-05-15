@@ -38,6 +38,7 @@
         "network.direction": "outbound",
         "network.packets": 1,
         "network.transport": "tcp",
+        "network.type": "ipv4",
         "observer.serial_number": "01606001116",
         "palo_alto.pan_os.destination.interface": "ethernet1/1",
         "palo_alto.pan_os.destination.nat.ip": "0.0.0.0",
