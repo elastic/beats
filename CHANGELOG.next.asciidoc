@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
 - Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
 - Login dataset: Fix re-read of utmp files. {pull}12028[12028]
+- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
 
 *Filebeat*
 
