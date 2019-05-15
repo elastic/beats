@@ -1,0 +1,10 @@
+- name: log
+  description: Common log fields
+  type: group
+  fields:
+    - name: source
+      description: Origin of the message, usually the server but it can also be a recovery process
+      type: text
+    - name: msg
+      description: Text of the message
+      type: text
