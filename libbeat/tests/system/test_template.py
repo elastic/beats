@@ -5,6 +5,7 @@ from nose.plugins.attrib import attr
 import unittest
 import shutil
 import logging
+import json
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -88,17 +89,18 @@ class Test(BaseTest):
         Test loading of json based template
         """
 
+        template_name = "bla"
+        es = self.es_client()
         self.copy_files(["template.json"])
-
         path = os.path.join(self.working_dir, "template.json")
-
         print path
+
         self.render_config_template(
             elasticsearch={"hosts": self.get_host()},
             template_overwrite="true",
             template_json_enabled="true",
             template_json_path=path,
-            template_json_name="bla",
+            template_json_name=template_name,
         )
 
         proc = self.start_beat()
@@ -107,8 +109,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains("template with name 'bla' loaded"))
         proc.check_kill_and_wait()
 
-        es = self.es_client()
-        result = es.transport.perform_request('GET', '/_template/bla')
+        result = es.transport.perform_request('GET', '/_template/' + template_name)
         assert len(result) == 1
 
     def get_host(self):
@@ -127,10 +128,10 @@ class TestRunTemplate(BaseTest):
 
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(index=self.index_name)
+        self.idxmgmt.delete(indices=[self.index_name])
 
     def tearDown(self):
-        self.idxmgmt.delete(index=self.index_name)
+        self.idxmgmt.delete(indices=[self.index_name])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -185,14 +186,12 @@ class TestCommandSetupTemplate(BaseTest):
 
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(index=self.custom_alias)
-        self.idxmgmt.delete(index=self.index_name)
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name])
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(index=self.custom_alias)
-        self.idxmgmt.delete(index=self.index_name)
+        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -335,9 +334,8 @@ class TestCommandExportTemplate(BaseTest):
         shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
         self.template_name = self.beat_name + "-9.9.9"
 
-    def assert_log_contains_template(self, template, index_pattern):
+    def assert_log_contains_template(self, index_pattern):
         assert self.log_contains('Loaded index template')
-        assert self.log_contains(template)
         assert self.log_contains(index_pattern)
 
     def test_default(self):
@@ -351,7 +349,7 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(self.template_name, self.template_name + "-*")
+        self.assert_log_contains_template(self.template_name + "-*")
 
     def test_changed_index_pattern(self):
         """
@@ -367,7 +365,7 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(self.template_name, alias_name + "-*")
+        self.assert_log_contains_template(alias_name + "-*")
 
     def test_load_disabled(self):
         """
@@ -380,4 +378,49 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(self.template_name, self.template_name + "-*")
+        self.assert_log_contains_template(self.template_name + "-*")
+
+    def test_export_to_file_absolute_path(self):
+        """
+        Test export template to file with absolute file path
+        """
+        self.render_config_template(self.beat_name, self.output,
+                                    fields=self.output)
+
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        exit_code = self.run_beat(
+            extra_args=["export", "template", "--dir=" + base_path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        file = os.path.join(base_path, "template", self.template_name + '.json')
+        with open(file) as f:
+            template = json.load(f)
+        assert 'index_patterns' in template
+        assert template['index_patterns'] == [self.template_name + '-*'], template
+
+        os.remove(file)
+
+    def test_export_to_file_relative_path(self):
+        """
+        Test export template to file with relative file path
+        """
+        self.render_config_template(self.beat_name, self.output,
+                                    fields=self.output)
+
+        path = os.path.join(os.path.dirname(__file__), "export")
+        exit_code = self.run_beat(
+            extra_args=["export", "template", "--dir=" + path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        file = os.path.join(base_path, "template", self.template_name + '.json')
+        with open(file) as f:
+            template = json.load(f)
+        assert 'index_patterns' in template
+        assert template['index_patterns'] == [self.template_name + '-*'], template
+
+        os.remove(file)

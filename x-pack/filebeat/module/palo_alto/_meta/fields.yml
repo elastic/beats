@@ -1,0 +1,10 @@
+- key: palo_alto
+  title: palo_alto
+  description: >
+    Module for Palo Alto Networks (PAN-OS)
+  fields:
+    - name: palo_alto
+      type: group
+      description: >
+        Fields from the palo_alto logs.
+      fields:
