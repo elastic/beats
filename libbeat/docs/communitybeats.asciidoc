@@ -67,6 +67,7 @@ https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Lo
 https://github.com/bozdag/macwifibeat[macwifibeat]:: Reads various indicators for a MacBook's WiFi Signal Strength
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
 https://developer.cisco.com/codeexchange/github/repo/CiscoDevNet/merakibeat[merakibeat]:: Collects https://dashboard.meraki.com/api_docs#wireless-health[wireless health] and users https://documentation.meraki.com/MR/Monitoring_and_Reporting/Scanning_API[location analytics] data using Cisco  Meraki APIs.
+https://github.com/berfinsari/mesosbeat[mesosbeat]:: Reads stats from the Mesos API and indexes them into Elasticsearch.
 https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
 https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
