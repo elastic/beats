@@ -1,0 +1,9 @@
+- key: shorewall
+  title: "shorewall"
+  description: >
+    shorewall Module
+  fields:
+    - name: shorewall
+      type: group
+      description: >
+      fields:
