@@ -15,3 +15,8 @@ If you want to contribute to the Beats project, you can start by reading
 the [contributing guidelines](https://www.elastic.co/guide/en/beats/devguide/current/beats-contributing.html)
 in the _Beats Developer Guide_.
 
+## Dev Tools
+
+First of all, check that you have following tools installed in your local computer:
+
+- [`mage`](https://magefile.org/#installation)
