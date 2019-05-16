@@ -43,6 +43,7 @@ grouped in the following categories:
 * <<exported-fields-palo_alto>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
+* <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
@@ -12192,6 +12193,37 @@ Process metadata fields
 type: alias
 
 alias to: process.executable
+
+--
+
+[[exported-fields-rabbitmq]]
+== RabbitMQ fields
+
+RabbitMQ Module
+
+
+
+[float]
+== rabbitmq fields
+
+
+
+
+[float]
+== log fields
+
+RabbitMQ log files
+
+
+
+*`rabbitmq.log.pid`*::
++
+--
+type: keyword
+
+example: <0.222.0>
+
+The Erlang process id
 
 --
 
