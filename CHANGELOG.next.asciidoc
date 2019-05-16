@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 *Metricbeat*
 
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 
 *Packetbeat*
 
