@@ -20,3 +20,13 @@ in the _Beats Developer Guide_.
 First of all, check that you have following tools installed in your local computer:
 
 - [`mage`](https://magefile.org/#installation)
+
+### Filebeat contribution
+
+If you want to contribute to the Filebeat project, please follow below steps to configure your development environment with the right tools:
+
+```shell
+cd filebeat
+make python-env
+source build/python-env/bin/activate
+```
