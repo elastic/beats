@@ -1,11 +1,22 @@
 {
-  "description": "Pipeline for parsing shorewall log logs",
-  "processors": [
+    "description": "Pipeline for parsing Shorewall firewall. Requires the geoip plugin.",
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "%{SHOREWALL}"
+                ],
+                "ignore_missing": false
+            }
+        }
     ],
-  "on_failure" : [{
-    "set" : {
-      "field" : "error.message",
-      "value" : "{{ _ingest.on_failure_message }}"
-    }
-  }]
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
 }
