@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Socket dataset: Exclude localhost by default {pull}11993[11993]
 
 *Filebeat*
+
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
@@ -176,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
 - Add support to new MongoDB additional diagnostic information {pull}11952[11952]
 - New module `palo_alto` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
+- Add RabbitMQ module. {pull}12032[12032]
 
 *Heartbeat*
 
