@@ -1,1 +1,3 @@
 dashboards:
+- id: Filebeat-shorewall-log-Dashboard
+  file: Filebeat-shorewall-log.json
