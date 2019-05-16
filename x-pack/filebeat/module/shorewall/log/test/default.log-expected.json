@@ -1,0 +1,29 @@
+[
+    {
+        "@timestamp": "2019-05-16T19:11:12.360Z",
+        "ecs.version": "1.0.0",
+        "event.dataset": "shorewall.log",
+        "event.module": "shorewall",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "May 28 17:23:25 myHost kernel: [3124658.791874] Shorewall:FORWARD:REJECT:IN=eth2 OUT=eth2 SRC=1.2.3.4 DST=1.2.3.4 LEN=141 TOS=0x00 PREC=0x00 TTL=63 ID=55251 PROTO=UDP SPT=5353 DPT=5353 LEN=121",
+        "nf_action1": "FORWARD",
+        "nf_action2": "REJECT",
+        "nf_dst_ip": "1.2.3.4",
+        "nf_dst_port": "5353",
+        "nf_host": "myHost",
+        "nf_id": "55251",
+        "nf_in_interface": "eth2",
+        "nf_len": "141",
+        "nf_out_interface": "eth2",
+        "nf_prec": "0x00",
+        "nf_protocol": "UDP",
+        "nf_src_ip": "1.2.3.4",
+        "nf_src_port": "5353",
+        "nf_tos": "0x00",
+        "nf_ttl": "63",
+        "service.type": "shorewall",
+        "timestamp": "May 28 17:23:25"
+    }
+]
