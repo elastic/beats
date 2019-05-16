@@ -22,6 +22,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-netflow>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-osquery>>
+  * <<filebeat-module-palo_alto>>
   * <<filebeat-module-postgresql>>
   * <<filebeat-module-redis>>
   * <<filebeat-module-santa>>
@@ -53,6 +54,7 @@ include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/osquery.asciidoc[]
+include::modules/palo_alto.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/santa.asciidoc[]
