@@ -37,12 +37,6 @@
                 "target_field": "message",
                 "ignore_missing": true
             }
-        },
-        {
-            "remove": {
-                "field": "msg_temp",
-                "ignore_missing": true
-            }
         }
     ],
     "on_failure": [

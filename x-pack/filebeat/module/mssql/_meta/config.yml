@@ -1,6 +1,3 @@
-# Module: mssql
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-mssql.html
-
 - module: mssql
   # Fileset for native deployment
   log:
