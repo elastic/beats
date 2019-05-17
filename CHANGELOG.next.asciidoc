@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Socket dataset: Exclude localhost by default {pull}11993[11993]
 
 *Filebeat*
+
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
@@ -36,7 +37,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
-- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 
 *Packetbeat*
 
@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
 - Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
 - Login dataset: Fix re-read of utmp files. {pull}12028[12028]
+- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
 
 *Filebeat*
 
@@ -116,12 +117,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 
 *Packetbeat*
 
 - Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 - Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
+- Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
 
 *Winlogbeat*
 
@@ -148,12 +151,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `decode_csv_fields` processor. {pull}11753[11753]
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
 - New `extract_array` processor. {pull}11761[11761]
+- Add number of goroutines to reported metrics. {pull}12135[12135]
 
 *Auditbeat*
 
 - Auditd module: Add `event.outcome` and `event.type` for ECS. {pull}11432[11432]
 - Package: Enable suse. {pull}11634[11634]
 - Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+- Process: Add file hash of process executable. {pull}11722[11722]
 
 *Filebeat*
 
@@ -171,6 +176,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Filebeat envoyproxy module. {pull}11700[11700]
 - Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
 - Add support to new MongoDB additional diagnostic information {pull}11952[11952]
+- New module `palo_alto` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
+- Add RabbitMQ module. {pull}12032[12032]
 
 *Heartbeat*
 
