@@ -9,6 +9,14 @@
                 ],
                 "ignore_missing": false
             }
+        },
+        {
+            "date": {
+                "field": "timestamp",
+                "target_field": "@timestamp",
+                "formats": ["MMM dd HH:mm:ss"],
+                "ignore_failure": false
+            }
         }
     ],
     "on_failure": [
