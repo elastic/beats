@@ -1,8 +1,6 @@
 [
     {
         "@timestamp": "2019-05-28T17:23:25.000Z",
-        "action_1": "FORWARD",
-        "action_2": "REJECT",
         "destination.ip": "1.2.3.4",
         "destination.port": 5353,
         "ecs.version": "1.0.0",
@@ -21,6 +19,8 @@
         "nf_prec": "0x00",
         "nf_ttl": 63,
         "service.type": "0x00",
+        "shorewall.action.1": "FORWARD",
+        "shorewall.action.2": "REJECT",
         "source.ip": "1.2.3.4",
         "source.port": 5353
     }

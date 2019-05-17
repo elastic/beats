@@ -5,7 +5,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "(%{SYSLOGTIMESTAMP:timestamp}) (%{WORD:host.hostname}) kernel:.*Shorewall:(%{WORD:action_1})?:(%{WORD:action_2})?.*IN=(%{USERNAME:nf_in_interface})?.*(OUT= *MAC=(%{COMMONMAC:destination.mac}):(%{COMMONMAC:source.mac})?|OUT=%{USERNAME:nf_out_interface}).*SRC=(%{IPV4:source.ip}).*DST=(%{IPV4:destination.ip}).*LEN=(%{WORD:nf_len:int}).?*TOS=(%{WORD:service.type}).?*PREC=(%{WORD:nf_prec}).?*TTL=(%{INT:nf_ttl:int}).?*ID=(%{INT:nf_id:int}).?*PROTO=(%{WORD:network.protocol}).?*SPT=(%{INT:source.port:int}?.*DPT=%{INT:destination.port:int}?.*)"
+                    "(%{SYSLOGTIMESTAMP:timestamp}) (%{WORD:host.hostname}) kernel:.*Shorewall:(%{WORD:shorewall.action.1})?:(%{WORD:shorewall.action.2})?.*IN=(%{USERNAME:nf_in_interface})?.*(OUT= *MAC=(%{COMMONMAC:destination.mac}):(%{COMMONMAC:source.mac})?|OUT=%{USERNAME:nf_out_interface}).*SRC=(%{IPV4:source.ip}).*DST=(%{IPV4:destination.ip}).*LEN=(%{WORD:nf_len:int}).?*TOS=(%{WORD:service.type}).?*PREC=(%{WORD:nf_prec}).?*TTL=(%{INT:nf_ttl:int}).?*ID=(%{INT:nf_id:int}).?*PROTO=(%{WORD:network.protocol}).?*SPT=(%{INT:source.port:int}?.*DPT=%{INT:destination.port:int}?.*)"
                 ],
                 "ignore_missing": false
             }
