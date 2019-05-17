@@ -36,6 +36,9 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+
 *Heartbeat*
 
 *Journalbeat*
@@ -44,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 
 *Packetbeat*
 
