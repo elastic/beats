@@ -17,6 +17,11 @@
                 "formats": ["MMM dd HH:mm:ss"],
                 "ignore_failure": false
             }
+        },
+        {
+            "remove": {
+                "field": "timestamp"
+            }
         }
     ],
     "on_failure": [
