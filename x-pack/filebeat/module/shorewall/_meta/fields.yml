@@ -7,3 +7,5 @@
       type: group
       description: >
       fields:
+        - name: nf_src_port
+          type: integer
