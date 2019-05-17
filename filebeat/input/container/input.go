@@ -48,7 +48,11 @@ func NewInput(
 		return nil, errors.Wrap(err, "reading container input config")
 	}
 
-	if err := checkStream(config.Stream); err != nil {
+	if err := validateStream(config.Stream); err != nil {
+		return nil, err
+	}
+
+	if err := validateFormat(config.Format); err != nil {
 		return nil, err
 	}
 
@@ -66,7 +70,7 @@ func NewInput(
 		return nil, errors.Wrap(err, "update input config")
 	}
 
-	if err := cfg.SetBool("docker-json.force_cri_logs", -1, config.CRIForce); err != nil {
+	if err := cfg.SetString("docker-json.format", -1, config.Format); err != nil {
 		return nil, errors.Wrap(err, "update input config")
 	}
 
@@ -86,23 +90,28 @@ func NewInput(
 	return log.NewInput(cfg, outletFactory, context)
 }
 
-func checkStream(val string) error {
-	for _, s := range []string{"all", "stdout", "stderr"} {
-		if s == val {
-			return nil
-		}
+func validateStream(val string) error {
+	if stringInSlice(val, []string{"all", "stdout", "stderr"}) {
+		return nil
 	}
 
 	return fmt.Errorf("Invalid value for stream: %s, supported values are: all, stdout, stderr", val)
 }
 
-func checkFormat(val string) error {
+func validateFormat(val string) error {
 	val = strings.ToLower(val)
-	for _, s := range []string{"auto", "docker", "cri"} {
-		if s == val {
-			return nil
-		}
+	if stringInSlice(val, []string{"auto", "docker", "cri"}) {
+		return nil
 	}
 
 	return fmt.Errorf("Invalid value for format: %s, supported values are: auto, docker, cri", val)
+}
+
+func stringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

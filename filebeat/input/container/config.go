@@ -26,10 +26,6 @@ type config struct {
 	// Stream can be all, stdout or stderr
 	Stream string `config:"stream"`
 
-	// Fore CRI format (don't perform autodetection)
-	// TODO remove in favor of format, below
-	CRIForce bool `config:"cri.force"`
-
-	// TODO Format can be auto, cri, json-file
+	// Format can be auto, cri, json-file
 	Format string `config:"format"`
 }

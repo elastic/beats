@@ -154,11 +154,7 @@ func (h *Harvester) open() error {
 	switch h.config.Type {
 	case harvester.StdinType:
 		return h.openStdin()
-	case harvester.LogType:
-		return h.openFile()
-	case harvester.DockerType:
-		return h.openFile()
-	case harvester.ContainerType:
+	case harvester.LogType, harvester.DockerType, harvester.ContainerType:
 		return h.openFile()
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
