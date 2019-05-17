@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-05-17T13:36:04.167Z",
+        "@timestamp": "2019-05-28T17:23:25.000Z",
         "ecs.version": "1.0.0",
         "event.dataset": "shorewall.log",
         "event.module": "shorewall",
@@ -23,7 +23,6 @@
         "nf_src_port": 5353,
         "nf_tos": "0x00",
         "nf_ttl": 63,
-        "service.type": "shorewall",
-        "timestamp": "May 28 17:23:25"
+        "service.type": "shorewall"
     }
 ]
