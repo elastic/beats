@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-05-17T13:30:53.027Z",
+        "@timestamp": "2019-05-17T13:36:04.167Z",
         "ecs.version": "1.0.0",
         "event.dataset": "shorewall.log",
         "event.module": "shorewall",
@@ -11,18 +11,18 @@
         "nf_action1": "FORWARD",
         "nf_action2": "REJECT",
         "nf_dst_ip": "1.2.3.4",
-        "nf_dst_port": "5353",
+        "nf_dst_port": 5353,
         "nf_host": "myHost",
-        "nf_id": "55251",
+        "nf_id": 55251,
         "nf_in_interface": "eth2",
-        "nf_len": "141",
+        "nf_len": 141,
         "nf_out_interface": "eth2",
         "nf_prec": "0x00",
         "nf_protocol": "UDP",
         "nf_src_ip": "1.2.3.4",
         "nf_src_port": 5353,
         "nf_tos": "0x00",
-        "nf_ttl": "63",
+        "nf_ttl": 63,
         "service.type": "shorewall",
         "timestamp": "May 28 17:23:25"
     }
