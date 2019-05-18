@@ -1,4 +1,10 @@
 - key: shorewall
   title: "shorewall"
   description: >
-    shorewall Module
+    Module for parsing Shorewall log files.
+  fields:
+    - name: shorewall
+      type: group
+      description: >
+        Fields from Shorewall logs.
+      fields:
