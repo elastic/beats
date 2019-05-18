@@ -17,7 +17,7 @@ Running the environment chains the following docker-compose files together
 ## Start / Stop environment
 
 ```
-make start ENV=es17-ls15-kb41.yml
+make start
 ```
 
 This will start the environment and log you into the debian machine. This machine is intended for manual testing of the beats. Download the beats package or snapshot you want to test. Elasticsearch can be reached under the host `elasticsearch`, logstash under `logstash`. Make sure to update the configuration file of the beat with the specific host.
@@ -25,7 +25,7 @@ This will start the environment and log you into the debian machine. This machin
 To stop an clean up the environment afterwards, make sure to run:
 
 ```
-make stop ENV=es17-ls15-kb41.yml
+make stop
 ```
 
 
