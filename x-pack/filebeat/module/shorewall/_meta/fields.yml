@@ -2,18 +2,3 @@
   title: "shorewall"
   description: >
     shorewall Module
-  fields:
-    - name: shorewall
-      type: group
-      description: >
-      fields:
-        - name: nf_dst_port
-          type: integer
-        - name: nf_id
-          type: integer
-        - name: nf_len
-          type: integer
-        - name: nf_src_port
-          type: integer
-        - name: nf_ttl
-          type: integer

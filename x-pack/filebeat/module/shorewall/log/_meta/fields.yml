@@ -1,0 +1,29 @@
+- key: shorewall
+  title: "shorewall"
+  description: >
+    shorewall Module
+  fields:
+    - name: shorewall
+      type: group
+      description: >
+      fields:
+        - name: destination.ip
+          type: source.ip
+        - name: destination.port
+          type: integer
+        - name: shorewall_action_1
+          type: keyword
+        - name: shorewall_action_2
+          type: keyword
+        - name: shorewall_in_interface
+          type: keyword
+        - name: shorewall_out_interface
+          type: keyword
+        - name: shorewall_precedence
+          type: keyword
+        - name: shorewall_ttl
+          type: integer
+        - name: source.ip
+          type: source.ip
+        - name: source.port
+          type: integer
