@@ -5,7 +5,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "(%{SYSLOGTIMESTAMP:timestamp}) (%{WORD:host.hostname}) kernel:.*Shorewall:(%{WORD:shorewall.action.one})?:(%{WORD:shorewall.action.two})?.*IN=(%{USERNAME:shorewall.network.in})?.*(OUT= *MAC=(%{COMMONMAC:destination.mac}):(%{COMMONMAC:source.mac})?|OUT=%{USERNAME:shorewall.network.out}).*SRC=(%{IPV4:source.ip}).*DST=(%{IPV4:destination.ip}).*LEN=(%{WORD:network.packets:int}).?*TOS=(%{WORD:service.type}).?*PREC=(%{WORD:shorewall.precedence}).?*TTL=(%{INT:shorewall.ttl:int}).?*ID=(%{INT:event.id:int}).?*PROTO=(%{WORD:network.protocol}).?*SPT=(%{INT:source.port:int}?.*DPT=%{INT:destination.port:int}?.*)"
+                    "(%{SYSLOGTIMESTAMP:timestamp}) (%{WORD:host.hostname}) kernel:.*Shorewall:(%{WORD:shorewall.action.one})?:(%{WORD:shorewall.action.two})?.*IN=(%{USERNAME:shorewall.network.in})?.*(OUT= *MAC=(%{COMMONMAC:destination.mac}):(%{COMMONMAC:source.mac})?|OUT=%{USERNAME:shorewall.network.out}).*SRC=(%{IPV4:source.ip}).*DST=(%{IPV4:destination.ip}).*LEN=(%{INT:network.packets:int}).?*TOS=(%{WORD:service.type}).?*PREC=(%{WORD:shorewall.precedence}).?*TTL=(%{INT:shorewall.ttl:int}).?*ID=(%{INT:event.id:int}).?*PROTO=(%{WORD:network.protocol}).?*SPT=(%{INT:source.port:int}?.*DPT=%{INT:destination.port:int}?.*)"
                 ],
                 "ignore_missing": false
             }
