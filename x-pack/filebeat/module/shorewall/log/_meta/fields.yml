@@ -1,21 +1,26 @@
-- key: shorewall
-  title: "shorewall"
+- name: network
+  type: group
   description: >
-    shorewall Module
+    Shorewal log files
   fields:
-    - name: shorewall
-      type: group
+    - name: in
+      type: keywork
+    - name: out
+      type: keyword
+- name: action
+  type: group
+  description: >
+    Shorewal network log files
+  fields:
+    - name: one
+      type: keywork
       description: >
-      fields:
-        - name: shorewall_action_1
-          type: keyword
-        - name: shorewall_action_2
-          type: keyword
-        - name: shorewall_in_interface
-          type: keyword
-        - name: shorewall_out_interface
-          type: keyword
-        - name: shorewall_precedence
-          type: keyword
-        - name: shorewall_ttl
-          type: integer
+        Action one
+    - name: two
+      type: keyword
+      description: >
+        Action two
+- name: precedence
+  type: keyword
+- name: ttl
+  type: integer
