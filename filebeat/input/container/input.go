@@ -56,26 +56,20 @@ func NewInput(
 		return nil, err
 	}
 
-	// Set partial line joining to true (both json-file and CRI)
-	if err := cfg.SetBool("docker-json.partial", -1, true); err != nil {
-		return nil, errors.Wrap(err, "update input config")
-	}
+	err := cfg.Merge(common.MapStr{
+		"docker-json.partial":   true,
+		"docker-json.cri_flags": true,
 
-	if err := cfg.SetBool("docker-json.cri_flags", -1, true); err != nil {
-		return nil, errors.Wrap(err, "update input config")
-	}
+		// Allow stream selection (stdout/stderr/all)
+		"docker-json.stream": config.Stream,
 
-	// Allow stream selection (stdout/stderr/all)
-	if err := cfg.SetString("docker-json.stream", -1, config.Stream); err != nil {
-		return nil, errors.Wrap(err, "update input config")
-	}
+		// Select file format (auto/cri/docker)
+		"docker-json.format": config.Format,
 
-	if err := cfg.SetString("docker-json.format", -1, config.Format); err != nil {
-		return nil, errors.Wrap(err, "update input config")
-	}
-
-	// Set symlinks to true as CRI-O paths could point to symlinks instead of the actual path.
-	if err := cfg.SetBool("symlinks", -1, true); err != nil {
+		// Set symlinks to true as CRI-O paths could point to symlinks instead of the actual path.
+		"symlinks": true,
+	})
+	if err != nil {
 		return nil, errors.Wrap(err, "update input config")
 	}
 
