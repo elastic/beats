@@ -24,7 +24,7 @@ Example configuration:
     - '/var/lib/docker/containers/*/*.log'
 ----
 
-<1> `path` is required. All other settings are optional.
+<1> `paths` is required. All other settings are optional.
 
 ==== Configuration options
 
