@@ -18,9 +18,6 @@
 package container
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/log"
@@ -46,14 +43,6 @@ func NewInput(
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading container input config")
-	}
-
-	if err := validateStream(config.Stream); err != nil {
-		return nil, err
-	}
-
-	if err := validateFormat(config.Format); err != nil {
-		return nil, err
 	}
 
 	err := cfg.Merge(common.MapStr{
@@ -82,30 +71,4 @@ func NewInput(
 	}
 
 	return log.NewInput(cfg, outletFactory, context)
-}
-
-func validateStream(val string) error {
-	if stringInSlice(val, []string{"all", "stdout", "stderr"}) {
-		return nil
-	}
-
-	return fmt.Errorf("Invalid value for stream: %s, supported values are: all, stdout, stderr", val)
-}
-
-func validateFormat(val string) error {
-	val = strings.ToLower(val)
-	if stringInSlice(val, []string{"auto", "docker", "cri"}) {
-		return nil
-	}
-
-	return fmt.Errorf("Invalid value for format: %s, supported values are: auto, docker, cri", val)
-}
-
-func stringInSlice(str string, list []string) bool {
-	for _, v := range list {
-		if v == str {
-			return true
-		}
-	}
-	return false
 }

@@ -17,6 +17,11 @@
 
 package container
 
+import (
+	"fmt"
+	"strings"
+)
+
 var defaultConfig = config{
 	Stream: "all",
 	Format: "auto",
@@ -28,4 +33,26 @@ type config struct {
 
 	// Format can be auto, cri, json-file
 	Format string `config:"format"`
+}
+
+// Validate validates the config.
+func (c *config) Validate() error {
+	if !stringInSlice(c.Stream, []string{"all", "stdout", "stderr"}) {
+		return fmt.Errorf("invalid value for stream: %s, supported values are: all, stdout, stderr", c.Stream)
+	}
+
+	if !stringInSlice(strings.ToLower(c.Format), []string{"auto", "docker", "cri"}) {
+		return fmt.Errorf("invalid value for format: %s, supported values are: auto, docker, cri", c.Format)
+	}
+
+	return nil
+}
+
+func stringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
