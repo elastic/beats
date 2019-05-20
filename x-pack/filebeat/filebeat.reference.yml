@@ -470,6 +470,16 @@ filebeat.modules:
     # Filebeat will choose the the default path.
     #var.paths:
 
+#------------------------------ Shorewall Module ------------------------------
+- module: shorewall
+  # All logs
+  {fileset}:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Suricata Module -------------------------------
 - module: suricata
   # All logs
