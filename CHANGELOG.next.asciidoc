@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
 - Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 
 *Heartbeat*
 
