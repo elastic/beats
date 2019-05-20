@@ -39,4 +39,5 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update urllib3 version to 1.24.2 {pull}11930[11930]
 - Add libbeat/common/cleanup package. {pull}12134[12134]
 - Only Load minimal template if no fields are provided. {pull}12103[12103]
+- Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
 - Deprecate setup cmds for `template` and `ilm-policy`. Add new setup cmd for `index-management`. {pull}12132[12132]
