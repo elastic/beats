@@ -67,7 +67,11 @@ ifeval::["{beatname_lc}"=="filebeat"]
 :processor-scope: input
 endif::[]
 
-ifeval::["{beatname_lc}"=="auditbeat" or "{beatname_lc}"=="metricbeat"]
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
 :processor-scope: module
 endif::[]
 
@@ -198,20 +202,26 @@ The supported processors are:
  * <<add-docker-metadata,`add_docker_metadata`>>
  * <<add-fields, `add_fields`>>
  * <<add-host-metadata,`add_host_metadata`>>
+ * <<add-observer-metadata,`add_observer_metadata`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-labels, `add_labels`>>
  * <<add-locale,`add_locale`>>
  * <<add-process-metadata,`add_process_metadata`>>
  * <<add-tags, `add_tags`>>
  * <<community-id,`community_id`>>
+ * <<convert,`convert`>>
+ifdef::has_decode_csv_fields_processor[]
+ * <<decode-csv-fields,`decode_csv_fields`>>
+endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
  * <<dissect, `dissect`>>
+ * <<extract-array,`extract_array`>>
  * <<processor-dns, `dns`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
  * <<rename-fields,`rename`>>
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
  * <<processor-script,`script`>>
 endif::[]
 
@@ -495,7 +505,7 @@ provider and cache the instance metadata.
 
 The following cloud providers are supported:
 
-- Amazon Elastic Compute Cloud (EC2)
+- Amazon Web Services (AWS)
 - Digital Ocean
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
@@ -511,19 +521,23 @@ processors:
 - add_cloud_metadata: ~
 -------------------------------------------------------------------------------
 
-The `add_cloud_metadata` processor has one optional configuration setting named
-`timeout` that specifies the maximum amount of time to wait for a successful
-response when detecting the hosting provider. The default timeout value is
-`3s`.
+The `add_cloud_metadata` processor has two optional configuration settings.
+The first one is `timeout` which specifies the maximum amount of time to wait
+for a successful response when detecting the hosting provider. The default
+timeout value is `3s`.
 
 If a timeout occurs then no instance metadata will be added to the events. This
 makes it possible to enable this processor for all your deployments (in the
 cloud or on-premise).
 
+The second optional configuration setting is `overwrite`. When `overwrite` is
+`true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
+default).
+
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.
 
-_EC2_
+_AWS_
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -532,7 +546,7 @@ _EC2_
     "availability_zone": "us-east-1c",
     "instance_id": "i-4e123456",
     "machine_type": "t2.medium",
-    "provider": "ec2",
+    "provider": "aws",
     "region": "us-east-1"
   }
 }
@@ -551,7 +565,7 @@ _Digital Ocean_
 }
 -------------------------------------------------------------------------------
 
-_GCE_
+_GCP_
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -561,7 +575,7 @@ _GCE_
     "instance_id": "1234556778987654321",
     "machine_type": "f1-micro",
     "project_id": "my-dev",
-    "provider": "gce"
+    "provider": "gcp"
   }
 }
 -------------------------------------------------------------------------------
@@ -771,6 +785,50 @@ Adds the environment field to every event:
 }
 -------------------------------------------------------------------------------
 
+ifdef::has_decode_csv_fields_processor[]
+[[decode-csv-fields]]
+=== Decode CSV fields
+
+experimental[]
+
+The `decode_csv_fields` processor decodes fields containing records in
+comma-separated format (CSV). It will output the values as an array of strings.
+This processor is available for Filebeat and Journalbeat.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - decode_csv_fields:
+     fields:
+        message: decoded.csv
+     separator: ,
+     ignore_missing: false
+     overwrite_keys: true
+     trim_leading_whitespace: false
+     fail_on_error: true
+-----------------------------------------------------
+
+The `decode_csv_fields` has the following settings:
+
+`fields`:: This is a mapping from the source field containing the CSV data to
+           the destination field to which the decoded array will be written.
+`separator`:: (Optional) Character to be used as a column separator.
+              The default is the comma character. For using a TAB character you
+              must set it to "\t".
+`ignore_missing`:: (Optional) Whether to ignore events which lack the source
+                   field. The default is `false`, which will fail processing of
+                   an event if a field is missing.
+`overwrite_keys`:: Whether the target field is overwritten if it
+                   already exists. The default is false, which will fail
+                   processing of an event when `target` already exists.
+`trim_leading_space`:: Whether extra space after the separator is trimmed from
+                       values. This works even if the separator is also a space.
+                       The default is `false`.
+`fail_on_error`:: (Optional) If set to true, in case of an error the changes to
+the event are reverted, and the original event is returned. If set to `false`,
+processing continues also if an error happens. Default is `true`.
+
+endif::[]
 
 [[decode-json-fields]]
 === Decode JSON fields
@@ -850,6 +908,52 @@ silently continue without adding the target field.
 
 The processor also accepts an optional `seed` parameter that must be a 16-bit
 unsigned integer. This value gets incorporated into all generated hashes.
+
+[[convert]]
+=== Convert
+
+The `convert` processor converts a field in the event to a different type, such
+as converting a string to an integer.
+
+The supported types include: `integer`, `long`, `float`, `double`, `string`,
+`boolean`, and `ip`.
+
+The `ip` type is effectively an alias for `string`, but with an added validation
+that the value is an IPv4 or IPv6 address.
+
+[source,yaml]
+----
+processors:
+  - convert:
+      fields:
+        - {from: "src_ip", to: "source.ip", type: "ip"}
+        - {from: "src_port", to: "source.port", type: "integer"}
+      ignore_missing: true
+      fail_on_error: false
+----
+
+The `convert` processor has the following configuration settings:
+
+`fields`:: (Required) This is the list of fields to convert. At least one item
+must be contained in the list. Each item in the list must have a `from` key that
+specifies the source field. The `to` key is optional and specifies where to
+assign the converted value. If `to` is omitted then the `from` field is updated
+in-place. The `type` key specifies the data type to convert the value to. If
+`type` is omitted then the processor copies or renames the field without any
+type conversion.
+
+`ignore_missing`:: (Optional) If `true` the processor continues to the next
+field when the `from` key is not found in the event. If false then the processor
+returns an error and does not process the remaining fields. Default is `false`.
+
+`fail_on_error`:: (Optional) If false type conversion failures are ignored and
+the processor continues to the next field. Default is `true`.
+
+`tag`:: (Optional) An identifier for this processor. Useful for debugging.
+
+`mode`:: (Optional) When both `from` and `to` are defined for a field then
+`mode` controls whether to `copy` or `rename` the field when the type conversion
+is successful. Default is `copy`.
 
 [[drop-event]]
 === Drop events
@@ -1107,10 +1211,10 @@ process is running in Docker then the event will be enriched. The default value
 is `["process.pid", "process.ppid"]`.
 
 `match_source`:: (Optional) Match container ID from a log path present in the
-`source` field. Enabled by default.
+`log.file.path` field. Enabled by default.
 
 `match_short_id`:: (Optional) Match container short ID from a log path present
-in the `source` field. Disabled by default.
+in the `log.file.path` field. Disabled by default.
 This allows to match directories names that have the first 12 characters
 of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
 
@@ -1169,7 +1273,7 @@ It has the following settings:
 
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
-The fields added to the event are looking as following:
+The fields added to the event look like the following:
 
 [source,json]
 -------------------------------------------------------------------------------
@@ -1198,6 +1302,80 @@ The fields added to the event are looking as following:
           "location": "40.7128, -74.0060"
         }
    }
+}
+-------------------------------------------------------------------------------
+
+[[add-observer-metadata]]
+=== Add Observer metadata
+
+beta[]
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_observer_metadata:
+    netinfo.enabled: false
+    cache.ttl: 5m
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields observer.ip and observer.mac
+
+`cache.ttl`:: (Optional) The processor uses an internal cache for the observer metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
+
+`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+
+`geo.location`:: Longitude and latitude in comma separated format.
+
+`geo.continent_name`:: Name of the continent.
+
+`geo.country_name`:: Name of the country.
+
+`geo.region_name`:: Name of the region.
+
+`geo.city_name`:: Name of the city.
+
+`geo.country_iso_code`:: ISO country code.
+
+`geo.region_iso_code`:: ISO region code.
+
+
+The `add_geo_metadata` processor annotates each event with relevant metadata from the observer machine.
+The fields added to the event look like the following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "observer" : {
+    "hostname" : "avce",
+    "type" : "heartbeat",
+    "vendor" : "elastic",
+    "ip" : [
+      "192.168.1.251",
+      "fe80::64b2:c3ff:fe5b:b974",
+    ],
+    "mac" : [
+      "dc:c1:02:6f:1b:ed",
+    ],
+    "geo": {
+      "continent_name": "North America",
+      "country_iso_code": "US",
+      "region_name": "New York",
+      "region_iso_code": "NY",
+      "city_name": "New York",
+      "name": "nyc-dc1-rack1",
+      "location": "40.7128, -74.0060"
+    }
+  }
 }
 -------------------------------------------------------------------------------
 
@@ -1399,7 +1577,7 @@ set to `true`, this condition will be ignored.
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
 [[processor-script]]
 === Script Processor
 
@@ -1569,3 +1747,46 @@ thrown.
 *Example*: `event.AppendTo("error.message", "invalid file hash");`
 |===
 endif::[]
+
+[[extract-array]]
+=== Extract array
+
+experimental[]
+
+The `extract_array` processor populates fields with values read from an array
+field. The following example will populate `source.ip` with the first element of
+the `my_array` field, `destination.ip` with the second element, and
+`network.transport` with the third.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - extract_array:
+     field: my_array
+     mappings:
+        source.ip: 0
+        destination.ip: 1
+        network.transport: 2
+-----------------------------------------------------
+
+The following settings are supported:
+
+`field`:: The array field whose elements are to be extracted.
+`mappings`:: Maps each field name to an array index. Use 0 for the first element in
+             the array. Multiple fields can be mapped to the same array element.
+`ignore_missing`:: (Optional) Whether to ignore events where the array field is
+                   missing. The default is `false`, which will fail processing
+                   of an event if the specified field does not exist. Set it to
+                   `true` to ignore this condition.
+`overwrite_keys`:: Whether the target fields specified in the mapping are
+                   overwritten if they already exist. The default is `false`,
+                   which will fail processing if a target field already exists.
+`fail_on_error`:: (Optional) If set to `true` and an error happens, changes to
+                  the event are reverted, and the original event is returned. If
+                  set to `false`, processing continues despite errors.
+                  Default is `true`.
+`omit_empty`:: (Optional) Whether empty values are extracted from the array. If
+                  set to `true`, instead of the target field being set to an
+                  empty value, it is left unset. The empty string (`""`), an
+                  empty array (`[]`) or an empty object (`{}`) are considered
+                  empty values. Default is `false`.

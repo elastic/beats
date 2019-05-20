@@ -24,16 +24,22 @@ import (
 
 var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
-		"coredns_panic_count_total":       prometheus.Metric("panic.count.total"),
-		"coredns_dns_request_count_total": prometheus.Metric("dns.request.count.total"),
+
+		// base CoreDNS metrics
+		"coredns_panic_count_total":       prometheus.Metric("panic.count"),
+		"coredns_dns_request_count_total": prometheus.Metric("dns.request.count"),
 		"coredns_dns_request_duration_seconds": prometheus.Metric(
 			"dns.request.duration.ns",
 			prometheus.OpMultiplyBuckets(1000000000)),
 		"coredns_dns_request_size_bytes":         prometheus.Metric("dns.request.size.bytes"),
-		"coredns_dns_request_do_count_total":     prometheus.Metric("dns.request.do.count.total"),
-		"coredns_dns_request_type_count_total":   prometheus.Metric("dns.request.type.count.total"),
+		"coredns_dns_request_do_count_total":     prometheus.Metric("dns.request.do.count"),
+		"coredns_dns_request_type_count_total":   prometheus.Metric("dns.request.type.count"),
 		"coredns_dns_response_size_bytes":        prometheus.Metric("dns.response.size.bytes"),
-		"coredns_dns_response_rcode_count_total": prometheus.Metric("dns.response.rcode.count.total"),
+		"coredns_dns_response_rcode_count_total": prometheus.Metric("dns.response.rcode.count"),
+
+		// cache plugin metrics (might not be present if cache plugin is not configured)
+		"coredns_cache_hits_total":   prometheus.Metric("dns.cache.hits.count"),
+		"coredns_cache_misses_total": prometheus.Metric("dns.cache.misses.count"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{

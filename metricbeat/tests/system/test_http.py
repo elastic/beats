@@ -35,8 +35,7 @@ class Test(metricbeat.BaseTest):
 
         assert evt["http"]["test"]["hello"] == "world"
 
-        # Delete dynamic namespace part for fields comparison
-        del evt["http"]["test"]
+        del evt["http"]["test"]["hello"]
 
         self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
 
@@ -55,7 +54,7 @@ class Test(metricbeat.BaseTest):
             "host": host,
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Starting http server on "))
+        self.wait_until(lambda: self.log_contains("Starting HTTP"))
         requests.post("http://" + host + ":" + str(port),
                       json={'hello': 'world'}, headers={'Content-Type': 'application/json'})
         self.wait_until(lambda: self.output_lines() > 0)
@@ -76,4 +75,4 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_host(self):
-        return "http://" + os.getenv('HTTP_HOST', 'localhost') + ':' + os.getenv('HTTP_PORT', '8080')
+        return "http://" + self.compose_host()

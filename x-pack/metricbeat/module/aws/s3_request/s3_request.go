@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -37,23 +37,16 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	logger *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The aws s3_request metricset is beta.")
-	s3Logger := logp.NewLogger(aws.ModuleName)
 
 	moduleConfig := aws.Config{}
 	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
 		return nil, err
-	}
-
-	if moduleConfig.Period == "" {
-		err := errors.New("period is not set in AWS module config")
-		s3Logger.Error(err)
 	}
 
 	metricSet, err := aws.NewMetricSet(base)
@@ -62,41 +55,35 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// Check if period is set to be multiple of 60s
-	remainder := metricSet.PeriodInSec % 60
+	remainder := int(metricSet.Period.Seconds()) % 60
 	if remainder != 0 {
 		err := errors.New("period needs to be set to 60s (or a multiple of 60s). " +
 			"To avoid data missing or extra costs, please make sure period is set correctly " +
 			"in config.yml")
-		s3Logger.Info(err)
+		base.Logger().Info(err)
 	}
 
 	return &MetricSet{
 		MetricSet: metricSet,
-		logger:    s3Logger,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
-	if err != nil {
-		logp.Error(errors.Wrap(err, "Error ParseDuration"))
-		m.logger.Error(err.Error())
-		report.Error(err)
-		return
-	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.MetricSet.RegionsList {
-		m.MetricSet.AwsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		awsConfig := m.MetricSet.AwsConfig.Copy()
+		awsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(awsConfig)
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -105,7 +92,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
-		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.PeriodInSec)
+		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.Period)
 		// This happens when S3 cloudwatch request metrics are not enabled.
 		if len(metricDataQueries) == 0 {
 			continue
@@ -114,7 +101,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		metricDataOutputs, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-			m.logger.Error(err.Error())
+			m.Logger().Error(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -124,14 +111,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, bucketName := range bucketNames {
 			event, err := createS3RequestEvents(metricDataOutputs, regionName, bucketName)
 			if err != nil {
-				m.logger.Error(err.Error())
+				m.Logger().Error(err.Error())
 				event.Error = err
 				report.Event(event)
 				continue
 			}
-			report.Event(event)
+
+			if reported := report.Event(event); !reported {
+				m.Logger().Debug("Fetch interrupted, failed to emit event")
+				return nil
+			}
 		}
 	}
+
+	return nil
 }
 
 func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []string) {
@@ -148,9 +141,9 @@ func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []strin
 	return
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Sum"
-	period := int64(periodInSec)
+	periodInSec := int64(period.Seconds())
 	id := "s3r" + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 	bucketName := ""
@@ -167,7 +160,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int)
 	metricDataQuery = cloudwatch.MetricDataQuery{
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
-			Period: &period,
+			Period: &periodInSec,
 			Stat:   &statistic,
 			Metric: &metric,
 		},
@@ -176,8 +169,8 @@ func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int)
 	return
 }
 
-func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, periodInSec int) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	dailyMetricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutputs {
@@ -185,7 +178,7 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, periodInSec 
 			continue
 		}
 
-		metricDataQuery := createMetricDataQuery(listMetric, periodInSec, i)
+		metricDataQuery := createMetricDataQuery(listMetric, period, i)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}

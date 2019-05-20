@@ -39,6 +39,10 @@ import (
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
 
+	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
+	ucfg "github.com/elastic/go-ucfg"
+
 	"github.com/elastic/beats/libbeat/api"
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
@@ -66,21 +70,17 @@ import (
 	"github.com/elastic/beats/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/version"
-	sysinfo "github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
 
-	Config    beatConfig
-	RawConfig *common.Config // Raw config that can be unpacked to get Beat specific config data.
+	Config       beatConfig
+	RawConfig    *common.Config // Raw config that can be unpacked to get Beat specific config data.
+	IdxSupporter idxmgmt.Supporter
 
-	keystore keystore.Keystore
-	index    idxmgmt.Supporter
-
+	keystore   keystore.Keystore
 	processing processing.Supporter
 }
 
@@ -102,8 +102,10 @@ type beatConfig struct {
 	Keystore      *common.Config `config:"keystore"`
 
 	// output/publishing related configurations
-	Pipeline   pipeline.Config `config:",inline"`
-	Monitoring *common.Config  `config:"xpack.monitoring"`
+	Pipeline pipeline.Config `config:",inline"`
+
+	// monitoring settings
+	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
 
 	// central management settings
 	Management *common.Config `config:"management"`
@@ -181,6 +183,18 @@ func Run(settings Settings, bt beat.Creator) error {
 
 		return b.launch(settings, bt)
 	}())
+}
+
+// NewInitializedBeat creates a new beat where all information and initialization is derived from settings
+func NewInitializedBeat(settings Settings) (*Beat, error) {
+	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+	if err != nil {
+		return nil, err
+	}
+	if err := b.InitWithSettings(settings); err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 // NewBeat creates a new beat instance
@@ -284,6 +298,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	err = b.registerClusterUUIDFetching()
+	if err != nil {
+		return nil, err
+	}
+
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
 		reg = monitoring.Default.NewRegistry("libbeat")
@@ -361,11 +380,17 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	if b.Config.Monitoring.Enabled() {
+	monitoringCfg, reporterSettings, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
+	if err != nil {
+		return err
+	}
+
+	if monitoringCfg.Enabled() {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
+			Format:          reporterSettings.Format,
 		}
-		reporter, err := report.New(b.Info, settings, b.Config.Monitoring, b.Config.Output)
+		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return err
 		}
@@ -422,11 +447,14 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 
 //SetupSettings holds settings necessary for beat setup
 type SetupSettings struct {
-	Template        bool
 	Dashboard       bool
 	MachineLearning bool
 	Pipeline        bool
-	ILMPolicy       bool
+	IndexManagement bool
+	//Deprecated: use IndexManagementKey instead
+	Template bool
+	//Deprecated: use IndexManagementKey instead
+	ILMPolicy bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
@@ -446,29 +474,31 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			return err
 		}
 
-		if setup.Template || setup.ILMPolicy {
+		if setup.IndexManagement || setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
-
 			if outCfg.Name() != "elasticsearch" {
 				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
 			}
-
-			esConfig := outCfg.Config()
-			if b.index.Enabled() {
-				esClient, err := elasticsearch.NewConnectedClient(esConfig)
-				if err != nil {
-					return err
-				}
-
-				// prepare index by loading templates, lifecycle policies and write aliases
-
-				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-				err = m.Setup(setup.Template, setup.ILMPolicy)
-				if err != nil {
-					return err
-				}
+			esClient, err := elasticsearch.NewConnectedClient(outCfg.Config())
+			if err != nil {
+				return err
 			}
-			fmt.Println("Index setup complete.")
+
+			var loadTemplate, loadILM = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
+			if setup.IndexManagement || setup.Template {
+				loadTemplate = idxmgmt.LoadModeOverwrite
+			}
+			if setup.IndexManagement || setup.ILMPolicy {
+				loadILM = idxmgmt.LoadModeOverwrite
+			}
+			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
+				fmt.Println(warn)
+			}
+			if err = m.Setup(loadTemplate, loadILM); err != nil {
+				return err
+			}
+			fmt.Println("Index setup finished.")
 		}
 
 		if setup.Dashboard {
@@ -601,7 +631,7 @@ func (b *Beat) configure(settings Settings) error {
 	if imFactory == nil {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
 	}
-	b.index, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	b.IdxSupporter, err = imFactory(nil, b.Beat.Info, b.RawConfig)
 	if err != nil {
 		return err
 	}
@@ -748,7 +778,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if b.Config.Output.Name() != "elasticsearch" || !b.index.Enabled() {
+	if b.Config.Output.Name() != "elasticsearch" || !b.IdxSupporter.Enabled() {
 		return nil
 	}
 
@@ -759,11 +789,10 @@ func (b *Beat) registerESIndexManagement() error {
 	return nil
 }
 
-// Build and return a callback to load index template into ES
-func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
+func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
-		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-		return m.Setup(true, true)
+		m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
 	}
 }
 
@@ -787,7 +816,48 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 		return outputs.Group{}, nil
 	}
 
-	return outputs.Load(b.index, b.Info, stats, cfg.Name(), cfg.Config())
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
+}
+
+func (b *Beat) registerClusterUUIDFetching() error {
+	if b.Config.Output.Name() == "elasticsearch" {
+		callback, err := b.clusterUUIDFetchingCallback()
+		if err != nil {
+			return err
+		}
+		elasticsearch.RegisterConnectCallback(callback)
+	}
+	return nil
+}
+
+// Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
+func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
+	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
+
+	callback := func(esClient *elasticsearch.Client) error {
+		var response struct {
+			ClusterUUID string `json:"cluster_uuid"`
+		}
+
+		status, body, err := esClient.Request("GET", "/", "", nil, nil)
+		if err != nil {
+			return errw.Wrap(err, "error querying /")
+		}
+		if status > 299 {
+			return fmt.Errorf("Error querying /. Status: %d. Response body: %s", status, body)
+		}
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			return fmt.Errorf("Error unmarshaling json when querying /. Body: %s", body)
+		}
+
+		clusterUUIDRegVar.Set(response.ClusterUUID)
+		return nil
+	}
+
+	return callback, nil
 }
 
 // handleError handles the given error by logging it and then returning the

@@ -1,0 +1,137 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "kube-state-metrics",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 2,
+                    "unavailable": 1,
+                    "updated": 2
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_deployment"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "wise-lynx-jenkins",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "jenkins"
+        },
+        "metricset": {
+            "name": "state_deployment"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "tiller-deploy",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_deployment"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jumpy-owl-redis",
+                "paused": true,
+                "replicas": {
+                    "available": 6,
+                    "desired": 2,
+                    "unavailable": 7,
+                    "updated": 8
+                }
+            },
+            "namespace": "test"
+        },
+        "metricset": {
+            "name": "state_deployment"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jumpy-owl-redis",
+                "paused": false,
+                "replicas": {
+                    "available": 0,
+                    "desired": 1,
+                    "unavailable": 1,
+                    "updated": 1
+                }
+            },
+            "namespace": "default"
+        },
+        "metricset": {
+            "name": "state_deployment"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

@@ -27,6 +27,13 @@
       }
     },
     {
+      "rename": {
+        "field": "json.kubernetes",
+        "target_field": "kubernetes",
+        "ignore_failure" : true
+      }
+    },
+    {
       "remove": {
         "field": ["json", "bufsize"],
         "ignore_failure" : true

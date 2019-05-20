@@ -24,6 +24,8 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
@@ -70,6 +72,36 @@ func TestData(t *testing.T) {
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0], mb.AddMetricSetInfo)
 	mbtest.WriteEventToDataJSON(t, beatEvent, "")
+}
+
+func TestCounterWithNoInstanceName(t *testing.T) {
+	config := map[string]interface{}{
+		"module":     "windows",
+		"metricsets": []string{"perfmon"},
+		"perfmon.counters": []map[string]string{
+			{
+				"instance_label":    "processor.name",
+				"measurement_label": "processor.time.total.pct",
+				"query":             `\UDPv4\Datagrams Sent/sec`,
+			},
+		},
+	}
+
+	ms := mbtest.NewReportingMetricSetV2(t, config)
+	mbtest.ReportingFetchV2(ms)
+	time.Sleep(60 * time.Millisecond)
+
+	events, errs := mbtest.ReportingFetchV2(ms)
+	if len(errs) > 0 {
+		t.Fatal(errs)
+	}
+	if len(events) == 0 {
+		t.Fatal("no events received")
+	}
+	process := events[0].MetricSetFields["processor"].(common.MapStr)
+	// Check values
+	assert.EqualValues(t, "UDPv4", process["name"])
+
 }
 
 func TestQuery(t *testing.T) {

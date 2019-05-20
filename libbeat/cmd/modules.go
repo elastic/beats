@@ -49,23 +49,19 @@ func GenModulesCmd(name, version string, modulesFactory modulesManagerFactory) *
 		Use:   "modules",
 		Short: "Manage configured modules",
 	}
+	settings := instance.Settings{Name: name, Version: version}
 
-	modulesCmd.AddCommand(genListModulesCmd(name, version, modulesFactory))
-	modulesCmd.AddCommand(genEnableModulesCmd(name, version, modulesFactory))
-	modulesCmd.AddCommand(genDisableModulesCmd(name, version, modulesFactory))
+	modulesCmd.AddCommand(genListModulesCmd(settings, modulesFactory))
+	modulesCmd.AddCommand(genEnableModulesCmd(settings, modulesFactory))
+	modulesCmd.AddCommand(genDisableModulesCmd(settings, modulesFactory))
 
 	return &modulesCmd
 }
 
 // Instantiate a modules manager or die trying
-func getModules(name, version string, modulesFactory modulesManagerFactory) ModulesManager {
-	b, err := instance.NewBeat(name, "", version)
+func getModules(settings instance.Settings, modulesFactory modulesManagerFactory) ModulesManager {
+	b, err := instance.NewInitializedBeat(settings)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-		os.Exit(1)
-	}
-
-	if err = b.Init(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 		os.Exit(1)
 	}
@@ -79,12 +75,12 @@ func getModules(name, version string, modulesFactory modulesManagerFactory) Modu
 	return manager
 }
 
-func genListModulesCmd(name, version string, modulesFactory modulesManagerFactory) *cobra.Command {
+func genListModulesCmd(settings instance.Settings, modulesFactory modulesManagerFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List modules",
 		Run: func(cmd *cobra.Command, args []string) {
-			modules := getModules(name, version, modulesFactory)
+			modules := getModules(settings, modulesFactory)
 
 			fmt.Println("Enabled:")
 			for _, module := range modules.ListEnabled() {
@@ -99,12 +95,12 @@ func genListModulesCmd(name, version string, modulesFactory modulesManagerFactor
 	}
 }
 
-func genEnableModulesCmd(name, version string, modulesFactory modulesManagerFactory) *cobra.Command {
+func genEnableModulesCmd(settings instance.Settings, modulesFactory modulesManagerFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:   "enable MODULE...",
 		Short: "Enable one or more given modules",
 		Run: func(cmd *cobra.Command, args []string) {
-			modules := getModules(name, version, modulesFactory)
+			modules := getModules(settings, modulesFactory)
 
 			for _, module := range args {
 				if !modules.Exists(module) {
@@ -128,12 +124,12 @@ func genEnableModulesCmd(name, version string, modulesFactory modulesManagerFact
 	}
 }
 
-func genDisableModulesCmd(name, version string, modulesFactory modulesManagerFactory) *cobra.Command {
+func genDisableModulesCmd(settings instance.Settings, modulesFactory modulesManagerFactory) *cobra.Command {
 	return &cobra.Command{
 		Use:   "disable MODULE...",
 		Short: "Disable one or more given modules",
 		Run: func(cmd *cobra.Command, args []string) {
-			modules := getModules(name, version, modulesFactory)
+			modules := getModules(settings, modulesFactory)
 
 			for _, module := range args {
 				if !modules.Exists(module) {

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type copyFields struct {
@@ -40,13 +41,14 @@ type copyFieldsConfig struct {
 
 func init() {
 	processors.RegisterPlugin("copy_fields",
-		configChecked(newCopyFields,
-			requireFields("fields"),
+		checks.ConfigChecked(NewCopyFields,
+			checks.RequireFields("fields"),
 		),
 	)
 }
 
-func newCopyFields(c *common.Config) (processors.Processor, error) {
+// NewCopyFields returns a new copy_fields processor.
+func NewCopyFields(c *common.Config) (processors.Processor, error) {
 	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

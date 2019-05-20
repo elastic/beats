@@ -2,89 +2,195 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of CoreDNS server metrics.",
+        "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "coredns.stats.panic.count.total"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
-                  "key": "coredns.stats.panic.count.total",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
+            "filter": [],
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "Panic Count Total [Metricbeat CoreDNS] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "field": "coredns.stats.panic.count.total",
-                "percents": [
-                  100
-                ]
-              },
-              "schema": "metric",
-              "type": "percentiles"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": false
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "1",
+              "w": 10,
+              "x": 0,
+              "y": 0
             },
-            "type": "metric"
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "6.7.0"
           },
-          "title": "Panic Count Total [Metricbeat CoreDNS] ECS",
-          "type": "metric"
-        }
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "2",
+              "w": 14,
+              "x": 10,
+              "y": 0
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "6.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "colors": {
+                  "NXDOMAIN": "#99440A"
+                }
+              }
+            },
+            "gridData": {
+              "h": 15,
+              "i": "3",
+              "w": 19,
+              "x": 24,
+              "y": 25
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "version": "6.7.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "10",
+              "w": 24,
+              "x": 0,
+              "y": 40
+            },
+            "panelIndex": "10",
+            "panelRefName": "panel_3",
+            "version": "6.7.0"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "colors": {
+                  "tcp - 1": "#B7DBAB",
+                  "udp - 1": "#5195CE"
+                },
+                "legendOpen": true
+              }
+            },
+            "gridData": {
+              "h": 10,
+              "i": "11",
+              "w": 19,
+              "x": 24,
+              "y": 0
+            },
+            "panelIndex": "11",
+            "panelRefName": "panel_4",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "12",
+              "w": 19,
+              "x": 24,
+              "y": 10
+            },
+            "panelIndex": "12",
+            "panelRefName": "panel_5",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "15",
+              "w": 24,
+              "x": 0,
+              "y": 10
+            },
+            "panelIndex": "15",
+            "panelRefName": "panel_6",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "16",
+              "w": 24,
+              "x": 0,
+              "y": 25
+            },
+            "panelIndex": "16",
+            "panelRefName": "panel_7",
+            "version": "7.0.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat CoreDNS] Overview ECS",
+        "version": 1
       },
-      "id": "36e08510-53c4-11e9-b466-9be470bbd327-ecs",
-      "type": "visualization",
-      "updated_at": "2019-04-02T21:47:09.206Z",
-      "version": "WzQ1MSwyXQ=="
+      "id": "Metricbeat-CoreDNS-Dashboard-ecs",
+      "migrationVersion": {
+        "dashboard": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "36e08510-53c4-11e9-b466-9be470bbd327-ecs",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "a19df590-53c4-11e9-b466-9be470bbd327-ecs",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "27da53f0-53d5-11e9-b466-9be470bbd327-ecs",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "277fc650-67a9-11e9-a534-715561d0bf42",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "86177430-728d-11e9-b0d0-414c3011ddbb",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "a58345f0-7298-11e9-b0d0-414c3011ddbb",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "57c74300-7308-11e9-b0d0-414c3011ddbb",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "4804eaa0-7315-11e9-b0d0-414c3011ddbb",
+          "name": "panel_7",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-05-10T11:25:44.629Z",
+      "version": "WzE3MzcsMV0="
     },
     {
       "attributes": {
@@ -97,27 +203,27 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "coredns.stats.dns.request.do.count.total"
+                  "field": "coredns.stats.panic.count"
                 },
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
-                  "key": "coredns.stats.dns.request.do.count.total",
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "coredns.stats.panic.count",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"
                 }
               }
             ],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "DO Count Total [Metricbeat CoreDNS] ECS",
+        "title": "Panic Count [Metricbeat CoreDNS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -126,8 +232,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "customLabel": "DO Count Total",
-                "field": "coredns.stats.dns.request.do.count.total",
+                "field": "coredns.stats.panic.count",
                 "percents": [
                   100
                 ]
@@ -164,14 +269,131 @@
             },
             "type": "metric"
           },
-          "title": "DO Count Total [Metricbeat CoreDNS] ECS",
+          "title": "Panic Count [Metricbeat CoreDNS] ECS",
+          "type": "metric"
+        }
+      },
+      "id": "36e08510-53c4-11e9-b466-9be470bbd327-ecs",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-05-10T07:46:22.258Z",
+      "version": "WzE1MjcsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "coredns.stats.dns.request.do.count"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "coredns.stats.dns.request.do.count",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "DO Count [Metricbeat CoreDNS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "DO Count",
+                "field": "coredns.stats.dns.request.do.count",
+                "percents": [
+                  100
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": false
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "DO Count [Metricbeat CoreDNS] ECS",
           "type": "metric"
         }
       },
       "id": "a19df590-53c4-11e9-b466-9be470bbd327-ecs",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-04-02T21:41:30.112Z",
-      "version": "WzQ0OSwyXQ=="
+      "updated_at": "2019-05-10T07:46:22.258Z",
+      "version": "WzE1MjgsMV0="
     },
     {
       "attributes": {
@@ -179,7 +401,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "lucene",
               "query": ""
@@ -195,20 +417,29 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "coredns.stats.dns.response.rcode.count.total"
+                "customLabel": "Response per rcode",
+                "field": "coredns.stats.dns.response.rcode.count"
               },
               "schema": "metric",
               "type": "avg"
             },
             {
               "enabled": true,
-              "id": "4",
+              "id": "5",
               "params": {
-                "field": "coredns.stats.rcode",
-                "size": 2
+                "customLabel": "server",
+                "field": "coredns.stats.server",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "row": true,
+                "size": 5
               },
-              "schema": "group",
-              "type": "significant_terms"
+              "schema": "split",
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -221,15 +452,45 @@
                 "interval": "auto",
                 "min_doc_count": 1,
                 "timeRange": {
-                  "from": "now-1h",
-                  "mode": "quick",
+                  "from": "now-15m",
                   "to": "now"
                 },
-                "time_zone": "Europe/Helsinki",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
               "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "field": "coredns.stats.rcode",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "6",
+              "params": {
+                "field": "coredns.stats.zone",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
             }
           ],
           "params": {
@@ -264,11 +525,11 @@
               {
                 "data": {
                   "id": "1",
-                  "label": "Average coredns.stats.dns.response.rcode.count.total"
+                  "label": "Response per rcode"
                 },
                 "drawLinesBetweenPoints": true,
                 "interpolate": "linear",
-                "lineWidth": null,
+                "lineWidth": 1,
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
@@ -296,7 +557,7 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "Average coredns.stats.dns.response.rcode.count.total"
+                  "text": "Response per rcode"
                 },
                 "type": "value"
               }
@@ -307,119 +568,428 @@
         }
       },
       "id": "27da53f0-53d5-11e9-b466-9be470bbd327-ecs",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-04-02T21:54:58.431Z",
-      "version": "WzQ1NCwyXQ=="
+      "updated_at": "2019-05-10T07:46:22.258Z",
+      "version": "WzE1MjksMV0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "coredns.stats.dns.request.count.total"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
-                  "key": "coredns.stats.dns.request.count.total",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "Requests by Protocol [Metricbeat CoreDNS] ECS",
-        "uiStateJSON": {},
+        "title": " Cache Hits, Misses [Metricbeat CoreDNS] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "Average coredns.stats.dns.cache.misses.count": "#E24D42",
+              "Hits": "#9AC48A",
+              "Misses": "#EA6460"
+            }
+          }
+        },
         "version": 1,
         "visState": {
           "aggs": [
             {
               "enabled": true,
               "id": "1",
-              "params": {},
+              "params": {
+                "customLabel": "Hits",
+                "field": "coredns.stats.dns.cache.hits.count"
+              },
               "schema": "metric",
-              "type": "count"
+              "type": "max"
             },
             {
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "coredns.stats.proto",
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 0,
+                "timeRange": {
+                  "from": "now-30m",
+                  "to": "now"
+                },
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Misses",
+                "field": "coredns.stats.dns.cache.misses.count"
+              },
+              "schema": "metric",
+              "type": "max"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "server",
+                "field": "coredns.stats.server",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
                 "orderBy": "1",
                 "otherBucket": false,
                 "otherBucketLabel": "Other",
+                "row": true,
                 "size": 5
               },
-              "schema": "segment",
+              "schema": "split",
               "type": "terms"
             }
           ],
           "params": {
             "addLegend": true,
+            "addTimeMarker": false,
             "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
             },
             "legendPosition": "right",
-            "type": "pie"
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Hits"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "3",
+                  "label": "Misses"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-2"
+              }
+            ],
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Hits"
+                },
+                "type": "value"
+              },
+              {
+                "id": "ValueAxis-2",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "RightAxis-1",
+                "position": "right",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Misses"
+                },
+                "type": "value"
+              }
+            ]
           },
-          "title": "Requests by Protocol [Metricbeat CoreDNS] ECS",
-          "type": "pie"
+          "title": " Cache Hits, Misses [Metricbeat CoreDNS] ECS",
+          "type": "line"
         }
       },
-      "id": "ad4f1200-53e4-11e9-b466-9be470bbd327-ecs",
+      "id": "277fc650-67a9-11e9-a534-715561d0bf42",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-04-01T21:33:04.790Z",
-      "version": "WzQzMywyXQ=="
+      "updated_at": "2019-05-10T07:46:22.258Z",
+      "version": "WzE1MzAsMV0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Requests by Zone [Metricbeat CoreDNS] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "legendOpen": true
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "aggregate": "max",
+                "customLabel": "Request count",
+                "field": "coredns.stats.dns.request.count",
+                "size": 1,
+                "sortField": "@timestamp",
+                "sortOrder": "desc"
+              },
+              "schema": "metric",
+              "type": "top_hits"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "server",
+                "field": "coredns.stats.server",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "row": true,
+                "size": 5
+              },
+              "schema": "split",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "zone",
+                "field": "coredns.stats.zone",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "5",
+              "params": {
+                "customLabel": "protocol",
+                "field": "coredns.stats.proto",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "6",
+              "params": {
+                "customLabel": "family",
+                "field": "coredns.stats.family",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
               {
-                "$state": {
-                  "store": "appState"
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "filter": true,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 200
                 },
-                "exists": {
-                  "field": "coredns.stats.dns.request.type.count.total"
+                "position": "left",
+                "scale": {
+                  "type": "linear"
                 },
-                "meta": {
-                  "alias": null,
-                  "disabled": true,
-                  "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
-                  "key": "coredns.stats.dns.request.type.count.total",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
               }
             ],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
+            "grid": {
+              "categoryLines": false
+            },
+            "legendPosition": "right",
+            "orderBucketsBySum": false,
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Request count"
+                },
+                "drawLinesBetweenPoints": true,
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": true,
+                  "rotate": 75,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "BottomAxis-1",
+                "position": "bottom",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Request count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Requests by Zone [Metricbeat CoreDNS] ECS",
+          "type": "horizontal_bar"
+        }
+      },
+      "id": "86177430-728d-11e9-b0d0-414c3011ddbb",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-05-10T07:46:22.258Z",
+      "version": "WzE1MzEsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -433,14 +1003,37 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "coredns.stats.dns.request.type.count.total"
+                "aggregate": "max",
+                "customLabel": "Requests",
+                "field": "coredns.stats.dns.request.type.count",
+                "size": 1,
+                "sortField": "@timestamp",
+                "sortOrder": "desc"
               },
               "schema": "metric",
-              "type": "avg"
+              "type": "top_hits"
             },
             {
               "enabled": true,
               "id": "2",
+              "params": {
+                "customLabel": "server",
+                "field": "coredns.stats.server",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "row": true,
+                "size": 5
+              },
+              "schema": "split",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
               "params": {
                 "customInterval": "2h",
                 "drop_partials": false,
@@ -450,10 +1043,8 @@
                 "min_doc_count": 1,
                 "timeRange": {
                   "from": "now-15m",
-                  "mode": "quick",
                   "to": "now"
                 },
-                "time_zone": "Europe/Helsinki",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -461,25 +1052,35 @@
             },
             {
               "enabled": true,
-              "id": "3",
+              "id": "4",
               "params": {
-                "field": "coredns.stats.type",
-                "size": 8
+                "field": "coredns.stats.zone",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
               },
               "schema": "group",
-              "type": "significant_terms"
+              "type": "terms"
             },
             {
               "enabled": true,
-              "id": "4",
+              "id": "5",
               "params": {
-                "customLabel": "DNS Server",
-                "field": "coredns.stats.server",
-                "row": false,
-                "size": 2
+                "field": "coredns.stats.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
               },
-              "schema": "split",
-              "type": "significant_terms"
+              "schema": "group",
+              "type": "terms"
             }
           ],
           "params": {
@@ -504,25 +1105,20 @@
               }
             ],
             "grid": {
-              "categoryLines": false,
-              "style": {
-                "color": "#eee"
-              },
-              "valueAxis": "ValueAxis-1"
+              "categoryLines": false
             },
             "legendPosition": "right",
             "seriesParams": [
               {
                 "data": {
                   "id": "1",
-                  "label": "Average coredns.stats.dns.request.type.count.total"
+                  "label": "Requests"
                 },
                 "drawLinesBetweenPoints": true,
-                "interpolate": "linear",
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "type": "histogram",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -546,7 +1142,7 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "Average coredns.stats.dns.request.type.count.total"
+                  "text": "Requests"
                 },
                 "type": "value"
               }
@@ -556,10 +1152,20 @@
           "type": "line"
         }
       },
-      "id": "ff3285d0-53e8-11e9-b466-9be470bbd327-ecs",
+      "id": "a58345f0-7298-11e9-b0d0-414c3011ddbb",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-04-01T21:54:04.557Z",
-      "version": "WzQzNywyXQ=="
+      "updated_at": "2019-05-10T07:46:22.258Z",
+      "version": "WzE1MzIsMV0="
     },
     {
       "attributes": {
@@ -567,215 +1173,108 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Request Duration [Metricbeat CoreDNS] ECS",
+        "title": "Avg Request Duration (cumulative) [Metricbeat CoreDNS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.duration.ns.bucket.+Inf"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "7",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.duration.ns.bucket.8192000000"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "6",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.duration.ns.bucket.4096000000"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.duration.ns.bucket.2048000000"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.duration.ns.bucket.1024000000"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "8",
-              "params": {
-                "customInterval": "2h",
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "timeRange": {
-                  "from": "now-15m",
-                  "mode": "quick",
-                  "to": "now"
-                },
-                "time_zone": "Europe/Helsinki",
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            }
-          ],
+          "aggs": [],
           "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "auto",
+            "series": [
               {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0.1",
+                "filter": "",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Avg Request Duration (ms)",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "agg_with": "max",
+                    "field": "coredns.stats.dns.request.duration.ns.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "order": "desc",
+                    "order_by": "@timestamp",
+                    "size": 1,
+                    "type": "sum"
+                  },
+                  {
+                    "agg_with": "max",
+                    "field": "coredns.stats.dns.request.duration.ns.count",
+                    "id": "f6c82d30-7307-11e9-aba0-4f43d70788c6",
+                    "order": "desc",
+                    "order_by": "@timestamp",
+                    "size": 1,
+                    "type": "sum"
+                  },
+                  {
+                    "id": "1d9de350-7308-11e9-aba0-4f43d70788c6",
+                    "script": "params.sum / params.count / 1e6",
+                    "type": "calculation",
+                    "variables": [
+                      {
+                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "id": "20eee310-7308-11e9-aba0-4f43d70788c6",
+                        "name": "sum"
+                      },
+                      {
+                        "field": "f6c82d30-7307-11e9-aba0-4f43d70788c6",
+                        "id": "2e4139f0-7308-11e9-aba0-4f43d70788c6",
+                        "name": "count"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_filters": [
+                  {
+                    "color": "#68BC00",
+                    "filter": "",
+                    "id": "505e0670-7309-11e9-aba0-4f43d70788c6",
+                    "label": ""
+                  }
+                ],
+                "split_mode": "terms",
+                "stacked": "none",
+                "steps": 0,
+                "terms_field": "coredns.stats.zone",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "value_template": "{{value}} ms"
               }
             ],
-            "grid": {
-              "categoryLines": false,
-              "style": {
-                "color": "#eee"
-              },
-              "valueAxis": "ValueAxis-1"
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "3",
-                  "label": "Average coredns.stats.dns.request.duration.ns.bucket.+Inf"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "7",
-                  "label": "Average coredns.stats.dns.request.duration.ns.bucket.8192000000"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "6",
-                  "label": "Average coredns.stats.dns.request.duration.ns.bucket.4096000000"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "5",
-                  "label": "Average coredns.stats.dns.request.duration.ns.bucket.2048000000"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "4",
-                  "label": "Average coredns.stats.dns.request.duration.ns.bucket.1024000000"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "line",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
           },
-          "title": "Request Duration [Metricbeat CoreDNS] ECS",
-          "type": "line"
+          "title": "Avg Request Duration (cumulative) [Metricbeat CoreDNS] ECS",
+          "type": "metrics"
         }
       },
-      "id": "e3e73b00-53ec-11e9-b466-9be470bbd327-ecs",
+      "id": "57c74300-7308-11e9-b0d0-414c3011ddbb",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-02T21:14:41.416Z",
-      "version": "WzQ0NSwyXQ=="
+      "updated_at": "2019-05-10T11:07:14.131Z",
+      "version": "WzE3MzQsMV0="
     },
     {
       "attributes": {
@@ -783,434 +1282,90 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Request Size Bytes [Metricbeat CoreDNS] ECS",
+        "title": "Avg Request Size (cumulative) [Metricbeat CoreDNS] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.size.bytes.bucket.+Inf"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.size.bytes.bucket.1023"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.size.bytes.bucket.2047"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.size.bytes.bucket.4095"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "",
-                "field": "coredns.stats.dns.request.size.bytes.bucket.8291"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "6",
-              "params": {
-                "customInterval": "2h",
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "timeRange": {
-                  "from": "now-15m",
-                  "mode": "quick",
-                  "to": "now"
-                },
-                "time_zone": "Europe/Helsinki",
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            }
-          ],
+          "aggs": [],
           "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "auto",
+            "series": [
               {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(228,155,238,1)",
+                "fill": "0.1",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Avg Request Size (bytes)",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "coredns.stats.dns.request.size.bytes.sum",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "sum"
+                  },
+                  {
+                    "field": "coredns.stats.dns.request.size.bytes.count",
+                    "id": "98fe65e0-7314-11e9-8e06-d9a616f1e6f2",
+                    "type": "sum"
+                  },
+                  {
+                    "id": "ab81ee30-7314-11e9-8e06-d9a616f1e6f2",
+                    "script": "params.sum / params.count",
+                    "type": "calculation",
+                    "variables": [
+                      {
+                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "id": "aeed53c0-7314-11e9-8e06-d9a616f1e6f2",
+                        "name": "sum"
+                      },
+                      {
+                        "field": "98fe65e0-7314-11e9-8e06-d9a616f1e6f2",
+                        "id": "b84dd700-7314-11e9-8e06-d9a616f1e6f2",
+                        "name": "count"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "coredns.stats.zone",
+                "value_template": "{{value}} bytes"
               }
             ],
-            "grid": {
-              "categoryLines": false,
-              "style": {
-                "color": "#eee"
-              }
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Average coredns.stats.dns.request.size.bytes.bucket.+Inf"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": "true",
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "2",
-                  "label": "Average coredns.stats.dns.request.size.bytes.bucket.1023"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "3",
-                  "label": "Average coredns.stats.dns.request.size.bytes.bucket.2047"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "4",
-                  "label": "Average coredns.stats.dns.request.size.bytes.bucket.4095"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "5",
-                  "label": "Average coredns.stats.dns.request.size.bytes.bucket.8291"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "line",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Size Bytes"
-                },
-                "type": "value"
-              }
-            ]
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
           },
-          "title": "Request Size Bytes [Metricbeat CoreDNS] ECS",
-          "type": "line"
+          "title": "Avg Request Size (cumulative) [Metricbeat CoreDNS] ECS",
+          "type": "metrics"
         }
       },
-      "id": "45d03ed0-53f1-11e9-b466-9be470bbd327-ecs",
-      "type": "visualization",
-      "updated_at": "2019-04-01T21:42:21.120Z",
-      "version": "WzQzNiwyXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "3a2bade0-53c3-11e9-b466-9be470bbd327",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Requests by Zone [Metricbeat CoreDNS] ECS",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "coredns.stats.zone",
-                "size": 3
-              },
-              "schema": "segment",
-              "type": "significant_terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": false,
-            "labels": {
-              "last_level": true,
-              "show": true,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "top",
-            "type": "pie"
-          },
-          "title": "Requests by Zone [Metricbeat CoreDNS] ECS",
-          "type": "pie"
-        }
+      "id": "4804eaa0-7315-11e9-b0d0-414c3011ddbb",
+      "migrationVersion": {
+        "visualization": "7.0.0"
       },
-      "id": "84a59b70-5593-11e9-b87d-f90ad5e8a010-ecs",
+      "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-02T22:18:19.942Z",
-      "version": "WzQ2MSwyXQ=="
-    },
-    {
-      "attributes": {
-        "description": "Overview of CoreDNS server metrics.",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": [
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "1",
-              "w": 15,
-              "x": 0,
-              "y": 0
-            },
-            "id": "36e08510-53c4-11e9-b466-9be470bbd327-ecs",
-            "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.7.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "2",
-              "w": 15,
-              "x": 15,
-              "y": 0
-            },
-            "id": "a19df590-53c4-11e9-b466-9be470bbd327-ecs",
-            "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.7.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "colors": {
-                  "NXDOMAIN": "#99440A"
-                }
-              }
-            },
-            "gridData": {
-              "h": 15,
-              "i": "3",
-              "w": 24,
-              "x": 0,
-              "y": 19
-            },
-            "id": "27da53f0-53d5-11e9-b466-9be470bbd327-ecs",
-            "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.7.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "colors": {
-                  "udp": "#5195CE"
-                },
-                "legendOpen": true
-              }
-            },
-            "gridData": {
-              "h": 7,
-              "i": "4",
-              "w": 18,
-              "x": 30,
-              "y": 0
-            },
-            "id": "ad4f1200-53e4-11e9-b466-9be470bbd327-ecs",
-            "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.7.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 12,
-              "i": "6",
-              "w": 48,
-              "x": 0,
-              "y": 7
-            },
-            "id": "ff3285d0-53e8-11e9-b466-9be470bbd327-ecs",
-            "panelIndex": "6",
-            "type": "visualization",
-            "version": "6.7.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "7",
-              "w": 48,
-              "x": 0,
-              "y": 34
-            },
-            "id": "e3e73b00-53ec-11e9-b466-9be470bbd327-ecs",
-            "panelIndex": "7",
-            "type": "visualization",
-            "version": "6.7.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "8",
-              "w": 48,
-              "x": 0,
-              "y": 49
-            },
-            "id": "45d03ed0-53f1-11e9-b466-9be470bbd327-ecs",
-            "panelIndex": "8",
-            "type": "visualization",
-            "version": "6.7.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "colors": {
-                  ".": "#EF843C",
-                  "my.domain.org.": "#447EBC"
-                }
-              }
-            },
-            "gridData": {
-              "h": 15,
-              "i": "9",
-              "w": 24,
-              "x": 24,
-              "y": 19
-            },
-            "id": "84a59b70-5593-11e9-b87d-f90ad5e8a010-ecs",
-            "panelIndex": "9",
-            "type": "visualization",
-            "version": "6.7.0"
-          }
-        ],
-        "timeRestore": false,
-        "title": "[Metricbeat CoreDNS] Overview ECS",
-        "version": 1
-      },
-      "id": "Metricbeat-CoreDNS-Dashboard-ecs",
-      "type": "dashboard",
-      "updated_at": "2019-04-02T22:18:49.544Z",
-      "version": "WzQ2MiwyXQ=="
+      "updated_at": "2019-05-10T11:18:05.129Z",
+      "version": "WzE3MzUsMV0="
     }
   ],
-  "version": "6.7.0"
+  "version": "7.0.0"
 }
