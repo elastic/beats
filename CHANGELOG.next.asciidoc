@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
 - Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 
 *Heartbeat*
 
