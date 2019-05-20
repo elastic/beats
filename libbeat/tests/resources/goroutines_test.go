@@ -25,6 +25,9 @@ import (
 )
 
 func TestGoroutinesChecker(t *testing.T) {
+	block := make(chan struct{})
+	defer close(block)
+
 	cases := []struct {
 		title   string
 		test    func()
@@ -43,8 +46,7 @@ func TestGoroutinesChecker(t *testing.T) {
 			title: "blocked goroutine",
 			test: func() {
 				go func() {
-					c := make(chan struct{})
-					<-c
+					<-block
 				}()
 			},
 			timeout: 500 * time.Millisecond,
