@@ -113,12 +113,17 @@
         Log entry identifier that is incremented sequentially.
         Unique for each log type.
 
-    - name: threat_file_or_url
+    - name: threat.resource
       type: keyword
       description: >
         URL or file name for a threat.
 
-    - name: threat_id
+    - name: threat.id
       type: keyword
       description: >
         Palo Alto Networks identifier for the threat.
+
+    - name: threat.name
+      type: keyword
+      description: >
+        Palo Alto Networks name for the threat.

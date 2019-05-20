@@ -43,6 +43,7 @@ grouped in the following categories:
 * <<exported-fields-palo_alto>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
+* <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
@@ -12046,7 +12047,7 @@ Log entry identifier that is incremented sequentially. Unique for each log type.
 
 --
 
-*`palo_alto.pan_os.threat_file_or_url`*::
+*`palo_alto.pan_os.threat.resource`*::
 +
 --
 type: keyword
@@ -12056,12 +12057,22 @@ URL or file name for a threat.
 
 --
 
-*`palo_alto.pan_os.threat_id`*::
+*`palo_alto.pan_os.threat.id`*::
 +
 --
 type: keyword
 
 Palo Alto Networks identifier for the threat.
+
+
+--
+
+*`palo_alto.pan_os.threat.name`*::
++
+--
+type: keyword
+
+Palo Alto Networks name for the threat.
 
 
 --
@@ -12182,6 +12193,37 @@ Process metadata fields
 type: alias
 
 alias to: process.executable
+
+--
+
+[[exported-fields-rabbitmq]]
+== RabbitMQ fields
+
+RabbitMQ Module
+
+
+
+[float]
+== rabbitmq fields
+
+
+
+
+[float]
+== log fields
+
+RabbitMQ log files
+
+
+
+*`rabbitmq.log.pid`*::
++
+--
+type: keyword
+
+example: <0.222.0>
+
+The Erlang process id
 
 --
 
