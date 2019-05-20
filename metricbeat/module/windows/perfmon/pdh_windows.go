@@ -20,20 +20,8 @@
 package perfmon
 
 import (
-	"bytes"
-	"regexp"
-	"strconv"
 	"syscall"
-	"unicode/utf16"
 	"unsafe"
-
-	"github.com/pkg/errors"
-	"golang.org/x/sys/windows"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/winlogbeat/sys"
 )
 
 // Windows API calls
@@ -47,13 +35,10 @@ import (
 //sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
 //sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
-//sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath string, expandedPathList *uint16, pathListLength *uint32, expandFlag uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
+//sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 
 var (
 	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
-	wildcardRegexp            = regexp.MustCompile(`.*\(.*\*.*\).*|.*\(.*\)\\.*\*.*`)
-	instanceNameRegexp        = regexp.MustCompile(`.*\((.*)\).*`)
-	objectNameRegexp          = regexp.MustCompile(`\\([^\\]+)\\`)
 )
 
 type PdhQueryHandle uintptr
@@ -94,7 +79,6 @@ func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	if err := _PdhOpenQuery(dataSourcePtr, userData, &handle); err != nil {
 		return InvalidQueryHandle, PdhErrno(err.(syscall.Errno))
 	}
-
 	return handle, nil
 }
 
@@ -128,47 +112,6 @@ func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterForm
 	return counterType, &value, nil
 }
 
-// PdhGetFormattedCounterArray returns an array of formatted counter values.
-func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) ([]CounterValueItem, error) {
-	var bufferSize uint32
-	var bufferCount uint32
-
-	if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, nil); err != nil {
-		// From MSDN: You should call this function twice, the first time to get the required
-		// buffer size (set ItemBuffer to NULL and lpdwBufferSize to 0), and the second time to get the data.
-		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
-			return nil, PdhErrno(err.(syscall.Errno))
-		}
-
-		// Buffer holds PdhCounterValueItems at the beginning and then null-terminated
-		// strings at the end.
-		buffer := make([]byte, bufferSize)
-		if err := _PdhGetFormattedCounterArray(counter, format, &bufferSize, &bufferCount, &buffer[0]); err != nil {
-			return nil, PdhErrno(err.(syscall.Errno))
-		}
-
-		values := make([]CounterValueItem, bufferCount)
-		nameBuffer := new(bytes.Buffer)
-		for i := 0; i < len(values); i++ {
-			pdhValueItem := (*pdhCounterValueItem)(unsafe.Pointer(&buffer[i*sizeofPdhCounterValueItem]))
-
-			// The strings are appended to the end of the buffer.
-			nameOffset := pdhValueItem.SzName - (uintptr)(unsafe.Pointer(&buffer[0]))
-			nameBuffer.Reset()
-			if err := sys.UTF16ToUTF8Bytes(buffer[nameOffset:], nameBuffer); err != nil {
-				return nil, err
-			}
-
-			values[i].Name = nameBuffer.String()
-			values[i].Value = pdhValueItem.FmtValue
-		}
-
-		return values, nil
-	}
-
-	return nil, nil
-}
-
 // PdhGetRawCounterValue returns the current raw value of the counter.
 func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, error) {
 	var counterType uint32
@@ -190,56 +133,25 @@ func PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounter
 	return &value, nil
 }
 
-// PdhFormatFromRawValue computes a displayable value for the given raw counter values.
-func PdhFormatFromRawValue(format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
-	var counterType uint32
-	var value PdhCounterValue
-	var timeBase uint64
-	if err := _PdhFormatFromRawValue(counterType, format, &timeBase, rawValue1, rawValue2, &value); err != nil {
-		return nil, PdhErrno(err.(syscall.Errno))
-	}
-
-	return &value, nil
-}
-
 // PdhExpandWildCardPath returns counter paths that match the given counter path.
-func PdhExpandWildCardPath(wildCardPath string) ([]string, error) {
-	if wildCardPath == "" {
-		return nil, errors.New("no wildcardpath given")
+func PdhExpandWildCardPath(wildCardPath string) ([]uint16, error) {
+	utfPath, err := syscall.UTF16PtrFromString(wildCardPath)
+	if err != nil {
+		return nil, err
 	}
-
 	var bufferSize uint32
-	if err := _PdhExpandWildCardPath(nil, wildCardPath, nil, &bufferSize, 0); err != nil {
+	if err := _PdhExpandWildCardPath(nil, utfPath, nil, &bufferSize); err != nil {
 		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 
 		expdPaths := make([]uint16, bufferSize)
-		if err := _PdhExpandWildCardPath(nil, wildCardPath, &expdPaths[0], &bufferSize, 0); err != nil {
+		bufferSize = uint32(len(expdPaths))
+		if err := _PdhExpandWildCardPath(nil, utfPath, &expdPaths[0], &bufferSize); err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-
-		// Split the uint16 slice at null-terminators.
-		var startIdx int
-		var expdPathsUTF16 [][]uint16
-		for i, value := range expdPaths {
-			if value == 0 {
-				expdPathsUTF16 = append(expdPathsUTF16, expdPaths[startIdx:i])
-				startIdx = i + 1
-			}
-		}
-
-		// Convert the utf16 slices to strings.
-		paths := make([]string, 0, len(expdPathsUTF16))
-		for _, pathUTF16 := range expdPathsUTF16 {
-			if len(pathUTF16) > 0 {
-				paths = append(paths, syscall.UTF16ToString(pathUTF16))
-			}
-		}
-
-		return paths, nil
+		return expdPaths, nil
 	}
-
 	return nil, nil
 }
 
@@ -250,268 +162,4 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 	}
 
 	return nil
-}
-
-type Counter struct {
-	handle       PdhCounterHandle
-	format       PdhCounterFormat
-	instanceName string
-}
-
-type Counters map[string]*Counter
-
-type Query struct {
-	handle   PdhQueryHandle
-	counters Counters
-}
-
-type Format int
-
-const (
-	FloatFormat Format = iota
-	LongFormat
-)
-
-// NewQuery creates a new query.
-func NewQuery(dataSource string) (*Query, error) {
-	h, err := PdhOpenQuery(dataSource, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Query{
-		handle:   h,
-		counters: make(Counters),
-	}, nil
-}
-
-// AddCounter adds the specified counter to the query.
-func (q *Query) AddCounter(counterPath string, format Format, instanceName string, wildcard bool) error {
-	if _, found := q.counters[counterPath]; found {
-		return errors.New("counter already added")
-	}
-
-	h, err := PdhAddCounter(q.handle, counterPath, 0)
-	if err != nil {
-		return err
-	}
-
-	// Extract the instance name from the counterPath for non-wildcard paths.
-	if !wildcard && instanceName == "" {
-		instanceName, err = matchInstanceName(counterPath)
-		if err != nil {
-			return err
-		}
-	}
-	q.counters[counterPath] = &Counter{
-		handle:       h,
-		instanceName: instanceName,
-	}
-	switch format {
-	case FloatFormat:
-		q.counters[counterPath].format = PdhFmtDouble
-	case LongFormat:
-		q.counters[counterPath].format = PdhFmtLarge
-	}
-	return nil
-}
-
-// matchInstanceName will check first for instance and then for any objects names
-func matchInstanceName(counterPath string) (string, error) {
-	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
-	if len(matches) != 2 {
-		matches = objectNameRegexp.FindStringSubmatch(counterPath)
-	}
-	if len(matches) == 2 {
-		return matches[1], nil
-	}
-	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
-}
-
-// Execute collects the value for all counters in the query.
-func (q *Query) Execute() error {
-	return PdhCollectQueryData(q.handle)
-}
-
-type Value struct {
-	Instance    string
-	Measurement interface{}
-	Err         error
-}
-
-// Values returns an array of formatted values for a query.
-func (q *Query) Values() (map[string][]Value, error) {
-	rtn := make(map[string][]Value, len(q.counters))
-
-	for path, counter := range q.counters {
-		_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
-		if err != nil {
-			rtn[path] = append(rtn[path], Value{Err: err})
-			continue
-		}
-
-		switch counter.format {
-		case PdhFmtDouble:
-			rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-		case PdhFmtLarge:
-			rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-
-		}
-	}
-
-	return rtn, nil
-}
-
-// Close closes the query and all of its counters.
-func (q *Query) Close() error {
-	return PdhCloseQuery(q.handle)
-}
-
-type PerfmonReader struct {
-	query             *Query            // PDH Query
-	instanceLabel     map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
-	measurement       map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed          bool              // Indicates if the query has been executed.
-	log               *logp.Logger      //
-	groupMeasurements bool              // Indicates if measurements with the same instance label should be sent in the same event
-}
-
-// NewPerfmonReader creates a new instance of PerfmonReader.
-func NewPerfmonReader(config Config) (*PerfmonReader, error) {
-	query, err := NewQuery("")
-	if err != nil {
-		return nil, err
-	}
-
-	r := &PerfmonReader{
-		query:             query,
-		instanceLabel:     map[string]string{},
-		measurement:       map[string]string{},
-		log:               logp.NewLogger("perfmon"),
-		groupMeasurements: config.GroupMeasurements,
-	}
-
-	for _, counter := range config.CounterConfig {
-		var format Format
-		switch counter.Format {
-		case "float":
-			format = FloatFormat
-		case "long":
-			format = LongFormat
-		}
-		
-		values, err := PdhExpandWildCardPath(counter.Query)
-		if err != nil {
-			if config.IgnoreNECounters {
-				switch err {
-				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
-					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
-					r.log.Infow("Ignoring non existent counter", "error", err,
-						logp.Namespace("perfmon"), "query", counter.Query)
-					continue
-				}
-			} else {
-				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
-			}
-		}
-		
-		wildcard := wildcardRegexp.MatchString(counter.Query)
-		for _, v := range values {
-			if err := query.AddCounter(v, format, counter.InstanceName, wildcard); err != nil {
-				query.Close()
-				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
-			}
-
-			r.instanceLabel[v] = counter.InstanceLabel
-			r.measurement[v] = counter.MeasurementLabel
-		}
-	}
-
-	return r, nil
-}
-
-// Read executes a query and returns those values in an event.
-func (r *PerfmonReader) Read() ([]mb.Event, error) {
-	if err := r.query.Execute(); err != nil {
-		return nil, errors.Wrap(err, "failed querying counter values")
-	}
-
-	// Get the values.
-	values, err := r.query.Values()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed formatting counter values")
-	}
-
-	eventMap := make(map[string]*mb.Event)
-
-	for counterPath, values := range values {
-		for ind, val := range values {
-			if val.Err != nil && !r.executed {
-				r.log.Debugw("Ignoring the first measurement because the data isn't ready",
-					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-				continue
-			}
-
-			var eventKey string
-			if r.groupMeasurements && val.Err == nil {
-				// Send measurements with the same instance label as part of the same event
-				eventKey = val.Instance
-			} else {
-				// Send every measurement as an individual event
-				// If a counter contains an error, it will always be sent as an individual event
-				eventKey = counterPath + strconv.Itoa(ind)
-			}
-
-			// Create a new event if the key doesn't exist in the map
-			if _, ok := eventMap[eventKey]; !ok {
-				eventMap[eventKey] = &mb.Event{
-					MetricSetFields: common.MapStr{},
-					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
-				}
-
-				if val.Instance != "" {
-					eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
-				}
-			}
-
-			event := eventMap[eventKey]
-
-			if val.Measurement != nil {
-				event.MetricSetFields.Put(r.measurement[counterPath], val.Measurement)
-			} else {
-				event.MetricSetFields.Put(r.measurement[counterPath], 0)
-			}
-		}
-	}
-
-	// Write the values into the map.
-	events := make([]mb.Event, 0, len(eventMap))
-	for _, val := range eventMap {
-		events = append(events, *val)
-	}
-
-	r.executed = true
-	return events, nil
-}
-
-func (e PdhErrno) Error() string {
-	// If the value is not one of the known PDH errors then assume its a
-	// general windows error.
-	if _, found := pdhErrors[e]; !found {
-		return syscall.Errno(e).Error()
-	}
-
-	// Use FormatMessage to convert the PDH errno to a string.
-	// Example: https://msdn.microsoft.com/en-us/library/windows/desktop/aa373046(v=vs.85).aspx
-	var flags uint32 = windows.FORMAT_MESSAGE_FROM_HMODULE | windows.FORMAT_MESSAGE_ARGUMENT_ARRAY | windows.FORMAT_MESSAGE_IGNORE_INSERTS
-	b := make([]uint16, 300)
-	n, err := windows.FormatMessage(flags, modpdh.Handle(), uint32(e), 0, b, nil)
-	if err != nil {
-		return "pdh error #" + strconv.Itoa(int(e))
-	}
-
-	// Trim terminating \r and \n
-	for ; n > 0 && (b[n-1] == '\n' || b[n-1] == '\r'); n-- {
-	}
-	return string(utf16.Decode(b[:n]))
 }

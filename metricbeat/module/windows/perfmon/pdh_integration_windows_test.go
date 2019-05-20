@@ -105,25 +105,26 @@ func TestCounterWithNoInstanceName(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	q, err := NewQuery("")
+	var q Query
+	err := q.Open()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer q.Close()
-
-	err = q.AddCounter(processorTimeCounter, FloatFormat, "TestInstanceName", false)
+	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
+	err = q.AddCounter(processorTimeCounter, counter, false)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for i := 0; i < 2; i++ {
-		err = q.Execute()
+		err = q.CollectData()
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	values, err := q.Values()
+	values, err := q.GetFormattedCounterValues()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -225,30 +226,31 @@ func TestNonExistingObject(t *testing.T) {
 }
 
 func TestLongOutputFormat(t *testing.T) {
-	query, err := NewQuery("")
+	var query Query
+	err := query.Open()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer query.Close()
-
-	err = query.AddCounter(processorTimeCounter, LongFormat, "", false)
+	counter := CounterConfig{Format: "long"}
+	err = query.AddCounter(processorTimeCounter, counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
 
-	err = query.Execute()
+	err = query.CollectData()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	time.Sleep(time.Millisecond * 1000)
 
-	err = query.Execute()
+	err = query.CollectData()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	values, err := query.Values()
+	values, err := query.GetFormattedCounterValues()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,30 +261,31 @@ func TestLongOutputFormat(t *testing.T) {
 }
 
 func TestFloatOutputFormat(t *testing.T) {
-	query, err := NewQuery("")
+	var query Query
+	err := query.Open()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer query.Close()
-
-	err = query.AddCounter(processorTimeCounter, FloatFormat, "", false)
+	counter := CounterConfig{Format: "float"}
+	err = query.AddCounter(processorTimeCounter, counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
 
-	err = query.Execute()
+	err = query.CollectData()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	time.Sleep(time.Millisecond * 1000)
 
-	err = query.Execute()
+	err = query.CollectData()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	values, err := query.Values()
+	values, err := query.GetFormattedCounterValues()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -293,13 +296,14 @@ func TestFloatOutputFormat(t *testing.T) {
 }
 
 func TestRawValues(t *testing.T) {
-	query, err := NewQuery("")
+	var query Query
+	err := query.Open()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer query.Close()
-
-	err = query.AddCounter(processorTimeCounter, FloatFormat, "", false)
+	counter := CounterConfig{Format: "float"}
+	err = query.AddCounter(processorTimeCounter, counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -307,7 +311,7 @@ func TestRawValues(t *testing.T) {
 	var values []float64
 
 	for i := 0; i < 2; i++ {
-		if err = query.Execute(); err != nil {
+		if err = query.CollectData(); err != nil {
 			t.Fatal(err)
 		}
 
@@ -318,7 +322,7 @@ func TestRawValues(t *testing.T) {
 
 		time.Sleep(time.Millisecond * 1000)
 
-		if err = query.Execute(); err != nil {
+		if err = query.CollectData(); err != nil {
 			t.Fatal(err)
 		}
 

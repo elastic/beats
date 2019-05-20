@@ -15,6 +15,7 @@ to collect. The example below collects processor time and disk writes every
   period: 10s
   perfmon.ignore_non_existent_counters: true
   perfmon.group_measurements_by_instance: true
+  perfmon.append_instance_counter: true
   perfmon.counters:
     - instance_label: processor.name
       instance_name: total
@@ -41,7 +42,27 @@ event. In the above example, this will cause the physical_disk.write.per_sec
 and physical_disk.write.time.pct measurements to be sent as a single event.
 The default behaviour is for all measurements to be sent as separate events.
 
-*`counters`*:: Counters specifies a list of queries to perform. Each individual
+*`append_instance_counter`*:: A boolean option to retrieve the full instance name with the included
+ counter, ex.
+----
+ "perfmon" : {
+              "process" : {
+                "name" : "conhost",
+                ..
+              }
+            }
+----
+will become:
+----
+ "perfmon" : {
+              "process" : {
+                "name" : "conhost#3",
+                ..
+              }
+            }
+----
+
+_*`counters`*:: Counters specifies a list of queries to perform. Each individual_
 counter requires three config options - `instance_label`, `measurement_label`,
 and `query`.
 

@@ -1,1 +1,15 @@
-- release: beta
+- name: processor
+  type: group
+  description: >
+    `processor` contains the performance counter values.
+  release: beta
+  fields:
+  - name: id
+    type: keyword
+    description: >
+      A unique ID for the process.
+  - name: name
+    type: keyword
+    description: >
+      The process name.
+
