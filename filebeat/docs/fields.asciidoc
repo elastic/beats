@@ -46,6 +46,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
+* <<exported-fields-shorewall>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
@@ -12483,6 +12484,82 @@ SHA256 hash of code signing certificate.
 type: keyword
 
 Hash of process executable.
+
+--
+
+[[exported-fields-shorewall]]
+== shorewall fields
+
+Module for parsing Shorewall log files.
+
+
+
+[float]
+== shorewall fields
+
+Fields from Shorewall logs.
+
+
+
+[float]
+== network fields
+
+Shorewal log files
+
+
+
+*`shorewall.network.in`*::
++
+--
+type: keywork
+
+--
+
+*`shorewall.network.out`*::
++
+--
+type: keyword
+
+--
+
+[float]
+== action fields
+
+Shorewal network log files
+
+
+
+*`shorewall.action.one`*::
++
+--
+type: keywork
+
+Action one
+
+
+--
+
+*`shorewall.action.two`*::
++
+--
+type: keyword
+
+Action two
+
+
+--
+
+*`shorewall.precedence`*::
++
+--
+type: keyword
+
+--
+
+*`shorewall.ttl`*::
++
+--
+type: integer
 
 --
 
