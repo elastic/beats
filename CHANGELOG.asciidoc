@@ -3,6 +3,14 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.1.0]]
+=== Beats version 7.1.0
+
+* Updates to support changes to licensing of security features.
++
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and 
+role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
+
 [[release-notes-7.0.1]]
 === Beats version 7.0.1
 https://github.com/elastic/beats/compare/v7.0.0...v7.0.1[View commits]
