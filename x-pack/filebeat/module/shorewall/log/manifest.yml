@@ -4,10 +4,6 @@ var:
   - name: paths
     default:
       - /var/log/shorewall.log
-    os.darwin:
-      - /usr/local/example/test.log*
-    os.windows:
-      - c:/programdata/example/logs/test.log*
 
 ingest_pipeline: ingest/pipeline.json
 input: config/log.yml
