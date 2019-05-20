@@ -28,14 +28,15 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda: self.output_count(lambda x: x >= 21))
+        self.wait_until(lambda:  self.output_has(lines=21))
 
         filebeat.check_kill_and_wait()
 
         output = self.read_output()
-        assert output[0]["stream"] == "stdout"
-        assert output[0]["message"] == "Fetching main repository github.com/elastic/beats..."
         assert len(output) == 21
+        assert output[0]["message"] == "Fetching main repository github.com/elastic/beats..."
+        for o in output:
+            assert output["stream"] == "stdout"
 
     def test_container_input_cri(self):
         """
@@ -64,3 +65,4 @@ class Test(BaseTest):
 
         output = self.read_output()
         assert len(output) == 1
+        assert output[0]["stream"] == "stdout"
