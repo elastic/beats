@@ -49,9 +49,9 @@ func GetInfo(m *MetricSet) (*Info, error) {
 	return info, nil
 }
 
-func fetchPath(http *helper.HTTP, path string, query string) ([]byte, error) {
-	currentURI := http.GetURI()
-	defer http.SetURI(currentURI)
+func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, error) {
+	currentURI := httpHelper.GetURI()
+	defer httpHelper.SetURI(currentURI)
 
 	// Parses the uri to replace the path
 	u, _ := url.Parse(currentURI)
@@ -59,6 +59,6 @@ func fetchPath(http *helper.HTTP, path string, query string) ([]byte, error) {
 	u.RawQuery = query
 
 	// Http helper includes the HostData with username and password
-	http.SetURI(u.String())
-	return http.FetchContent()
+	httpHelper.SetURI(u.String())
+	return httpHelper.FetchContent()
 }
