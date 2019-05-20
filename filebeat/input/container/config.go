@@ -15,35 +15,44 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package docker
+package container
+
+import (
+	"fmt"
+	"strings"
+)
 
 var defaultConfig = config{
-	Partial: true,
-	Containers: containers{
-		IDs:    []string{},
-		Path:   "/var/lib/docker/containers",
-		Stream: "all",
-	},
+	Stream: "all",
+	Format: "auto",
 }
 
 type config struct {
-	// List of containers' log files to tail
-	Containers containers `config:"containers"`
-
-	// Partial configures the input to join partial lines
-	Partial bool `config:"combine_partials"`
-
-	// Enable CRI flags parsing (to be switched to default in 7.0)
-	CRIFlags bool `config:"cri.parse_flags"`
-
-	// Fore CRI format (don't perform autodetection)
-	CRIForce bool `config:"cri.force"`
-}
-
-type containers struct {
-	IDs  []string `config:"ids"`
-	Path string   `config:"path"`
-
 	// Stream can be all, stdout or stderr
 	Stream string `config:"stream"`
+
+	// Format can be auto, cri, json-file
+	Format string `config:"format"`
+}
+
+// Validate validates the config.
+func (c *config) Validate() error {
+	if !stringInSlice(c.Stream, []string{"all", "stdout", "stderr"}) {
+		return fmt.Errorf("invalid value for stream: %s, supported values are: all, stdout, stderr", c.Stream)
+	}
+
+	if !stringInSlice(strings.ToLower(c.Format), []string{"auto", "docker", "cri"}) {
+		return fmt.Errorf("invalid value for format: %s, supported values are: auto, docker, cri", c.Format)
+	}
+
+	return nil
+}
+
+func stringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
