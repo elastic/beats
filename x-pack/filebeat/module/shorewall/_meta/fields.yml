@@ -30,7 +30,19 @@
               type: keyword
               description: >
                 Action two
+        - name: frame_type
+          type: keyword
         - name: precedence
           type: keyword
+        - name: res
+          type: keyword
+        - name: time1
+          type: integer
+        - name: time2
+          type: integer
         - name: ttl
+          type: integer
+        - name: urgp
+          type: integer
+        - name: window
           type: integer
