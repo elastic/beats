@@ -1,0 +1,4 @@
+The CockroachDB `status` metricset collects metrics exposed by the
+https://www.cockroachlabs.com/docs/v2.1/monitoring-and-alerting.html#prometheus-endpoint[Prometheus endpoint]
+of CockroachDB.
+

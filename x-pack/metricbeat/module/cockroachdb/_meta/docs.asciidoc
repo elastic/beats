@@ -1,0 +1,7 @@
+This module periodically fetches metrics from CockroachDB.
+
+[float]
+=== Compatibility
+
+The CockroachDB `status` metricset is compatible with any CockroachDB version
+exposing metrics in Prometheus format.
