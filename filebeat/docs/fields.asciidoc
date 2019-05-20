@@ -12513,12 +12513,18 @@ Shorewal log files
 --
 type: keywork
 
+Name of the input network interface
+
+
 --
 
 *`shorewall.network.out`*::
 +
 --
 type: keyword
+
+Name of the output network interface
+
 
 --
 
@@ -12534,7 +12540,7 @@ Shorewal network log files
 --
 type: keywork
 
-Action one
+Specifies the action to be taken if the connection request matches the rule. target must be one of the following values (ACCEPT, ACCEPT+, ACCEPT!, ADD, AUDIT, A_ACCEPT, A_ACCEPT+, A_ACCEPT!, A_DROP, A_DROP!, A_REJECT, A_REJECT!, ?COMMENT, CONMARK, CONTINUE, CONTINUE!, COUNT, DEL, DNAT, DNAT-, DROP, DROP!, HELPER, INLINE, IPTABLES, IP6TABLES, LOG, MACRO, MARK, NFLOG, NFQUEUE, NONAT, QUEUE, QUEUE!, REJECT, REJECT!, REDIRECT, REDIRECT-, TARPIT, ULOG. See http://shorewall.net/manpages/shorewall-rules.html
 
 
 --
@@ -12549,10 +12555,47 @@ Action two
 
 --
 
+*`shorewall.frame_type`*::
++
+--
+type: keyword
+
+This field is part of the MAC address in the log. It indicates whether the ethernet frame carried an IPv4 datagram or not.
+
+
+--
+
 *`shorewall.precedence`*::
 +
 --
 type: keyword
+
+Type Of Service, and it's increasingly being replaced by DS and ECN.
+
+
+--
+
+*`shorewall.res`*::
++
+--
+type: keyword
+
+Reserved bits. The ECN flags "CWR" and "ECNE" will show up in the two least significant bits of this field.
+
+
+--
+
+*`shorewall.time1`*::
++
+--
+type: integer
+
+--
+
+*`shorewall.time2`*::
++
+--
+type: integer
 
 --
 
@@ -12560,6 +12603,29 @@ type: keyword
 +
 --
 type: integer
+
+The remaining Time To Live.
+
+
+--
+
+*`shorewall.urgp`*::
++
+--
+type: integer
+
+The Urgent Pointer allows for urgent, "out of band" data transfer. Unfortunately not all protocol implementations agree, so this facility is hardly ever used.
+
+
+--
+
+*`shorewall.window`*::
++
+--
+type: integer
+
+The TCP Receive Window size. This may be scaled by bit-shifting left by a number of bits specified in the "Window Scale" TCP option. If the host supports ECN, then the TCP Receive Window size will also be controlled by that.
+
 
 --
 
