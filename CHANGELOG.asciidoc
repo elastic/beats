@@ -3,6 +3,14 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.0]]
+=== Beats version 6.8.0
+
+* Updates to support changes to licensing of security features.
++
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and 
+role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
+
 [[release-notes-6.7.2]]
 === Beats version 6.7.2
 https://github.com/elastic/beats/compare/v6.7.1...v6.7.2[View commits]
