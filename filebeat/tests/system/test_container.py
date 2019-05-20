@@ -36,7 +36,7 @@ class Test(BaseTest):
         assert len(output) == 21
         assert output[0]["message"] == "Fetching main repository github.com/elastic/beats..."
         for o in output:
-            assert output["stream"] == "stdout"
+            assert o["stream"] == "stdout"
 
     def test_container_input_cri(self):
         """
