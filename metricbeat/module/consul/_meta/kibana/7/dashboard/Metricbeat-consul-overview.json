@@ -182,8 +182,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-05-21T14:20:40.892Z",
-      "version": "WzQxMSwxXQ=="
+      "updated_at": "2019-02-11T10:55:39.323Z",
+      "version": "WzU5NywzXQ=="
     },
     {
       "attributes": {
@@ -272,12 +272,12 @@
       },
       "id": "dda0c950-2dea-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-20T14:33:46.434Z",
-      "version": "WzIxNiwxXQ=="
+      "updated_at": "2019-02-11T10:55:03.187Z",
+      "version": "WzU5NSwzXQ=="
     },
     {
       "attributes": {
@@ -338,12 +338,12 @@
       },
       "id": "ea842730-2de9-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-20T14:33:46.434Z",
-      "version": "WzIxNywxXQ=="
+      "updated_at": "2019-02-11T10:43:49.667Z",
+      "version": "WzU4NywzXQ=="
     },
     {
       "attributes": {
@@ -404,12 +404,12 @@
       },
       "id": "6c39d4b0-2de9-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-20T14:33:46.434Z",
-      "version": "WzIxOCwxXQ=="
+      "updated_at": "2019-02-11T10:40:41.790Z",
+      "version": "WzU4NSwzXQ=="
     },
     {
       "attributes": {
@@ -433,7 +433,6 @@
             "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "auto",
@@ -471,12 +470,12 @@
       },
       "id": "37c75bc0-2dea-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-21T14:17:31.707Z",
-      "version": "WzQwOSwxXQ=="
+      "updated_at": "2019-02-11T10:45:59.292Z",
+      "version": "WzU4OSwzXQ=="
     },
     {
       "attributes": {
@@ -537,12 +536,12 @@
       },
       "id": "69b29820-2dea-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-20T14:33:46.434Z",
-      "version": "WzIyMCwxXQ=="
+      "updated_at": "2019-02-11T10:47:23.042Z",
+      "version": "WzU5MCwzXQ=="
     },
     {
       "attributes": {
@@ -566,7 +565,6 @@
             "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "auto",
@@ -610,12 +608,12 @@
       },
       "id": "8ab67000-2dea-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-21T14:18:16.981Z",
-      "version": "WzQxMCwxXQ=="
+      "updated_at": "2019-02-11T10:48:18.432Z",
+      "version": "WzU5MSwzXQ=="
     },
     {
       "attributes": {
@@ -677,12 +675,12 @@
       },
       "id": "d275dbc0-2de9-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-20T14:33:46.434Z",
-      "version": "WzIyMiwxXQ=="
+      "updated_at": "2019-02-11T10:43:09.308Z",
+      "version": "WzU4NiwzXQ=="
     },
     {
       "attributes": {
@@ -750,13 +748,13 @@
       },
       "id": "1e97c1d0-2dea-11e9-bf7e-f35bf5d2e71b",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.0.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-20T14:33:46.434Z",
-      "version": "WzIyMywxXQ=="
+      "updated_at": "2019-02-11T10:51:44.187Z",
+      "version": "WzU5MywzXQ=="
     }
   ],
-  "version": "7.0.1"
+  "version": "7.0.0-SNAPSHOT"
 }
