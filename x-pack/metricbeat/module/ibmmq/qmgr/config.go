@@ -3,30 +3,24 @@
 
 package qmgr
 
-type ConnectionConfig struct {
-	ClientMode bool
-	UserId     string
-	Password   string
-}
-
-type mqConfig struct {
-	QueueManager       string `config:"queueManager"`
-	RemoteQueueManager string `config:"remoteQueueManager"`
-	Queue              string `config:"queue"`
-	Channel            string `config:"channel"`
-	QMgrStat           bool   `config:"queueManagerStatus"`
-	PubSub             bool   `config:"pubSub"`
-	Custom             string `config:"custome"`
-	CC                 ConnectionConfig
-}
+import (
+	"github.com/felix-lessoer/beats/x-pack/metricbeat/module/ibmmq/lib"
+)
 
 var (
-	DefaultConfig = mqConfig{
+	DefaultConfig = ibmmqlib.Config{
 		PubSub:             false,
 		QMgrStat:           true,
-		RemoteQueueManager: "",
-		Queue:              "*",
+		RemoteQueueManager: []string{""},
+		Queue:        			"*",
+		QueueStatus:        true,
+		QueueStats:         true,
 		Channel:            "*",
-		Custom:             "",
+		Custom:           	"",
+		ConnectionConfig:   ibmmqlib.ConnectionConfig{
+			ClientMode: false,
+			UserId:     "",
+			Password:   "",
+		},
 	}
 )

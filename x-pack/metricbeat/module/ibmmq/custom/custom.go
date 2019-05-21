@@ -22,6 +22,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	queueManager string
 	custom       string
+	connectionConfig					ibmmqlib.ConnectionConfig
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -38,6 +39,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		queueManager:  config.QueueManager,
 		custom:        config.Custom,
+		connectionConfig: config.ConnectionConfig,
 	}, nil
 }
 
@@ -45,7 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
-	events, _ := ibmmqlib.CollectCustomMetricset(m.custom, "Custom", m.queueManager)
+	events, _ := ibmmqlib.CollectCustomMetricset(m.custom, "Custom", m.queueManager, m.connectionConfig)
 
 	for _, beatEvent := range events {
 		var mbEvent mb.Event

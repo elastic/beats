@@ -29,14 +29,14 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/felix-lessoer\beats\x-pack\metricbeat\module\ibmmq\lib\ibmmq"
+	"github.com/felix-lessoer/beats/x-pack/metricbeat/module/ibmmq/lib/ibmmq"
 )
 
 var (
-	qMgr             ibmmq.MQQueueManager
-	cmdQObj          ibmmq.MQObject
-	replyQObj        ibmmq.MQObject
-	statsQObj        ibmmq.MQObject
+	qMgr             ibmmqi.MQQueueManager
+	cmdQObj          ibmmqi.MQObject
+	replyQObj        ibmmqi.MQObject
+	statsQObj        ibmmqi.MQObject
 	getBuffer        = make([]byte, 32768)
 	platform         int32
 	commandLevel     int32
@@ -56,7 +56,7 @@ InitConnection connects to the queue manager, and then
 opens both the command queue and a dynamic reply queue
 to be used for all responses including the publications
 */
-func InitConnection(qMgrName string, replyQ string, cc *config.ConnectionConfig) error {
+func InitConnection(qMgrName string, replyQ string, cc *ConnectionConfig) error {
 	return InitConnectionStats(qMgrName, replyQ, "", cc)
 }
 
@@ -64,18 +64,18 @@ func InitConnection(qMgrName string, replyQ string, cc *config.ConnectionConfig)
 InitConnectionStats is the same as InitConnection with the addition
 of a call to open the queue manager statistics queue.
 */
-func InitConnectionStats(qMgrName string, replyQ string, statsQ string, cc *config.ConnectionConfig) error {
+func InitConnectionStats(qMgrName string, replyQ string, statsQ string, cc *ConnectionConfig) error {
 	var err error
-	gocno := ibmmq.NewMQCNO()
-	gocsp := ibmmq.NewMQCSP()
+	gocno := ibmmqi.NewMQCNO()
+	gocsp := ibmmqi.NewMQCSP()
 
 	if cc.ClientMode {
 		os.Setenv("MQSERVER", cc.MqServer)
-		gocno.Options = ibmmq.MQCNO_CLIENT_BINDING
+		gocno.Options = ibmmqi.MQCNO_CLIENT_BINDING
 	} else {
-		gocno.Options = ibmmq.MQCNO_LOCAL_BINDING
+		gocno.Options = ibmmqi.MQCNO_LOCAL_BINDING
 	}
-	gocno.Options |= ibmmq.MQCNO_HANDLE_SHARE_BLOCK
+	gocno.Options |= ibmmqi.MQCNO_HANDLE_SHARE_BLOCK
 
 	if cc.Password != "" {
 		gocsp.Password = cc.Password
@@ -85,16 +85,16 @@ func InitConnectionStats(qMgrName string, replyQ string, statsQ string, cc *conf
 		gocno.SecurityParms = gocsp
 	}
 
-	qMgr, err = ibmmq.Connx(qMgrName, gocno)
+	qMgr, err = ibmmqi.Connx(qMgrName, gocno)
 	if err == nil {
 		qmgrConnected = true
 	}
 
 	// MQOPEN of the statistics queue
 	if err == nil && statsQ != "" {
-		mqod := ibmmq.NewMQOD()
-		openOptions := ibmmq.MQOO_INPUT_AS_Q_DEF | ibmmq.MQOO_FAIL_IF_QUIESCING
-		mqod.ObjectType = ibmmq.MQOT_Q
+		mqod := ibmmqi.NewMQOD()
+		openOptions := ibmmqi.MQOO_INPUT_AS_Q_DEF | ibmmqi.MQOO_FAIL_IF_QUIESCING
+		mqod.ObjectType = ibmmqi.MQOT_Q
 		mqod.ObjectName = statsQ
 		statsQObj, err = qMgr.Open(mqod, openOptions)
 		if err == nil {
@@ -104,9 +104,9 @@ func InitConnectionStats(qMgrName string, replyQ string, statsQ string, cc *conf
 
 	// MQOPEN of a reply queue
 	if err == nil {
-		mqod := ibmmq.NewMQOD()
-		openOptions := ibmmq.MQOO_INPUT_AS_Q_DEF | ibmmq.MQOO_FAIL_IF_QUIESCING
-		mqod.ObjectType = ibmmq.MQOT_Q
+		mqod := ibmmqi.NewMQOD()
+		openOptions := ibmmqi.MQOO_INPUT_AS_Q_DEF | ibmmqi.MQOO_FAIL_IF_QUIESCING
+		mqod.ObjectType = ibmmqi.MQOT_Q
 		mqod.ObjectName = replyQ
 		replyQObj, err = qMgr.Open(mqod, openOptions)
 		if err == nil {
@@ -133,11 +133,11 @@ func OpenCommandQueue(remoteQMgr string) error {
 		cmdQObj.Close(0)
 	}
 	logp.Info("Connect to command queue of q mgr name: %v", remoteQMgr)
-	mqod := ibmmq.NewMQOD()
+	mqod := ibmmqi.NewMQOD()
 
-	openOptions := ibmmq.MQOO_OUTPUT | ibmmq.MQOO_FAIL_IF_QUIESCING
+	openOptions := ibmmqi.MQOO_OUTPUT | ibmmqi.MQOO_FAIL_IF_QUIESCING
 
-	mqod.ObjectType = ibmmq.MQOT_Q
+	mqod.ObjectType = ibmmqi.MQOT_Q
 	if remoteQMgr != "" {
 		mqod.ObjectQMgrName = remoteQMgr
 	}
@@ -179,7 +179,7 @@ func DiscoverQmgrMetadata(remoteQMgr string) error {
 				commandLevel = 0
 			}
 			if platform != 0 && commandLevel != 0 {
-				logp.Info("Successfully collected q mgr metadata. Name: %v, Platform: %v", obj.TargetObject, ibmmq.MQItoString("PL", int(platform)))
+				logp.Info("Successfully collected q mgr metadata. Name: %v, Platform: %v", obj.TargetObject, ibmmqi.MQItoString("PL", int(platform)))
 				return nil
 			}
 			return errors.New("Not able to get platfrom information")
@@ -236,20 +236,20 @@ func getMessage(wait bool) ([]byte, error) {
 	return GetMessageWithHObj(wait, replyQObj)
 }
 
-func GetMessageWithHObj(wait bool, hObj ibmmq.MQObject) ([]byte, error) {
+func GetMessageWithHObj(wait bool, hObj ibmmqi.MQObject) ([]byte, error) {
 	var err error
 	var datalen int
 
-	getmqmd := ibmmq.NewMQMD()
-	gmo := ibmmq.NewMQGMO()
-	gmo.Options = ibmmq.MQGMO_NO_SYNCPOINT
-	gmo.Options |= ibmmq.MQGMO_FAIL_IF_QUIESCING
-	gmo.Options |= ibmmq.MQGMO_CONVERT
+	getmqmd := ibmmqi.NewMQMD()
+	gmo := ibmmqi.NewMQGMO()
+	gmo.Options = ibmmqi.MQGMO_NO_SYNCPOINT
+	gmo.Options |= ibmmqi.MQGMO_FAIL_IF_QUIESCING
+	gmo.Options |= ibmmqi.MQGMO_CONVERT
 
-	gmo.MatchOptions = ibmmq.MQMO_NONE
+	gmo.MatchOptions = ibmmqi.MQMO_NONE
 
 	if wait {
-		gmo.Options |= ibmmq.MQGMO_WAIT
+		gmo.Options |= ibmmqi.MQGMO_WAIT
 		gmo.WaitInterval = 2 * 1000
 	}
 	datalen, err = hObj.Get(getmqmd, gmo, getBuffer)
@@ -263,13 +263,13 @@ replyQ is used for publications; we do not use a managed queue here,
 so that everything can be read from one queue. The object handle for the
 subscription is returned so we can close it when it's no longer needed.
 */
-func subscribe(topic string) (ibmmq.MQObject, error) {
+func subscribe(topic string) (ibmmqi.MQObject, error) {
 	var err error
 
-	mqsd := ibmmq.NewMQSD()
-	mqsd.Options = ibmmq.MQSO_CREATE
-	mqsd.Options |= ibmmq.MQSO_NON_DURABLE
-	mqsd.Options |= ibmmq.MQSO_FAIL_IF_QUIESCING
+	mqsd := ibmmqi.NewMQSD()
+	mqsd.Options = ibmmqi.MQSO_CREATE
+	mqsd.Options |= ibmmqi.MQSO_NON_DURABLE
+	mqsd.Options |= ibmmqi.MQSO_FAIL_IF_QUIESCING
 
 	mqsd.ObjectString = topic
 
