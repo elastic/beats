@@ -18,12 +18,13 @@
 package info
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
-	"github.com/pkg/errors"
 
 	"reflect"
 	"strconv"
