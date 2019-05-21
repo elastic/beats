@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
+* <<exported-fields-ibmmq>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
 * <<exported-fields-iptables>>
@@ -5891,6 +5892,232 @@ example: 18D109
 
 OS build information.
 
+
+--
+
+[[exported-fields-ibmmq]]
+== ibmmq fields
+
+ibmmq Module
+
+
+
+[float]
+== ibmmq fields
+
+
+
+
+[float]
+== errorlog fields
+
+IBM MQ error logs
+
+
+*`ibmmq.errorlog.process`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.user`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.program`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.hostname`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.installation`*::
++
+--
+type: keyword
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.vrmf`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.qmgr`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.iso8601_timestamp`*::
++
+--
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.remotehost`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.arithinsert1`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.arithinsert2`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.commentinsert1`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.commentinsert2`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.commentinsert3`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.errorcode`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.errordescription`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.explanation`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.errorlog.action`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
+
+--
+
+*`ibmmq.severity`*::
++
+--
+type: text
+
+example: Please add example
+
+Please add description
 
 --
 
