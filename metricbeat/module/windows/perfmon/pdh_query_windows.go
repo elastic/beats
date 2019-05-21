@@ -35,20 +35,21 @@ var (
 	objectNameRegexp   = regexp.MustCompile(`(?:^\\\\[^\\]+\\|^\\)([^\\]+)`)
 )
 
+// Counter object will contain the handle and format of each performance counter.
 type Counter struct {
 	handle       PdhCounterHandle
 	format       PdhCounterFormat
 	instanceName string
 }
 
-type Counters map[string]*Counter
-
+// Query contains the pdh.
 type Query struct {
 	handle   PdhQueryHandle
-	counters Counters
+	counters map[string]*Counter
 }
 
-type Value struct {
+// CounterValue contains the performance counter values.
+type CounterValue struct {
 	Instance    string
 	Measurement interface{}
 	Err         error
@@ -61,7 +62,7 @@ func (q *Query) Open() error {
 		return err
 	}
 	q.handle = h
-	q.counters = make(Counters)
+	q.counters = make(map[string]*Counter)
 	return nil
 }
 
@@ -100,21 +101,21 @@ func (q *Query) CollectData() error {
 }
 
 // GetFormattedCounterValues returns an array of formatted values for a query.
-func (q *Query) GetFormattedCounterValues() (map[string][]Value, error) {
-	rtn := make(map[string][]Value, len(q.counters))
+func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
+	rtn := make(map[string][]CounterValue, len(q.counters))
 
 	for path, counter := range q.counters {
 		_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
 		if err != nil {
-			rtn[path] = append(rtn[path], Value{Err: err})
+			rtn[path] = append(rtn[path], CounterValue{Err: err})
 			continue
 		}
 
 		switch counter.format {
 		case PdhFmtDouble:
-			rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
+			rtn[path] = append(rtn[path], CounterValue{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
 		case PdhFmtLarge:
-			rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
+			rtn[path] = append(rtn[path], CounterValue{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
 
 		}
 	}
@@ -141,7 +142,7 @@ func (q *Query) Close() error {
 	return PdhCloseQuery(q.handle)
 }
 
-// Error returns a more explicit error message
+// Error returns a more explicit error message.
 func (e PdhErrno) Error() string {
 	// If the value is not one of the known PDH errors then assume its a
 	// general windows error.
@@ -164,7 +165,7 @@ func (e PdhErrno) Error() string {
 	return string(utf16.Decode(b[:n]))
 }
 
-// matchInstanceName will check first for instance and then for any objects names
+// matchInstanceName will check first for instance and then for any objects names.
 func matchInstanceName(counterPath string) (string, error) {
 	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
 	if len(matches) != 2 {
@@ -187,7 +188,7 @@ func getFormat(format string) PdhCounterFormat {
 	return PdhFmtDouble
 }
 
-// UTF16ToStringArray converts list of Windows API NULL terminated strings  to go string array
+// UTF16ToStringArray converts list of Windows API NULL terminated strings  to go string array.
 func UTF16ToStringArray(buf []uint16) []string {
 	var strings []string
 	nextLineStart := 0
@@ -201,7 +202,7 @@ func UTF16ToStringArray(buf []uint16) []string {
 	return strings
 }
 
-// UTF16PtrToString converts Windows API LPTSTR (pointer to string) to go string
+// UTF16PtrToString converts Windows API LPTSTR (pointer to string) to go string.
 func UTF16PtrToString(s *uint16) string {
 	if s == nil {
 		return ""

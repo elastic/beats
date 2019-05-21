@@ -52,7 +52,7 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	reader *PerfmonReader
+	reader *Reader
 	log    *logp.Logger
 }
 

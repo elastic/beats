@@ -35,7 +35,8 @@ var (
 	processRegexp  = regexp.MustCompile(`(.+?)#[1-9]+`)
 )
 
-type PerfmonReader struct {
+// Reader will contain the config options
+type Reader struct {
 	query                 Query             // PDH Query
 	instanceLabel         map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
 	measurement           map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
@@ -46,13 +47,13 @@ type PerfmonReader struct {
 }
 
 // NewPerfmonReader creates a new instance of PerfmonReader.
-func NewPerfmonReader(config Config) (*PerfmonReader, error) {
+func NewPerfmonReader(config Config) (*Reader, error) {
 	var query Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
 
-	r := &PerfmonReader{
+	r := &Reader{
 		query:                 query,
 		instanceLabel:         map[string]string{},
 		measurement:           map[string]string{},
@@ -92,7 +93,7 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 }
 
 // Read executes a query and returns those values in an event.
-func (r *PerfmonReader) Read() ([]mb.Event, error) {
+func (r *Reader) Read() ([]mb.Event, error) {
 	if err := r.query.CollectData(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
 	}
@@ -132,7 +133,7 @@ func (r *PerfmonReader) Read() ([]mb.Event, error) {
 
 				if val.Instance != "" {
 					if !r.appendInstanceCounter {
-						if ok, match := matchesParentProcess(val.Instance); ok == true {
+						if ok, match := matchesParentProcess(val.Instance); ok {
 							eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], match)
 						}
 					} else {
