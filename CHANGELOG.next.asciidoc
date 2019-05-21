@@ -82,6 +82,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
 - Login dataset: Fix re-read of utmp files. {pull}12028[12028]
 - Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
+- Fix formatting of config files on macOS and Windows. {pull}12148[12148]
 
 *Filebeat*
 
@@ -119,6 +120,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089] 
 
 *Packetbeat*
 
@@ -179,6 +181,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to new MongoDB additional diagnostic information {pull}11952[11952]
 - New module `palo_alto` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
 - Add RabbitMQ module. {pull}12032[12032]
+- Add new `container` input. {pull}12162[12162]
 
 *Heartbeat*
 
@@ -218,6 +221,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 *Filebeat*
+
+- `docker` input is deprecated in favour `container`. {pull}12162[12162]
 
 *Heartbeat*
 
