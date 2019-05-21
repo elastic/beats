@@ -55,6 +55,7 @@ var gauges = map[string]bool{
 	"beat.handles.open":              true,
 	"beat.handles.limit.hard":        true,
 	"beat.handles.limit.soft":        true,
+	"beat.runtime.goroutines":        true,
 	"system.load.1":                  true,
 	"system.load.5":                  true,
 	"system.load.15":                 true,

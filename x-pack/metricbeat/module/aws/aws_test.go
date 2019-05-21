@@ -9,7 +9,6 @@ package aws
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -47,39 +46,4 @@ func TestGetRegions(t *testing.T) {
 	}
 	assert.Equal(t, 1, len(regionsList))
 	assert.Equal(t, regionName, regionsList[0])
-}
-
-func TestConvertPeriodToDuration(t *testing.T) {
-	cases := []struct {
-		period               time.Duration
-		expectedDuration     string
-		expectedPeriodNumber int
-	}{
-		{
-			period:               time.Duration(300) * time.Second,
-			expectedDuration:     "-10m0s",
-			expectedPeriodNumber: 300,
-		},
-		{
-			period:               time.Duration(10) * time.Minute,
-			expectedDuration:     "-20m0s",
-			expectedPeriodNumber: 600,
-		},
-		{
-			period:               time.Duration(30) * time.Second,
-			expectedDuration:     "-1m0s",
-			expectedPeriodNumber: 30,
-		},
-		{
-			period:               time.Duration(60) * time.Second,
-			expectedDuration:     "-2m0s",
-			expectedPeriodNumber: 60,
-		},
-	}
-
-	for _, c := range cases {
-		duration, periodSec := convertPeriodToDuration(c.period)
-		assert.Equal(t, c.expectedDuration, duration)
-		assert.Equal(t, c.expectedPeriodNumber, periodSec)
-	}
 }

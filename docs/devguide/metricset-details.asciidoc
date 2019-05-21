@@ -155,8 +155,9 @@ You can simply run the command `make python-env`  and then `. build/python-env/b
 You should use a combination of the three test types to test your metricsets because
 each method has advantages and disadvantages. To get started with your own tests, it's best
 to look at the existing tests. You'll find the unit and integration tests
-in the `_test.go` files under existing modules and metricsets. The system
-tests are under `tests/systems`.
+in the `_test.go` files under existing modules and metricsets. 
+Integration tests usually take the form of `TestFetch` and `TestData`.
+The system tests are under `tests/systems`.
 
 
 [float]
@@ -205,11 +206,95 @@ The environment expects your service to be available as soon as it receives a re
 the given address and port.
 
 [float]
+===== Adding the standard metricset integration tests
+
+There are normally two integration tests that are part of every metricset: `TestFetch` and `TestData`.
+Both tests will start up a new instance of your metricset and fetch an event. In order to start a metricset, you need to create a configuration object:
+
+[source,go]
+----
+func getConfig() map[string]interface{} {
+    return map[string]interface{}{
+    "module":           "{module}",
+    "metricsets":       []string{"{metricset}"},
+    "hosts":      []string{GetEnvHost() + ":" + GetEnvPort()}, <1>
+  }
+}
+
+func GetEnvHost() string { <2>
+    host := os.Getenv("{module}_HOST")
+    if len(host) == 0 {
+    host = "127.0.0.1"
+  }
+  return host
+}
+
+func GetEnvPort() string { <2>
+    port := os.Getenv("{module}_PORT")
+
+    if len(port) == 0 {
+      port = "1234"
+    }
+  return port
+}
+
+----
+<1> Add any additional config options your metricset needs here.
+<2> The endpoint used by the metricset needs to be configurable for manual and automated testing. 
+Environment variables should be defined in the module under `_meta/env` and included in the `docker-compose.yml` file.
+
+The `TestFetch` integration test will return a single event from your metricset, which you can use to test the validity of the data.
+`TestData` will (re)generate the `_meta/data.json` file that documents the data reported by the metricset.
+
+[source,go]
+----
+import (
+	"os"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+)
+
+func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "{module}") <1>
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 errord, had %d. %v\n", len(errs), errs)
+	}
+
+	assert.NotEmpty(t, events) <2>
+
+}
+
+func TestData(t *testing.T) {
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+
+	err := mbtest.WriteEventsReporterV2Error(f, t, "") <3>
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+}
+----
+<1> Use this to start the docker service associated with your metricset.
+<2> Add any further validity checks to verify the metricset is working.
+<3> `WriteEventsReporterV2Error` will take the first valid event from the metricset and write it to `_meta/data.json`
+
+[float]
 ===== Running the Tests
 
 To run all the tests, run `make testsuite`. To only run unit tests, run
 `make unit-tests` or for integration tests `make integration-tests-environment`. Be aware that
 a running Docker environment is needed for integration and system tests.
+
+To run `TestData` and generate the `data.json` file, run
+`go test -tags=integration -data -run TestData` in the directory where your test is located.
 
 Sometimes you may want to run a single integration test, for example, to test a
 module such as the `apache` module. To do this, you can:

@@ -47,5 +47,6 @@ func DefaultConfig() TemplateConfig {
 	return TemplateConfig{
 		Enabled: true,
 		Fields:  "",
+		Order:   1,
 	}
 }
