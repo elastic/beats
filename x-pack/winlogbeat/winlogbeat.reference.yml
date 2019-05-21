@@ -29,6 +29,19 @@ winlogbeat.event_logs:
   - name: System
 
   - name: Security
+    processors:
+      - script:
+          lang: javascript
+          id: security
+          file: ${path.home}/module/security/config/winlogbeat-security.js
+
+  - name: Microsoft-Windows-Sysmon/Operational
+    processors:
+      - script:
+          lang: javascript
+          id: sysmon
+          file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+
 
 
 #================================ General ======================================
@@ -1092,6 +1105,10 @@ logging.files:
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
   #interval: 0
+
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
 
 # Set to true to log messages in JSON format.
 #logging.json: false

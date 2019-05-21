@@ -17,7 +17,7 @@ operators, wildcards, and field filtering. For example, if you want to find the
 HTTP redirects, you can search for `http.response.status_code: 302`.
 
 [role="screenshot"]
-image:./images/kibana-query-filtering.png[Kibana query]
+image::./images/kibana-query-filtering.png[Kibana query]
 
 [float]
 ==== String queries
@@ -170,9 +170,9 @@ redirects coming from the IP and port, click the *Filter out value*
 image:./images/filteroutval_icon.png[] icon instead.
 
 [role="screenshot"]
-image:./images/filter_from_context.png[Filter from context]
+image::./images/filter_from_context.png[Filter from context]
 
 The selected filters appear under the search box.
 
 [role="screenshot"]
-image:./images/kibana-filters.png[Kibana filters]
+image::./images/kibana-filters.png[Kibana filters]

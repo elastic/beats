@@ -112,11 +112,10 @@ func TestGetListMetricsOutput(t *testing.T) {
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
-	startTime, endTime, err := GetStartTimeEndTime("-10m")
-	assert.NoError(t, err)
+	startTime, endTime := GetStartTimeEndTime(10 * time.Minute)
 
 	mockSvc := &MockCloudWatchClient{}
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	var metricDataQueries []cloudwatch.MetricDataQuery
 	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQueries, nil, mockSvc, startTime, endTime)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
@@ -142,8 +141,7 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 }
 
 func TestGetMetricDataResults(t *testing.T) {
-	startTime, endTime, err := GetStartTimeEndTime("-10m")
-	assert.NoError(t, err)
+	startTime, endTime := GetStartTimeEndTime(10 * time.Minute)
 
 	mockSvc := &MockCloudWatchClient{}
 	metricInfo := cloudwatch.Metric{

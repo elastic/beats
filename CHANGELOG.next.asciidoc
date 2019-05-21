@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Socket dataset: Exclude localhost by default {pull}11993[11993]
 
 *Filebeat*
+
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
@@ -71,12 +72,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
 - Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
+- Fix queue.spool.write.flush.events config type. {pull}12080[12080]
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 
 *Auditbeat*
 
 - Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
 - Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
+- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
+- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
+- Fix formatting of config files on macOS and Windows. {pull}12148[12148]
 
 *Filebeat*
 
@@ -88,10 +95,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
 - Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
 - Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 
 *Heartbeat*
 
 - Fix NPE on some monitor configuration errors. {pull}11910[11910]
+- Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
 
 *Journalbeat*
 
@@ -105,11 +116,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
 - Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Check permissions in system socket metricset based on capabilities. {pull}12039[12039]
+- Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089] 
 
 *Packetbeat*
 
 - Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
+- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
+- Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
 
 *Winlogbeat*
 
@@ -121,6 +140,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add an option to append to existing logs rather than always rotate on start. {pull}11953[11953]
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
 - Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
@@ -133,12 +153,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
 - Add `add_observer_metadata` processor. {pull}11394[11394]
 - Add `decode_csv_fields` processor. {pull}11753[11753]
+- Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
+- New `extract_array` processor. {pull}11761[11761]
+- Add number of goroutines to reported metrics. {pull}12135[12135]
 
 *Auditbeat*
 
 - Auditd module: Add `event.outcome` and `event.type` for ECS. {pull}11432[11432]
 - Package: Enable suse. {pull}11634[11634]
 - Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+- Process: Add file hash of process executable. {pull}11722[11722]
 
 *Filebeat*
 
@@ -156,6 +180,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Filebeat envoyproxy module. {pull}11700[11700]
 - Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
 - Add support to new MongoDB additional diagnostic information {pull}11952[11952]
+- New module `palo_alto` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
+- Add RabbitMQ module. {pull}12032[12032]
+- Add new `container` input. {pull}12162[12162]
 
 *Heartbeat*
 
@@ -178,6 +205,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add check on object name in the counter path if the instance name is missing {issue}6528[6528] {pull}11878[11878]
 - Add AWS cloudwatch metricset. {pull}11798[11798] {issue}11734[11734]
 - Add `regions` in aws module config to specify target regions for querying cloudwatch metrics. {issue}11932[11932] {pull}11956[11956]
+- Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
 
 *Packetbeat*
 
@@ -194,6 +222,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 *Filebeat*
+
+- `docker` input is deprecated in favour `container`. {pull}12162[12162]
 
 *Heartbeat*
 
