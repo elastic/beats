@@ -318,3 +318,10 @@ func (o *eventCapturer) Close() error {
 func (o *eventCapturer) Done() <-chan struct{} {
 	return o.c
 }
+
+// TestOutlet is an empty outlet for testing
+type TestOutlet struct{}
+
+func (o TestOutlet) OnEvent(event *util.Data) bool { return true }
+func (o TestOutlet) Close() error                  { return nil }
+func (o TestOutlet) Done() <-chan struct{}         { return nil }
