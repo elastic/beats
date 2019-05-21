@@ -64,6 +64,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Not hiding error in case of http failure using elastic fetcher {pull}11604[11604]
 - Relax validation of the X-Pack license UID value. {issue}11640[11640]
 - Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Escape BOM on JsonReader before trying to decode line {pull}11661[11661]
 - Fix ILM policy always being overwritten. {pull}11671[11671]
 - Fix template always being overwritten. {pull}11671[11671]
 - Fix matching of string arrays in contains condition. {pull}11691[11691]
