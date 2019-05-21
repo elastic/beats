@@ -169,7 +169,10 @@ func eventMapping(info *haproxy.Info, r mb.ReporterV2) (mb.Event, error) {
 		RootFields: common.MapStr{},
 	}
 
-	fields, _ := schema.Apply(source)
+	fields, err := schema.Apply(source)
+	if err != nil {
+		return event, errors.Wrap(err, "error applying schema")
+	}
 	if processID, err := fields.GetValue("pid"); err == nil {
 		event.RootFields.Put("process.pid", processID)
 		fields.Delete("pid")
