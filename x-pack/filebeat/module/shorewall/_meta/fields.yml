@@ -21,30 +21,21 @@
               type: keyword
               description: >
                 Name of the output network interface
-        - name: action
-          type: group
-          description: >
-            Shorewal network log files
-          fields:
-            - name: one
-              type: keywork
-              description: >
-                Specifies the action to be taken if the connection request matches
-                the rule. target must be one of the following values (ACCEPT, ACCEPT+,
-                ACCEPT!, ADD, AUDIT, A_ACCEPT, A_ACCEPT+, A_ACCEPT!, A_DROP, A_DROP!,
-                A_REJECT, A_REJECT!, ?COMMENT, CONMARK, CONTINUE, CONTINUE!, COUNT, DEL,
-                DNAT, DNAT-, DROP, DROP!, HELPER, INLINE, IPTABLES, IP6TABLES, LOG, MACRO,
-                MARK, NFLOG, NFQUEUE, NONAT, QUEUE, QUEUE!, REJECT, REJECT!, REDIRECT,
-                REDIRECT-, TARPIT, ULOG. See http://shorewall.net/manpages/shorewall-rules.html
-            - name: two
-              type: keyword
-              description: >
-                Action two
         - name: frame_type
           type: keyword
           description: >
             This field is part of the MAC address in the log. It indicates whether
             the ethernet frame carried an IPv4 datagram or not.
+        - name: packet_action
+          type: keywork
+          description: >
+            Specifies the action to be taken if the connection request matches
+            the rule. target must be one of the following values (ACCEPT, ACCEPT+,
+            ACCEPT!, ADD, AUDIT, A_ACCEPT, A_ACCEPT+, A_ACCEPT!, A_DROP, A_DROP!,
+            A_REJECT, A_REJECT!, ?COMMENT, CONMARK, CONTINUE, CONTINUE!, COUNT, DEL,
+            DNAT, DNAT-, DROP, DROP!, HELPER, INLINE, IPTABLES, IP6TABLES, LOG, MACRO,
+            MARK, NFLOG, NFQUEUE, NONAT, QUEUE, QUEUE!, REJECT, REJECT!, REDIRECT,
+            REDIRECT-, TARPIT, ULOG. See http://shorewall.net/manpages/shorewall-rules.html
         - name: precedence
           type: keyword
           description: >
@@ -75,3 +66,16 @@
             by a number of bits specified in the "Window Scale" TCP option.
             If the host supports ECN, then the TCP Receive Window size will also
             be controlled by that.
+        - name: zone
+          type: group
+          description: >
+            Shorewal Zone fields
+          fields:
+            - name: device
+              type: keyword
+              description: >
+                Name of the device for the zone
+            - name: name
+              type: keywork
+              description: >
+                Name of the zone
