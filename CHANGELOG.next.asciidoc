@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v7.1.1...7.1[Check the HEAD diff]
 *Affecting all Beats*
 
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+- Fixed Beat ID being reported by GET / API. {pull}12180[12180]
 
 *Auditbeat*
 
