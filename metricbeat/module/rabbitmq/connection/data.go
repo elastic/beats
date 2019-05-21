@@ -106,5 +106,5 @@ func eventMapping(connection map[string]interface{}) (mb.Event, error) {
 		RootFields:      rootFields,
 		ModuleFields:    moduleFields,
 	}
-	return event, err
+	return event, nil
 }
