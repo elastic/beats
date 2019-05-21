@@ -27,6 +27,7 @@
         "event.module": "palo_alto",
         "event.outcome": "allow",
         "event.start": "2012-04-10T04:39:56.000Z",
+        "event.timezone": "+00:00",
         "fileset.name": "pan_os",
         "input.type": "log",
         "labels.captive_portal": true,
