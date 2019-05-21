@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 
-	"github.com/felix-lessoer/qbeat/beater/ibmmq"
+	"github.com/felix-lessoer\beats\x-pack\metricbeat\module\ibmmq\lib\ibmmq"
 )
 
 type Response struct {
@@ -21,103 +21,78 @@ var (
 	err error
 )
 
-func connectLegacy(qMgrName string, remoteQMgrName string) error {
-	qMgr, err := ibmmq.Conn(qMgrName)
-
-	logp.Info("Connect to command queue")
-	//Connect to Command Queue
-	mqod := ibmmq.NewMQOD()
-	openOptions := ibmmq.MQOO_OUTPUT | ibmmq.MQOO_FAIL_IF_QUIESCING
-	mqod.ObjectType = ibmmq.MQOT_Q
-	mqod.ObjectName = "SYSTEM.ADMIN.COMMAND.QUEUE"
-
-	cmdQObj, err = qMgr.Open(mqod, openOptions)
-
-	if err != nil {
-		return err
-	}
-
-	logp.Info("Connect to Reply queue")
-	//Connect to Reply Queue
-	mqod2 := ibmmq.NewMQOD()
-	openOptions2 := ibmmq.MQOO_INPUT_AS_Q_DEF | ibmmq.MQOO_FAIL_IF_QUIESCING
-	mqod2.ObjectType = ibmmq.MQOT_Q
-	mqod2.ObjectName = "SYSTEM.DEFAULT.MODEL.QUEUE"
-	replyQObj, err = qMgr.Open(mqod2, openOptions2)
-
-	if err != nil {
-		return err
-	}
-
-	qmgrConnected = true
-
-	return err
-}
-
-func getQueueStatistics(localQueueName string) (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getQueueStatistics(targetQMgrName string, localQueueName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
 	params[ibmmq.MQCA_Q_NAME] = localQueueName
 
-	err = putCommand(ibmmq.MQCMD_RESET_Q_STATS, params)
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_RESET_Q_STATS, params)
 	return parseResponse()
 }
 
-func getQueueStatus(localQueueName string) (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getQueueStatus(targetQMgrName string, localQueueName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
 	params[ibmmq.MQCA_Q_NAME] = localQueueName
 
-	err = putCommand(ibmmq.MQCMD_INQUIRE_Q_STATUS, params)
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_INQUIRE_Q_STATUS, params)
 	return parseResponse()
 }
 
-func getQueueMetadata(localQueueName string) (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getQueueMetadata(targetQMgrName string, localQueueName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
 	params[ibmmq.MQCA_Q_NAME] = localQueueName
 
-	err = putCommand(ibmmq.MQCMD_INQUIRE_Q, params)
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_INQUIRE_Q, params)
 	return parseResponse()
 }
 
-func getChannelMetadata(channelName string) (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getChannelMetadata(targetQMgrName string, channelName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
 	params[ibmmq.MQCACH_CHANNEL_NAME] = channelName
 
-	err = putCommand(ibmmq.MQCMD_INQUIRE_CHANNEL, params)
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_INQUIRE_CHANNEL, params)
 	return parseResponse()
 }
 
-func getChannelStatus(channelName string) (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getChannelStatus(targetQMgrName string, channelName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
 	params[ibmmq.MQCACH_CHANNEL_NAME] = channelName
 
-	err = putCommand(ibmmq.MQCMD_INQUIRE_CHANNEL_STATUS, params)
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_INQUIRE_CHANNEL_STATUS, params)
 	return parseResponse()
 }
 
-func getQManagerMetadata() (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getSavedChannelStatus(targetQMgrName string, channelName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
+	params[ibmmq.MQCACH_CHANNEL_NAME] = channelName
+	params[ibmmq.MQIACH_CHANNEL_INSTANCE_TYPE] = ibmmq.MQOT_SAVED_CHANNEL
 
-	err = putCommand(ibmmq.MQCMD_INQUIRE_Q_MGR, params)
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_INQUIRE_CHANNEL_STATUS, params)
 	return parseResponse()
 }
 
-func getQManagerStatus() (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getQManagerMetadata(targetQMgrName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
 
-	err = putCommand(ibmmq.MQCMD_INQUIRE_Q_MGR_STATUS, params)
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_INQUIRE_Q_MGR, params)
 	return parseResponse()
 }
 
-func getAdvancedResponse(cmdString string, paramsInput map[string]interface{}) (map[string]*Response, error) {
-	var params = make(map[int32]string)
+func getQManagerStatus(targetQMgrName string) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
+	err = putCommand(targetQMgrName, ibmmq.MQCMD_INQUIRE_Q_MGR_STATUS, params)
+	return parseResponse()
+}
+
+func getAdvancedResponse(targetQMgrName string, cmdString string, paramsInput map[string]interface{}) (map[string]*Response, error) {
+	var params = make(map[int32]interface{})
 	var cmd int32
 
 	cmd = GetMQConstant(cmdString)
 	for paramNameString, paramValue := range paramsInput {
-		params[GetMQConstant(paramNameString)] = paramValue.(string)
+		params[GetMQConstant(paramNameString)] = paramValue
 	}
 
-	err = putCommand(cmd, params)
+	err = putCommand(targetQMgrName, cmd, params)
 	return parseResponse()
 }
 
@@ -185,7 +160,7 @@ func parseResponse() (map[string]*Response, error) {
 					resp.Metrictype = "Status"
 					key = resp.TargetObject
 				}
-			case ibmmq.MQCA_Q_MGR_NAME:
+			case ibmmq.MQCA_Q_MGR_NAME, ibmmq.MQCACF_RESPONSE_Q_MGR_NAME:
 				for i := 0; i < len(elem.String); i++ {
 					logp.Debug("", "Current queueManager %v", strings.TrimSpace(elem.String[i]))
 					resp.TargetObject = strings.TrimSpace(elem.String[i])
@@ -194,6 +169,7 @@ func parseResponse() (map[string]*Response, error) {
 					key = resp.TargetObject
 				}
 			default:
+				logp.Debug("Mapping", "Current map: %v ", resp)
 				if normalizeMetricNames(elem.Parameter) != "" {
 					paramName := normalizeMetricNames(elem.Parameter)
 					switch elem.Type {
@@ -222,17 +198,21 @@ func parseResponse() (map[string]*Response, error) {
 		}
 	}
 	//Reset err if error is no more messages
-
 	return responses, nil
 
 }
 
-func putCommand(commandCode int32, params map[int32]string) error {
+func putCommand(targetQMgrName string, commandCode int32, params map[int32]interface{}) error {
 	var buf []byte
 
 	//Insert command
 	putmqmd := ibmmq.NewMQMD()
 	pmo := ibmmq.NewMQPMO()
+
+	pmo.Options = ibmmq.MQPMO_NO_SYNCPOINT
+	pmo.Options |= ibmmq.MQPMO_NEW_MSG_ID
+	pmo.Options |= ibmmq.MQPMO_NEW_CORREL_ID
+	pmo.Options |= ibmmq.MQPMO_FAIL_IF_QUIESCING
 
 	putmqmd.Format = "MQADMIN"
 	putmqmd.ReplyToQ = replyQObj.Name
@@ -241,17 +221,39 @@ func putCommand(commandCode int32, params map[int32]string) error {
 
 	// Reset QStats
 	cfh := ibmmq.NewMQCFH()
+	cfh.Version = ibmmq.MQCFH_VERSION_3
+	cfh.Type = ibmmq.MQCFT_COMMAND_XR
+
 	cfh.Command = commandCode
+
+	if targetQMgrName != remoteQMgrName {
+		OpenCommandQueue(targetQMgrName)
+	}
+
+	//If target queue manager is on z_os we need to add Commandscope
+	if platform == ibmmq.MQPL_ZOS {
+		params[ibmmq.MQCACF_COMMAND_SCOPE] = targetQMgrName
+	}
 
 	logp.Info("%v initiated", ibmmq.MQItoString("CMD", int(commandCode)))
 	// Add the parameters once at a time into a buffer
 	for paramType, paramValue := range params {
 		if paramType != 0 {
-			logp.Info("Param %v set to %v", ibmmq.MQItoString("CA", int(paramType)), paramValue)
 			pcfparm := new(ibmmq.PCFParameter)
-			pcfparm.Type = ibmmq.MQCFT_STRING
+			switch paramValue.(type) {
+			case string:
+				logp.Info("Param %v set to %v", ibmmq.MQItoString("CA", int(paramType)), paramValue)
+				pcfparm.Type = ibmmq.MQCFT_STRING
+				pcfparm.String = []string{paramValue.(string)}
+			case int32:
+				logp.Info("Param %v set to %v", ibmmq.MQItoString("IA", int(paramType)), paramValue)
+				pcfparm.Type = ibmmq.MQCFT_INTEGER
+				pcfparm.Int64Value = []int64{int64(paramValue.(int32))}
+			default:
+				logp.Info("Param type not supported")
+			}
 			pcfparm.Parameter = paramType
-			pcfparm.String = []string{paramValue}
+
 			cfh.ParameterCount++
 			buf = append(buf, pcfparm.Bytes()...)
 		}

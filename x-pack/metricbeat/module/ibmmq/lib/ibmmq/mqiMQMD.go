@@ -12,7 +12,8 @@ package ibmmqi
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
    Contributors:
      Mark Taylor - Initial Contribution
@@ -158,7 +159,7 @@ func copyMDfromC(mqmd *C.MQMD, gomd *MQMD) {
 	gomd.Feedback = int32(mqmd.Feedback)
 	gomd.Encoding = int32(mqmd.Encoding)
 	gomd.CodedCharSetId = int32(mqmd.CodedCharSetId)
-	gomd.Format = C.GoStringN((*C.char)(&mqmd.Format[0]), C.MQ_FORMAT_LENGTH)
+	gomd.Format = trimStringN((*C.char)(&mqmd.Format[0]), C.MQ_FORMAT_LENGTH)
 	gomd.Priority = int32(mqmd.Priority)
 	gomd.Persistence = int32(mqmd.Persistence)
 
@@ -170,19 +171,19 @@ func copyMDfromC(mqmd *C.MQMD, gomd *MQMD) {
 	}
 	gomd.BackoutCount = int32(mqmd.BackoutCount)
 
-	gomd.ReplyToQ = C.GoStringN((*C.char)(&mqmd.ReplyToQ[0]), C.MQ_OBJECT_NAME_LENGTH)
-	gomd.ReplyToQMgr = C.GoStringN((*C.char)(&mqmd.ReplyToQMgr[0]), C.MQ_OBJECT_NAME_LENGTH)
+	gomd.ReplyToQ = trimStringN((*C.char)(&mqmd.ReplyToQ[0]), C.MQ_OBJECT_NAME_LENGTH)
+	gomd.ReplyToQMgr = trimStringN((*C.char)(&mqmd.ReplyToQMgr[0]), C.MQ_OBJECT_NAME_LENGTH)
 
-	gomd.UserIdentifier = C.GoStringN((*C.char)(&mqmd.UserIdentifier[0]), C.MQ_USER_ID_LENGTH)
+	gomd.UserIdentifier = trimStringN((*C.char)(&mqmd.UserIdentifier[0]), C.MQ_USER_ID_LENGTH)
 	for i = 0; i < C.MQ_ACCOUNTING_TOKEN_LENGTH; i++ {
 		gomd.AccountingToken[i] = (byte)(mqmd.AccountingToken[i])
 	}
-	gomd.ApplIdentityData = C.GoStringN((*C.char)(&mqmd.ApplIdentityData[0]), C.MQ_APPL_IDENTITY_DATA_LENGTH)
+	gomd.ApplIdentityData = trimStringN((*C.char)(&mqmd.ApplIdentityData[0]), C.MQ_APPL_IDENTITY_DATA_LENGTH)
 	gomd.PutApplType = int32(mqmd.PutApplType)
-	gomd.PutApplName = C.GoStringN((*C.char)(&mqmd.PutApplName[0]), C.MQ_PUT_APPL_NAME_LENGTH)
-	gomd.PutDate = C.GoStringN((*C.char)(&mqmd.PutDate[0]), C.MQ_PUT_DATE_LENGTH)
-	gomd.PutTime = C.GoStringN((*C.char)(&mqmd.PutTime[0]), C.MQ_PUT_TIME_LENGTH)
-	gomd.ApplOriginData = C.GoStringN((*C.char)(&mqmd.ApplOriginData[0]), C.MQ_APPL_ORIGIN_DATA_LENGTH)
+	gomd.PutApplName = trimStringN((*C.char)(&mqmd.PutApplName[0]), C.MQ_PUT_APPL_NAME_LENGTH)
+	gomd.PutDate = trimStringN((*C.char)(&mqmd.PutDate[0]), C.MQ_PUT_DATE_LENGTH)
+	gomd.PutTime = trimStringN((*C.char)(&mqmd.PutTime[0]), C.MQ_PUT_TIME_LENGTH)
+	gomd.ApplOriginData = trimStringN((*C.char)(&mqmd.ApplOriginData[0]), C.MQ_APPL_ORIGIN_DATA_LENGTH)
 
 	for i = 0; i < C.MQ_GROUP_ID_LENGTH; i++ {
 		gomd.GroupId[i] = (byte)(mqmd.GroupId[i])

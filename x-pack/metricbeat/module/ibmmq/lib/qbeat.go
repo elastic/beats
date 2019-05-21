@@ -2,13 +2,23 @@ package ibmmqlib
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+
 )
+
+// Qbeat configuration.
+type Qbeat struct {
+	done   chan struct{}
+	config config.Config
+	client beat.Client
+}
 
 type RequestObject struct {
 	Commands []struct {
@@ -17,25 +27,33 @@ type RequestObject struct {
 	}
 }
 
-type ConnectionConfig struct {
-	ClientMode bool
-	UserId     string
-	Password   string
-}
-
 var (
 	first      = true
 	errorCount = 0
 )
 
-func connectPubSub(qmgrName string, queuePattern string, cc *ConnectionConfig) error {
+// New creates an instance of qbeat.
+func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	c := config.DefaultConfig
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, fmt.Errorf("Error reading config file: %v", err)
+	}
+
+	bt := &Qbeat{
+		done:   make(chan struct{}),
+		config: c,
+	}
+	return bt, nil
+}
+
+func connectPubSub(bt *Qbeat) error {
 	var err error
 
 	// Connect to MQ
-	logp.Info("Connect to QM %v start", qmgrName)
-	err = InitConnection(qmgrName, "SYSTEM.DEFAULT.MODEL.QUEUE", cc)
+	logp.Info("Connect to QM %v start", bt.config.QueueManager)
+	err = InitConnection(bt.config.QueueManager, "SYSTEM.DEFAULT.MODEL.QUEUE", &bt.config.CC)
 	if err == nil {
-		logp.Info("Connected to queue manager %v", qmgrName)
+		logp.Info("Connected to queue manager %v with client mode %v", bt.config.QueueManager, bt.config.CC.ClientMode)
 	}
 
 	logp.Info("Connect to QM done")
@@ -44,14 +62,14 @@ func connectPubSub(qmgrName string, queuePattern string, cc *ConnectionConfig) e
 	// subscribe.
 	if err == nil {
 		logp.Info("DiscoverAndSubscribe start")
-		err = DiscoverAndSubscribe(queuePattern, true, "")
+		err = DiscoverAndSubscribe(bt.config.LocalQueue, true, "")
 	}
 	logp.Info("DiscoverAndSubscribe done")
 
 	return err
 }
 
-func collectPubSub(qmgrName string, eventType string) {
+func collectPubSub(bt *Qbeat, b *beat.Beat) {
 	// #####Code for collecting the MQ metrics
 	// Clear out everything we know so far. In particular, replace
 	// the map of values for each object so the collection starts
@@ -85,8 +103,8 @@ func collectPubSub(qmgrName string, eventType string) {
 					Fields: common.MapStr{
 						"metrictype":  cl.Name,
 						"objecttopic": ty.ObjectTopic,
-						"type":        eventType,
-						"qmgr":        qmgrName,
+						"type":        b.Info.Name,
+						"qmgr":        bt.config.QueueManager,
 					},
 				}
 				for _, elem := range ty.Elements {
@@ -103,6 +121,7 @@ func collectPubSub(qmgrName string, eventType string) {
 						event.Fields[elem.MetricName] = float32(f)
 					}
 				}
+				bt.client.Publish(event)
 			}
 		}
 
@@ -112,23 +131,18 @@ func collectPubSub(qmgrName string, eventType string) {
 
 }
 
-func connectLegacyMode(qmgrName string) error {
+func connectLegacyMode(bt *Qbeat) error {
+	logp.Info("Connect in legacy mode with client mode %v", bt.config.CC.ClientMode)
 
-	//Only connect if not yet connected.
-	if !qmgrConnected {
-		logp.Info("Connect in legacy mode")
+	err = InitConnection(bt.config.QueueManager, "SYSTEM.DEFAULT.MODEL.QUEUE", &bt.config.CC)
+	//err = connectLegacy(bt.config.QueueManager, bt.config.RemoteQueueManager)
 
-		err = connectLegacy(qmgrName, qmgrName)
-
-		if err != nil {
-			return err
-		}
-
-		logp.Info("Connection successfull")
+	if err != nil {
 		return err
 	}
 
-	return nil
+	logp.Info("Connection successfull")
+	return err
 }
 
 func createEvents(eventType string, qmgrName string, responseObj map[string]*Response) []beat.Event {
@@ -192,109 +206,185 @@ func generateConnectedObjectsField(events []beat.Event) []beat.Event {
 	return events
 }
 
-func CollectCustomMetricset(configString string, eventType string, qmgrName string) ([]beat.Event, error) {
+func collectLegacy(bt *Qbeat, b *beat.Beat) error {
 	//Collect queue statistics
 	var err error
 	var events []beat.Event
+	var targetQMgrNames []string
 
-	if configString != "" {
+	if bt.config.RemoteQueueManager[0] != "" {
+		targetQMgrNames = bt.config.RemoteQueueManager
+	} else {
+		targetQMgrNames = []string{bt.config.QueueManager}
+	}
 
-		connectLegacyMode(qmgrName)
-
-		logp.Info("Start collecting in advance object")
-		var requestObject RequestObject
-		err := json.Unmarshal([]byte(configString), &requestObject)
-
-		if err != nil {
-			return nil, err
-		}
-		logp.Info("Advanced json: %v", requestObject)
-		for _, command := range requestObject.Commands {
-			responseObj, err := getAdvancedResponse(command.Cmd, command.Params)
+	for _, targetQMgrName := range targetQMgrNames {
+		logp.Info("Collecting from q manager: %v", targetQMgrName)
+		if bt.config.Advanced != "" {
+			logp.Info("Start collecting in advance object")
+			var requestObject RequestObject
+			err := json.Unmarshal([]byte(bt.config.Advanced), &requestObject)
 
 			if err != nil {
-				return nil, err
+				return err
+			}
+			logp.Info("Advanced json: %v", requestObject)
+			for _, command := range requestObject.Commands {
+				responseObj, err := getAdvancedResponse(targetQMgrName, command.Cmd, command.Params)
+
+				if err != nil {
+					return err
+				}
+
+				events = append(events, createEvents(b.Info.Name, targetQMgrName, responseObj)...)
+			}
+		}
+		if bt.config.QMgrStat {
+			qMgrMetadata, err := getQManagerMetadata(targetQMgrName)
+			if err != nil {
+				return err
 			}
 
-			events = append(events, createEvents(eventType, qmgrName, responseObj)...)
+			qMgrStatus, err := getQManagerStatus(targetQMgrName)
+			if err != nil {
+				return err
+			}
+			tmpEvents := createEvents(b.Info.Name, targetQMgrName, qMgrMetadata)
+			events = append(events, mergeEventsWithResponseObj(tmpEvents, qMgrStatus)...)
+		}
+
+		if bt.config.Channel != "" {
+			chMetadata, err := getChannelMetadata(targetQMgrName, bt.config.Channel)
+			if err != nil {
+				return err
+			}
+			chStatus, err := getChannelStatus(targetQMgrName, bt.config.Channel)
+			if err != nil {
+				return err
+			}
+
+			//chSavedStatus, err := getSavedChannelStatus(targetQMgrName, bt.config.Channel)
+			//if err != nil {
+			//	return err
+			//}
+
+			tmpEvents := createEvents(b.Info.Name, targetQMgrName, chMetadata)
+			events = append(events, mergeEventsWithResponseObj(tmpEvents, chStatus)...)
+			//events = append(events, mergeEventsWithResponseObj(tmpEvents, chSavedStatus)...)
+		}
+
+		if bt.config.LocalQueue != "" {
+			qMetadata, err := getQueueMetadata(targetQMgrName, bt.config.LocalQueue)
+			if err != nil {
+				return err
+			}
+			tmpEvents := createEvents(b.Info.Name, targetQMgrName, qMetadata)
+
+			if bt.config.QueueStatus {
+				qStatus, err := getQueueStatus(targetQMgrName, bt.config.LocalQueue)
+				if err != nil {
+					return err
+				}
+
+				tmpEvents = mergeEventsWithResponseObj(tmpEvents, qStatus)
+			}
+
+			if bt.config.QueueStats {
+				qStatistics, err := getQueueStatistics(targetQMgrName, bt.config.LocalQueue)
+				if err != nil {
+					return err
+				}
+
+				tmpEvents = mergeEventsWithResponseObj(tmpEvents, qStatistics)
+			}
+
+			events = append(events, tmpEvents...)
 		}
 	}
 
-	return events, err
+	//Add a field that contains all connections to other MQ objects
+	// this helps to visualize via graph
+	events = generateConnectedObjectsField(events)
+
+	// Always ignore the first loop through as there might
+	// be accumulated stuff from a while ago, and lead to
+	// a misleading range on graphs.
+	if !first {
+		bt.client.PublishAll(events)
+	}
+
+	return err
 }
 
-func CollectQmgrMetricset(eventType string, qmgrName string) ([]beat.Event, error) {
-	//Collect queue statistics
+// Run starts qbeat.
+func (bt *Qbeat) Run(b *beat.Beat) error {
+	logp.Info("qbeat is running! Hit CTRL-C to stop it.")
+
 	var err error
-	var events []beat.Event
 
-	connectLegacyMode(qmgrName)
-
-	qMgrMetadata, err := getQManagerMetadata()
+	bt.client, err = b.Publisher.Connect()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	qMgrStatus, err := getQManagerStatus()
-	if err != nil {
-		return nil, err
+	var legacy = false
+	if bt.config.LocalQueue != "" || bt.config.Channel != "" || bt.config.QMgrStat || bt.config.Advanced != "" {
+		legacy = true
 	}
-	tmpEvents := createEvents(eventType, qmgrName, qMgrMetadata)
-	events = append(events, mergeEventsWithResponseObj(tmpEvents, qMgrStatus)...)
 
-	return events, err
+	logp.Info("Trying to connect to %v", bt.config.QueueManager)
+	if bt.config.QueueManager == "" {
+		return errors.New("Queue manager not set in your configuration file")
+	}
+	if legacy {
+		err = connectLegacyMode(bt)
+		if err != nil {
+			logp.Critical("Wasn't able to connect due to an error")
+			return err
+		}
+	}
+
+	if bt.config.PubSub {
+		err = connectPubSub(bt)
+
+		if err != nil {
+			logp.Critical("Wasn't able to connect due to an error")
+			return err
+		}
+	}
+
+	ticker := time.NewTicker(bt.config.Period)
+	for {
+		select {
+		case <-bt.done:
+			return nil
+		case <-ticker.C:
+		}
+
+		if legacy {
+			err = collectLegacy(bt, b)
+		}
+		if bt.config.PubSub {
+			collectPubSub(bt, b)
+		}
+
+		if err != nil {
+			return err
+		}
+
+		//This is to ignore the first chunk of data because this can have inappropiate data
+		if first {
+			first = false
+			logp.Info("Events ignored in the first loop")
+			continue
+		}
+
+		logp.Info("Events sent")
+	}
 }
 
-func CollectChannelMetricset(channelPattern string, eventType string, qmgrName string) ([]beat.Event, error) {
-	//Collect queue statistics
-	var err error
-	var events []beat.Event
-
-	if channelPattern != "" {
-
-		connectLegacyMode(qmgrName)
-
-		chMetadata, err := getChannelMetadata(channelPattern)
-		if err != nil {
-			return nil, err
-		}
-		chStatus, err := getChannelStatus(channelPattern)
-		if err != nil {
-			return nil, err
-		}
-
-		tmpEvents := createEvents(eventType, qmgrName, chMetadata)
-		events = append(events, mergeEventsWithResponseObj(tmpEvents, chStatus)...)
-	}
-	return events, err
-}
-
-func CollectQueueMetricset(queuePattern string, eventType string, qmgrName string) ([]beat.Event, error) {
-	//Collect queue statistics
-	var err error
-	var events []beat.Event
-
-	if queuePattern != "" {
-
-		connectLegacyMode(qmgrName)
-
-		qMetadata, err := getQueueMetadata(queuePattern)
-		if err != nil {
-			return nil, err
-		}
-
-		qStatus, err := getQueueStatus(queuePattern)
-		if err != nil {
-			return nil, err
-		}
-
-		qStatistics, err := getQueueStatistics(queuePattern)
-		if err != nil {
-			return nil, err
-		}
-		tmpEvents := createEvents(eventType, qmgrName, qMetadata)
-		tmpEvents = mergeEventsWithResponseObj(tmpEvents, qStatus)
-		events = append(events, mergeEventsWithResponseObj(tmpEvents, qStatistics)...)
-	}
-	return events, err
+// Stop stops qbeat.
+func (bt *Qbeat) Stop() {
+	bt.client.Close()
+	close(bt.done)
 }

@@ -1,10 +1,10 @@
-package ibmmqi
+package ibmmq
 
 /*
 ****************************************************************
 *
 *
-*                     IBM MQ for Go on Windows
+*                     IBM MQ for Go on LinuxS390
 * FILE NAME:      CMQC
 *
 * This file contains the MQI definitions needed for a
@@ -99,7 +99,7 @@ var (
 	MQAT_CICS                      int32  = 1
 	MQAT_CICS_BRIDGE               int32  = 21
 	MQAT_CICS_VSE                  int32  = 10
-	MQAT_DEFAULT                   int32  = 11
+	MQAT_DEFAULT                   int32  = 6
 	MQAT_DOS                       int32  = 5
 	MQAT_DQM                       int32  = 29
 	MQAT_GUARDIAN                  int32  = 13
@@ -1352,13 +1352,13 @@ var (
 	MQDCC_NONE                     int32  = 0
 	MQDCC_SOURCE_ENC_FACTOR        int32  = 16
 	MQDCC_SOURCE_ENC_MASK          int32  = 240
-	MQDCC_SOURCE_ENC_NATIVE        int32  = 32
+	MQDCC_SOURCE_ENC_NATIVE        int32  = 16
 	MQDCC_SOURCE_ENC_NORMAL        int32  = 16
 	MQDCC_SOURCE_ENC_REVERSED      int32  = 32
 	MQDCC_SOURCE_ENC_UNDEFINED     int32  = 0
 	MQDCC_TARGET_ENC_FACTOR        int32  = 256
 	MQDCC_TARGET_ENC_MASK          int32  = 3840
-	MQDCC_TARGET_ENC_NATIVE        int32  = 512
+	MQDCC_TARGET_ENC_NATIVE        int32  = 256
 	MQDCC_TARGET_ENC_NORMAL        int32  = 256
 	MQDCC_TARGET_ENC_REVERSED      int32  = 512
 	MQDCC_TARGET_ENC_UNDEFINED     int32  = 0
@@ -1441,7 +1441,7 @@ var (
 	MQENC_INTEGER_NORMAL           int32  = 1
 	MQENC_INTEGER_REVERSED         int32  = 2
 	MQENC_INTEGER_UNDEFINED        int32  = 0
-	MQENC_NATIVE                   int32  = 546
+	MQENC_NATIVE                   int32  = 273
 	MQENC_NORMAL                   int32  = 273
 	MQENC_RESERVED_MASK            int32  = -4096
 	MQENC_REVERSED                 int32  = 546
@@ -4855,7 +4855,7 @@ var (
 	MQ_MCA_JOB_NAME_LENGTH         int32  = 28
 	MQ_MCA_NAME_LENGTH             int32  = 20
 	MQ_MCA_USER_DATA_LENGTH        int32  = 32
-	MQ_MCA_USER_ID_LENGTH          int32  = 64
+	MQ_MCA_USER_ID_LENGTH          int32  = 12
 	MQ_MFS_MAP_NAME_LENGTH         int32  = 8
 	MQ_MODE_NAME_LENGTH            int32  = 8
 	MQ_MQTT_MAX_KEEP_ALIVE         int32  = 65536

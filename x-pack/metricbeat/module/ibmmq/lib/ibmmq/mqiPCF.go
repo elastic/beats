@@ -1,7 +1,7 @@
 package ibmmqi
 
 /*
-  Copyright (c) IBM Corporation 2016
+  Copyright (c) IBM Corporation 2016,2018
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -12,7 +12,8 @@ package ibmmqi
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
    Contributors:
      Mark Taylor - Initial Contribution
@@ -45,8 +46,6 @@ type MQCFH struct {
 	Reason         int32
 	ParameterCount int32
 }
-
-var endian binary.ByteOrder
 
 /*
 PCFParameter is a structure containing the data associated with
@@ -251,6 +250,15 @@ func ReadPCFParameter(buf []byte) (*PCFParameter, int) {
 	case C.MQCFT_GROUP:
 		binary.Read(p, endian, &pcfParm.Parameter)
 		binary.Read(p, endian, &pcfParm.ParameterCount)
+
+	case C.MQCFT_BYTE_STRING:
+		// For now, the data is not actually stored anywhere as we don't need it
+		// But we do need to know how to step over the field
+		offset := int32(C.MQCFBS_STRUC_LENGTH_FIXED)
+		binary.Read(p, endian, &pcfParm.Parameter)
+		binary.Read(p, endian, &pcfParm.stringLength)
+		p.Next(int(pcfParm.strucLength - offset))
+
 	default:
 		fmt.Println("mqiPCF.go: Unknown PCF type ", pcfParm.Type)
 		// Skip the remains of this structure, assuming it really is

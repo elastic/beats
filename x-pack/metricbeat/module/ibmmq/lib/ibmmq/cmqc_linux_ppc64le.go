@@ -4,7 +4,7 @@ package ibmmqi
 ****************************************************************
 *
 *
-*                     IBM MQ for Go on Windows
+*                     IBM MQ for Go on Linux PowerLE
 * FILE NAME:      CMQC
 *
 * This file contains the MQI definitions needed for a
@@ -99,7 +99,7 @@ var (
 	MQAT_CICS                      int32  = 1
 	MQAT_CICS_BRIDGE               int32  = 21
 	MQAT_CICS_VSE                  int32  = 10
-	MQAT_DEFAULT                   int32  = 11
+	MQAT_DEFAULT                   int32  = 6
 	MQAT_DOS                       int32  = 5
 	MQAT_DQM                       int32  = 29
 	MQAT_GUARDIAN                  int32  = 13
@@ -4855,7 +4855,7 @@ var (
 	MQ_MCA_JOB_NAME_LENGTH         int32  = 28
 	MQ_MCA_NAME_LENGTH             int32  = 20
 	MQ_MCA_USER_DATA_LENGTH        int32  = 32
-	MQ_MCA_USER_ID_LENGTH          int32  = 64
+	MQ_MCA_USER_ID_LENGTH          int32  = 12
 	MQ_MFS_MAP_NAME_LENGTH         int32  = 8
 	MQ_MODE_NAME_LENGTH            int32  = 8
 	MQ_MQTT_MAX_KEEP_ALIVE         int32  = 65536

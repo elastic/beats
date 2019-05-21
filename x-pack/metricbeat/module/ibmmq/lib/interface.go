@@ -3,7 +3,7 @@ package ibmmqlib
 import (
 	"reflect"
 
-	"github.com/felix-lessoer/qbeat/beater/ibmmq"
+	"github.com/felix-lessoer\beats\x-pack\metricbeat\module\ibmmq\lib\ibmmq"
 )
 
 type MQconstants struct {

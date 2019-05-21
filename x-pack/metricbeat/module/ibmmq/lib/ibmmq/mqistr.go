@@ -12,7 +12,8 @@ package ibmmqi
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
    Contributors:
      Mark Taylor - Initial Contribution
@@ -49,7 +50,6 @@ or MQRCCF sets. These sets are related and do not overlap values.
 func MQItoString(class string, value int) string {
 	s := ""
 	v := C.MQLONG(value)
-
 	switch class {
 	case "BACF":
 		s = C.GoString(C.MQBACF_STR(v))
@@ -68,6 +68,8 @@ func MQItoString(class string, value int) string {
 
 	case "CC":
 		s = C.GoString(C.MQCC_STR(v))
+	case "CHT":
+		s = C.GoString(C.MQCHT_STR(v))
 	case "CMD":
 		s = C.GoString(C.MQCMD_STR(v))
 
@@ -89,6 +91,9 @@ func MQItoString(class string, value int) string {
 	case "OT":
 		s = C.GoString(C.MQOT_STR(v))
 
+	case "PL":
+		s = C.GoString(C.MQPL_STR(v))
+
 	case "RC":
 		s = C.GoString(C.MQRC_STR(v))
 		if s == "" {
@@ -98,8 +103,6 @@ func MQItoString(class string, value int) string {
 		s = C.GoString(C.MQCFT_STR(v))
 	case "CHS":
 		s = C.GoString(C.MQCHS_STR(v))
-	case "CHT":
-		s = C.GoString(C.MQCHT_STR(v))
 	case "QT":
 		s = C.GoString(C.MQQT_STR(v))
 	case "NPM":

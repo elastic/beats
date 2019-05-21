@@ -12,7 +12,8 @@ package ibmmqi
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
    Contributors:
      Mark Taylor - Initial Contribution
@@ -106,7 +107,7 @@ func copySDtoC(mqsd *C.MQSD, gosd *MQSD) {
 
 	setMQIString((*C.char)(&mqsd.StrucId[0]), "SD  ", 4)
 	mqsd.Version = C.MQLONG(gosd.Version)
-	mqsd.Options = C.MQLONG(gosd.Options)
+	mqsd.Options = C.MQLONG(gosd.Options) | C.MQSO_FAIL_IF_QUIESCING
 
 	setMQIString((*C.char)(&mqsd.ObjectName[0]), gosd.ObjectName, C.MQ_OBJECT_NAME_LENGTH)
 	setMQIString((*C.char)(&mqsd.AlternateUserId[0]), gosd.AlternateUserId, C.MQ_USER_ID_LENGTH)
@@ -180,18 +181,18 @@ func copySDfromC(mqsd *C.MQSD, gosd *MQSD) {
 	gosd.Version = int32(mqsd.Version)
 	gosd.Options = int32(mqsd.Options)
 
-	gosd.ObjectName = C.GoStringN((*C.char)(&mqsd.ObjectName[0]), C.MQ_OBJECT_NAME_LENGTH)
-	gosd.AlternateUserId = C.GoStringN((*C.char)(&mqsd.AlternateUserId[0]), C.MQ_USER_ID_LENGTH)
+	gosd.ObjectName = trimStringN((*C.char)(&mqsd.ObjectName[0]), C.MQ_OBJECT_NAME_LENGTH)
+	gosd.AlternateUserId = trimStringN((*C.char)(&mqsd.AlternateUserId[0]), C.MQ_USER_ID_LENGTH)
 	for i := 0; i < C.MQ_SECURITY_ID_LENGTH; i++ {
 		gosd.AlternateSecurityId[i] = (byte)(mqsd.AlternateSecurityId[i])
 	}
 	gosd.SubExpiry = int32(mqsd.SubExpiry)
 
-	gosd.ObjectString = C.GoStringN((*C.char)(mqsd.ObjectString.VSPtr), (C.int)(mqsd.ObjectString.VSLength))
+	gosd.ObjectString = trimStringN((*C.char)(mqsd.ObjectString.VSPtr), (C.int)(mqsd.ObjectString.VSLength))
 	C.free(unsafe.Pointer(mqsd.ObjectString.VSPtr))
-	gosd.SubName = C.GoStringN((*C.char)(mqsd.SubName.VSPtr), (C.int)(mqsd.SubName.VSLength))
+	gosd.SubName = trimStringN((*C.char)(mqsd.SubName.VSPtr), (C.int)(mqsd.SubName.VSLength))
 	C.free(unsafe.Pointer(mqsd.SubName.VSPtr))
-	gosd.SubUserData = C.GoStringN((*C.char)(mqsd.SubUserData.VSPtr), (C.int)(mqsd.SubUserData.VSLength))
+	gosd.SubUserData = trimStringN((*C.char)(mqsd.SubUserData.VSPtr), (C.int)(mqsd.SubUserData.VSLength))
 	C.free(unsafe.Pointer(mqsd.SubUserData.VSPtr))
 
 	for i = 0; i < C.MQ_CORREL_ID_LENGTH; i++ {
@@ -203,14 +204,14 @@ func copySDfromC(mqsd *C.MQSD, gosd *MQSD) {
 		gosd.PubAccountingToken[i] = (byte)(mqsd.PubAccountingToken[i])
 	}
 
-	gosd.PubApplIdentityData = C.GoStringN((*C.char)(&mqsd.PubApplIdentityData[0]), C.MQ_APPL_IDENTITY_DATA_LENGTH)
+	gosd.PubApplIdentityData = trimStringN((*C.char)(&mqsd.PubApplIdentityData[0]), C.MQ_APPL_IDENTITY_DATA_LENGTH)
 
-	gosd.SelectionString = C.GoStringN((*C.char)(mqsd.SelectionString.VSPtr), (C.int)(mqsd.SelectionString.VSLength))
+	gosd.SelectionString = trimStringN((*C.char)(mqsd.SelectionString.VSPtr), (C.int)(mqsd.SelectionString.VSLength))
 	C.free(unsafe.Pointer(mqsd.SelectionString.VSPtr))
 
 	gosd.SubLevel = int32(mqsd.SubLevel)
 
-	gosd.ResObjectString = C.GoStringN((*C.char)(mqsd.ResObjectString.VSPtr), (C.int)(mqsd.ResObjectString.VSLength))
+	gosd.ResObjectString = trimStringN((*C.char)(mqsd.ResObjectString.VSPtr), (C.int)(mqsd.ResObjectString.VSLength))
 	C.free(unsafe.Pointer(mqsd.ResObjectString.VSPtr))
 	return
 }
