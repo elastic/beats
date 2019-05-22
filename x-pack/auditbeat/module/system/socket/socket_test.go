@@ -108,7 +108,13 @@ func TestOutbound(t *testing.T) {
 	checkFieldValue(t, event.RootFields, "process.name", "socket.test")
 	checkFieldValue(t, event.RootFields, "user.id", os.Geteuid())
 	checkFieldValue(t, event.RootFields, "network.direction", sock.Outbound.String())
+	checkFieldValue(t, event.RootFields, "network.transport", "tcp")
 	checkFieldValue(t, event.RootFields, "destination.port", 80)
+
+	communityID, err := event.RootFields.GetValue("network.community_id")
+	if assert.NoError(t, err) {
+		assert.NotEmpty(t, communityID)
+	}
 }
 
 func TestListening(t *testing.T) {
@@ -154,6 +160,7 @@ func TestListening(t *testing.T) {
 	checkFieldValue(t, event.RootFields, "process.name", "socket.test")
 	checkFieldValue(t, event.RootFields, "user.id", os.Geteuid())
 	checkFieldValue(t, event.RootFields, "network.direction", sock.Listening.String())
+	checkFieldValue(t, event.RootFields, "network.transport", "tcp")
 }
 
 func TestLocalhost(t *testing.T) {
@@ -204,7 +211,9 @@ func TestLocalhost(t *testing.T) {
 	checkFieldValue(t, event.RootFields, "process.name", "socket.test")
 	checkFieldValue(t, event.RootFields, "user.id", os.Geteuid())
 	checkFieldValue(t, event.RootFields, "network.direction", sock.Listening.String())
+	checkFieldValue(t, event.RootFields, "network.transport", "tcp")
 	checkFieldValue(t, event.RootFields, "destination.ip", "127.0.0.1")
+
 }
 
 func TestLocalhostExcluded(t *testing.T) {
