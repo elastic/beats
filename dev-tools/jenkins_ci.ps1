@@ -39,7 +39,7 @@ if (Test-Path "$env:beat\magefile.go") {
 } else {
     echo "$env:beat\magefile.go does not exist"
     New-Item -ItemType directory -Path build | Out-Null
-    New-Item -Name build\TEST-empty.xml -ItemType File | Out-Null
+    New-Item -Name build\TEST-empty.out -ItemType File | Out-Null
     exit
 }
 
