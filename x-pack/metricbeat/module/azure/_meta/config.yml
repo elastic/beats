@@ -1,0 +1,7 @@
+- module: azure
+  metricsets: ["monitor"]
+  enabled: true
+  period: 30s
+  client_id: '${AWS_ACCESS_KEY_ID:""}'
+  client_secret: '${AWS_SECRET_ACCESS_KEY:""}'
+  tenant_id: ''

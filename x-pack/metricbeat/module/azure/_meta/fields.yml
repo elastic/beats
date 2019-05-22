@@ -1,0 +1,10 @@
+- key: azure
+  title: "azure"
+  release: beta
+  description: >
+    azure module
+  fields:
+    - name: azure
+      type: group
+      description: >
+      fields:

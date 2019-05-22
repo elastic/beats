@@ -1,0 +1,9 @@
+- name: monitor
+  type: group
+  description: >
+    monitor
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
