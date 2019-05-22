@@ -52,6 +52,7 @@ func TestData(t *testing.T) {
 func testSocket() *Socket {
 	return &Socket{
 		Family:      linux.AF_INET,
+		Protocol:    tcp,
 		LocalIP:     net.IPv4(10, 0, 2, 15),
 		LocalPort:   22,
 		RemoteIP:    net.IPv4(10, 0, 2, 2),
