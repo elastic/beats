@@ -55,7 +55,7 @@ type FileLoader struct {
 // FileClient defines the minimal interface required for the FileLoader
 type FileClient interface {
 	GetVersion() common.Version
-	Write(name string, body string) error
+	Write(component string, name string, body string) error
 }
 
 // NewESLoader creates a new template loader for ES
@@ -145,9 +145,8 @@ func (l *FileLoader) Load(config TemplateConfig, info beat.Info, fields []byte, 
 		return err
 	}
 
-	p := common.MapStr{tmpl.name: body}
-	str := fmt.Sprintf("%s\n", p.StringToPrint())
-	if err := l.client.Write(tmpl.name, str); err != nil {
+	str := fmt.Sprintf("%s\n", body.StringToPrint())
+	if err := l.client.Write("template", tmpl.name, str); err != nil {
 		return fmt.Errorf("error printing template: %v", err)
 	}
 	return nil
@@ -175,6 +174,9 @@ func buildBody(tmpl *Template, config TemplateConfig, fields []byte) (common.Map
 	}
 	if config.Fields != "" {
 		return buildBodyFromFile(tmpl, config)
+	}
+	if fields == nil {
+		return buildMinimalTemplate(tmpl)
 	}
 	return buildBodyFromFields(tmpl, fields)
 }
@@ -213,6 +215,15 @@ func buildBodyFromFields(tmpl *Template, fields []byte) (common.MapStr, error) {
 	body, err := tmpl.LoadBytes(fields)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template: %v", err)
+	}
+	return body, nil
+}
+
+func buildMinimalTemplate(tmpl *Template) (common.MapStr, error) {
+	logp.Debug("template", "Load minimal template")
+	body, err := tmpl.LoadMinimal()
+	if err != nil {
+		return nil, fmt.Errorf("error creating mimimal template: %v", err)
 	}
 	return body, nil
 }
