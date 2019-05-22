@@ -9,6 +9,21 @@
 
 ############################# Heartbeat ######################################
 
+heartbeat.autodiscover:
+  providers:
+    - type: elasticsearch
+      index: "metricbeat-*"
+      query: {"bool": {"filter": [{"term": {"service.type": "redis"}}, {"range": {"@timestamp": {"gte": "now-5m"}}}]}}
+      fields: ["service.address"]
+      sort: {"field": "@timestamp", "direction": "DESC"}
+      templates:
+        - config:
+          - type: tcp
+            id: "${data.doc.service.address}"
+            hosts: ["${data.doc.service.address}"] 
+            schedule: "@every 1s"
+            timeout: 1s
+
 # Define a directory to load monitor definitions from. Definitions take the form
 # of individual yaml files.
 heartbeat.config.monitors:
@@ -18,19 +33,6 @@ heartbeat.config.monitors:
   reload.enabled: false
   # How often to check for changes
   reload.period: 5s
-
-# Configure monitors inline
-heartbeat.monitors:
-- type: http
-
-  # List or urls to query
-  urls: ["http://localhost:9200"]
-
-  # Configure task schedule
-  schedule: '@every 10s'
-
-  # Total test connection and data exchange timeout
-  #timeout: 16s
 
 #==================== Elasticsearch template setting ==========================
 
@@ -142,7 +144,7 @@ processors:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-#logging.level: debug
+logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
