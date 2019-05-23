@@ -40,6 +40,9 @@ https://github.com/elastic/beats/compare/v6.7.2...6.x[Check the HEAD diff]
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Add support for Cisco syslog format used by their switch. {pull}10760[10760]
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 
 *Heartbeat*
 
@@ -58,8 +61,6 @@ https://github.com/elastic/beats/compare/v6.7.2...6.x[Check the HEAD diff]
 *Affecting all Beats*
 
 *Auditbeat*
-
-- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
 
 *Filebeat*
 
