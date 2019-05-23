@@ -174,14 +174,18 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 	histogram := metric.GetHistogram()
 	if histogram != nil {
 		value := common.MapStr{}
-		value["sum"] = histogram.GetSampleSum()
-		value["count"] = histogram.GetSampleCount()
+		if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
+			value["sum"] = histogram.GetSampleSum()
+			value["count"] = histogram.GetSampleCount()
+		}
 
 		buckets := histogram.GetBucket()
 		bucketMap := common.MapStr{}
 		for _, bucket := range buckets {
-			key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
-			bucketMap[key] = bucket.GetCumulativeCount()
+			if !math.IsNaN(float64(bucket.GetCumulativeCount())) && !math.IsInf(float64(bucket.GetCumulativeCount()), 0) {
+				key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
+				bucketMap[key] = bucket.GetCumulativeCount()
+			}
 		}
 
 		if len(bucketMap) != 0 {

@@ -107,15 +107,21 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 		histogram := metric.GetHistogram()
 		if histogram != nil {
-			events = append(events, PromEvent{
-				data: common.MapStr{
-					name + "_sum":   histogram.GetSampleSum(),
-					name + "_count": histogram.GetSampleCount(),
-				},
-				labels: labels,
-			})
+			if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
+				events = append(events, PromEvent{
+					data: common.MapStr{
+						name + "_sum":   histogram.GetSampleSum(),
+						name + "_count": histogram.GetSampleCount(),
+					},
+					labels: labels,
+				})
+			}
 
 			for _, bucket := range histogram.GetBucket() {
+				if math.IsNaN(float64(bucket.GetCumulativeCount())) || math.IsInf(float64(bucket.GetCumulativeCount()), 0) {
+					continue
+				}
+
 				bucketLabels := labels.Clone()
 				bucketLabels["le"] = strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
 
