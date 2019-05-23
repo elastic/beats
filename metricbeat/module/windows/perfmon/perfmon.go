@@ -40,10 +40,9 @@ type CounterConfig struct {
 
 // Config for the windows perfmon metricset.
 type Config struct {
-	IgnoreNECounters      bool            `config:"perfmon.ignore_non_existent_counters"`
-	GroupMeasurements     bool            `config:"perfmon.group_measurements_by_instance"`
-	CounterConfig         []CounterConfig `config:"perfmon.counters" validate:"required"`
-	AppendInstanceCounter bool            `config:"perfmon.append_instance_counter"`
+	IgnoreNECounters  bool            `config:"perfmon.ignore_non_existent_counters"`
+	GroupMeasurements bool            `config:"perfmon.group_measurements_by_instance"`
+	CounterConfig     []CounterConfig `config:"perfmon.counters" validate:"required"`
 }
 
 func init() {
@@ -79,7 +78,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	}
 
-	reader, err := NewPerfmonReader(config)
+	reader, err := NewReader(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization of reader failed")
 	}
@@ -102,4 +101,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	for _, event := range events {
 		report.Event(event)
 	}
+}
+
+func (m *MetricSet) Close() error {
+	err := m.reader.CloseQuery()
+	if err != nil {
+		return errors.Wrap(err, "failed to close pdh query")
+	}
+	return nil
 }

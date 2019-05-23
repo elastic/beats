@@ -31,39 +31,37 @@ import (
 )
 
 var (
-	wildcardRegexp = regexp.MustCompile(`.*\(.*\*.*\).*|.*\(.*\)\\.*\*.*`)
-	processRegexp  = regexp.MustCompile(`(.+?)#[1-9]+`)
+	//wildcardRegexp = regexp.MustCompile(`.*\(.*\*.*\).*|.*\(.*\)\\.*\*.*`)
+	processRegexp = regexp.MustCompile(`(.+?)#[1-9]+`)
 )
 
 // Reader will contain the config options
 type Reader struct {
-	query                 Query             // PDH Query
-	instanceLabel         map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
-	measurement           map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed              bool              // Indicates if the query has been executed.
-	log                   *logp.Logger      //
-	groupMeasurements     bool              // Indicates if measurements with the same instance label should be sent in the same event
-	appendInstanceCounter bool              // Will assign the full instance name (containing counter) if set to true
+	query             Query             // PDH Query
+	instanceLabel     map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
+	measurement       map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
+	executed          bool              // Indicates if the query has been executed.
+	log               *logp.Logger      //
+	groupMeasurements bool              // Indicates if measurements with the same instance label should be sent in the same event
 }
 
-// NewPerfmonReader creates a new instance of PerfmonReader.
-func NewPerfmonReader(config Config) (*Reader, error) {
+// NewReader creates a new instance of Reader.
+func NewReader(config Config) (*Reader, error) {
 	var query Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
 
 	r := &Reader{
-		query:                 query,
-		instanceLabel:         map[string]string{},
-		measurement:           map[string]string{},
-		log:                   logp.NewLogger("perfmon"),
-		groupMeasurements:     config.GroupMeasurements,
-		appendInstanceCounter: config.AppendInstanceCounter,
+		query:             query,
+		instanceLabel:     map[string]string{},
+		measurement:       map[string]string{},
+		log:               logp.NewLogger("perfmon"),
+		groupMeasurements: config.GroupMeasurements,
 	}
 
 	for _, counter := range config.CounterConfig {
-		values, err := query.ExpandWildCardPath(counter.Query)
+		childQueries, err := query.ExpandWildCardPath(counter.Query)
 		if err != nil {
 			if config.IgnoreNECounters {
 				switch err {
@@ -77,9 +75,8 @@ func NewPerfmonReader(config Config) (*Reader, error) {
 				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
 			}
 		}
-		wildcard := wildcardRegexp.MatchString(counter.Query)
-		for _, v := range values {
-			if err := query.AddCounter(v, counter, wildcard); err != nil {
+		for _, v := range childQueries {
+			if err := query.AddCounter(v, counter); err != nil {
 				query.Close()
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
@@ -130,21 +127,16 @@ func (r *Reader) Read() ([]mb.Event, error) {
 					MetricSetFields: common.MapStr{},
 					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
 				}
-
 				if val.Instance != "" {
-					if !r.appendInstanceCounter {
-						if ok, match := matchesParentProcess(val.Instance); ok {
-							eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], match)
-						}
+					//will ignore instance counter
+					if ok, match := matchesParentProcess(val.Instance); ok {
+						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], match)
 					} else {
 						eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
 					}
-
 				}
 			}
-
 			event := eventMap[eventKey]
-
 			if val.Measurement != nil {
 				event.MetricSetFields.Put(r.measurement[counterPath], val.Measurement)
 			} else {
@@ -161,6 +153,10 @@ func (r *Reader) Read() ([]mb.Event, error) {
 
 	r.executed = true
 	return events, nil
+}
+
+func (r *Reader) CloseQuery() error {
+	return r.query.Close()
 }
 
 // matchParentProcess will try to get the parent process name

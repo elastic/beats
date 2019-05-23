@@ -22,7 +22,6 @@ package perfmon
 import (
 	"testing"
 	"time"
-	"unsafe"
 
 	"github.com/elastic/beats/libbeat/common"
 
@@ -112,7 +111,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	err = q.AddCounter(processorTimeCounter, counter, false)
+	err = q.AddCounter(processorTimeCounter, counter)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,7 +147,7 @@ func TestExistingCounter(t *testing.T) {
 	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
 	config.CounterConfig[0].Query = processorTimeCounter
 	config.CounterConfig[0].Format = "float"
-	handle, err := NewPerfmonReader(config)
+	handle, err := NewReader(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -170,7 +169,7 @@ func TestNonExistingCounter(t *testing.T) {
 	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
 	config.CounterConfig[0].Query = "\\Processor Information(_Total)\\not existing counter"
 	config.CounterConfig[0].Format = "float"
-	handle, err := NewPerfmonReader(config)
+	handle, err := NewReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_COUNTER, errors.Cause(err))
 	}
@@ -190,7 +189,7 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
 	config.CounterConfig[0].Query = "\\Processor Information(_Total)\\not existing counter"
 	config.CounterConfig[0].Format = "float"
-	handle, err := NewPerfmonReader(config)
+	handle, err := NewReader(config)
 
 	values, err := handle.Read()
 
@@ -214,7 +213,7 @@ func TestNonExistingObject(t *testing.T) {
 	config.CounterConfig[0].MeasurementLabel = "processor.time.total.pct"
 	config.CounterConfig[0].Query = "\\non existing object\\% Processor Performance"
 	config.CounterConfig[0].Format = "float"
-	handle, err := NewPerfmonReader(config)
+	handle, err := NewReader(config)
 	if assert.Error(t, err) {
 		assert.EqualValues(t, PDH_CSTATUS_NO_OBJECT, errors.Cause(err))
 	}
@@ -233,7 +232,7 @@ func TestLongOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 	counter := CounterConfig{Format: "long"}
-	err = query.AddCounter(processorTimeCounter, counter, false)
+	err = query.AddCounter(processorTimeCounter, counter)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -268,7 +267,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 	counter := CounterConfig{Format: "float"}
-	err = query.AddCounter(processorTimeCounter, counter, false)
+	err = query.AddCounter(processorTimeCounter, counter)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -295,53 +294,6 @@ func TestFloatOutputFormat(t *testing.T) {
 	assert.True(t, okFloat)
 }
 
-func TestRawValues(t *testing.T) {
-	var query Query
-	err := query.Open()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer query.Close()
-	counter := CounterConfig{Format: "float"}
-	err = query.AddCounter(processorTimeCounter, counter, false)
-	if err != nil && err != PDH_NO_MORE_DATA {
-		t.Fatal(err)
-	}
-
-	var values []float64
-
-	for i := 0; i < 2; i++ {
-		if err = query.CollectData(); err != nil {
-			t.Fatal(err)
-		}
-
-		_, rawvalue1, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		time.Sleep(time.Millisecond * 1000)
-
-		if err = query.CollectData(); err != nil {
-			t.Fatal(err)
-		}
-
-		_, rawvalue2, err := PdhGetRawCounterValue(query.counters[processorTimeCounter].handle)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		value, err := PdhCalculateCounterFromRawValue(query.counters[processorTimeCounter].handle, PdhFmtDouble|PdhFmtNoCap100, rawvalue2, rawvalue1)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		values = append(values, *(*float64)(unsafe.Pointer(&value.LongValue)))
-	}
-
-	t.Log(values)
-}
-
 func TestWildcardQuery(t *testing.T) {
 	config := Config{
 		CounterConfig: make([]CounterConfig, 1),
@@ -351,7 +303,7 @@ func TestWildcardQuery(t *testing.T) {
 	config.CounterConfig[0].MeasurementLabel = "processor.time.pct"
 	config.CounterConfig[0].Query = `\Processor Information(*)\% Processor Time`
 	config.CounterConfig[0].Format = "float"
-	handle, err := NewPerfmonReader(config)
+	handle, err := NewReader(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -401,7 +353,7 @@ func TestGroupByInstance(t *testing.T) {
 	config.CounterConfig[2].Query = `\Processor Information(_Total)\Average Idle Time`
 	config.CounterConfig[2].Format = "float"
 
-	handle, err := NewPerfmonReader(config)
+	handle, err := NewReader(config)
 	if err != nil {
 		t.Fatal(err)
 	}

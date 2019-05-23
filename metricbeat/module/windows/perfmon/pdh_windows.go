@@ -20,8 +20,11 @@
 package perfmon
 
 import (
+	"strconv"
 	"syscall"
-	"unsafe"
+	"unicode/utf16"
+
+	"golang.org/x/sys/windows"
 )
 
 // Windows API calls
@@ -29,17 +32,8 @@ import (
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
 //sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
-//sys _PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat, bufferSize *uint32, bufferCount *uint32, itemBuffer *byte) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterArrayW
-//sys _PdhGetRawCounterValue(counter PdhCounterHandle, counterType *uint32, value *PdhRawCounter) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterValue
-//sys _PdhGetRawCounterArray(counter PdhCounterHandle, bufferSize *uint32, bufferCount *uint32, itemBuffer *pdhRawCounterItem) (errcode error) [failretval!=0] = pdh.PdhGetRawCounterArray
-//sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
-//sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
-
-var (
-	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
-)
 
 type PdhQueryHandle uintptr
 
@@ -48,21 +42,6 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
-
-type pdhCounterValueItem struct {
-	SzName   uintptr
-	FmtValue PdhCounterValue
-}
-
-type pdhRawCounterItem struct {
-	SzName   uintptr
-	RawValue PdhRawCounter
-}
-
-type CounterValueItem struct {
-	Name  string
-	Value PdhCounterValue
-}
 
 // PdhOpenQuery creates a new query.
 func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
@@ -112,27 +91,6 @@ func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterForm
 	return counterType, &value, nil
 }
 
-// PdhGetRawCounterValue returns the current raw value of the counter.
-func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, error) {
-	var counterType uint32
-	var value PdhRawCounter
-	if err := _PdhGetRawCounterValue(counter, &counterType, &value); err != nil {
-		return 0, nil, PdhErrno(err.(syscall.Errno))
-	}
-
-	return counterType, &value, nil
-}
-
-// PdhCalculateCounterFromRawValue calculates the displayable value of two raw counter values.
-func PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
-	var value PdhCounterValue
-	if err := _PdhCalculateCounterFromRawValue(counter, format, rawValue1, rawValue2, &value); err != nil {
-		return nil, PdhErrno(err.(syscall.Errno))
-	}
-
-	return &value, nil
-}
-
 // PdhExpandWildCardPath returns counter paths that match the given counter path.
 func PdhExpandWildCardPath(wildCardPath string) ([]uint16, error) {
 	utfPath, err := syscall.UTF16PtrFromString(wildCardPath)
@@ -162,4 +120,27 @@ func PdhCloseQuery(query PdhQueryHandle) error {
 	}
 
 	return nil
+}
+
+// Error returns a more explicit error message.
+func (e PdhErrno) Error() string {
+	// If the value is not one of the known PDH errors then assume its a
+	// general windows error.
+	if _, found := pdhErrors[e]; !found {
+		return syscall.Errno(e).Error()
+	}
+
+	// Use FormatMessage to convert the PDH errno to a string.
+	// Example: https://msdn.microsoft.com/en-us/library/windows/desktop/aa373046(v=vs.85).aspx
+	var flags uint32 = windows.FORMAT_MESSAGE_FROM_HMODULE | windows.FORMAT_MESSAGE_ARGUMENT_ARRAY | windows.FORMAT_MESSAGE_IGNORE_INSERTS
+	b := make([]uint16, 300)
+	n, err := windows.FormatMessage(flags, modpdh.Handle(), uint32(e), 0, b, nil)
+	if err != nil {
+		return "pdh error #" + strconv.Itoa(int(e))
+	}
+
+	// Trim terminating \r and \n
+	for ; n > 0 && (b[n-1] == '\n' || b[n-1] == '\r'); n-- {
+	}
+	return string(utf16.Decode(b[:n]))
 }

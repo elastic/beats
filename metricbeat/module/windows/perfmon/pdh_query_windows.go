@@ -21,13 +21,10 @@ package perfmon
 
 import (
 	"regexp"
-	"strconv"
 	"syscall"
-	"unicode/utf16"
 	"unsafe"
 
 	"github.com/pkg/errors"
-	"golang.org/x/sys/windows"
 )
 
 var (
@@ -67,14 +64,14 @@ func (q *Query) Open() error {
 }
 
 // AddCounter adds the specified counter to the query.
-func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
+func (q *Query) AddCounter(counterPath string, counter CounterConfig) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.Errorf("Counter %s has been already added", counterPath)
 	}
 	var err error
 	var instanceName string
 	// Extract the instance name from the counterPath.
-	if wildcard || (!wildcard && counter.InstanceName == "") {
+	if counter.InstanceName == "" {
 		instanceName, err = matchInstanceName(counterPath)
 		if err != nil {
 			return err
@@ -140,29 +137,6 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 // Close closes the query and all of its counters.
 func (q *Query) Close() error {
 	return PdhCloseQuery(q.handle)
-}
-
-// Error returns a more explicit error message.
-func (e PdhErrno) Error() string {
-	// If the value is not one of the known PDH errors then assume its a
-	// general windows error.
-	if _, found := pdhErrors[e]; !found {
-		return syscall.Errno(e).Error()
-	}
-
-	// Use FormatMessage to convert the PDH errno to a string.
-	// Example: https://msdn.microsoft.com/en-us/library/windows/desktop/aa373046(v=vs.85).aspx
-	var flags uint32 = windows.FORMAT_MESSAGE_FROM_HMODULE | windows.FORMAT_MESSAGE_ARGUMENT_ARRAY | windows.FORMAT_MESSAGE_IGNORE_INSERTS
-	b := make([]uint16, 300)
-	n, err := windows.FormatMessage(flags, modpdh.Handle(), uint32(e), 0, b, nil)
-	if err != nil {
-		return "pdh error #" + strconv.Itoa(int(e))
-	}
-
-	// Trim terminating \r and \n
-	for ; n > 0 && (b[n-1] == '\n' || b[n-1] == '\r'); n-- {
-	}
-	return string(utf16.Decode(b[:n]))
 }
 
 // matchInstanceName will check first for instance and then for any objects names.
