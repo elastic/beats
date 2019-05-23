@@ -121,6 +121,19 @@ metrics_one_midichlorians_count{rank="padawan",alive="yes"} 28
 
 `
 
+	promHistogramKeyLabelWithNaNInf = `
+# TYPE metrics_one_midichlorians histogram
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="2000"} NaN
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="4000"} +Inf
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="8000"} -Inf
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="16000"} 84
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="32000"} 86
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="+Inf"} 86
+metrics_one_midichlorians_sum{rank="youngling",alive="yes"} 1000001
+metrics_one_midichlorians_count{rank="youngling",alive="yes"} 86
+
+`
+
 	promSummaryKeyLabel = `
 # TYPE metrics_force_propagation_ms summary
 metrics_force_propagation_ms{kind="jedi",quantile="0"} 35
@@ -711,6 +724,40 @@ func TestPrometheusKeyLabels(t *testing.T) {
 									"+Inf":  uint64(28),
 								},
 								"rank":  "padawan",
+								"alive": "yes",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			testName:           "Test histogram with KeyLabel With NaN Inf",
+			prometheusResponse: promHistogramKeyLabelWithNaNInf,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_one_midichlorians": Metric("metrics.one.midichlorians"),
+				},
+				Labels: map[string]LabelMap{
+					"rank":  KeyLabel("metrics.one.midichlorians.rank"),
+					"alive": KeyLabel("metrics.one.midichlorians.alive"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"midichlorians": common.MapStr{
+								"count": uint64(86),
+								"sum":   1000001.0,
+								"bucket": common.MapStr{
+									"16000": uint64(84),
+									"32000": uint64(86),
+									"+Inf":  uint64(86),
+								},
+
+								"rank":  "youngling",
 								"alive": "yes",
 							},
 						},

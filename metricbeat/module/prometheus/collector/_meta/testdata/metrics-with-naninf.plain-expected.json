@@ -53,9 +53,121 @@
             "name": "collector"
         },
         "prometheus": {
+            "labels": {
+                "le": "5"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "le": "+Inf"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "le": "3"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 3
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
             "metrics": {
                 "go_gc_duration_seconds_count": 13118,
-                "go_gc_duration_seconds_sum": 3.451780079
+                "go_gc_duration_seconds_sum": 3.451780079,
+                "http_request_duration_seconds_count": 3,
+                "http_request_duration_seconds_sum": 6
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "le": "2"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 2
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "le": "1"
+            },
+            "metrics": {
+                "http_request_duration_seconds_bucket": 1
             }
         },
         "service": {

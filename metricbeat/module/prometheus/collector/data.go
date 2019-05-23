@@ -118,7 +118,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 			}
 
 			for _, bucket := range histogram.GetBucket() {
-				if math.IsNaN(float64(bucket.GetCumulativeCount())) || math.IsInf(float64(bucket.GetCumulativeCount()), 0) {
+				if bucket.GetCumulativeCount() == uint64(math.NaN()) || bucket.GetCumulativeCount() == uint64(math.Inf(0)) {
 					continue
 				}
 

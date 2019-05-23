@@ -18,3 +18,15 @@ go_gc_duration_seconds{quantile="0.75"} 9.8154e-05
 go_gc_duration_seconds{quantile="1",} 0.011689149
 go_gc_duration_seconds_sum 3.451780079
 go_gc_duration_seconds_count 13118
+# HELP http_request_duration_seconds request duration histogram
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le="0.1"} +Inf
+http_request_duration_seconds_bucket{le="0.2"} -Inf
+http_request_duration_seconds_bucket{le="0.5"} NaN
+http_request_duration_seconds_bucket{le="1"} 1
+http_request_duration_seconds_bucket{le="2"} 2
+http_request_duration_seconds_bucket{le="3"} 3
+http_request_duration_seconds_bucket{le="5"} 3
+http_request_duration_seconds_bucket{le="+Inf"} 3
+http_request_duration_seconds_sum 6
+http_request_duration_seconds_count 3
