@@ -18,7 +18,7 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["system.audit.host.id", "system.audit.host.uptime", "system.audit.host.ip",
-                  "system.audit.host.os.name"]
+                  "system.audit.host.os.name", "host.ip", "host.mac"]
 
         # Metricset is beta and that generates a warning, TODO: remove later
         self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)

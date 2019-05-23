@@ -311,7 +311,9 @@ func getHost() (*Host, error) {
 }
 
 func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
-	return mb.Event{
+	hostFields := host.toMapStr()
+
+	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"kind":   eventType,
@@ -319,8 +321,17 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 			},
 			"message": hostMessage(host, action),
 		},
-		MetricSetFields: host.toMapStr(),
+		MetricSetFields: hostFields,
 	}
+
+	// Copy IP and MAC to host.* since add_host_metadata does not fill them by default.
+	hostTopLevel := common.MapStr{}
+	hostFields.CopyFieldsTo(hostTopLevel, "ip")
+	hostFields.CopyFieldsTo(hostTopLevel, "mac")
+
+	event.RootFields.Put("host", hostTopLevel)
+
+	return event
 }
 
 func hostMessage(host *Host, action eventAction) string {
