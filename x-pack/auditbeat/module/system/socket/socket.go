@@ -364,7 +364,7 @@ func (ms *MetricSet) enrichSocket(socket *Socket) error {
 
 	socket.Username = userAccount.Username
 
-	socket.Direction = ms.listeners.Direction(uint8(syscall.IPPROTO_TCP),
+	socket.Direction = ms.listeners.Direction(uint8(socket.Family), uint8(syscall.IPPROTO_TCP),
 		socket.LocalIP, socket.LocalPort, socket.RemoteIP, socket.RemotePort)
 
 	if ms.ptable != nil {
