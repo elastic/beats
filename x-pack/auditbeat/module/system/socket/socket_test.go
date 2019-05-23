@@ -213,7 +213,6 @@ func TestLocalhost(t *testing.T) {
 	checkFieldValue(t, event.RootFields, "network.direction", sock.Listening.String())
 	checkFieldValue(t, event.RootFields, "network.transport", "tcp")
 	checkFieldValue(t, event.RootFields, "destination.ip", "127.0.0.1")
-
 }
 
 func TestLocalhostExcluded(t *testing.T) {
