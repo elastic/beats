@@ -558,9 +558,13 @@ output.elasticsearch:
   # until all events are published. The default is 3.
   #max_retries: 3
 
-  # The maximum number of events to bulk in a single Kafka request. The default
-  # is 2048.
+  # The "best effort" number of events to bulk in a single Kafka request. Works 
+  # only when bulk_flush_frequency > 0; The default is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 10s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
