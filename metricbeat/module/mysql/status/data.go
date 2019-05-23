@@ -75,11 +75,11 @@ var (
 		"queries":   c.Int("Queries"),
 		"questions": c.Int("Questions"),
 		"handler": s.Object{
-			"commit":             c.Int("Handler_commit"),
-			"delete":             c.Int("Handler_delete"),
-			"external_lock":      c.Int("Handler_external_lock"),
-			"mrr_init":           c.Int("Handler_mrr_init"),
-			"prepare":            c.Int("Handler_prepare"),
+			"commit":        c.Int("Handler_commit"),
+			"delete":        c.Int("Handler_delete"),
+			"external_lock": c.Int("Handler_external_lock"),
+			"mrr_init":      c.Int("Handler_mrr_init"),
+			"prepare":       c.Int("Handler_prepare"),
 			"read": s.Object{
 				"first":    c.Int("Handler_read_first"),
 				"key":      c.Int("Handler_read_key"),
