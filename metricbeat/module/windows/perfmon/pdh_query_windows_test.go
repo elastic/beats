@@ -16,3 +16,72 @@
 // under the License.
 
 package perfmon
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+// TestOpenSuccessful will open query successfully.
+func TestOpenSuccessful(t *testing.T) {
+	var q Query
+	err := q.Open()
+	assert.Nil(t, err)
+	defer q.Close()
+}
+
+// TestAddCounterInvalidArgWhenQueryClosed will check if addcounter func fails when query is closed.
+func TestAddCounterInvalidArgWhenQueryClosed(t *testing.T) {
+	var q Query
+	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
+	queryPath, err := q.ExpandWildCardPath(validQuery)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = q.AddCounter(queryPath[0], counter, false)
+	assert.EqualValues(t, err, PDH_INVALID_ARGUMENT)
+}
+
+// func TestGetFormattedCounterValuesEmptyCounterList will check if getting the counter values will fail when no counter handles are added.
+func TestGetFormattedCounterValuesEmptyCounterList(t *testing.T) {
+	var q Query
+	list, err := q.GetFormattedCounterValues()
+	assert.Nil(t, list)
+	assert.EqualValues(t, err.Error(), "no counter list found")
+}
+
+// TestExpandWildCardPathWithEmptyString will check for a valid path string.
+func TestExpandWildCardPathWithEmptyString(t *testing.T) {
+	var q Query
+	list, err := q.ExpandWildCardPath("")
+	assert.Nil(t, list)
+	assert.EqualValues(t, err.Error(), "no query path given")
+}
+
+// TestSuccessfulQuery retrieves a per counter successfully.
+func TestSuccessfulQuery(t *testing.T) {
+	var q Query
+	err := q.Open()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer q.Close()
+	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
+	queryPath, err := q.ExpandWildCardPath(validQuery)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = q.AddCounter(queryPath[0], counter, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = q.CollectData()
+	err = q.CollectData()
+	if err != nil {
+		t.Fatal(err)
+	}
+	list, err := q.GetFormattedCounterValues()
+	assert.Nil(t, err)
+	assert.NotNil(t, list)
+}

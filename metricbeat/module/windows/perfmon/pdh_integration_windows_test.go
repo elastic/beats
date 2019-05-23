@@ -111,7 +111,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
-	err = q.AddCounter(processorTimeCounter, counter)
+	err = q.AddCounter(processorTimeCounter, counter, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -232,7 +232,7 @@ func TestLongOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 	counter := CounterConfig{Format: "long"}
-	err = query.AddCounter(processorTimeCounter, counter)
+	err = query.AddCounter(processorTimeCounter, counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}
@@ -267,7 +267,7 @@ func TestFloatOutputFormat(t *testing.T) {
 	}
 	defer query.Close()
 	counter := CounterConfig{Format: "float"}
-	err = query.AddCounter(processorTimeCounter, counter)
+	err = query.AddCounter(processorTimeCounter, counter, false)
 	if err != nil && err != PDH_NO_MORE_DATA {
 		t.Fatal(err)
 	}

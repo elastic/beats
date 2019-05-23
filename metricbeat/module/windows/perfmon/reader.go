@@ -31,7 +31,6 @@ import (
 )
 
 var (
-	//wildcardRegexp = regexp.MustCompile(`.*\(.*\*.*\).*|.*\(.*\)\\.*\*.*`)
 	processRegexp = regexp.MustCompile(`(.+?)#[1-9]+`)
 )
 
@@ -59,7 +58,6 @@ func NewReader(config Config) (*Reader, error) {
 		log:               logp.NewLogger("perfmon"),
 		groupMeasurements: config.GroupMeasurements,
 	}
-
 	for _, counter := range config.CounterConfig {
 		childQueries, err := query.ExpandWildCardPath(counter.Query)
 		if err != nil {
@@ -72,11 +70,15 @@ func NewReader(config Config) (*Reader, error) {
 					continue
 				}
 			} else {
+				query.Close()
 				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
 			}
 		}
+		if childQueries == nil || len(childQueries) == 0 {
+			return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
+		}
 		for _, v := range childQueries {
-			if err := query.AddCounter(v, counter); err != nil {
+			if err := query.AddCounter(v, counter, len(childQueries) > 1); err != nil {
 				query.Close()
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
@@ -155,6 +157,7 @@ func (r *Reader) Read() ([]mb.Event, error) {
 	return events, nil
 }
 
+// CloseQuery will close the PDH query.
 func (r *Reader) CloseQuery() error {
 	return r.query.Close()
 }

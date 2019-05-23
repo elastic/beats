@@ -18,3 +18,63 @@
 // +build windows
 
 package perfmon
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+// TestNewReaderWhenQueryPathNotProvided will check for invalid/no query.
+func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
+	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName"}
+	config := Config{
+		IgnoreNECounters:  false,
+		GroupMeasurements: false,
+		CounterConfig:     []CounterConfig{counter},
+	}
+	reader, err := NewReader(config)
+	assert.NotNil(t, err)
+	assert.Nil(t, reader)
+	assert.EqualValues(t, err.Error(), `failed to expand counter (query=""): no query path given`)
+}
+
+// TestNewReaderWithValidQueryPath should successfully instantiate the reader.
+func TestNewReaderWithValidQueryPath(t *testing.T) {
+	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
+	config := Config{
+		IgnoreNECounters:  false,
+		GroupMeasurements: false,
+		CounterConfig:     []CounterConfig{counter},
+	}
+	reader, err := NewReader(config)
+	assert.Nil(t, err)
+	assert.NotNil(t, reader)
+	assert.NotNil(t, reader.query)
+	assert.NotNil(t, reader.query.handle)
+	assert.NotNil(t, reader.query.counters)
+	assert.NotZero(t, len(reader.query.counters))
+	defer reader.CloseQuery()
+}
+
+// TestReadSuccessfully will test the func read when it first retrieves no events (and ignored) and then starts retrieving events.
+func TestReadSuccessfully(t *testing.T) {
+	counter := CounterConfig{Format: "float", InstanceName: "TestInstanceName", Query: validQuery}
+	config := Config{
+		IgnoreNECounters:  false,
+		GroupMeasurements: false,
+		CounterConfig:     []CounterConfig{counter},
+	}
+	reader, err := NewReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	events, err := reader.Read()
+	assert.Nil(t, err)
+	assert.NotNil(t, events)
+	assert.Zero(t, len(events))
+	events, err = reader.Read()
+	assert.Nil(t, err)
+	assert.NotNil(t, events)
+	assert.NotZero(t, len(events))
+}

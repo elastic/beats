@@ -63,7 +63,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
 	for _, value := range config.CounterConfig {
 		form := strings.ToLower(value.Format)
 		switch form {
@@ -77,7 +76,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 
 	}
-
 	reader, err := NewReader(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization of reader failed")
@@ -103,6 +101,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
+// Close will be called when metricbeat is stopped, should close the query.
 func (m *MetricSet) Close() error {
 	err := m.reader.CloseQuery()
 	if err != nil {

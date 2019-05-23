@@ -64,14 +64,14 @@ func (q *Query) Open() error {
 }
 
 // AddCounter adds the specified counter to the query.
-func (q *Query) AddCounter(counterPath string, counter CounterConfig) error {
+func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.Errorf("Counter %s has been already added", counterPath)
 	}
 	var err error
 	var instanceName string
 	// Extract the instance name from the counterPath.
-	if counter.InstanceName == "" {
+	if counter.InstanceName == "" || wildcard {
 		instanceName, err = matchInstanceName(counterPath)
 		if err != nil {
 			return err
@@ -99,6 +99,9 @@ func (q *Query) CollectData() error {
 
 // GetFormattedCounterValues returns an array of formatted values for a query.
 func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
+	if q.counters == nil || len(q.counters) == 0 {
+		return nil, errors.New("no counter list found")
+	}
 	rtn := make(map[string][]CounterValue, len(q.counters))
 
 	for path, counter := range q.counters {
@@ -123,7 +126,7 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 // ExpandWildCardPath  examines local computer and returns those counter paths that match the given counter path which contains wildcard characters.
 func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	if wildCardPath == "" {
-		return nil, errors.New("no wildcardpath given")
+		return nil, errors.New("no query path given")
 	}
 
 	expdPaths, err := PdhExpandWildCardPath(wildCardPath)
@@ -131,7 +134,6 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		return nil, err
 	}
 	return UTF16ToStringArray(expdPaths), nil
-
 }
 
 // Close closes the query and all of its counters.
@@ -151,7 +153,7 @@ func matchInstanceName(counterPath string) (string, error) {
 	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
 }
 
-// calculates data format
+// getFormat calculates data format.
 func getFormat(format string) PdhCounterFormat {
 	switch format {
 	case "double":
