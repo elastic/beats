@@ -74,7 +74,7 @@ specific to your Beat (the code that creates the event and sends it to the publi
 Libbeat also offers common services like configuration management, logging,
 daemonzing, and Windows service handling, and data processing modules.
 
-image:./images/beat_overview.png[Beat overview architecture]
+image::./images/beat_overview.png[Beat overview architecture]
 
 The event that you create is a JSON-like object (Go type `map[string]interface{}`) that
 contains the collected data to send to the publisher. At a minimum, the event object

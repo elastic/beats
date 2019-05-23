@@ -123,7 +123,7 @@ func TestGetInstanceIDs(t *testing.T) {
 
 func TestCreateCloudWatchEvents(t *testing.T) {
 	mockModuleConfig := aws.Config{
-		Period:        "300s",
+		Period:        300 * time.Second,
 		DefaultRegion: regionName,
 	}
 
@@ -217,7 +217,7 @@ func TestConstructMetricQueries(t *testing.T) {
 	}
 
 	listMetricsOutput := []cloudwatch.Metric{listMetric}
-	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 300)
+	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 5*time.Minute)
 	assert.Equal(t, 1, len(metricDataQuery))
 	assert.Equal(t, "i-123 CPUUtilization", *metricDataQuery[0].Label)
 	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)

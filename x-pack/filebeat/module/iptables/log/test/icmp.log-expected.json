@@ -6,6 +6,7 @@
         "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
+        "event.timezone": "+00:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,

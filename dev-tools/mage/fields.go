@@ -25,6 +25,35 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+const (
+	// FieldsYML specifies the path to the file containing the field data for
+	// the Beat (formerly this was ./fields.yml).
+	FieldsYML = "build/fields/fields.yml"
+	// FieldsYMLRoot specifies the filename of the project's root level
+	// fields.yml file (this is being replaced by FieldsYML).
+	FieldsYMLRoot = "fields.yml"
+	// FieldsAllYML specifies the path to the file containing the field data for
+	// the Beat from all license types. It's generally used for making documentation.
+	FieldsAllYML = "build/fields/fields.all.yml"
+)
+
+// FieldsBuilder is the interface projects to implement for building field data.
+type FieldsBuilder interface {
+	// Generate all fields.go files.
+	FieldsGo() error
+
+	// Generate build/fields/fields.yml containing fields for the Beat. This
+	// file may need be copied to fields.yml if tests depend on it, but those
+	// tests should be updated.
+	FieldsYML() error
+
+	// Generate build/fields/fields.all.yml containing all possible fields
+	// for all license types. (Used for field documentation.)
+	FieldsAllYML() error
+
+	All() // Build everything.
+}
+
 // GenerateFieldsYAML generates a fields.yml file for a Beat. This will include
 // the common fields specified by libbeat, the common fields for the Beat,
 // and any additional fields.yml files you specify.
@@ -54,7 +83,7 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
 		"-beat_path", baseDir,
-		"-out", output,
+		"-out", CreateDir(output),
 	)
 
 	return globalFieldsCmd(moduleDirs...)
@@ -78,7 +107,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		filepath.Join(beatsDir, assetCmdPath),
 		"-pkg", "include",
 		"-in", fieldsYML,
-		"-out", createDir(out),
+		"-out", CreateDir(out),
 		"-license", toLibbeatLicenseName(BeatLicense),
 		BeatName,
 	)
@@ -97,11 +126,15 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 		return err
 	}
 
+	if !filepath.IsAbs(moduleDir) {
+		moduleDir = CWD(moduleDir)
+	}
+
 	moduleFieldsCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
 		"-license", toLibbeatLicenseName(BeatLicense),
-		filepath.Join(moduleDir),
+		moduleDir,
 	)
 
 	return moduleFieldsCmd()
@@ -110,9 +143,7 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 // GenerateModuleIncludeListGo generates an include/list.go file containing
 // a import statement for each module and dataset.
 func GenerateModuleIncludeListGo() error {
-	return GenerateIncludeListGo(nil, []string{
-		filepath.Join(CWD(), "module"),
-	})
+	return GenerateIncludeListGo(nil, []string{"module"})
 }
 
 // GenerateIncludeListGo generates an include/list.go file containing imports
@@ -133,9 +164,15 @@ func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
 
 	var args []string
 	for _, dir := range importDirs {
+		if !filepath.IsAbs(dir) {
+			dir = CWD(dir)
+		}
 		args = append(args, "-import", dir)
 	}
 	for _, dir := range moduleDirs {
+		if !filepath.IsAbs(dir) {
+			dir = CWD(dir)
+		}
 		args = append(args, "-moduleDir", dir)
 	}
 

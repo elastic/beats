@@ -67,7 +67,11 @@ ifeval::["{beatname_lc}"=="filebeat"]
 :processor-scope: input
 endif::[]
 
-ifeval::["{beatname_lc}"=="auditbeat" or "{beatname_lc}"=="metricbeat"]
+ifeval::["{beatname_lc}"=="auditbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="metricbeat"]
 :processor-scope: module
 endif::[]
 
@@ -205,17 +209,19 @@ The supported processors are:
  * <<add-process-metadata,`add_process_metadata`>>
  * <<add-tags, `add_tags`>>
  * <<community-id,`community_id`>>
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
-* <<decode-csv-fields,`decode_csv_fields`>>
+ * <<convert,`convert`>>
+ifdef::has_decode_csv_fields_processor[]
+ * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
  * <<dissect, `dissect`>>
+ * <<extract-array,`extract_array`>>
  * <<processor-dns, `dns`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
  * <<rename-fields,`rename`>>
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
  * <<processor-script,`script`>>
 endif::[]
 
@@ -779,8 +785,7 @@ Adds the environment field to every event:
 }
 -------------------------------------------------------------------------------
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
-* <<decode-csv-fields,`decode_csv_fields`>>
+ifdef::has_decode_csv_fields_processor[]
 [[decode-csv-fields]]
 === Decode CSV fields
 
@@ -806,22 +811,22 @@ processors:
 The `decode_csv_fields` has the following settings:
 
 `fields`:: This is a mapping from the source field containing the CSV data to
-           the destination field where the decoded array will be written.
+           the destination field to which the decoded array will be written.
 `separator`:: (Optional) Character to be used as a column separator.
               The default is the comma character. For using a TAB character you
               must set it to "\t".
 `ignore_missing`:: (Optional) Whether to ignore events which lack the source
-                   field. The default is false, which will fail processing of an
-                   event if `target` field is missing.
+                   field. The default is `false`, which will fail processing of
+                   an event if a field is missing.
 `overwrite_keys`:: Whether the target field is overwritten if it
                    already exists. The default is false, which will fail
                    processing of an event when `target` already exists.
 `trim_leading_space`:: Whether extra space after the separator is trimmed from
                        values. This works even if the separator is also a space.
-                       The default is false.
+                       The default is `false`.
 `fail_on_error`:: (Optional) If set to true, in case of an error the changes to
-the event are reverted and the original event is returned. If set to false,
-processing continues also if an error happened during renaming. Default is `true`.
+the event are reverted, and the original event is returned. If set to `false`,
+processing continues also if an error happens. Default is `true`.
 
 endif::[]
 
@@ -903,6 +908,52 @@ silently continue without adding the target field.
 
 The processor also accepts an optional `seed` parameter that must be a 16-bit
 unsigned integer. This value gets incorporated into all generated hashes.
+
+[[convert]]
+=== Convert
+
+The `convert` processor converts a field in the event to a different type, such
+as converting a string to an integer.
+
+The supported types include: `integer`, `long`, `float`, `double`, `string`,
+`boolean`, and `ip`.
+
+The `ip` type is effectively an alias for `string`, but with an added validation
+that the value is an IPv4 or IPv6 address.
+
+[source,yaml]
+----
+processors:
+  - convert:
+      fields:
+        - {from: "src_ip", to: "source.ip", type: "ip"}
+        - {from: "src_port", to: "source.port", type: "integer"}
+      ignore_missing: true
+      fail_on_error: false
+----
+
+The `convert` processor has the following configuration settings:
+
+`fields`:: (Required) This is the list of fields to convert. At least one item
+must be contained in the list. Each item in the list must have a `from` key that
+specifies the source field. The `to` key is optional and specifies where to
+assign the converted value. If `to` is omitted then the `from` field is updated
+in-place. The `type` key specifies the data type to convert the value to. If
+`type` is omitted then the processor copies or renames the field without any
+type conversion.
+
+`ignore_missing`:: (Optional) If `true` the processor continues to the next
+field when the `from` key is not found in the event. If false then the processor
+returns an error and does not process the remaining fields. Default is `false`.
+
+`fail_on_error`:: (Optional) If false type conversion failures are ignored and
+the processor continues to the next field. Default is `true`.
+
+`tag`:: (Optional) An identifier for this processor. Useful for debugging.
+
+`mode`:: (Optional) When both `from` and `to` are defined for a field then
+`mode` controls whether to `copy` or `rename` the field when the type conversion
+is successful. Default is `copy`.
 
 [[drop-event]]
 === Drop events
@@ -1526,7 +1577,7 @@ set to `true`, this condition will be ignored.
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
+ifdef::has_script_processor[]
 [[processor-script]]
 === Script Processor
 
@@ -1696,3 +1747,46 @@ thrown.
 *Example*: `event.AppendTo("error.message", "invalid file hash");`
 |===
 endif::[]
+
+[[extract-array]]
+=== Extract array
+
+experimental[]
+
+The `extract_array` processor populates fields with values read from an array
+field. The following example will populate `source.ip` with the first element of
+the `my_array` field, `destination.ip` with the second element, and
+`network.transport` with the third.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - extract_array:
+     field: my_array
+     mappings:
+        source.ip: 0
+        destination.ip: 1
+        network.transport: 2
+-----------------------------------------------------
+
+The following settings are supported:
+
+`field`:: The array field whose elements are to be extracted.
+`mappings`:: Maps each field name to an array index. Use 0 for the first element in
+             the array. Multiple fields can be mapped to the same array element.
+`ignore_missing`:: (Optional) Whether to ignore events where the array field is
+                   missing. The default is `false`, which will fail processing
+                   of an event if the specified field does not exist. Set it to
+                   `true` to ignore this condition.
+`overwrite_keys`:: Whether the target fields specified in the mapping are
+                   overwritten if they already exist. The default is `false`,
+                   which will fail processing if a target field already exists.
+`fail_on_error`:: (Optional) If set to `true` and an error happens, changes to
+                  the event are reverted, and the original event is returned. If
+                  set to `false`, processing continues despite errors.
+                  Default is `true`.
+`omit_empty`:: (Optional) Whether empty values are extracted from the array. If
+                  set to `true`, instead of the target field being set to an
+                  empty value, it is left unset. The empty string (`""`), an
+                  empty array (`[]`) or an empty object (`{}`) are considered
+                  empty values. Default is `false`.
