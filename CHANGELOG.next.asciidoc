@@ -123,7 +123,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
-- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089] 
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 
 *Packetbeat*
@@ -159,6 +159,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
 - New `extract_array` processor. {pull}11761[11761]
 - Add number of goroutines to reported metrics. {pull}12135[12135]
+- Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
 
 *Auditbeat*
 
