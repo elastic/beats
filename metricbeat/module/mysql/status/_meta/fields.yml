@@ -160,3 +160,183 @@
           type: long
           description: >
             The number of UPDATE queries since startup.
+
+    - name: queries
+      type: long
+      description: >
+
+    - name: questions
+      type: long
+      description: >
+
+    - name: handler
+      type: group
+      description: >
+      fields:
+        - name: commit
+          type: long
+          description: >
+
+        - name: delete
+          type: long
+          description: >
+
+        - name: external_lock
+          type: long
+          description: >
+
+        - name: mrr_init
+          type: long
+          description: >
+
+        - name: prepare
+          type: long
+          description: >
+
+        - name: read
+          type: group
+          description: >
+          fields:
+            - name: first
+              type: long
+              description: >
+
+            - name: key
+              type: long
+              description: >
+
+            - name: last
+              type: long
+              description: >
+
+            - name: next
+              type: long
+              description: >
+
+            - name: prev
+              type: long
+              description: >
+
+            - name: rnd
+              type: long
+              description: >
+
+            - name: rnd_next
+              type: long
+              description: >
+
+        - name: rollback
+          type: long
+          description: >
+
+        - name: savepoint
+          type: long
+          description: >
+
+        - name: savepoint_rollback
+          type: long
+          description: >
+
+        - name: update
+          type: long
+          description: >
+
+        - name: write
+          type: long
+          description: >
+
+    - name: innodb_buffer_pool
+      type: group
+      description: >
+      fields:
+        - name: dump_status
+          type: long
+          description: >
+
+        - name: load_status
+          type: long
+          description: >
+
+        - name: bytes
+          type: group
+          description: >
+          fields:
+            - name: data
+              type: long
+              description: >
+
+            - name: dirty
+              type: long
+              description: >
+
+        - name: pages
+          type: group
+          description: >
+          fields:
+            - name: data
+              type: long
+              description: >
+
+            - name: dirty
+              type: long
+              description: >
+
+            - name: flushed
+              type: long
+              description: >
+
+            - name: free
+              type: long
+              description: >
+
+            - name: latched
+              type: long
+              description: >
+
+            - name: misc
+              type: long
+              description: >
+
+            - name: total
+              type: long
+              description: >
+
+        - name: read
+          type: group
+          description: >
+          fields:
+            - name: ahead
+              type: long
+              description: >
+
+            - name: ahead_evicted
+              type: long
+              description: >
+
+            - name: ahead_rnd
+              type: long
+              description: >
+
+            - name: requests
+              type: long
+              description: >
+
+        - name: pool
+          type: group
+          description: >
+          fields:
+            - name: reads
+              type: long
+              description: >
+
+            - name: resize_status
+              type: long
+              description: >
+
+            - name: wait_free
+              type: long
+              description: >
+
+        - name: write_requests
+          type: long
+          description: >
