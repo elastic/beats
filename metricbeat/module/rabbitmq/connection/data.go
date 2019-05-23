@@ -31,9 +31,9 @@ import (
 var (
 	schema = s.Schema{
 		"name":        c.Str("name"),
-		"vhost":       c.Str("vhost"),
-		"user":        c.Str("user"),
-		"node":        c.Str("node"),
+		"vhost":       c.Str("vhost", s.Required),
+		"user":        c.Str("user", s.Required),
+		"node":        c.Str("node", s.Required),
 		"channels":    c.Int("channels"),
 		"channel_max": c.Int("channel_max"),
 		"frame_max":   c.Int("frame_max"),
@@ -79,7 +79,7 @@ func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 }
 
 func eventMapping(connection map[string]interface{}) (mb.Event, error) {
-	fields, err := schema.Apply(connection)
+	fields, err := schema.Apply(connection, s.FailOnRequired)
 	if err != nil {
 		return mb.Event{}, errors.Wrap(err, "error applying schema")
 	}
