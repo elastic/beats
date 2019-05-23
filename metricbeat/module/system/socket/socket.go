@@ -184,7 +184,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 	c.Username = m.users.LookupUID(int(c.UID))
 
 	// Determine direction (incoming, outgoing, or listening).
-	c.Direction = m.listeners.Direction(uint8(syscall.IPPROTO_TCP),
+	c.Direction = m.listeners.Direction(uint8(c.Family), uint8(syscall.IPPROTO_TCP),
 		c.LocalIP, c.LocalPort, c.RemoteIP, c.RemotePort)
 
 	// Reverse DNS lookup on the remote IP.
