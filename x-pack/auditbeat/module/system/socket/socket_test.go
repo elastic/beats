@@ -49,6 +49,14 @@ func TestData(t *testing.T) {
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
+func TestSocket(t *testing.T) {
+	s := testSocket()
+
+	assert.Equal(t, uint64(0xee1186910755e9b1), s.Hash())
+	assert.Equal(t, "fIj66YRoGyoe8dML", s.entityID("fa8a1edd06864f47ba4cad5d0f5ca134"))
+	assert.Equal(t, "1:IXrg9Y06W7zrkqBlE30jpC/mzjo=", s.communityID())
+}
+
 func testSocket() *Socket {
 	return &Socket{
 		Family:      linux.AF_INET,
