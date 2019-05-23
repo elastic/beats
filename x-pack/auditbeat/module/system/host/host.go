@@ -123,6 +123,10 @@ func (host *Host) toMapStr() common.MapStr {
 		mapstr.Put("containerized", host.info.Containerized)
 	}
 
+	if host.info.OS.Codename != "" {
+		mapstr.Put("os.codename", host.info.OS.Codename)
+	}
+
 	var ipStrings []string
 	for _, ip := range host.ips {
 		ipStrings = append(ipStrings, ip.String())
@@ -324,10 +328,20 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 		MetricSetFields: hostFields,
 	}
 
-	// Copy IP and MAC to host.* since add_host_metadata does not fill them by default.
+	// Copy select host.* fields in case add_host_metadata is not configured.
 	hostTopLevel := common.MapStr{}
+	hostFields.CopyFieldsTo(hostTopLevel, "architecture")
+	hostFields.CopyFieldsTo(hostTopLevel, "containerized")
+	hostFields.CopyFieldsTo(hostTopLevel, "hostname")
+	hostFields.CopyFieldsTo(hostTopLevel, "id")
 	hostFields.CopyFieldsTo(hostTopLevel, "ip")
 	hostFields.CopyFieldsTo(hostTopLevel, "mac")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.codename")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.family")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.kernel")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.name")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.platform")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.version")
 
 	event.RootFields.Put("host", hostTopLevel)
 
