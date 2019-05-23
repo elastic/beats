@@ -64,6 +64,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "failed fetching haproxy info")
 	}
 
-	eventMapping(res, reporter)
+	event, err := eventMapping(res, reporter)
+	if err != nil {
+		return errors.Wrap(err, "error in mapping")
+	}
+	reporter.Event(event)
 	return nil
 }

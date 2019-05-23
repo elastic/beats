@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Socket dataset: Exclude localhost by default {pull}11993[11993]
 
 *Filebeat*
+
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
@@ -63,6 +64,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Not hiding error in case of http failure using elastic fetcher {pull}11604[11604]
 - Relax validation of the X-Pack license UID value. {issue}11640[11640]
 - Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Escape BOM on JsonReader before trying to decode line {pull}11661[11661]
 - Fix ILM policy always being overwritten. {pull}11671[11671]
 - Fix template always being overwritten. {pull}11671[11671]
 - Fix matching of string arrays in contains condition. {pull}11691[11691]
@@ -72,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
 - Fix queue.spool.write.flush.events config type. {pull}12080[12080]
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+- Fixed Beat ID being reported by GET / API. {pull}12180[12180]
 
 *Auditbeat*
 
@@ -81,6 +84,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
 - Login dataset: Fix re-read of utmp files. {pull}12028[12028]
 - Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
+- Fix formatting of config files on macOS and Windows. {pull}12148[12148]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 
 *Filebeat*
 
@@ -94,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
 - Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 
 *Heartbeat*
 
@@ -117,6 +123,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089] 
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 
 *Packetbeat*
 
@@ -176,6 +184,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
 - Add support to new MongoDB additional diagnostic information {pull}11952[11952]
 - New module `palo_alto` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
+- Add RabbitMQ module. {pull}12032[12032]
+- Add new `container` input. {pull}12162[12162]
 
 *Heartbeat*
 
@@ -199,6 +209,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS cloudwatch metricset. {pull}11798[11798] {issue}11734[11734]
 - Add `regions` in aws module config to specify target regions for querying cloudwatch metrics. {issue}11932[11932] {pull}11956[11956]
 - Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
+- Add overview dashboard to Consul module {pull}10665[10665]
 
 *Packetbeat*
 
@@ -215,6 +226,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 *Filebeat*
+
+- `docker` input is deprecated in favour `container`. {pull}12162[12162]
 
 *Heartbeat*
 
