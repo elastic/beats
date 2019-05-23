@@ -19467,6 +19467,390 @@ The number of UPDATE queries since startup.
 
 --
 
+*`mysql.status.queries`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.questions`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== handler fields
+
+
+
+
+*`mysql.status.handler.commit`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.delete`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.external_lock`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.mrr_init`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.prepare`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== read fields
+
+
+
+
+*`mysql.status.handler.read.first`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.read.key`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.read.last`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.read.next`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.read.prev`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.read.rnd`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.read.rnd_next`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.rollback`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.savepoint`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.savepoint_rollback`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.update`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.handler.write`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== innodb_buffer_pool fields
+
+
+
+
+*`mysql.status.innodb_buffer_pool.dump_status`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.load_status`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== bytes fields
+
+
+
+
+*`mysql.status.innodb_buffer_pool.bytes.data`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.bytes.dirty`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== pages fields
+
+
+
+
+*`mysql.status.innodb_buffer_pool.pages.data`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pages.dirty`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pages.flushed`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pages.free`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pages.latched`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pages.misc`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pages.total`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== read fields
+
+
+
+
+*`mysql.status.innodb_buffer_pool.read.ahead`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.read.ahead_evicted`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.read.ahead_rnd`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.read.requests`*::
++
+--
+type: long
+
+
+
+--
+
+[float]
+== pool fields
+
+
+
+
+*`mysql.status.innodb_buffer_pool.pool.reads`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pool.resize_status`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.pool.wait_free`*::
++
+--
+type: long
+
+
+
+--
+
+*`mysql.status.innodb_buffer_pool.write_requests`*::
++
+--
+type: long
+
+
+
+--
+
 [[exported-fields-nats]]
 == Nats fields
 
