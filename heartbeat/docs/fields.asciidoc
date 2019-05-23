@@ -3546,6 +3546,18 @@ OS build information.
 
 --
 
+*`host.os.codename`*::
++
+--
+type: keyword
+
+example: stretch
+
+OS codename, if any.
+
+
+--
+
 [[exported-fields-http]]
 == HTTP monitor fields
 
