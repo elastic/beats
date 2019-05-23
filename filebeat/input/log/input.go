@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -68,6 +69,7 @@ type Input struct {
 	done          chan struct{}
 	numHarvesters atomic.Uint32
 	meta          map[string]string
+	stopOnce      sync.Once
 }
 
 // NewInput instantiates a new Log
@@ -146,6 +148,8 @@ func NewInput(
 	logp.Info("Configured paths: %v", p.config.Paths)
 
 	cleanupNeeded = false
+	go p.stopWhenDone()
+
 	return p, nil
 }
 
@@ -727,14 +731,27 @@ func (p *Input) Wait() {
 
 // Stop stops all harvesters and then stops the input
 func (p *Input) Stop() {
-	// Stop all harvesters
-	// In case the beatDone channel is closed, this will not wait for completion
-	// Otherwise Stop will wait until output is complete
-	p.harvesters.Stop()
+	p.stopOnce.Do(func() {
+		// Stop all harvesters
+		// In case the beatDone channel is closed, this will not wait for completion
+		// Otherwise Stop will wait until output is complete
+		p.harvesters.Stop()
 
-	// close state updater
-	p.stateOutlet.Close()
+		// close state updater
+		p.stateOutlet.Close()
 
-	// stop all communication between harvesters and publisher pipeline
-	p.outlet.Close()
+		// stop all communication between harvesters and publisher pipeline
+		p.outlet.Close()
+	})
+}
+
+// stopWhenDone takes care of stopping the input if some of the contexts are done
+func (p *Input) stopWhenDone() {
+	select {
+	case <-p.done:
+	case <-p.stateOutlet.Done():
+	case <-p.outlet.Done():
+	}
+
+	p.Wait()
 }

@@ -13,9 +13,6 @@ This module wraps the <<filebeat-input-netflow,netflow input>> to enrich the
 flow records with geolocation information about the IP endpoints by using
 Elasticsearch Ingest Node.
 
-[float]
-=== Compatibility
-
 include::../include/running-modules.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
