@@ -40,7 +40,11 @@ the same {es} cluster, specify the following minimal configuration:
 --
 [source, yml]
 --------------------
-monitoring.enabled: true
+xpack.monitoring:
+  enabled: true
+  elasticsearch:
+    username: {beat_monitoring_user}
+    password: somepassword
 --------------------
 
 If you configured a different output, such as {ls} or you want to send {beatname_uc}
