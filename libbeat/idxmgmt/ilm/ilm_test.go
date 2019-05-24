@@ -74,6 +74,49 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(Alias{Name: "alias", Pattern: "01"}, s.Alias())
 	})
 
+	t.Run("with custom alias config with fieldref", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":        true,
+				"name":           "test-%{[agent.version]}",
+				"rollover_alias": "alias-%{[agent.version]}",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
+			},
+		))
+		require.NoError(t, err)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "alias-9.9.9", Pattern: "01"}, s.Alias())
+	})
+
+	t.Run("with default alias", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":      true,
+				"name":         "test-%{[agent.version]}",
+				"pattern":      "01",
+				"check_exists": false,
+				"overwrite":    true,
+			},
+		))
+		require.NoError(t, err)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "test-9.9.9", Pattern: "01"}, s.Alias())
+	})
+
 	t.Run("load external policy", func(t *testing.T) {
 		s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			common.MapStr{"policy_file": "testfiles/custom.json"},
