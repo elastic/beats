@@ -4,10 +4,10 @@
     Memory metrics.
   release: ga
   fields:
-    - name: private_working_set
+    - name: private_working_set.total
       type: long
       description: >
-        private working sets
+        private working sets on Windows
     - name: fail.count
       type: scaled_float
       description: >

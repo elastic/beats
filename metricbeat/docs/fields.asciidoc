@@ -4539,12 +4539,12 @@ Memory metrics.
 
 
 
-*`docker.memory.private_working_set`*::
+*`docker.memory.private_working_set.total`*::
 +
 --
 type: long
 
-private working sets
+private working sets on Windows
 
 
 --

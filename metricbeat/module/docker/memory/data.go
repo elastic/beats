@@ -38,7 +38,9 @@ func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 				"commit":      memoryData.Commit,
 				"commit_peak": memoryData.CommitPeak,
 			},
-			"private_working_set": memoryData.PrivateWorkingSet,
+			"private_working_set": common.MapStr{
+				"total": memoryData.PrivateWorkingSet,
+			},
 		}
 	} else {
 		fields = common.MapStr{
