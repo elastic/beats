@@ -2,330 +2,330 @@
     "objects": [
         {
             "attributes": {
-                "description": "", 
+                "description": "",
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": []
                     }
-                }, 
-                "savedSearchId": "PostgreSQL All Logs-ecs", 
-                "title": "Log Level Count [Filebeat PostgreSQL] ECS", 
+                },
+                "savedSearchId": "PostgreSQL All Logs-ecs",
+                "title": "Log Level Count [Filebeat PostgreSQL] ECS",
                 "uiStateJSON": {
                     "vis": {
                         "params": {
                             "sort": {
-                                "columnIndex": null, 
+                                "columnIndex": null,
                                 "direction": null
                             }
                         }
                     }
-                }, 
-                "version": 1, 
+                },
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
                             "type": "count"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "2", 
+                            "enabled": true,
+                            "id": "2",
                             "params": {
-                                "field": "log.level", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "field": "log.level",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 12
-                            }, 
-                            "schema": "bucket", 
+                            },
+                            "schema": "bucket",
                             "type": "terms"
                         }
-                    ], 
+                    ],
                     "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false, 
-                        "showTotal": false, 
+                        "perPage": 10,
+                        "showMeticsAtAllLevels": false,
+                        "showPartialRows": false,
+                        "showTotal": false,
                         "sort": {
-                            "columnIndex": null, 
+                            "columnIndex": null,
                             "direction": null
-                        }, 
+                        },
                         "totalFunc": "sum"
-                    }, 
-                    "title": "Log Level Count [Filebeat PostgreSQL] ECS", 
+                    },
+                    "title": "Log Level Count [Filebeat PostgreSQL] ECS",
                     "type": "table"
                 }
-            }, 
-            "id": "PostgreSQL Log Level Count-ecs", 
-            "type": "visualization", 
+            },
+            "id": "PostgreSQL Log Level Count-ecs",
+            "type": "visualization",
             "version": 2
-        }, 
+        },
         {
             "attributes": {
                 "columns": [
-                    "user.name", 
-                    "postgresql.log.database", 
-                    "log.level", 
-                    "message", 
+                    "user.name",
+                    "postgresql.log.database",
+                    "log.level",
+                    "message",
                     "postgresql.log.query"
-                ], 
-                "description": "", 
-                "hits": 0, 
+                ],
+                "description": "",
+                "hits": 0,
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": [
                             {
                                 "$state": {
                                     "store": "appState"
-                                }, 
+                                },
                                 "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "filebeat-*", 
-                                    "key": "event.module", 
-                                    "negate": false, 
+                                    "alias": null,
+                                    "disabled": false,
+                                    "index": "filebeat-*",
+                                    "key": "event.module",
+                                    "negate": false,
                                     "params": {
-                                        "query": "postgresql", 
+                                        "query": "postgresql",
                                         "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
+                                    },
+                                    "type": "phrase",
                                     "value": "postgresql"
-                                }, 
+                                },
                                 "query": {
                                     "match": {
                                         "event.module": {
-                                            "query": "postgresql", 
+                                            "query": "postgresql",
                                             "type": "phrase"
                                         }
                                     }
                                 }
                             }
-                        ], 
-                        "highlightAll": true, 
-                        "index": "filebeat-*", 
+                        ],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
                             "query": ""
-                        }, 
+                        },
                         "version": true
                     }
-                }, 
+                },
                 "sort": [
-                    "@timestamp", 
+                    "@timestamp",
                     "desc"
-                ], 
-                "title": "All Logs [Filebeat PostgreSQL] ECS", 
+                ],
+                "title": "All Logs [Filebeat PostgreSQL] ECS",
                 "version": 1
-            }, 
-            "id": "PostgreSQL All Logs-ecs", 
-            "type": "search", 
+            },
+            "id": "PostgreSQL All Logs-ecs",
+            "type": "search",
             "version": 1
-        }, 
+        },
         {
             "attributes": {
-                "description": "", 
+                "description": "",
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": []
                     }
-                }, 
-                "savedSearchId": "PostgreSQL All Logs-ecs", 
-                "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
-                "uiStateJSON": {}, 
-                "version": 1, 
+                },
+                "savedSearchId": "PostgreSQL All Logs-ecs",
+                "title": "Logs by level over time [Filebeat PostgreSQL] ECS",
+                "uiStateJSON": {},
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
                             "type": "count"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "2", 
+                            "enabled": true,
+                            "id": "2",
                             "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
+                                "customInterval": "2h",
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
                                 "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
+                            },
+                            "schema": "segment",
                             "type": "date_histogram"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "3", 
+                            "enabled": true,
+                            "id": "3",
                             "params": {
-                                "field": "log.level", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "field": "log.level",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 5
-                            }, 
-                            "schema": "group", 
+                            },
+                            "schema": "group",
                             "type": "terms"
                         }
-                    ], 
+                    ],
                     "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
                         "categoryAxes": [
                             {
-                                "id": "CategoryAxis-1", 
+                                "id": "CategoryAxis-1",
                                 "labels": {
-                                    "show": true, 
+                                    "show": true,
                                     "truncate": 100
-                                }, 
-                                "position": "bottom", 
+                                },
+                                "position": "bottom",
                                 "scale": {
                                     "type": "linear"
-                                }, 
-                                "show": true, 
-                                "style": {}, 
+                                },
+                                "show": true,
+                                "style": {},
                                 "title": {
                                     "text": "@timestamp per month"
-                                }, 
+                                },
                                 "type": "category"
                             }
-                        ], 
+                        ],
                         "grid": {
-                            "categoryLines": false, 
+                            "categoryLines": false,
                             "style": {
                                 "color": "#eee"
                             }
-                        }, 
-                        "legendPosition": "right", 
+                        },
+                        "legendPosition": "right",
                         "seriesParams": [
                             {
                                 "data": {
-                                    "id": "1", 
+                                    "id": "1",
                                     "label": "Count"
-                                }, 
-                                "drawLinesBetweenPoints": true, 
-                                "mode": "stacked", 
-                                "show": "true", 
-                                "showCircles": true, 
-                                "type": "histogram", 
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "stacked",
+                                "show": "true",
+                                "showCircles": true,
+                                "type": "histogram",
                                 "valueAxis": "ValueAxis-1"
                             }
-                        ], 
-                        "times": [], 
-                        "type": "histogram", 
+                        ],
+                        "times": [],
+                        "type": "histogram",
                         "valueAxes": [
                             {
-                                "id": "ValueAxis-1", 
+                                "id": "ValueAxis-1",
                                 "labels": {
-                                    "filter": false, 
-                                    "rotate": 0, 
-                                    "show": true, 
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
                                     "truncate": 100
-                                }, 
-                                "name": "LeftAxis-1", 
-                                "position": "left", 
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "left",
                                 "scale": {
-                                    "mode": "normal", 
+                                    "mode": "normal",
                                     "type": "linear"
-                                }, 
-                                "show": true, 
-                                "style": {}, 
+                                },
+                                "show": true,
+                                "style": {},
                                 "title": {
                                     "text": "Count"
-                                }, 
+                                },
                                 "type": "value"
                             }
                         ]
-                    }, 
-                    "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
+                    },
+                    "title": "Logs by level over time [Filebeat PostgreSQL] ECS",
                     "type": "histogram"
                 }
-            }, 
-            "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
-            "type": "visualization", 
+            },
+            "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs",
+            "type": "visualization",
             "version": 1
-        }, 
+        },
         {
             "attributes": {
-                "description": "Overview dashboard for the Filebeat PostgreSQL module", 
-                "hits": 0, 
+                "description": "Overview dashboard for the Filebeat PostgreSQL module",
+                "hits": 0,
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [], 
-                        "highlightAll": true, 
+                        "filter": [],
+                        "highlightAll": true,
                         "query": {
                             "language": "kuery",
                             "query": ""
-                        }, 
+                        },
                         "version": true
                     }
-                }, 
+                },
                 "optionsJSON": {
                     "darkTheme": false
-                }, 
+                },
                 "panelsJSON": [
                     {
-                        "col": 1, 
-                        "id": "PostgreSQL Log Level Count-ecs", 
-                        "panelIndex": 1, 
-                        "row": 1, 
-                        "size_x": 3, 
-                        "size_y": 3, 
+                        "col": 1,
+                        "id": "PostgreSQL Log Level Count-ecs",
+                        "panelIndex": 1,
+                        "row": 1,
+                        "size_x": 3,
+                        "size_y": 3,
                         "type": "visualization"
-                    }, 
+                    },
                     {
-                        "col": 1, 
+                        "col": 1,
                         "columns": [
-                            "user.name", 
-                            "postgresql.log.database", 
-                            "log.level", 
-                            "message", 
+                            "user.name",
+                            "postgresql.log.database",
+                            "log.level",
+                            "message",
                             "postgresql.log.query"
-                        ], 
-                        "id": "PostgreSQL All Logs-ecs", 
-                        "panelIndex": 2, 
-                        "row": 4, 
-                        "size_x": 12, 
-                        "size_y": 6, 
+                        ],
+                        "id": "PostgreSQL All Logs-ecs",
+                        "panelIndex": 2,
+                        "row": 4,
+                        "size_x": 12,
+                        "size_y": 6,
                         "sort": [
-                            "@timestamp", 
+                            "@timestamp",
                             "desc"
-                        ], 
+                        ],
                         "type": "search"
-                    }, 
+                    },
                     {
-                        "col": 4, 
-                        "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
-                        "panelIndex": 3, 
-                        "row": 1, 
-                        "size_x": 9, 
-                        "size_y": 3, 
+                        "col": 4,
+                        "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs",
+                        "panelIndex": 3,
+                        "row": 1,
+                        "size_x": 9,
+                        "size_y": 3,
                         "type": "visualization"
                     }
-                ], 
-                "timeRestore": false, 
-                "title": "[Filebeat PostgreSQL] Overview ECS", 
+                ],
+                "timeRestore": false,
+                "title": "[Filebeat PostgreSQL] Overview ECS",
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
                             "params": {
                                 "sort": {
-                                    "columnIndex": null, 
+                                    "columnIndex": null,
                                     "direction": null
                                 }
                             }
                         }
                     }
-                }, 
+                },
                 "version": 1
-            }, 
-            "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3-ecs", 
-            "type": "dashboard", 
+            },
+            "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3-ecs",
+            "type": "dashboard",
             "version": 1
         }
-    ], 
+    ],
     "version": "6.0.0-beta1-SNAPSHOT"
 }

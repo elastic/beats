@@ -15,7 +15,6 @@
                 "target_field": "event.created"
             }
         },
-
         {
             "rename": {
                 "field": "json",
@@ -25,7 +24,9 @@
         {
             "date": {
                 "field": "kibana.log.meta.@timestamp",
-                "formats" : ["ISO8601"],
+                "formats": [
+                    "ISO8601"
+                ],
                 "target_field": "@timestamp"
             }
         },
@@ -34,7 +35,6 @@
                 "field": "kibana.log.meta.@timestamp"
             }
         },
-
         {
             "rename": {
                 "field": "kibana.log.meta.message",
@@ -44,8 +44,8 @@
         {
             "rename": {
                 "field": "kibana.log.meta.state",
-                "target_field": "kibana.log.state",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "kibana.log.state"
             }
         },
         {
@@ -63,25 +63,26 @@
         {
             "rename": {
                 "field": "kibana.log.meta.res.statusCode",
-                "target_field": "http.response.status_code",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "http.response.status_code"
             }
         },
         {
             "rename": {
                 "field": "kibana.log.meta.res.responseTime",
-                "target_field": "temp.duration",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "temp.duration"
             }
         },
         {
             "script": {
+                "if": "ctx.temp?.duration != null",
                 "lang": "painless",
-                "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
-                "params": { "scale": 1000000 },
-                "if": "ctx.temp?.duration != null"
+                "params": {
+                    "scale": 1000000
+                },
+                "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)"
             }
-
         },
         {
             "remove": {
@@ -92,54 +93,52 @@
         {
             "rename": {
                 "field": "kibana.log.meta.res.contentLength",
-                "target_field": "http.response.body.bytes",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "http.response.body.bytes"
             }
         },
         {
             "rename": {
                 "field": "kibana.log.meta.req.method",
-                "target_field": "http.request.method",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "http.request.method"
             }
         },
-
         {
             "rename": {
                 "field": "kibana.log.meta.req.headers.referer",
-                "target_field": "http.request.referrer",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "http.request.referrer"
             }
         },
         {
             "rename": {
                 "field": "kibana.log.meta.req.headers.user-agent",
-                "target_field": "user_agent.original",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "user_agent.original"
             }
         },
         {
             "rename": {
                 "field": "kibana.log.meta.req.remoteAddress",
-                "target_field": "source.address",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "source.address"
             }
         },
         {
             "set": {
                 "field": "source.ip",
-                "value": "{{source.address}}",
-                "if": "ctx.source?.address != null"
+                "if": "ctx.source?.address != null",
+                "value": "{{source.address}}"
             }
         },
         {
             "rename": {
                 "field": "kibana.log.meta.req.url",
-                "target_field": "url.original",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "url.original"
             }
         },
-
         {
             "remove": {
                 "field": "kibana.log.meta.req.referer",
@@ -158,7 +157,6 @@
                 "ignore_missing": true
             }
         },
-
         {
             "append": {
                 "field": "service.name",

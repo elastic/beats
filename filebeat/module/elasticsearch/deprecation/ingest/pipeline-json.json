@@ -70,8 +70,8 @@
         {
             "rename": {
                 "field": "elasticsearch.deprecation.cluster.uuid",
-                "target_field": "elasticsearch.cluster.uuid",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "elasticsearch.cluster.uuid"
             }
         },
         {
@@ -83,8 +83,8 @@
         {
             "rename": {
                 "field": "elasticsearch.deprecation.node.id",
-                "target_field": "elasticsearch.node.id",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "elasticsearch.node.id"
             }
         },
         {

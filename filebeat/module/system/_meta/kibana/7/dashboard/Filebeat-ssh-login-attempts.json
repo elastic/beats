@@ -10,8 +10,8 @@
                         "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                "query": "system.auth.ssh.event:Accepted"
-                            }
+                            "query": "system.auth.ssh.event:Accepted"
+                        }
                     }
                 },
                 "title": "Successful SSH logins [Filebeat System] ECS",
@@ -168,8 +168,8 @@
                         "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
-                            }
+                            "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
+                        }
                     }
                 },
                 "title": "SSH users of failed login attempts [Filebeat System] ECS",
@@ -222,8 +222,8 @@
                         "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
-                            }
+                            "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
+                        }
                     }
                 },
                 "title": "SSH failed login attempts source locations [Filebeat System] ECS",

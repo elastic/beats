@@ -1,5 +1,13 @@
 {
     "description": "Pipeline for parsing elasticsearch audit logs in JSON format",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
     "processors": [
         {
             "json": {
@@ -66,28 +74,28 @@
         },
         {
             "set": {
-                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query == null",
                 "field": "url.original",
+                "if": "ctx.elasticsearch.audit?.url?.path != null \u0026\u0026 ctx.elasticsearch.audit?.url?.query == null",
                 "value": "{{elasticsearch.audit.url.path}}"
             }
         },
         {
             "set": {
-                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null",
                 "field": "url.original",
+                "if": "ctx.elasticsearch.audit?.url?.path != null \u0026\u0026 ctx.elasticsearch.audit?.url?.query != null",
                 "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
             }
         },
         {
             "remove": {
-                "if": "ctx.elasticsearch.audit?.url?.path != null",
-                "field": "elasticsearch.audit.url.path"
+                "field": "elasticsearch.audit.url.path",
+                "if": "ctx.elasticsearch.audit?.url?.path != null"
             }
         },
         {
             "remove": {
-                "if": "ctx.elasticsearch.audit?.url?.query != null",
-                "field": "elasticsearch.audit.url.query"
+                "field": "elasticsearch.audit.url.query",
+                "if": "ctx.elasticsearch.audit?.url?.query != null"
             }
         },
         {
@@ -129,10 +137,9 @@
         {
             "rename": {
                 "field": "elasticsearch.audit.request.method",
-                "target_field": "http.request.method",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "http.request.method"
             }
-
         },
         {
             "dot_expander": {
@@ -143,16 +150,8 @@
         {
             "rename": {
                 "field": "elasticsearch.audit.request.body",
-                "target_field": "http.request.body.content",
-                "ignore_missing": true
-            }
-        }
-    ],
-    "on_failure": [
-        {
-            "set": {
-                "field": "error.message",
-                "value": "{{ _ingest.on_failure_message }}"
+                "ignore_missing": true,
+                "target_field": "http.request.body.content"
             }
         }
     ]

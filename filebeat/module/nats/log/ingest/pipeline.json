@@ -1,32 +1,57 @@
 {
     "description": "Pipeline for parsing nats log logs",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
     "processors": [
         {
             "grok": {
                 "field": "message",
-                "patterns":[
-                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{GREEDYDATA:nats.log.info}"
-                ],
+                "ignore_missing": true,
                 "pattern_definitions": {
-                    "NATSTIME": "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{TIME}",
-                    "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)"
+                    "NATSLOGLEVEL": "(INF|DBG|WRN|ERR|FTL|TRC)",
+                    "NATSTIME": "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{TIME}"
                 },
-                "ignore_missing": true
+                "patterns": [
+                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{GREEDYDATA:nats.log.info}"
+                ]
             }
         },
         {
             "grok": {
                 "field": "nats.log.info",
+                "ignore_missing": true,
                 "patterns": [
                     "%{IPV4:client.ip}:%{POSINT:client.port} - cid:%{POSINT:nats.log.client.id} - %{GREEDYDATA:nats.log.msg.info}",
                     "%{GREEDYDATA:nats.log.msg.data}"
-                ],
-                "ignore_missing": true
+                ]
             }
         },
         {
             "grok": {
                 "field": "nats.log.msg.info",
+                "ignore_missing": true,
+                "pattern_definitions": {
+                    "NATSCONNECT": "CONNECT",
+                    "NATSCONNECTION": "(?:%{NATSCONNECT}|%{NATSINFO})",
+                    "NATSDIRECTION": "(\u003c\u003c-|-\u003e\u003e)",
+                    "NATSERROR": "-ERROR",
+                    "NATSINFO": "INFO",
+                    "NATSMSG": "MSG",
+                    "NATSNOINFO": "(?:%{NATSPING}|%{NATSPONG}|%{NATSOK})",
+                    "NATSOK": "OK",
+                    "NATSPAYLOAD": "MSG_PAYLOAD",
+                    "NATSPING": "PING",
+                    "NATSPONG": "PONG",
+                    "NATSPUB": "PUB",
+                    "NATSSUB": "SUB",
+                    "NATSUNSUB": "UNSUB"
+                },
                 "patterns": [
                     "%{NATSDIRECTION:network.direction} %{NATSPAYLOAD:nats.log.msg.type}: \\[%{GREEDYDATA:nats.log.msg.payload}\\]",
                     "%{NATSDIRECTION:network.direction} \\[%{NATSNOINFO:nats.log.msg.type}\\]",
@@ -37,24 +62,7 @@
                     "%{NATSDIRECTION:network.direction} \\[%{NATSCONNECTION:nats.log.msg.type}\\s+%{GREEDYDATA:nats.log.msg.data}\\]",
                     "%{NATSDIRECTION:network.direction} \\[%{NATSERROR:nats.log.msg.type}\\s+%{GREEDYDATA:nats.log.msg.error\\]",
                     "%{GREEDYDATA:nats.log.msg.data}"
-                ],
-                "pattern_definitions": {
-                    "NATSDIRECTION": "(<<-|->>)",
-                    "NATSMSG": "MSG",
-                    "NATSPUB": "PUB",
-                    "NATSSUB": "SUB",
-                    "NATSUNSUB": "UNSUB",
-                    "NATSPAYLOAD": "MSG_PAYLOAD",
-                    "NATSERROR": "-ERROR",
-                    "NATSPING": "PING",
-                    "NATSPONG": "PONG",
-                    "NATSOK": "OK",
-                    "NATSCONNECT": "CONNECT",
-                    "NATSINFO": "INFO",
-                    "NATSCONNECTION": "(?:%{NATSCONNECT}|%{NATSINFO})",
-                    "NATSNOINFO": "(?:%{NATSPING}|%{NATSPONG}|%{NATSOK})"
-                },
-                "ignore_missing": true
+                ]
             }
         },
         {
@@ -82,72 +90,72 @@
         {
             "rename": {
                 "field": "nats.log.msg.data",
-                "target_field": "message",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "message"
             }
         },
         {
             "script": {
                 "lang": "painless",
-                "source": "if (ctx.log.level == params.inf) {\n          ctx.log.level = params.info;\n        } else if (ctx.log.level == params.dbg) {\n          ctx.log.level = params.debug;\n        } else if (ctx.log.level == params.wrn) {\n          ctx.log.level = params.warning;\n        } else if (ctx.log.level == params.err) {\n          ctx.log.level = params.error;\n        } else if (ctx.log.level == params.ftl) {\n          ctx.log.level = params.fatal;\n        } else if (ctx.log.level == params.trc) {\n          ctx.log.level = params.trace;\n        }",
                 "params": {
-                    "inf": "INF",
-                    "info": "info",
                     "dbg": "DBG",
                     "debug": "debug",
-                    "wrn": "WRN",
-                    "warning": "warning",
                     "err": "ERR",
                     "error": "error",
-                    "ftl": "FTL",
                     "fatal": "fatal",
+                    "ftl": "FTL",
+                    "inf": "INF",
+                    "info": "info",
+                    "trace": "trace",
                     "trc": "TRC",
-                    "trace": "trace"
-                }
+                    "warning": "warning",
+                    "wrn": "WRN"
+                },
+                "source": "if (ctx.log.level == params.inf) {\n          ctx.log.level = params.info;\n        } else if (ctx.log.level == params.dbg) {\n          ctx.log.level = params.debug;\n        } else if (ctx.log.level == params.wrn) {\n          ctx.log.level = params.warning;\n        } else if (ctx.log.level == params.err) {\n          ctx.log.level = params.error;\n        } else if (ctx.log.level == params.ftl) {\n          ctx.log.level = params.fatal;\n        } else if (ctx.log.level == params.trc) {\n          ctx.log.level = params.trace;\n        }"
             }
         },
         {
             "script": {
+                "if": "ctx.nats.log.msg?.type != null",
                 "lang": "painless",
-                "source": "if (ctx.nats.log.msg.type == params.msg) {\n          ctx.nats.log.msg.type = params.message;\n        } else if (ctx.nats.log.msg.type == params.pub) {\n          ctx.nats.log.msg.type = params.publish;\n        } else if (ctx.nats.log.msg.type == params.sub) {\n          ctx.nats.log.msg.type = params.subscribe;\n        } else if (ctx.nats.log.msg.type == params.unsub) {\n          ctx.nats.log.msg.type = params.unsubscribe;\n        } else if (ctx.nats.log.msg.type == params.msg_payload) {\n          ctx.nats.log.msg.type = params.payload;\n        } else if (ctx.nats.log.msg.type == params.err) {\n          ctx.nats.log.msg.type = params.error;\n        } else if (ctx.nats.log.msg.type == params.pi) {\n          ctx.nats.log.msg.type = params.ping;\n        } else if (ctx.nats.log.msg.type == params.po) {\n          ctx.nats.log.msg.type = params.pong;\n        } else if (ctx.nats.log.msg.type == params.ok) {\n          ctx.nats.log.msg.type = params.acknowledge;\n        } else if (ctx.nats.log.msg.type == params.connect) {\n          ctx.nats.log.msg.type = params.connection;\n        } else if (ctx.nats.log.msg.type == params.info) {\n          ctx.nats.log.msg.type = params.information;\n        }",
                 "params": {
-                    "msg": "MSG",
+                    "acknowledge": "acknowledge",
+                    "connect": "CONNECT",
+                    "connection": "connection",
+                    "err": "-ERROR",
+                    "error": "error",
+                    "info": "INFO",
+                    "information": "information",
                     "message": "message",
+                    "msg": "MSG",
+                    "msg_payload": "MSG_PAYLOAD",
+                    "ok": "OK",
+                    "payload": "payload",
+                    "pi": "PING",
+                    "ping": "ping",
+                    "po": "PONG",
+                    "pong": "pong",
                     "pub": "PUB",
                     "publish": "publish",
                     "sub": "SUB",
                     "subscribe": "subscribe",
                     "unsub": "UNSUB",
-                    "unsubscribe": "unsubscribe",
-                    "msg_payload": "MSG_PAYLOAD",
-                    "payload": "payload",
-                    "err": "-ERROR",
-                    "error": "error",
-                    "pi": "PING",
-                    "ping": "ping",
-                    "po": "PONG",
-                    "pong": "pong",
-                    "ok": "OK",
-                    "acknowledge": "acknowledge",
-                    "connect": "CONNECT",
-                    "connection": "connection",
-                    "info": "INFO",
-                    "information": "information"
+                    "unsubscribe": "unsubscribe"
                 },
-                "if": "ctx.nats.log.msg?.type != null"
+                "source": "if (ctx.nats.log.msg.type == params.msg) {\n          ctx.nats.log.msg.type = params.message;\n        } else if (ctx.nats.log.msg.type == params.pub) {\n          ctx.nats.log.msg.type = params.publish;\n        } else if (ctx.nats.log.msg.type == params.sub) {\n          ctx.nats.log.msg.type = params.subscribe;\n        } else if (ctx.nats.log.msg.type == params.unsub) {\n          ctx.nats.log.msg.type = params.unsubscribe;\n        } else if (ctx.nats.log.msg.type == params.msg_payload) {\n          ctx.nats.log.msg.type = params.payload;\n        } else if (ctx.nats.log.msg.type == params.err) {\n          ctx.nats.log.msg.type = params.error;\n        } else if (ctx.nats.log.msg.type == params.pi) {\n          ctx.nats.log.msg.type = params.ping;\n        } else if (ctx.nats.log.msg.type == params.po) {\n          ctx.nats.log.msg.type = params.pong;\n        } else if (ctx.nats.log.msg.type == params.ok) {\n          ctx.nats.log.msg.type = params.acknowledge;\n        } else if (ctx.nats.log.msg.type == params.connect) {\n          ctx.nats.log.msg.type = params.connection;\n        } else if (ctx.nats.log.msg.type == params.info) {\n          ctx.nats.log.msg.type = params.information;\n        }"
             }
         },
         {
             "script": {
+                "if": "ctx.network?.direction != null",
                 "lang": "painless",
-                "source": "if (ctx.network.direction == params.in) {\n          ctx.network.direction = params.inbound;\n        } else if (ctx.network.direction == params.out) {\n          ctx.network.direction = params.outbound;\n        }",
                 "params": {
-                    "in": "<<-",
+                    "in": "\u003c\u003c-",
                     "inbound": "inbound",
-                    "out": "->>",
+                    "out": "-\u003e\u003e",
                     "outbound": "outbound"
                 },
-                "if": "ctx.network?.direction != null"
+                "source": "if (ctx.network.direction == params.in) {\n          ctx.network.direction = params.inbound;\n        } else if (ctx.network.direction == params.out) {\n          ctx.network.direction = params.outbound;\n        }"
             }
         },
         {
@@ -159,19 +167,16 @@
         {
             "date": {
                 "field": "nats.log.timestamp",
-                "target_field": "@timestamp",
-                "formats": ["yyyy/MM/dd HH:mm:ss.SSSSSS"]
+                "formats": [
+                    "yyyy/MM/dd HH:mm:ss.SSSSSS"
+                ],
+                "target_field": "@timestamp"
             }
         },
         {
             "remove": {
                 "field": "nats.log.timestamp"
             }
-        }],
-    "on_failure" : [{
-        "set" : {
-            "field" : "error.message",
-            "value" : "{{ _ingest.on_failure_message }}"
         }
-    }]
+    ]
 }

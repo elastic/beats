@@ -1,5 +1,13 @@
 {
     "description": "Pipeline for parsing Traefik access logs. Requires the geoip and user_agent plugins.",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
     "processors": [
         {
             "dissect": {
@@ -10,10 +18,10 @@
         {
             "grok": {
                 "field": "traefik.access.message",
+                "ignore_missing": true,
                 "patterns": [
                     "(?:%{NUMBER:http.response.body.bytes:long}|-)( (?:\"%{DATA:http.request.referrer}\"|-)?( (?:\"%{DATA:user_agent.original}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:temp.duration:long}ms)?)?"
-                ],
-                "ignore_missing": true
+                ]
             }
         },
         {
@@ -37,10 +45,10 @@
         {
             "date": {
                 "field": "traefik.access.time",
-                "target_field": "@timestamp",
                 "formats": [
                     "dd/MMM/yyyy:H:m:s Z"
-                ]
+                ],
+                "target_field": "@timestamp"
             }
         },
         {
@@ -48,14 +56,12 @@
                 "field": "traefik.access.time"
             }
         },
-
         {
             "convert": {
                 "field": "http.response.status_code",
                 "type": "long"
             }
         },
-
         {
             "grok": {
                 "field": "source.address",
@@ -64,13 +70,14 @@
                 ]
             }
         },
-
         {
             "script": {
+                "if": "ctx.temp?.duration != null",
                 "lang": "painless",
-                "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
-                "params": { "scale": 1000000 },
-                "if": "ctx.temp?.duration != null"
+                "params": {
+                    "scale": 1000000
+                },
+                "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)"
             }
         },
         {
@@ -79,7 +86,6 @@
                 "ignore_missing": true
             }
         },
-
         {
             "user_agent": {
                 "field": "user_agent.original",
@@ -89,16 +95,8 @@
         {
             "geoip": {
                 "field": "source.ip",
-                "target_field": "source.geo",
-                "ignore_missing": true
-            }
-        }
-    ],
-    "on_failure": [
-        {
-            "set": {
-                "field": "error.message",
-                "value": "{{ _ingest.on_failure_message }}"
+                "ignore_missing": true,
+                "target_field": "source.geo"
             }
         }
     ]

@@ -17,7 +17,7 @@
         },
         {
             "drop": {
-                "if": "ctx.elasticsearch.slowlog.type != 'index_indexing_slowlog' && ctx.elasticsearch.slowlog.type != 'index_search_slowlog'"
+                "if": "ctx.elasticsearch.slowlog.type != 'index_indexing_slowlog' \u0026\u0026 ctx.elasticsearch.slowlog.type != 'index_search_slowlog'"
             }
         },
         {
@@ -70,8 +70,8 @@
         {
             "rename": {
                 "field": "elasticsearch.slowlog.cluster.uuid",
-                "target_field": "elasticsearch.cluster.uuid",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "elasticsearch.cluster.uuid"
             }
         },
         {
@@ -83,15 +83,15 @@
         {
             "rename": {
                 "field": "elasticsearch.slowlog.node.id",
-                "target_field": "elasticsearch.node.id",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "elasticsearch.node.id"
             }
         },
         {
             "grok": {
                 "field": "elasticsearch.slowlog.message",
-                "pattern_definitions" : {
-                    "GREEDYMULTILINE" : "(.|\n)*",
+                "pattern_definitions": {
+                    "GREEDYMULTILINE": "(.|\n)*",
                     "INDEXNAME": "[a-zA-Z0-9_.-]*"
                 },
                 "patterns": [

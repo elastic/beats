@@ -41,9 +41,9 @@
                             "enabled": true,
                             "id": "3",
                             "params": {
-                                "field": "user_agent.version", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "field": "user_agent.version",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 5
                             },
                             "schema": "segment",
@@ -107,9 +107,9 @@
                             "enabled": true,
                             "id": "3",
                             "params": {
-                                "field": "user_agent.os.version", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "field": "user_agent.os.version",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 5
                             },
                             "schema": "segment",

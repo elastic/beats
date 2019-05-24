@@ -21,8 +21,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/magefile/mage/mg"
 
@@ -225,4 +230,56 @@ func PythonIntegTest(ctx context.Context) error {
 		args.Env["MODULES_PATH"] = mage.CWD("module")
 		return mage.PythonNoseTest(args)
 	})
+}
+
+func LintJSON() error {
+
+	files, err := filepath.Glob("module/*/_meta/kibana/*/*/*.json")
+	if err != nil {
+		return err
+	}
+
+	pipelines, err := filepath.Glob("module/*/*/ingest/*.json")
+	if err != nil {
+		return err
+	}
+
+	files = append(files, pipelines...)
+
+	for _, f := range files {
+
+		err := lintJSONFile(f)
+		if err != nil {
+			// These are files with template code inside.
+			fmt.Println(errors.Wrap(err, "error processing file: "+f))
+		}
+	}
+
+	return nil
+}
+
+func lintJSONFile(f string) error {
+	var data = map[string]interface{}{}
+
+	content, err := ioutil.ReadFile(f)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(content, &data)
+	if err != nil {
+		return err
+	}
+
+	newContent, err := json.MarshalIndent(data, "", "    ")
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(f, newContent, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

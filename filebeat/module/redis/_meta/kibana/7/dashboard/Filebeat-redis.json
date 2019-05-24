@@ -2,561 +2,561 @@
     "objects": [
         {
             "attributes": {
-                "description": "", 
+                "description": "",
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [], 
-                        "highlightAll": true, 
-                        "index": "filebeat-*", 
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                    "query": "event.dataset:redis.log"
-                        }, 
+                            "query": "event.dataset:redis.log"
+                        },
                         "version": true
                     }
-                }, 
-                "title": "Log levels and roles breakdown [Filebeat Redis] ECS", 
-                "uiStateJSON": {}, 
-                "version": 1, 
+                },
+                "title": "Log levels and roles breakdown [Filebeat Redis] ECS",
+                "uiStateJSON": {},
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
                             "type": "count"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "3", 
+                            "enabled": true,
+                            "id": "3",
                             "params": {
-                                "field": "redis.log.role", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "field": "redis.log.role",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 5
-                            }, 
-                            "schema": "segment", 
+                            },
+                            "schema": "segment",
                             "type": "terms"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "2", 
+                            "enabled": true,
+                            "id": "2",
                             "params": {
-                                "customLabel": "Log level", 
-                                "field": "log.level", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "customLabel": "Log level",
+                                "field": "log.level",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 5
-                            }, 
-                            "schema": "segment", 
+                            },
+                            "schema": "segment",
                             "type": "terms"
                         }
-                    ], 
+                    ],
                     "params": {
-                        "addLegend": true, 
-                        "addTooltip": true, 
-                        "isDonut": false, 
-                        "legendPosition": "bottom", 
+                        "addLegend": true,
+                        "addTooltip": true,
+                        "isDonut": false,
+                        "legendPosition": "bottom",
                         "type": "pie"
-                    }, 
-                    "title": "Log levels and roles breakdown [Filebeat Redis] ECS", 
+                    },
+                    "title": "Log levels and roles breakdown [Filebeat Redis] ECS",
                     "type": "pie"
                 }
-            }, 
-            "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b-ecs", 
-            "type": "visualization", 
+            },
+            "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b-ecs",
+            "type": "visualization",
             "version": 2
-        }, 
+        },
         {
             "attributes": {
-                "description": "", 
+                "description": "",
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [], 
-                        "highlightAll": true, 
-                        "index": "filebeat-*", 
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                    "query": "event.dataset:redis.log"
-                        }, 
+                            "query": "event.dataset:redis.log"
+                        },
                         "version": true
                     }
-                }, 
-                "title": "Logs over time [Filebeat Redis] ECS", 
+                },
+                "title": "Logs over time [Filebeat Redis] ECS",
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
-                            "notice": "#629E51", 
+                            "notice": "#629E51",
                             "warning": "#EF843C"
                         }
                     }
-                }, 
-                "version": 1, 
+                },
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
+                            "enabled": true,
+                            "id": "1",
+                            "params": {},
+                            "schema": "metric",
                             "type": "count"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "2", 
+                            "enabled": true,
+                            "id": "2",
                             "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
+                                "customInterval": "2h",
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
                                 "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
+                            },
+                            "schema": "segment",
                             "type": "date_histogram"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "3", 
+                            "enabled": true,
+                            "id": "3",
                             "params": {
-                                "field": "log.level", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "field": "log.level",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 5
-                            }, 
-                            "schema": "group", 
+                            },
+                            "schema": "group",
                             "type": "terms"
                         }
-                    ], 
+                    ],
                     "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
                         "categoryAxes": [
                             {
-                                "id": "CategoryAxis-1", 
+                                "id": "CategoryAxis-1",
                                 "labels": {
-                                    "show": true, 
+                                    "show": true,
                                     "truncate": 100
-                                }, 
-                                "position": "bottom", 
+                                },
+                                "position": "bottom",
                                 "scale": {
                                     "type": "linear"
-                                }, 
-                                "show": true, 
-                                "style": {}, 
+                                },
+                                "show": true,
+                                "style": {},
                                 "title": {
                                     "text": "@timestamp per month"
-                                }, 
+                                },
                                 "type": "category"
                             }
-                        ], 
-                        "defaultYExtents": false, 
-                        "drawLinesBetweenPoints": true, 
+                        ],
+                        "defaultYExtents": false,
+                        "drawLinesBetweenPoints": true,
                         "grid": {
-                            "categoryLines": false, 
+                            "categoryLines": false,
                             "style": {
                                 "color": "#eee"
                             }
-                        }, 
-                        "interpolate": "linear", 
-                        "legendPosition": "right", 
-                        "radiusRatio": 9, 
-                        "scale": "linear", 
+                        },
+                        "interpolate": "linear",
+                        "legendPosition": "right",
+                        "radiusRatio": 9,
+                        "scale": "linear",
                         "seriesParams": [
                             {
                                 "data": {
-                                    "id": "1", 
+                                    "id": "1",
                                     "label": "Count"
-                                }, 
-                                "drawLinesBetweenPoints": true, 
-                                "mode": "stacked", 
-                                "show": "true", 
-                                "showCircles": true, 
-                                "type": "histogram", 
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "stacked",
+                                "show": "true",
+                                "showCircles": true,
+                                "type": "histogram",
                                 "valueAxis": "ValueAxis-1"
                             }
-                        ], 
-                        "setYExtents": false, 
-                        "showCircles": true, 
-                        "times": [], 
-                        "type": "histogram", 
+                        ],
+                        "setYExtents": false,
+                        "showCircles": true,
+                        "times": [],
+                        "type": "histogram",
                         "valueAxes": [
                             {
-                                "id": "ValueAxis-1", 
+                                "id": "ValueAxis-1",
                                 "labels": {
-                                    "filter": false, 
-                                    "rotate": 0, 
-                                    "show": true, 
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
                                     "truncate": 100
-                                }, 
-                                "name": "LeftAxis-1", 
-                                "position": "left", 
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "left",
                                 "scale": {
-                                    "mode": "normal", 
+                                    "mode": "normal",
                                     "type": "linear"
-                                }, 
-                                "show": true, 
-                                "style": {}, 
+                                },
+                                "show": true,
+                                "style": {},
                                 "title": {
                                     "text": "Count"
-                                }, 
+                                },
                                 "type": "value"
                             }
                         ]
-                    }, 
-                    "title": "Logs over time [Filebeat Redis] ECS", 
+                    },
+                    "title": "Logs over time [Filebeat Redis] ECS",
                     "type": "histogram"
                 }
-            }, 
-            "id": "d2864600-478f-11e7-be88-2ddb32f3df97-ecs", 
-            "type": "visualization", 
+            },
+            "id": "d2864600-478f-11e7-be88-2ddb32f3df97-ecs",
+            "type": "visualization",
             "version": 2
-        }, 
+        },
         {
             "attributes": {
                 "columns": [
-                    "host.name", 
-                    "log.level", 
-                    "redis.log.role", 
+                    "host.name",
+                    "log.level",
+                    "redis.log.role",
                     "message"
-                ], 
-                "description": "", 
-                "hits": 0, 
+                ],
+                "description": "",
+                "hits": 0,
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": [
                             {
                                 "$state": {
                                     "store": "appState"
-                                }, 
+                                },
                                 "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "filebeat-*", 
-                                    "key": "event.module", 
-                                    "negate": false, 
+                                    "alias": null,
+                                    "disabled": false,
+                                    "index": "filebeat-*",
+                                    "key": "event.module",
+                                    "negate": false,
                                     "params": {
-                                        "query": "redis", 
+                                        "query": "redis",
                                         "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
+                                    },
+                                    "type": "phrase",
                                     "value": "redis"
-                                }, 
+                                },
                                 "query": {
                                     "match": {
                                         "event.module": {
-                                            "query": "redis", 
+                                            "query": "redis",
                                             "type": "phrase"
                                         }
                                     }
                                 }
-                            }, 
+                            },
                             {
                                 "$state": {
                                     "store": "appState"
-                                }, 
+                                },
                                 "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "filebeat-*", 
-                                    "key": "fileset.name", 
-                                    "negate": false, 
+                                    "alias": null,
+                                    "disabled": false,
+                                    "index": "filebeat-*",
+                                    "key": "fileset.name",
+                                    "negate": false,
                                     "params": {
-                                        "query": "log", 
+                                        "query": "log",
                                         "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
+                                    },
+                                    "type": "phrase",
                                     "value": "log"
-                                }, 
+                                },
                                 "query": {
                                     "match": {
                                         "fileset.name": {
-                                            "query": "log", 
+                                            "query": "log",
                                             "type": "phrase"
                                         }
                                     }
                                 }
                             }
-                        ], 
-                        "highlightAll": true, 
-                        "index": "filebeat-*", 
+                        ],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
                             "query": ""
-                        }, 
+                        },
                         "version": true
                     }
-                }, 
+                },
                 "sort": [
-                    "@timestamp", 
+                    "@timestamp",
                     "desc"
-                ], 
-                "title": "Logs [Filebeat Redis] ECS", 
+                ],
+                "title": "Logs [Filebeat Redis] ECS",
                 "version": 1
-            }, 
-            "id": "73613570-4791-11e7-be88-2ddb32f3df97-ecs", 
-            "type": "search", 
+            },
+            "id": "73613570-4791-11e7-be88-2ddb32f3df97-ecs",
+            "type": "search",
             "version": 2
-        }, 
+        },
         {
             "attributes": {
-                "description": "", 
+                "description": "",
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
                         "filter": []
                     }
-                }, 
-                "savedSearchId": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
-                "title": "Top slowest commands [Filebeat Redis] ECS", 
-                "uiStateJSON": {}, 
-                "version": 1, 
+                },
+                "savedSearchId": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs",
+                "title": "Top slowest commands [Filebeat Redis] ECS",
+                "uiStateJSON": {},
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
-                            "enabled": true, 
-                            "id": "1", 
+                            "enabled": true,
+                            "id": "1",
                             "params": {
-                                "customLabel": "Command", 
+                                "customLabel": "Command",
                                 "field": "redis.slowlog.duration.us"
-                            }, 
-                            "schema": "metric", 
+                            },
+                            "schema": "metric",
                             "type": "max"
-                        }, 
+                        },
                         {
-                            "enabled": true, 
-                            "id": "2", 
+                            "enabled": true,
+                            "id": "2",
                             "params": {
-                                "customLabel": "Duration (microseconds)", 
-                                "field": "redis.slowlog.cmd", 
-                                "order": "desc", 
-                                "orderBy": "1", 
+                                "customLabel": "Duration (microseconds)",
+                                "field": "redis.slowlog.cmd",
+                                "order": "desc",
+                                "orderBy": "1",
                                 "size": 5
-                            }, 
-                            "schema": "segment", 
+                            },
+                            "schema": "segment",
                             "type": "terms"
                         }
-                    ], 
+                    ],
                     "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
                         "categoryAxes": [
                             {
-                                "id": "CategoryAxis-1", 
+                                "id": "CategoryAxis-1",
                                 "labels": {
-                                    "filter": false, 
-                                    "rotate": 0, 
-                                    "show": true, 
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
                                     "truncate": 200
-                                }, 
-                                "position": "left", 
+                                },
+                                "position": "left",
                                 "scale": {
                                     "type": "linear"
-                                }, 
-                                "show": true, 
-                                "style": {}, 
+                                },
+                                "show": true,
+                                "style": {},
                                 "title": {
                                     "text": "Duration (microseconds)"
-                                }, 
+                                },
                                 "type": "category"
                             }
-                        ], 
-                        "defaultYExtents": false, 
-                        "drawLinesBetweenPoints": true, 
+                        ],
+                        "defaultYExtents": false,
+                        "drawLinesBetweenPoints": true,
                         "grid": {
-                            "categoryLines": false, 
+                            "categoryLines": false,
                             "style": {
                                 "color": "#eee"
                             }
-                        }, 
-                        "interpolate": "linear", 
-                        "legendPosition": "right", 
-                        "radiusRatio": 9, 
-                        "scale": "linear", 
+                        },
+                        "interpolate": "linear",
+                        "legendPosition": "right",
+                        "radiusRatio": 9,
+                        "scale": "linear",
                         "seriesParams": [
                             {
                                 "data": {
-                                    "id": "1", 
+                                    "id": "1",
                                     "label": "Command"
-                                }, 
-                                "drawLinesBetweenPoints": true, 
-                                "mode": "normal", 
-                                "show": true, 
-                                "showCircles": true, 
-                                "type": "histogram", 
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "histogram",
                                 "valueAxis": "ValueAxis-1"
                             }
-                        ], 
-                        "setYExtents": false, 
-                        "showCircles": true, 
-                        "times": [], 
-                        "type": "histogram", 
+                        ],
+                        "setYExtents": false,
+                        "showCircles": true,
+                        "times": [],
+                        "type": "histogram",
                         "valueAxes": [
                             {
-                                "id": "ValueAxis-1", 
+                                "id": "ValueAxis-1",
                                 "labels": {
-                                    "filter": true, 
-                                    "rotate": 75, 
-                                    "show": true, 
+                                    "filter": true,
+                                    "rotate": 75,
+                                    "show": true,
                                     "truncate": 100
-                                }, 
-                                "name": "LeftAxis-1", 
-                                "position": "bottom", 
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "bottom",
                                 "scale": {
-                                    "mode": "normal", 
+                                    "mode": "normal",
                                     "type": "linear"
-                                }, 
-                                "show": true, 
-                                "style": {}, 
+                                },
+                                "show": true,
+                                "style": {},
                                 "title": {
                                     "text": "Command"
-                                }, 
+                                },
                                 "type": "value"
                             }
                         ]
-                    }, 
-                    "title": "Top slowest commands [Filebeat Redis] ECS", 
+                    },
+                    "title": "Top slowest commands [Filebeat Redis] ECS",
                     "type": "histogram"
                 }
-            }, 
-            "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97-ecs", 
-            "type": "visualization", 
+            },
+            "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97-ecs",
+            "type": "visualization",
             "version": 2
-        }, 
+        },
         {
             "attributes": {
                 "columns": [
-                    "host.name", 
-                    "message", 
-                    "redis.slowlog.duration.us", 
+                    "host.name",
+                    "message",
+                    "redis.slowlog.duration.us",
                     "redis.slowlog.key"
-                ], 
-                "description": "", 
-                "hits": 0, 
+                ],
+                "description": "",
+                "hits": 0,
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [], 
-                        "highlightAll": true, 
-                        "index": "filebeat-*", 
+                        "filter": [],
+                        "highlightAll": true,
+                        "index": "filebeat-*",
                         "query": {
                             "language": "kuery",
-                                    "query": "event.dataset:redis.slowlog"
-                        }, 
+                            "query": "event.dataset:redis.slowlog"
+                        },
                         "version": true
                     }
-                }, 
+                },
                 "sort": [
-                    "@timestamp", 
+                    "@timestamp",
                     "desc"
-                ], 
-                "title": "Slow logs [Filebeat Redis] ECS", 
+                ],
+                "title": "Slow logs [Filebeat Redis] ECS",
                 "version": 1
-            }, 
-            "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
-            "type": "search", 
+            },
+            "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs",
+            "type": "search",
             "version": 2
-        }, 
+        },
         {
             "attributes": {
-                "description": "Overview dashboard for the FIlebeat Redis module", 
-                "hits": 0, 
+                "description": "Overview dashboard for the FIlebeat Redis module",
+                "hits": 0,
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [], 
-                        "highlightAll": true, 
+                        "filter": [],
+                        "highlightAll": true,
                         "query": {
                             "language": "kuery",
                             "query": ""
-                        }, 
+                        },
                         "version": true
                     }
-                }, 
+                },
                 "optionsJSON": {
                     "darkTheme": false
-                }, 
+                },
                 "panelsJSON": [
                     {
-                        "col": 1, 
-                        "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b-ecs", 
-                        "panelIndex": 2, 
-                        "row": 5, 
-                        "size_x": 3, 
-                        "size_y": 3, 
+                        "col": 1,
+                        "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b-ecs",
+                        "panelIndex": 2,
+                        "row": 5,
+                        "size_x": 3,
+                        "size_y": 3,
                         "type": "visualization"
-                    }, 
+                    },
                     {
-                        "col": 4, 
-                        "id": "d2864600-478f-11e7-be88-2ddb32f3df97-ecs", 
-                        "panelIndex": 3, 
-                        "row": 5, 
-                        "size_x": 9, 
-                        "size_y": 3, 
+                        "col": 4,
+                        "id": "d2864600-478f-11e7-be88-2ddb32f3df97-ecs",
+                        "panelIndex": 3,
+                        "row": 5,
+                        "size_x": 9,
+                        "size_y": 3,
                         "type": "visualization"
-                    }, 
+                    },
                     {
-                        "col": 1, 
+                        "col": 1,
                         "columns": [
-                            "host.name", 
-                            "log.level", 
-                            "redis.log.role", 
+                            "host.name",
+                            "log.level",
+                            "redis.log.role",
                             "message"
-                        ], 
-                        "id": "73613570-4791-11e7-be88-2ddb32f3df97-ecs", 
-                        "panelIndex": 4, 
-                        "row": 8, 
-                        "size_x": 12, 
-                        "size_y": 4, 
+                        ],
+                        "id": "73613570-4791-11e7-be88-2ddb32f3df97-ecs",
+                        "panelIndex": 4,
+                        "row": 8,
+                        "size_x": 12,
+                        "size_y": 4,
                         "sort": [
-                            "@timestamp", 
+                            "@timestamp",
                             "desc"
-                        ], 
+                        ],
                         "type": "search"
-                    }, 
+                    },
                     {
-                        "col": 7, 
-                        "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97-ecs", 
-                        "panelIndex": 5, 
-                        "row": 1, 
-                        "size_x": 6, 
-                        "size_y": 4, 
+                        "col": 7,
+                        "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97-ecs",
+                        "panelIndex": 5,
+                        "row": 1,
+                        "size_x": 6,
+                        "size_y": 4,
                         "type": "visualization"
-                    }, 
+                    },
                     {
-                        "col": 1, 
+                        "col": 1,
                         "columns": [
-                            "host.name", 
-                            "message", 
-                            "redis.slowlog.duration.us", 
+                            "host.name",
+                            "message",
+                            "redis.slowlog.duration.us",
                             "redis.slowlog.key"
-                        ], 
-                        "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
-                        "panelIndex": 6, 
-                        "row": 1, 
-                        "size_x": 6, 
-                        "size_y": 4, 
+                        ],
+                        "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs",
+                        "panelIndex": 6,
+                        "row": 1,
+                        "size_x": 6,
+                        "size_y": 4,
                         "sort": [
-                            "@timestamp", 
+                            "@timestamp",
                             "desc"
-                        ], 
+                        ],
                         "type": "search"
                     }
-                ], 
-                "timeRestore": false, 
-                "title": "[Filebeat Redis] Overview ECS", 
+                ],
+                "timeRestore": false,
+                "title": "[Filebeat Redis] Overview ECS",
                 "uiStateJSON": {
                     "P-5": {
                         "vis": {
                             "legendOpen": false
                         }
                     }
-                }, 
+                },
                 "version": 1
-            }, 
-            "id": "7fea2930-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
-            "type": "dashboard", 
+            },
+            "id": "7fea2930-478e-11e7-b1f0-cb29bac6bf8b-ecs",
+            "type": "dashboard",
             "version": 4
         }
-    ], 
+    ],
     "version": "6.0.0-beta1-SNAPSHOT"
 }
