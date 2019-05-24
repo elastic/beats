@@ -377,7 +377,7 @@ func TestGenerateHints(t *testing.T) {
 
 	for _, test := range tests {
 		cfg, _ := common.NewConfigFrom(map[string]interface{}{
-			"config": map[string]interface{}{
+			"default_config": map[string]interface{}{
 				"type": "docker",
 				"containers": map[string]interface{}{
 					"ids": []string{
@@ -609,7 +609,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 
 	for _, test := range tests {
 		cfg, _ := common.NewConfigFrom(map[string]interface{}{
-			"config": map[string]interface{}{
+			"default_config": map[string]interface{}{
 				"type": "docker",
 				"containers": map[string]interface{}{
 					"paths": []string{

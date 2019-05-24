@@ -75,6 +75,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix queue.spool.write.flush.events config type. {pull}12080[12080]
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 - Fixed Beat ID being reported by GET / API. {pull}12180[12180]
+- Add host.os.codename to fields.yml. {pull}12261[12261]
 
 *Auditbeat*
 
@@ -123,8 +124,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
-- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089] 
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
 
 *Packetbeat*
 
@@ -159,6 +161,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
 - New `extract_array` processor. {pull}11761[11761]
 - Add number of goroutines to reported metrics. {pull}12135[12135]
+- Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
 
 *Auditbeat*
 
@@ -166,6 +169,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package: Enable suse. {pull}11634[11634]
 - Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
 - Process: Add file hash of process executable. {pull}11722[11722]
+- Socket: Add network.transport and network.community_id. {pull}12231[12231]
 
 *Filebeat*
 
@@ -173,7 +177,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add option to configure docker input with paths {pull}10687[10687]
 - Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
 - Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
-- Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {pull}10911[10911]
+- Allow custom default settings with autodiscover (for example, use of CRI paths for logs). {pull}12193[12193]
+- Allow to disable hints based autodiscover default behavior (fetching all logs). {pull}12193[12193]
 - Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
 - Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 - New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
