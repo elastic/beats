@@ -77,7 +77,7 @@ type stats struct {
 
 // NewWrapper create a new Module and its associated MetricSets based
 // on the given configuration.
-func NewWrapper(config *common.Config, r *mb.Register, options ...Option) (*Wrapper, error) {
+func NewWrapper(config *common.Config, r mb.ModulesRegistry, options ...Option) (*Wrapper, error) {
 	module, metricsets, err := mb.NewModule(config, r)
 	if err != nil {
 		return nil, err

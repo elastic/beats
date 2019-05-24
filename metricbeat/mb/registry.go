@@ -28,9 +28,23 @@ import (
 
 const initialSize = 20 // initialSize specifies the initial size of the Register.
 
+// ModulesRegistry is the interface implemented by module registries
+type ModulesRegistry interface {
+	AddModule(name string, factory ModuleFactory) error
+	AddMetricSet(module string, name string, factory MetricSetFactory, hostParser ...HostParser) error
+	MustAddMetricSet(module, name string, factory MetricSetFactory, options ...MetricSetOption)
+	DefaultMetricSets(module string) ([]string, error)
+	Modules() []string
+	MetricSets(module string) []string
+	String() string
+
+	moduleFactory(name string) ModuleFactory
+	metricSetRegistration(module, name string) (MetricSetRegistration, error)
+}
+
 // Registry is the singleton Register instance where all ModuleFactory's and
 // MetricSetFactory's should be registered.
-var Registry = NewRegister()
+var Registry ModulesRegistry = NewLightModulesRegistry()
 
 // DefaultModuleFactory returns the given BaseModule and never returns an error.
 // If a MetricSets are registered without an associated ModuleFactory, then
