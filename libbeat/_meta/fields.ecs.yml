@@ -1129,6 +1129,7 @@
     - name: response.bytes
       level: extended
       type: long
+      format: bytes
       description: Total size in bytes of the response (body and headers).
       example: 1437
     - name: response.status_code
