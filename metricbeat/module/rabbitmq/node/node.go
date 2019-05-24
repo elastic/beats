@@ -92,12 +92,12 @@ func (m *MetricSet) fetchOverview() (*apiOverview, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	o, err := m.fetchOverview()
 	if err != nil {
-		errors.Wrap(err, "error in fetch")
+		return errors.Wrap(err, "error in fetch")
 	}
 
 	node, err := rabbitmq.NewMetricSet(m.BaseMetricSet, rabbitmq.NodesPath+"/"+o.Node)
 	if err != nil {
-		errors.Wrap(err, "error creating new metricset")
+		return errors.Wrap(err, "error creating new metricset")
 	}
 
 	content, err := node.HTTP.FetchJSON()
