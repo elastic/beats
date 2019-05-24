@@ -67,7 +67,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 		gauge := metric.GetGauge()
 		if gauge != nil {
-			if !math.IsNaN(gauge.GetValue()) && !math.IsInf(gauge.GetValue(), 1) && !math.IsInf(gauge.GetValue(), 0) {
+			if !math.IsNaN(gauge.GetValue()) && !math.IsInf(gauge.GetValue(), 0) {
 				events = append(events, PromEvent{
 					data: common.MapStr{
 						name: gauge.GetValue(),
