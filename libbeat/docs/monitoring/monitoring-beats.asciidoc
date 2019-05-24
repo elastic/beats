@@ -37,7 +37,7 @@ information, see
 configured {es} output, specify the following minimal configuration:
 +
 --
-[source, yml]
+["source","yml",subs="attributes"]
 --------------------
 xpack.monitoring:
   enabled: true
