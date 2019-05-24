@@ -264,117 +264,121 @@
           description: >
             The number of requests to insert a row in a table.
 
-    - name: innodb_buffer_pool
+    - name: innodb 
       type: group
       description: >
       fields:
-        - name: dump_status
-          type: long
-          description: >
-            The progress of an operation to record the pages held in the InnoDB buffer pool, triggered by the setting of innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.
+      - name: buffer_pool
+        type: group
+        description: >
+        fields:
+          - name: dump_status
+            type: long
+            description: >
+              The progress of an operation to record the pages held in the InnoDB buffer pool, triggered by the setting of innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.
 
-        - name: load_status
-          type: long
-          description: >
-            The progress of an operation to warm up the InnoDB buffer pool by reading in a set of pages corresponding to an earlier point in time, triggered by the setting of innodb_buffer_pool_load_at_startup or innodb_buffer_pool_load_now.
+          - name: load_status
+            type: long
+            description: >
+              The progress of an operation to warm up the InnoDB buffer pool by reading in a set of pages corresponding to an earlier point in time, triggered by the setting of innodb_buffer_pool_load_at_startup or innodb_buffer_pool_load_now.
 
-        - name: bytes
-          type: group
-          description: >
-          fields:
-            - name: data
-              type: long
-              description: >
-                The total number of bytes in the InnoDB buffer pool containing data. 
+          - name: bytes
+            type: group
+            description: >
+            fields:
+              - name: data
+                type: long
+                description: >
+                  The total number of bytes in the InnoDB buffer pool containing data. 
 
-            - name: dirty
-              type: long
-              description: >
-                The total current number of bytes held in dirty pages in the InnoDB buffer pool.
+              - name: dirty
+                type: long
+                description: >
+                  The total current number of bytes held in dirty pages in the InnoDB buffer pool.
 
-        - name: pages
-          type: group
-          description: >
-          fields:
-            - name: data
-              type: long
-              description: >
-                he number of pages in the InnoDB buffer pool containing data.
+          - name: pages
+            type: group
+            description: >
+            fields:
+              - name: data
+                type: long
+                description: >
+                  he number of pages in the InnoDB buffer pool containing data.
 
-            - name: dirty
-              type: long
-              description: >
-                The current number of dirty pages in the InnoDB buffer pool.
+              - name: dirty
+                type: long
+                description: >
+                  The current number of dirty pages in the InnoDB buffer pool.
 
-            - name: flushed
-              type: long
-              description: >
-                The number of requests to flush pages from the InnoDB buffer pool.
+              - name: flushed
+                type: long
+                description: >
+                  The number of requests to flush pages from the InnoDB buffer pool.
 
-            - name: free
-              type: long
-              description: >
-                The number of free pages in the InnoDB buffer pool.
+              - name: free
+                type: long
+                description: >
+                  The number of free pages in the InnoDB buffer pool.
 
-            - name: latched
-              type: long
-              description: >
-                The number of latched pages in the InnoDB buffer pool.
+              - name: latched
+                type: long
+                description: >
+                  The number of latched pages in the InnoDB buffer pool.
 
-            - name: misc
-              type: long
-              description: >
-                The number of pages in the InnoDB buffer pool that are busy because they have been allocated for administrative overhead, such as row locks or the adaptive hash index.
+              - name: misc
+                type: long
+                description: >
+                  The number of pages in the InnoDB buffer pool that are busy because they have been allocated for administrative overhead, such as row locks or the adaptive hash index.
 
-            - name: total
-              type: long
-              description: >
-                The total size of the InnoDB buffer pool, in pages.
+              - name: total
+                type: long
+                description: >
+                  The total size of the InnoDB buffer pool, in pages.
 
-        - name: read
-          type: group
-          description: >
-          fields:
-            - name: ahead
-              type: long
-              description: >
-                The number of pages read into the InnoDB buffer pool by the read-ahead background thread.
+          - name: read
+            type: group
+            description: >
+            fields:
+              - name: ahead
+                type: long
+                description: >
+                  The number of pages read into the InnoDB buffer pool by the read-ahead background thread.
 
-            - name: ahead_evicted
-              type: long
-              description: >
-                The number of pages read into the InnoDB buffer pool by the read-ahead background thread that were subsequently evicted without having been accessed by queries.
+              - name: ahead_evicted
+                type: long
+                description: >
+                  The number of pages read into the InnoDB buffer pool by the read-ahead background thread that were subsequently evicted without having been accessed by queries.
 
-            - name: ahead_rnd
-              type: long
-              description: >
-                The number of "random" read-aheads initiated by InnoDB.
+              - name: ahead_rnd
+                type: long
+                description: >
+                  The number of "random" read-aheads initiated by InnoDB.
 
-            - name: requests
-              type: long
-              description: >
-                The number of logical read requests.
+              - name: requests
+                type: long
+                description: >
+                  The number of logical read requests.
 
-        - name: pool
-          type: group
-          description: >
-          fields:
-            - name: reads
-              type: long
-              description: >
-                The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.
+          - name: pool
+            type: group
+            description: >
+            fields:
+              - name: reads
+                type: long
+                description: >
+                  The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.
 
-            - name: resize_status
-              type: long
-              description: >
-                The status of an operation to resize the InnoDB buffer pool dynamically, triggered by setting the innodb_buffer_pool_size parameter dynamically.
+              - name: resize_status
+                type: long
+                description: >
+                  The status of an operation to resize the InnoDB buffer pool dynamically, triggered by setting the innodb_buffer_pool_size parameter dynamically.
 
-            - name: wait_free
-              type: long
-              description: >
-                Normally, writes to the InnoDB buffer pool happen in the background. When InnoDB needs to read or create a page and no clean pages are available, InnoDB flushes some dirty pages first and waits for that operation to finish. This counter counts instances of these waits.
+              - name: wait_free
+                type: long
+                description: >
+                  Normally, writes to the InnoDB buffer pool happen in the background. When InnoDB needs to read or create a page and no clean pages are available, InnoDB flushes some dirty pages first and waits for that operation to finish. This counter counts instances of these waits.
 
-        - name: write_requests
-          type: long
-          description: >
-            The number of writes done to the InnoDB buffer pool.
+          - name: write_requests
+            type: long
+            description: >
+              The number of writes done to the InnoDB buffer pool.

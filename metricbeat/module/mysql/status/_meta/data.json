@@ -11,7 +11,7 @@
     "mysql": {
         "status": {
             "aborted": {
-                "clients": 0,
+                "clients": 3,
                 "connects": 4
             },
             "binlog": {
@@ -21,8 +21,8 @@
                 }
             },
             "bytes": {
-                "received": 972,
-                "sent": 19720
+                "received": 1272,
+                "sent": 47735
             },
             "command": {
                 "delete": 0,
@@ -30,12 +30,12 @@
                 "select": 1,
                 "update": 0
             },
-            "connections": 9,
+            "connections": 12,
             "created": {
                 "tmp": {
                     "disk_tables": 0,
                     "files": 5,
-                    "tables": 3
+                    "tables": 6
                 }
             },
             "delayed": {
@@ -57,38 +57,40 @@
                     "next": 32,
                     "prev": 0,
                     "rnd": 0,
-                    "rnd_next": 702
+                    "rnd_next": 1728
                 },
                 "rollback": 0,
                 "savepoint": 0,
                 "savepoint_rollback": 0,
                 "update": 0,
-                "write": 682
+                "write": 1705
             },
-            "innodb_buffer_pool": {
-                "bytes": {
-                    "data": 6914048,
-                    "dirty": 0
-                },
-                "pages": {
-                    "data": 422,
-                    "dirty": 0,
-                    "flushed": 207,
-                    "free": 7768,
-                    "misc": 1,
-                    "total": 8191
-                },
-                "pool": {
-                    "reads": 423,
-                    "wait_free": 0
-                },
-                "read": {
-                    "ahead": 0,
-                    "ahead_evicted": 0,
-                    "ahead_rnd": 0,
-                    "requests": 14198
-                },
-                "write_requests": 207
+            "innodb": {
+                "buffer_pool": {
+                    "bytes": {
+                        "data": 6914048,
+                        "dirty": 0
+                    },
+                    "pages": {
+                        "data": 422,
+                        "dirty": 0,
+                        "flushed": 207,
+                        "free": 7768,
+                        "misc": 1,
+                        "total": 8191
+                    },
+                    "pool": {
+                        "reads": 423,
+                        "wait_free": 0
+                    },
+                    "read": {
+                        "ahead": 0,
+                        "ahead_evicted": 0,
+                        "ahead_rnd": 0,
+                        "requests": 14198
+                    },
+                    "write_requests": 207
+                }
             },
             "max_used_connections": 3,
             "open": {
@@ -97,8 +99,8 @@
                 "tables": 60
             },
             "opened_tables": 67,
-            "queries": 7,
-            "questions": 6,
+            "queries": 10,
+            "questions": 9,
             "threads": {
                 "cached": 0,
                 "connected": 3,

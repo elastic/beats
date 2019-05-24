@@ -19670,12 +19670,18 @@ The number of requests to insert a row in a table.
 --
 
 [float]
-== innodb_buffer_pool fields
+== innodb fields
 
 
 
 
-*`mysql.status.innodb_buffer_pool.dump_status`*::
+[float]
+== buffer_pool fields
+
+
+
+
+*`mysql.status.innodb.buffer_pool.dump_status`*::
 +
 --
 type: long
@@ -19685,7 +19691,7 @@ The progress of an operation to record the pages held in the InnoDB buffer pool,
 
 --
 
-*`mysql.status.innodb_buffer_pool.load_status`*::
+*`mysql.status.innodb.buffer_pool.load_status`*::
 +
 --
 type: long
@@ -19701,7 +19707,7 @@ The progress of an operation to warm up the InnoDB buffer pool by reading in a s
 
 
 
-*`mysql.status.innodb_buffer_pool.bytes.data`*::
+*`mysql.status.innodb.buffer_pool.bytes.data`*::
 +
 --
 type: long
@@ -19711,7 +19717,7 @@ The total number of bytes in the InnoDB buffer pool containing data.
 
 --
 
-*`mysql.status.innodb_buffer_pool.bytes.dirty`*::
+*`mysql.status.innodb.buffer_pool.bytes.dirty`*::
 +
 --
 type: long
@@ -19727,7 +19733,7 @@ The total current number of bytes held in dirty pages in the InnoDB buffer pool.
 
 
 
-*`mysql.status.innodb_buffer_pool.pages.data`*::
+*`mysql.status.innodb.buffer_pool.pages.data`*::
 +
 --
 type: long
@@ -19737,7 +19743,7 @@ he number of pages in the InnoDB buffer pool containing data.
 
 --
 
-*`mysql.status.innodb_buffer_pool.pages.dirty`*::
+*`mysql.status.innodb.buffer_pool.pages.dirty`*::
 +
 --
 type: long
@@ -19747,7 +19753,7 @@ The current number of dirty pages in the InnoDB buffer pool.
 
 --
 
-*`mysql.status.innodb_buffer_pool.pages.flushed`*::
+*`mysql.status.innodb.buffer_pool.pages.flushed`*::
 +
 --
 type: long
@@ -19757,7 +19763,7 @@ The number of requests to flush pages from the InnoDB buffer pool.
 
 --
 
-*`mysql.status.innodb_buffer_pool.pages.free`*::
+*`mysql.status.innodb.buffer_pool.pages.free`*::
 +
 --
 type: long
@@ -19767,7 +19773,7 @@ The number of free pages in the InnoDB buffer pool.
 
 --
 
-*`mysql.status.innodb_buffer_pool.pages.latched`*::
+*`mysql.status.innodb.buffer_pool.pages.latched`*::
 +
 --
 type: long
@@ -19777,7 +19783,7 @@ The number of latched pages in the InnoDB buffer pool.
 
 --
 
-*`mysql.status.innodb_buffer_pool.pages.misc`*::
+*`mysql.status.innodb.buffer_pool.pages.misc`*::
 +
 --
 type: long
@@ -19787,7 +19793,7 @@ The number of pages in the InnoDB buffer pool that are busy because they have be
 
 --
 
-*`mysql.status.innodb_buffer_pool.pages.total`*::
+*`mysql.status.innodb.buffer_pool.pages.total`*::
 +
 --
 type: long
@@ -19803,7 +19809,7 @@ The total size of the InnoDB buffer pool, in pages.
 
 
 
-*`mysql.status.innodb_buffer_pool.read.ahead`*::
+*`mysql.status.innodb.buffer_pool.read.ahead`*::
 +
 --
 type: long
@@ -19813,7 +19819,7 @@ The number of pages read into the InnoDB buffer pool by the read-ahead backgroun
 
 --
 
-*`mysql.status.innodb_buffer_pool.read.ahead_evicted`*::
+*`mysql.status.innodb.buffer_pool.read.ahead_evicted`*::
 +
 --
 type: long
@@ -19823,7 +19829,7 @@ The number of pages read into the InnoDB buffer pool by the read-ahead backgroun
 
 --
 
-*`mysql.status.innodb_buffer_pool.read.ahead_rnd`*::
+*`mysql.status.innodb.buffer_pool.read.ahead_rnd`*::
 +
 --
 type: long
@@ -19833,7 +19839,7 @@ The number of "random" read-aheads initiated by InnoDB.
 
 --
 
-*`mysql.status.innodb_buffer_pool.read.requests`*::
+*`mysql.status.innodb.buffer_pool.read.requests`*::
 +
 --
 type: long
@@ -19849,7 +19855,7 @@ The number of logical read requests.
 
 
 
-*`mysql.status.innodb_buffer_pool.pool.reads`*::
+*`mysql.status.innodb.buffer_pool.pool.reads`*::
 +
 --
 type: long
@@ -19859,7 +19865,7 @@ The number of logical reads that InnoDB could not satisfy from the buffer pool, 
 
 --
 
-*`mysql.status.innodb_buffer_pool.pool.resize_status`*::
+*`mysql.status.innodb.buffer_pool.pool.resize_status`*::
 +
 --
 type: long
@@ -19869,7 +19875,7 @@ The status of an operation to resize the InnoDB buffer pool dynamically, trigger
 
 --
 
-*`mysql.status.innodb_buffer_pool.pool.wait_free`*::
+*`mysql.status.innodb.buffer_pool.pool.wait_free`*::
 +
 --
 type: long
@@ -19879,7 +19885,7 @@ Normally, writes to the InnoDB buffer pool happen in the background. When InnoDB
 
 --
 
-*`mysql.status.innodb_buffer_pool.write_requests`*::
+*`mysql.status.innodb.buffer_pool.write_requests`*::
 +
 --
 type: long

@@ -95,34 +95,36 @@ var (
 			"update":             c.Int("Handler_update"),
 			"write":              c.Int("Handler_write"),
 		},
-		"innodb_buffer_pool": s.Object{
-			"dump_status": c.Int("Innodb_buffer_pool_dump_status"),
-			"load_status": c.Int("Innodb_buffer_pool_load_status"),
-			"bytes": s.Object{
-				"data":  c.Int("Innodb_buffer_pool_bytes_data"),
-				"dirty": c.Int("Innodb_buffer_pool_bytes_dirty"),
+		"innodb": s.Object{
+			"buffer_pool": s.Object{
+				"dump_status": c.Int("Innodb_buffer_pool_dump_status"),
+				"load_status": c.Int("Innodb_buffer_pool_load_status"),
+				"bytes": s.Object{
+					"data":  c.Int("Innodb_buffer_pool_bytes_data"),
+					"dirty": c.Int("Innodb_buffer_pool_bytes_dirty"),
+				},
+				"pages": s.Object{
+					"data":    c.Int("Innodb_buffer_pool_pages_data"),
+					"dirty":   c.Int("Innodb_buffer_pool_pages_dirty"),
+					"flushed": c.Int("Innodb_buffer_pool_pages_flushed"),
+					"free":    c.Int("Innodb_buffer_pool_pages_free"),
+					"latched": c.Int("Innodb_buffer_pool_pages_latched"),
+					"misc":    c.Int("Innodb_buffer_pool_pages_misc"),
+					"total":   c.Int("Innodb_buffer_pool_pages_total"),
+				},
+				"read": s.Object{
+					"ahead":         c.Int("Innodb_buffer_pool_read_ahead"),
+					"ahead_evicted": c.Int("Innodb_buffer_pool_read_ahead_evicted"),
+					"ahead_rnd":     c.Int("Innodb_buffer_pool_read_ahead_rnd"),
+					"requests":      c.Int("Innodb_buffer_pool_read_requests"),
+				},
+				"pool": s.Object{
+					"reads":         c.Int("Innodb_buffer_pool_reads"),
+					"resize_status": c.Int("Innodb_buffer_pool_resize_status"),
+					"wait_free":     c.Int("Innodb_buffer_pool_wait_free"),
+				},
+				"write_requests": c.Int("Innodb_buffer_pool_write_requests"),
 			},
-			"pages": s.Object{
-				"data":    c.Int("Innodb_buffer_pool_pages_data"),
-				"dirty":   c.Int("Innodb_buffer_pool_pages_dirty"),
-				"flushed": c.Int("Innodb_buffer_pool_pages_flushed"),
-				"free":    c.Int("Innodb_buffer_pool_pages_free"),
-				"latched": c.Int("Innodb_buffer_pool_pages_latched"),
-				"misc":    c.Int("Innodb_buffer_pool_pages_misc"),
-				"total":   c.Int("Innodb_buffer_pool_pages_total"),
-			},
-			"read": s.Object{
-				"ahead":         c.Int("Innodb_buffer_pool_read_ahead"),
-				"ahead_evicted": c.Int("Innodb_buffer_pool_read_ahead_evicted"),
-				"ahead_rnd":     c.Int("Innodb_buffer_pool_read_ahead_rnd"),
-				"requests":      c.Int("Innodb_buffer_pool_read_requests"),
-			},
-			"pool": s.Object{
-				"reads":         c.Int("Innodb_buffer_pool_reads"),
-				"resize_status": c.Int("Innodb_buffer_pool_resize_status"),
-				"wait_free":     c.Int("Innodb_buffer_pool_wait_free"),
-			},
-			"write_requests": c.Int("Innodb_buffer_pool_write_requests"),
 		},
 	}
 )
