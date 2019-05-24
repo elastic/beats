@@ -403,8 +403,8 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
-#------------------------------ Palo_alto Module ------------------------------
-- module: palo_alto
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
   pan_os:
     enabled: true
 

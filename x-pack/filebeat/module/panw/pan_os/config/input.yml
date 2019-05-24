@@ -51,25 +51,25 @@ processors:
         server.ip: 8
         destination.ip: 8
         destination.address: 8
-        palo_alto.pan_os.source.nat.ip: 9
-        palo_alto.pan_os.destination.nat.ip: 10
-        palo_alto.pan_os.ruleset: 11
+        panw.pan_os.source.nat.ip: 9
+        panw.pan_os.destination.nat.ip: 10
+        panw.pan_os.ruleset: 11
         client.user.name: 12
         source.user.name: 12
         server.user.name: 13
         destination.user.name: 13
         network.application: 14
-        palo_alto.pan_os.source.zone: 16
-        palo_alto.pan_os.destination.zone: 17
-        palo_alto.pan_os.source.interface: 18
-        palo_alto.pan_os.destination.interface: 19
-        palo_alto.pan_os.flow_id: 22
+        panw.pan_os.source.zone: 16
+        panw.pan_os.destination.zone: 17
+        panw.pan_os.source.interface: 18
+        panw.pan_os.destination.interface: 19
+        panw.pan_os.flow_id: 22
         client.port: 24
         source.port: 24
         destination.port: 25
         server.port: 25
-        palo_alto.pan_os.source.nat.port: 26
-        palo_alto.pan_os.destination.nat.port: 27
+        panw.pan_os.source.nat.port: 26
+        panw.pan_os.destination.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
         event.outcome: 30
@@ -81,8 +81,8 @@ processors:
         network.packets: 34
         event.start: 35
         event.duration: 36
-        palo_alto.pan_os.url.category: 37
-        palo_alto.pan_os.sequence_number: 39
+        panw.pan_os.url.category: 37
+        panw.pan_os.sequence_number: 39
         server.packets: 44
         destination.packets: 44
         client.packets: 45
@@ -104,44 +104,44 @@ processors:
         server.ip: 8
         destination.ip: 8
         destination.address: 8
-        palo_alto.pan_os.source.nat.ip: 9
-        palo_alto.pan_os.destination.nat.ip: 10
-        palo_alto.pan_os.ruleset: 11
+        panw.pan_os.source.nat.ip: 9
+        panw.pan_os.destination.nat.ip: 10
+        panw.pan_os.ruleset: 11
         client.user.name: 12
         source.user.name: 12
         server.user.name: 13
         destination.user.name: 13
         network.application: 14
-        palo_alto.pan_os.source.zone: 16
-        palo_alto.pan_os.destination.zone: 17
-        palo_alto.pan_os.source.interface: 18
-        palo_alto.pan_os.destination.interface: 19
-        palo_alto.pan_os.flow_id: 22
+        panw.pan_os.source.zone: 16
+        panw.pan_os.destination.zone: 17
+        panw.pan_os.source.interface: 18
+        panw.pan_os.destination.interface: 19
+        panw.pan_os.flow_id: 22
         client.port: 24
         source.port: 24
         destination.port: 25
         server.port: 25
-        palo_alto.pan_os.source.nat.port: 26
-        palo_alto.pan_os.destination.nat.port: 27
+        panw.pan_os.source.nat.port: 26
+        panw.pan_os.destination.nat.port: 27
         _temp_.labels: 28
         network.transport: 29
         event.outcome: 30
-        palo_alto.pan_os.threat.resource: 31
+        panw.pan_os.threat.resource: 31
         url.original: 31
-        palo_alto.pan_os.threat.name: 32
-        palo_alto.pan_os.url.category: 33
+        panw.pan_os.threat.name: 32
+        panw.pan_os.url.category: 33
         log.level: 34
         _temp_.direction: 35
         source.geo.country_iso_code: 38
         destination.geo.country_iso_code: 39
-        palo_alto.pan_os.network.pcap_id: 42
-        palo_alto.pan_os.file.hash: 43
+        panw.pan_os.network.pcap_id: 42
+        panw.pan_os.file.hash: 43
         user_agent.original: 46
         file.type: 47
         network.forwarded_ip: 48
         http.request.referer: 49
         source.user.email: 50
-        palo_alto.pan_os.subject: 51
+        panw.pan_os.subject: 51
         destination.user.email: 52
         observer.hostname: 59
 
@@ -152,9 +152,9 @@ processors:
   - community_id: ~
 
   - community_id:
-      target: palo_alto.pan_os.network.nat.community_id
+      target: panw.pan_os.network.nat.community_id
       fields:
-        source_ip: palo_alto.pan_os.source.nat.ip
-        source_port: palo_alto.pan_os.source.nat.port
-        destination_ip: palo_alto.pan_os.destination.nat.ip
-        destination_port: palo_alto.pan_os.destination.nat.port
+        source_ip: panw.pan_os.source.nat.ip
+        source_port: panw.pan_os.source.nat.port
+        destination_ip: panw.pan_os.destination.nat.ip
+        destination_port: panw.pan_os.destination.nat.port
