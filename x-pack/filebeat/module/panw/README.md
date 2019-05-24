@@ -1,4 +1,4 @@
-# Palo Alto module
+# Palo Alto Networks module
 
 ## Caveats
 

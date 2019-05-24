@@ -329,7 +329,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "panw.pan_os.threat.name",
+                "field": "panw.panos.threat.name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -764,7 +764,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "panw.pan_os:* and event.category: \"security_threat\""
+              "query": "panw.panos:* and event.category: \"security_threat\""
             },
             "version": true
           }

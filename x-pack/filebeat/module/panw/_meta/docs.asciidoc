@@ -24,7 +24,7 @@ include::../include/running-modules.asciidoc[]
 === ECS field mappings
 
 These are the PAN-OS to ECS field mappings as well as those fields still not
-in ECS that are added under the `panw.pan_os` prefix:
+in ECS that are added under the `panw.panos` prefix:
 
 .Traffic log mappings
 [options="header"]
@@ -37,21 +37,21 @@ in ECS that are added under the `panw.pan_os` prefix:
 | Generated Time | `@timestamp` |
 | Source IP | client.ip source.ip |
 | Destination IP | server.ip destination.ip |
-| NAT Source IP |  | panw.pan_os.source.nat.ip
-| NAT Destination IP |  | panw.pan_os.destination.nat.ip
-| Rule Name |  | panw.pan_os.ruleset
+| NAT Source IP |  | panw.panos.source.nat.ip
+| NAT Destination IP |  | panw.panos.destination.nat.ip
+| Rule Name |  | panw.panos.ruleset
 | Source User | client.user.name source.user.name |
 | Destination User | server.user.name destination.user.name |
 | Application | network.application |
-| Source Zone |  | panw.pan_os.source.zone
-| Destination Zone |  | panw.pan_os.destination.zone
-| Ingress Interface |  | panw.pan_os.source.interface
-| Egress Interface |  | panw.pan_os.destination.interface
-| Session ID |  | panw.pan_os.flow_id
+| Source Zone |  | panw.panos.source.zone
+| Destination Zone |  | panw.panos.destination.zone
+| Ingress Interface |  | panw.panos.source.interface
+| Egress Interface |  | panw.panos.destination.interface
+| Session ID |  | panw.panos.flow_id
 | Source Port | client.port source.port |
 | Destination Port | destination.port server.port |
-| NAT Source Port |  | panw.pan_os.source.nat.port
-| NAT Destination Port |  | panw.pan_os.destination.nat.port
+| NAT Source Port |  | panw.panos.source.nat.port
+| NAT Destination Port |  | panw.panos.destination.nat.port
 | Flags | labels |
 | Protocol | network.transport |
 | Action | event.outcome |
@@ -61,8 +61,8 @@ in ECS that are added under the `panw.pan_os` prefix:
 | Packets | network.packets |
 | Start Time | event.start |
 | Elapsed Time | event.duration |
-| Category |  | panw.pan_os.url.category
-| Sequence Number |  | panw.pan_os.sequence_number
+| Category |  | panw.panos.url.category
+| Sequence Number |  | panw.panos.sequence_number
 | Packets Sent | server.packets destination.packets |
 | Packets Received | client.packets source.packets |
 | Device Name | observer.hostname |
@@ -79,39 +79,39 @@ in ECS that are added under the `panw.pan_os` prefix:
 | Generated Time | `@timestamp` |
 | Source IP | client.ip source.ip |
 | Destination IP | server.ip destination.ip |
-| NAT Source IP |  | panw.pan_os.source.nat.ip
-| NAT Destination IP |  | panw.pan_os.destination.nat.ip
-| Rule Name |  | panw.pan_os.ruleset
+| NAT Source IP |  | panw.panos.source.nat.ip
+| NAT Destination IP |  | panw.panos.destination.nat.ip
+| Rule Name |  | panw.panos.ruleset
 | Source User | client.user.name source.user.name |
 | Destination User | server.user.name destination.user.name |
 | Application | network.application |
-| Source Zone |  | panw.pan_os.source.zone
-| Destination Zone |  | panw.pan_os.destination.zone
-| Ingress Interface |  | panw.pan_os.source.interface
-| Egress Interface |  | panw.pan_os.destination.interface
-| Session ID |  | panw.pan_os.flow_id
+| Source Zone |  | panw.panos.source.zone
+| Destination Zone |  | panw.panos.destination.zone
+| Ingress Interface |  | panw.panos.source.interface
+| Egress Interface |  | panw.panos.destination.interface
+| Session ID |  | panw.panos.flow_id
 | Source Port | client.port source.port |
 | Destination Port | destination.port server.port |
-| NAT Source Port |  | panw.pan_os.source.nat.port
-| NAT Destination Port |  | panw.pan_os.destination.nat.port
+| NAT Source Port |  | panw.panos.source.nat.port
+| NAT Destination Port |  | panw.panos.destination.nat.port
 | Flags | labels |
 | Protocol | network.transport |
 | Action | event.outcome |
-| Miscellaneous | url.original | panw.pan_os.threat.resource
-| Threat ID |  | panw.pan_os.threat.id
-| Category |  | panw.pan_os.url.category
+| Miscellaneous | url.original | panw.panos.threat.resource
+| Threat ID |  | panw.panos.threat.id
+| Category |  | panw.panos.url.category
 | Severity | log.level |
 | Direction | network.direction |
 | Source Location | source.geo.country_iso_code |
 | Destination Location | destination.geo.country_iso_code |
-| PCAP_id |  | panw.pan_os.network.pcap_id
-| Filedigest |  | panw.pan_os.file.hash
+| PCAP_id |  | panw.panos.network.pcap_id
+| Filedigest |  | panw.panos.file.hash
 | User Agent | user_agent.original |
 | File Type | file.type |
 | X-Forwarded-For | network.forwarded_ip |
 | Referer | http.request.referer |
 | Sender | source.user.email |
-| Subject |  | panw.pan_os.subject
+| Subject |  | panw.panos.subject
 | Recipient | destination.user.email |
 | Device Name | observer.hostname |
 |==============
@@ -135,24 +135,24 @@ it can also be configured to read logs from a file. See the following example.
 ["source","yaml",subs="attributes"]
 -----
 - module: panw
-  pan_os:
+  panos:
     enabled: true
     var.paths: ["/var/log/pan-os.log"]
     var.input: "file"
 -----
 
-:fileset_ex: pan_os
+:fileset_ex: panos
 
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `pan_os` fileset settings
+==== `panos` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
-  pan_os:
+  panos:
     var.syslog_host: 0.0.0.0
     var.syslog_port: 514
 ----

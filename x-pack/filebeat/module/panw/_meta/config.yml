@@ -1,5 +1,5 @@
 - module: panw
-  pan_os:
+  panos:
     enabled: true
 
     # Set which input to use between syslog (default) or file.

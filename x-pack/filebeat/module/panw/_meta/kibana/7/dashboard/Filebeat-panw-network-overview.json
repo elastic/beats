@@ -570,7 +570,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "panw.pan_os.source.zone",
+                "field": "panw.panos.source.zone",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -745,7 +745,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "panw.pan_os.destination.zone",
+                "field": "panw.panos.destination.zone",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -1075,7 +1075,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "panw.pan_os:* and event.category: \"network_traffic\""
+              "query": "panw.panos:* and event.category: \"network_traffic\""
             },
             "version": true
           }
