@@ -19472,6 +19472,7 @@ The number of UPDATE queries since startup.
 --
 type: long
 
+The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable. It does not count COM_PING or COM_STATISTICS commands.
 
 
 --
@@ -19481,6 +19482,7 @@ type: long
 --
 type: long
 
+The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable. This variable does not count COM_PING, COM_STATISTICS, COM_STMT_PREPARE, COM_STMT_CLOSE, or COM_STMT_RESET commands.
 
 
 --
@@ -19496,6 +19498,7 @@ type: long
 --
 type: long
 
+The number of internal COMMIT statements.
 
 
 --
@@ -19505,6 +19508,7 @@ type: long
 --
 type: long
 
+The number of times that rows have been deleted from tables.
 
 
 --
@@ -19514,6 +19518,7 @@ type: long
 --
 type: long
 
+The server increments this variable for each call to its external_lock() function, which generally occurs at the beginning and end of access to a table instance.
 
 
 --
@@ -19523,6 +19528,7 @@ type: long
 --
 type: long
 
+The number of times the server uses a storage engine's own Multi-Range Read implementation for table access.
 
 
 --
@@ -19532,6 +19538,7 @@ type: long
 --
 type: long
 
+A counter for the prepare phase of two-phase commit operations.
 
 
 --
@@ -19547,6 +19554,7 @@ type: long
 --
 type: long
 
+The number of times the first entry in an index was read.
 
 
 --
@@ -19556,6 +19564,7 @@ type: long
 --
 type: long
 
+The number of requests to read a row based on a key.
 
 
 --
@@ -19565,6 +19574,7 @@ type: long
 --
 type: long
 
+The number of requests to read the last key in an index. 
 
 
 --
@@ -19574,6 +19584,7 @@ type: long
 --
 type: long
 
+The number of requests to read the next row in key order.
 
 
 --
@@ -19583,6 +19594,7 @@ type: long
 --
 type: long
 
+The number of requests to read the previous row in key order.
 
 
 --
@@ -19592,6 +19604,7 @@ type: long
 --
 type: long
 
+The number of requests to read a row based on a fixed position. 
 
 
 --
@@ -19601,6 +19614,7 @@ type: long
 --
 type: long
 
+The number of requests to read the next row in the data file. 
 
 
 --
@@ -19610,6 +19624,7 @@ type: long
 --
 type: long
 
+The number of requests for a storage engine to perform a rollback operation.
 
 
 --
@@ -19619,6 +19634,7 @@ type: long
 --
 type: long
 
+The number of requests for a storage engine to place a savepoint.
 
 
 --
@@ -19628,6 +19644,7 @@ type: long
 --
 type: long
 
+The number of requests for a storage engine to roll back to a savepoint.
 
 
 --
@@ -19637,6 +19654,7 @@ type: long
 --
 type: long
 
+The number of requests to update a row in a table.
 
 
 --
@@ -19646,6 +19664,7 @@ type: long
 --
 type: long
 
+The number of requests to insert a row in a table.
 
 
 --
@@ -19661,6 +19680,7 @@ type: long
 --
 type: long
 
+The progress of an operation to record the pages held in the InnoDB buffer pool, triggered by the setting of innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.
 
 
 --
@@ -19670,6 +19690,7 @@ type: long
 --
 type: long
 
+The progress of an operation to warm up the InnoDB buffer pool by reading in a set of pages corresponding to an earlier point in time, triggered by the setting of innodb_buffer_pool_load_at_startup or innodb_buffer_pool_load_now.
 
 
 --
@@ -19685,6 +19706,7 @@ type: long
 --
 type: long
 
+The total number of bytes in the InnoDB buffer pool containing data. 
 
 
 --
@@ -19694,6 +19716,7 @@ type: long
 --
 type: long
 
+The total current number of bytes held in dirty pages in the InnoDB buffer pool.
 
 
 --
@@ -19709,6 +19732,7 @@ type: long
 --
 type: long
 
+he number of pages in the InnoDB buffer pool containing data.
 
 
 --
@@ -19718,6 +19742,7 @@ type: long
 --
 type: long
 
+The current number of dirty pages in the InnoDB buffer pool.
 
 
 --
@@ -19727,6 +19752,7 @@ type: long
 --
 type: long
 
+The number of requests to flush pages from the InnoDB buffer pool.
 
 
 --
@@ -19736,6 +19762,7 @@ type: long
 --
 type: long
 
+The number of free pages in the InnoDB buffer pool.
 
 
 --
@@ -19745,6 +19772,7 @@ type: long
 --
 type: long
 
+The number of latched pages in the InnoDB buffer pool.
 
 
 --
@@ -19754,6 +19782,7 @@ type: long
 --
 type: long
 
+The number of pages in the InnoDB buffer pool that are busy because they have been allocated for administrative overhead, such as row locks or the adaptive hash index.
 
 
 --
@@ -19763,6 +19792,7 @@ type: long
 --
 type: long
 
+The total size of the InnoDB buffer pool, in pages.
 
 
 --
@@ -19778,6 +19808,7 @@ type: long
 --
 type: long
 
+The number of pages read into the InnoDB buffer pool by the read-ahead background thread.
 
 
 --
@@ -19787,6 +19818,7 @@ type: long
 --
 type: long
 
+The number of pages read into the InnoDB buffer pool by the read-ahead background thread that were subsequently evicted without having been accessed by queries.
 
 
 --
@@ -19796,6 +19828,7 @@ type: long
 --
 type: long
 
+The number of "random" read-aheads initiated by InnoDB.
 
 
 --
@@ -19805,6 +19838,7 @@ type: long
 --
 type: long
 
+The number of logical read requests.
 
 
 --
@@ -19820,6 +19854,7 @@ type: long
 --
 type: long
 
+The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.
 
 
 --
@@ -19829,6 +19864,7 @@ type: long
 --
 type: long
 
+The status of an operation to resize the InnoDB buffer pool dynamically, triggered by setting the innodb_buffer_pool_size parameter dynamically.
 
 
 --
@@ -19838,6 +19874,7 @@ type: long
 --
 type: long
 
+Normally, writes to the InnoDB buffer pool happen in the background. When InnoDB needs to read or create a page and no clean pages are available, InnoDB flushes some dirty pages first and waits for that operation to finish. This counter counts instances of these waits.
 
 
 --
@@ -19847,6 +19884,7 @@ type: long
 --
 type: long
 
+The number of writes done to the InnoDB buffer pool.
 
 
 --
