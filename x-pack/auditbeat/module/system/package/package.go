@@ -508,7 +508,7 @@ func listDebPackages() ([]*Package, error) {
 
 	var packages []*Package
 	var skipPackage bool
-	pkg := &Package{}
+	var pkg *Package
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -518,7 +518,7 @@ func listDebPackages() ([]*Package, error) {
 				packages = append(packages, pkg)
 			}
 			skipPackage = false
-			pkg = &Package{}
+			pkg = nil
 			continue
 		} else if skipPackage {
 			// Skipping this package - read on.
@@ -534,6 +534,11 @@ func listDebPackages() ([]*Package, error) {
 			return nil, fmt.Errorf("the following line was unexpected (no ':' found): '%s'", line)
 		}
 		value := strings.TrimSpace(words[1])
+
+		if pkg == nil {
+			pkg = &Package{}
+		}
+
 		switch strings.ToLower(words[0]) {
 		case "package":
 			pkg.Name = value
@@ -553,12 +558,21 @@ func listDebPackages() ([]*Package, error) {
 			if err != nil {
 				return nil, errors.Wrapf(err, "error converting %s to int", value)
 			}
+		case "homepage":
+			pkg.URL = value
 		default:
 			continue
 		}
 	}
+
 	if err = scanner.Err(); err != nil {
 		return nil, errors.Wrapf(err, "error scanning file %v", dpkgStatusFile)
 	}
+
+	// Append last package if file ends without newline
+	if pkg != nil && !skipPackage {
+		packages = append(packages, pkg)
+	}
+
 	return packages, nil
 }
