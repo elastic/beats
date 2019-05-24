@@ -100,8 +100,8 @@
       "working_directory": "C:\\Windows\\system32\\"
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -171,8 +171,8 @@
       "working_directory": "C:\\Windows\\system32\\"
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -318,8 +318,8 @@
       "working_directory": "C:\\Windows\\system32\\"
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -384,8 +384,8 @@
       "port": 62141
     },
     "user": {
-      "domain": "NETWORK SERVICE",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
@@ -441,8 +441,8 @@
       "port": 62141
     },
     "user": {
-      "domain": "NETWORK SERVICE",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
@@ -498,8 +498,8 @@
       "port": 1138
     },
     "user": {
-      "domain": "vagrant",
-      "name": "VAGRANT-2012-R2"
+      "domain": "VAGRANT-2012-R2",
+      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -555,8 +555,8 @@
       "port": 1139
     },
     "user": {
-      "domain": "vagrant",
-      "name": "VAGRANT-2012-R2"
+      "domain": "VAGRANT-2012-R2",
+      "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
@@ -612,8 +612,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -672,8 +672,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -732,8 +732,8 @@
       "port": 55542
     },
     "user": {
-      "domain": "NETWORK SERVICE",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
@@ -788,8 +788,8 @@
       "port": 55542
     },
     "user": {
-      "domain": "NETWORK SERVICE",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
@@ -844,8 +844,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -903,8 +903,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -962,8 +962,8 @@
       "port": 55717
     },
     "user": {
-      "domain": "NETWORK SERVICE",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1018,8 +1018,8 @@
       "port": 55717
     },
     "user": {
-      "domain": "NETWORK SERVICE",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1075,8 +1075,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1135,8 +1135,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1195,8 +1195,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
@@ -1255,8 +1255,8 @@
       "port": 137
     },
     "user": {
-      "domain": "SYSTEM",
-      "name": "NT AUTHORITY"
+      "domain": "NT AUTHORITY",
+      "name": "SYSTEM"
     },
     "winlog": {
       "api": "wineventlog",
