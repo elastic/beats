@@ -6,6 +6,7 @@
   fields:
     - name: private_working_set.total
       type: long
+      format: bytes
       description: >
         private working sets on Windows
     - name: fail.count
@@ -38,11 +39,13 @@
         Usage memory stats.
       fields:
         - name: commit
-          type: bytes
+          type: long
+          format: bytes
           description: >
             Committed bytes on Windows
         - name: commit_peak
           type: long
+          format: bytes
           description: >
             Peak committed bytes on Windows
         - name: max

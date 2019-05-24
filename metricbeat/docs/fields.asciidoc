@@ -4544,6 +4544,8 @@ Memory metrics.
 --
 type: long
 
+format: bytes
+
 private working sets on Windows
 
 
@@ -4612,7 +4614,9 @@ Usage memory stats.
 *`docker.memory.usage.commit`*::
 +
 --
-type: bytes
+type: long
+
+format: bytes
 
 Committed bytes on Windows
 
@@ -4623,6 +4627,8 @@ Committed bytes on Windows
 +
 --
 type: long
+
+format: bytes
 
 Peak committed bytes on Windows
 
