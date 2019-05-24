@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.1.1...7.1[Check the HEAD diff]
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 - Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
+- Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 
 *Packetbeat*
 
