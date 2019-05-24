@@ -14,9 +14,6 @@ supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
 
 include::../include/what-happens.asciidoc[]
 
-[float]
-=== Compatibility
-
 include::../include/running-modules.asciidoc[]
 
 [float]

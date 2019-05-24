@@ -43,6 +43,7 @@ grouped in the following categories:
 * <<exported-fields-palo_alto>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
+* <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
@@ -11820,6 +11821,8 @@ Unix timestamp of the event, in seconds since the epoch. Used for computing the 
 *`osquery.result.calendar_time`*::
 +
 --
+type: keyword
+
 String representation of the collection time, as formatted by osquery.
 
 
@@ -12192,6 +12195,37 @@ Process metadata fields
 type: alias
 
 alias to: process.executable
+
+--
+
+[[exported-fields-rabbitmq]]
+== RabbitMQ fields
+
+RabbitMQ Module
+
+
+
+[float]
+== rabbitmq fields
+
+
+
+
+[float]
+== log fields
+
+RabbitMQ log files
+
+
+
+*`rabbitmq.log.pid`*::
++
+--
+type: keyword
+
+example: <0.222.0>
+
+The Erlang process id
 
 --
 

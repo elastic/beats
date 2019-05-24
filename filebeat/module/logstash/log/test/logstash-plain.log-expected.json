@@ -4,6 +4,7 @@
         "ecs.version": "1.0.0",
         "event.dataset": "logstash.log",
         "event.module": "logstash",
+        "event.timezone": "+00:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "INFO",
@@ -17,6 +18,7 @@
         "ecs.version": "1.0.0",
         "event.dataset": "logstash.log",
         "event.module": "logstash",
+        "event.timezone": "+00:00",
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [

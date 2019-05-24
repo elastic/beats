@@ -21,11 +21,12 @@ import "github.com/elastic/beats/libbeat/common/match"
 
 // Contains available input types
 const (
-	LogType    = "log"
-	StdinType  = "stdin"
-	RedisType  = "redis"
-	UdpType    = "udp"
-	DockerType = "docker"
+	LogType       = "log"
+	StdinType     = "stdin"
+	RedisType     = "redis"
+	UdpType       = "udp"
+	DockerType    = "docker"
+	ContainerType = "container"
 )
 
 // MatchAny checks if the text matches any of the regular expressions
