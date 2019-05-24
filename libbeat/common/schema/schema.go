@@ -20,6 +20,8 @@ package schema
 import (
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -39,10 +41,11 @@ type Mapper interface {
 
 // A Conv object represents a conversion mechanism from the data map to the event map.
 type Conv struct {
-	Func     Converter // Convertor function
-	Key      string    // The key in the data map
-	Optional bool      // Whether to ignore errors if the key is not found
-	Required bool      // Whether to provoke errors if the key is not found
+	Func            Converter // Convertor function
+	Key             string    // The key in the data map
+	Optional        bool      // Whether to ignore errors if the key is not found
+	Required        bool      // Whether to provoke errors if the key is not found
+	IgnoreAllErrors bool      // Ignore any value conversion error
 }
 
 // Converter function type
@@ -56,6 +59,10 @@ func (conv Conv) Map(key string, event common.MapStr, data map[string]interface{
 		if err, keyNotFound := err.(*KeyNotFoundError); keyNotFound {
 			err.Optional = conv.Optional
 			err.Required = conv.Required
+		}
+		if conv.IgnoreAllErrors {
+			logp.Debug("schema", "ignoring error for key %q: %s", key, err)
+			return nil
 		}
 		return multierror.Errors{err}
 	}
@@ -139,6 +146,12 @@ func Optional(c Conv) Conv {
 // doesn't exist, even if other missing keys can be ignored
 func Required(c Conv) Conv {
 	c.Required = true
+	return c
+}
+
+// IgnoreAllErrors set the enable all errors flag
+func IgnoreAllErrors(c Conv) Conv {
+	c.IgnoreAllErrors = true
 	return c
 }
 

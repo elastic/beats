@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -81,12 +82,13 @@ func TestTemplate(t *testing.T) {
 	beatVersion := "6.6.0"
 	beatName := "testbeat"
 	ver := common.MustNewVersion("6.6.0")
-	template, err := New(beatVersion, beatName, *ver, TemplateConfig{}, false)
-	assert.NoError(t, err)
+	template, err := New(beatVersion, beatName, *ver, DefaultConfig(), false)
+	require.NoError(t, err)
 
-	data := template.Generate(nil, nil)
+	data := template.Generate(common.MapStr{}, nil)
 	assert.Equal(t, []string{"testbeat-6.6.0-*"}, data["index_patterns"])
+	assert.Equal(t, 1, data["order"])
 	meta, err := data.GetValue("mappings.doc._meta")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, common.MapStr{"beat": "testbeat", "version": "6.6.0"}, meta)
 }

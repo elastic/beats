@@ -33,18 +33,22 @@ func init() {
 	)
 }
 
+const (
+	nodePath = "/_node"
+)
+
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		PathConfigKey: "path",
-		DefaultPath:   "_node",
+		DefaultPath:   nodePath,
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
-	http *helper.HTTP
+	*helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -69,10 +73,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	content, err := m.http.FetchContent()
-	if err != nil {
-		return err
+	if !m.MetricSet.XPack {
+		content, err := m.HTTP.FetchContent()
+		if err != nil {
+			return err
+		}
+
+		return eventMapping(r, content)
 	}
 
-	return eventMapping(r, content)
+	pipelinesContent, err := logstash.GetPipelines(m.HTTP, m.HostData().SanitizedURI+nodePath)
+	if err != nil {
+		m.Logger().Error(err)
+		return nil
+	}
+
+	err = eventMappingXPack(r, m, pipelinesContent)
+	if err != nil {
+		m.Logger().Error(err)
+	}
+
+	return nil
 }

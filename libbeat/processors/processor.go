@@ -71,7 +71,12 @@ func New(config PluginConfig) (*Processors, error) {
 
 		gen, exists := registry.reg[actionName]
 		if !exists {
-			return nil, errors.Errorf("the processor action %s does not exist", actionName)
+			var validActions []string
+			for k := range registry.reg {
+				validActions = append(validActions, k)
+
+			}
+			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
 		actionCfg.PrintDebugf("Configure processor action '%v' with:", actionName)

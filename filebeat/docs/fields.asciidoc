@@ -40,8 +40,10 @@ grouped in the following categories:
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
+* <<exported-fields-palo_alto>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
+* <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
@@ -1048,6 +1050,15 @@ alias to: host.name
 type: alias
 
 alias to: agent.hostname
+
+--
+
+*`timeseries.instance`*::
++
+--
+type: keyword
+
+Time series instance id
 
 --
 
@@ -11810,7 +11821,260 @@ Unix timestamp of the event, in seconds since the epoch. Used for computing the 
 *`osquery.result.calendar_time`*::
 +
 --
+type: keyword
+
 String representation of the collection time, as formatted by osquery.
+
+
+--
+
+[[exported-fields-palo_alto]]
+== palo_alto fields
+
+Module for Palo Alto Networks (PAN-OS)
+
+
+
+[float]
+== palo_alto fields
+
+Fields from the palo_alto logs.
+
+
+
+[float]
+== pan_os fields
+
+Fields for the Palo Alto Networks PAN-OS logs.
+
+
+
+*`palo_alto.pan_os.ruleset`*::
++
+--
+type: keyword
+
+Name of the rule that matched this session.
+
+
+--
+
+[float]
+== source fields
+
+Fields to extend the top-level source object.
+
+
+
+*`palo_alto.pan_os.source.zone`*::
++
+--
+type: keyword
+
+Source zone for this session.
+
+
+--
+
+*`palo_alto.pan_os.source.interface`*::
++
+--
+type: keyword
+
+Source interface for this session.
+
+
+--
+
+[float]
+== nat fields
+
+Post-NAT source address, if source NAT is performed.
+
+
+
+*`palo_alto.pan_os.source.nat.ip`*::
++
+--
+type: ip
+
+Post-NAT source IP.
+
+
+--
+
+*`palo_alto.pan_os.source.nat.port`*::
++
+--
+type: long
+
+Post-NAT source port.
+
+
+--
+
+[float]
+== destination fields
+
+Fields to extend the top-level destination object.
+
+
+
+*`palo_alto.pan_os.destination.zone`*::
++
+--
+type: keyword
+
+Destination zone for this session.
+
+
+--
+
+*`palo_alto.pan_os.destination.interface`*::
++
+--
+type: keyword
+
+Destination interface for this session.
+
+
+--
+
+[float]
+== nat fields
+
+Post-NAT destination address, if destination NAT is performed.
+
+
+
+*`palo_alto.pan_os.destination.nat.ip`*::
++
+--
+type: ip
+
+Post-NAT destination IP.
+
+
+--
+
+*`palo_alto.pan_os.destination.nat.port`*::
++
+--
+type: long
+
+Post-NAT destination port.
+
+
+--
+
+[float]
+== network fields
+
+Fields to extend the top-level network object.
+
+
+
+*`palo_alto.pan_os.network.pcap_id`*::
++
+--
+type: keyword
+
+Packet capture ID for a threat.
+
+
+--
+
+
+*`palo_alto.pan_os.network.nat.community_id`*::
++
+--
+type: keyword
+
+Community ID flow-hash for the NAT 5-tuple.
+
+
+--
+
+[float]
+== file fields
+
+Fields to extend the top-level file object.
+
+
+
+*`palo_alto.pan_os.file.hash`*::
++
+--
+type: keyword
+
+Binary hash for a threat file sent to be analyzed by the WildFire service.
+
+
+--
+
+[float]
+== url fields
+
+Fields to extend the top-level url object.
+
+
+
+*`palo_alto.pan_os.url.category`*::
++
+--
+type: keyword
+
+For threat URLs, it's the URL category. For WildFire, the verdict on the file and is either 'malicious', 'grayware', or 'benign'.
+
+
+--
+
+*`palo_alto.pan_os.flow_id`*::
++
+--
+type: keyword
+
+Internal numeric identifier for each session.
+
+
+--
+
+*`palo_alto.pan_os.sequence_number`*::
++
+--
+type: long
+
+Log entry identifier that is incremented sequentially. Unique for each log type.
+
+
+--
+
+*`palo_alto.pan_os.threat.resource`*::
++
+--
+type: keyword
+
+URL or file name for a threat.
+
+
+--
+
+*`palo_alto.pan_os.threat.id`*::
++
+--
+type: keyword
+
+Palo Alto Networks identifier for the threat.
+
+
+--
+
+*`palo_alto.pan_os.threat.name`*::
++
+--
+type: keyword
+
+Palo Alto Networks name for the threat.
 
 
 --
@@ -11931,6 +12195,37 @@ Process metadata fields
 type: alias
 
 alias to: process.executable
+
+--
+
+[[exported-fields-rabbitmq]]
+== RabbitMQ fields
+
+RabbitMQ Module
+
+
+
+[float]
+== rabbitmq fields
+
+
+
+
+[float]
+== log fields
+
+RabbitMQ log files
+
+
+
+*`rabbitmq.log.pid`*::
++
+--
+type: keyword
+
+example: <0.222.0>
+
+The Erlang process id
 
 --
 

@@ -29,10 +29,14 @@ import (
 	"github.com/elastic/beats/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_locale"
+	"github.com/elastic/beats/libbeat/processors/add_observer_metadata"
 	"github.com/elastic/beats/libbeat/processors/add_process_metadata"
 	"github.com/elastic/beats/libbeat/processors/communityid"
+	"github.com/elastic/beats/libbeat/processors/convert"
+	"github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 	"github.com/elastic/beats/libbeat/processors/dissect"
 	"github.com/elastic/beats/libbeat/processors/dns"
+	"github.com/elastic/beats/libbeat/processors/extract_array"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 )
 
@@ -44,13 +48,17 @@ var constructors = map[string]processors.Constructor{
 	"AddFields":             actions.CreateAddFields,
 	"AddHostMetadata":       add_host_metadata.New,
 	"AddKubernetesMetadata": add_kubernetes_metadata.New,
+	"AddObserverMetadata":   add_observer_metadata.New,
 	"AddLocale":             add_locale.New,
 	"AddProcessMetadata":    add_process_metadata.New,
 	"CommunityID":           communityid.New,
+	"Convert":               convert.New,
 	"CopyFields":            actions.NewCopyFields,
+	"DecodeCSVField":        decode_csv_fields.NewDecodeCSVField,
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
+	"ExtractArray":          extract_array.New,
 	"Rename":                actions.NewRenameFields,
 	"TruncateFields":        actions.NewTruncateFields,
 }

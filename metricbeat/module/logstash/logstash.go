@@ -18,6 +18,12 @@
 package logstash
 
 import (
+	"encoding/json"
+	"net/url"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -27,12 +33,73 @@ const ModuleName = "logstash"
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
 	mb.BaseMetricSet
+	XPack bool
+}
+
+// PipelineState represents the state (shape) of a Logstash pipeline
+type PipelineState struct {
+	ID             string                 `json:"id"`
+	Hash           string                 `json:"hash"`
+	EphemeralID    string                 `json:"ephemeral_id"`
+	Graph          map[string]interface{} `json:"graph,omitempty"`
+	Representation map[string]interface{} `json:"representation"`
+	BatchSize      int                    `json:"batch_size"`
+	Workers        int                    `json:"workers"`
+	ClusterIDs     []string               `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Logstash module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+	config := struct {
+		XPack bool `config:"xpack.enabled"`
+	}{
+		XPack: false,
+	}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		base,
+		config.XPack,
 	}, nil
+}
+
+// GetPipelines returns the list of pipelines running on a Logstash node
+func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
+	content, err := fetchPath(http, resetURI, "_node/pipelines", "graph=true")
+	if err != nil {
+		return nil, errors.Wrap(err, "could not fetch node pipelines")
+	}
+
+	pipelinesResponse := struct {
+		Pipelines map[string]PipelineState `json:"pipelines"`
+	}{}
+
+	err = json.Unmarshal(content, &pipelinesResponse)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not parse node pipelines response")
+	}
+
+	var pipelines []PipelineState
+	for pipelineID, pipeline := range pipelinesResponse.Pipelines {
+		pipeline.ID = pipelineID
+		pipelines = append(pipelines, pipeline)
+	}
+
+	return pipelines, nil
+}
+
+func fetchPath(http *helper.HTTP, resetURI, path string, query string) ([]byte, error) {
+	defer http.SetURI(resetURI)
+
+	// Parses the uri to replace the path
+	u, _ := url.Parse(resetURI)
+	u.Path = path
+	u.RawQuery = query
+
+	// Http helper includes the HostData with username and password
+	http.SetURI(u.String())
+	return http.FetchContent()
 }

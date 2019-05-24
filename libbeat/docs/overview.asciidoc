@@ -24,7 +24,7 @@ https://www.elastic.co/products/logstash[{ls}], where you can further process
 and enhance the data, before visualizing it in
 https://www.elastic.co/products/logstash[{kib}].
 
-image:./images/beats-platform.png[Beats Platform]
+image::./images/beats-platform.png[Beats Platform]
 
 To get started, see <<getting-started>>.
 

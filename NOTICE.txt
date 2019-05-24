@@ -715,7 +715,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Revision: ab4f04edfc3d6b3864f5f06a068ddab9ad79774f
+Revision: 9a4be54a53be4c48b44d351d52fb425a5e274be5
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
@@ -723,7 +723,7 @@ Apache License 2.0
 
 -------NOTICE.txt-----
 Elastic go-sysinfo
-Copyright 2017-2018 Elasticsearch B.V.
+Copyright 2017-2019 Elasticsearch B.V.
 
 This product includes software developed at
 Elasticsearch, B.V. (https://www.elastic.co/).
@@ -765,8 +765,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.10.0
-Revision: f2a90fc413720c43da9c4fe1a47513c73f45ac3d
+Version: v0.10.2
+Revision: 1227b9d6877d126ad640087e44439d70dba2df4f
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
@@ -1921,7 +1921,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/lib/pq
-Revision: 2704adc878c21e1329f46f6e56a1c387d788ff94
+Revision: 2ff3cb3adc01768e0a552b3a02575a6df38a9bea
 License type (autodetected): MIT
 ./metricbeat/module/postgresql/vendor/github.com/lib/pq/LICENSE.md:
 --------------------------------------------------------------------
