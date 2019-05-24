@@ -176,6 +176,7 @@ func (conn *Connection) Request(method, extraPath string,
 	return resp.StatusCode, result, retError
 }
 
+// Sends an application/json request to Kibana with appropriate kbn headers
 func (conn *Connection) Send(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
 
@@ -183,7 +184,7 @@ func (conn *Connection) Send(method, extraPath string,
 
 	req, err := http.NewRequest(method, reqURL, body)
 	if err != nil {
-		return nil, fmt.Errorf("fail to create the HTTP %s request: %v", method, err)
+		return nil, fmt.Errorf("fail to create the HTTP %s request: %+v", method, err)
 	}
 
 	if conn.Username != "" || conn.Password != "" {
@@ -206,6 +207,7 @@ func (conn *Connection) Send(method, extraPath string,
 	return conn.RoundTrip(req)
 }
 
+// Implements RoundTrip interface
 func (conn *Connection) RoundTrip(r *http.Request) (*http.Response, error) {
 	return conn.http.Do(r)
 }
