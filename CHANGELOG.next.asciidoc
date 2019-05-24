@@ -168,7 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add option to configure docker input with paths {pull}10687[10687]
 - Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
 - Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
-- Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {pull}10911[10911]
+- Refactor autodiscover default input settings handling. {pull}12193[12193]
 - Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
 - Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 - New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
