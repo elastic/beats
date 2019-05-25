@@ -76,6 +76,7 @@
         },
         {
             "rename": {
+                "if": "ctx.elasticsearch.audit?.user?.name != null",
                 "field": "elasticsearch.audit.user.name",
                 "target_field": "elasticsearch.audit.principal"
             }
