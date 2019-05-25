@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.1.1...7.1[Check the HEAD diff]
 - Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
 
 *Packetbeat*
 
