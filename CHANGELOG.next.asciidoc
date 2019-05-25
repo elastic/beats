@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 *Metricbeat*
 
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
 
 *Packetbeat*
 
