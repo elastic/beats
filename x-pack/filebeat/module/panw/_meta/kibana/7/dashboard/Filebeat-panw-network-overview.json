@@ -119,7 +119,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat palo_alto] Network Flows ECS",
+        "title": "[Filebeat PANW] Network Flows ECS",
         "version": 1
       },
       "id": "e40ba240-7572-11e9-976e-65a8f47cc4c1",
@@ -180,7 +180,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Destination Flows Map [Filebeat palo_alto] ECS",
+        "title": "Destination Flows Map [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -231,7 +231,7 @@
               }
             }
           },
-          "title": "Destination Flows Map [Filebeat palo_alto] ECS",
+          "title": "Destination Flows Map [Filebeat PANW] ECS",
           "type": "tile_map"
         }
       },
@@ -263,7 +263,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Source Flows Map [Filebeat palo_alto] ECS",
+        "title": "Source Flows Map [Filebeat PANW] ECS",
         "uiStateJSON": {
           "mapCenter": [
             -0.17578097424708533,
@@ -320,7 +320,7 @@
               }
             }
           },
-          "title": "Source Flows Map [Filebeat palo_alto] ECS",
+          "title": "Source Flows Map [Filebeat PANW] ECS",
           "type": "tile_map"
         }
       },
@@ -378,7 +378,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Flow Creation Histogram [Filebeat palo_alto] ECS",
+        "title": "Flow Creation Histogram [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -491,7 +491,7 @@
               }
             ]
           },
-          "title": "Flow Creation Histogram [Filebeat palo_alto] ECS",
+          "title": "Flow Creation Histogram [Filebeat PANW] ECS",
           "type": "histogram"
         }
       },
@@ -554,7 +554,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Source Zone breakout [Filebeat palo_alto] ECS",
+        "title": "Source Zone breakout [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -570,7 +570,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "palo_alto.pan_os.source.zone",
+                "field": "panw.panos.source.zone",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -666,7 +666,7 @@
               }
             ]
           },
-          "title": "Source Zone breakout [Filebeat palo_alto] ECS",
+          "title": "Source Zone breakout [Filebeat PANW] ECS",
           "type": "horizontal_bar"
         }
       },
@@ -729,7 +729,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Destination Zone breakout [Filebeat palo_alto] ECS",
+        "title": "Destination Zone breakout [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -745,7 +745,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "palo_alto.pan_os.destination.zone",
+                "field": "panw.panos.destination.zone",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -841,7 +841,7 @@
               }
             ]
           },
-          "title": "Destination Zone breakout [Filebeat palo_alto] ECS",
+          "title": "Destination Zone breakout [Filebeat PANW] ECS",
           "type": "horizontal_bar"
         }
       },
@@ -878,7 +878,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Event Outcome by Transport and Destination Port [Filebeat palo_alto] ECS",
+        "title": "Event Outcome by Transport and Destination Port [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -952,7 +952,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Event Outcome by Transport and Destination Port [Filebeat palo_alto] ECS",
+          "title": "Event Outcome by Transport and Destination Port [Filebeat PANW] ECS",
           "type": "pie"
         }
       },
@@ -984,7 +984,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Network Application breakout [Filebeat palo_alto] ECS",
+        "title": "Network Application breakout [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1042,7 +1042,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Application breakout [Filebeat palo_alto] ECS",
+          "title": "Network Application breakout [Filebeat PANW] ECS",
           "type": "pie"
         }
       },
@@ -1075,7 +1075,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "palo_alto.pan_os:* and event.category: \"network_traffic\""
+              "query": "panw.panos:* and event.category: \"network_traffic\""
             },
             "version": true
           }
@@ -1084,7 +1084,7 @@
           "@timestamp",
           "desc"
         ],
-        "title": "PAN-OS Flows [Filebeat palo_alto] ECS",
+        "title": "PAN-OS Flows [Filebeat PANW] ECS",
         "version": 1
       },
       "id": "290685e0-7569-11e9-976e-65a8f47cc4c1",
