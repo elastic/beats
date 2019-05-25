@@ -6,7 +6,7 @@ the +{beatname_lc}.yml+ config file. Each entry in the list begins with a dash
 (-) and is followed by settings for that module.
 
 The following example shows a configuration that runs the `auditd` and
-`file_integrity` moduled.
+`file_integrity` modules.
 
 [source,yaml]
 ----
