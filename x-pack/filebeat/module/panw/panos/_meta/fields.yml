@@ -1,4 +1,4 @@
- - name: pan_os
+ - name: panos
    type: group
    description: >
      Fields for the Palo Alto Networks PAN-OS logs.

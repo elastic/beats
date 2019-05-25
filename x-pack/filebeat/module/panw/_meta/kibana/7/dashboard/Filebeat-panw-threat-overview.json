@@ -112,7 +112,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat palo_alto] Threats Overview ECS",
+        "title": "[Filebeat PANW] Threats Overview ECS",
         "version": 1
       },
       "id": "772964e0-7591-11e9-aacf-79a3704914a0",
@@ -168,7 +168,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Threat outcome histogram [Filebeat palo_alto] ECS",
+        "title": "Threat outcome histogram [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -281,7 +281,7 @@
               }
             ]
           },
-          "title": "Threat outcome histogram [Filebeat palo_alto] ECS",
+          "title": "Threat outcome histogram [Filebeat PANW] ECS",
           "type": "histogram"
         }
       },
@@ -313,7 +313,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Threat ID Cloud [Filebeat palo_alto] ECS",
+        "title": "Threat ID Cloud [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -329,7 +329,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "palo_alto.pan_os.threat.name",
+                "field": "panw.panos.threat.name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -349,7 +349,7 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Threat ID Cloud [Filebeat palo_alto] ECS",
+          "title": "Threat ID Cloud [Filebeat PANW] ECS",
           "type": "tagcloud"
         }
       },
@@ -381,7 +381,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Threat Resource Cloud [Filebeat palo_alto] ECS",
+        "title": "Threat Resource Cloud [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -417,7 +417,7 @@
             "scale": "linear",
             "showLabel": true
           },
-          "title": "Threat Resource Cloud [Filebeat palo_alto] ECS",
+          "title": "Threat Resource Cloud [Filebeat PANW] ECS",
           "type": "tagcloud"
         }
       },
@@ -475,7 +475,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top attackers (clients) [Filebeat palo_alto] ECS",
+        "title": "Top attackers (clients) [Filebeat PANW] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -524,7 +524,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top attackers (clients) [Filebeat palo_alto] ECS",
+          "title": "Top attackers (clients) [Filebeat PANW] ECS",
           "type": "table"
         }
       },
@@ -587,7 +587,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Top attackers (servers) [Filebeat palo_alto] ECS",
+        "title": "Top attackers (servers) [Filebeat PANW] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -636,7 +636,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top attackers (servers) [Filebeat palo_alto] ECS",
+          "title": "Top attackers (servers) [Filebeat PANW] ECS",
           "type": "table"
         }
       },
@@ -673,7 +673,7 @@
           }
         },
         "savedSearchRefName": "search_0",
-        "title": "Outcome by Threat Type [Filebeat palo_alto] ECS",
+        "title": "Outcome by Threat Type [Filebeat PANW] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -731,7 +731,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Outcome by Threat Type [Filebeat palo_alto] ECS",
+          "title": "Outcome by Threat Type [Filebeat PANW] ECS",
           "type": "pie"
         }
       },
@@ -764,7 +764,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "palo_alto.pan_os:* and event.category: \"security_threat\""
+              "query": "panw.panos:* and event.category: \"security_threat\""
             },
             "version": true
           }
@@ -773,7 +773,7 @@
           "@timestamp",
           "desc"
         ],
-        "title": "PAN-OS Threats [Filebeat palo_alto] ECS",
+        "title": "PAN-OS Threats [Filebeat PANW] ECS",
         "version": 1
       },
       "id": "3cea1360-7569-11e9-976e-65a8f47cc4c1",
