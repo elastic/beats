@@ -35,6 +35,8 @@ class Test(BaseTest):
         subnet_ids = ["subnet-ABCDEFGHIJKL"]
         log_group = "/aws/lambda/functionbeat-cloudwatch"
 
+        self._generate_dummy_binary_for_template_checksum()
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             cloudwatch={
@@ -73,6 +75,8 @@ class Test(BaseTest):
         function_name = "INVALID_$_FUNCTION_$_NAME"
         bucket_name = "my-bucket-name"
 
+        self._generate_dummy_binary_for_template_checksum()
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             cloudwatch={
@@ -91,6 +95,10 @@ class Test(BaseTest):
 
         exit_code = functionbeat_proc.kill_and_wait()
         assert exit_code != 0
+
+    def _generate_dummy_binary_for_template_checksum(self):
+        with open('pkg/functionbeat', 'wb') as f:
+            f.write("my dummy functionbeat binary")
 
     def _get_generated_function_template(self):
         logs = self.get_log_lines()
