@@ -20,13 +20,13 @@ package hints
 import "github.com/elastic/beats/libbeat/common"
 
 type config struct {
-	Key    string         `config:"key"`
-	Config *common.Config `config:"config"`
+	Key           string         `config:"key"`
+	DefaultConfig *common.Config `config:"default_config"`
 }
 
 func defaultConfig() config {
-	rawCfg := map[string]interface{}{
-		"type": "docker",
+	defaultCfgRaw := map[string]interface{}{
+		"type": "container",
 		"containers": map[string]interface{}{
 			"paths": []string{
 				// To be able to use this builder with CRI-O replace paths with:
@@ -35,10 +35,10 @@ func defaultConfig() config {
 			},
 		},
 	}
-	cfg, _ := common.NewConfigFrom(rawCfg)
+	defaultCfg, _ := common.NewConfigFrom(defaultCfgRaw)
 	return config{
-		Key:    "logs",
-		Config: cfg,
+		Key:           "logs",
+		DefaultConfig: defaultCfg,
 	}
 }
 
@@ -52,8 +52,8 @@ func (c *config) Unpack(from *common.Config) error {
 		return err
 	}
 
-	if config, err := from.Child("config", -1); err == nil {
-		c.Config = config
+	if config, err := from.Child("default_config", -1); err == nil {
+		c.DefaultConfig = config
 	}
 
 	c.Key = tmpConfig.Key

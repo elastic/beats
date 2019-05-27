@@ -33,9 +33,9 @@ func TestDockerJSON(t *testing.T) {
 		input           [][]byte
 		stream          string
 		partial         bool
-		forceCRI        bool
+		format          string
 		criflags        bool
-		expectedError   bool
+		expectedError   error
 		expectedMessage reader.Message
 	}{
 		{
@@ -53,7 +53,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong JSON",
 			input:         [][]byte{[]byte(`this is not JSON`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 16,
 			},
@@ -62,7 +62,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 37,
 			},
@@ -71,7 +71,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`{this is not JSON nor CRI`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 25,
 			},
@@ -80,7 +80,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Missing time",
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 82,
 			},
@@ -206,10 +206,20 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Force CRI with JSON logs",
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
-			forceCRI:      true,
-			expectedError: true,
+			format:        "cri",
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 82,
+			},
+		},
+		{
+			name:          "Force JSON with CRI logs",
+			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
+			stream:        "all",
+			format:        "docker",
+			expectedError: reader.ErrLineUnparsable,
+			expectedMessage: reader.Message{
+				Bytes: 115,
 			},
 		},
 		{
@@ -222,7 +232,7 @@ func TestDockerJSON(t *testing.T) {
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   115,
 			},
-			forceCRI: true,
+			format:   "cri",
 			criflags: false,
 		},
 		{
@@ -235,7 +245,7 @@ func TestDockerJSON(t *testing.T) {
 				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
 				Bytes:   117,
 			},
-			forceCRI: true,
+			format:   "cri",
 			criflags: true,
 		},
 		{
@@ -252,7 +262,7 @@ func TestDockerJSON(t *testing.T) {
 				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
 				Bytes:   163,
 			},
-			forceCRI: true,
+			format:   "cri",
 			criflags: true,
 		},
 		{
@@ -269,7 +279,7 @@ func TestDockerJSON(t *testing.T) {
 				Bytes:   164,
 			},
 			partial:  true,
-			forceCRI: true,
+			format:   "cri",
 			criflags: true,
 		},
 		{
@@ -279,22 +289,32 @@ func TestDockerJSON(t *testing.T) {
 				[]byte(`{"log":"shutdown...\n","stream`),
 			},
 			stream:        "stdout",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 139,
 			},
 			partial: true,
+		},
+		{
+			name:          "Corrupted log message line",
+			input:         [][]byte{[]byte(`36.276 # User requested shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`)},
+			stream:        "all",
+			expectedError: reader.ErrLineUnparsable,
+			expectedMessage: reader.Message{
+				Bytes: 97,
+			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := &mockReader{messages: test.input}
-			json := New(r, test.stream, test.partial, test.forceCRI, test.criflags)
+			json := New(r, test.stream, test.partial, test.format, test.criflags)
 			message, err := json.Next()
 
-			if test.expectedError {
+			if test.expectedError != nil {
 				assert.Error(t, err)
+				assert.Equal(t, test.expectedError, err)
 			} else {
 				assert.NoError(t, err)
 			}

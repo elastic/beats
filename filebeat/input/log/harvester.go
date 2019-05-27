@@ -29,7 +29,6 @@
 package log
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -154,9 +153,7 @@ func (h *Harvester) open() error {
 	switch h.config.Type {
 	case harvester.StdinType:
 		return h.openStdin()
-	case harvester.LogType:
-		return h.openFile()
-	case harvester.DockerType:
+	case harvester.LogType, harvester.DockerType, harvester.ContainerType:
 		return h.openFile()
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
@@ -279,16 +276,14 @@ func (h *Harvester) Run() error {
 				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
 			case ErrInactive:
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
+			case reader.ErrLineUnparsable:
+				logp.Info("Skipping unparsable line in file: %v", h.state.Source)
+				//line unparsable, go to next line
+				continue
 			default:
 				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
 			}
 			return nil
-		}
-
-		// Strip UTF-8 BOM if beginning of file
-		// As all BOMS are converted to UTF-8 it is enough to only remove this one
-		if h.state.Offset == 0 {
-			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
 		}
 
 		// Get copy of state to work on
@@ -577,7 +572,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.Format, h.config.DockerJSON.CRIFlags)
 	}
 
 	if h.config.JSON != nil {
