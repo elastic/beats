@@ -27,6 +27,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/reader"
 )
 
@@ -187,7 +188,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		var logLine logLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
-			return message, err
+			logp.Err("Parse line error: %v", err)
+			return message, reader.ErrLineUnparsable
 		}
 
 		// Handle multiline messages, join partial lines
@@ -203,7 +205,8 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			}
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
-				return message, err
+				logp.Err("Parse line error: %v", err)
+				return message, reader.ErrLineUnparsable
 			}
 			message.Content = append(message.Content, next.Content...)
 		}
