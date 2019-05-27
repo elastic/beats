@@ -403,9 +403,9 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
-#------------------------------ Palo_alto Module ------------------------------
-- module: palo_alto
-  pan_os:
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  panos:
     enabled: true
 
     # Set which input to use between syslog (default) or file.
@@ -1298,6 +1298,11 @@ output.elasticsearch:
 
   # Proxy server URL
   #proxy_url: http://proxy:3128
+
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
 
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
