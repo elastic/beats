@@ -59,6 +59,17 @@ func TestDockerJSON(t *testing.T) {
 			},
 		},
 		{
+			name:   "0 length message",
+			input:  [][]byte{[]byte(`{"log":"","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`)},
+			stream: "all",
+			expectedMessage: reader.Message{
+				Content: []byte(""),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   68,
+			},
+		},
+		{
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
 			stream:        "all",
