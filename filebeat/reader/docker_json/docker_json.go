@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/reader"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Reader processor renames a given field
@@ -185,7 +186,8 @@ func (p *Reader) Next() (reader.Message, error) {
 		var logLine logLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
-			return message, err
+			logp.Err("Parse line error: %v", err)
+			return message, reader.ErrLineUnparsable
 		}
 
 		// Handle multiline messages, join partial lines
@@ -201,7 +203,8 @@ func (p *Reader) Next() (reader.Message, error) {
 			}
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
-				return message, err
+				logp.Err("Parse line error: %v", err)
+				return message, reader.ErrLineUnparsable
 			}
 			message.Content = append(message.Content, next.Content...)
 		}

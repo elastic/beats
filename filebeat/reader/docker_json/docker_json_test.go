@@ -35,7 +35,7 @@ func TestDockerJSON(t *testing.T) {
 		partial         bool
 		forceCRI        bool
 		criflags        bool
-		expectedError   bool
+		expectedError   error
 		expectedMessage reader.Message
 	}{
 		{
@@ -53,7 +53,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong JSON",
 			input:         [][]byte{[]byte(`this is not JSON`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 16,
 			},
@@ -62,7 +62,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 37,
 			},
@@ -71,7 +71,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`{this is not JSON nor CRI`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 25,
 			},
@@ -80,7 +80,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Missing time",
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 82,
 			},
@@ -207,7 +207,7 @@ func TestDockerJSON(t *testing.T) {
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
 			forceCRI:      true,
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 82,
 			},
@@ -279,11 +279,20 @@ func TestDockerJSON(t *testing.T) {
 				[]byte(`{"log":"shutdown...\n","stream`),
 			},
 			stream:        "stdout",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 139,
 			},
 			partial: true,
+		},
+		{
+			name:          "Corrupted log message line",
+			input:         [][]byte{[]byte(`36.276 # User requested shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`)},
+			stream:        "all",
+			expectedError: reader.ErrLineUnparsable,
+			expectedMessage: reader.Message{
+				Bytes: 97,
+			},
 		},
 	}
 
@@ -293,8 +302,9 @@ func TestDockerJSON(t *testing.T) {
 			json := New(r, test.stream, test.partial, test.forceCRI, test.criflags)
 			message, err := json.Next()
 
-			if test.expectedError {
+			if test.expectedError != nil {
 				assert.Error(t, err)
+				assert.Equal(t, test.expectedError, err)
 			} else {
 				assert.NoError(t, err)
 			}
