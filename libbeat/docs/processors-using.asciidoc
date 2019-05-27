@@ -214,7 +214,7 @@ ifdef::has_decode_csv_fields_processor[]
  * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
- * <<decode-base64-fields,`decode_base64_fields`>>
+ * <<decode-base64-field,`decode_base64_field`>>
  * <<dissect, `dissect`>>
  * <<extract-array,`extract_array`>>
  * <<processor-dns, `dns`>>
@@ -865,38 +865,30 @@ is treated as if the field was not set at all.
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
 
-[[decode-base64-fields]]
+[[decode-base64-field]]
 === Decode Base64 fields
 
-The `decode_base64_fields` processor specifies a list of fields to base64 decode.
-Under the `fields` key each entry contains a `from: old-key` and a `to: new-key` pair. `from` is
+The `decode_base64_field` processor specifies a field to base64 decode.
+The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
 the origin and `to` the target name of the field.
 
-Rename fields cannot be used to overwrite fields. To overwrite fields either
-first rename the target field or use the `drop_fields` processor to drop the
-field and then rename the field.
+To overwrite fields either first rename the target field or use the `drop_fields`
+processor to drop the field and then rename the field.
 
 [source,yaml]
 -------
 processors:
-- decode_base64_fields:
-    fields:
-     - from: "field1"
-       to: "field2"
-     - from: "field3"
-       to: "field3"
-     - from: "field4"
-       to: ""
+- decode_base64_field:
+    from: "field1"
+    to: "field2"
     ignore_missing: false
     fail_on_error: true
 -------
 
 In the example above:
     - field1 is decoded in field2
-    - field3 is decoded in field3
-    - field4 is decoded in field4
 
-The `decode_base64_fields` processor has the following configuration settings:
+The `decode_base64_field` processor has the following configuration settings:
 
 `ignore_missing`:: (Optional) If set to true, no error is logged in case a key
 which should be base64 decoded is missing. Default is `false`.

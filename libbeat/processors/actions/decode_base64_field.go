@@ -31,19 +31,19 @@ import (
 )
 
 const (
-	processorName = "decode_base64_fields"
+	processorName = "decode_base64_field"
 )
 
-type decodeBase64Fields struct {
+type decodeBase64Field struct {
 	log *logp.Logger
 
 	config base64Config
 }
 
 type base64Config struct {
-	Fields        []fromTo `config:"fields"`
-	IgnoreMissing bool     `config:"ignore_missing"`
-	FailOnError   bool     `config:"fail_on_error"`
+	fromTo        `config:"field"`
+	IgnoreMissing bool `config:"ignore_missing"`
+	FailOnError   bool `config:"fail_on_error"`
 }
 
 var (
@@ -56,11 +56,11 @@ var (
 func init() {
 	processors.RegisterPlugin(processorName,
 		checks.ConfigChecked(NewDecodeBase64Field,
-			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "when")))
+			checks.RequireFields("field"),
+			checks.AllowedFields("field", "when")))
 }
 
-// NewDecodeBase64Field construct a new decode_base64_fields processor.
+// NewDecodeBase64Field construct a new decode_base64_field processor.
 func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
 	config := defaultBase64Config
 
@@ -71,38 +71,36 @@ func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %s configuration: %s", processorName, err)
 	}
 
-	return &decodeBase64Fields{
+	return &decodeBase64Field{
 		log:    log,
 		config: config,
 	}, nil
 }
 
-func (f *decodeBase64Fields) Run(event *beat.Event) (*beat.Event, error) {
+func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
 	var backup common.MapStr
 	// Creates a copy of the event to revert in case of failure
 	if f.config.FailOnError {
 		backup = event.Fields.Clone()
 	}
 
-	for _, field := range f.config.Fields {
-		err := f.decodeField(field.From, field.To, event.Fields)
-		if err != nil && f.config.FailOnError {
-			errMsg := fmt.Errorf("failed to decode base64 fields in processor: %v", err)
-			f.log.Debug("decode base64", errMsg.Error())
-			event.Fields = backup
-			_, _ = event.PutValue("error.message", errMsg.Error())
-			return event, err
-		}
+	err := f.decodeField(f.config.From, f.config.To, event.Fields)
+	if err != nil && f.config.FailOnError {
+		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %v", err)
+		f.log.Debug("decode base64", errMsg.Error())
+		event.Fields = backup
+		_, _ = event.PutValue("error.message", errMsg.Error())
+		return event, err
 	}
 
 	return event, nil
 }
 
-func (f decodeBase64Fields) String() string {
-	return fmt.Sprintf("%s=%+v", processorName, f.config.Fields)
+func (f decodeBase64Field) String() string {
+	return fmt.Sprintf("%s=%+v", processorName, f.config.fromTo)
 }
 
-func (f *decodeBase64Fields) decodeField(from string, to string, fields common.MapStr) error {
+func (f *decodeBase64Field) decodeField(from string, to string, fields common.MapStr) error {
 	value, err := fields.GetValue(from)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors

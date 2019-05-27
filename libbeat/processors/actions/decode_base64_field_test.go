@@ -38,8 +38,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field base64 decode",
 			config: base64Config{
-				Fields: []fromTo{
-					{From: "field1", To: "field2"},
+				fromTo: fromTo{
+					From: "field1", To: "field2",
 				},
 				IgnoreMissing: false,
 				FailOnError:   true,
@@ -56,8 +56,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field base64 decode To empty",
 			config: base64Config{
-				Fields: []fromTo{
-					{From: "field1", To: ""},
+				fromTo: fromTo{
+					From: "field1", To: "",
 				},
 				IgnoreMissing: false,
 				FailOnError:   true,
@@ -73,8 +73,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field base64 decode from and to equals",
 			config: base64Config{
-				Fields: []fromTo{
-					{From: "field1", To: "field1"},
+				fromTo: fromTo{
+					From: "field1", To: "field1",
 				},
 				IgnoreMissing: false,
 				FailOnError:   true,
@@ -90,8 +90,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field bad data - fail on error",
 			config: base64Config{
-				Fields: []fromTo{
-					{From: "field1", To: "field1"},
+				fromTo: fromTo{
+					From: "field1", To: "field1",
 				},
 				IgnoreMissing: false,
 				FailOnError:   true,
@@ -110,8 +110,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "simple field bad data fail on error false",
 			config: base64Config{
-				Fields: []fromTo{
-					{From: "field1", To: "field2"},
+				fromTo: fromTo{
+					From: "field1", To: "field2",
 				},
 				IgnoreMissing: false,
 				FailOnError:   false,
@@ -127,8 +127,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "missing field",
 			config: base64Config{
-				Fields: []fromTo{
-					{From: "field2", To: "field3"},
+				fromTo: fromTo{
+					From: "field2", To: "field3",
 				},
 				IgnoreMissing: false,
 				FailOnError:   true,
@@ -147,8 +147,8 @@ func TestDecodeBase64Run(t *testing.T) {
 		{
 			description: "missing field ignore",
 			config: base64Config{
-				Fields: []fromTo{
-					{From: "field2", To: "field3"},
+				fromTo: fromTo{
+					From: "field2", To: "field3",
 				},
 				IgnoreMissing: true,
 				FailOnError:   true,
@@ -168,7 +168,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
 
-			f := &decodeBase64Fields{
+			f := &decodeBase64Field{
 				log:    logp.NewLogger(processorName),
 				config: test.config,
 			}
