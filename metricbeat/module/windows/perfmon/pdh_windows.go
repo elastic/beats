@@ -31,7 +31,9 @@ import (
 //sys _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhOpenQueryW
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddEnglishCounterW
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
-//sys _PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetFormattedCounterValueDouble(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueDouble) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetFormattedCounterValueLarge(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLarge) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
+//sys _PdhGetFormattedCounterValueLong(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLong) (errcode error) [failretval!=0]= pdh.PdhGetFormattedCounterValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 
@@ -42,6 +44,30 @@ var InvalidQueryHandle = ^PdhQueryHandle(0)
 type PdhCounterHandle uintptr
 
 var InvalidCounterHandle = ^PdhCounterHandle(0)
+
+// PdhCounterValueDouble  for double values
+type PdhCounterValueDouble struct {
+	CStatus   uint32
+	Pad_cgo_0 [4]byte
+	Value     float64
+	Pad_cgo_1 [4]byte
+}
+
+// PdhCounterValueLarge for 64 bit integer values
+type PdhCounterValueLarge struct {
+	CStatus   uint32
+	Pad_cgo_0 [4]byte
+	Value     int64
+	Pad_cgo_1 [4]byte
+}
+
+// PdhCounterValueLong for long values
+type PdhCounterValueLong struct {
+	CStatus   uint32
+	Pad_cgo_0 [4]byte
+	Value     int32
+	Pad_cgo_1 [4]byte
+}
 
 // PdhOpenQuery creates a new query.
 func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
@@ -80,11 +106,33 @@ func PdhCollectQueryData(query PdhQueryHandle) error {
 	return nil
 }
 
-// PdhGetFormattedCounterValue computes a displayable value for the specified counter.
-func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat) (uint32, *PdhCounterValue, error) {
+// PdhGetFormattedCounterValueDouble computes a displayable double value for the specified counter.
+func PdhGetFormattedCounterValueDouble(counter PdhCounterHandle) (uint32, *PdhCounterValueDouble, error) {
 	var counterType uint32
-	var value PdhCounterValue
-	if err := _PdhGetFormattedCounterValue(counter, format, &counterType, &value); err != nil {
+	var value PdhCounterValueDouble
+	if err := _PdhGetFormattedCounterValueDouble(counter, PdhFmtDouble|PdhFmtNoCap100, &counterType, &value); err != nil {
+		return 0, nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return counterType, &value, nil
+}
+
+// PdhGetFormattedCounterValueLarge computes a displayable large value for the specified counter.
+func PdhGetFormattedCounterValueLarge(counter PdhCounterHandle) (uint32, *PdhCounterValueLarge, error) {
+	var counterType uint32
+	var value PdhCounterValueLarge
+	if err := _PdhGetFormattedCounterValueLarge(counter, PdhFmtLarge|PdhFmtNoCap100, &counterType, &value); err != nil {
+		return 0, nil, PdhErrno(err.(syscall.Errno))
+	}
+
+	return counterType, &value, nil
+}
+
+// PdhGetFormattedCounterValueLong computes a displayable long value for the specified counter.
+func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCounterValueLong, error) {
+	var counterType uint32
+	var value PdhCounterValueLong
+	if err := _PdhGetFormattedCounterValueLong(counter, PdhFmtLong|PdhFmtNoCap100, &counterType, &value); err != nil {
 		return 0, nil, PdhErrno(err.(syscall.Errno))
 	}
 

@@ -75,6 +75,7 @@ func NewReader(config Config) (*Reader, error) {
 			}
 		}
 		if childQueries == nil || len(childQueries) == 0 {
+			query.Close()
 			return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
 		}
 		for _, v := range childQueries {
@@ -107,6 +108,8 @@ func (r *Reader) Read() ([]mb.Event, error) {
 
 	for counterPath, values := range values {
 		for ind, val := range values {
+			//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 			if val.Err != nil && !r.executed {
 				r.log.Debugw("Ignoring the first measurement because the data isn't ready",
 					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
@@ -157,8 +160,8 @@ func (r *Reader) Read() ([]mb.Event, error) {
 	return events, nil
 }
 
-// CloseQuery will close the PDH query.
-func (r *Reader) CloseQuery() error {
+// Close will close the PDH query for now.
+func (r *Reader) Close() error {
 	return r.query.Close()
 }
 

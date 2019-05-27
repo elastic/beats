@@ -48,9 +48,9 @@ func TestPdhAddCounterInvalidCounter(t *testing.T) {
 
 // TestPdhGetFormattedCounterValueInvalidCounter will test for invalid counters.
 func TestPdhGetFormattedCounterValueInvalidCounter(t *testing.T) {
-	counterType, counterValue, err := PdhGetFormattedCounterValue(InvalidCounterHandle, PdhFmtDouble)
+	counterType, counterValue, err := PdhGetFormattedCounterValueDouble(InvalidCounterHandle)
 	assert.EqualValues(t, counterType, 0)
-	assert.EqualValues(t, counterValue, (*PdhCounterValue)(nil))
+	assert.EqualValues(t, counterValue, (*PdhCounterValueDouble)(nil))
 	assert.EqualValues(t, err, PDH_INVALID_HANDLE)
 }
 
@@ -93,13 +93,15 @@ func TestPdhSuccessfulCounterRetrieval(t *testing.T) {
 		}
 		counters = append(counters, counterHandle)
 	}
+	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	err = PdhCollectQueryData(queryHandle)
 	err = PdhCollectQueryData(queryHandle)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, counter := range counters {
-		counterType, counterValue, err := PdhGetFormattedCounterValue(counter, PdhFmtDouble)
+		counterType, counterValue, err := PdhGetFormattedCounterValueDouble(counter)
 		assert.Nil(t, err)
 		assert.NotZero(t, counterType)
 		assert.NotNil(t, counterValue)

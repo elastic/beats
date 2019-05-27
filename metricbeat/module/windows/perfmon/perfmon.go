@@ -68,7 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		switch form {
 		case "":
 			value.Format = "float"
-		case "float", "long":
+		case "float", "long", "large":
 		default:
 			return nil, errors.Errorf("initialization failed: format '%s' "+
 				"for counter '%s' is invalid (must be float or long)",
@@ -103,7 +103,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 // Close will be called when metricbeat is stopped, should close the query.
 func (m *MetricSet) Close() error {
-	err := m.reader.CloseQuery()
+	err := m.reader.Close()
 	if err != nil {
 		return errors.Wrap(err, "failed to close pdh query")
 	}

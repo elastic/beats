@@ -254,7 +254,7 @@ func TestLongOutputFormat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, okLong := values[processorTimeCounter][0].Measurement.(int64)
+	_, okLong := values[processorTimeCounter][0].Measurement.(int32)
 
 	assert.True(t, okLong)
 }

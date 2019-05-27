@@ -87,7 +87,7 @@ func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard b
 	q.counters[counterPath] = &Counter{
 		handle:       h,
 		instanceName: instanceName,
-		format:       getFormat(counter.Format),
+		format:       getPDHFormat(counter.Format),
 	}
 	return nil
 }
@@ -103,23 +103,9 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 		return nil, errors.New("no counter list found")
 	}
 	rtn := make(map[string][]CounterValue, len(q.counters))
-
 	for path, counter := range q.counters {
-		_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
-		if err != nil {
-			rtn[path] = append(rtn[path], CounterValue{Err: err})
-			continue
-		}
-
-		switch counter.format {
-		case PdhFmtDouble:
-			rtn[path] = append(rtn[path], CounterValue{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-		case PdhFmtLarge:
-			rtn[path] = append(rtn[path], CounterValue{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-
-		}
+		rtn[path] = append(rtn[path], getCounterValue(counter))
 	}
-
 	return rtn, nil
 }
 
@@ -153,15 +139,42 @@ func matchInstanceName(counterPath string) (string, error) {
 	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
 }
 
-// getFormat calculates data format.
-func getFormat(format string) PdhCounterFormat {
-	switch format {
-	case "double":
-		return PdhFmtDouble
-	case "long":
-		return PdhFmtLarge
+// getCounterValue will retrieve the counter value based on the format applied in the config options
+func getCounterValue(counter *Counter) CounterValue {
+	counterValue := CounterValue{Instance: counter.instanceName}
+	switch counter.format {
+	case PdhFmtLong:
+		_, value, err := PdhGetFormattedCounterValueLong(counter.handle)
+		if err != nil {
+			return CounterValue{Err: err}
+		}
+		counterValue.Measurement = value.Value
+	case PdhFmtLarge:
+		_, value, err := PdhGetFormattedCounterValueLarge(counter.handle)
+		if err != nil {
+			return CounterValue{Err: err}
+		}
+		counterValue.Measurement = value.Value
+	default:
+		_, value, err := PdhGetFormattedCounterValueDouble(counter.handle)
+		if err != nil {
+			return CounterValue{Err: err}
+		}
+		counterValue.Measurement = value.Value
 	}
-	return PdhFmtDouble
+	return counterValue
+}
+
+// getPDHFormat calculates data pdhformat.
+func getPDHFormat(format string) PdhCounterFormat {
+	switch format {
+	case "long":
+		return PdhFmtLong
+	case "large":
+		return PdhFmtLarge
+	default:
+		return PdhFmtDouble
+	}
 }
 
 // UTF16ToStringArray converts list of Windows API NULL terminated strings  to go string array.

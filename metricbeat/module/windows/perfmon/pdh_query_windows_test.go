@@ -76,6 +76,8 @@ func TestSuccessfulQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	err = q.CollectData()
 	err = q.CollectData()
 	if err != nil {

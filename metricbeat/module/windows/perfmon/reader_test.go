@@ -54,7 +54,7 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 	assert.NotNil(t, reader.query.handle)
 	assert.NotNil(t, reader.query.counters)
 	assert.NotZero(t, len(reader.query.counters))
-	defer reader.CloseQuery()
+	defer reader.Close()
 }
 
 // TestReadSuccessfully will test the func read when it first retrieves no events (and ignored) and then starts retrieving events.
@@ -69,6 +69,8 @@ func TestReadSuccessfully(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we call reader.Read() twice.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	events, err := reader.Read()
 	assert.Nil(t, err)
 	assert.NotNil(t, events)

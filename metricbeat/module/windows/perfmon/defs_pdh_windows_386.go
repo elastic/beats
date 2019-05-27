@@ -216,13 +216,6 @@ const (
 	PdhFmtMultiply1000 PdhCounterFormat = 0x2000
 )
 
-type PdhCounterValue struct {
-	CStatus   uint32
-	Pad_cgo_0 [4]byte
-	LongValue int32
-	Pad_cgo_1 [4]byte
-}
-
 type PdhRawCounter struct {
 	CStatus     uint32
 	TimeStamp   PdhFileTime

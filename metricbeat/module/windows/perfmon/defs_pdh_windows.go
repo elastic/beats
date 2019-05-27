@@ -233,9 +233,6 @@ const (
 	PdhFmtMultiply1000 PdhCounterFormat = C.PDH_FMT_1000
 )
 
-// PdhCounterValue is the structure that receives the counter value.
-type PdhCounterValue C.PDH_FMT_COUNTERVALUE
-
 // PdhRawCounter is the structure that receives the raw counter.
 type PdhRawCounter C.PDH_RAW_COUNTER
 
