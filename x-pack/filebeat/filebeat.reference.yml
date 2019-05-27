@@ -403,9 +403,9 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
-#------------------------------ Palo_alto Module ------------------------------
-- module: palo_alto
-  pan_os:
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  panos:
     enabled: true
 
     # Set which input to use between syslog (default) or file.

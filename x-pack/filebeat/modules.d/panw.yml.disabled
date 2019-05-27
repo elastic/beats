@@ -1,5 +1,8 @@
-- module: palo_alto
-  pan_os:
+# Module: panw
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.2/filebeat-module-panw.html
+
+- module: panw
+  panos:
     enabled: true
 
     # Set which input to use between syslog (default) or file.

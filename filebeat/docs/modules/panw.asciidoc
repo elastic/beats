@@ -1,6 +1,11 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-panw]]
 [role="xpack"]
 
-:modulename: palo_alto
+:modulename: panw
 :has-dashboards: true
 
 == Palo Alto Networks module
@@ -24,7 +29,7 @@ include::../include/running-modules.asciidoc[]
 === ECS field mappings
 
 These are the PAN-OS to ECS field mappings as well as those fields still not
-in ECS that are added under the `palo_alto` prefix:
+in ECS that are added under the `panw.panos` prefix:
 
 .Traffic log mappings
 [options="header"]
@@ -37,21 +42,21 @@ in ECS that are added under the `palo_alto` prefix:
 | Generated Time | `@timestamp` |
 | Source IP | client.ip source.ip |
 | Destination IP | server.ip destination.ip |
-| NAT Source IP |  | palo_alto.source.nat.ip
-| NAT Destination IP |  | palo_alto.destination.nat.ip
-| Rule Name |  | palo_alto.ruleset
+| NAT Source IP |  | panw.panos.source.nat.ip
+| NAT Destination IP |  | panw.panos.destination.nat.ip
+| Rule Name |  | panw.panos.ruleset
 | Source User | client.user.name source.user.name |
 | Destination User | server.user.name destination.user.name |
 | Application | network.application |
-| Source Zone |  | palo_alto.source.zone
-| Destination Zone |  | palo_alto.destination.zone
-| Ingress Interface |  | palo_alto.source.interface
-| Egress Interface |  | palo_alto.destination.interface
-| Session ID |  | palo_alto.flow_id
+| Source Zone |  | panw.panos.source.zone
+| Destination Zone |  | panw.panos.destination.zone
+| Ingress Interface |  | panw.panos.source.interface
+| Egress Interface |  | panw.panos.destination.interface
+| Session ID |  | panw.panos.flow_id
 | Source Port | client.port source.port |
 | Destination Port | destination.port server.port |
-| NAT Source Port |  | palo_alto.source.nat.port
-| NAT Destination Port |  | palo_alto.destination.nat.port
+| NAT Source Port |  | panw.panos.source.nat.port
+| NAT Destination Port |  | panw.panos.destination.nat.port
 | Flags | labels |
 | Protocol | network.transport |
 | Action | event.outcome |
@@ -61,8 +66,8 @@ in ECS that are added under the `palo_alto` prefix:
 | Packets | network.packets |
 | Start Time | event.start |
 | Elapsed Time | event.duration |
-| Category |  | palo_alto.url.category
-| Sequence Number |  | palo_alto.sequence_number
+| Category |  | panw.panos.url.category
+| Sequence Number |  | panw.panos.sequence_number
 | Packets Sent | server.packets destination.packets |
 | Packets Received | client.packets source.packets |
 | Device Name | observer.hostname |
@@ -79,39 +84,39 @@ in ECS that are added under the `palo_alto` prefix:
 | Generated Time | `@timestamp` |
 | Source IP | client.ip source.ip |
 | Destination IP | server.ip destination.ip |
-| NAT Source IP |  | palo_alto.source.nat.ip
-| NAT Destination IP |  | palo_alto.destination.nat.ip
-| Rule Name |  | palo_alto.ruleset
+| NAT Source IP |  | panw.panos.source.nat.ip
+| NAT Destination IP |  | panw.panos.destination.nat.ip
+| Rule Name |  | panw.panos.ruleset
 | Source User | client.user.name source.user.name |
 | Destination User | server.user.name destination.user.name |
 | Application | network.application |
-| Source Zone |  | palo_alto.source.zone
-| Destination Zone |  | palo_alto.destination.zone
-| Ingress Interface |  | palo_alto.source.interface
-| Egress Interface |  | palo_alto.destination.interface
-| Session ID |  | palo_alto.flow_id
+| Source Zone |  | panw.panos.source.zone
+| Destination Zone |  | panw.panos.destination.zone
+| Ingress Interface |  | panw.panos.source.interface
+| Egress Interface |  | panw.panos.destination.interface
+| Session ID |  | panw.panos.flow_id
 | Source Port | client.port source.port |
 | Destination Port | destination.port server.port |
-| NAT Source Port |  | palo_alto.source.nat.port
-| NAT Destination Port |  | palo_alto.destination.nat.port
+| NAT Source Port |  | panw.panos.source.nat.port
+| NAT Destination Port |  | panw.panos.destination.nat.port
 | Flags | labels |
 | Protocol | network.transport |
 | Action | event.outcome |
-| Miscellaneous | url.original | palo_alto.threat_file_or_url
-| Threat ID |  | palo_alto.threat_id
-| Category |  | palo_alto.url.category
+| Miscellaneous | url.original | panw.panos.threat.resource
+| Threat ID |  | panw.panos.threat.id
+| Category |  | panw.panos.url.category
 | Severity | log.level |
 | Direction | network.direction |
 | Source Location | source.geo.country_iso_code |
 | Destination Location | destination.geo.country_iso_code |
-| PCAP_id |  | palo_alto.network.pcap_id
-| Filedigest |  | palo_alto.file.hash
+| PCAP_id |  | panw.panos.network.pcap_id
+| Filedigest |  | panw.panos.file.hash
 | User Agent | user_agent.original |
 | File Type | file.type |
 | X-Forwarded-For | network.forwarded_ip |
 | Referer | http.request.referer |
 | Sender | source.user.email |
-| Subject |  | palo_alto.subject
+| Subject |  | panw.panos.subject
 | Recipient | destination.user.email |
 | Device Name | observer.hostname |
 |==============
@@ -122,10 +127,10 @@ in ECS that are added under the `palo_alto` prefix:
 This module comes with two sample dashboards:
 
 [role="screenshot"]
-image::./images/filebeat-palo-alto-traffic.png[]
+image::./images/filebeat-panw-traffic.png[]
 
 [role="screenshot"]
-image::./images/filebeat-palo-alto-threat.png[]
+image::./images/filebeat-panw-threat.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -134,25 +139,25 @@ it can also be configured to read logs from a file. See the following example.
 
 ["source","yaml",subs="attributes"]
 -----
-- module: palo_alto
-  pan_os:
+- module: panw
+  panos:
     enabled: true
     var.paths: ["/var/log/pan-os.log"]
     var.input: "file"
 -----
 
-:fileset_ex: pan_os
+:fileset_ex: panos
 
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `pan_os` fileset settings
+==== `panos` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
-  pan_os:
+  panos:
     var.syslog_host: 0.0.0.0
     var.syslog_port: 514
 ----
@@ -175,3 +180,11 @@ NOTE: Ports below 1024 require {beatname_uc} to run as root.
 :fileset_ex!:
 
 :modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-panw,exported fields>> section.
+
