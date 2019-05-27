@@ -1,11 +1,13 @@
 import os
+from xpack_metricbeat import XPackTest
 import metricbeat
 import unittest
+
 
 COREDNS_FIELDS = metricbeat.COMMON_FIELDS + ["coredns"]
 
 
-class Test(metricbeat.BaseTest):
+class Test(XPackTest):
 
     COMPOSE_SERVICES = ['coredns']
 
