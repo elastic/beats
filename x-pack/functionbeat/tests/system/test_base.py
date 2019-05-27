@@ -97,7 +97,8 @@ class Test(BaseTest):
         assert exit_code != 0
 
     def _generate_dummy_binary_for_template_checksum(self):
-        with open('pkg/functionbeat', 'wb') as f:
+        os.mkdir("pkg")
+        with open("pkg/functionbeat", "wb") as f:
             f.write("my dummy functionbeat binary")
 
     def _get_generated_function_template(self):
