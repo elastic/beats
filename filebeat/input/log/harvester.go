@@ -276,6 +276,10 @@ func (h *Harvester) Run() error {
 				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
 			case ErrInactive:
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
+			case reader.ErrLineUnparsable:
+				logp.Info("Skipping unparsable line in file: %v", h.state.Source)
+				//line unparsable, go to next line
+				continue
 			default:
 				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
 			}
