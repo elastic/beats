@@ -36,12 +36,22 @@ const promMetrics = `
 first_metric{label1="value1",label2="value2",label3="Value3",label4="FOO"} 1
 # TYPE second_metric gauge
 second_metric{label1="value1",label3="othervalue"} 0
+# TYPE metrics_one_count_total counter
+metrics_one_count_total{name="jane",surname="foster"} NaN
+metrics_one_count_total{name="john",surname="williams"} +Inf
+metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 # TYPE summary_metric summary
 summary_metric{quantile="0.5"} 29735
 summary_metric{quantile="0.9"} 47103
 summary_metric{quantile="0.99"} 50681
 summary_metric_sum 234892394
 summary_metric_count 44000
+# TYPE summary_metric_with_nan_inf summary
+summary_metric_with_nan_inf{quantile="0.5"} NaN
+summary_metric_with_nan_inf{quantile="0.9"} +Inf
+summary_metric_with_nan_inf{quantile="0.99"} 50681
+summary_metric_with_nan_inf_sum 50681
+summary_metric_with_nan_inf_count 44000
 # TYPE histogram_metric histogram
 histogram_metric_bucket{le="1000"} 1
 histogram_metric_bucket{le="10000"} 1
@@ -52,7 +62,16 @@ histogram_metric_bucket{le="1e+09"} 1
 histogram_metric_bucket{le="+Inf"} 1
 histogram_metric_sum 117
 histogram_metric_count 1
-
+# TYPE histogram_metric_with_nan_inf histogram
+histogram_metric_with_nan_inf_bucket{le="1000"} NaN
+histogram_metric_with_nan_inf_bucket{le="10000"} +Inf
+histogram_metric_with_nan_inf_bucket{le="100000"} -Inf
+histogram_metric_with_nan_inf_bucket{le="1e+06"} 1
+histogram_metric_with_nan_inf_bucket{le="1e+08"} 1
+histogram_metric_with_nan_inf_bucket{le="1e+09"} 1
+histogram_metric_with_nan_inf_bucket{le="+Inf"} 1
+histogram_metric_with_nan_inf_sum 117
+histogram_metric_with_nan_inf_count 1
 `
 
 type mockFetcher struct{}
@@ -280,6 +299,33 @@ func TestPrometheus(t *testing.T) {
 			expected: []common.MapStr{},
 		},
 		{
+			msg: "Counter metric with NaN Inf",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_one_count_total": Metric("metrics.one.count"),
+				},
+				Labels: map[string]LabelMap{
+					"name":    Label("metrics.one.labels.name"),
+					"surname": Label("metrics.one.labels.surname"),
+					"age":     Label("metrics.one.labels.age"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": int64(3.0),
+							"labels": common.MapStr{
+								"name":    "jahn",
+								"surname": "baldwin",
+								"age":     "30",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			msg: "Summary metric",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
@@ -295,6 +341,27 @@ func TestPrometheus(t *testing.T) {
 							"percentile": common.MapStr{
 								"50": 29735.0,
 								"90": 47103.0,
+								"99": 50681.0,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			msg: "Summary metric with NaN Inf",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"summary_metric_with_nan_inf": Metric("summary.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"summary": common.MapStr{
+						"metric": common.MapStr{
+							"sum":   50681.0,
+							"count": uint64(44000),
+							"percentile": common.MapStr{
 								"99": 50681.0,
 							},
 						},
@@ -320,6 +387,30 @@ func TestPrometheus(t *testing.T) {
 								"1000":       uint64(1),
 								"10000":      uint64(1),
 								"100000":     uint64(1),
+								"1000000":    uint64(1),
+								"100000000":  uint64(1),
+							},
+							"sum": 117.0,
+						},
+					},
+				},
+			},
+		},
+		{
+			msg: "Histogram metric with NaN Inf",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"histogram_metric_with_nan_inf": Metric("histogram.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"count": uint64(1),
+							"bucket": common.MapStr{
+								"1000000000": uint64(1),
+								"+Inf":       uint64(1),
 								"1000000":    uint64(1),
 								"100000000":  uint64(1),
 							},
