@@ -162,10 +162,9 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 
 			if field != "" {
 				event := getEvent(eventsMap, keyLabels)
-
-				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				update := common.MapStr{}
 				update.Put(field, value)
+				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				event.DeepUpdate(update)
 
 				event.DeepUpdate(labels)

@@ -135,28 +135,33 @@ func (m *commonMetric) GetField() string {
 func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 	counter := metric.GetCounter()
 	if counter != nil {
-		return int64(counter.GetValue())
+		if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
+			return int64(counter.GetValue())
+		}
 	}
 
 	gauge := metric.GetGauge()
 	if gauge != nil {
-		return gauge.GetValue()
+		if !math.IsNaN(gauge.GetValue()) && !math.IsInf(gauge.GetValue(), 0) {
+			return gauge.GetValue()
+		}
 	}
 
 	summary := metric.GetSummary()
 	if summary != nil {
 		value := common.MapStr{}
-		value["sum"] = summary.GetSampleSum()
-		value["count"] = summary.GetSampleCount()
+		if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
+			value["sum"] = summary.GetSampleSum()
+			value["count"] = summary.GetSampleCount()
+		}
 
 		quantiles := summary.GetQuantile()
 		percentileMap := common.MapStr{}
 		for _, quantile := range quantiles {
-			if !math.IsNaN(quantile.GetValue()) {
-				key := strconv.FormatFloat((100 * quantile.GetQuantile()), 'f', -1, 64)
+			if !math.IsNaN(quantile.GetValue()) && !math.IsInf(quantile.GetValue(), 0) {
+				key := strconv.FormatFloat(100*quantile.GetQuantile(), 'f', -1, 64)
 				percentileMap[key] = quantile.GetValue()
 			}
-
 		}
 
 		if len(percentileMap) != 0 {
@@ -169,14 +174,18 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 	histogram := metric.GetHistogram()
 	if histogram != nil {
 		value := common.MapStr{}
-		value["sum"] = histogram.GetSampleSum()
-		value["count"] = histogram.GetSampleCount()
+		if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
+			value["sum"] = histogram.GetSampleSum()
+			value["count"] = histogram.GetSampleCount()
+		}
 
 		buckets := histogram.GetBucket()
 		bucketMap := common.MapStr{}
 		for _, bucket := range buckets {
-			key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
-			bucketMap[key] = bucket.GetCumulativeCount()
+			if bucket.GetCumulativeCount() != uint64(math.NaN()) && bucket.GetCumulativeCount() != uint64(math.Inf(0)) {
+				key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
+				bucketMap[key] = bucket.GetCumulativeCount()
+			}
 		}
 
 		if len(bucketMap) != 0 {
