@@ -7677,21 +7677,12 @@ Fields from the MSSQL log files
 Common log fields
 
 
-*`mssql.log.source`*::
+*`mssql.log.origin`*::
 +
 --
 type: text
 
 Origin of the message, usually the server but it can also be a recovery process
-
---
-
-*`mssql.log.msg`*::
-+
---
-type: text
-
-Text of the message
 
 --
 
