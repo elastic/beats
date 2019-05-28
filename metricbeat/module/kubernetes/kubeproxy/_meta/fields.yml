@@ -1,0 +1,90 @@
+- name: kubeproxy
+  type: group
+  description: >
+    Kubernetes proxy server metrics
+  release: beta
+  fields:
+    - name: client
+      type: group
+      description: >
+        kubeproxy HTTP client labels
+      fields:
+        - name: request.code
+          type: keyword
+          description: >
+            HTTP Code returned to kubeproxy
+        - name: request.host
+          type: keyword
+          description: >
+            Host addressing the request from kubeproxy
+        - name: request.method
+          type: keyword
+          description: >
+            HTTP method issued from kubeproxy
+        - name: request.url
+          type: keyword
+          description: >
+            URL requested from kubeproxy
+
+    - name: process
+      type: group
+      description: >
+        kubeproxy process metrics
+      fields:
+        - name: cpu.sec
+          type: long
+          description: >
+            Total user and system CPU time spent in seconds
+        - name: memory.resident.bytes
+          type: long
+          description: >
+            Resident memory size in bytes
+        - name: memory.virtual.bytes
+          type: long
+          description: >
+            Resident memory size in bytes
+
+    - name: client
+      type: group
+      description: >
+        kubeproxy REST client metrics
+      fields:
+        - name: request.latency.us.sum
+          type: long
+          description: >
+            Requests latency, sum of latencies in microseconds
+        - name: request.latency.us.count
+          type: long
+          description: >
+            Request latency, number of requests
+        - name: request.latency.us.bucket.*
+          type: object
+          object_type: long
+          description: >
+            Request latency, histogram buckets
+            
+        - name: request.count
+          type: long
+          description: >
+            Number of HTTP requests, partitioned by status code, method, and host
+
+    - name: sync
+      type: group
+      description: >
+        kubeproxy proxy rules metrics
+      fields:
+        - name: rules.latency.us.sum
+          type: long
+          description: >
+            SyncProxyRules latency, sum of latencies in microseconds
+        - name: rules.latency.us.count
+          type: long
+          description: >
+            SyncProxyRules latency, number of operations
+        - name: rules.latency.us.bucket.*
+          type: object
+          object_type: long
+          description: >
+            SyncProxyRules latency, histogram buckets
+
+
