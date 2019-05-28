@@ -135,7 +135,7 @@ processors:
       # Token describing this location
     #  name: us-east-1a
 
-    #  Lat, Lon in decimal
+      # Lat, Lon in decimal
     #  location: "37.926868, -78.024902"
 
 #================================ Logging =====================================
