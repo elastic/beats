@@ -24,10 +24,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/stretchr/testify/assert"
 )
 
 func createEC2MockAPI(responseMap map[string]string) *httptest.Server {
