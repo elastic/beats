@@ -6838,6 +6838,16 @@ IP addresses.
 
 
 
+*`system.audit.host.os.codename`*::
++
+--
+type: keyword
+
+OS codename, if any (e.g. stretch).
+
+
+--
+
 *`system.audit.host.os.platform`*::
 +
 --
