@@ -39,10 +39,20 @@
         Usage memory stats.
       fields:
         - name: commit
-          type: long
-          format: bytes
+          type: group
           description: >
             Committed bytes on Windows
+          fields:
+            - name: total
+              type: long
+              format: bytes
+              description: >
+                Total bytes
+            - name: peak
+              type: long
+              format: bytes
+              description: >
+                peak bytes
         - name: commit_peak
           type: long
           format: bytes

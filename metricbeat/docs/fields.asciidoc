@@ -4611,14 +4611,33 @@ Usage memory stats.
 
 
 
-*`docker.memory.usage.commit`*::
+[float]
+== commit fields
+
+Committed bytes on Windows
+
+
+
+*`docker.memory.usage.commit.total`*::
 +
 --
 type: long
 
 format: bytes
 
-Committed bytes on Windows
+Total bytes
+
+
+--
+
+*`docker.memory.usage.commit.peak`*::
++
+--
+type: long
+
+format: bytes
+
+peak bytes
 
 
 --
