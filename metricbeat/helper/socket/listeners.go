@@ -19,6 +19,7 @@ package socket
 
 import (
 	"net"
+	"syscall"
 )
 
 // Direction indicates how a socket was initiated.
@@ -106,7 +107,7 @@ func (t *ListenerTable) Put(proto uint8, ip net.IP, port int) {
 // listeners in the table for the protocol and returns Incoming if there is a
 // match. If remotePort is 0 then Listening is returned.
 func (t *ListenerTable) Direction(
-	proto uint8,
+	family uint8, proto uint8,
 	localIP net.IP, localPort int,
 	remoteIP net.IP, remotePort int,
 ) Direction {
@@ -128,14 +129,13 @@ func (t *ListenerTable) Direction(
 
 	// Is there a listener that specific interface? OR
 	// Is there a listener on the "any" address (0.0.0.0 or ::)?
-	isIPv4 := localIP.To4() != nil
 	for _, ip := range interfaces.ips {
 		switch {
 		case ip.Equal(localIP):
 			return Incoming
-		case ip.Equal(net.IPv4zero) && isIPv4:
+		case family == syscall.AF_INET && ip.Equal(net.IPv4zero):
 			return Incoming
-		case ip.Equal(net.IPv6zero) && !isIPv4:
+		case family == syscall.AF_INET6 && ip.Equal(net.IPv6zero):
 			return Incoming
 		}
 	}

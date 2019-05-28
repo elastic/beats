@@ -33,14 +33,23 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+
 *Auditbeat*
 
 - Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
+- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
+- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 
 *Filebeat*
 
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 
 *Heartbeat*
 
@@ -49,8 +58,12 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 *Metricbeat*
 
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
 
 *Packetbeat*
+
+- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
 
 *Winlogbeat*
 
