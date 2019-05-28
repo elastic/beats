@@ -260,6 +260,16 @@ func (h *Harvester) Run() error {
 		}
 
 		message, err := h.reader.Next()
+
+		// Get copy of state to work on
+		// This is important in case sending is not successful so on shutdown
+		// the old offset is reported
+		state := h.getState()
+
+		// always save state.Offset
+		state.Offset += int64(message.Bytes)
+		h.state = state
+
 		if err != nil {
 			switch err {
 			case ErrFileTruncate:
@@ -286,12 +296,7 @@ func (h *Harvester) Run() error {
 			return nil
 		}
 
-		// Get copy of state to work on
-		// This is important in case sending is not successful so on shutdown
-		// the old offset is reported
-		state := h.getState()
 		startingOffset := state.Offset
-		state.Offset += int64(message.Bytes)
 
 		// Create state event
 		data := util.NewData()
