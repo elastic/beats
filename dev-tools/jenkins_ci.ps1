@@ -34,12 +34,12 @@ $env:RACE_DETECTOR = "true"
 # Install mage from vendor.
 exec { go install github.com/elastic/beats/vendor/github.com/magefile/mage } "mage install FAILURE"
 
-if (Test-Path "$env:beat") {
+if (Test-Path "$env:beat\magefile.go") {
     cd "$env:beat"
 } else {
-    echo "$env:beat does not exist"
+    echo "$env:beat\magefile.go does not exist"
     New-Item -ItemType directory -Path build | Out-Null
-    New-Item -Name build\TEST-empty.xml -ItemType File | Out-Null
+    New-Item -Name build\TEST-empty.out -ItemType File | Out-Null
     exit
 }
 
@@ -62,5 +62,8 @@ echo "System testing $env:beat"
 $packages = $(go list ./... | select-string -Pattern "/vendor/" -NotMatch | select-string -Pattern "/scripts/cmd/" -NotMatch)
 $packages = ($packages|group|Select -ExpandProperty Name) -join ","
 exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test -race -cover FAILURE"
-Set-Location -Path tests/system
-exec { nosetests --with-timer --with-xunit --xunit-file=../../build/TEST-system.xml } "System test FAILURE"
+
+if (Test-Path "tests\system") {
+    Set-Location -Path tests\system
+    exec { nosetests --with-timer --with-xunit --xunit-file=../../build/TEST-system.xml } "System test FAILURE"
+}

@@ -847,7 +847,7 @@ The percentage of allocated EC2 compute units that are currently in use on the i
 *`aws.ec2.cpu.credit_usage`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of CPU credits spent by the instance for CPU utilization.
 
@@ -857,7 +857,7 @@ The number of CPU credits spent by the instance for CPU utilization.
 *`aws.ec2.cpu.credit_balance`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of earned CPU credits that an instance has accrued since it was launched or started.
 
@@ -867,7 +867,7 @@ The number of earned CPU credits that an instance has accrued since it was launc
 *`aws.ec2.cpu.surplus_credit_balance`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
 
@@ -877,7 +877,7 @@ The number of surplus credits that have been spent by an unlimited instance when
 *`aws.ec2.cpu.surplus_credits_charged`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
 
@@ -887,7 +887,7 @@ The number of spent surplus credits that are not paid down by earned CPU credits
 *`aws.ec2.network.in.packets`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of packets received on all network interfaces by the instance.
 
@@ -897,7 +897,7 @@ The number of packets received on all network interfaces by the instance.
 *`aws.ec2.network.out.packets`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of packets sent out on all network interfaces by the instance.
 
@@ -907,7 +907,9 @@ The number of packets sent out on all network interfaces by the instance.
 *`aws.ec2.network.in.bytes`*::
 +
 --
-type: scaled_float
+type: long
+
+format: bytes
 
 The number of bytes received on all network interfaces by the instance.
 
@@ -917,7 +919,9 @@ The number of bytes received on all network interfaces by the instance.
 *`aws.ec2.network.out.bytes`*::
 +
 --
-type: scaled_float
+type: long
+
+format: bytes
 
 The number of bytes sent out on all network interfaces by the instance.
 
@@ -927,7 +931,9 @@ The number of bytes sent out on all network interfaces by the instance.
 *`aws.ec2.diskio.read.bytes`*::
 +
 --
-type: scaled_float
+type: long
+
+format: bytes
 
 Bytes read from all instance store volumes available to the instance.
 
@@ -937,7 +943,9 @@ Bytes read from all instance store volumes available to the instance.
 *`aws.ec2.diskio.write.bytes`*::
 +
 --
-type: scaled_float
+type: long
+
+format: bytes
 
 Bytes written to all instance store volumes available to the instance.
 
@@ -947,7 +955,7 @@ Bytes written to all instance store volumes available to the instance.
 *`aws.ec2.diskio.read.ops`*::
 +
 --
-type: scaled_float
+type: long
 
 Completed read operations from all instance store volumes available to the instance in a specified period of time.
 
@@ -957,7 +965,7 @@ Completed read operations from all instance store volumes available to the insta
 *`aws.ec2.diskio.write.ops`*::
 +
 --
-type: scaled_float
+type: long
 
 Completed write operations to all instance store volumes available to the instance in a specified period of time.
 

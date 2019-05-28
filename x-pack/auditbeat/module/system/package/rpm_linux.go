@@ -33,6 +33,20 @@ my_rpmtsCreate(void *f) {
   return rpmtsCreate();
 }
 
+void
+my_rpmFreeMacros(void *f) {
+	void (*rpmFreeMacros)(void *);
+	rpmFreeMacros = (void(*)(void*))f;
+    rpmFreeMacros(NULL);
+}
+
+void
+my_rpmFreeRpmrc(void *f) {
+	void (*rpmFreeRpmrc)(void);
+	rpmFreeRpmrc = (void (*)(void))f;
+	rpmFreeRpmrc();
+}
+
 int
 my_rpmReadConfigFiles(void *f) {
   int (*rpmReadConfigFiles)(const char*, const char*);
@@ -163,6 +177,8 @@ type cFunctions struct {
 	rpmdbFreeIterator       unsafe.Pointer
 	rpmtsFree               unsafe.Pointer
 	rpmsqSetInterruptSafety unsafe.Pointer
+	rpmFreeRpmrc            unsafe.Pointer
+	rpmFreeMacros           unsafe.Pointer
 }
 
 var cFun *cFunctions
@@ -238,8 +254,17 @@ func dlopenCFunctions() (*cFunctions, error) {
 		return nil, err
 	}
 
+	cFun.rpmFreeRpmrc, err = librpm.GetSymbolPointer("rpmFreeRpmrc")
+	if err != nil {
+		return nil, err
+	}
+
 	// Only available in librpm>=4.13.0
 	cFun.rpmsqSetInterruptSafety, err = librpm.GetSymbolPointer("rpmsqSetInterruptSafety")
+	// no error check
+
+	// Only available in librpm>=4.6.0
+	cFun.rpmFreeMacros, err = librpm.GetSymbolPointer("rpmFreeMacros")
 	// no error check
 
 	return &cFun, nil
@@ -271,9 +296,14 @@ func listRPMPackages() ([]*Package, error) {
 		return nil, fmt.Errorf("Failed to get rpmts")
 	}
 	defer C.my_rpmtsFree(cFun.rpmtsFree, rpmts)
+
 	res := C.my_rpmReadConfigFiles(cFun.rpmReadConfigFiles)
 	if int(res) != 0 {
 		return nil, fmt.Errorf("Error: %d", int(res))
+	}
+	defer C.my_rpmFreeRpmrc(cFun.rpmFreeRpmrc)
+	if cFun.rpmFreeMacros != nil {
+		defer C.my_rpmFreeMacros(cFun.rpmFreeMacros)
 	}
 
 	mi := C.my_rpmtsInitIterator(cFun.rpmtsInitIterator, rpmts)
