@@ -130,7 +130,7 @@ output.elasticsearch:
 processors:
   - add_observer_metadata: 
     # Optional, but recommended geo settings for the location heartbeat is running in 
-    # geo: 
+    #geo: 
 
     # Token describing this location
     #  name: us-east-1a
