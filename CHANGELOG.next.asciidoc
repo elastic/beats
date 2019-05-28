@@ -164,6 +164,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New `extract_array` processor. {pull}11761[11761]
 - Add number of goroutines to reported metrics. {pull}12135[12135]
 - Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
+- Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
 
 *Auditbeat*
 
