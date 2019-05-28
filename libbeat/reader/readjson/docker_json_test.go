@@ -318,6 +318,7 @@ func TestDockerJSON(t *testing.T) {
 				Fields:  common.MapStr{"docker": common.MapStr{"attrs": map[string]string{"KEY1": "value1", "KEY2": "value2"}}, "stream": "stdout"},
 				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
 				Bytes:   117,
+			},
 		},
 		{
 			name:          "Corrupted log message line",
