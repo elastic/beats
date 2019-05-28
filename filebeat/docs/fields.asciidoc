@@ -7680,7 +7680,7 @@ Common log fields
 *`mssql.log.origin`*::
 +
 --
-type: text
+type: keyword
 
 Origin of the message, usually the server but it can also be a recovery process
 

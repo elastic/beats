@@ -19,5 +19,5 @@ func init() {
 // AssetMssql returns asset data.
 // This is the base64 encoded gzipped contents of module/mssql.
 func AssetMssql() string {
-	return "eJxsj0FurDAQRPecojTrPxdg+6VZBUURJzBQECttmribUbh9BEEJQ+Kdy13vta9441Iimb1LAXh0YYnLdr8UQEdrc5w86liiqlG/POEWhQ2Do9JuFhZAHymdlQUAXDGGxB/kenyZWGLIOk978sC9bXX0WRP8lajqVSM6oI9C2ytHyVEkOnxnJ/B/TUnHnbS2D4O/d/pLchRpjkMcH55OvudtAtpv30g0CwP/YbY5iCxbaMx3ZjSzIzraMCKIKRoiILPVO/OCKWtLs5Pqa2PnhxefAQAA///eJ4Gx"
+	return "eJxsj0FugzAQRfec4ivr5gJsK2XVqKo4gYEPtTJm6IxJxe0rKGoJrXf+nv/e+Iwb5xLJ/UMKIMcsLHFa76cCaOmNxTFHHUpcK1RvL7hEYc2QcdV2EhZAFymtlwUAnDGExF/kcvI8skRvOo1b8sC9rHV0pgn5nbhWi0a0RxeFvlX2kr1ItP/JDuBnTUmHjbS0d4N/d/pPshepxT4OD08H3+s6Ae3WbyS6h55PmHwKIvMaOu1OQz1lxIwmDAjiipoIMDZ6p80YTRu6H1TfG984f6q1xVcAAAD//2bhgvE="
 }

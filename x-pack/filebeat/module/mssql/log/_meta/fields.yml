@@ -4,4 +4,4 @@
   fields:
     - name: origin
       description: Origin of the message, usually the server but it can also be a recovery process
-      type: text
+      type: keyword
