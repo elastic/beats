@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
 - Fix formatting of config files on macOS and Windows. {pull}12148[12148]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Package dataset: Close librpm handle. {pull}12215[12215]
 
 *Filebeat*
 
