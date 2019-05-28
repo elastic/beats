@@ -5,9 +5,14 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-elasticsearch]]
 == Elasticsearch module
 
-The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {stack-ov}/xpack-monitoring.html[monitoring] feature.
+The Elasticsearch module contains a minimal set of metrics to enable monitoring
+of Elasticsearch across multiple versions. The Elasticsearch X-Pack module
+enables you to monitor more Elasticsearch metrics with our {stack-ov}/xpack-monitoring.html[monitoring] feature.
 
-The default metricsets are `node` and `node_stats`.
+The default metricsets in the Elasticsearch module are `node` and `node_stats`.
+The default metricsets in the Elasticsearch X-Pack module are `ccr`,
+`cluster_stats`, `index`, `index_recovery`, `index_summary`, `ml_job`,
+`node_stats`, and `shard`.
 
 [float]
 === Compability
