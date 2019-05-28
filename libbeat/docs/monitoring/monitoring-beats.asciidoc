@@ -38,9 +38,13 @@ configured the {es} output and want to send {beatname_uc} monitoring events to
 the same {es} cluster, specify the following minimal configuration:
 +
 --
-[source, yml]
+["source","yml",subs="attributes"]
 --------------------
-monitoring.enabled: true
+monitoring:
+  enabled: true
+  elasticsearch:
+    username: {beat_monitoring_user}
+    password: somepassword
 --------------------
 
 If you configured a different output, such as {ls} or you want to send {beatname_uc}
