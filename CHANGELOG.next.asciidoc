@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
 - Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
+- Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
 
 *Heartbeat*
 
@@ -61,6 +62,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 - Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 - Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
+- Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
 
 *Packetbeat*
 
