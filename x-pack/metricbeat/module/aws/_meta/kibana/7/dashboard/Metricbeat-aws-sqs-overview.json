@@ -174,8 +174,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-05-29T02:31:10.742Z",
-      "version": "WzczNCwxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI4NywxXQ=="
     },
     {
       "attributes": {
@@ -218,7 +218,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -257,12 +257,12 @@
       },
       "id": "f74eb760-41e8-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-29T02:50:27.296Z",
-      "version": "Wzk0NCwxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI4OCwxXQ=="
     },
     {
       "attributes": {
@@ -292,7 +292,7 @@
             ],
             "default_index_pattern": "metricbeat-*",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -331,12 +331,12 @@
       },
       "id": "53730d20-437e-11e9-8697-530f39afc6eb",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-29T03:01:21.100Z",
-      "version": "Wzk1MSwxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI4OSwxXQ=="
     },
     {
       "attributes": {
@@ -372,7 +372,7 @@
             "default_index_pattern": "metricbeat-*",
             "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -412,12 +412,12 @@
       },
       "id": "1235fe50-41e7-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-29T02:58:56.673Z",
-      "version": "Wzk0NiwxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MCwxXQ=="
     },
     {
       "attributes": {
@@ -443,7 +443,7 @@
             "default_index_pattern": "metricbeat-*",
             "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -482,12 +482,12 @@
       },
       "id": "be6c4180-41e6-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-29T02:59:38.411Z",
-      "version": "Wzk0OCwxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MSwxXQ=="
     },
     {
       "attributes": {
@@ -513,7 +513,7 @@
             "default_index_pattern": "metricbeat-*",
             "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -552,12 +552,12 @@
       },
       "id": "dcd31cd0-41e5-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-29T02:59:16.711Z",
-      "version": "Wzk0NywxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MiwxXQ=="
     },
     {
       "attributes": {
@@ -588,7 +588,7 @@
             "default_index_pattern": "metricbeat-*",
             "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -627,12 +627,12 @@
       },
       "id": "dd2f2a10-41e6-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-29T02:59:56.218Z",
-      "version": "Wzk0OSwxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5MywxXQ=="
     },
     {
       "attributes": {
@@ -654,7 +654,7 @@
           "params": {
             "controls": [
               {
-                "fieldName": "cloud.region.keyword",
+                "fieldName": "cloud.region",
                 "id": "1549397251041",
                 "indexPatternRefName": "control_0_index_pattern",
                 "label": "region",
@@ -669,7 +669,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "aws.sqs.queue.name.keyword",
+                "fieldName": "aws.sqs.queue.name",
                 "id": "1549512142947",
                 "indexPatternRefName": "control_1_index_pattern",
                 "label": "queue name",
@@ -694,23 +694,23 @@
       },
       "id": "b0afd3e0-43b7-11e9-8697-530f39afc6eb",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [
         {
-          "id": "cdbddb70-81bb-11e9-8414-3bb4f4aaced8",
+          "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "cdbddb70-81bb-11e9-8414-3bb4f4aaced8",
+          "id": "metricbeat-*",
           "name": "control_1_index_pattern",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-29T03:00:54.314Z",
-      "version": "Wzk1MCwxXQ=="
+      "updated_at": "2019-05-29T14:13:49.585Z",
+      "version": "WzQ5NCwxXQ=="
     },
     {
       "attributes": {
@@ -753,7 +753,7 @@
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "metricbeat*",
+            "index_pattern": "metricbeat-*",
             "interval": "5m",
             "series": [
               {
@@ -801,13 +801,13 @@
       },
       "id": "bb82c4d0-6c25-11e9-81bc-7f4cd8b3d892",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-29T02:58:35.107Z",
-      "version": "Wzk0NSwxXQ=="
+      "updated_at": "2019-05-29T14:11:54.211Z",
+      "version": "WzI5NSwxXQ=="
     }
   ],
-  "version": "7.1.1"
+  "version": "7.2.0"
 }
