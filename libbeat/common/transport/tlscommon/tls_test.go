@@ -184,7 +184,7 @@ func TestServerConfigDefaults(t *testing.T) {
 	assert.Len(t, cfg.CurvePreferences, 0)
 	// values set by default
 	assert.Equal(t, false, cfg.InsecureSkipVerify)
-	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
+	assert.Equal(t, int(tls.VersionTLS10), int(cfg.MinVersion))
 	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
 	assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
 }
