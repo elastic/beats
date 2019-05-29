@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.1.1...7.1[Check the HEAD diff]
 - Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
 - Require certificate authorities, certificate file, and key when SSL is enabled for module http metricset server. {pull}12355[12355]
+- In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12353[12353]
 
 *Packetbeat*
 
