@@ -10,33 +10,44 @@ processors:
  - date:
      field: "_temp_.generated_time"
      ignore_failure: true
-     #{< if .convert_timezone >}
-     timezone: "{{ event.timezone }}"
-     #{< end >}
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+ - date:
+    if: "ctx.event.timezone != null"
+    field: "@timestamp"
+    formats: ["ISO8601"]
+    timezone: "{{ event.timezone }}"
+    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # event.created is the time the event was received at the management plane.
  - date:
      field: "event.created"
      target_field: "event.created"
      ignore_failure: true
-     #{< if .convert_timezone >}
-     timezone: "{{ event.timezone }}"
-     #{< end >}
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+ - date:
+    if: "ctx.event.timezone != null && ctx.event.created != null "
+    field: "event.created"
+    target_field: "event.created"
+    formats: ["ISO8601"]
+    timezone: "{{ event.timezone }}"
+    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # event.start (traffic only) is the time the session started.
  - date:
      field: "event.start"
      target_field: "event.start"
      ignore_failure: true
-     #{< if .convert_timezone >}
-     timezone: "{{ event.timezone }}"
-     #{< end >}
      formats:
        - "yyyy/MM/dd HH:mm:ss"
+ - date:
+    if: "ctx.event.timezone != null && ctx.event.start != null"
+    field: "event.start"
+    target_field: "event.start"
+    formats: ["ISO8601"]
+    timezone: "{{ event.timezone }}"
+    on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 # convert integer fields as the output of the CSV processor is always a string.
  - convert: { type: long, ignore_missing: true, field: client.bytes }
