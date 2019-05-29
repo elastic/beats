@@ -1,7 +1,7 @@
-#- module: rabbitmq
+- module: rabbitmq
   # All logs
-  #log:
-    #enabled: true
+  log:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
