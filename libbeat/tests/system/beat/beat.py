@@ -221,8 +221,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def render_config_template(self, template_name=None,
                                output=None, **kargs):
 
-        print("render config")
-
         # Init defaults
         if template_name is None:
             template_name = self.beat_name
