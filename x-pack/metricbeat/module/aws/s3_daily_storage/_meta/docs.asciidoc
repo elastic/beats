@@ -14,6 +14,6 @@ cloudwatch:ListMetrics
 [float]
 === Dashboard
 
-The aws s3 metricset comes with a predefined dashboard. For example:
+The aws s3_daily_storage metricset and s3_request metricset shares one predefined dashboard. For example:
 
 image::./images/metricbeat-aws-s3-overview.png[]
