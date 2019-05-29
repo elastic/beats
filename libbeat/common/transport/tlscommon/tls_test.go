@@ -138,6 +138,7 @@ func TestApplyEmptyConfig(t *testing.T) {
 	assert.Equal(t, false, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 0)
 	assert.Len(t, cfg.CurvePreferences, 0)
+	assert.Equal(t, tls.RenegotiateNever, cfg.Renegotiation)
 }
 
 func TestApplyWithConfig(t *testing.T) {
@@ -150,6 +151,7 @@ func TestApplyWithConfig(t *testing.T) {
       - "ECDHE-ECDSA-AES-256-CBC-SHA"
       - "ECDHE-ECDSA-AES-256-GCM-SHA384"
     curve_types: [P-384]
+    renegotiation: once
   `))
 	if err != nil {
 		t.Fatal(err)
@@ -164,6 +166,7 @@ func TestApplyWithConfig(t *testing.T) {
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
 	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
 	assert.Len(t, cfg.CurvePreferences, 1)
+	assert.Equal(t, tls.RenegotiateOnceAsClient, cfg.Renegotiation)
 }
 
 func TestServerConfigDefaults(t *testing.T) {
