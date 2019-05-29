@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 - Login dataset: Fix re-read of utmp files. {pull}12028[12028]
 - Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Package dataset: Auto-detect package directories. {pull}12289[12289]
 
 *Filebeat*
 
