@@ -31,8 +31,8 @@ type ServerConfig struct {
 	VerificationMode TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full'
 	Versions         []TLSVersion        `config:"supported_protocols"`
 	CipherSuites     []tlsCipherSuite    `config:"cipher_suites"`
-	CAs              []string            `config:"certificate_authorities"`
-	Certificate      CertificateConfig   `config:",inline"`
+	CAs              []string            `config:"certificate_authorities" validate:"required"`
+	Certificate      CertificateConfig   `config:",inline" validate:"required"`
 	CurveTypes       []tlsCurveType      `config:"curve_types"`
 	ClientAuth       tlsClientAuth       `config:"client_authentication"` //`none`, `optional` or `required`
 }

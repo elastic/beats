@@ -167,9 +167,15 @@ func TestApplyWithConfig(t *testing.T) {
 }
 
 func TestServerConfigDefaults(t *testing.T) {
+	yamlStr := `
+    certificate: ca_test.pem
+    key: ca_test.key
+    certificate_authorities: [ca_test.pem]
+  `
 	var c ServerConfig
-	config := common.MustNewConfigFrom([]byte(``))
-	err := config.Unpack(&c)
+	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	require.NoError(t, err)
+	err = config.Unpack(&c)
 	require.NoError(t, err)
 	tmp, err := LoadTLSServerConfig(&c)
 	require.NoError(t, err)
@@ -178,8 +184,8 @@ func TestServerConfigDefaults(t *testing.T) {
 
 	assert.NotNil(t, cfg)
 	// values not set by default
-	assert.Len(t, cfg.Certificates, 0)
-	assert.Nil(t, cfg.ClientCAs)
+	assert.Len(t, cfg.Certificates, 1)
+	assert.NotNil(t, cfg.ClientCAs)
 	assert.Len(t, cfg.CipherSuites, 0)
 	assert.Len(t, cfg.CurvePreferences, 0)
 	// values set by default
@@ -187,6 +193,30 @@ func TestServerConfigDefaults(t *testing.T) {
 	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
 	assert.Equal(t, int(tls.VersionTLS12), int(cfg.MaxVersion))
 	assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
+}
+
+func TestServerConfigEnsureCA(t *testing.T) {
+	yamlStr := `
+    certificate: ca_test.pem
+    key: ca_test.key
+  `
+	var c ServerConfig
+	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	require.NoError(t, err)
+	err = config.Unpack(&c)
+	require.Error(t, err)
+}
+
+func TestServerConfigCertificate(t *testing.T) {
+	yamlStr := `
+    certificate: ca_test.pem
+    certificate_authorities: [ca_test.pem]
+  `
+	var c ServerConfig
+	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	require.NoError(t, err)
+	err = config.Unpack(&c)
+	require.Error(t, err)
 }
 
 func TestApplyWithServerConfig(t *testing.T) {
