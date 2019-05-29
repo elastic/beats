@@ -8,6 +8,11 @@
       example: project-x
       description: >
         Name of the project in Google Cloud.
+    
+    - name: cloud.image.id
+      example: ami-abcd1234
+      description: >
+        Image ID for the cloud instance.
 
     # Alias for old fields
     - name: meta.cloud.provider
@@ -44,3 +49,14 @@
       type: alias
       path: cloud.region
       migration: true
+
+    - name: meta.cloud.account.id
+      type: alias
+      path: cloud.account.id
+
+    - name: meta.cloud.image.id
+      type: alias
+      path: cloud.image.id
+      migration: true
+
+    
