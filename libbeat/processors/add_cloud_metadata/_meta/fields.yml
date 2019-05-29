@@ -50,13 +50,4 @@
       path: cloud.region
       migration: true
 
-    - name: meta.cloud.account.id
-      type: alias
-      path: cloud.account.id
-
-    - name: meta.cloud.image.id
-      type: alias
-      path: cloud.image.id
-      migration: true
-
     
