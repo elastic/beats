@@ -4565,7 +4565,7 @@ type: long
 
 format: bytes
 
-peak bytes
+Peak committed bytes on Windows
 
 
 --
@@ -4641,18 +4641,6 @@ Memory resident set size percentage.
 Usage memory stats.
 
 
-
-*`docker.memory.usage.commit_peak`*::
-+
---
-type: long
-
-format: bytes
-
-Peak committed bytes on Windows
-
-
---
 
 *`docker.memory.usage.max`*::
 +

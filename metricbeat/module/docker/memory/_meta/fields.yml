@@ -18,7 +18,7 @@
           type: long
           format: bytes
           description: >
-            peak bytes
+            Peak committed bytes on Windows
     - name: private_working_set.total
       type: long
       format: bytes
@@ -53,11 +53,6 @@
       description: >
         Usage memory stats.
       fields:
-        - name: commit_peak
-          type: long
-          format: bytes
-          description: >
-            Peak committed bytes on Windows
         - name: max
           type: long
           format: bytes
