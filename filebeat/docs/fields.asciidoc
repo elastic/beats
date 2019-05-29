@@ -12150,7 +12150,7 @@ Fields from the PostgreSQL log files.
 +
 --
 
-deprecated[7.2.0]
+deprecated[7.3.0]
 
 The timestamp from the log line.
 
