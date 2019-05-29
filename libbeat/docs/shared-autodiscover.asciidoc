@@ -295,7 +295,7 @@ applied if there is no condition provided.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-metricbeat.autodiscover:
+{beatname_lc}.autodiscover:
   providers:
     - type: kubernetes
       templates:
