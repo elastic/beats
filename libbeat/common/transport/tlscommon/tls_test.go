@@ -207,9 +207,21 @@ func TestServerConfigEnsureCA(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestServerConfigCertificate(t *testing.T) {
+func TestServerConfigCertificateKey(t *testing.T) {
 	yamlStr := `
     certificate: ca_test.pem
+    certificate_authorities: [ca_test.pem]
+  `
+	var c ServerConfig
+	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	require.NoError(t, err)
+	err = config.Unpack(&c)
+	require.Error(t, err)
+}
+
+func TestServerConfigCertificate(t *testing.T) {
+	yamlStr := `
+    key: ca_test.key
     certificate_authorities: [ca_test.pem]
   `
 	var c ServerConfig

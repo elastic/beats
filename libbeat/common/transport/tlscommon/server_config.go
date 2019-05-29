@@ -19,6 +19,7 @@ package tlscommon
 
 import (
 	"crypto/tls"
+	"errors"
 
 	"github.com/joeshaw/multierror"
 
@@ -31,8 +32,8 @@ type ServerConfig struct {
 	VerificationMode TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full'
 	Versions         []TLSVersion        `config:"supported_protocols"`
 	CipherSuites     []tlsCipherSuite    `config:"cipher_suites"`
-	CAs              []string            `config:"certificate_authorities" validate:"required"`
-	Certificate      CertificateConfig   `config:",inline" validate:"required"`
+	CAs              []string            `config:"certificate_authorities"`
+	Certificate      CertificateConfig   `config:",inline"`
 	CurveTypes       []tlsCurveType      `config:"curve_types"`
 	ClientAuth       tlsClientAuth       `config:"client_authentication"` //`none`, `optional` or `required`
 }
@@ -91,6 +92,7 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 	}, nil
 }
 
+// Unpack unpacks the TLS Server configuration.
 func (c *ServerConfig) Unpack(cfg common.Config) error {
 	clientAuthKey := "client_authentication"
 	if !cfg.HasField(clientAuthKey) {
@@ -101,6 +103,13 @@ func (c *ServerConfig) Unpack(cfg common.Config) error {
 	if err := cfg.Unpack(&sCfg); err != nil {
 		return err
 	}
+
+	if sCfg.VerificationMode != VerifyNone {
+		if len(sCfg.CAs) == 0 {
+			return errors.New("certificate authorities not configured")
+		}
+	}
+
 	*c = ServerConfig(sCfg)
 	return nil
 }
