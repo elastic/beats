@@ -5,10 +5,124 @@
         "description": "Overview of AWS SQS Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}",
-        "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"x\":12,\"y\":0,\"w\":12,\"h\":8,\"i\":\"1\"},\"panelIndex\":\"1\",\"version\":\"7.0.0-beta1\",\"panelRefName\":\"panel_0\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":36,\"y\":0,\"w\":12,\"h\":8,\"i\":\"2\"},\"panelIndex\":\"2\",\"version\":\"7.0.0-beta1\",\"panelRefName\":\"panel_1\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":0,\"y\":8,\"w\":24,\"h\":8,\"i\":\"3\"},\"panelIndex\":\"3\",\"version\":\"7.0.0-beta1\",\"panelRefName\":\"panel_2\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":24,\"y\":8,\"w\":24,\"h\":8,\"i\":\"4\"},\"panelIndex\":\"4\",\"version\":\"7.0.0-beta1\",\"panelRefName\":\"panel_3\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":0,\"y\":16,\"w\":24,\"h\":8,\"i\":\"7\"},\"panelIndex\":\"7\",\"version\":\"7.0.0-beta1\",\"panelRefName\":\"panel_4\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":24,\"y\":16,\"w\":24,\"h\":8,\"i\":\"8\"},\"panelIndex\":\"8\",\"version\":\"7.0.0-beta1\",\"panelRefName\":\"panel_5\"},{\"embeddableConfig\":{},\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":8,\"i\":\"9\"},\"panelIndex\":\"9\",\"version\":\"7.0.0-beta1\",\"panelRefName\":\"panel_6\"},{\"gridData\":{\"x\":24,\"y\":0,\"w\":12,\"h\":8,\"i\":\"10\"},\"version\":\"7.0.0\",\"panelIndex\":\"10\",\"embeddableConfig\":{},\"panelRefName\":\"panel_7\"}]",
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "1",
+              "w": 12,
+              "x": 12,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "2",
+              "w": 12,
+              "x": 36,
+              "y": 0
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "3",
+              "w": 24,
+              "x": 0,
+              "y": 8
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "4",
+              "w": 24,
+              "x": 24,
+              "y": 8
+            },
+            "panelIndex": "4",
+            "panelRefName": "panel_3",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "7",
+              "w": 24,
+              "x": 0,
+              "y": 16
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_4",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "8",
+              "w": 24,
+              "x": 24,
+              "y": 16
+            },
+            "panelIndex": "8",
+            "panelRefName": "panel_5",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "9",
+              "w": 12,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "9",
+            "panelRefName": "panel_6",
+            "version": "7.0.0-beta1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "10",
+              "w": 12,
+              "x": 24,
+              "y": 0
+            },
+            "panelIndex": "10",
+            "panelRefName": "panel_7",
+            "version": "7.0.0"
+          }
+        ],
         "timeRestore": false,
         "title": "[Metricbeat AWS] SQS Overview",
         "version": 1
@@ -60,180 +174,640 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-05-01T15:29:54.161Z",
-      "version": "WzUwMCwxXQ=="
+      "updated_at": "2019-05-29T02:31:10.742Z",
+      "version": "WzczNCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Messages Visible",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"type\": \"metrics\", \"params\": {\"bar_color_rules\": [{\"id\": \"d2d14920-41e8-11e9-9e94-11d4d21d3f4b\"}], \"background_color_rules\": [{\"id\": \"d5b83c70-41e8-11e9-9e94-11d4d21d3f4b\"}], \"index_pattern\": \"metricbeat*\", \"gauge_inner_width\": 10, \"series\": [{\"line_width\": 1, \"terms_field\": \"aws.sqs.queue.name\", \"point_size\": 1, \"terms_size\": \"5\", \"color\": \"#68BC00\", \"stacked\": \"none\", \"label\": \"SQS Message Visible\", \"metrics\": [{\"field\": \"aws.sqs.messages.visible\", \"type\": \"avg\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}], \"split_mode\": \"terms\", \"chart_type\": \"line\", \"terms_order_by\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"separate_axis\": 0, \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": \"0\"}], \"axis_formatter\": \"number\", \"interval\": \"5m\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"gauge_color_rules\": [{\"id\": \"d2163680-41e8-11e9-9e94-11d4d21d3f4b\"}], \"time_field\": \"@timestamp\", \"show_legend\": 1, \"show_grid\": 1, \"gauge_style\": \"half\", \"axis_scale\": \"normal\", \"gauge_width\": 10, \"type\": \"top_n\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"AWS SQS Messages Visible\"}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "d5b83c70-41e8-11e9-9e94-11d4d21d3f4b"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "d2d14920-41e8-11e9-9e94-11d4d21d3f4b"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "gauge_color_rules": [
+              {
+                "id": "d2163680-41e8-11e9-9e94-11d4d21d3f4b"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "SQS Message Visible",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.messages.visible",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "top_n"
+          },
+          "title": "AWS SQS Messages Visible",
+          "type": "metrics"
+        }
       },
       "id": "f74eb760-41e8-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-30T19:38:07.572Z",
-      "version": "WzI1OCwxXQ=="
+      "updated_at": "2019-05-29T02:50:27.296Z",
+      "version": "Wzk0NCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Oldest Message Age in Seconds",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"type\": \"metrics\", \"params\": {\"bar_color_rules\": [{\"id\": \"3e3d3610-437e-11e9-a35d-972620e4f790\"}], \"index_pattern\": \"metricbeat*\", \"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"terms_field\": \"aws.sqs.queue.name\", \"point_size\": 1, \"terms_size\": \"5\", \"color\": \"#68BC00\", \"stacked\": \"none\", \"label\": \"AWS SQS Oldest Message Age in Seconds\", \"metrics\": [{\"field\": \"aws.sqs.oldest_message_age.sec\", \"type\": \"max\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}], \"split_mode\": \"terms\", \"chart_type\": \"line\", \"terms_order_by\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"separate_axis\": 0, \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"5m\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"axis_scale\": \"normal\", \"type\": \"top_n\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"AWS SQS Oldest Message Age in Seconds\"}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "bar_color_rules": [
+              {
+                "id": "3e3d3610-437e-11e9-a35d-972620e4f790"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "AWS SQS Oldest Message Age in Seconds",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.oldest_message_age.sec",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "top_n"
+          },
+          "title": "AWS SQS Oldest Message Age in Seconds",
+          "type": "metrics"
+        }
       },
       "id": "53730d20-437e-11e9-8697-530f39afc6eb",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-04-30T19:38:07.572Z",
-      "version": "WzI1OSwxXQ=="
+      "updated_at": "2019-05-29T03:01:21.100Z",
+      "version": "Wzk1MSwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"kuery\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Messages Received",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"AWS SQS Messages Received\",\"type\":\"metrics\",\"params\":{\"bar_color_rules\":[{\"id\":\"57cc0200-43b5-11e9-84e9-a97a63579915\"}],\"background_color_rules\":[{\"id\":\"1ccb6710-43b3-11e9-8c70-d17a67455a84\"}],\"index_pattern\":\"metricbeat*\",\"time_field\":\"@timestamp\",\"series\":[{\"line_width\":1,\"terms_field\":\"aws.sqs.queue.name\",\"point_size\":1,\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"color\":\"#68BC00\",\"stacked\":\"none\",\"terms_size\":\"5\",\"metrics\":[{\"field\":\"aws.sqs.messages.received\",\"type\":\"sum\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"split_mode\":\"terms\",\"chart_type\":\"line\",\"series_drop_last_bucket\":1,\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"split_color_mode\":\"rainbow\",\"fill\":\"0\"}],\"axis_formatter\":\"number\",\"interval\":\"5m\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"show_legend\":1,\"show_grid\":1,\"axis_scale\":\"normal\",\"type\":\"timeseries\",\"axis_position\":\"left\",\"default_index_pattern\":\"metricbeat-8*\",\"drop_last_bucket\":1},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "1ccb6710-43b3-11e9-8c70-d17a67455a84"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "57cc0200-43b5-11e9-84e9-a97a63579915"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.messages.received",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "sum"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "series_drop_last_bucket": 1,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS SQS Messages Received",
+          "type": "metrics"
+        }
       },
       "id": "1235fe50-41e7-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-01T17:13:25.154Z",
-      "version": "WzUwOSwxXQ=="
+      "updated_at": "2019-05-29T02:58:56.673Z",
+      "version": "Wzk0NiwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"kuery\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Messages Deleted",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"AWS SQS Messages Deleted\",\"type\":\"metrics\",\"params\":{\"time_field\":\"@timestamp\",\"series\":[{\"line_width\":1,\"terms_field\":\"aws.sqs.queue.name\",\"point_size\":1,\"terms_size\":\"5\",\"color\":\"#68BC00\",\"stacked\":\"none\",\"metrics\":[{\"field\":\"aws.sqs.messages.deleted\",\"type\":\"avg\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"split_mode\":\"terms\",\"chart_type\":\"line\",\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"split_color_mode\":\"rainbow\",\"fill\":\"0\"}],\"axis_formatter\":\"number\",\"interval\":\"5m\",\"axis_position\":\"left\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"show_legend\":1,\"show_grid\":1,\"index_pattern\":\"metricbeat*\",\"type\":\"timeseries\",\"axis_scale\":\"normal\",\"default_index_pattern\":\"metricbeat-8*\",\"drop_last_bucket\":1},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.messages.deleted",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS SQS Messages Deleted",
+          "type": "metrics"
+        }
       },
       "id": "be6c4180-41e6-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-01T16:02:55.414Z",
-      "version": "WzUwNiwxXQ=="
+      "updated_at": "2019-05-29T02:59:38.411Z",
+      "version": "Wzk0OCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"kuery\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Messages Delayed",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"AWS SQS Messages Delayed\",\"type\":\"metrics\",\"params\":{\"time_field\":\"@timestamp\",\"series\":[{\"line_width\":1,\"terms_field\":\"aws.sqs.queue.name\",\"point_size\":1,\"terms_size\":\"5\",\"color\":\"#68BC00\",\"stacked\":\"none\",\"metrics\":[{\"field\":\"aws.sqs.messages.delayed\",\"type\":\"avg\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\"}],\"split_mode\":\"terms\",\"chart_type\":\"line\",\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"split_color_mode\":\"rainbow\",\"fill\":\"0\"}],\"axis_formatter\":\"number\",\"interval\":\"5m\",\"axis_position\":\"left\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"show_legend\":1,\"show_grid\":1,\"index_pattern\":\"metricbeat*\",\"type\":\"timeseries\",\"axis_scale\":\"normal\",\"default_index_pattern\":\"metricbeat-8*\",\"drop_last_bucket\":1},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.messages.delayed",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS SQS Messages Delayed",
+          "type": "metrics"
+        }
       },
       "id": "dcd31cd0-41e5-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-01T16:02:29.684Z",
-      "version": "WzUwNSwxXQ=="
+      "updated_at": "2019-05-29T02:59:16.711Z",
+      "version": "Wzk0NywxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Messages Sent",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"AWS SQS Messages Sent\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"background_color_rules\":[{\"id\":\"d95adba0-6b8a-11e9-98b0-9b2c3d14a4c1\"}],\"default_index_pattern\":\"metricbeat-8*\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat*\",\"interval\":\"5m\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":\"0\",\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"line_width\":1,\"metrics\":[{\"field\":\"aws.sqs.messages.sent\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\"}],\"point_size\":1,\"separate_axis\":0,\"split_color_mode\":\"rainbow\",\"split_mode\":\"terms\",\"stacked\":\"none\",\"terms_field\":\"aws.sqs.queue.name\",\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"terms_size\":\"5\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\",\"drop_last_bucket\":1},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "d95adba0-6b8a-11e9-98b0-9b2c3d14a4c1"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "drop_last_bucket": 1,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.messages.sent",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS SQS Messages Sent",
+          "type": "metrics"
+        }
       },
       "id": "dd2f2a10-41e6-11e9-b7a0-c99d9d127b61",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-01T16:05:22.598Z",
-      "version": "WzUwOCwxXQ=="
+      "updated_at": "2019-05-29T02:59:56.218Z",
+      "version": "Wzk0OSwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"kuery\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Filters",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"AWS SQS Filters\",\"type\":\"input_control_vis\",\"params\":{\"pinFilters\":false,\"useTimeFilter\":false,\"updateFiltersOnChange\":true,\"controls\":[{\"parent\":\"\",\"id\":\"1549397251041\",\"fieldName\":\"cloud.region\",\"label\":\"region\",\"type\":\"list\",\"options\":{\"type\":\"terms\",\"size\":5,\"multiselect\":true,\"dynamicOptions\":true,\"order\":\"desc\"},\"indexPatternRefName\":\"control_0_index_pattern\"},{\"parent\":\"\",\"id\":\"1549512142947\",\"fieldName\":\"aws.sqs.queue.name\",\"label\":\"queue name\",\"type\":\"list\",\"options\":{\"type\":\"terms\",\"size\":5,\"multiselect\":true,\"dynamicOptions\":true,\"order\":\"desc\"},\"indexPatternRefName\":\"control_1_index_pattern\"}]},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "cloud.region.keyword",
+                "id": "1549397251041",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "region",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "aws.sqs.queue.name.keyword",
+                "id": "1549512142947",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "queue name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": false
+          },
+          "title": "AWS SQS Filters",
+          "type": "input_control_vis"
+        }
       },
       "id": "b0afd3e0-43b7-11e9-8697-530f39afc6eb",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [
         {
-          "id": "8e9a4cf0-6bcf-11e9-81bc-7f4cd8b3d892",
+          "id": "cdbddb70-81bb-11e9-8414-3bb4f4aaced8",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
         },
         {
-          "id": "8e9a4cf0-6bcf-11e9-81bc-7f4cd8b3d892",
+          "id": "cdbddb70-81bb-11e9-8414-3bb4f4aaced8",
           "name": "control_1_index_pattern",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-01T15:16:57.709Z",
-      "version": "WzQ5OCwxXQ=="
+      "updated_at": "2019-05-29T03:00:54.314Z",
+      "version": "Wzk1MCwxXQ=="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
         "title": "AWS SQS Empty Receives",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"AWS SQS Empty Receives\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"background_color_rules\":[{\"id\":\"d95adba0-6b8a-11e9-98b0-9b2c3d14a4c1\"}],\"default_index_pattern\":\"metricbeat-8*\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"metricbeat*\",\"interval\":\"5m\",\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"#68BC00\",\"fill\":\"0\",\"formatter\":\"number\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"line_width\":1,\"metrics\":[{\"field\":\"aws.sqs.empty_receives\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"numerator\":\"\",\"percentiles\":[{\"id\":\"74323cf0-6c25-11e9-9cd1-3bdb0c7db024\",\"mode\":\"line\",\"shade\":0.2,\"value\":50}]}],\"point_size\":1,\"separate_axis\":0,\"split_color_mode\":\"rainbow\",\"split_mode\":\"terms\",\"stacked\":\"none\",\"terms_field\":\"aws.sqs.queue.name\",\"terms_order_by\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"terms_size\":\"5\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"top_n\",\"gauge_color_rules\":[{\"id\":\"a778eaa0-6c25-11e9-9cd1-3bdb0c7db024\"}],\"gauge_width\":10,\"gauge_inner_width\":10,\"gauge_style\":\"half\",\"bar_color_rules\":[{\"id\":\"a7e8c370-6c25-11e9-9cd1-3bdb0c7db024\"}]},\"aggs\":[]}"
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "d95adba0-6b8a-11e9-98b0-9b2c3d14a4c1"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "a7e8c370-6c25-11e9-9cd1-3bdb0c7db024"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "gauge_color_rules": [
+              {
+                "id": "a778eaa0-6c25-11e9-9cd1-3bdb0c7db024"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.sqs.empty_receives",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "numerator": "",
+                    "percentiles": [
+                      {
+                        "id": "74323cf0-6c25-11e9-9cd1-3bdb0c7db024",
+                        "mode": "line",
+                        "shade": 0.2,
+                        "value": 50
+                      }
+                    ],
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.sqs.queue.name.keyword",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "top_n"
+          },
+          "title": "AWS SQS Empty Receives",
+          "type": "metrics"
+        }
       },
       "id": "bb82c4d0-6c25-11e9-81bc-7f4cd8b3d892",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.0.1"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-05-01T15:28:12.701Z",
-      "version": "WzQ5OSwxXQ=="
+      "updated_at": "2019-05-29T02:58:35.107Z",
+      "version": "Wzk0NSwxXQ=="
     }
   ],
-  "version": "7.0.0"
+  "version": "7.1.1"
 }
