@@ -195,6 +195,17 @@ func TestServerConfigDefaults(t *testing.T) {
 	assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
 }
 
+func TestServerConfigSkipCACertificateAndKeyWhenVerifyNone(t *testing.T) {
+	yamlStr := `
+    verification_mode: none
+  `
+	var c ServerConfig
+	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
+	require.NoError(t, err)
+	err = config.Unpack(&c)
+	require.NoError(t, err)
+}
+
 func TestServerConfigEnsureCA(t *testing.T) {
 	yamlStr := `
     certificate: ca_test.pem
