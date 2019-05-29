@@ -105,7 +105,7 @@ func (c *ServerConfig) Unpack(cfg common.Config) error {
 	}
 
 	if sCfg.VerificationMode != VerifyNone && len(sCfg.CAs) == 0 {
-		return errors.New("certificate authorities not configured")
+		return errors.New("certificate_authorities not configured")
 	}
 
 	*c = ServerConfig(sCfg)
