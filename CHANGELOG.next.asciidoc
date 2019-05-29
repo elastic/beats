@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Skipping unparsable log entries from docker json reader {pull}12268[12268]
+- Parse timezone in PostgreSQL logs as part of the timestamp {pull}12338[12338]
 
 *Heartbeat*
 
