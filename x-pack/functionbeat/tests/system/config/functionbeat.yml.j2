@@ -7,6 +7,7 @@ functionbeat.provider.local:
 {% endif %}
 
 {% if cloudwatch %}
+functionbeat.provider.aws.endpoint: {{ cloudwatch.endpoint | default("s3.amazonaws.com") }}
 functionbeat.provider.aws.deploy_bucket: {{ cloudwatch.bucket | default("functionbeat-deploy") }}
 functionbeat.provider.aws.functions:
   - name: {{ cloudwatch.name }}
