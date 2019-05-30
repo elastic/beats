@@ -351,7 +351,9 @@ func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAc
 		MetricSetFields: pkg.toMapStr(),
 	}
 
-	event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
+	if ms.HostID() != "" {
+		event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
+	}
 
 	if pkg.Error != nil {
 		event.RootFields.Put("error.message", pkg.Error.Error())
