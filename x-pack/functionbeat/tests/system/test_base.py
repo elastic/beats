@@ -100,6 +100,7 @@ class Test(BaseTest):
         if os.path.exists("pkg/functionbeat"):
             return
 
+        os.mkdir("pkg")
         with open("pkg/functionbeat", "wb") as f:
             f.write("my dummy functionbeat binary")
 
