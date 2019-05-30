@@ -29,20 +29,35 @@ func eventsMapping(r mb.ReporterV2, memoryDataList []MemoryData) {
 }
 
 func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
-	fields := common.MapStr{
-		"fail": common.MapStr{
-			"count": memoryData.Failcnt,
-		},
-		"limit": memoryData.Limit,
-		"rss": common.MapStr{
-			"total": memoryData.TotalRss,
-			"pct":   memoryData.TotalRssP,
-		},
-		"usage": common.MapStr{
-			"total": memoryData.Usage,
-			"pct":   memoryData.UsageP,
-			"max":   memoryData.MaxUsage,
-		},
+
+	//if we have windows memory data, just report windows stats
+	var fields common.MapStr
+	if memoryData.Commit+memoryData.CommitPeak+memoryData.PrivateWorkingSet > 0 {
+		fields = common.MapStr{
+			"commit": common.MapStr{
+				"total": memoryData.Commit,
+				"peak":  memoryData.CommitPeak,
+			},
+			"private_working_set": common.MapStr{
+				"total": memoryData.PrivateWorkingSet,
+			},
+		}
+	} else {
+		fields = common.MapStr{
+			"fail": common.MapStr{
+				"count": memoryData.Failcnt,
+			},
+			"limit": memoryData.Limit,
+			"rss": common.MapStr{
+				"total": memoryData.TotalRss,
+				"pct":   memoryData.TotalRssP,
+			},
+			"usage": common.MapStr{
+				"total": memoryData.Usage,
+				"pct":   memoryData.UsageP,
+				"max":   memoryData.MaxUsage,
+			},
+		}
 	}
 
 	r.Event(mb.Event{
