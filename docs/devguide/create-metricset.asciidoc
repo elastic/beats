@@ -256,8 +256,6 @@ func eventMapping(input map[string]interface{}) common.MapStr {
 In the above example, note that it is possible to create the schema object once
 and apply it to all events. 
 
-
-
 [float]
 ==== Configuration File
 The configuration file for a metricset is handled by the module. If there are
