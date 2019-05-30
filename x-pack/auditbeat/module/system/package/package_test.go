@@ -74,7 +74,6 @@ func TestDpkg(t *testing.T) {
 		checkFieldValue(t, event, "system.audit.package.summary", "Test Package")
 		checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
 		checkFieldValue(t, event, "system.audit.package.version", "8.2.0-1ubuntu2~18.04")
-		checkFieldValue(t, event, "system.audit.package.entity_id", "+LbVb+f5cZZcYzCp")
 	}
 }
 
