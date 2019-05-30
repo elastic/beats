@@ -17,6 +17,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-kibana>>
   * <<filebeat-module-logstash>>
   * <<filebeat-module-mongodb>>
+  * <<filebeat-module-mssql>>
   * <<filebeat-module-mysql>>
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
@@ -50,6 +51,7 @@ include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/mongodb.asciidoc[]
+include::modules/mssql.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]

@@ -4539,6 +4539,49 @@ Memory metrics.
 
 
 
+[float]
+== commit fields
+
+Committed bytes on Windows
+
+
+
+*`docker.memory.commit.total`*::
++
+--
+type: long
+
+format: bytes
+
+Total bytes
+
+
+--
+
+*`docker.memory.commit.peak`*::
++
+--
+type: long
+
+format: bytes
+
+Peak committed bytes on Windows
+
+
+--
+
+*`docker.memory.private_working_set.total`*::
++
+--
+type: long
+
+format: bytes
+
+private working sets on Windows
+
+
+--
+
 *`docker.memory.fail.count`*::
 +
 --
