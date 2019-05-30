@@ -76,7 +76,7 @@ func (sr *SetupCfgRunner) Start() {
 	}
 }
 
-// Stopping SetupCfgRunner.
+// Stopp of SetupCfgRunner.
 func (sr *SetupCfgRunner) Stop() {}
 
 // String returns information on the Runner

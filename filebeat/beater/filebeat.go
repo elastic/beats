@@ -153,17 +153,6 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		return nil
 	}
 
-	// When running the subcommand setup, configuration from modules.d directories are
-	// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
-	var modulesLoader *cfgfile.Reloader
-	var modulesFactory cfgfile.RunnerFactory
-
-	pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
-	modulesFactory = fileset.NewSetupFactory(b.Info.Version, pipelineLoaderFactory)
-	if fb.config.ConfigModules.Enabled() {
-		modulesLoader = cfgfile.NewReloader(b.Publisher, fb.config.ConfigModules)
-	}
-
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
 		esClient, err := elasticsearch.NewConnectedClient(esConfig)
@@ -171,7 +160,12 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 			return err
 		}
 
-		if modulesLoader != nil {
+		// When running the subcommand setup, configuration from modules.d directories are
+		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
+		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
+		modulesFactory := fileset.NewSetupFactory(b.Info.Version, pipelineLoaderFactory)
+		if fb.config.ConfigModules.Enabled() {
+			modulesLoader := cfgfile.NewReloader(b.Publisher, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
 		}
 
