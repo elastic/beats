@@ -1,0 +1,11 @@
+- key: oracle
+  title: "Oracle"
+  description: Oracle database module
+  short_config: false
+  release: experimental
+  settings: ["tablespace"]
+  fields:
+    - name: oracle
+      type: group
+      description: Oracle module
+      fields:

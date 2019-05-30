@@ -361,7 +361,6 @@
 
           - name: pool
             type: group
-            description: >
             fields:
               - name: reads
                 type: long

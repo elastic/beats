@@ -1,0 +1,55 @@
+- name: tablespace
+  type: group
+  description: tablespace
+  fields:
+    - name: name
+      type: keyword
+      description: Database name
+
+    - name: data_file
+      type: group
+      description: TODO
+      fields:
+        - name: bytes
+          type: long
+          description: TODO
+        - name: instance_id
+          type: long
+          description: TODO
+        - name: file_id
+          type: long
+          description: TODO
+        - name: filename
+          type: keyword
+          description: TODO
+        - name: max.bytes
+          type: long
+          description: TODO
+        - name: status
+          type: keyword
+          description: >
+            'File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in
+            a tablespace that was dropped)'
+        - name: user.bytes
+          type: long
+          description: TODO
+        - name: online_status
+        type: keyword
+        description: Last known online status of the data file. One of SYSOFF, SYSTEM, OFFLINE, ONLINE or RECOVER.
+
+    - name: temp_free_space
+      type: group
+      description: TODO
+      fields:
+        - name: allocated.bytes
+          type: long
+          description: TODO
+        - name: free.bytes
+          type: long
+          description: TODO
+        - name: table_size.bytes
+          type: long
+          description: TODO
+        - name: instance_id
+          type: long
+          description: TODO

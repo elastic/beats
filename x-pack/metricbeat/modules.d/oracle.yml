@@ -1,0 +1,9 @@
+- module: oracle
+  metricsets: ["tablespace"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:1521"]
+  service_name: "ORCLPDB1.localdomain"
+  username: sys
+  password: Oradoc_db1
+  sid_connection_suffix: " AS SYSDBA"

@@ -1,0 +1,46 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "oracle.tablespace",
+        "duration": 115000,
+        "module": "oracle"
+    },
+    "metricset": {
+        "name": "tablespace"
+    },
+    "oracle": {
+        "tablespace": {
+            "data_file": {
+                "id": 3,
+                "name": "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/temp012017-03-02_07-54-38-075-AM.dbf",
+                "online_status": "ONLINE",
+                "size": {
+                    "bytes": 67108864,
+                    "max": {
+                        "bytes": 34359721984
+                    }
+                },
+                "status": "ONLINE",
+                "user": {
+                    "bytes": 66060288
+                }
+            },
+            "free_space": {
+                "allocated": {
+                    "bytes": 11534336
+                },
+                "free": {
+                    "bytes": 66060288
+                },
+                "table_size": {
+                    "bytes": 67108864
+                }
+            },
+            "name": "TEMP"
+        }
+    },
+    "service": {
+        "address": "localhost:1521",
+        "type": "oracle"
+    }
+}

@@ -1641,6 +1641,12 @@
 			"revisionTime": "2017-03-27T23:54:44Z"
 		},
 		{
+			"checksumSHA1": "fMtE9NnJqBmETy1wH+ByyucE8bU=",
+			"path": "github.com/go-goracle/goracle",
+			"revision": "0a45a710690db3e5c692a9d6f371b0c4f7fd0fd5",
+			"revisionTime": "2019-04-12T06:59:33Z"
+		},
+		{
 			"checksumSHA1": "wDZdTaY9JiqqqnF4c3pHP71nWmk=",
 			"path": "github.com/go-ole/go-ole",
 			"revision": "de8695c8edbf8236f30d6e1376e20b198a028d42",

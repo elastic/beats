@@ -685,6 +685,24 @@ metricbeat.modules:
   # Path to server status. Default server-status
   server_status_path: "server-status"
 
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  metricsets: ["tablespace"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+  # username: ""
+  # password: ""
+  # service_name: ""
+
+  # An string to prepend to the sid connection
+  # sid_connection_prefix: ""
+
+  # An string to append to the sid connection
+  # sid_connection_suffix: ""
+
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:
