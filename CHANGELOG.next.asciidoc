@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Update to Golang 1.12.4. {pull}11782[11782]
+- Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
 
 *Auditbeat*
 
@@ -75,6 +76,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix queue.spool.write.flush.events config type. {pull}12080[12080]
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 - Fixed Beat ID being reported by GET / API. {pull}12180[12180]
+- Fixed setting bulk max size in kafka output. {pull}12254[12254]
 
 *Auditbeat*
 

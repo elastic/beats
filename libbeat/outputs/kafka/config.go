@@ -212,8 +212,8 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.ChannelBufferSize = config.ChanBufferSize
 
 	// configure bulk size
+	k.Producer.Flush.MaxMessages = config.BulkMaxSize
 	if config.BulkFlushFrequency > 0 {
-		k.Producer.Flush.Messages = config.BulkMaxSize
 		k.Producer.Flush.Frequency = config.BulkFlushFrequency
 	}
 
