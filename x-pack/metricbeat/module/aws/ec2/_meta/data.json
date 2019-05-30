@@ -4,7 +4,7 @@
         "ec2": {
             "cpu": {
                 "total": {
-                    "pct": 0.6999999999922392
+                    "pct": 0.7000000000116418
                 }
             },
             "diskio": {
@@ -38,20 +38,16 @@
                     "code": 16,
                     "name": "running"
                 },
-                "tags": {
-                    "Name": "service-node",
-                    "aws:autoscaling:groupName": "service-group"
-                },
                 "threads_per_core": 2
             },
             "network": {
                 "in": {
-                    "bytes": 15161,
-                    "packets": 133.4
+                    "bytes": 16598.6,
+                    "packets": 127.8
                 },
                 "out": {
-                    "bytes": 29254.4,
-                    "packets": 230
+                    "bytes": 29934.4,
+                    "packets": 225.4
                 }
             },
             "status": {
@@ -59,6 +55,10 @@
                 "check_failed_instance": 0,
                 "check_failed_system": 0
             }
+        },
+        "tags": {
+            "Name": "service-node",
+            "aws:autoscaling:groupName": "service-asg"
         }
     },
     "cloud": {

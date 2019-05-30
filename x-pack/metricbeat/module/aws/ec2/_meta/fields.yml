@@ -112,9 +112,3 @@
       type: integer
       description: >
         The number of threads per CPU core.
-    - name: instance.tags.*
-      type: object
-      object_type: keyword
-      object_type_mapping_type: "*"
-      description: >
-        Tag key value pairs from aws ec2 instances.

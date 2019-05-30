@@ -212,7 +212,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 				tags := instanceOutput[instanceID].Tags
 				for _, tag := range tags {
-					events[instanceID].MetricSetFields.Put("instance.tags."+ *tag.Key, *tag.Value)
+					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
 				}
 			}
 		}
