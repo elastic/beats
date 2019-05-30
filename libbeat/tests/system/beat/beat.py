@@ -692,5 +692,4 @@ class TestCase(unittest.TestCase, ComposeMixin):
         proc = self.start_beat(extra_args=["version"], output="version")
         proc.wait()
 
-        print(self.get_log(logfile="version")[0])
-        #version = semver.parse(es_info["version"]["number"])
+        return self.get_log_lines(logfile="version")[0].split()[2]
