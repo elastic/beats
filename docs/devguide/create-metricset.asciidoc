@@ -220,7 +220,7 @@ common.MapStr{
 }
 ----
 
-You can use the following code to make the transformations:
+You can use the schema package to transform the data, and optionally mark some fields in a schema as required or not. For example:
 
 [source,go]
 ----
@@ -231,9 +231,9 @@ import (
 
 var (
 	schema = s.Schema{
-		"test_string": c.Str("testString"),
-		"test_int":    c.Int("testInt"),
-		"test_bool":   c.Bool("testBool"),
+		"test_string": c.Str("testString", s.Required), <1>
+		"test_int":    c.Int("testInt"), <2>
+		"test_bool":   c.Bool("testBool", s.Optional), <3>
 		"test_float":  c.Float("testFloat"),
 		"test_obj": s.Object{
 			"test_obj_string": c.Str("testObjString"),
@@ -242,12 +242,21 @@ var (
 )
 
 func eventMapping(input map[string]interface{}) common.MapStr {
-	return schema.Apply(input)
+	return schema.Apply(input) <4>
 }
 ----
+<1> `Required` will explicitly mark a field as non-optional.
+<2> If a field has no Schema Option set, it is equivalent to `Required`.
+<3> `Optional` You can also explicitly mark a field as not required.
+<4> By default, `Apply` will fail and return an error if any field not marked as optional is missing. Using the optional second argument, you can specify how `Apply` handles different fields of the  schema. The possible values are:
+- `AllRequired` is the default behavior. Return an error if any field not marked as optional is missing.
+- `FailOnRequired`  will fail if a field explicitly marked as `required` is missing.
+- `NotFoundKeys(cb func([]string))` will pass a callback function that will be called with the list of missing keys, for more fine-grained error handling.
 
 In the above example, note that it is possible to create the schema object once
-and apply it to all events.
+and apply it to all events. 
+
+
 
 [float]
 ==== Configuration File
