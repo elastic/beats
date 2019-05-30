@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -56,7 +55,6 @@ type metricHints struct {
 
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
-	cfgwarn.Beta("The hints builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 

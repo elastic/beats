@@ -40,7 +40,7 @@ grouped in the following categories:
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
-* <<exported-fields-palo_alto>>
+* <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-rabbitmq>>
@@ -1608,7 +1608,7 @@ Version of the agent.
 == client fields
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
-For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
 Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
@@ -1768,6 +1768,8 @@ Packets sent from the client to the server.
 +
 --
 type: long
+
+format: string
 
 Port of the client.
 
@@ -2150,6 +2152,8 @@ Packets sent from the destination to the source.
 --
 type: long
 
+format: string
+
 Port of the destination.
 
 --
@@ -2447,6 +2451,8 @@ This is mainly useful if you use more than one system that assigns risk scores, 
 type: long
 
 example: 7
+
+format: string
 
 Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
 
@@ -3151,6 +3157,8 @@ type: long
 
 example: 404
 
+format: string
+
 HTTP response status code.
 
 --
@@ -3716,6 +3724,10 @@ Sometimes called program name or similar.
 --
 type: long
 
+example: 4242
+
+format: string
+
 Process id.
 
 --
@@ -3725,7 +3737,11 @@ Process id.
 --
 type: long
 
-Process parent id.
+example: 4241
+
+format: string
+
+Parent process' pid.
 
 --
 
@@ -3746,6 +3762,8 @@ The time the process started.
 type: long
 
 example: 4242
+
+format: string
 
 Thread ID.
 
@@ -3953,6 +3971,8 @@ Packets sent from the server to the client.
 +
 --
 type: long
+
+format: string
 
 Port of the server.
 
@@ -4270,6 +4290,8 @@ Packets sent from the source to the destination.
 --
 type: long
 
+format: string
+
 Port of the source.
 
 --
@@ -4418,6 +4440,8 @@ Path of the request, such as "/search".
 type: long
 
 example: 443
+
+format: string
 
 Port of the request, such as 443.
 
@@ -5896,6 +5920,18 @@ OS build information.
 
 --
 
+*`host.os.codename`*::
++
+--
+type: keyword
+
+example: stretch
+
+OS codename, if any.
+
+
+--
+
 [[exported-fields-icinga]]
 == Icinga fields
 
@@ -7355,6 +7391,16 @@ alias to: event.module
 type: alias
 
 alias to: event.created
+
+--
+
+*`docker.attrs`*::
++
+--
+type: object
+
+docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
+
 
 --
 
@@ -11828,28 +11874,28 @@ String representation of the collection time, as formatted by osquery.
 
 --
 
-[[exported-fields-palo_alto]]
-== palo_alto fields
+[[exported-fields-panw]]
+== panw fields
 
 Module for Palo Alto Networks (PAN-OS)
 
 
 
 [float]
-== palo_alto fields
+== panw fields
 
-Fields from the palo_alto logs.
+Fields from the panw module.
 
 
 
 [float]
-== pan_os fields
+== panos fields
 
 Fields for the Palo Alto Networks PAN-OS logs.
 
 
 
-*`palo_alto.pan_os.ruleset`*::
+*`panw.panos.ruleset`*::
 +
 --
 type: keyword
@@ -11866,7 +11912,7 @@ Fields to extend the top-level source object.
 
 
 
-*`palo_alto.pan_os.source.zone`*::
+*`panw.panos.source.zone`*::
 +
 --
 type: keyword
@@ -11876,7 +11922,7 @@ Source zone for this session.
 
 --
 
-*`palo_alto.pan_os.source.interface`*::
+*`panw.panos.source.interface`*::
 +
 --
 type: keyword
@@ -11893,7 +11939,7 @@ Post-NAT source address, if source NAT is performed.
 
 
 
-*`palo_alto.pan_os.source.nat.ip`*::
+*`panw.panos.source.nat.ip`*::
 +
 --
 type: ip
@@ -11903,7 +11949,7 @@ Post-NAT source IP.
 
 --
 
-*`palo_alto.pan_os.source.nat.port`*::
+*`panw.panos.source.nat.port`*::
 +
 --
 type: long
@@ -11920,7 +11966,7 @@ Fields to extend the top-level destination object.
 
 
 
-*`palo_alto.pan_os.destination.zone`*::
+*`panw.panos.destination.zone`*::
 +
 --
 type: keyword
@@ -11930,7 +11976,7 @@ Destination zone for this session.
 
 --
 
-*`palo_alto.pan_os.destination.interface`*::
+*`panw.panos.destination.interface`*::
 +
 --
 type: keyword
@@ -11947,7 +11993,7 @@ Post-NAT destination address, if destination NAT is performed.
 
 
 
-*`palo_alto.pan_os.destination.nat.ip`*::
+*`panw.panos.destination.nat.ip`*::
 +
 --
 type: ip
@@ -11957,7 +12003,7 @@ Post-NAT destination IP.
 
 --
 
-*`palo_alto.pan_os.destination.nat.port`*::
+*`panw.panos.destination.nat.port`*::
 +
 --
 type: long
@@ -11974,7 +12020,7 @@ Fields to extend the top-level network object.
 
 
 
-*`palo_alto.pan_os.network.pcap_id`*::
+*`panw.panos.network.pcap_id`*::
 +
 --
 type: keyword
@@ -11985,7 +12031,7 @@ Packet capture ID for a threat.
 --
 
 
-*`palo_alto.pan_os.network.nat.community_id`*::
+*`panw.panos.network.nat.community_id`*::
 +
 --
 type: keyword
@@ -12002,7 +12048,7 @@ Fields to extend the top-level file object.
 
 
 
-*`palo_alto.pan_os.file.hash`*::
+*`panw.panos.file.hash`*::
 +
 --
 type: keyword
@@ -12019,7 +12065,7 @@ Fields to extend the top-level url object.
 
 
 
-*`palo_alto.pan_os.url.category`*::
+*`panw.panos.url.category`*::
 +
 --
 type: keyword
@@ -12029,7 +12075,7 @@ For threat URLs, it's the URL category. For WildFire, the verdict on the file an
 
 --
 
-*`palo_alto.pan_os.flow_id`*::
+*`panw.panos.flow_id`*::
 +
 --
 type: keyword
@@ -12039,7 +12085,7 @@ Internal numeric identifier for each session.
 
 --
 
-*`palo_alto.pan_os.sequence_number`*::
+*`panw.panos.sequence_number`*::
 +
 --
 type: long
@@ -12049,7 +12095,7 @@ Log entry identifier that is incremented sequentially. Unique for each log type.
 
 --
 
-*`palo_alto.pan_os.threat.resource`*::
+*`panw.panos.threat.resource`*::
 +
 --
 type: keyword
@@ -12059,7 +12105,7 @@ URL or file name for a threat.
 
 --
 
-*`palo_alto.pan_os.threat.id`*::
+*`panw.panos.threat.id`*::
 +
 --
 type: keyword
@@ -12069,7 +12115,7 @@ Palo Alto Networks identifier for the threat.
 
 --
 
-*`palo_alto.pan_os.threat.name`*::
+*`panw.panos.threat.name`*::
 +
 --
 type: keyword

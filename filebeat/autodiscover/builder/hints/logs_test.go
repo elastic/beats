@@ -29,14 +29,105 @@ import (
 )
 
 func TestGenerateHints(t *testing.T) {
+	customCfg := common.MustNewConfigFrom(map[string]interface{}{
+		"default_config": map[string]interface{}{
+			"type": "docker",
+			"containers": map[string]interface{}{
+				"ids": []string{
+					"${data.container.id}",
+				},
+			},
+			"close_timeout": "true",
+		},
+	})
+
+	defaultCfg := common.NewConfig()
+
+	defaultDisabled := common.MustNewConfigFrom(map[string]interface{}{
+		"default_config": map[string]interface{}{
+			"enabled": "false",
+		},
+	})
+
 	tests := []struct {
 		msg    string
+		config *common.Config
 		event  bus.Event
 		len    int
 		result common.MapStr
 	}{
 		{
-			msg: "Hints without host should return nothing",
+			msg:    "Default config is correct",
+			config: defaultCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+				"type":  "container",
+			},
+		},
+		{
+			msg:    "Config disabling works",
+			config: defaultDisabled,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+			},
+			len: 0,
+		},
+		{
+			msg:    "Hint to enable when disabled by default works",
+			config: defaultDisabled,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"enabled":       "true",
+						"exclude_lines": "^test2, ^test3",
+					},
+				},
+			},
+			len: 1,
+			result: common.MapStr{
+				"type":          "container",
+				"paths":         []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+				"exclude_lines": []interface{}{"^test2", "^test3"},
+			},
+		},
+		{
+			msg:    "Hints without host should return nothing",
+			config: customCfg,
 			event: bus.Event{
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -48,7 +139,8 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{},
 		},
 		{
-			msg: "Hints with logs.disable should return nothing",
+			msg:    "Hints with logs.disable should return nothing",
+			config: customCfg,
 			event: bus.Event{
 				"hints": common.MapStr{
 					"logs": common.MapStr{
@@ -60,7 +152,8 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{},
 		},
 		{
-			msg: "Empty event hints should return default config",
+			msg:    "Empty event hints should return default config",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -84,7 +177,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg: "Hint with include|exclude_lines must be part of the input config",
+			msg:    "Hint with include|exclude_lines must be part of the input config",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -116,7 +210,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg: "Hint with multiline config must have a multiline in the input config",
+			msg:    "Hint with multiline config must have a multiline in the input config",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -152,7 +247,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg: "Hint with inputs config as json must be accepted",
+			msg:    "Hint with inputs config as json must be accepted",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -184,7 +280,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg: "Hint with processors config must have a processors in the input config",
+			msg:    "Hint with processors config must have a processors in the input config",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -230,7 +327,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg: "Hint with module should attach input to its filesets",
+			msg:    "Hint with module should attach input to its filesets",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -277,7 +375,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg: "Hint with module should honor defined filesets",
+			msg:    "Hint with module should honor defined filesets",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -325,7 +424,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg: "Hint with module should honor defined filesets with streams",
+			msg:    "Hint with module should honor defined filesets with streams",
+			config: customCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": common.MapStr{
@@ -376,25 +476,13 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := common.NewConfigFrom(map[string]interface{}{
-			"config": map[string]interface{}{
-				"type": "docker",
-				"containers": map[string]interface{}{
-					"ids": []string{
-						"${data.container.id}",
-					},
-				},
-				"close_timeout": "true",
-			},
-		})
-
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
 		err := paths.InitPaths(&paths.Path{
 			Home: abs,
 		})
 
-		l, err := NewLogHints(cfg)
+		l, err := NewLogHints(test.config)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -609,7 +697,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 
 	for _, test := range tests {
 		cfg, _ := common.NewConfigFrom(map[string]interface{}{
-			"config": map[string]interface{}{
+			"default_config": map[string]interface{}{
 				"type": "docker",
 				"containers": map[string]interface{}{
 					"paths": []string{

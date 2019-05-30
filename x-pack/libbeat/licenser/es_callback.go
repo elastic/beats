@@ -26,7 +26,7 @@ func Enforce(log *logp.Logger, checks ...CheckFunc) {
 
 		if license == OSSLicense {
 			return errors.New("This Beat requires the default distribution of Elasticsearch. Please " +
-				"upgrade to the default distribution of Elasticsearch from elastic.co, or downgrade to " +
+				"install the default distribution of Elasticsearch from elastic.co, or install " +
 				"the oss-only distribution of beats")
 		}
 
