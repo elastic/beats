@@ -28,7 +28,7 @@ class Test(BaseTest):
         self.init()
         self.render_config_template(
             elasticsearch={
-                "host": "localhost:9200",
+                "host": self.get_elasticsearch_url(),
             }
         )
 
