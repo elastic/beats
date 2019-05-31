@@ -29,9 +29,9 @@ func init() {
 			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
 			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
 
-			"kubeproxy_sync_proxy_rules_latency_microseconds_bucket": prometheus.Metric("sync.rules.latency.us"),
+			"kubeproxy_sync_proxy_rules_latency_microseconds": prometheus.Metric("sync.rules.latency.us"),
 
-			"rest_client_request_latency_seconds_bucket": prometheus.Metric("client.request.latency.us",
+			"rest_client_request_latency_seconds": prometheus.Metric("client.request.latency.us",
 				prometheus.OpMultiplyBuckets(1000000)),
 			"rest_client_requests_total": prometheus.Metric("client.request.count"),
 		},
@@ -42,7 +42,7 @@ func init() {
 			// TODO method and verb are used to store the same info at different buckets
 			// We need to make sure this doesn't overwrites data at the prometheus helper
 			"method": prometheus.KeyLabel("client.request.method"),
-			"verb":   prometheus.KeyLabel("client.request.method"),
+			"verb":   prometheus.KeyLabel("client.request.verb"),
 			"url":    prometheus.KeyLabel("client.request.url"),
 		},
 	}

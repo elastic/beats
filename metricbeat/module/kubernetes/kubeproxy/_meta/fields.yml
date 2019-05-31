@@ -4,12 +4,35 @@
     Kubernetes proxy server metrics
   release: beta
   fields:
+
+    # - name: status_code
+    #   type: keyword
+    #   description: >
+    #     HTTP Code returned to kubeproxy
+    # - name: host
+    #   type: keyword
+    #   description: >
+    #     Host addressing the request from kubeproxy
+    # - name: method
+    #   type: keyword
+    #   description: >
+    #     HTTP method issued from kubeproxy
+    # - name: verb
+    #   type: keyword
+    #   description: >
+    #     HTTP verb issued from kubeproxy
+    # - name: url
+    #   type: keyword
+    #   description: >
+    #     URL requested from kubeproxy
+
+
     - name: client
       type: group
       description: >
         kubeproxy HTTP client labels
       fields:
-        - name: request.code
+        - name: request.status_code
           type: keyword
           description: >
             HTTP Code returned to kubeproxy
@@ -20,7 +43,11 @@
         - name: request.method
           type: keyword
           description: >
-            HTTP method issued from kubeproxy
+            HTTP method issued from kubeproxy (used at client.request.count)
+        - name: request.verb
+          type: keyword
+          description: >
+            HTTP method issued from kubeproxy (used at sync.rules.latency.us)
         - name: request.url
           type: keyword
           description: >
