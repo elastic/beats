@@ -22,7 +22,7 @@ class Test(BaseTest):
         exit_code = functionbeat_proc.kill_and_wait()
         assert exit_code == 0
 
-    def test_export_function_template(self):
+    def test_export_function(self):
         """
         Test if the template can be exported
         """
@@ -56,8 +56,7 @@ class Test(BaseTest):
         )
 
         self.wait_until(lambda: self.log_contains("PASS"))
-        exit_code = functionbeat_proc.kill_and_wait()
-        assert exit_code == 0
+        functionbeat_proc.check_wait()
 
         function_template = self._get_generated_function_template()
         function_properties = function_template["Resources"][fnb_name]["Properties"]
@@ -68,7 +67,7 @@ class Test(BaseTest):
         assert function_properties["VpcConfig"]["SecurityGroupIds"] == security_group_ids
         assert function_properties["VpcConfig"]["SubnetIds"] == subnet_ids
 
-    def test_export_function_template_with_invalid_configuration(self):
+    def test_export_function_invalid_conf(self):
         """
         Test if invalid configuration is exportable
         """
