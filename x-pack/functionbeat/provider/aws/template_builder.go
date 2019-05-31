@@ -37,6 +37,7 @@ type templateData struct {
 type defaultTemplateBuilder struct {
 	provider provider.Provider
 	log      *logp.Logger
+	endpoint string
 	bucket   string
 }
 
@@ -53,6 +54,7 @@ func NewTemplateBuilder(log *logp.Logger, cfg *common.Config, p provider.Provide
 	return &defaultTemplateBuilder{
 		provider: p,
 		log:      log,
+		endpoint: config.Endpoint,
 		bucket:   string(config.DeployBucket),
 	}, nil
 }
@@ -101,7 +103,7 @@ func (d *defaultTemplateBuilder) execute(name string) (templateData, error) {
 
 	templateChecksum := checksum(templateJSON)
 	templateKey := keyPrefix + name + "/" + templateChecksum + "/cloudformation-template-create.json"
-	templateURL := "https://" + d.bucket + "s3.amazonaws.com/" + templateKey
+	templateURL := "https://" + d.bucket + "." + d.endpoint + "/" + templateKey
 
 	return templateData{
 		json:     templateJSON,
