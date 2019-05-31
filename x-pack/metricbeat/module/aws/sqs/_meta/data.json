@@ -9,20 +9,23 @@
                 "not_visible": 0,
                 "received": 0,
                 "sent": 0,
-                "visible": 80
+                "visible": 0
             },
             "oldest_message_age": {
-                "sec": 83991
+                "sec": 0
             },
             "queue": {
-                "name": "elb-log-queue-20171218185917658900000001"
+                "name": "mb-test-log"
             },
-            "sent_message_size": {
-                "bytes": 976
-            }
+            "sent_message_size": {}
+        },
+        "tags": {
+            "dep": "eng",
+            "owner": "ks"
         }
     },
     "cloud": {
+        "provider": "aws",
         "region": "us-east-1"
     },
     "event": {

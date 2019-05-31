@@ -7,6 +7,9 @@ package aws
 import (
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/pkg/errors"
@@ -144,4 +147,23 @@ func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time
 	}
 
 	return timestamp
+}
+
+// GetS3Tags function calls GetBucketTagging api to get tags for specified bucket.
+func GetS3Tags(svc *s3.S3, bucketName string) ([]s3.Tag, error) {
+	getBucketTaggingInput := &s3.GetBucketTaggingInput{
+		Bucket: awssdk.String(bucketName),
+	}
+	req := svc.GetBucketTaggingRequest(getBucketTaggingInput)
+	output, err := req.Send()
+	if err != nil {
+		err = errors.Wrap(err, "Error GetBucketTagging")
+		return nil, err
+	}
+
+	var tagSet []s3.Tag
+	if output != nil {
+		tagSet = output.TagSet
+	}
+	return tagSet, nil
 }

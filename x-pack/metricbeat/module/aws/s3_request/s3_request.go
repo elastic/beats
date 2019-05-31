@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -108,9 +108,19 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// Create Cloudwatch Events for s3_request
 		bucketNames := getBucketNames(listMetricsOutputs)
+		svcS3 := s3.New(awsConfig)
 		for _, bucketName := range bucketNames {
-			event, err := createS3RequestEvents(metricDataOutputs, regionName, bucketName)
+			// Get tags for each bucket
+			tagSet, err := aws.GetS3Tags(svcS3, bucketName)
 			if err != nil {
+				err = errors.Wrap(err, "failed GetS3Tags")
+				m.Logger().Error(err.Error())
+			}
+
+			// Call createS3RequestEvent
+			event, err := createS3RequestEvent(metricDataOutputs, regionName, bucketName, tagSet)
+			if err != nil {
+				err = errors.Wrap(err, "failed createS3RequestEvent")
 				m.Logger().Error(err.Error())
 				event.Error = err
 				report.Event(event)
@@ -187,15 +197,10 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 	return metricDataQueries
 }
 
-// CreateS3Events creates s3_request and s3_daily_storage events from Cloudwatch metric data.
-func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	// Cloud fields in ECS
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
-	event.RootFields.Put("cloud.provider", "aws")
-
+// createS3RequestEvent creates s3_request event from Cloudwatch metric data per bucket.
+func createS3RequestEvent(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, tagSet []s3.Tag) (mb.Event, error) {
+	// Initialize event
+	event := aws.InitEvent(metricsetName, regionName)
 	// AWS s3_request metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 
@@ -219,10 +224,15 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS s3_request metricbeat module.")
-		return
+		return event, err
 	}
 
 	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
-	return
+
+	// Add tags
+	for _, tag := range tagSet {
+		event.ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+	}
+	return event, nil
 }

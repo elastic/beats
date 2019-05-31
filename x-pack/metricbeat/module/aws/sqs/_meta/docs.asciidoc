@@ -10,6 +10,7 @@ cloudwatch:GetMetricData
 cloudwatch:ListMetrics
 ec2:DescribeRegions
 sqs:ListQueues
+sqs:ListQueueTags
 ----
 
 [float]

@@ -3,12 +3,16 @@
     "aws": {
         "s3_daily_storage": {
             "bucket": {
-                "name": "test-s3-ks",
+                "name": "test-s3-ks-2",
                 "size": {
-                    "bytes": 1679631
+                    "bytes": 766083
                 }
             },
-            "number_of_objects": 3
+            "number_of_objects": 64
+        },
+        "tags": {
+            "dep": "eng",
+            "owner": "ks"
         }
     },
     "cloud": {

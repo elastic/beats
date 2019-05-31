@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	schemaRequestFields = s.Schema{
+	schemaMetricSetFields = s.Schema{
 		"oldest_message_age": s.Object{
 			"sec": c.Float("ApproximateAgeOfOldestMessage"),
 		},

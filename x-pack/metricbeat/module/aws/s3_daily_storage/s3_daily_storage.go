@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -106,8 +106,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// Create Cloudwatch Events for s3_daily_storage
 		bucketNames := getBucketNames(listMetricsOutputs)
+		svcS3 := s3.New(awsConfig)
 		for _, bucketName := range bucketNames {
-			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName)
+			// Get tags for each bucket
+			tagSet, err := aws.GetS3Tags(svcS3, bucketName)
+			if err != nil {
+				err = errors.Wrap(err, "failed GetS3Tags")
+				m.Logger().Error(err.Error())
+			}
+
+			// Call createS3DailyStorageEvent
+			event, err := createS3DailyStorageEvent(metricDataOutputs, regionName, bucketName, tagSet)
 			if err != nil {
 				err = errors.Wrap(err, "createCloudWatchEvents failed")
 				m.Logger().Error(err)
@@ -187,13 +196,10 @@ func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index
 	return
 }
 
-func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	// Cloud fields in ECS
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
-	event.RootFields.Put("cloud.provider", "aws")
+// createS3DailyStorageEvent creates s3_daily_storage event from Cloudwatch metric data per bucket.
+func createS3DailyStorageEvent(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, tagSet []s3.Tag) (event mb.Event, err error) {
+	// Initialize event
+	event = aws.InitEvent(metricsetName, regionName)
 
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
@@ -223,5 +229,10 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 
 	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
+
+	// Add tags
+	for _, tag := range tagSet {
+		event.ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+	}
 	return
 }
