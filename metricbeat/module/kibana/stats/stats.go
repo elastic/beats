@@ -131,13 +131,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	now := time.Now()
 
-	m.fetchStats(r, now)
+	err := m.fetchStats(r, now)
+	if err != nil {
+		if m.XPackEnabled {
+			m.Log.Error(err)
+		} else {
+			elastic.ReportAndLogError(err, r, m.Log)
+		}
+		return
+	}
+
 	if m.XPackEnabled {
-		m.fetchSettings(r, now)
+		err = m.fetchSettings(r, now)
+		if err != nil {
+			m.Log.Error(err)
+		}
 	}
 }
 
-func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
+func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 	// Collect usage stats only once every usageCollectionPeriod
 	if m.isUsageExcludable {
 		origURI := m.statsHTTP.GetURI()
@@ -152,39 +164,25 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) {
 
 	content, err := m.statsHTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return err
 	}
 
 	if m.XPackEnabled {
 		intervalMs := m.calculateIntervalMs()
-		err = eventMappingStatsXPack(r, intervalMs, now, content)
-		if err != nil {
-			m.Log.Error(err)
-			return
-		}
+		return eventMappingStatsXPack(r, intervalMs, now, content)
 	} else {
-		err = eventMapping(r, content)
-		if err != nil {
-			elastic.ReportAndLogError(err, r, m.Log)
-			return
-		}
+		return eventMapping(r, content)
 	}
 }
 
-func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
+func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) error {
 	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
-		m.Log.Error(err)
-		return
+		return err
 	}
 
 	intervalMs := m.calculateIntervalMs()
-	err = eventMappingSettingsXPack(r, intervalMs, now, content)
-	if err != nil {
-		m.Log.Error(err)
-		return
-	}
+	return eventMappingSettingsXPack(r, intervalMs, now, content)
 }
 
 func (m *MetricSet) calculateIntervalMs() int64 {
