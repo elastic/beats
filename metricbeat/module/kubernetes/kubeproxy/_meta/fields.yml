@@ -5,28 +5,6 @@
   release: beta
   fields:
 
-    # - name: status_code
-    #   type: keyword
-    #   description: >
-    #     HTTP Code returned to kubeproxy
-    # - name: host
-    #   type: keyword
-    #   description: >
-    #     Host addressing the request from kubeproxy
-    # - name: method
-    #   type: keyword
-    #   description: >
-    #     HTTP method issued from kubeproxy
-    # - name: verb
-    #   type: keyword
-    #   description: >
-    #     HTTP verb issued from kubeproxy
-    # - name: url
-    #   type: keyword
-    #   description: >
-    #     URL requested from kubeproxy
-
-
     - name: client
       type: group
       description: >
