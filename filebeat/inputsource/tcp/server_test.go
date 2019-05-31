@@ -53,7 +53,7 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 func TestReceiveEventsAndMetadata(t *testing.T) {
 	expectedMessages := generateMessages(5, 100)
 	largeMessages := generateMessages(10, 4096)
-	extraLargeMessages := generateMessages(1, 100000)
+	extraLargeMessages := generateMessages(1, 700000)
 
 	tests := []struct {
 		name             string
