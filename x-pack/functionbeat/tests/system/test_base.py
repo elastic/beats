@@ -56,9 +56,7 @@ class Test(BaseTest):
         )
 
         self.wait_until(lambda: self.log_contains("PASS"))
-        exit_code = functionbeat_proc.kill_and_wait()
-        print(exit_code)
-        assert exit_code == 0
+        functionbeat_proc.check_wait()
 
         function_template = self._get_generated_function_template()
         function_properties = function_template["Resources"][fnb_name]["Properties"]
