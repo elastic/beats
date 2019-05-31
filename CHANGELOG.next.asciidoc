@@ -65,6 +65,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 - Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
 - Require certificate authorities, certificate file, and key when SSL is enabled for module http metricset server. {pull}12355[12355]
+- In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12353[12353]
 
 *Packetbeat*
 
