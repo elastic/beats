@@ -6,7 +6,6 @@ package tablespace
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/pkg/errors"
 
@@ -72,7 +71,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
+// Close the connection to Oracle
 func (m *MetricSet) Close() error {
-	fmt.Println("closing")
 	return m.db.Close()
 }

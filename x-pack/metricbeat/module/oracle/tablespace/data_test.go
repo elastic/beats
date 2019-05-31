@@ -1,10 +1,15 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package tablespace
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestEventMapping(t *testing.T) {
@@ -16,6 +21,7 @@ func TestEventMapping(t *testing.T) {
 
 		fmt.Printf("Total %d events\n", len(events))
 		for _, event := range events {
+			//TODO
 			pretty.Println(event.MetricSetFields)
 		}
 	})

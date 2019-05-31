@@ -7,8 +7,9 @@
 package tablespace
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	_ "gopkg.in/goracle.v2"
 

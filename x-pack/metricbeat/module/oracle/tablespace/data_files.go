@@ -15,7 +15,7 @@ type dataFile struct {
 	FileName              sql.NullString
 	FileID                sql.NullInt64
 	TablespaceName        sql.NullString
-	TotalSizeBytes        sql.NullInt64
+	FileSizeBytes         sql.NullInt64
 	Status                sql.NullString
 	MaxFileSizeBytes      sql.NullInt64
 	AvailableForUserBytes sql.NullInt64
@@ -40,7 +40,7 @@ func (e *tablespaceExtractor) dataFilesData() ([]dataFile, error) {
 
 	for rows.Next() {
 		dest := dataFile{}
-		if err = rows.Scan(&dest.FileName, &dest.FileID, &dest.TablespaceName, &dest.TotalSizeBytes, &dest.Status, &dest.MaxFileSizeBytes, &dest.AvailableForUserBytes, &dest.OnlineStatus); err != nil {
+		if err = rows.Scan(&dest.FileName, &dest.FileID, &dest.TablespaceName, &dest.FileSizeBytes, &dest.Status, &dest.MaxFileSizeBytes, &dest.AvailableForUserBytes, &dest.OnlineStatus); err != nil {
 			return nil, err
 		}
 		results = append(results, dest)

@@ -13,7 +13,7 @@ import (
 type tempFreeSpace struct {
 	TablespaceName string
 	TablespaceSize sql.NullInt64
-	AllocatedSpace sql.NullInt64
+	UsedSpaceBytes sql.NullInt64
 	FreeSpace      sql.NullInt64
 }
 
@@ -35,7 +35,7 @@ func (e *tablespaceExtractor) tempFreeSpaceData() ([]tempFreeSpace, error) {
 
 	for rows.Next() {
 		dest := tempFreeSpace{}
-		if err = rows.Scan(&dest.TablespaceName, &dest.TablespaceSize, &dest.AllocatedSpace, &dest.FreeSpace); err != nil {
+		if err = rows.Scan(&dest.TablespaceName, &dest.TablespaceSize, &dest.UsedSpaceBytes, &dest.FreeSpace); err != nil {
 			return nil, err
 		}
 		results = append(results, dest)
