@@ -272,12 +272,12 @@ var (
 
 	additionalSchema = s.Schema{
 		"second_string": c.Str("secondString"),
-		"second_int": ": c.Int("secondInt")
+		"second_int": ": c.Int("secondInt"),
 	}
 )
 
 	data, err := schema.apply(input)
-	if err {
+	if err != nil {
 		return err
 	}
 
