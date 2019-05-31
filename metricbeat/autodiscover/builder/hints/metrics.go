@@ -50,7 +50,7 @@ const (
 
 type metricHints struct {
 	Key      string
-	Registry mb.ModulesRegistry
+	Registry *mb.Register
 }
 
 // NewMetricHints builds a new metrics builder based on hints

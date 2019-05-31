@@ -21,7 +21,7 @@ import "github.com/elastic/beats/metricbeat/mb"
 
 type config struct {
 	Key      string `config:"key"`
-	Registry mb.ModulesRegistry
+	Registry *mb.Register
 }
 
 func defaultConfig() config {

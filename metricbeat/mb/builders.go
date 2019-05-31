@@ -47,7 +47,7 @@ var (
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
 // returns a Module and its configured MetricSets or an error.
-func NewModule(config *common.Config, r ModulesRegistry) (Module, []MetricSet, error) {
+func NewModule(config *common.Config, r *Register) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
 	}
@@ -97,7 +97,7 @@ func newBaseModuleFromConfig(rawConfig *common.Config) (BaseModule, error) {
 	return baseModule, nil
 }
 
-func createModule(r ModulesRegistry, bm BaseModule) (Module, error) {
+func createModule(r *Register, bm BaseModule) (Module, error) {
 	f := r.moduleFactory(bm.Name())
 	if f == nil {
 		f = DefaultModuleFactory
@@ -106,7 +106,7 @@ func createModule(r ModulesRegistry, bm BaseModule) (Module, error) {
 	return f(bm)
 }
 
-func initMetricSets(r ModulesRegistry, m Module) ([]MetricSet, error) {
+func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 	var (
 		errs       multierror.Errors
 		metricsets []MetricSet
@@ -157,7 +157,7 @@ func initMetricSets(r ModulesRegistry, m Module) ([]MetricSet, error) {
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined
 // in the module's config. An error is returned if no MetricSets are specified
 // in the module's config and no default MetricSet is defined.
-func newBaseMetricSets(r ModulesRegistry, m Module) ([]BaseMetricSet, error) {
+func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 	hosts := []string{""}
 	if l := m.Config().Hosts; len(l) > 0 {
 		hosts = l
