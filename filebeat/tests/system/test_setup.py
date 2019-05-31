@@ -27,18 +27,23 @@ class Test(BaseTest):
         """
         self.init()
         self.render_config_template(
+            modules=True,
             elasticsearch={
                 "host": self.get_elasticsearch_url(),
-            }
+            },
         )
 
-        copyfile(self.beat_path + "/tests/system/input/system.yml", self.beat_path + "/modules.d/system.yml")
+        modules_d_path = self.working_dir + "/modules.d"
+        if not os.path.isdir(modules_d_path):
+            os.mkdir(modules_d_path)
+        copyfile(self.beat_path + "/tests/system/input/system.yml", modules_d_path + "/system.yml")
 
         beat_setup_modules_pipelines = self.start_beat(
             extra_args=[
                 "setup",
-                "-path.home", self.beat_path,
                 "--pipelines",
+                "-path.home=" + self.beat_path,
+                "-E", "filebeat.config.modules.path=" + modules_d_path + "/*.yml",
             ],
             configure_home=False,
         )
@@ -49,7 +54,7 @@ class Test(BaseTest):
         system_syslog_pipeline = self.es.transport.perform_request("GET",
                                                                    "/_ingest/pipeline/" + system_syslog_pipeline_name)
 
-        assert "timezone" in system_syslog_pipeline[system_syslog_pipeline_name]["processors"][3]["date"]
+        assert "timezone" in system_syslog_pipeline[system_syslog_pipeline_name]["processors"][4]["date"]
 
         system_auth_pipeline_name = "filebeat-" + version + "-system-auth-pipeline"
         system_auth_pipeline = self.es.transport.perform_request("GET",

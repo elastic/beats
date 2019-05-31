@@ -81,5 +81,5 @@ func (sr *SetupCfgRunner) Stop() {}
 
 // String returns information on the Runner
 func (sr *SetupCfgRunner) String() string {
-	return "Setting up:\n" + sr.moduleRegistry.InfoString()
+	return sr.moduleRegistry.InfoString()
 }
