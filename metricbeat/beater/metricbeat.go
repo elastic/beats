@@ -99,6 +99,9 @@ func DefaultCreator() beat.Creator {
 
 // newMetricbeat creates and returns a new Metricbeat instance.
 func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbeat, error) {
+	// Add light modules support
+	mb.Registry.SetChild(mb.NewLightModulesRegistry("module"))
+
 	// List all registered modules and metricsets.
 	logp.Debug("modules", "%s", mb.Registry.String())
 

@@ -18,108 +18,198 @@
 package mb
 
 import (
-	"fmt"
-	"sort"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
-// LigthModulesRegistry wraps
-type LightModulesRegistry struct {
-	ModulesRegistry
+const (
+	moduleYML   = "module.yml"
+	manifestYML = "manifest.yml"
+)
 
+// LightModulesRegistry reads module definitions from files
+type LightModulesRegistry struct {
 	paths []string
 }
 
 // NewLightModulesRegistry creates a new LightModulesRegistry
 func NewLightModulesRegistry(paths ...string) *LightModulesRegistry {
 	return &LightModulesRegistry{
-		ModulesRegistry: NewRegister(),
-		paths:           paths,
+		paths: paths,
 	}
 }
 
-func (r *LightModulesRegistry) DefaultMetricSets(module string) ([]string, error) {
-	if stringInSlice(module, r.parent().Modules()) {
-		return r.parent().DefaultMetricSets(module)
-	}
-	module, err := r.readModule(module)
+func (r *LightModulesRegistry) Modules() ([]string, error) {
+	return r.listModules()
+}
+
+func (r *LightModulesRegistry) DefaultMetricSets(moduleName string) ([]string, error) {
+	module, found, err := r.readModule(moduleName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get default metricsets for module '%s'", module)
 	}
-	var metricsets []string
-	for i, ms := range module.Metricsets {
-		if ms.Default {
-			metricsets = append(metricsets, ms)
-		}
+	if !found {
+		return nil, nil
 	}
-	if len(metricsets) == 0 {
-		return nil, fmt.Errorf("no default metricset exists for module '%s'", module)
+	var metricsets []string
+	for _, ms := range module.MetricSets {
+		if ms.Default {
+			metricsets = append(metricsets, ms.Name)
+		}
 	}
 	return metricsets, nil
 }
 
-func (r *LightModulesRegistry) Modules() []string {
-	registeredModules := r.parent().Modules()
-	modules := r.listModules()
-	return append(registeredModules, modules...)
+func (r *LightModulesRegistry) MetricSets(moduleName string) ([]string, error) {
+	module, found, err := r.readModule(moduleName)
+	if err != nil || !found {
+		return nil, errors.Wrapf(err, "failed to get metricsets for module '%s'", moduleName)
+	}
+	metricsets := make([]string, 0, len(module.MetricSets))
+	for _, ms := range module.MetricSets {
+		metricsets = append(metricsets, ms.Name)
+	}
+	return metricsets, nil
 }
 
-func (r *LightModulesRegistry) MetricSets(module string) []string {
-	if stringInSlice(module, r.parent().Modules()) {
-		return r.parent().MetricSets(module)
+func (r *LightModulesRegistry) MetricSetRegistration(parent *Register, module, name string) (MetricSetRegistration, bool, error) {
+	lightModule, found, err := r.readModule(module)
+	if err != nil || !found {
+		return MetricSetRegistration{}, found, err
 	}
-	module, err := r.readModule(module)
+
+	ms, found := lightModule.MetricSets[name]
+	if !found {
+		return MetricSetRegistration{}, false, nil
+	}
+
+	registration, err := ms.Registration(parent)
+	return registration, true, err
+}
+
+type lightModuleConfig struct {
+	Name       string   `config:"name"`
+	MetricSets []string `config:"metricsets"`
+}
+
+type LightModule struct {
+	Name       string
+	MetricSets map[string]LightMetricSet
+}
+
+type LightMetricSet struct {
+	Name    string
+	Module  string
+	Default bool `config:"default"`
+	Input   struct {
+		Module    string      `config:"module" validate:"required"`
+		MetricSet string      `config:"metricset" validate:"required"`
+		Defaults  interface{} `config:"defaults"`
+	} `config:"input" validate:"required"`
+}
+
+func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error) {
+	registration, err := r.metricSetRegistration(m.Input.Module, m.Input.MetricSet)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to get metricsets for module '%s'", module)
+		return registration, errors.Wrapf(err,
+			"failed to start light metricset '%s/%s' using '%s/%s' metricset as input",
+			m.Module, m.Name,
+			m.Input.Module, m.Input.MetricSet)
 	}
-	metricsets := make([]string, len(module.MetricSets))
-	for i := range module.Metricsets {
-		metricset[i] = module.MetricSets[i].Name
+
+	originalFactory := registration.Factory
+	registration.IsDefault = m.Default
+
+	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
+		baseModule := base.module.(*BaseModule)
+		baseModule.name = m.Module
+		baseModule.rawConfig.Merge(m.Input.Defaults)
+		base.name = m.Name
+
+		// At this point host parser was already run, we need to run this again
+		// with the overriden data
+		if registration.HostParser != nil {
+			base.hostData, err = registration.HostParser(baseModule, base.host)
+			if err != nil {
+				return nil, err
+			}
+			base.host = base.hostData.Host
+		}
+
+		return originalFactory(base)
 	}
-	return metricsets
+
+	return registration, nil
 }
 
-func (r *LightModulesRegistry) String() string {
-	var metricsets []string
-	modules := r.listModules()
-	for _, moduleName := range modules {
-		module, err := r.readModule(module)
+func (r *LightModulesRegistry) readModule(moduleName string) (*LightModule, bool, error) {
+	var modulePath string
+	for _, dir := range r.paths {
+		p := filepath.Join(dir, moduleName, moduleYML)
+		if _, err := os.Stat(p); err == nil {
+			modulePath = p
+			break
+		}
+	}
+	if len(modulePath) == 0 {
+		return nil, false, nil
+	}
+
+	c, err := common.LoadFile(modulePath)
+	if err != nil {
+		return nil, true, errors.Wrapf(err, "failed to load light module '%s' definition", moduleName)
+	}
+
+	var moduleConfig lightModuleConfig
+	if err = c.Unpack(&moduleConfig); err != nil {
+		return nil, true, errors.Wrapf(err, "failed to parse light module definition from '%s'", modulePath)
+	}
+
+	metricSets := make(map[string]LightMetricSet)
+	for _, metricSet := range moduleConfig.MetricSets {
+		manifestPath := filepath.Join(filepath.Dir(modulePath), metricSet, manifestYML)
+		c, err := common.LoadFile(manifestPath)
 		if err != nil {
-			continue
+			return nil, true, errors.Wrapf(err, "failed to load light metricset '%s/%s' definition", moduleName, metricSet)
 		}
-		for _, metricset := range module.MetricSets {
-			metricsets = append(metricsets, fmt.Sprintf("%s/%s", moduleName, metricset.Name))
+
+		metricSetConfig := LightMetricSet{
+			Name:   metricSet,
+			Module: moduleName,
 		}
+		if err := c.Unpack(&metricSetConfig); err != nil {
+			return nil, true, errors.Wrapf(err, "failed to parse metricset manifest from '%s'", manifestPath)
+		}
+		metricSets[metricSet] = metricSetConfig
 	}
-	sort.Strings(metricsets)
-	parent := r.parent().String()
-	if len(modules) == 0 {
-		return parent
-	}
-	return fmt.Sprintf("%s, Light Modules [MetricSets:[%s]]",
-		parent,
-		strings.Join(metricsets, ", "),
-	)
+
+	return &LightModule{Name: moduleName, MetricSets: metricSets}, true, nil
 }
 
-func (r *LightModulesRegistry) moduleFactory(name string) ModuleFactory {
-	return r.parent().moduleFactory(name)
-}
-
-func (r *LightModulesRegistry) metricSetRegistration(module, name string) (MetricSetRegistration, error) {
-	return r.parent().metricSetRegistration(module, name)
-}
-
-func (r *LightModulesRegistry) parent() ModulesRegistry {
-	return r.ModulesRegistry
-}
-
-func stringInSlice(s string, slice []string) bool {
-	for i := range slice {
-		if s == slice[i] {
-			return true
+func (r *LightModulesRegistry) listModules() ([]string, error) {
+	modules := make(map[string]bool)
+	for _, dir := range r.paths {
+		files, err := ioutil.ReadDir(dir)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to list modules on path '%s'", dir)
+		}
+		for _, f := range files {
+			modulePath := filepath.Join(dir, f.Name(), moduleYML)
+			if _, err := os.Stat(modulePath); os.IsNotExist(err) {
+				continue
+			}
+			modules[f.Name()] = true
 		}
 	}
-	return false
+
+	list := make([]string, 0, len(modules))
+	for m := range modules {
+		list = append(list, m)
+	}
+	return list, nil
 }

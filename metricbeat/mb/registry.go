@@ -23,6 +23,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -105,6 +107,16 @@ type Register struct {
 	modules map[string]ModuleFactory
 	// A map of module name to nested map of MetricSet name to MetricSetRegistration.
 	metricSets map[string]map[string]MetricSetRegistration
+	// Child registry that can contain additional modules
+	child ChildRegister
+}
+
+// ChildRegister contains an additional source of modules
+type ChildRegister interface {
+	Modules() ([]string, error)
+	MetricSets(module string) ([]string, error)
+	DefaultMetricSets(module string) ([]string, error)
+	MetricSetRegistration(parent *Register, module, name string) (MetricSetRegistration, bool, error)
 }
 
 // NewRegister creates and returns a new Register.
@@ -222,16 +234,24 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 	name = strings.ToLower(name)
 
 	metricSets, exists := r.metricSets[module]
-	if !exists {
-		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' is not registered, module not found", module, name)
+	if exists {
+		registration, exists := metricSets[name]
+		if exists {
+			return registration, nil
+		}
 	}
 
-	registration, exists := metricSets[name]
-	if !exists {
-		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' is not registered, metricset not found", module, name)
+	if r.child != nil {
+		registration, found, err := r.child.MetricSetRegistration(r, module, name)
+		if err != nil {
+			return MetricSetRegistration{}, err
+		}
+		if found {
+			return registration, nil
+		}
 	}
 
-	return registration, nil
+	return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", module, name)
 }
 
 // DefaultMetricSets returns the names of the default MetricSets for a module.
@@ -243,18 +263,30 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 
 	module = strings.ToLower(module)
 
-	metricSets, exists := r.metricSets[module]
-	if !exists {
-		return nil, fmt.Errorf("module '%s' not found", module)
-	}
-
 	var defaults []string
-	for _, reg := range metricSets {
-		if reg.IsDefault {
-			defaults = append(defaults, reg.Name)
+	metricSets, exists := r.metricSets[module]
+	if exists {
+		for _, reg := range metricSets {
+			if reg.IsDefault {
+				defaults = append(defaults, reg.Name)
+			}
 		}
 	}
 
+	if r.child != nil {
+		childDefaults, err := r.child.DefaultMetricSets(module)
+		if err != nil {
+			logp.Error(err)
+		}
+		if len(childDefaults) > 0 {
+			exists = true
+			defaults = append(defaults, childDefaults...)
+		}
+	}
+
+	if !exists {
+		return nil, fmt.Errorf("module '%s' not found", module)
+	}
 	if len(defaults) == 0 {
 		return nil, fmt.Errorf("no default metricset exists for module '%s'", module)
 	}
@@ -271,6 +303,14 @@ func (r *Register) Modules() []string {
 		modules = append(modules, module)
 	}
 
+	if r.child != nil {
+		childModules, err := r.child.Modules()
+		if err != nil {
+			logp.Error(err)
+		}
+		modules = append(modules, childModules...)
+	}
+
 	return modules
 }
 
@@ -279,9 +319,10 @@ func (r *Register) MetricSets(module string) []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	var metricsets []string
+	module = strings.ToLower(module)
 
-	sets, ok := r.metricSets[strings.ToLower(module)]
+	var metricsets []string
+	sets, ok := r.metricSets[module]
 	if ok {
 		metricsets = make([]string, 0, len(sets))
 		for name := range sets {
@@ -289,7 +330,23 @@ func (r *Register) MetricSets(module string) []string {
 		}
 	}
 
+	if r.child != nil {
+		childMetricSets, err := r.child.MetricSets(module)
+		if err != nil {
+			logp.Error(errors.Wrap(err, "failed to get metricsets from child registry"))
+		}
+		metricsets = append(metricsets, childMetricSets...)
+	}
+
 	return metricsets
+}
+
+// SetChild sets a child register with an additional source of modules
+func (r *Register) SetChild(child ChildRegister) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+
+	r.child = child
 }
 
 // String return a string representation of the registered ModuleFactory's and
@@ -302,7 +359,6 @@ func (r *Register) String() string {
 	for module := range r.modules {
 		modules = append(modules, module)
 	}
-	sort.Strings(modules)
 
 	var metricSets []string
 	for module, m := range r.metricSets {
@@ -310,8 +366,21 @@ func (r *Register) String() string {
 			metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 		}
 	}
-	sort.Strings(metricSets)
 
+	if r.child != nil {
+		childModules, _ := r.child.Modules()
+		modules = append(modules, childModules...)
+
+		for _, module := range childModules {
+			childMetricSets, _ := r.child.MetricSets(module)
+			for _, name := range childMetricSets {
+				metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
+			}
+		}
+	}
+
+	sort.Strings(modules)
+	sort.Strings(metricSets)
 	return fmt.Sprintf("Register [ModuleFactory:[%s], MetricSetFactory:[%s]]",
 		strings.Join(modules, ", "), strings.Join(metricSets, ", "))
 }
