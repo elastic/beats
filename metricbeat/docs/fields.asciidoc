@@ -13350,6 +13350,191 @@ UUID version of the object
 --
 
 [float]
+== kubeproxy fields
+
+Kubernetes proxy server metrics
+
+
+
+[float]
+== client fields
+
+kubeproxy HTTP client labels
+
+
+
+*`kubernetes.kubeproxy.client.request.status_code`*::
++
+--
+type: keyword
+
+HTTP Code returned to kubeproxy
+
+
+--
+
+*`kubernetes.kubeproxy.client.request.host`*::
++
+--
+type: keyword
+
+Host addressing the request from kubeproxy
+
+
+--
+
+*`kubernetes.kubeproxy.client.request.method`*::
++
+--
+type: keyword
+
+HTTP method issued from kubeproxy (used at client.request.count)
+
+
+--
+
+*`kubernetes.kubeproxy.client.request.verb`*::
++
+--
+type: keyword
+
+HTTP method issued from kubeproxy (used at sync.rules.latency.us)
+
+
+--
+
+*`kubernetes.kubeproxy.client.request.url`*::
++
+--
+type: keyword
+
+URL requested from kubeproxy
+
+
+--
+
+[float]
+== process fields
+
+kubeproxy process metrics
+
+
+
+*`kubernetes.kubeproxy.process.cpu.sec`*::
++
+--
+type: long
+
+Total user and system CPU time spent in seconds
+
+
+--
+
+*`kubernetes.kubeproxy.process.memory.resident.bytes`*::
++
+--
+type: long
+
+Resident memory size in bytes
+
+
+--
+
+*`kubernetes.kubeproxy.process.memory.virtual.bytes`*::
++
+--
+type: long
+
+Resident memory size in bytes
+
+
+--
+
+[float]
+== client fields
+
+kubeproxy REST client metrics
+
+
+
+*`kubernetes.kubeproxy.client.request.latency.us.sum`*::
++
+--
+type: long
+
+Requests latency, sum of latencies in microseconds
+
+
+--
+
+*`kubernetes.kubeproxy.client.request.latency.us.count`*::
++
+--
+type: long
+
+Request latency, number of requests
+
+
+--
+
+*`kubernetes.kubeproxy.client.request.latency.us.bucket.*`*::
++
+--
+type: object
+
+Request latency, histogram buckets
+
+
+--
+
+*`kubernetes.kubeproxy.client.request.count`*::
++
+--
+type: long
+
+Number of HTTP requests, partitioned by status code, method, and host
+
+
+--
+
+[float]
+== sync fields
+
+kubeproxy proxy rules metrics
+
+
+
+*`kubernetes.kubeproxy.sync.rules.latency.us.sum`*::
++
+--
+type: long
+
+SyncProxyRules latency, sum of latencies in microseconds
+
+
+--
+
+*`kubernetes.kubeproxy.sync.rules.latency.us.count`*::
++
+--
+type: long
+
+SyncProxyRules latency, number of operations
+
+
+--
+
+*`kubernetes.kubeproxy.sync.rules.latency.us.bucket.*`*::
++
+--
+type: object
+
+SyncProxyRules latency, histogram buckets
+
+
+--
+
+[float]
 == node fields
 
 kubernetes node metrics

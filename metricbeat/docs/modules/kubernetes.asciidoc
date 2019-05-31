@@ -85,6 +85,14 @@ metricbeat.modules:
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+# Kubernetes proxy server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - kubeproxy
+  hosts: ["localhost:10249"]
+  period: 10s
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
@@ -100,6 +108,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-kubernetes-container,container>>
 
 * <<metricbeat-metricset-kubernetes-event,event>>
+
+* <<metricbeat-metricset-kubernetes-kubeproxy,kubeproxy>>
 
 * <<metricbeat-metricset-kubernetes-node,node>>
 
@@ -126,6 +136,8 @@ include::kubernetes/apiserver.asciidoc[]
 include::kubernetes/container.asciidoc[]
 
 include::kubernetes/event.asciidoc[]
+
+include::kubernetes/kubeproxy.asciidoc[]
 
 include::kubernetes/node.asciidoc[]
 
