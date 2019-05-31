@@ -35,7 +35,11 @@ import (
 
 // Select Docker API version
 const (
-	shortIDLen = 12
+	shortIDLen                         = 12
+	dockerRequestTimeout               = 10 * time.Second
+	dockerWatchRequestTimeout          = 60 * time.Minute
+	dockerEventsWatchPityTimerInterval = 10 * time.Second
+	dockerEventsWatchPityTimerTimeout  = 10 * time.Minute
 )
 
 // Watcher reads docker events and keeps a list of known containers
@@ -68,16 +72,17 @@ type TLSConfig struct {
 
 type watcher struct {
 	sync.RWMutex
-	client             Client
-	ctx                context.Context
-	stop               context.CancelFunc
-	containers         map[string]*Container
-	deleted            map[string]time.Time // deleted annotations key -> last access time
-	cleanupTimeout     time.Duration
-	lastValidTimestamp int64
-	stopped            sync.WaitGroup
-	bus                bus.Bus
-	shortID            bool // whether to store short ID in "containers" too
+	client                     Client
+	ctx                        context.Context
+	stop                       context.CancelFunc
+	containers                 map[string]*Container
+	deleted                    map[string]time.Time // deleted annotations key -> last access time
+	cleanupTimeout             time.Duration
+	lastValidTimestamp         int64
+	lastWatchReceivedEventTime time.Time
+	stopped                    sync.WaitGroup
+	bus                        bus.Bus
+	shortID                    bool // whether to store short ID in "containers" too
 }
 
 // Container info retrieved by the watcher
@@ -231,13 +236,15 @@ func (w *watcher) watch() {
 		}
 
 		logp.Debug("docker", "Fetching events since %s", options.Since)
-		ctx, cancel := context.WithTimeout(w.ctx, 60*time.Minute)
+		ctx, cancel := context.WithTimeout(w.ctx, dockerWatchRequestTimeout)
 		defer cancel()
 
 		events, errors := w.client.Events(ctx, options)
 
 		//ticker for timeout to restart watcher when no events are received
-		tickChan := time.NewTicker(10 * time.Second)
+		w.lastWatchReceivedEventTime = time.Now()
+		tickChan := time.NewTicker(dockerEventsWatchPityTimerInterval)
+		defer tickChan.Stop()
 
 	WATCH:
 		for {
@@ -245,6 +252,7 @@ func (w *watcher) watch() {
 			case event := <-events:
 				logp.Debug("docker", "Got a new docker event: %v", event)
 				w.lastValidTimestamp = event.Time
+				w.lastWatchReceivedEventTime = time.Now()
 
 				// Add / update
 				if event.Action == "start" || event.Action == "update" {
@@ -297,9 +305,8 @@ func (w *watcher) watch() {
 				break WATCH
 
 			case <-tickChan.C:
-				if time.Since(time.Unix(w.lastValidTimestamp, 0)) > 10*time.Minute {
-					logp.Info("No events received withing 10 minutes, restarting watch call")
-					w.lastValidTimestamp = time.Now().Unix()
+				if time.Since(w.lastWatchReceivedEventTime) > dockerEventsWatchPityTimerTimeout {
+					logp.Info("No events received withing %s, restarting watch call", dockerEventsWatchPityTimerTimeout)
 					time.Sleep(1 * time.Second)
 					break WATCH
 				}
@@ -307,18 +314,16 @@ func (w *watcher) watch() {
 			case <-w.ctx.Done():
 				logp.Debug("docker", "Watcher stopped")
 				w.stopped.Done()
-				tickChan.Stop()
 				return
 			}
 		}
 
-		tickChan.Stop()
 	}
 }
 
 func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Container, error) {
 	logp.Debug("docker", "List containers")
-	ctx, cancel := context.WithTimeout(w.ctx, 10*time.Second)
+	ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
 	defer cancel()
 
 	containers, err := w.client.ContainerList(ctx, options)
@@ -339,7 +344,7 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 		// Inspect the container directly and use the hostname as the IP address in order
 		if len(ipaddresses) == 0 {
 			logp.Debug("docker", "Inspect container %s", c.ID)
-			ctx, cancel := context.WithTimeout(w.ctx, 10*time.Second)
+			ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
 			defer cancel()
 			info, err := w.client.ContainerInspect(ctx, c.ID)
 			if err == nil {
