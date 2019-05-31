@@ -2544,6 +2544,16 @@ Name of the project in Google Cloud.
 
 --
 
+*`cloud.image.id`*::
++
+--
+example: ami-abcd1234
+
+Image ID for the cloud instance.
+
+
+--
+
 *`meta.cloud.provider`*::
 +
 --
@@ -6861,6 +6871,16 @@ IP addresses.
 `os` contains information about the operating system.
 
 
+
+*`system.audit.host.os.codename`*::
++
+--
+type: keyword
+
+OS codename, if any (e.g. stretch).
+
+
+--
 
 *`system.audit.host.os.platform`*::
 +

@@ -62,8 +62,8 @@ type countACK struct {
 	fn       func(total, acked int)
 }
 
-func newCountACK(fn func(total, acked int)) *countACK {
-	a := &countACK{fn: fn}
+func newCountACK(pipeline *Pipeline, fn func(total, acked int)) *countACK {
+	a := &countACK{fn: fn, pipeline: pipeline}
 	return a
 }
 
@@ -358,7 +358,7 @@ func makeCountACK(pipeline *Pipeline, canDrop bool, sema *sema, fn func(int, int
 	if canDrop {
 		return newBoundGapCountACK(pipeline, sema, fn)
 	}
-	return newCountACK(fn)
+	return newCountACK(pipeline, fn)
 }
 
 func (a *eventDataACK) close() {

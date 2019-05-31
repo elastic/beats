@@ -49,11 +49,12 @@ type DockerJSONReader struct {
 }
 
 type logLine struct {
-	Partial   bool      `json:"-"`
-	Timestamp time.Time `json:"-"`
-	Time      string    `json:"time"`
-	Stream    string    `json:"stream"`
-	Log       string    `json:"log"`
+	Partial   bool              `json:"-"`
+	Timestamp time.Time         `json:"-"`
+	Time      string            `json:"time"`
+	Stream    string            `json:"stream"`
+	Log       string            `json:"log"`
+	Attrs     map[string]string `json:"attrs"`
 }
 
 // New creates a new reader renaming a field
@@ -158,6 +159,15 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 	message.AddFields(common.MapStr{
 		"stream": msg.Stream,
 	})
+
+	if len(msg.Attrs) > 0 {
+		message.AddFields(common.MapStr{
+			"docker": common.MapStr{
+				"attrs": msg.Attrs,
+			},
+		})
+	}
+
 	message.Content = []byte(msg.Log)
 	msg.Partial = (len(message.Content) == 0) || (message.Content[len(message.Content)-1] != byte('\n'))
 	return nil

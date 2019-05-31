@@ -28,8 +28,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -41,7 +41,7 @@ func TestFetch(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
