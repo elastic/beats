@@ -427,21 +427,26 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 }
 
 func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction) mb.Event {
-	return mb.Event{
+	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"kind":   eventType,
 				"action": action.String(),
 			},
 			"user": common.MapStr{
-				"entity_id": user.entityID(ms.HostID()),
-				"id":        user.UID,
-				"name":      user.Name,
+				"id":   user.UID,
+				"name": user.Name,
 			},
 			"message": userMessage(user, action),
 		},
 		MetricSetFields: user.toMapStr(),
 	}
+
+	if ms.HostID() != "" {
+		event.RootFields.Put("user.entity_id", user.entityID(ms.HostID()))
+	}
+
+	return event
 }
 
 func userMessage(user *User, action eventAction) string {

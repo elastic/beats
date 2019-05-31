@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix formatting of config files on macOS and Windows. {pull}12148[12148]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 - Package dataset: Auto-detect package directories. {pull}12289[12289]
+- System module: Start system module without host ID. {pull}12373[12373]
 
 *Filebeat*
 
