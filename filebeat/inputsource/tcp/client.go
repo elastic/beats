@@ -73,7 +73,9 @@ func (c *client) handle() error {
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
 	scanner.Split(c.splitFunc)
-
+	//16 is ratio of MaxScanTokenSize/startBufSize
+	buffer := make([]byte, c.maxMessageSize/16)
+	scanner.Buffer(buffer, int(c.maxMessageSize))
 	for scanner.Scan() {
 		err := scanner.Err()
 		if err != nil {
