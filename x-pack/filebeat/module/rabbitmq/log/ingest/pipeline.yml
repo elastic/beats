@@ -16,9 +16,11 @@ processors:
     formats:
     - yy-MM-dd HH:mm:ss.SSS
     ignore_failure: true
-    #{< if .convert_timezone >}
+- date:
+    if: "ctx.event.timezone != null"
+    field: "@timestamp"
+    formats: ["ISO8601"]
     timezone: "{{ event.timezone }}"
-    #{< end >}
 - remove:
     field:
     - timestamp

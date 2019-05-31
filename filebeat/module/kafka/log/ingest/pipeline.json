@@ -62,9 +62,17 @@
         "field": "kafka.log.timestamp",
         "target_field": "@timestamp",
         "formats": ["yyyy-MM-dd HH:mm:ss,SSS"],
-        {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
         "ignore_failure": true
       }
+    },
+    {
+      "date": {
+        "if": "ctx.event.timezone != null",
+        "field": "@timestamp",
+        "formats": ["ISO8601"],
+        "timezone": "{{ event.timezone }}",
+          "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+        }
     },
     {"remove": {"field": "kafka.log.timestamp" }}
   ],

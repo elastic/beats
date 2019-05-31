@@ -19,8 +19,11 @@ package tlscommon
 
 import (
 	"crypto/tls"
+	"errors"
 
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // ServerConfig defines the user configurable tls options for any TCP based service.
@@ -87,6 +90,26 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 		CurvePreferences: curves,
 		ClientAuth:       tls.ClientAuthType(config.ClientAuth),
 	}, nil
+}
+
+// Unpack unpacks the TLS Server configuration.
+func (c *ServerConfig) Unpack(cfg common.Config) error {
+	clientAuthKey := "client_authentication"
+	if !cfg.HasField(clientAuthKey) {
+		cfg.SetString(clientAuthKey, -1, "required")
+	}
+	type serverCfg ServerConfig
+	var sCfg serverCfg
+	if err := cfg.Unpack(&sCfg); err != nil {
+		return err
+	}
+
+	if sCfg.VerificationMode != VerifyNone && len(sCfg.CAs) == 0 {
+		return errors.New("certificate_authorities not configured")
+	}
+
+	*c = ServerConfig(sCfg)
+	return nil
 }
 
 // Validate values the TLSConfig struct making sure certificate sure we have both a certificate and

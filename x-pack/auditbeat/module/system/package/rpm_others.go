@@ -12,3 +12,7 @@ import "github.com/pkg/errors"
 func listRPMPackages() ([]*Package, error) {
 	return nil, errors.New("listing RPM packages is only supported on Linux")
 }
+
+func closeDataset() error {
+	return nil
+}
