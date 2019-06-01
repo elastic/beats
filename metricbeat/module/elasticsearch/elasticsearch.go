@@ -42,18 +42,26 @@ func init() {
 }
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	// Validate that at least one host has been specified.
+	if err := validateXPackMetricsets(base); err != nil {
+		return nil, err
+	}
+
+	return &base, nil
+}
+
+// Validate that correct metricsets have been specified if xpack.enabled = true.
+func validateXPackMetricsets(base mb.BaseModule) error {
 	config := struct {
 		Metricsets   []string `config:"metricsets"`
 		XPackEnabled bool     `config:"xpack.enabled"`
 	}{}
 	if err := base.UnpackConfig(&config); err != nil {
-		return nil, err
+		return err
 	}
 
 	// Nothing to validate if xpack.enabled != true
 	if !config.XPackEnabled {
-		return &base, nil
+		return nil
 	}
 
 	expectedXPackMetricsets := []string{
@@ -68,10 +76,10 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	}
 
 	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
-		return nil, errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
+		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
 	}
 
-	return &base, nil
+	return nil
 }
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
