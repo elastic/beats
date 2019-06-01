@@ -128,11 +128,16 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
 		baseModule := base.module.(*BaseModule)
 		baseModule.name = m.Module
-		baseModule.rawConfig.Merge(m.Input.Defaults)
 		base.name = m.Name
 
+		// Override defaults
+		config, _ := common.NewConfigFrom(m.Input.Defaults)
+		config.Merge(baseModule.rawConfig)
+		config.Unpack(&baseModule.config)
+		baseModule.rawConfig = config
+
 		// At this point host parser was already run, we need to run this again
-		// with the overriden data
+		// with the overriden defaults
 		if registration.HostParser != nil {
 			base.hostData, err = registration.HostParser(baseModule, base.host)
 			if err != nil {
