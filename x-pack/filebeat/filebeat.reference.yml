@@ -313,6 +313,16 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#-------------------------------- Mssql Module --------------------------------
+- module: mssql
+  # Fileset for native deployment
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
   # Error logs
@@ -403,9 +413,9 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
-#------------------------------ Palo_alto Module ------------------------------
-- module: palo_alto
-  pan_os:
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  panos:
     enabled: true
 
     # Set which input to use between syslog (default) or file.
@@ -430,10 +440,10 @@ filebeat.modules:
     #input:
 
 #------------------------------- RabbitMQ Module -------------------------------
-#- module: rabbitmq
+- module: rabbitmq
   # All logs
-  #log:
-    #enabled: true
+  log:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

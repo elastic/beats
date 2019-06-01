@@ -221,8 +221,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def render_config_template(self, template_name=None,
                                output=None, **kargs):
 
-        print("render config")
-
         # Init defaults
         if template_name is None:
             template_name = self.beat_name
@@ -357,6 +355,18 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         with open(os.path.join(self.working_dir, logfile), 'r') as f:
             data = f.read()
+
+        return data
+
+    def get_log_lines(self, logfile=None):
+        """
+        Returns the log lines as a list of strings
+        """
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+            data = f.readlines()
 
         return data
 

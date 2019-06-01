@@ -17,12 +17,13 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-kibana>>
   * <<filebeat-module-logstash>>
   * <<filebeat-module-mongodb>>
+  * <<filebeat-module-mssql>>
   * <<filebeat-module-mysql>>
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-osquery>>
-  * <<filebeat-module-palo_alto>>
+  * <<filebeat-module-panw>>
   * <<filebeat-module-postgresql>>
   * <<filebeat-module-rabbitmq>>
   * <<filebeat-module-redis>>
@@ -50,12 +51,13 @@ include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/mongodb.asciidoc[]
+include::modules/mssql.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/osquery.asciidoc[]
-include::modules/palo_alto.asciidoc[]
+include::modules/panw.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/redis.asciidoc[]

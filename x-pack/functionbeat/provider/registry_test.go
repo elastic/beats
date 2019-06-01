@@ -35,6 +35,8 @@ func (m *mockProvider) Name() string { return m.name }
 
 func (m *mockProvider) CLIManager() (CLIManager, error) { return nil, nil }
 
+func (m *mockProvider) TemplateBuilder() (TemplateBuilder, error) { return nil, nil }
+
 func TestRegistry(t *testing.T) {
 	t.Run("provider", testProviderLookup)
 	t.Run("functions", testFunctionLookup)
