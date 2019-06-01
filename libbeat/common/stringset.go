@@ -50,6 +50,7 @@ func (set StringSet) Has(s string) (exists bool) {
 	return
 }
 
+// Equals compares this StringSet with another StringSet.
 func (set StringSet) Equals(anotherSet StringSet) bool {
 	if set.Count() != anotherSet.Count() {
 		return false

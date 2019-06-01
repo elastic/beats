@@ -41,6 +41,7 @@ func init() {
 	}
 }
 
+// NewModule creates a new module after performing validation.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	if err := validateXPackMetricsets(base); err != nil {
 		return nil, err
