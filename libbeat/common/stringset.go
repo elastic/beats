@@ -49,3 +49,17 @@ func (set StringSet) Has(s string) (exists bool) {
 	}
 	return
 }
+
+func (set StringSet) Equals(anotherSet StringSet) bool {
+	if set.Count() != anotherSet.Count() {
+		return false
+	}
+
+	for k := range set {
+		if !anotherSet.Has(k) {
+			return false
+		}
+	}
+
+	return true
+}

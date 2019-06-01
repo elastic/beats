@@ -25,12 +25,54 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 )
+
+func init() {
+	// Register the ModuleFactory function for the "elasticsearch" module.
+	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
+		panic(err)
+	}
+}
+
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	// Validate that at least one host has been specified.
+	config := struct {
+		Metricsets   []string `config:"metricsets"`
+		XPackEnabled bool     `config:"xpack.enabled"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	// Nothing to validate if xpack.enabled != true
+	if !config.XPackEnabled {
+		return &base, nil
+	}
+
+	expectedXPackMetricsets := []string{
+		"ccr",
+		"cluster_stats",
+		"index",
+		"index_recovery",
+		"index_summary",
+		"ml_job",
+		"node_stats",
+		"shard",
+	}
+
+	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
+		return nil, errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
+	}
+
+	return &base, nil
+}
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
 var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
