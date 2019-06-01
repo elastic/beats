@@ -63,7 +63,6 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	t.Skip("flaky")
 	compose.EnsureUp(t, "elasticsearch")
 
 	host := net.JoinHostPort(getEnvHost(), getEnvPort())
@@ -101,7 +100,6 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	t.Skip("flaky")
 	compose.EnsureUp(t, "elasticsearch")
 
 	host := net.JoinHostPort(getEnvHost(), getEnvPort())
