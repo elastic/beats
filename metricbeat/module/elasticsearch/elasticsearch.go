@@ -35,7 +35,7 @@ import (
 )
 
 func init() {
-	// Register the ModuleFactory function for the "elasticsearch" module.
+	// Register the ModuleFactory function for this module.
 	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
 		panic(err)
 	}
