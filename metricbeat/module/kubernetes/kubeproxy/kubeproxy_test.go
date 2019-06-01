@@ -31,8 +31,8 @@ func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "kubeproxy",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.kubeproxy.1.13",
-				ExpectedFile: "./_meta/test/metrics.kubeproxy.1.13.expected",
+				MetricsFile:  "./_meta/test/metrics.kubeproxy.1.14",
+				ExpectedFile: "./_meta/test/metrics.kubeproxy.1.14.expected",
 			},
 		},
 	)
