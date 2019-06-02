@@ -303,14 +303,6 @@ func (r *Register) Modules() []string {
 		modules = append(modules, module)
 	}
 
-	if r.child != nil {
-		childModules, err := r.child.Modules()
-		if err != nil {
-			logp.Error(err)
-		}
-		modules = append(modules, childModules...)
-	}
-
 	return modules
 }
 

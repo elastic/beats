@@ -1,0 +1,6 @@
+default: true
+input:
+  module: foo
+  metricset: bar
+  defaults:
+    option: test

@@ -51,7 +51,7 @@ func (r *LightModulesRegistry) Modules() ([]string, error) {
 func (r *LightModulesRegistry) DefaultMetricSets(moduleName string) ([]string, error) {
 	module, found, err := r.readModule(moduleName)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to get default metricsets for module '%s'", module)
+		return nil, errors.Wrapf(err, "failed to get default metricsets for module '%s'", moduleName)
 	}
 	if !found {
 		return nil, nil
@@ -125,6 +125,8 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	originalFactory := registration.Factory
 	registration.IsDefault = m.Default
 
+	// Override metricset factory to use defaults and reprocess host data before
+	// calling the real factory
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
 		baseModule := base.module.(*BaseModule)
 		baseModule.name = m.Module
