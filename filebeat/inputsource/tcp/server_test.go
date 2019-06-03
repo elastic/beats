@@ -53,7 +53,7 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 func TestReceiveEventsAndMetadata(t *testing.T) {
 	expectedMessages := generateMessages(5, 100)
 	largeMessages := generateMessages(10, 4096)
-	extraLargeMessages := generateMessages(1, 700000)
+	extraLargeMessages := generateMessages(10, 700000)
 
 	tests := []struct {
 		name             string
@@ -145,7 +145,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			name:      "MaxBufferSizeSet",
 			splitFunc: SplitFunc([]byte("\n")),
 			cfg: map[string]interface{}{
-				"max_read_message": 60000,
+				"max_message_size": 700001,
 			},
 			expectedMessages: extraLargeMessages,
 			messageSent:      strings.Join(extraLargeMessages, "\n"),
