@@ -27,6 +27,7 @@ type outlet struct {
 	wg     eventCounter
 	client beat.Client
 	isOpen atomic.Bool
+	done   chan struct{}
 }
 
 func newOutlet(client beat.Client, wg eventCounter) *outlet {
@@ -34,6 +35,7 @@ func newOutlet(client beat.Client, wg eventCounter) *outlet {
 		wg:     wg,
 		client: client,
 		isOpen: atomic.MakeBool(true),
+		done:   make(chan struct{}),
 	}
 	return o
 }
@@ -41,9 +43,14 @@ func newOutlet(client beat.Client, wg eventCounter) *outlet {
 func (o *outlet) Close() error {
 	isOpen := o.isOpen.Swap(false)
 	if isOpen {
+		close(o.done)
 		return o.client.Close()
 	}
 	return nil
+}
+
+func (o *outlet) Done() <-chan struct{} {
+	return o.done
 }
 
 func (o *outlet) OnEvent(d *util.Data) bool {

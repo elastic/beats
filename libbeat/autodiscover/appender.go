@@ -23,7 +23,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Appender provides an interface by which extra configuration can be added into configs
@@ -57,7 +56,7 @@ func (r *registry) AddAppender(name string, appender AppenderBuilder) error {
 	}
 
 	r.appenders[name] = appender
-	logp.Debug(debugK, "Appender registered: %s", name)
+	r.logger.Debugf("Appender registered: %s", name)
 	return nil
 }
 

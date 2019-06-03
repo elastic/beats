@@ -18,8 +18,8 @@
 package node
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -53,8 +53,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
-
 	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
 	if err != nil {
 		return nil, err
@@ -65,16 +63,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return err
 	}
 
-	err = eventsMapping(r, content)
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+nodeStatsPath)
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
+
+	return eventsMapping(r, *info, content)
 }

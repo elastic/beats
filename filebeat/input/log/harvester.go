@@ -29,7 +29,6 @@
 package log
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -51,6 +50,7 @@ import (
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/debug"
 	"github.com/elastic/beats/libbeat/reader/multiline"
 	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
@@ -153,9 +153,7 @@ func (h *Harvester) open() error {
 	switch h.config.Type {
 	case harvester.StdinType:
 		return h.openStdin()
-	case harvester.LogType:
-		return h.openFile()
-	case harvester.DockerType:
+	case harvester.LogType, harvester.DockerType, harvester.ContainerType:
 		return h.openFile()
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
@@ -181,6 +179,8 @@ func (h *Harvester) Setup() error {
 		}
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
+
+	logp.Debug("harvester", "Harvester setup successful. Line terminator: %d", h.config.LineTerminator)
 
 	return nil
 }
@@ -276,16 +276,14 @@ func (h *Harvester) Run() error {
 				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
 			case ErrInactive:
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
+			case reader.ErrLineUnparsable:
+				logp.Info("Skipping unparsable line in file: %v", h.state.Source)
+				//line unparsable, go to next line
+				continue
 			default:
 				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
 			}
 			return nil
-		}
-
-		// Strip UTF-8 BOM if beginning of file
-		// As all BOMS are converted to UTF-8 it is enough to only remove this one
-		if h.state.Offset == 0 {
-			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
 		}
 
 		// Get copy of state to work on
@@ -390,12 +388,12 @@ func (h *Harvester) SendStateUpdate() {
 		return
 	}
 
-	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
-	h.states.Update(h.state)
-
 	d := util.NewData()
 	d.SetState(h.state)
 	h.publishState(d)
+
+	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+	h.states.Update(h.state)
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -558,21 +556,30 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(h.log, h.encoding, h.config.BufferSize)
+	reader, err := debug.AppendReaders(h.log)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err = readfile.NewEncodeReader(reader, readfile.Config{
+		Codec:      h.encoding,
+		BufferSize: h.config.BufferSize,
+		Terminator: h.config.LineTerminator,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.Format, h.config.DockerJSON.CRIFlags)
 	}
 
 	if h.config.JSON != nil {
 		r = readjson.NewJSONReader(r, h.config.JSON)
 	}
 
-	r = readfile.NewStripNewline(r)
+	r = readfile.NewStripNewline(r, h.config.LineTerminator)
 
 	if h.config.Multiline != nil {
 		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)

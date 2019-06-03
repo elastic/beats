@@ -9,6 +9,13 @@
 //// include::../../libbeat/docs/dashboards.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
+ifdef::has_solutions[]
+TIP: For deeper observability into your infrastructure, use the
+{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
+{infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}. For setup details, see
+the {infra-guide}/index.html[Infrastructure Monitoring Guide].
+endif::has_solutions[]
+
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,
 and searches for visualizing {beatname_uc} data in Kibana. Before you can use
 the dashboards, you need to create the index pattern, +{beat_default_index_prefix}-*+, and
@@ -57,6 +64,15 @@ ifdef::mac_os[]
 ./{beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
 endif::mac_os[]
+
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} setup --dashboards
+----------------------------------------------------------------------
+endif::linux_os[]
 
 ifdef::docker_platform[]
 *docker:*
@@ -125,6 +141,19 @@ ifdef::mac_os[]
 ----
 endif::mac_os[]
 
+ifdef::linux_os[]
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 
+----
+endif::linux_os[]
 
 ifdef::docker_platform[]
 *docker:*

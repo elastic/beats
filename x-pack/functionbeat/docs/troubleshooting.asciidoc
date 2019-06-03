@@ -1,4 +1,5 @@
 [[troubleshooting]]
+[role="xpack"]
 = Troubleshooting
 
 [partintro]
@@ -15,6 +16,7 @@ following tips:
 --
 
 [[getting-help]]
+[role="xpack"]
 == Get help
 
 include::{libbeat-dir}/docs/getting-help.asciidoc[]
@@ -22,6 +24,7 @@ include::{libbeat-dir}/docs/getting-help.asciidoc[]
 //sets block macro for debugging.asciidoc included in next section
 
 [id="enable-{beatname_lc}-debugging"]
+[role="xpack"]
 == Debug
 
 include::{libbeat-dir}/docs/debugging.asciidoc[]

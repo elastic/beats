@@ -45,14 +45,12 @@ type jobsStruct struct {
 	Jobs []map[string]interface{} `json:"jobs"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
 	}
 
 	var errs multierror.Errors
@@ -63,10 +61,14 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		event.RootFields = common.MapStr{}
 		event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
+		event.ModuleFields = common.MapStr{}
+		event.ModuleFields.Put("cluster.name", info.ClusterName)
+		event.ModuleFields.Put("cluster.id", info.ClusterID)
+
 		event.MetricSetFields, err = schema.Apply(job)
 		if err != nil {
-			event.Error = errors.Wrap(err, "failure applying ml job schema")
-			errs = append(errs, event.Error)
+			errs = append(errs, errors.Wrap(err, "failure applying ml job schema"))
+			continue
 		}
 
 		r.Event(event)

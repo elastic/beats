@@ -154,3 +154,18 @@ func TestNonZeroRedirect(t *testing.T) {
 	// We are now at the limit, this request should fail
 	assert.Equal(t, http.ErrUseLastResponse, checker(makeTestHTTPRequest(t), via))
 }
+
+func TestRequestBuildingWithCustomHost(t *testing.T) {
+	var config = Config{}
+	var encoder = nilEncoder{}
+
+	config.Check.Request.SendHeaders = make(map[string]string)
+	config.Check.Request.SendHeaders["Host"] = "custom-host"
+
+	request, err := buildRequest("localhost", &config, encoder)
+
+	if assert.Nil(t, err) {
+		assert.Equal(t, "custom-host", request.Host)
+		assert.Equal(t, "custom-host", request.Header.Get("Host"))
+	}
+}

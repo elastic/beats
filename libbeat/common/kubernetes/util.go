@@ -75,19 +75,19 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 	if inCluster {
 		ns, err := inClusterNamespace()
 		if err != nil {
-			logp.Err("kubernetes: Couldn't get namespace when beat is in cluster with error: ", err.Error())
+			logp.Err("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
 			return defaultNode
 		}
 		podName, err := os.Hostname()
 		if err != nil {
-			logp.Err("kubernetes: Couldn't get hostname as beat pod name in cluster with error: ", err.Error())
+			logp.Err("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
 			return defaultNode
 		}
 		logp.Info("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
 		pod := v1.Pod{}
 		err = client.Get(context.TODO(), ns, podName, &pod)
 		if err != nil {
-			logp.Err("kubernetes: Querying for pod failed with error: %v", err.Error())
+			logp.Err("kubernetes: Querying for pod failed with error: %+v", err.Error())
 			return defaultNode
 		}
 		logp.Info("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.GetNodeName())
@@ -103,7 +103,7 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 	nodes := v1.NodeList{}
 	err := client.List(context.TODO(), k8s.AllNamespaces, &nodes)
 	if err != nil {
-		logp.Err("kubernetes: Querying for nodes failed with error: ", err.Error())
+		logp.Err("kubernetes: Querying for nodes failed with error: %+v", err.Error())
 		return defaultNode
 	}
 	for _, n := range nodes.Items {

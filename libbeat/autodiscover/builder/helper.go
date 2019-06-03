@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -144,11 +145,31 @@ func GetHintAsConfigs(hints common.MapStr, key string) []common.MapStr {
 	return nil
 }
 
-// IsNoOp is a big red button to prevent spinning up Runners in case of issues.
-func IsNoOp(hints common.MapStr, key string) bool {
+// IsEnabled will return true when 'enabled' is **explicity** set to true
+func IsEnabled(hints common.MapStr, key string) bool {
+	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
+		enabled, _ := strconv.ParseBool(value.(string))
+		return enabled
+	}
+
+	return false
+}
+
+// IsDisabled will return true when 'enabled' key is **explicity** set to false
+func IsDisabled(hints common.MapStr, key string) bool {
+	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
+		enabled, err := strconv.ParseBool(value.(string))
+		if err == nil {
+			logp.Debug("autodiscover.builder", "error parsing 'enabled' hint from: %+v", hints)
+			return !enabled
+		}
+	}
+
+	// keep reading disable (deprecated) for backwards compatibility
 	if value, err := hints.GetValue(fmt.Sprintf("%s.disable", key)); err == nil {
-		noop, _ := strconv.ParseBool(value.(string))
-		return noop
+		cfgwarn.Deprecate("8.0.0", "disable hint is deprecated. Use `enabled: false` instead.")
+		disabled, _ := strconv.ParseBool(value.(string))
+		return disabled
 	}
 
 	return false

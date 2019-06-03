@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "zookeeper.server",
+        "duration": 115000,
+        "module": "zookeeper"
+    },
+    "metricset": {
+        "name": "server"
+    },
+    "service": {
+        "address": "localhost:2181",
+        "type": "zookeeper",
+        "version": "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03"
+    },
+    "zookeeper": {
+        "server": {
+            "connections": 1,
+            "count": 0,
+            "epoch": 0,
+            "latency": {
+                "avg": 0,
+                "max": 0,
+                "min": 0
+            },
+            "mode": "standalone",
+            "node_count": 4,
+            "outstanding": 0,
+            "received": 38,
+            "sent": 37,
+            "version_date": "06/29/2018 04:05 GMT",
+            "zxid": "0x0"
+        }
+    }
+}

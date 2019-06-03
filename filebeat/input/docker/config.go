@@ -27,6 +27,7 @@ var defaultConfig = config{
 }
 
 type config struct {
+	// List of containers' log files to tail
 	Containers containers `config:"containers"`
 
 	// Partial configures the input to join partial lines

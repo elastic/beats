@@ -1,0 +1,27 @@
+[role="xpack"]
+
+beta[]
+
+This is the `socket` dataset of the system module.
+
+[float]
+=== Implementation
+
+It is implemented for Linux only.
+
+On Linux, the dataset uses the
+http://man7.org/linux/man-pages/man7/sock_diag.7.html[sock_diag netlink subsystem]
+to periodically receive a list of all sockets from the kernel. The polling frequency
+can be set using the `period` configuration option. A low value (e.g. `1s`) is
+recommended to capture short-lived sockets.
+
+By default, sockets from or to `localhost` will be excluded. This can be controlled using
+the `socket.include_localhost` configuration option.
+
+[float]
+==== Example dashboard
+
+The dataset comes with a sample dashboard:
+
+[role="screenshot"]
+image::./images/auditbeat-system-socket-dashboard.png[Auditbeat System Socket Dashboard]

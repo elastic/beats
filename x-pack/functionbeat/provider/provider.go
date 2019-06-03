@@ -32,6 +32,7 @@ type Provider interface {
 	CreateFunctions(clientFactory, []string) ([]core.Runner, error)
 	FindFunctionByName(string) (Function, error)
 	CLIManager() (CLIManager, error)
+	TemplateBuilder() (TemplateBuilder, error)
 	Name() string
 }
 

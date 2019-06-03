@@ -20,12 +20,13 @@ package queue
 import (
 	"encoding/json"
 
-	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 var (
@@ -43,7 +44,7 @@ var (
 		"consumers": s.Object{
 			"count": c.Int("consumers"),
 			"utilisation": s.Object{
-				"pct": c.Int("consumer_utilisation", s.Optional),
+				"pct": c.Int("consumer_utilisation", s.IgnoreAllErrors),
 			},
 		},
 		"messages": s.Object{
@@ -83,28 +84,48 @@ var (
 	}
 )
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 	var queues []map[string]interface{}
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
-		logp.Err("Error: ", err)
-		return nil, err
+		return errors.Wrap(err, "error in mapping")
 	}
 
-	var events []common.MapStr
-	var errors multierror.Errors
 	for _, queue := range queues {
-		event, err := eventMapping(queue)
-		events = append(events, event)
+		evt, err := eventMapping(queue)
 		if err != nil {
-			errors = append(errors, err)
+			m.Logger().Errorf("error in mapping: %s", err)
+			r.Error(err)
+			continue
+		}
+		if !r.Event(evt) {
+			return nil
 		}
 	}
 
-	return events, errors.Err()
+	return nil
 }
 
-func eventMapping(queue map[string]interface{}) (common.MapStr, error) {
-	event, err := schema.Apply(queue)
-	return event, err
+func eventMapping(queue map[string]interface{}) (mb.Event, error) {
+	fields, err := schema.Apply(queue)
+	if err != nil {
+		return mb.Event{}, errors.Wrap(err, "error applying schema")
+	}
+
+	moduleFields := common.MapStr{}
+	if v, err := fields.GetValue("vhost"); err == nil {
+		moduleFields.Put("vhost", v)
+		fields.Delete("vhost")
+	}
+
+	if v, err := fields.GetValue("node"); err == nil {
+		moduleFields.Put("node.name", v)
+		fields.Delete("node")
+	}
+
+	event := mb.Event{
+		MetricSetFields: fields,
+		ModuleFields:    moduleFields,
+	}
+	return event, nil
 }

@@ -33,7 +33,7 @@ import (
 )
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
-const CCRStatsAPIAvailableVersion = "6.5.0"
+var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -46,7 +46,7 @@ type Info struct {
 	ClusterName string `json:"cluster_name"`
 	ClusterID   string `json:"cluster_uuid"`
 	Version     struct {
-		Number string `json:"number"`
+		Number *common.Version `json:"number"`
 	} `json:"version"`
 }
 
@@ -57,6 +57,25 @@ type NodeInfo struct {
 	IP               string `json:"ip"`
 	Name             string `json:"name"`
 	ID               string
+}
+
+// License contains data about the Elasticsearch license
+type License struct {
+	Status             string     `json:"status"`
+	ID                 string     `json:"uid"`
+	Type               string     `json:"type"`
+	IssueDate          *time.Time `json:"issue_date"`
+	IssueDateInMillis  int        `json:"issue_date_in_millis"`
+	ExpiryDate         *time.Time `json:"expiry_date,omitempty"`
+	ExpiryDateInMillis int        `json:"expiry_date_in_millis,omitempty"`
+	MaxNodes           int        `json:"max_nodes"`
+	IssuedTo           string     `json:"issued_to"`
+	Issuer             string     `json:"issuer"`
+	StartDateInMillis  int        `json:"start_date_in_millis"`
+}
+
+type licenseWrapper struct {
+	License License `json:"license"`
 }
 
 // GetClusterID fetches cluster id for given nodeID.
@@ -141,7 +160,10 @@ func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
 	}
 
 	info := &Info{}
-	json.Unmarshal(content, info)
+	err = json.Unmarshal(content, &info)
+	if err != nil {
+		return nil, err
+	}
 
 	return info, nil
 }
@@ -187,34 +209,36 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 // GetLicense returns license information. Since we don't expect license information
 // to change frequently, the information is cached for 1 minute to avoid
 // hitting Elasticsearch frequently.
-func GetLicense(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	// First, check the cache
 	license := licenseCache.get()
 
+	info, err := GetInfo(http, resetURI)
+	if err != nil {
+		return nil, err
+	}
+	var licensePath string
+	if info.Version.Number.Major < 7 {
+		licensePath = "_xpack/license"
+	} else {
+		licensePath = "_license"
+	}
+
 	// Not cached, fetch license from Elasticsearch
 	if license == nil {
-		content, err := fetchPath(http, resetURI, "_xpack/license", "")
+		content, err := fetchPath(http, resetURI, licensePath, "")
 		if err != nil {
 			return nil, err
 		}
 
-		var data common.MapStr
+		var data licenseWrapper
 		err = json.Unmarshal(content, &data)
 		if err != nil {
 			return nil, err
 		}
 
-		l, err := data.GetValue("license")
-		if err != nil {
-			return nil, err
-		}
-		license, ok := l.(map[string]interface{})
-		if !ok {
-			return nil, elastic.MakeErrorForMissingField("license", elastic.Elasticsearch)
-		}
-
 		// Cache license for a minute
-		licenseCache.set(license, time.Minute)
+		licenseCache.set(&data.License, time.Minute)
 	}
 
 	return licenseCache.get(), nil
@@ -332,23 +356,17 @@ func MergeClusterSettings(clusterSettings common.MapStr) (common.MapStr, error) 
 	return settings, nil
 }
 
-// IsCCRStatsAPIAvailable returns whether the CCR stats API is available in the given version
-// of Elasticsearch.
-func IsCCRStatsAPIAvailable(currentElasticsearchVersion string) (bool, error) {
-	return elastic.IsFeatureAvailable(currentElasticsearchVersion, CCRStatsAPIAvailableVersion)
-}
-
 // Global cache for license information. Assumption is that license information changes infrequently.
 var licenseCache = &_licenseCache{}
 
 type _licenseCache struct {
 	sync.RWMutex
-	license  common.MapStr
+	license  *License
 	cachedOn time.Time
 	ttl      time.Duration
 }
 
-func (c *_licenseCache) get() common.MapStr {
+func (c *_licenseCache) get() *License {
 	c.Lock()
 	defer c.Unlock()
 
@@ -360,13 +378,26 @@ func (c *_licenseCache) get() common.MapStr {
 	return c.license
 }
 
-func (c *_licenseCache) set(license common.MapStr, ttl time.Duration) {
+func (c *_licenseCache) set(license *License, ttl time.Duration) {
 	c.Lock()
 	defer c.Unlock()
 
 	c.license = license
 	c.ttl = ttl
 	c.cachedOn = time.Now()
+}
+
+// IsOneOf returns whether the license is one of the specified candidate licenses
+func (l *License) IsOneOf(candidateLicenses ...string) bool {
+	t := l.Type
+
+	for _, candidateLicense := range candidateLicenses {
+		if candidateLicense == t {
+			return true
+		}
+	}
+
+	return false
 }
 
 func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr, error) {

@@ -30,7 +30,6 @@ type redisConfig struct {
 	Password    string                `config:"password"`
 	Index       string                `config:"index"`
 	Key         string                `config:"key"`
-	Port        int                   `config:"port"`
 	LoadBalance bool                  `config:"loadbalance"`
 	Timeout     time.Duration         `config:"timeout"`
 	BulkMaxSize int                   `config:"bulk_max_size"`
@@ -50,7 +49,6 @@ type backoff struct {
 
 var (
 	defaultConfig = redisConfig{
-		Port:        6379,
 		LoadBalance: true,
 		Timeout:     5 * time.Second,
 		BulkMaxSize: 2048,

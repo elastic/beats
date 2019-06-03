@@ -1,0 +1,10 @@
+{
+    "processors": [
+        {
+            "rename": {
+                "field": "json",
+                "target_field": "log.meta"
+            }
+        }
+    ]
+}

@@ -7,7 +7,7 @@
 
 Packetbeat is a real-time network packet analyzer that you can use
 with Elasticsearch to provide an _application monitoring and performance
-analytics system_. Packetbeat completes the {libbeat}/index.html[Beats platform]
+analytics system_. Packetbeat completes the {beats-ref}/index.html[Beats platform]
 by providing visibility between the servers of your network.
 
 Packetbeat works by capturing the network traffic between your application servers,
@@ -43,3 +43,5 @@ The same Elasticsearch and Kibana instances that are used for analysing the
 network traffic gathered by Packetbeat can be used for analysing the log files
 gathered by Logstash. This way, you can have network traffic and log analysis
 in the same system.
+
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]

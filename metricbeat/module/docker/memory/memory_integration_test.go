@@ -25,21 +25,9 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-/*
-// TODO: Enable
-func TestFetch(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf(" module : %s metricset : %s event: %+v", f.Module().Name(), f.Name(), event)
-}*/
-
 func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

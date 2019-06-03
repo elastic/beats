@@ -1,5 +1,5 @@
 Elastic Beats
-Copyright 2014-2018 Elasticsearch BV
+Copyright 2014-2019 Elasticsearch BV
 
 This product includes software developed by The Apache Software 
 Foundation (http://www.apache.org/).
@@ -7,6 +7,15 @@ Foundation (http://www.apache.org/).
 ==========================================================================
 Third party libraries used by the Elastic Beats project:
 ==========================================================================
+
+
+--------------------------------------------------------------------
+Dependency: cloud.google.com/go
+Revision: 632e11ec7c242a85e1931e4a8fdda2002316569f
+License type (autodetected): Apache-2.0
+./vendor/cloud.google.com/go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
 
 
 --------------------------------------------------------------------
@@ -232,8 +241,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Version: v17
-Revision: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
+Version: v18
+Revision: 9002847aa1425fb6ac49077c0a630b3b67e0fbfd
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------
@@ -260,6 +269,40 @@ Copyright 2014 CoreOS, Inc
 
 This product includes software developed at CoreOS, Inc.
 (http://www.coreos.com/).
+
+--------------------------------------------------------------------
+Dependency: github.com/DataDog/zstd
+Revision: 2bf71ec4836011b92dc78df3b9ace6b40e65f7df
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/DataDog/zstd/LICENSE:
+--------------------------------------------------------------------
+Simplified BSD License
+
+Copyright (c) 2016, Datadog <info@datadoghq.com>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
+    * Neither the name of the copyright holder nor the names of its contributors
+      may be used to endorse or promote products derived from this software
+      without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/davecgh/go-spew
@@ -304,6 +347,40 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 --------------------------------------------------------------------
+Dependency: github.com/denisenkom/go-mssqldb
+Revision: 4e0d7dc8888fbb59764060e99b7b68e77a6f9698
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/denisenkom/go-mssqldb/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2012 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/digitalocean/go-libvirt
 Revision: 59d541f19311883ad82708651353009fb207d8a9
 License type (autodetected): Apache-2.0
@@ -311,6 +388,34 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/dlclark/regexp2
+Revision: 7632a260cbaf5e7594fc1544a503456ecd0827f1
+License type (autodetected): MIT
+./vendor/github.com/dlclark/regexp2/LICENSE:
+--------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) Doug Clark
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/distribution
@@ -323,7 +428,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/docker
-Revision: d192db0d9350222d2b8bb6eba8525b04c3be7d61
+Revision: 1009e6a40b295187e038b67e184e9c0384d95538
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/docker/LICENSE:
 --------------------------------------------------------------------
@@ -352,7 +457,8 @@ See also https://www.apache.org/dev/crypto.html and/or seek legal counsel.
 
 --------------------------------------------------------------------
 Dependency: github.com/docker/go-connections
-Revision: e15c02316c12de00874640cd76311849de2aeed5
+Version: v0.3.0
+Revision: 3ede32e2033de7505e6500d6c868c2b9ed9f169d
 License type (autodetected): Apache-2.0
 ./vendor/github.com/docker/go-connections/LICENSE:
 --------------------------------------------------------------------
@@ -376,6 +482,48 @@ License type (autodetected): Apache-2.0
 --------------------------------------------------------------------
 Apache License 2.0
 
+
+--------------------------------------------------------------------
+Dependency: github.com/dop251/goja
+Revision: dd2ac4456e2073f116d6b88741d513addabe0326
+License type (autodetected): MIT
+./vendor/github.com/dop251/goja/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2016 Dmitry Panov
+
+Copyright (c) 2012 Robert Krimen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
+Dependency: github.com/dop251/goja_nodejs
+Revision: adff31b136e6b7e044712aab7236a775e1bd085e
+License type (autodetected): MIT
+./vendor/github.com/dop251/goja_nodejs/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2016 Dmitry Panov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/dustin/go-humanize
@@ -490,6 +638,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
+Dependency: github.com/elastic/ecs
+Version: 1.0
+Revision: b9f735dd33b0bbb95dbca4229397c9b7f81f8f53
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/ecs/LICENSE.txt:
+--------------------------------------------------------------------
+Apache License 2.0
+
+-------NOTICE.txt-----
+Elastic Common Schema
+Copyright 2018 Elasticsearch B.V.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-libaudit
 Version: v0.4.0
 Revision: 39073a2988f718067d85d27a4d18b1b57de5d947
@@ -516,7 +689,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-seccomp-bpf
-Revision: 5bed103a93993f24c58dd267faaab582f2373e31
+Version: v1.1.0
+Revision: 4e6640ac0ec1b7cd22a7ec12f4ca610efbe3c4d9
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-seccomp-bpf/LICENSE.txt:
 --------------------------------------------------------------------
@@ -541,7 +715,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Revision: 7b021494a9562d0c3f0422d49b9980709c5650e9
+Revision: 9a4be54a53be4c48b44d351d52fb425a5e274be5
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
@@ -549,15 +723,15 @@ Apache License 2.0
 
 -------NOTICE.txt-----
 Elastic go-sysinfo
-Copyright 2017-2018 Elasticsearch B.V.
+Copyright 2017-2019 Elasticsearch B.V.
 
 This product includes software developed at
 Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-txfile
-Version: v0.0.3
-Revision: 389b527ad365f6fc6cf5fa7e0ba5a2294ad2f3ed
+Version: v0.0.6
+Revision: fa3d87c14381c01aaa1c7901877fb5e483294964
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-txfile/LICENSE:
 --------------------------------------------------------------------
@@ -566,8 +740,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.6.5
-Revision: 92d43887f91851c9936621665af7f796f4d03412
+Version: v0.7.0
+Revision: 0539807037ce820e147797f051ff32b05f4f9288
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -591,8 +765,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.9.0
-Revision: 237dff72b4ba95da2cd985f96a9c0ede4aefc760
+Version: v0.10.2
+Revision: 1227b9d6877d126ad640087e44439d70dba2df4f
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
@@ -648,7 +822,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/fsnotify/fsevents
-Revision: 4d5197691b054c220286f7c6ea167de9753d902d
+Revision: e1d381a4d27063baac2e9d3c5887ceb4ab059287
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/fsnotify/fsevents/LICENSE:
 --------------------------------------------------------------------
@@ -804,8 +978,41 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
+Dependency: github.com/go-sourcemap/sourcemap
+Revision: b019cc30c1eaa584753491b0d8f8c1534bf1eb44
+License type (autodetected): BSD-2-Clause
+./vendor/github.com/go-sourcemap/sourcemap/LICENSE:
+--------------------------------------------------------------------
+Copyright (c) 2016 The github.com/go-sourcemap/sourcemap Contributors.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
 Dependency: github.com/go-sql-driver/mysql
-Revision: 9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3
+Version: v1.4.1
+Revision: 72cd26f257d44c1114970e19afddcd812016007e
 License type (autodetected): MPL-2.0
 ./metricbeat/module/mysql/vendor/github.com/go-sql-driver/mysql/LICENSE:
 --------------------------------------------------------------------
@@ -1687,6 +1894,22 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
+Dependency: github.com/konsorten/go-windows-terminal-sequences
+Revision: f55edac94c9bbba5d6182a4be46d86a2c9b5b50e
+License type (autodetected): MIT
+./vendor/github.com/konsorten/go-windows-terminal-sequences/LICENSE:
+--------------------------------------------------------------------
+(The MIT License)
+
+Copyright (c) 2017 marvin + konsorten GmbH (open-source@konsorten.de)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------
 Dependency: github.com/kubernetes/apimachinery
 Version: kubernetes-1.11.1
 Revision: 103fd098999dc9c0c88536f5c9ad2e5da39373ae
@@ -1698,7 +1921,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/lib/pq
-Revision: 2704adc878c21e1329f46f6e56a1c387d788ff94
+Revision: 2ff3cb3adc01768e0a552b3a02575a6df38a9bea
 License type (autodetected): MIT
 ./metricbeat/module/postgresql/vendor/github.com/lib/pq/LICENSE.md:
 --------------------------------------------------------------------
@@ -1713,7 +1936,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------
 Dependency: github.com/magefile/mage
-Revision: 5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034
+Version: v1.8.0
+Revision: aedfce64c122eef47009b7f80c9771044753215d
 License type (autodetected): Apache-2.0
 ./vendor/github.com/magefile/mage/LICENSE:
 --------------------------------------------------------------------
@@ -2151,7 +2375,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/rcrowley/go-metrics
-Revision: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
+Revision: 3113b8401b8a98917cde58f8bbd42a1b1c03b1fd
 License type (autodetected): BSD-2-Clause
 ./vendor/github.com/rcrowley/go-metrics/LICENSE:
 --------------------------------------------------------------------
@@ -2357,8 +2581,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/shirou/gopsutil
-Version: v2.18.06
-Revision: 4a180b209f5f494e5923cfce81ea30ba23915877
+Version: v2.18.11
+Revision: 0f70a4a06f7a1039305ec9b3ba9c2800f8929fba
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/shirou/gopsutil/LICENSE:
 --------------------------------------------------------------------
@@ -2425,8 +2649,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------
 Dependency: github.com/Shopify/sarama
-Version: =v1.18.0/enh/offset-replica-id
-Revision: 0143592836b090a1b481def4d902cfb3c5c05ae5
+Version: v1.20.1
+Revision: 03a43f93cd29dc549e6d9b11892795c206f9c38c
 License type (autodetected): MIT
 ./vendor/github.com/Shopify/sarama/LICENSE:
 --------------------------------------------------------------------
@@ -2452,10 +2676,10 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
-Dependency: github.com/Sirupsen/logrus
-Revision: 5e5dc898656f695e2a086b8e12559febbfc01562
+Dependency: github.com/sirupsen/logrus
+Revision: a6c0064cfaf982707445a1c90368f956421ebcf0
 License type (autodetected): MIT
-./vendor/github.com/Sirupsen/logrus/LICENSE:
+./vendor/github.com/sirupsen/logrus/LICENSE:
 --------------------------------------------------------------------
 The MIT License (MIT)
 
@@ -2646,7 +2870,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
-Revision: f289b3ea3e41a01b2822be9caf5f40c01fdda05c
+Revision: 7c5392a5f2b5c5fa393c71e1f9064e22b5408995
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/tsg/gopacket/LICENSE:
 --------------------------------------------------------------------
@@ -2849,7 +3073,7 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/crypto
-Revision: 5119cf507ed5294cc409c092980c7497ee5d6fd2
+Revision: 85e1b3f9139abd58575d728a509643924e3b2ebf
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/crypto/LICENSE:
 --------------------------------------------------------------------
@@ -2918,7 +3142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: golang.org/x/sys
-Revision: 0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe
+Revision: d989b31c87461dc8ab2f1cac6792814e27fadea9
 License type (autodetected): BSD-3-Clause
 ./vendor/golang.org/x/sys/LICENSE:
 --------------------------------------------------------------------
@@ -3052,6 +3276,15 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/appengine
+Revision: e9657d882bb81064595ca3b56cbe2546bbabf7b1
+License type (autodetected): Apache-2.0
+./metricbeat/module/mysql/vendor/google.golang.org/appengine/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0

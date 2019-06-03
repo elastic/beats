@@ -67,11 +67,12 @@ func New(
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
 		cfg := reader.Config{
-			Path:       reader.LocalSystemJournalID, // used to identify the state in the registry
-			Backoff:    config.Backoff,
-			MaxBackoff: config.MaxBackoff,
-			Seek:       config.Seek,
-			Matches:    config.Matches,
+			Path:               reader.LocalSystemJournalID, // used to identify the state in the registry
+			Backoff:            config.Backoff,
+			MaxBackoff:         config.MaxBackoff,
+			Seek:               config.Seek,
+			CursorSeekFallback: config.CursorSeekFallback,
+			Matches:            config.Matches,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -84,11 +85,12 @@ func New(
 
 	for _, p := range config.Paths {
 		cfg := reader.Config{
-			Path:       p,
-			Backoff:    config.Backoff,
-			MaxBackoff: config.MaxBackoff,
-			Seek:       config.Seek,
-			Matches:    config.Matches,
+			Path:               p,
+			Backoff:            config.Backoff,
+			MaxBackoff:         config.MaxBackoff,
+			Seek:               config.Seek,
+			CursorSeekFallback: config.CursorSeekFallback,
+			Matches:            config.Matches,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)
@@ -123,10 +125,12 @@ func New(
 func (i *Input) Run() {
 	var err error
 	i.client, err = i.pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: i.eventMeta,
-		Meta:          nil,
-		Processor:     i.processors,
+		PublishMode: beat.GuaranteedSend,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: i.eventMeta,
+			Meta:          nil,
+			Processor:     i.processors,
+		},
 		ACKCount: func(n int) {
 			i.logger.Infof("journalbeat successfully published %d events", n)
 		},
@@ -187,10 +191,10 @@ func (i *Input) publishAll() {
 
 // Stop stops all readers of the input.
 func (i *Input) Stop() {
-	i.client.Close()
 	for _, r := range i.readers {
 		r.Close()
 	}
+	i.client.Close()
 }
 
 // Wait waits until all readers are done.

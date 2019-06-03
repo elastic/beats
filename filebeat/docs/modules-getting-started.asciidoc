@@ -14,9 +14,8 @@ This topic shows you how to run the basic modules with minimal extra
 configuration. For detailed documentation and the full list of available
 modules, see <<filebeat-modules>>.
 
-If you are using a log file type that isn't supported by one of the available
-{beatname_uc} modules, you'll need to set up and configure {beatname_uc} manually by
-following the numbered steps under <<filebeat-getting-started>>.
+Can't find a module for your log file type? Follow the numbered steps under
+<<filebeat-getting-started>> to set up and configure {beatname_uc} manually.
 
 ==== Prerequisites
 
@@ -28,22 +27,6 @@ Before running {beatname_uc} modules:
 * Complete the {beatname_uc} installation instructions described in
 <<filebeat-installation>>. After installing {beatname_uc}, return to this
 quick start page.
-
-* Install the Ingest Node GeoIP and User Agent plugins. These plugins are
-required to capture the geographical location and browser information used by
-some of the visualizations available in the sample dashboards. You can install
-these plugins by running the following commands in the {es} home path:
-+
-[source,shell]
-----------------------------------------------------------------------
-sudo bin/elasticsearch-plugin install ingest-geoip
-sudo bin/elasticsearch-plugin install ingest-user-agent
-----------------------------------------------------------------------
-+
-You need to restart {es} after running these commands.
-+
-If you are using an https://cloud.elastic.co/[Elastic Cloud] instance, you can
-enable the two plugins from the configuration page.
 
 * Verify that {es} and {kib} are running and that {es} is
 ready to receive data from {beatname_uc}.
@@ -57,9 +40,9 @@ To set up and run {beatname_uc} modules:
 installation. By default, {beatname_uc} assumes {es} is running locally on port
 9200.
 +
-include::../../libbeat/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
 . Enable the modules you want to run. For example, the following command enables
 the system, nginx, and mysql modules:
@@ -91,7 +74,7 @@ include::./include/visualize-data.asciidoc[]
 
 Here's an example of the syslog dashboard:
 
-image:./images/kibana-system.png[Syslog dashboard]
+image::./images/kibana-system.png[Syslog dashboard]
 
 
 [[setting-variables]]
@@ -106,6 +89,54 @@ include::./include/set-paths.asciidoc[]
 See <<configuration-filebeat-modules>> for more information about setting
 variables and advanced options.
 
+[[load-ingest-pipelines]]
+==== Load ingest pipelines manually
+
+The ingest pipelines used to parse log lines are set up automatically the first
+time you run the module, assuming the {es} output is enabled. If you're sending
+events to {ls}, or plan to use
+<<configuration-central-management,{beats} central management>>, you need to
+load the ingest pipelines manually. To do this, run the `setup` command with
+the `--pipelines` option specified. If you used the
+<<modules-command,`modules`>> command to enable modules in the `modules.d`
+directory, also specify the `--modules` flag. For example, the following command
+loads the ingest pipelines used by all filesets enabled in the system, nginx,
+and mysql modules:
+
+// override modulename attribute so it works with the --modules option
+:modulename: system,nginx,mysql
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules {modulename}
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup --pipelines --modules {modulename}
+----
+
+TIP: If you're loading ingest pipelines manually because you want to send events
+to {ls}, also see
+{logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
 
 :has_module_steps!:
 :modulename!:

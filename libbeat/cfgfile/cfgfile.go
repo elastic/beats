@@ -18,7 +18,6 @@
 package cfgfile
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -34,7 +33,6 @@ var (
 	// be called prior to flags.Parse().
 	configfiles = common.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
 	overwrites  = common.SettingFlag(nil, "E", "Configuration overwrite")
-	testConfig  = flag.Bool("configtest", false, "Test configuration and exit.")
 
 	// Additional default settings, that must be available for variable expansion
 	defaults = common.MustNewConfigFrom(map[string]interface{}{
@@ -198,9 +196,4 @@ func GetPathConfig() string {
 	}
 	// TODO: Do we need this or should we always return *homePath?
 	return ""
-}
-
-// IsTestConfig returns whether or not this is configuration used for testing
-func IsTestConfig() bool {
-	return *testConfig
 }

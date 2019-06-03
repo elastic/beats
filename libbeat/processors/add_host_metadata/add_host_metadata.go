@@ -19,11 +19,9 @@ package add_host_metadata
 
 import (
 	"fmt"
-	"net"
 	"sync"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -31,75 +29,96 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/util"
 	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 )
 
 func init() {
-	processors.RegisterPlugin("add_host_metadata", newHostMetadataProcessor)
+	processors.RegisterPlugin("add_host_metadata", New)
 }
 
 type addHostMetadata struct {
-	info       types.HostInfo
 	lastUpdate struct {
 		time.Time
 		sync.Mutex
 	}
-	data   common.MapStrPointer
-	config Config
+	data    common.MapStrPointer
+	geoData common.MapStr
+	config  Config
 }
 
 const (
-	processorName   = "add_host_metadata"
-	cacheExpiration = time.Minute * 5
+	processorName = "add_host_metadata"
 )
 
-func newHostMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_host_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
 	}
 
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, err
-	}
 	p := &addHostMetadata{
-		info:   h.Info(),
 		config: config,
 		data:   common.NewMapStrPointer(nil),
 	}
 	p.loadData()
+
+	if config.Geo != nil {
+		geoFields, err := util.GeoConfigToMap(*config.Geo)
+		if err != nil {
+			return nil, err
+		}
+		p.geoData = common.MapStr{"host": common.MapStr{"geo": geoFields}}
+	}
+
 	return p, nil
 }
 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	p.loadData()
+	err := p.loadData()
+	if err != nil {
+		return nil, err
+	}
+
 	event.Fields.DeepUpdate(p.data.Get().Clone())
+
+	if len(p.geoData) > 0 {
+		event.Fields.DeepUpdate(p.geoData)
+	}
 	return event, nil
 }
 
 func (p *addHostMetadata) expired() bool {
+	if p.config.CacheTTL <= 0 {
+		return true
+	}
+
 	p.lastUpdate.Lock()
 	defer p.lastUpdate.Unlock()
 
-	if p.lastUpdate.Add(cacheExpiration).After(time.Now()) {
+	if p.lastUpdate.Add(p.config.CacheTTL).After(time.Now()) {
 		return false
 	}
 	p.lastUpdate.Time = time.Now()
 	return true
 }
 
-func (p *addHostMetadata) loadData() {
+func (p *addHostMetadata) loadData() error {
 	if !p.expired() {
-		return
+		return nil
 	}
 
-	data := host.MapHostInfo(p.info)
+	h, err := sysinfo.Host()
+	if err != nil {
+		return err
+	}
+
+	data := host.MapHostInfo(h.Info())
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
-		var ipList, hwList, err = p.getNetInfo()
+		var ipList, hwList, err = util.GetNetInfo()
 		if err != nil {
 			logp.Info("Error when getting network information %v", err)
 		}
@@ -112,55 +131,14 @@ func (p *addHostMetadata) loadData() {
 		}
 	}
 
+	if p.config.Name != "" {
+		data.Put("host.name", p.config.Name)
+	}
 	p.data.Set(data)
-}
-
-func (p *addHostMetadata) getNetInfo() ([]string, []string, error) {
-	var ipList []string
-	var hwList []string
-
-	// Get all interfaces and loop through them
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Keep track of all errors
-	var errs multierror.Errors
-
-	for _, i := range ifaces {
-		// Skip loopback interfaces
-		if i.Flags&net.FlagLoopback == net.FlagLoopback {
-			continue
-		}
-
-		hw := i.HardwareAddr.String()
-		// Skip empty hardware addresses
-		if hw != "" {
-			hwList = append(hwList, hw)
-		}
-
-		addrs, err := i.Addrs()
-		if err != nil {
-			// If we get an error, keep track of it and continue with the next interface
-			errs = append(errs, err)
-			continue
-		}
-
-		for _, addr := range addrs {
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ipList = append(ipList, v.IP.String())
-			case *net.IPAddr:
-				ipList = append(ipList, v.IP.String())
-			}
-		}
-	}
-
-	return ipList, hwList, errs.Err()
+	return nil
 }
 
 func (p *addHostMetadata) String() string {
-	return fmt.Sprintf("%v=[netinfo.enabled=[%v]]",
-		processorName, p.config.NetInfoEnabled)
+	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
+		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
 }

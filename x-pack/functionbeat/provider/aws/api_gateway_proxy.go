@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/core"
 	"github.com/elastic/beats/x-pack/functionbeat/provider"
@@ -32,6 +33,7 @@ type APIGatewayProxy struct {
 
 // NewAPIGatewayProxy creates a new function to receives events from the web api gateway.
 func NewAPIGatewayProxy(provider provider.Provider, config *common.Config) (provider.Function, error) {
+	cfgwarn.Experimental("The api_gateway_proxy trigger is experimental.")
 	return &APIGatewayProxy{log: logp.NewLogger("api gateway proxy")}, nil
 }
 

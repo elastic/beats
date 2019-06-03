@@ -4,6 +4,7 @@ package gosigar
 
 import (
 	"io/ioutil"
+	"runtime"
 	"strconv"
 	"strings"
 	"unsafe"
@@ -108,5 +109,50 @@ func parseCpuStat(self *Cpu, line string) error {
 	self.Nice, _ = strtoull(fields[2])
 	self.Sys, _ = strtoull(fields[3])
 	self.Idle, _ = strtoull(fields[4])
+	return nil
+}
+
+func (self *Mem) Get() error {
+	val := C.uint32_t(0)
+	sc := C.size_t(4)
+
+	name := C.CString("vm.stats.vm.v_page_count")
+	_, err := C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
+	C.free(unsafe.Pointer(name))
+	if err != nil {
+		return err
+	}
+	pagecount := uint64(val)
+
+	name = C.CString("vm.stats.vm.v_page_size")
+	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
+	C.free(unsafe.Pointer(name))
+	if err != nil {
+		return err
+	}
+	pagesize := uint64(val)
+
+	name = C.CString("vm.stats.vm.v_free_count")
+	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
+	C.free(unsafe.Pointer(name))
+	if err != nil {
+		return err
+	}
+	self.Free = uint64(val) * pagesize
+
+	name = C.CString("vm.stats.vm.v_inactive_count")
+	_, err = C.sysctlbyname(name, unsafe.Pointer(&val), &sc, nil, 0)
+	C.free(unsafe.Pointer(name))
+	if err != nil {
+		return err
+	}
+	kern := uint64(val)
+
+	self.Total = uint64(pagecount * pagesize)
+
+	self.Used = self.Total - self.Free
+	self.ActualFree = self.Free + (kern * pagesize)
+	self.ActualUsed = self.Used - (kern * pagesize)
+
 	return nil
 }

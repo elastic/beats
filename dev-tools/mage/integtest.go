@@ -20,8 +20,12 @@ package mage
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -41,6 +45,8 @@ var (
 	integTestUseCountLock sync.Mutex // Lock to guard integTestUseCount.
 
 	integTestLock sync.Mutex // Only allow one integration test at a time.
+
+	integTestBuildImagesOnce sync.Once // Build images one time for all integ testing.
 )
 
 // Integration Test Configuration
@@ -92,6 +98,10 @@ func StopIntegTestEnv() error {
 		return nil
 	}
 
+	if _, skip := skipIntegTest(); skip {
+		return nil
+	}
+
 	composeEnv, err := integTestDockerComposeEnvVars()
 	if err != nil {
 		return err
@@ -126,6 +136,11 @@ func StopIntegTestEnv() error {
 //
 // Always use this with AddIntegTestUsage() and defer StopIntegTestEnv().
 func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...string) error {
+	if reason, skip := skipIntegTest(); skip {
+		fmt.Printf(">> %v: Skipping because %v\n", mageTarget, reason)
+		return nil
+	}
+
 	AddIntegTestUsage()
 	defer StopIntegTestEnv()
 
@@ -139,7 +154,17 @@ func RunIntegTest(mageTarget string, test func() error, passThroughEnvVars ...st
 
 func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars ...string) error {
 	if IsInIntegTestEnv() {
+		// Fix file permissions after test is done writing files as root.
+		if runtime.GOOS != "windows" {
+			defer DockerChown(".")
+		}
 		return test()
+	}
+
+	var err error
+	integTestBuildImagesOnce.Do(func() { err = dockerComposeBuildImages() })
+	if err != nil {
+		return err
 	}
 
 	// Test that we actually have Docker and docker-compose.
@@ -164,6 +189,10 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 		// Disable strict.perms because we moust host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
+	}
+	args, err = addUidGidEnvArgs(args)
+	if err != nil {
+		return err
 	}
 	for _, envVar := range passThroughEnvVars {
 		args = append(args, "-e", envVar+"="+os.Getenv(envVar))
@@ -214,6 +243,31 @@ func haveIntegTestEnvRequirements() error {
 	return nil
 }
 
+// skipIntegTest returns true if integ tests should be skipped.
+func skipIntegTest() (reason string, skip bool) {
+	if IsInIntegTestEnv() {
+		return "", false
+	}
+
+	// Honor the TEST_ENVIRONMENT value if set.
+	if testEnvVar, isSet := os.LookupEnv("TEST_ENVIRONMENT"); isSet {
+		enabled, err := strconv.ParseBool(testEnvVar)
+		if err != nil {
+			panic(errors.Wrap(err, "failed to parse TEST_ENVIRONMENT value"))
+		}
+		return "TEST_ENVIRONMENT=" + testEnvVar, !enabled
+	}
+
+	// Otherwise skip if we don't have all the right dependencies.
+	if err := haveIntegTestEnvRequirements(); err != nil {
+		// Skip if we don't meet the requirements.
+		log.Println("Skipping integ test because:", err)
+		return "docker is not available", true
+	}
+
+	return "", false
+}
+
 // integTestDockerComposeEnvVars returns the environment variables used for
 // executing docker-compose (not the variables passed into the containers).
 // docker-compose uses these when evaluating docker-compose.yml files.
@@ -231,10 +285,55 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 	}, nil
 }
 
+// dockerComposeProjectName returns the project name to use with docker-compose.
+// It is passed to docker-compose using the `-p` flag. And is passed to our
+// Go and Python testing libraries through the DOCKER_COMPOSE_PROJECT_NAME
+// environment variable.
 func dockerComposeProjectName() string {
-	projectName := "{{.BeatName}}{{.StackEnvironment}}{{ beat_version }}{{ commit }}"
+	commit, err := CommitHash()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+	}
+
+	version, err := BeatQualifiedVersion()
+	if err != nil {
+		panic(errors.Wrap(err, "failed to construct docker compose project name"))
+	}
+	version = strings.NewReplacer(".", "_").Replace(version)
+
+	projectName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
 	projectName = MustExpand(projectName, map[string]interface{}{
 		"StackEnvironment": StackEnvironment,
+		"ShortCommit":      commit[:10],
+		"Version":          version,
 	})
 	return projectName
+}
+
+// dockerComposeBuildImages builds all images in the docker-compose.yml file.
+func dockerComposeBuildImages() error {
+	fmt.Println(">> Building docker images")
+
+	composeEnv, err := integTestDockerComposeEnvVars()
+	if err != nil {
+		return err
+	}
+
+	args := []string{"-p", dockerComposeProjectName(), "build", "--pull", "--force-rm"}
+	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
+		args = append(args, "--no-cache")
+	}
+
+	out := ioutil.Discard
+	if mg.Verbose() {
+		out = os.Stderr
+	}
+
+	_, err = sh.Exec(
+		composeEnv,
+		out,
+		os.Stderr,
+		"docker-compose", args...,
+	)
+	return err
 }

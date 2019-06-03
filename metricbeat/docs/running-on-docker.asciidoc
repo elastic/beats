@@ -1,4 +1,4 @@
-include::../../libbeat/docs/shared-docker.asciidoc[]
+include::{libbeat-dir}/docs/shared-docker.asciidoc[]
 
 [float]
 [[monitoring-host]]
@@ -18,8 +18,8 @@ docker run \
   --mount type=bind,source=/proc,target=/hostfs/proc,readonly \ <1>
   --mount type=bind,source=/sys/fs/cgroup,target=/hostfs/sys/fs/cgroup,readonly \ <2>
   --mount type=bind,source=/,target=/hostfs,readonly \ <3>
-  --net=host <4>
-  {dockerimage} -system.hostfs=/hostfs
+  --net=host \ <4>
+  {dockerimage} -e -system.hostfs=/hostfs
 ----
 
 <1> Metricbeat's <<metricbeat-module-system,system module>> collects much of its data through the Linux proc
@@ -46,7 +46,20 @@ NOTE: The special filesystems +/proc+ and +/sys+ are only available if the
 host system is running Linux. Attempts to bind-mount these filesystems will
 fail on Windows and MacOS.
 
+
+If the <<metricbeat-metricset-system-socket,system socket metricset>>
+is being used on Linux, more privileges will need to be granted to Metricbeat.
+This metricset reads files from `/proc` that are an interface to internal
+objects owned by other users. The capabilities needed to read all these files
+(`sys_ptrace` and `dac_read_search`) are disabled by default on Docker. To
+grant these permissions these flags are needed too:
+
+["source","sh",subs="attributes"]
+----
+--user root --cap-add sys_ptrace --cap-add dac_read_search
+----
 [float]
+
 [[monitoring-service]]
 ==== Monitor a service in another container
 

@@ -1,0 +1,1232 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "Hosts [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null, 
+                                "direction": null
+                            }
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Number of connections", 
+                                "field": "mongodb.status.connections.current"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "field": "service.address", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "bucket", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Arch", 
+                                "field": "mongodb.status.memory.bits"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "Resident memory", 
+                                "field": "mongodb.status.memory.resident.mb"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "5", 
+                            "params": {
+                                "customLabel": "Virtual memory", 
+                                "field": "mongodb.status.memory.virtual.mb"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }
+                    ], 
+                    "params": {
+                        "perPage": 10, 
+                        "showMeticsAtAllLevels": false, 
+                        "showPartialRows": false, 
+                        "showTotal": false, 
+                        "sort": {
+                            "columnIndex": null, 
+                            "direction": null
+                        }, 
+                        "totalFunc": "sum"
+                    }, 
+                    "title": "Hosts [Metricbeat MongoDB] ECS", 
+                    "type": "table"
+                }
+            }, 
+            "id": "MongoDB-hosts-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "Engine & Version [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "field": "service.address"
+                            }, 
+                            "schema": "metric", 
+                            "type": "cardinality"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Engine", 
+                                "field": "mongodb.status.storage_engine.name", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Version", 
+                                "field": "service.version", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "bottom", 
+                        "shareYAxis": true, 
+                        "type": "pie"
+                    }, 
+                    "title": "Engine & Version [Metricbeat MongoDB] ECS", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "MongoDB-Engine-ampersand-Version-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "Operation counters [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "command", 
+                                "field": "mongodb.status.ops.counters.command"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "delete", 
+                                "field": "mongodb.status.ops.counters.delete"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "getmore", 
+                                "field": "mongodb.status.ops.counters.getmore"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "5", 
+                            "params": {
+                                "customLabel": "insert", 
+                                "field": "mongodb.status.ops.counters.insert"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "6", 
+                            "params": {
+                                "customLabel": "query", 
+                                "field": "mongodb.status.ops.counters.query"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "7", 
+                            "params": {
+                                "customLabel": "update", 
+                                "field": "mongodb.status.ops.replicated.update"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "interpolate": "linear", 
+                        "legendPosition": "bottom", 
+                        "mode": "stacked", 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "interpolate": "linear", 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "area", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "smoothLines": false, 
+                        "times": [], 
+                        "type": "area", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Operation counters [Metricbeat MongoDB] ECS", 
+                    "type": "area"
+                }
+            }, 
+            "id": "MongoDB-operation-counters-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "Concurrent transactions Read [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "Read Available": "#508642", 
+                            "Read Used": "#BF1B00"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Read Available", 
+                                "field": "mongodb.status.wired_tiger.concurrent_transactions.read.available"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Read Used", 
+                                "field": "mongodb.status.wired_tiger.concurrent_transactions.read.out"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "interpolate": "linear", 
+                        "legendPosition": "bottom", 
+                        "mode": "stacked", 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "interpolate": "linear", 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "area", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "smoothLines": false, 
+                        "times": [], 
+                        "type": "area", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Concurrent transactions Read [Metricbeat MongoDB] ECS", 
+                    "type": "area"
+                }
+            }, 
+            "id": "MongoDB-Concurrent-transactions-Read-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "Concurrent transactions Write [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {
+                    "vis": {
+                        "colors": {
+                            "Write Available": "#629E51", 
+                            "Write Used": "#BF1B00"
+                        }
+                    }
+                }, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Write Available", 
+                                "field": "mongodb.status.wired_tiger.concurrent_transactions.write.available"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Write Used", 
+                                "field": "mongodb.status.wired_tiger.concurrent_transactions.write.out"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "interpolate": "linear", 
+                        "legendPosition": "bottom", 
+                        "mode": "stacked", 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "interpolate": "linear", 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "area", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "smoothLines": false, 
+                        "times": [], 
+                        "type": "area", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Concurrent transactions Write [Metricbeat MongoDB] ECS", 
+                    "type": "area"
+                }
+            }, 
+            "id": "MongoDB-Concurrent-transactions-Write-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "Memory stats [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "Mapped", 
+                                "field": "mongodb.status.memory.mapped.mb"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "Mapped with journal", 
+                                "field": "mongodb.status.memory.mapped_with_journal.mb"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "Rezident", 
+                                "field": "mongodb.status.memory.resident.mb"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "5", 
+                            "params": {
+                                "customLabel": "Virtual", 
+                                "field": "mongodb.status.memory.virtual.mb"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "drawLinesBetweenPoints": true, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "interpolate": "linear", 
+                        "legendPosition": "bottom", 
+                        "radiusRatio": 9, 
+                        "scale": "log", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "mode": "normal", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "line", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "showCircles": true, 
+                        "smoothLines": false, 
+                        "times": [], 
+                        "type": "line", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Memory stats [Metricbeat MongoDB] ECS", 
+                    "type": "line"
+                }
+            }, 
+            "id": "MongoDB-memory-stats-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "Asserts [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "message", 
+                                "field": "mongodb.status.asserts.msg"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "regular", 
+                                "field": "mongodb.status.asserts.regular"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "rollover", 
+                                "field": "mongodb.status.asserts.rollovers"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "5", 
+                            "params": {
+                                "customLabel": "user", 
+                                "field": "mongodb.status.asserts.user"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "6", 
+                            "params": {
+                                "customLabel": "warning", 
+                                "field": "mongodb.status.asserts.warning"
+                            }, 
+                            "schema": "metric", 
+                            "type": "max"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "interpolate": "linear", 
+                        "legendPosition": "bottom", 
+                        "mode": "stacked", 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "interpolate": "linear", 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "area", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "smoothLines": false, 
+                        "times": [], 
+                        "type": "area", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "Asserts [Metricbeat MongoDB] ECS", 
+                    "type": "area"
+                }
+            }, 
+            "id": "MongoDB-asserts-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": []
+                    }
+                }, 
+                "savedSearchId": "MongoDB-search-ecs", 
+                "title": "WiredTiger Cache [Metricbeat MongoDB] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {
+                                "customLabel": "max", 
+                                "field": "mongodb.status.wired_tiger.cache.maximum.bytes"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "customLabel": "used", 
+                                "field": "mongodb.status.wired_tiger.cache.used.bytes"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "4", 
+                            "params": {
+                                "customLabel": "dirty", 
+                                "field": "mongodb.status.wired_tiger.cache.dirty.bytes"
+                            }, 
+                            "schema": "metric", 
+                            "type": "avg"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "defaultYExtents": false, 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "interpolate": "linear", 
+                        "legendPosition": "bottom", 
+                        "mode": "overlap", 
+                        "scale": "linear", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "interpolate": "linear", 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "area", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "setYExtents": false, 
+                        "shareYAxis": true, 
+                        "smoothLines": false, 
+                        "times": [], 
+                        "type": "area", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ], 
+                        "yAxis": {}
+                    }, 
+                    "title": "WiredTiger Cache [Metricbeat MongoDB] ECS", 
+                    "type": "area"
+                }
+            }, 
+            "id": "MongoDB-WiredTiger-Cache-ecs", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlight": {
+                            "fields": {
+                                "*": {}
+                            }, 
+                            "fragment_size": 2147483647, 
+                            "post_tags": [
+                                "@/kibana-highlighted-field@"
+                            ], 
+                            "pre_tags": [
+                                "@kibana-highlighted-field@"
+                            ], 
+                            "require_field_match": false
+                        }, 
+                        "index": "metricbeat-*", 
+                        "query": {
+                            "language": "kuery",
+                                "query": "event.module:mongodb"
+                            }
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "MongoDB search ECS", 
+                "version": 1
+            }, 
+            "id": "MongoDB-search-ecs", 
+            "type": "search", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Overview of MongoDB server status",
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "col": 1, 
+                        "id": "MongoDB-hosts-ecs", 
+                        "panelIndex": 1, 
+                        "row": 1, 
+                        "size_x": 8, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 9, 
+                        "id": "MongoDB-Engine-ampersand-Version-ecs", 
+                        "panelIndex": 4, 
+                        "row": 1, 
+                        "size_x": 4, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "MongoDB-operation-counters-ecs", 
+                        "panelIndex": 2, 
+                        "row": 4, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 7, 
+                        "id": "MongoDB-Concurrent-transactions-Read-ecs", 
+                        "panelIndex": 6, 
+                        "row": 4, 
+                        "size_x": 3, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 10, 
+                        "id": "MongoDB-Concurrent-transactions-Write-ecs", 
+                        "panelIndex": 7, 
+                        "row": 4, 
+                        "size_x": 3, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "MongoDB-memory-stats-ecs", 
+                        "panelIndex": 5, 
+                        "row": 10, 
+                        "size_x": 12, 
+                        "size_y": 4, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 7, 
+                        "id": "MongoDB-asserts-ecs", 
+                        "panelIndex": 3, 
+                        "row": 7, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "MongoDB-WiredTiger-Cache-ecs", 
+                        "panelIndex": 8, 
+                        "row": 7, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "[Metricbeat MongoDB] Overview ECS", 
+                "uiStateJSON": {
+                    "P-1": {
+                        "vis": {
+                            "params": {
+                                "sort": {
+                                    "columnIndex": null, 
+                                    "direction": null
+                                }
+                            }
+                        }
+                    }
+                }, 
+                "version": 1
+            }, 
+            "id": "Metricbeat-MongoDB-ecs", 
+            "type": "dashboard", 
+            "version": 3
+        }
+    ], 
+    "version": "6.0.0-beta1-SNAPSHOT"
+}

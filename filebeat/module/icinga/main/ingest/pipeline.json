@@ -4,18 +4,13 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "\\[%{TIMESTAMP:icinga.main.timestamp}\\] %{WORD:icinga.main.severity}/%{WORD:icinga.main.facility}: %{GREEDYMULTILINE:icinga.main.message}"
+        "\\[%{TIMESTAMP:icinga.main.timestamp}\\] %{WORD:log.level}/%{WORD:icinga.main.facility}: %{GREEDYMULTILINE:message}"
       ],
       "ignore_missing": true,
       "pattern_definitions": {
         "TIMESTAMP": "%{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND} %{ISO8601_TIMEZONE}",
         "GREEDYMULTILINE": "(.|\n)*"
       }
-    }
-  },
-  {
-    "remove": {
-      "field": "message"
     }
   },
   {

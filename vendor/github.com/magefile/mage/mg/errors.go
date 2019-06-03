@@ -28,7 +28,7 @@ func Fatal(code int, args ...interface{}) error {
 }
 
 // Fatalf returns an error that will cause mage to print out the
-// given message and exit with an exit code of 1.
+// given message and exit with the given exit code.
 func Fatalf(code int, format string, args ...interface{}) error {
 	return fatalErr{
 		code:  code,

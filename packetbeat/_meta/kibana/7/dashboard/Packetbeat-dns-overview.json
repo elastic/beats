@@ -1,0 +1,975 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Query Summary [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Client Bytes",
+                "field": "source.bytes"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Server Bytes",
+                "field": "destination.bytes"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Avg Response Time (ns)",
+                "field": "event.duration"
+              },
+              "schema": "metric",
+              "type": "avg"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "fontSize": "17",
+            "handleNoResults": true,
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 28,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "DNS Query Summary [Packetbeat] ECS",
+          "type": "metric"
+        }
+      },
+      "id": "DNS-Query-Summary-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Request Status Over Time [Packetbeat] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "Error": "#890F02",
+              "OK": "#0A50A1"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "status",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "mode": "stacked",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": "true",
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "smoothLines": false,
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "DNS Request Status Over Time [Packetbeat] ECS",
+          "type": "area"
+        }
+      },
+      "id": "DNS-Request-Status-Over-Time-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Question Types [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "dns.question.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": false,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "shareYAxis": true,
+            "type": "pie"
+          },
+          "title": "DNS Question Types [Packetbeat] ECS",
+          "type": "pie"
+        }
+      },
+      "id": "DNS-Question-Types-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "status",
+                  "negate": false,
+                  "params": {
+                    "query": "OK",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "OK"
+                },
+                "query": {
+                  "match": {
+                    "status": {
+                      "query": "OK",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ],
+              "require_field_match": false
+            },
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Top 10 Questions [Packetbeat] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Question",
+                "field": "dns.question.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 30
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "DNS Top 10 Questions [Packetbeat] ECS",
+          "type": "table"
+        }
+      },
+      "id": "DNS-Top-10-Questions-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ],
+              "require_field_match": false
+            },
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Response Codes [Packetbeat] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Response Code",
+                "field": "dns.response_code",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "DNS Response Codes [Packetbeat] ECS",
+          "type": "table"
+        }
+      },
+      "id": "DNS-Response-Codes-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat] ECS",
+        "uiStateJSON": {
+          "vis": {
+            "colors": {
+              "Avg Response Time (ns)": "#629E51",
+              "Max Response Time (ns)": "#E24D42",
+              "Min Response Time (ns)": "#70DBED"
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "customLabel": "Min Response Time (ns)",
+                "field": "event.duration"
+              },
+              "schema": "metric",
+              "type": "min"
+            },
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Avg Response Time (ns)",
+                "field": "event.duration"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Max Response Time (ns)",
+                "field": "event.duration"
+              },
+              "schema": "metric",
+              "type": "max"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "4",
+                  "label": "Min Response Time (ns)"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Avg Response Time (ns)"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "3",
+                  "label": "Max Response Time (ns)"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": true,
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Average event.duration"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat] ECS",
+          "type": "area"
+        }
+      },
+      "id": "735d25c0-1459-11e9-9de0-f98d1808db8e-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+        "title": "DNS Client and Servers Pie Chart [Packetbeat] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customLabel": "Server",
+                "field": "destination.ip",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Client",
+                "field": "source.ip",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "DNS Client and Servers Pie Chart [Packetbeat] ECS",
+          "type": "pie"
+        }
+      },
+      "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "server.ip",
+          "destination.ip",
+          "dns.question.name",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "network.protocol",
+                  "negate": false,
+                  "params": {
+                    "query": "dns",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "dns"
+                },
+                "query": {
+                  "match": {
+                    "network.protocol": {
+                      "query": "dns",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ],
+              "require_field_match": false
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "DNS Protocol [Packetbeat] ECS",
+        "version": 1
+      },
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
+      "type": "search",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "Overview of DNS request and response metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "id": "DNS-Query-Summary-ecs",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "id": "DNS-Request-Status-Over-Time-ecs",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "3",
+              "w": 13,
+              "x": 0,
+              "y": 15
+            },
+            "id": "DNS-Question-Types-ecs",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 24,
+              "x": 0,
+              "y": 30
+            },
+            "id": "DNS-Top-10-Questions-ecs",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "6",
+              "w": 24,
+              "x": 24,
+              "y": 30
+            },
+            "id": "DNS-Response-Codes-ecs",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "7",
+              "w": 24,
+              "x": 24,
+              "y": 15
+            },
+            "id": "735d25c0-1459-11e9-9de0-f98d1808db8e-ecs",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "8",
+              "w": 11,
+              "x": 13,
+              "y": 15
+            },
+            "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e-ecs",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Packetbeat] DNS Overview ECS",
+        "version": 1
+      },
+      "id": "65120940-1454-11e9-9de0-f98d1808db8e-ecs",
+      "type": "dashboard",
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
+    }
+  ],
+  "version": "7.0.0-SNAPSHOT"
+}

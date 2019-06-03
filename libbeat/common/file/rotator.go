@@ -67,7 +67,9 @@ type Rotator struct {
 	permissions     os.FileMode
 	log             Logger // Optional Logger (may be nil).
 	interval        time.Duration
+	rotateOnStartup bool
 	intervalRotator *intervalRotator // Optional, may be nil
+	redirectStderr  bool
 
 	file  *os.File
 	size  uint
@@ -123,14 +125,31 @@ func Interval(d time.Duration) RotatorOption {
 	}
 }
 
+// RotateOnStartup immediately rotates files on startup rather than appending to
+// the existing file. The default is true.
+func RotateOnStartup(b bool) RotatorOption {
+	return func(r *Rotator) {
+		r.rotateOnStartup = b
+	}
+}
+
+// RedirectStderr causes all writes to standard error to be redirected
+// to this rotator.
+func RedirectStderr(redirect bool) RotatorOption {
+	return func(r *Rotator) {
+		r.redirectStderr = redirect
+	}
+}
+
 // NewFileRotator returns a new Rotator.
 func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error) {
 	r := &Rotator{
-		filename:     filename,
-		maxSizeBytes: 10 * 1024 * 1024, // 10 MiB
-		maxBackups:   7,
-		permissions:  0600,
-		interval:     0,
+		filename:        filename,
+		maxSizeBytes:    10 * 1024 * 1024, // 10 MiB
+		maxBackups:      7,
+		permissions:     0600,
+		interval:        0,
+		rotateOnStartup: true,
 	}
 
 	for _, opt := range options {
@@ -251,6 +270,8 @@ func (r *Rotator) dirMode() os.FileMode {
 	return os.FileMode(mode)
 }
 
+// openNew opens r's log file for the first time, creating it if it doesn't
+// exist, and performing an initial rotation if r.rotateOnStartup is set.
 func (r *Rotator) openNew() error {
 	err := os.MkdirAll(r.dir(), r.dirMode())
 	if err != nil {
@@ -259,6 +280,11 @@ func (r *Rotator) openNew() error {
 
 	_, err = os.Stat(r.filename)
 	if err == nil {
+		if !r.rotateOnStartup {
+			// If the file exists and rotateOnStartup is false, then we just want to
+			// append to the existing file.
+			return r.appendToFile()
+		}
 		if err = r.rotate(rotateReasonInitializing); err != nil {
 			return err
 		}
@@ -277,7 +303,24 @@ func (r *Rotator) openFile() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to open new file")
 	}
+	if r.redirectStderr {
+		RedirectStandardError(r.file)
+	}
+	return nil
+}
 
+// appendToFile opens an existing log file for appending. Unlike openFile it
+// does not call MkdirAll because it is an error for the file to not already
+// exist.
+func (r *Rotator) appendToFile() error {
+	var err error
+	r.file, err = os.OpenFile(r.filename, os.O_WRONLY|os.O_APPEND, r.permissions)
+	if err != nil {
+		return errors.Wrap(err, "failed to append to existing file")
+	}
+	if r.redirectStderr {
+		RedirectStandardError(r.file)
+	}
 	return nil
 }
 
@@ -355,6 +398,9 @@ func (r *Rotator) rotate(reason rotateReason) error {
 
 	var err error
 	if r.intervalRotator != nil {
+		// Interval and size rotation use different filename patterns, so we use
+		// rotateByInterval if interval rotation is enabled, even if this specific
+		// rotation is triggered by size.
 		err = r.rotateByInterval(reason)
 	} else {
 		err = r.rotateBySize(reason)

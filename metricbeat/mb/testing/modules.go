@@ -81,10 +81,10 @@ func NewTestModule(t testing.TB, config interface{}) *TestModule {
 	return &TestModule{RawConfig: c}
 }
 
-// newMetricSet instantiates a new MetricSet using the given configuration.
+// NewMetricSet instantiates a new MetricSet using the given configuration.
 // The ModuleFactory and MetricSetFactory are obtained from the global
 // Registry.
-func newMetricSet(t testing.TB, config interface{}) mb.MetricSet {
+func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 	c, err := common.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
@@ -112,7 +112,7 @@ func newMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
 func NewEventFetcher(t testing.TB, config interface{}) mb.EventFetcher {
-	metricSet := newMetricSet(t, config)
+	metricSet := NewMetricSet(t, config)
 
 	fetcher, ok := metricSet.(mb.EventFetcher)
 	if !ok {
@@ -126,7 +126,7 @@ func NewEventFetcher(t testing.TB, config interface{}) mb.EventFetcher {
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
 func NewEventsFetcher(t testing.TB, config interface{}) mb.EventsFetcher {
-	metricSet := newMetricSet(t, config)
+	metricSet := NewMetricSet(t, config)
 
 	fetcher, ok := metricSet.(mb.EventsFetcher)
 	if !ok {
@@ -137,7 +137,7 @@ func NewEventsFetcher(t testing.TB, config interface{}) mb.EventsFetcher {
 }
 
 func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {
-	metricSet := newMetricSet(t, config)
+	metricSet := NewMetricSet(t, config)
 
 	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSet)
 	if !ok {
@@ -158,7 +158,7 @@ func ReportingFetch(metricSet mb.ReportingMetricSet) ([]common.MapStr, []error) 
 // NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
 func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetricSetV2 {
-	metricSet := newMetricSet(t, config)
+	metricSet := NewMetricSet(t, config)
 
 	reportingMetricSetV2, ok := metricSet.(mb.ReportingMetricSetV2)
 	if !ok {
@@ -166,6 +166,19 @@ func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetri
 	}
 
 	return reportingMetricSetV2
+}
+
+// NewReportingMetricSetV2Error returns a new ReportingMetricSetV2 instance. Then
+// you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
+func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.ReportingMetricSetV2Error {
+	metricSet := NewMetricSet(t, config)
+
+	reportingMetricSetV2Error, ok := metricSet.(mb.ReportingMetricSetV2Error)
+	if !ok {
+		t.Fatal("MetricSet does not implement ReportingMetricSetV2Error")
+	}
+
+	return reportingMetricSetV2Error
 }
 
 // CapturingReporterV2 is a reporter used for testing which stores all events and errors
@@ -204,11 +217,22 @@ func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
 	return r.events, r.errs
 }
 
+// ReportingFetchV2Error runs the given reporting metricset and returns all of the
+// events and errors that occur during that period.
+func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, []error) {
+	r := &CapturingReporterV2{}
+	err := metricSet.Fetch(r)
+	if err != nil {
+		r.errs = append(r.errs, err)
+	}
+	return r.events, r.errs
+}
+
 // NewPushMetricSet instantiates a new PushMetricSet using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
 func NewPushMetricSet(t testing.TB, config interface{}) mb.PushMetricSet {
-	metricSet := newMetricSet(t, config)
+	metricSet := NewMetricSet(t, config)
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSet)
 	if !ok {
@@ -273,7 +297,7 @@ func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]com
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
 func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
-	metricSet := newMetricSet(t, config)
+	metricSet := NewMetricSet(t, config)
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
 	if !ok {

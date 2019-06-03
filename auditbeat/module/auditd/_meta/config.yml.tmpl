@@ -41,4 +41,5 @@
     ## Unauthorized access attempts.
     #-a always,exit -F arch=b{{call .ArchBits .GOARCH}} -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
     #-a always,exit -F arch=b{{call .ArchBits .GOARCH}} -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
-{{ end -}}
+
+{{ end }}

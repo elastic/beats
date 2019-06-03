@@ -27,17 +27,18 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
-
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/heartbeat/reason"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 func newHTTPMonitorHostJob(
@@ -47,60 +48,36 @@ func newHTTPMonitorHostJob(
 	enc contentEncoder,
 	body []byte,
 	validator RespCheck,
-) (monitors.Job, error) {
-	typ := config.Name
-	id := fmt.Sprintf("%v@%v", typ, addr)
+) (jobs.Job, error) {
 
 	client := &http.Client{
 		CheckRedirect: makeCheckRedirect(config.MaxRedirects),
 		Transport:     transport,
 		Timeout:       config.Timeout,
 	}
-	request, err := BuildRequest(addr, config, enc)
-	if err != nil {
-		return nil, err
-	}
-
-	hostname, port, err := splitHostnamePort(request)
+	request, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
 	}
 
 	timeout := config.Timeout
 
-	return monitors.WithJobId(id,
-		monitors.WithFields(
-			common.MapStr{
-				"monitor": common.MapStr{
-					"scheme": request.URL.Scheme,
-					"host":   hostname,
-				},
-				"http": common.MapStr{
-					"url": request.URL.String(),
-				},
-				"tcp": common.MapStr{
-					"port": port,
-				},
-			},
-			monitors.MakeSimpleJob(func() (*beat.Event, error) {
-				_, _, event, err := execPing(client, request, body, timeout, validator)
-				return event, err
-			}),
-		)), nil
+	return jobs.MakeSimpleJob(func(event *beat.Event) error {
+		_, _, err := execPing(event, client, request, body, timeout, validator)
+		return err
+	}), nil
 }
 
-func NewHTTPMonitorIPsJob(
+func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
 	tls *transport.TLSConfig,
 	enc contentEncoder,
 	body []byte,
 	validator RespCheck,
-) (monitors.Job, error) {
-	typ := config.Name
-	id := fmt.Sprintf("%v@%v", typ, addr)
+) (jobs.Job, error) {
 
-	req, err := BuildRequest(addr, config, enc)
+	req, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -110,41 +87,27 @@ func NewHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	settings := monitors.MakeHostJobSettings(id, hostname, config.Mode)
+	settings := monitors.MakeHostJobSettings(hostname, config.Mode)
 
-	pingFactory := CreatePingFactory(config, hostname, port, tls, req, body, validator)
+	pingFactory := createPingFactory(config, port, tls, req, body, validator)
 	job, err := monitors.MakeByHostJob(settings, pingFactory)
 
-	fields := common.MapStr{
-		"monitor": common.MapStr{
-			"scheme": req.URL.Scheme,
-		},
-		"http": common.MapStr{
-			"url": req.URL.String(),
-		},
-		"tcp": common.MapStr{
-			"port": port,
-		},
-	}
-
-	return monitors.WithJobId(id, monitors.WithFields(fields, job)), err
+	return job, err
 }
 
-func CreatePingFactory(
+func createPingFactory(
 	config *Config,
-	hostname string,
 	port uint16,
 	tls *transport.TLSConfig,
 	request *http.Request,
 	body []byte,
 	validator RespCheck,
-) func(*net.IPAddr) monitors.Job {
+) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
 	checkRedirect := makeCheckRedirect(config.MaxRedirects)
 
-	return monitors.MakePingIPFactory(func(ip *net.IPAddr) (*beat.Event, error) {
-		event := &beat.Event{}
+	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
 		d := &dialchain.DialerChain{
 			Net: dialchain.MakeConstAddrDialer(addr, dialchain.TCPDialer(timeout)),
@@ -158,32 +121,45 @@ func CreatePingFactory(
 
 		dialer, err := d.Build(event)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		var (
 			writeStart, readStart, writeEnd time.Time
 		)
+		// Ensure memory consistency for these callbacks.
+		// It seems they can be invoked still sometime after the request is done
+		cbMutex := sync.Mutex{}
 
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
 			Transport: &SimpleTransport{
-				Dialer:       dialer,
-				OnStartWrite: func() { writeStart = time.Now() },
-				OnEndWrite:   func() { writeEnd = time.Now() },
-				OnStartRead:  func() { readStart = time.Now() },
+				Dialer: dialer,
+				OnStartWrite: func() {
+					cbMutex.Lock()
+					writeStart = time.Now()
+					cbMutex.Unlock()
+				},
+				OnEndWrite: func() {
+					cbMutex.Lock()
+					writeEnd = time.Now()
+					cbMutex.Unlock()
+				},
+				OnStartRead: func() {
+					cbMutex.Lock()
+					readStart = time.Now()
+					cbMutex.Unlock()
+				},
 			},
 		}
 
-		_, end, result, err := execPing(client, request, body, timeout, validator)
-
-		if result != nil {
-			monitors.MergeEventFields(event, result.Fields)
-		}
+		_, end, err := execPing(event, client, request, body, timeout, validator)
+		cbMutex.Lock()
+		defer cbMutex.Unlock()
 
 		if !readStart.IsZero() {
-			monitors.MergeEventFields(event, common.MapStr{
+			eventext.MergeEventFields(event, common.MapStr{
 				"http": common.MapStr{
 					"rtt": common.MapStr{
 						"write_request":   look.RTT(writeEnd.Sub(writeStart)),
@@ -193,15 +169,15 @@ func CreatePingFactory(
 			})
 		}
 		if !writeStart.IsZero() {
-			event.Fields.Put("http.rtt.validate", look.RTT(end.Sub(writeStart)))
-			event.Fields.Put("http.rtt.content", look.RTT(end.Sub(readStart)))
+			event.PutValue("http.rtt.validate", look.RTT(end.Sub(writeStart)))
+			event.PutValue("http.rtt.content", look.RTT(end.Sub(readStart)))
 		}
 
-		return event, err
+		return err
 	})
 }
 
-func BuildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
+func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Request, error) {
 	method := strings.ToUpper(config.Check.Request.Method)
 	request, err := http.NewRequest(method, addr, nil)
 	if err != nil {
@@ -213,6 +189,11 @@ func BuildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 		request.SetBasicAuth(config.Username, config.Password)
 	}
 	for k, v := range config.Check.Request.SendHeaders {
+		// defining the Host header isn't enough. See https://github.com/golang/go/issues/7682
+		if k == "Host" {
+			request.Host = v
+		}
+
 		request.Header.Add(k, v)
 	}
 
@@ -224,28 +205,41 @@ func BuildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 }
 
 func execPing(
+	event *beat.Event,
 	client *http.Client,
 	req *http.Request,
 	body []byte,
 	timeout time.Duration,
 	validator func(*http.Response) error,
-) (start, end time.Time, event *beat.Event, errReason reason.Reason) {
+) (start, end time.Time, errReason reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	req = attachRequestBody(&ctx, req, body)
 	start, end, resp, errReason := execRequest(client, req, validator)
 
-	if errReason != nil {
-		if resp != nil {
-			return start, end, makeEvent(end.Sub(start), resp), errReason
-		}
-		return start, end, nil, errReason
+	if errReason == nil || errReason.Type() != "io" {
+		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+			"rtt": common.MapStr{
+				"total": look.RTT(end.Sub(start)),
+			},
+		}})
 	}
 
-	event = makeEvent(end.Sub(start), resp)
+	if resp != nil {
+		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+			"response": common.MapStr{"status_code": resp.StatusCode},
+		}})
+	}
 
-	return start, end, event, nil
+	if errReason != nil {
+		if resp != nil {
+			return start, end, errReason
+		}
+		return start, end, errReason
+	}
+
+	return start, end, nil
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
@@ -280,21 +274,6 @@ func execRequest(client *http.Client, req *http.Request, validator func(*http.Re
 	io.Copy(ioutil.Discard, resp.Body)
 
 	return start, time.Now(), resp, nil
-}
-
-func makeEvent(rtt time.Duration, resp *http.Response) *beat.Event {
-	return &beat.Event{
-		Fields: common.MapStr{
-			"http": common.MapStr{
-				"response": common.MapStr{
-					"status_code": resp.StatusCode,
-				},
-				"rtt": common.MapStr{
-					"total": look.RTT(rtt),
-				},
-			},
-		},
-	}
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {

@@ -1,4 +1,4 @@
 journalbeat.inputs:
 - paths: []
-  seek: tail
+  seek: cursor
 

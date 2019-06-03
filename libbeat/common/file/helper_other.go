@@ -40,7 +40,6 @@ func SafeFileRotate(path, tempfile string) error {
 		return nil // ignore error
 	}
 	defer f.Close()
-	f.Sync()
 
-	return nil
+	return f.Sync()
 }

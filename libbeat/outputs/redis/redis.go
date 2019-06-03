@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -40,6 +41,7 @@ var debugf = logp.MakeDebug("redis")
 const (
 	defaultWaitRetry    = 1 * time.Second
 	defaultMaxWaitRetry = 60 * time.Second
+	defaultPort         = 6379
 )
 
 func init() {
@@ -47,6 +49,7 @@ func init() {
 }
 
 func makeRedis(
+	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
@@ -54,6 +57,11 @@ func makeRedis(
 
 	if !cfg.HasField("index") {
 		cfg.SetString("index", -1, beat.Beat)
+	}
+
+	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
+	if err != nil {
+		return outputs.Fail(err)
 	}
 
 	// ensure we have a `key` field in settings
@@ -116,7 +124,7 @@ func makeRedis(
 			return outputs.Fail(err)
 		}
 
-		conn, err := transport.NewClient(transp, "tcp", host, config.Port)
+		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
 		if err != nil {
 			return outputs.Fail(err)
 		}

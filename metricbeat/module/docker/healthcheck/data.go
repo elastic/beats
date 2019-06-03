@@ -22,45 +22,43 @@ import (
 	"strings"
 
 	"github.com/docker/docker/api/types"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
 
-func eventsMapping(containers []types.Container, m *MetricSet) []common.MapStr {
-	var events []common.MapStr
+func eventsMapping(r mb.ReporterV2, containers []types.Container, m *MetricSet) {
 	for _, container := range containers {
-		event := eventMapping(&container, m)
-		if event != nil {
-			events = append(events, event)
-		}
+		eventMapping(r, &container, m)
 	}
-	return events
 }
 
-func eventMapping(cont *types.Container, m *MetricSet) common.MapStr {
+func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
 	if !hasHealthCheck(cont.Status) {
-		return nil
+		return
 	}
 
 	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
-		logp.Err("Error inspecting container %v: %v", cont.ID, err)
-		return nil
+		errors.Wrapf(err, "Error inspecting container %v", cont.ID)
+		return
 	}
+
+	// Check if the container has any health check
+	if container.State.Health == nil {
+		return
+	}
+
 	lastEvent := len(container.State.Health.Log) - 1
 
 	// Checks if a healthcheck already happened
 	if lastEvent < 0 {
-		return nil
+		return
 	}
 
-	return common.MapStr{
-		mb.ModuleDataKey: common.MapStr{
-			"container": docker.NewContainer(cont, m.dedot).ToMapStr(),
-		},
+	fields := common.MapStr{
 		"status":        container.State.Health.Status,
 		"failingstreak": container.State.Health.FailingStreak,
 		"event": common.MapStr{
@@ -70,6 +68,11 @@ func eventMapping(cont *types.Container, m *MetricSet) common.MapStr {
 			"output":     container.State.Health.Log[lastEvent].Output,
 		},
 	}
+
+	r.Event(mb.Event{
+		RootFields:      docker.NewContainer(cont, m.dedot).ToMapStr(),
+		MetricSetFields: fields,
+	})
 }
 
 // hasHealthCheck detects if healthcheck is available for container

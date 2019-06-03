@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -92,13 +93,14 @@ func TestFetchEventContent(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventFetcher(t, config)
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
 func testValue(t *testing.T, event common.MapStr, field string, value interface{}) {
@@ -129,13 +131,23 @@ func TestFetchTimeout(t *testing.T) {
 		"timeout":    "50ms",
 	}
 
-	f := mbtest.NewEventFetcher(t, config)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
 	start := time.Now()
-	_, err = f.Fetch()
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) == 0 {
+		t.Fatalf("Expected an error, had %d. %v\n", len(errs), errs)
+	}
+	assert.Empty(t, events)
 	elapsed := time.Since(start)
-	if assert.Error(t, err) {
-		assert.Contains(t, err.Error(), "request canceled (Client.Timeout exceeded")
+	var found bool
+	for _, err := range errs {
+		if strings.Contains(err.Error(), "request canceled (Client.Timeout exceeded") {
+			found = true
+		}
+	}
+	if !found {
+		assert.Failf(t, "", "expected an error containing 'request canceled (Client.Timeout exceeded'. Got %v", errs)
 	}
 
 	assert.True(t, elapsed < 5*time.Second, "elapsed time: %s", elapsed.String())

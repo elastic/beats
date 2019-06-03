@@ -22,6 +22,11 @@ func Clean() error {
 	return mage.Clean()
 }
 
+// Fields generates a fields.yml for the Beat.
+func Fields() error {
+	return mage.GenerateFieldsYAML()
+}
+
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.

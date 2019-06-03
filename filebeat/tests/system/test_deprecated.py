@@ -36,3 +36,20 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         assert self.log_contains("DEPRECATED: input_type input config is deprecated")
+
+    def test_invalid_config_with_removed_settings(self):
+        """
+        Checks if filebeat fails to load if removed settings have been used:
+        """
+        self.render_config_template()
+
+        exit_code = self.run_beat(extra_args=[
+            "-E", "filebeat.prospectors=anything",
+            "-E", "filebeat.config.prospectors=anything",
+        ])
+
+        assert exit_code == 1
+        assert self.log_contains("setting 'filebeat.prospectors'"
+                                 " has been removed")
+        assert self.log_contains("setting 'filebeat.config.prospectors'"
+                                 " has been removed")

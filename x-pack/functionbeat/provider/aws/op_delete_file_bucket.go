@@ -31,7 +31,7 @@ func newOpDeleteFileBucket(
 	}
 }
 
-func (o *opDeleteFileBucket) Execute() error {
+func (o *opDeleteFileBucket) Execute(_ executionContext) error {
 	o.log.Debugf("Removing file '%s' on bucket '%s'", o.path, o.bucketName)
 	input := &s3.DeleteObjectInput{
 		Bucket: aws.String(o.bucketName),

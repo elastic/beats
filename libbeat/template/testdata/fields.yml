@@ -24,3 +24,13 @@
     - name: alias
       type: alias
       path: keyword
+
+    - name: migration_alias_true
+      type: alias
+      path: keyword
+      migration: true
+
+    - name: migration_alias_false
+      type: alias
+      path: keyword
+      migration: false

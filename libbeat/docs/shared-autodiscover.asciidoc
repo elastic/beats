@@ -12,8 +12,8 @@ config file. To enable autodiscover, you specify a list of providers.
 === Providers
 
 Autodiscover providers work by watching for events on the system and translating those events into internal autodiscover
-events with a common format. When you configure the provider, you can use fields from the autodiscover event to set
-conditions that, when met, launch specific configurations.
+events with a common format. When you configure the provider, you can optionally use fields from the autodiscover event
+to set conditions that, when met, launch specific configurations.
 
 On start, {beatname_uc} will scan existing containers and launch the proper configs for them. Then it will watch for new
 start/stop events. This ensures you don't need to worry about state, but only define your desired configs.
@@ -125,9 +125,22 @@ event:
   * kubernetes.namespace
   * kubernetes.node.name
   * kubernetes.pod.name
+  * kubernetes.pod.uid
 
 If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
 are added to the event.
+
+If the `include_labels` config is added to the provider config, then the list of labels present in the config
+will be added to the event.
+
+If the `exclude_labels` config is added to the provider config, then the list of labels present in the config
+will be excluded from the event.
+
+if the `labels.dedot` config is set to be `true` in the provider config, then `.` in labels will be replaced with `_`.
+
+if the `annotations.dedot` config is set to be `true` in the provider config, then `.` in annotations will be replaced
+with `_`.
+
 
 For example:
 
@@ -167,6 +180,9 @@ The `kubernetes` autodiscover provider has the following configuration settings:
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
   cannot be accurately detected, as when running {beatname_lc} in host network
   mode.
+`namespace`:: (Optional) Select the namespace from which to collect the
+  metadata. If it is not set, the processor collects metadata from all
+  namespaces. It is unset by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
   client.
 
@@ -188,46 +204,9 @@ Pods share an identical host. If only the `{data.host}` variable is interpolated
 then one config will be generated per host. The configs will be identical.
 After they are de-duplicated, only one will be used.
 
-
-
-ifdef::autodiscoverAWSELB[]
-[float]
-===== AWS ELB
-
-Use the `aws_elb` autodiscover provider to automatically configure beats against ELB endpoints. It should be noted that classic ELBs are currently not supported.
-
-The aws_elb autodiscover provider actually renders once per load balancer listener, not once per load balancer. Since ELBs
-may expose multiple ports one generally wants to have a unique config per port.
-
-The `aws_elb` autodiscover provider requires AWS credentials to speak with the AWS API.
-If you are running heartbeat on an AWS instance, and IAM credentials are already associated with
-that instance these credentials will be automatically picked up. To set credentials via environment
-variables or credentials file read the https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html[AWS configuration docs].
-
-The available fields are:
-
-  * `arn`, A string uniquely identifying this load balancer listener.
-  * `host`, the DNS name of the given ELB
-  * `port`, the port of the ELB listener
-  * `protocol`, One of `HTTP`, `HTTPS`, or `TCP`.
-  * `type`, the type of load balancer, either `application` or `network`.
-  * `scheme`, the scheme used by this ELB. Either `internet-facing` or `internal`
-  * `availability_zones`, a list of strings names of AZs this ELB is present in.
-  * `created`, the time this load balancer was created.
-  * `state.code`, One of `active`, `provisioning`, `active_impaired`, or `failed`
-  * `state.reason`, A string giving more detail about the current state.
-  * `load_balancer_arn`, A string uniquely identifying the load balancer. Note that this may be shared by multiple configs. If you need a unique value use the `listener_arn`.
-  * `ip_address_type`, One of `ipv4` or `dualstack`.
-  * `security_groups`, A string list of security group names.
-  * `vpc_id`, The name of the VPC this ELB is configured within.
-  * `ssl_policy`, A string representing the security policy for this listener.
-
-include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
-endif::autodiscoverAWSELB[]
-
 ifdef::autodiscoverJolokia[]
 [float]
-===== Jolokia (experimental)
+===== Jolokia
 
 The Jolokia autodiscover provider uses Jolokia Discovery to find agents running
 in your host or your network.
@@ -316,7 +295,7 @@ applied if there is no condition provided.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-metricbeat.autodiscover:
+{beatname_lc}.autodiscover:
   providers:
     - type: kubernetes
       templates:

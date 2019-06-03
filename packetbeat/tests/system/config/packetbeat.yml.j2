@@ -128,6 +128,9 @@ packetbeat.protocols:
 {% if thrift_send_request %}  send_request: true{%- endif %}
 {% if thrift_send_response %}  send_response: true{%- endif %}
 
+- type: tls
+  ports: [{{ tls_ports|default([443])|join(", ") }}]
+
 - type: mongodb
   ports: [{{ mongodb_ports|default([27017])|join(", ") }}]
 {% if mongodb_send_request %}  send_request: true{%endif %}

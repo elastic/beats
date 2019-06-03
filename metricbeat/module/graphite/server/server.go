@@ -20,7 +20,6 @@ package server
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/helper/server/tcp"
@@ -50,7 +49,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The graphite server metricset is beta")
 
 	config := DefaultGraphiteCollectorConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {

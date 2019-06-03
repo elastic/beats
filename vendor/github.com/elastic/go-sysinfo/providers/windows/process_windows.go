@@ -26,8 +26,9 @@ import (
 	"unsafe"
 
 	"github.com/pkg/errors"
+	syswin "golang.org/x/sys/windows"
 
-	"github.com/elastic/go-windows"
+	windows "github.com/elastic/go-windows"
 
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -45,6 +46,12 @@ func (s windowsSystem) Processes() (procs []types.Process, err error) {
 	procs = make([]types.Process, 0, len(pids))
 	var proc types.Process
 	for _, pid := range pids {
+		if pid == 0 || pid == 4 {
+			// The Idle and System processes (PIDs 0 and 4) can never be
+			// opened by user-level code (see documentation for OpenProcess).
+			continue
+		}
+
 		if proc, err = s.Process(int(pid)); err == nil {
 			procs = append(procs, proc)
 		}
@@ -66,6 +73,19 @@ func (s windowsSystem) Self() (types.Process, error) {
 type process struct {
 	pid  int
 	info types.ProcessInfo
+}
+
+func (p *process) PID() int {
+	return p.pid
+}
+
+func (p *process) Parent() (types.Process, error) {
+	info, err := p.Info()
+	if err != nil {
+		return nil, err
+	}
+
+	return newProcess(info.PPID)
 }
 
 func newProcess(pid int) (*process, error) {
@@ -209,6 +229,10 @@ func splitCommandline(utf16 []byte) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Free memory allocated for CommandLineToArgvW arguments.
+	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(argsWide)))
+
 	args := make([]string, numArgs)
 	for idx := range args {
 		args[idx] = syscall.UTF16ToString(argsWide[idx][:])
@@ -239,6 +263,45 @@ func (p *process) open() (handle syscall.Handle, err error) {
 
 func (p *process) Info() (types.ProcessInfo, error) {
 	return p.info, nil
+}
+
+func (p *process) User() (types.UserInfo, error) {
+	handle, err := p.open()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrap(err, "OpenProcess failed")
+	}
+	defer syscall.CloseHandle(handle)
+
+	var accessToken syswin.Token
+	err = syswin.OpenProcessToken(syswin.Handle(handle), syscall.TOKEN_QUERY, &accessToken)
+	if err != nil {
+		return types.UserInfo{}, errors.Wrap(err, "OpenProcessToken failed")
+	}
+	defer accessToken.Close()
+
+	tokenUser, err := accessToken.GetTokenUser()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrap(err, "GetTokenUser failed")
+	}
+
+	sid, err := tokenUser.User.Sid.String()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrap(err, "failed to look up user SID")
+	}
+
+	tokenGroup, err := accessToken.GetTokenPrimaryGroup()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrap(err, "GetTokenPrimaryGroup failed")
+	}
+	gsid, err := tokenGroup.PrimaryGroup.String()
+	if err != nil {
+		return types.UserInfo{}, errors.Wrap(err, "failed to look up primary group SID")
+	}
+
+	return types.UserInfo{
+		UID: sid,
+		GID: gsid,
+	}, nil
 }
 
 func (p *process) Memory() (types.MemoryInfo, error) {

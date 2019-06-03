@@ -47,6 +47,7 @@ import (
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
@@ -72,12 +73,14 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	err := cfgwarn.CheckRemoved5xSettings(rawConfig, "spool_size", "publish_async", "idle_timeout")
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cfgwarn.CheckRemoved6xSettings(rawConfig, "prospectors", "config.prospectors"); err != nil {
+	if err := cfgwarn.CheckRemoved6xSettings(
+		rawConfig,
+		"prospectors",
+		"config.prospectors",
+		"registry_file",
+		"registry_file_permissions",
+		"registry_flush",
+	); err != nil {
 		return nil, err
 	}
 
@@ -222,12 +225,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 		return errors.Errorf("Error creating Kibana client: %v", err)
 	}
 
-	kibanaVersion, err := common.NewVersion(kibanaClient.GetVersion())
-	if err != nil {
-		return errors.Errorf("Error checking Kibana version: %v", err)
-	}
-
-	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient, kibanaVersion); err != nil {
+	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -253,7 +251,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 				continue
 			}
 
-			if err := setupMLBasedOnVersion(set, esClient, kibanaClient, kibanaVersion); err != nil {
+			if err := setupMLBasedOnVersion(set, esClient, kibanaClient); err != nil {
 				errs = append(errs, err)
 			}
 
@@ -263,18 +261,16 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	return errs.Err()
 }
 
-func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *elasticsearch.Client, kibanaClient *kibana.Client, kibanaVersion *common.Version) error {
-	if isElasticsearchLoads(kibanaVersion) {
+func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *elasticsearch.Client, kibanaClient *kibana.Client) error {
+	if isElasticsearchLoads(kibanaClient.GetVersion()) {
 		return reg.LoadML(esClient)
 	}
 	return reg.SetupML(esClient, kibanaClient)
 }
 
-func isElasticsearchLoads(kibanaVersion *common.Version) bool {
-	if kibanaVersion.Major < 6 || kibanaVersion.Major == 6 && kibanaVersion.Minor < 1 {
-		return true
-	}
-	return false
+func isElasticsearchLoads(kibanaVersion common.Version) bool {
+	return kibanaVersion.Major < 6 ||
+		(kibanaVersion.Major == 6 && kibanaVersion.Minor < 1)
 }
 
 // Run allows the beater to be run as a beat.
@@ -301,7 +297,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	finishedLogger := newFinishedLogger(wgEvents)
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(config.RegistryFile, config.RegistryFilePermissions, config.RegistryFlush, finishedLogger)
+	registrar, err := registrar.New(config.Registry, finishedLogger)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err

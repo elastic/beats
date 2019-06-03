@@ -14,10 +14,10 @@ clicking on elements within a visualization.
 The search field on the *Discover* page provides a way to query a specific
 subset of transactions from the selected time frame. It allows boolean
 operators, wildcards, and field filtering. For example, if you want to find the
-HTTP redirects, you can search for `type: http AND http.code: 302`.
+HTTP redirects, you can search for `http.response.status_code: 302`.
 
 [role="screenshot"]
-image:./images/kibana-query-filtering.png[Kibana query]
+image::./images/kibana-query-filtering.png[Kibana query]
 
 [float]
 ==== String queries
@@ -111,7 +111,7 @@ To search for slow transactions with a response time greater than or equal to
 
 [source,yaml]
 ------------------------
-responsetime: [10 TO *]
+event.duration: [10000000 TO *]
 ------------------------
 
 
@@ -119,7 +119,7 @@ To search for slow transactions with a response time greater than 10ms:
 
 [source,yaml]
 -------------------------
-responsetime: {10 TO *}
+responsetime: {10000000 TO *}
 -------------------------
 
 
@@ -129,7 +129,7 @@ responsetime: {10 TO *}
 Boolean operators (AND, OR, NOT) allow combining multiple sub-queries through
 logic operators.
 
-NOTE: Operators such as AND, OR, and NOT must be capitalized. 
+NOTE: Operators such as AND, OR, and NOT must be capitalized.
 
 To search for all transactions except MySQL transactions:
 
@@ -143,18 +143,18 @@ To search for all MySQL INSERT queries with errors:
 
 [source,yaml]
 -------------------------------------------------
-method: INSERT AND mysql.iserror: true
+type: mysql AND method: INSERT AND status: Error
 -------------------------------------------------
 
 
-Lucene also supports parentheses to group sub-queries.
+Kibana Query Language (KQL) also supports parentheses to group sub-queries.
 
 To search for either INSERT or UPDATE queries with a response time greater
 than or equal to 30ms:
 
 [source,yaml]
 ---------------------------------------------------------------------------
-(method: INSERT OR method: UPDATE) AND responsetime: [30 TO *]
+(method: INSERT OR method: UPDATE) AND event.duration >= 30000000
 ---------------------------------------------------------------------------
 
 
@@ -164,16 +164,15 @@ than or equal to 30ms:
 In Kibana, you can also filter transactions by clicking on elements within a
 visualization. For example, to filter for all the HTTP redirects that are coming
 from a specific IP and port, click the *Filter for value*
-image:./images/filterforval_icon.png[] icon next to the `client_ip`
-and `client_port` fields in the transaction detail table. To exclude the HTTP
+image:./images/filterforval_icon.png[] icon next to the `client.ip`
+and `client.port` fields in the transaction detail table. To exclude the HTTP
 redirects coming from the IP and port, click the *Filter out value*
 image:./images/filteroutval_icon.png[] icon instead.
 
 [role="screenshot"]
-image:./images/filter_from_context.png[Filter from context]
+image::./images/filter_from_context.png[Filter from context]
 
 The selected filters appear under the search box.
 
 [role="screenshot"]
-image:./images/kibana-filters.png[Kibana filters]
-
+image::./images/kibana-filters.png[Kibana filters]

@@ -11,13 +11,13 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-path]]
-== Set up project paths
+== Configure project paths
 
 The `path` section of the +{beatname_lc}.yml+ config file contains configuration
 options that define where {beatname_uc} looks for its files. For example, {beatname_uc}
 looks for the Elasticsearch template file in the configuration path and writes
 log files in the logs path.
-ifeval::["{beatname_lc}"=="filebeat" or "{beatname_lc}"=="winlogbeat"]
+ifdef::has_registry[]
 {beatname_uc} looks for its registry files in the data path.
 endif::[]
 
@@ -86,7 +86,7 @@ Example:
 path.data: /var/lib/beats
 ------------------------------------------------------------------------------
 
-TIP: When running multiple Beat instances on the same host, make sure they
+TIP: When running multiple {beatname_uc} instances on the same host, make sure they
 each have a distinct `path.data` value.
 
 [float]

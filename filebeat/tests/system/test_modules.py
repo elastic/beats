@@ -27,6 +27,8 @@ def load_fileset_test_cases():
     else:
         modules = os.listdir(modules_dir)
 
+    filesets_env = os.getenv("TESTING_FILEBEAT_FILESETS")
+
     test_cases = []
 
     for module in modules:
@@ -35,7 +37,12 @@ def load_fileset_test_cases():
         if not os.path.isdir(path):
             continue
 
-        for fileset in os.listdir(path):
+        if filesets_env:
+            filesets = filesets_env.split(",")
+        else:
+            filesets = os.listdir(path)
+
+        for fileset in filesets:
             if not os.path.isdir(os.path.join(path, fileset)):
                 continue
 
@@ -67,6 +74,14 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
+        body = {
+            "transient": {
+                "script.max_compilations_rate": "1000/1m"
+            }
+        }
+
+        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
+
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -81,7 +96,7 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url
+            elasticsearch_url=self.elasticsearch_url,
         )
 
         self.run_on_file(
@@ -103,9 +118,12 @@ class Test(BaseTest):
             self.filebeat, "-systemTest",
             "-e", "-d", "*", "-once",
             "-c", cfgfile,
+            "-E", "setup.ilm.enabled=false",
             "-modules={}".format(module),
             "-M", "{module}.*.enabled=false".format(module=module),
             "-M", "{module}.{fileset}.enabled=true".format(
+                module=module, fileset=fileset),
+            "-M", "{module}.{fileset}.var.convert_timezone=true".format(
                 module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.input=file".format(
                 module=module, fileset=fileset),
@@ -114,10 +132,20 @@ class Test(BaseTest):
             "-M", "*.*.input.close_eof=true",
         ]
 
+        # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
+        if "-json" in test_file:
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
+
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
+
+        local_env = os.environ.copy()
+        local_env["TZ"] = 'Etc/UTC'
+
         subprocess.Popen(cmd,
+                         env=local_env,
                          stdin=None,
                          stdout=output,
                          stderr=subprocess.STDOUT,
@@ -146,8 +174,7 @@ class Test(BaseTest):
             else:
                 self.assert_fields_are_documented(obj)
 
-        if os.path.exists(test_file + "-expected.json"):
-            self._test_expected_events(test_file, objects)
+        self._test_expected_events(test_file, objects)
 
     def _test_expected_events(self, test_file, objects):
 
@@ -159,7 +186,8 @@ class Test(BaseTest):
                 for k, obj in enumerate(objects):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
-                json.dump(objects, f, indent=4, sort_keys=True)
+
+                json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)
@@ -175,11 +203,6 @@ class Test(BaseTest):
                 obj = self.flatten_object(obj, {}, "")
                 clean_keys(obj)
 
-                # Remove timestamp for comparison where timestamp is not part of the log line
-                if obj["event.module"] == "icinga" and obj["event.dataset"] == "startup":
-                    delete_key(obj, "@timestamp")
-                    delete_key(ev, "@timestamp")
-
                 if ev == obj:
                     found = True
                     break
@@ -190,14 +213,18 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.hostname", "agent.type"]
+    host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
-    time_keys = ["read_timestamp", "event.created"]
-    # source path and beat.version can be different for each run
+    time_keys = ["event.created"]
+    # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
+
+    # Remove timestamp for comparison where timestamp is not part of the log line
+    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]):
+        delete_key(obj, "@timestamp")
 
 
 def delete_key(obj, key):

@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "munin", Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "munin", asset.ModuleFieldsPri, AssetMunin); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
-	return "eJxsjk2qhDAQhPc5ReHeC2TxbvAOEU2NNKOdkLQw3n4wBmaEqV3/FN834snDY9tV1AEmttJj+D/nwQGRdS6STZJ6/DkAaDdoisRGKzJX8JVTMRYHFK4MlR4TLTjgIVxj9a05QsPGD+2MHZkeS0l77psfyCuthjmpBdF6g1dGTAdC/2lyYaFar39bXCZ3z3cAAAD//xiKUG4="
+// AssetMunin returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/munin.
+func AssetMunin() string {
+	return "eJx8kUFuwyAURPc+xSibSJHiA7DoDdorRNhMKA0GBN9qffvKhlaOanX5Z/5oHp8rHlwUpjm40AHixFPh9LrOpw4wLGN2SVwMCi8dAGweQjTERMluLOBXilmYOyDTUxcqWN0Bd0dvitpyVwQ9sXX1LdpfNg+QJVEhDh8cpUl1uFXHxHnw/OvcJp2SC7atnS/ntnNAvtHvkAsNhgUayc/WBcQ7dMWrz9OWQfoD+Lrfr9IT/oPLZ8zmf4I3PXGtknf+FI/Re47igl3V8nvYg+6nPpvjnJqyP3VN7b/iOwAA//84wJVl"
 }

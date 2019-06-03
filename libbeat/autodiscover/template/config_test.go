@@ -60,6 +60,16 @@ func TestConfigsMapping(t *testing.T) {
 			},
 			expected: []*common.Config{config},
 		},
+		// No condition
+		{
+			mapping: `
+- config:
+    - correct: config`,
+			event: bus.Event{
+				"foo": 3,
+			},
+			expected: []*common.Config{config},
+		},
 	}
 
 	for _, test := range tests {
@@ -98,5 +108,6 @@ func TestNilConditionConfig(t *testing.T) {
 	}
 
 	_, err = NewConfigMapper(mappings)
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.Nil(t, mappings[0].ConditionConfig)
 }

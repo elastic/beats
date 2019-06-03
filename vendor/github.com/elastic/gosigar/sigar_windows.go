@@ -12,25 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/StackExchange/wmi"
 	"github.com/elastic/gosigar/sys/windows"
 	"github.com/pkg/errors"
 )
-
-// Win32_Process represents a process on the Windows operating system. If
-// additional fields are added here (that match the Windows struct) they will
-// automatically be populated when calling getWin32Process.
-// https://msdn.microsoft.com/en-us/library/windows/desktop/aa394372(v=vs.85).aspx
-type Win32_Process struct {
-	CommandLine string
-}
-
-// Win32_OperatingSystem WMI class represents a Windows-based operating system
-// installed on a computer.
-// https://msdn.microsoft.com/en-us/library/windows/desktop/aa394239(v=vs.85).aspx
-type Win32_OperatingSystem struct {
-	LastBootUpTime time.Time
-}
 
 var (
 	// version is Windows version of the host OS.
@@ -83,11 +67,12 @@ func (self *Uptime) Get() error {
 	bootTimeLock.Lock()
 	defer bootTimeLock.Unlock()
 	if bootTime == nil {
-		os, err := getWin32OperatingSystem()
+		uptime, err := windows.GetTickCount64()
 		if err != nil {
-			return errors.Wrap(err, "failed to get boot time using WMI")
+			return errors.Wrap(err, "failed to get boot time using win32 api")
 		}
-		bootTime = &os.LastBootUpTime
+		var boot = time.Unix(int64(uptime), 0)
+		bootTime = &boot
 	}
 
 	self.Length = time.Since(*bootTime).Seconds()
@@ -155,9 +140,9 @@ func (self *CpuList) Get() error {
 }
 
 func (self *FileSystemList) Get() error {
-	drives, err := windows.GetLogicalDriveStrings()
+	drives, err := windows.GetAccessPaths()
 	if err != nil {
-		return errors.Wrap(err, "GetLogicalDriveStrings failed")
+		return errors.Wrap(err, "GetAccessPaths failed")
 	}
 
 	for _, drive := range drives {
@@ -251,7 +236,7 @@ func getProcStatus(pid int) (RunState, error) {
 	var exitCode uint32
 	err = syscall.GetExitCodeProcess(handle, &exitCode)
 	if err != nil {
-		return RunStateUnknown, errors.Wrapf(err, "GetExitCodeProcess failed for pid=%v")
+		return RunStateUnknown, errors.Wrapf(err, "GetExitCodeProcess failed for pid=%v", pid)
 	}
 
 	if exitCode == 259 { //still active
@@ -371,13 +356,28 @@ func (self *ProcArgs) Get(pid int) error {
 	if !version.IsWindowsVistaOrGreater() {
 		return ErrNotImplemented{runtime.GOOS}
 	}
-
-	process, err := getWin32Process(int32(pid))
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess|windows.PROCESS_VM_READ, false, uint32(pid))
 	if err != nil {
-		return errors.Wrapf(err, "ProcArgs failed for pid=%v", pid)
+		return errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
 	}
-
-	self.List = []string{process.CommandLine}
+	defer syscall.CloseHandle(handle)
+	pbi, err := windows.NtQueryProcessBasicInformation(handle)
+	if err != nil {
+		return errors.Wrapf(err, "NtQueryProcessBasicInformation failed for pid=%v", pid)
+	}
+	if err != nil {
+		return nil
+	}
+	userProcParams, err := windows.GetUserProcessParams(handle, pbi)
+	if err != nil {
+		return nil
+	}
+	if argsW, err := windows.ReadProcessUnicodeString(handle, &userProcParams.CommandLine); err == nil {
+		self.List, err = windows.ByteSliceToStringSlice(argsW)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -392,35 +392,6 @@ func (self *FileSystemUsage) Get(path string) error {
 	self.Used = self.Total - self.Free
 	self.Avail = freeBytesAvailable
 	return nil
-}
-
-// getWin32Process gets information about the process with the given process ID.
-// It uses a WMI query to get the information from the local system.
-func getWin32Process(pid int32) (Win32_Process, error) {
-	var dst []Win32_Process
-	query := fmt.Sprintf("WHERE ProcessId = %d", pid)
-	q := wmi.CreateQuery(&dst, query)
-	err := wmi.Query(q, &dst)
-	if err != nil {
-		return Win32_Process{}, fmt.Errorf("could not get Win32_Process %s: %v", query, err)
-	}
-	if len(dst) < 1 {
-		return Win32_Process{}, fmt.Errorf("could not get Win32_Process %s: Process not found", query)
-	}
-	return dst[0], nil
-}
-
-func getWin32OperatingSystem() (Win32_OperatingSystem, error) {
-	var dst []Win32_OperatingSystem
-	q := wmi.CreateQuery(&dst, "")
-	err := wmi.Query(q, &dst)
-	if err != nil {
-		return Win32_OperatingSystem{}, errors.Wrap(err, "wmi query for Win32_OperatingSystem failed")
-	}
-	if len(dst) != 1 {
-		return Win32_OperatingSystem{}, errors.New("wmi query for Win32_OperatingSystem failed")
-	}
-	return dst[0], nil
 }
 
 func (self *Rusage) Get(who int) error {

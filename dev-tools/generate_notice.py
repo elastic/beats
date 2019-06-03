@@ -103,6 +103,8 @@ def get_licenses(folder):
             licenses.append(filename)
         elif filename.startswith("APLv2"):  # gorhill/cronexpr
             licenses.append(filename)
+        elif filename in ("COPYING",):  # BurntSushi/toml
+            licenses.append(filename)
     return licenses
 
 

@@ -46,16 +46,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches memory metrics from the OS.
-func (m *MetricSet) Fetch() (event common.MapStr, err error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	memStat, err := mem.Get()
 	if err != nil {
-		return nil, errors.Wrap(err, "memory")
+		r.Error(errors.Wrap(err, "memory"))
+		return
 	}
 	mem.AddMemPercentage(memStat)
 
 	swapStat, err := mem.GetSwap()
 	if err != nil {
-		return nil, errors.Wrap(err, "swap")
+		r.Error(errors.Wrap(err, "swap"))
+		return
 	}
 	mem.AddSwapPercentage(swapStat)
 
@@ -87,7 +89,8 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 
 	hugePagesStat, err := mem.GetHugeTLBPages()
 	if err != nil {
-		return nil, errors.Wrap(err, "hugepages")
+		r.Error(errors.Wrap(err, "hugepages"))
+		return
 	}
 	if hugePagesStat != nil {
 		mem.AddHugeTLBPagesPercentage(hugePagesStat)
@@ -104,5 +107,7 @@ func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 		}
 	}
 
-	return memory, nil
+	r.Event(mb.Event{
+		MetricSetFields: memory,
+	})
 }

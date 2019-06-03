@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-php_fpm]]
 == PHP_FPM module
 
-beta[]
-
 This module periodically fetches metrics from https://php-fpm.org[PHP-FPM]
 servers.
 

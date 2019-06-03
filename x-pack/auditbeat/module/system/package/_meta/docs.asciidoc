@@ -1,0 +1,16 @@
+[role="xpack"]
+
+beta[]
+
+This is the `package` dataset of the system module.
+
+It is implemented for Linux distributions using dpkg or rpm as their package
+manager, and for Homebrew on macOS (Darwin).
+
+[float]
+==== Example dashboard
+
+The dataset comes with a sample dashboard:
+
+[role="screenshot"]
+image::./images/auditbeat-system-package-dashboard.png[Auditbeat System Package Dashboard]

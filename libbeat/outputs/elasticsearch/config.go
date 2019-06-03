@@ -31,6 +31,7 @@ type elasticsearchConfig struct {
 	Username         string            `config:"username"`
 	Password         string            `config:"password"`
 	ProxyURL         string            `config:"proxy_url"`
+	ProxyDisable     bool              `config:"proxy_disable"`
 	LoadBalance      bool              `config:"loadbalance"`
 	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
 	EscapeHTML       bool              `config:"escape_html"`
@@ -55,13 +56,14 @@ var (
 		Protocol:         "",
 		Path:             "",
 		ProxyURL:         "",
+		ProxyDisable:     false,
 		Params:           nil,
 		Username:         "",
 		Password:         "",
 		Timeout:          90 * time.Second,
 		MaxRetries:       3,
 		CompressionLevel: 0,
-		EscapeHTML:       true,
+		EscapeHTML:       false,
 		TLS:              nil,
 		LoadBalance:      true,
 		Backoff: Backoff{
@@ -72,7 +74,7 @@ var (
 )
 
 func (c *elasticsearchConfig) Validate() error {
-	if c.ProxyURL != "" {
+	if c.ProxyURL != "" && !c.ProxyDisable {
 		if _, err := parseProxyURL(c.ProxyURL); err != nil {
 			return err
 		}

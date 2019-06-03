@@ -1,4 +1,5 @@
 [id="configuration-{beatname_lc}-options"]
+[role="xpack"]
 == Configure functions
 
 ++++
@@ -21,6 +22,7 @@ the events to {es}.
 
 ["source","sh",subs="attributes"]
 ----
+{beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 {beatname_lc}.provider.aws.functions:
   - name: cloudwatch
@@ -36,9 +38,10 @@ the events to {es}.
     description: "lambda function for SQS events"
     triggers:
       - event_source_arn: arn:aws:sqs:us-east-1:123456789012:myevents
-output.elasticsearch:
-  cloud.id: "MyESDeployment:SomeLongString=="
-  cloud.auth: "elastic:SomeLongString"
+
+cloud.id: "MyESDeployment:SomeLongString=="
+cloud.auth: "elastic:SomeLongString"
+
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
@@ -53,6 +56,12 @@ to deploy.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
+
+[float]
+[id="{beatname_lc}-endpoint"]
+==== `provider.aws.endpoint`
+
+AWS endpoint to use in the URL template to load functions.
 
 [float]
 [id="{beatname_lc}-deploy-bucket"]
@@ -76,6 +85,7 @@ are:
 
 `cloudwatch_logs`:: Collects events from CloudWatch logs.
 `sqs`:: Collects data from Amazon Simple Queue Service (SQS).
+`kinesis`:: Collects data from a Kinesis stream.
 
 [float]
 [id="{beatname_lc}-description"]
@@ -91,7 +101,7 @@ multiple functions and need more context about how each function is used.
 A list of triggers that will cause the function to execute. The list of valid
 triggers depends on the `type`. If `type` is `cloudwatch_logs` logs, specify a
 list of log groups. If `type` is `sqs`, specify a list of Amazon Resource Names
-(ARNs). 
+(ARNs).
 
 [float]
 [id="{beatname_lc}-filter_pattern"]
@@ -122,4 +132,18 @@ default is 128 MiB.
 ==== `dead_letter_config.target_arn`
 
 The dead letter queue to use for messages that can't be processed successfully.
-Set this option to an ARN that points to an SQS queue. 
+Set this option to an ARN that points to an SQS queue.
+
+[float]
+[id="{beatname_lc}-batch-size"]
+==== `batch_size`
+
+The number of events to read from a Kinesis stream, the minimal values is 100 and the maximun is
+10000. The default is 100.
+
+[float]
+[id="{beatname_lc}-starting-position"]
+==== `starting_position`
+
+The starting position to read from a Kinesis stream, valids values are `trim_horizon` and `latest`.
+The default is trim_horizon.
