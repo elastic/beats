@@ -248,6 +248,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - `docker` input is deprecated in favour `container`. {pull}12162[12162]
+- `postgresql.log.timestamp` field is deprecated in favour of `@timestamp`. {pull}12338[12338]
 
 *Heartbeat*
 
