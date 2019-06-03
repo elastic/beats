@@ -160,20 +160,6 @@
 			"versionExact": "v1.6.0"
 		},
 		{
-			"checksumSHA1": "ip1GD3+mwBprC9TzTP6UrkrvwiU=",
-			"path": "github.com/aws/aws-sdk-go-v2",
-			"revision": "da6472f8447d3fef65272d1e396e892df15310d5",
-			"revisionTime": "2019-05-29T23:50:13Z"
-		},
-		{
-			"checksumSHA1": "1AyIehd0sjJ9uJoLZyqq9L9a1Jg=",
-			"path": "github.com/aws/aws-sdk-go-v2/aws",
-			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
-			"revisionTime": "2018-09-27T22:51:20Z",
-			"version": "v2.0.0-preview.5",
-			"versionExact": "v2.0.0-preview.5"
-		},
-		{
 			"checksumSHA1": "DVN6AdXnfTwEOLJwCOhFqJAEF1E=",
 			"path": "github.com/aws/aws-sdk-go-v2/aws/awserr",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
@@ -420,6 +406,12 @@
 			"revisionTime": "2018-09-27T22:51:20Z",
 			"version": "v2.0.0-preview.5",
 			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "qUIf77TBORA1MZoNFNdiR5kFRjI=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2",
+			"revision": "da6472f8447d3fef65272d1e396e892df15310d5",
+			"revisionTime": "2019-05-29T23:50:13Z"
 		},
 		{
 			"checksumSHA1": "QX85Yp1ihkxh8ye/FktHZUVsT6A=",

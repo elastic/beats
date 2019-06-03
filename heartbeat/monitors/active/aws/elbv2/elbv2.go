@@ -1,17 +1,20 @@
 package elbv2
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 
-	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/heartbeat/eventext"
 
-	"github.com/elastic/beats/heartbeat/monitors/active/http"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/elbv2"
 
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/active/http"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -24,20 +27,20 @@ func init() {
 	monitors.RegisterActive("aws_elbv2", create)
 }
 
-func create(name string, commonCfg *common.Config) (jobs []monitors.Job, endpoints int, err error) {
+func create(name string, commonCfg *common.Config) (jobs []jobs.Job, endpoints int, err error) {
 	config := &Config{}
 	err = commonCfg.Unpack(config)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	cfg, err := external.LoadDefaultAWSConfig()
+	cfg, _ := external.LoadDefaultAWSConfig()
 	cfg.Region = config.Region
 	if err != nil {
 		logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 	}
 
-	client := elbv2.New(cfg)
+	client := elasticloadbalancingv2.New(cfg)
 
 	// The AWS API paginates, so let's chunk the ARNs
 	var pageARNs []string
@@ -55,105 +58,101 @@ func create(name string, commonCfg *common.Config) (jobs []monitors.Job, endpoin
 		}
 	}
 
-	return monitors.WrapAll(jobs, monitors.WithErrAsField), len(pageARNs), nil
+	return jobs, len(pageARNs), nil
 }
 
-func newELBv2Job(client *elbv2.ELBV2, arns []string) (monitors.Job, error) {
-	job := monitors.CreateNamedJob(
-		fmt.Sprintf("aws_elbv2/%v", arns),
-		func() (*beat.Event, []monitors.Job, error) {
-			describeInput := &elbv2.DescribeLoadBalancersInput{
-				LoadBalancerArns: arns,
-			}
+func newELBv2Job(client *elasticloadbalancingv2.Client, arns []string) (jobs.Job, error) {
+	job := func(event *beat.Event) ([]jobs.Job, error) {
+		describeInput := &elasticloadbalancingv2.DescribeLoadBalancersInput{
+			LoadBalancerArns: arns,
+		}
 
-			lbResp, err := client.DescribeLoadBalancersRequest(describeInput).Send()
+		lbResp, err := client.DescribeLoadBalancersRequest(describeInput).Send(context.TODO())
 
-			if err != nil {
-				return nil, nil, err
-			}
+		if err != nil {
+			return nil, err
+		}
 
-			var jobs []monitors.Job
-			for _, lb := range lbResp.LoadBalancers {
-				jobs = append(jobs, monitors.WithJobId(*lb.LoadBalancerArn, newLbJob(lb)))
-				jobs = append(jobs, monitors.WithJobId(*lb.LoadBalancerArn, newListenerJob(client, lb)))
-			}
+		var jobs []jobs.Job
+		for _, lb := range lbResp.LoadBalancers {
+			jobs = append(jobs, newLbJob(lb))
+			jobs = append(jobs, newListenerJob(client, lb))
+		}
 
-			return nil, jobs, nil
-		})
+		return jobs, nil
+	}
 
 	return job, nil
 }
 
-func newLbJob(lb elbv2.LoadBalancer) monitors.Job {
-	return monitors.TimeAndCheckJob(monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
+func newLbJob(lb elasticloadbalancingv2.LoadBalancer) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
 		var status string
-		if lb.State.Code == elbv2.LoadBalancerStateEnumActive {
+		if lb.State.Code == elasticloadbalancingv2.LoadBalancerStateEnumActive {
 			status = "up"
 		} else {
 			status = "down"
 		}
 
-		event := &beat.Event{
-			Fields: common.MapStr{
-				"monitor": common.MapStr{
-					"status":    status,
-					"task_type": "elbv2_state",
-					"task_id":   lb.DNSName,
-				},
-				"aws": common.MapStr{
-					"arn": lb.LoadBalancerArn,
-					"elbv2": common.MapStr{
-						"status": lb.State,
-						"arn":    lb.LoadBalancerArn,
-					},
+		eventext.MergeEventFields(event, common.MapStr{
+			"monitor": common.MapStr{
+				"status":    status,
+				"task_type": "elbv2_state",
+				"task_id":   lb.DNSName,
+			},
+			"aws": common.MapStr{
+				"arn": lb.LoadBalancerArn,
+				"elbv2": common.MapStr{
+					"status": lb.State,
+					"arn":    lb.LoadBalancerArn,
 				},
 			},
-		}
+		})
 
-		return event, []monitors.Job{}, nil
-	}))
+		return []jobs.Job{}, nil
+	}
 }
 
-func newListenerJob(client *elbv2.ELBV2, lb elbv2.LoadBalancer) monitors.Job {
-	return monitors.TimeAndCheckJob(monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
-		describeInput := &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
+func newListenerJob(client *elasticloadbalancingv2.Client, lb elasticloadbalancingv2.LoadBalancer) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		describeInput := &elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn}
 		// Pagination not supported when LB is specified
-		resp, err := client.DescribeListenersRequest(describeInput).Send()
+		resp, err := client.DescribeListenersRequest(describeInput).Send(context.TODO())
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
-		var jobs []monitors.Job
+		var conts []jobs.Job
 		for _, listener := range resp.Listeners {
 			hostPort := fmt.Sprintf("%s:%d", *lb.DNSName, *listener.Port)
 
-			var job monitors.Job
+			var job jobs.Job
 			var err error
 
 			var listenerURL url.URL
 			switch listener.Protocol {
-			case elbv2.ProtocolEnumHttps:
+			case elasticloadbalancingv2.ProtocolEnumHttps:
 				listenerURL = url.URL{Scheme: "https", Host: hostPort}
 				job, err = newHttpCheck(listener, &listenerURL)
-			case elbv2.ProtocolEnumHttp:
+			case elasticloadbalancingv2.ProtocolEnumHttp:
 				listenerURL = url.URL{Scheme: "http", Host: hostPort}
 				job, err = newHttpCheck(listener, &listenerURL)
-			case elbv2.ProtocolEnumTcp:
+			case elasticloadbalancingv2.ProtocolEnumTcp:
 				panic("IMPLEMENT ME")
 			}
 
 			if err != nil {
-				return nil, nil, err
+				return nil, err
 			}
 
-			jobs = append(jobs, job)
+			conts = append(conts, job)
 		}
 
-		return nil, jobs, nil
-	}))
+		return conts, nil
+	}
 }
 
-func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.Job, error) {
+func newHttpCheck(listener elasticloadbalancingv2.Listener, url *url.URL) (jobs.Job, error) {
 	httpConfig := &http.Config{
 		URLs: []string{url.String()},
 		Mode: monitors.DefaultIPSettings,
@@ -180,14 +179,15 @@ func newHttpCheck(listener elbv2.Listener, url *url.URL) (monitors.Job, error) {
 		},
 	}
 
-	runner := monitors.AnonJob(func() (*beat.Event, []monitors.Job, error) {
-		event, jobs, err := job.Run()
+	runner := func(event *beat.Event) ([]jobs.Job, error) {
+		jobs, err := job(event)
 
 		if event != nil {
-			monitors.MergeEventFields(event, overlay)
+			eventext.MergeEventFields(event, overlay)
 		}
 
-		return event, jobs, err
-	})
+		return jobs, err
+	}
+
 	return runner, nil
 }

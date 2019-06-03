@@ -91,7 +91,7 @@ func create(
 		}
 	} else {
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
+			return NewHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
 		}
 	}
 

@@ -68,7 +68,7 @@ func newHTTPMonitorHostJob(
 	}), nil
 }
 
-func newHTTPMonitorIPsJob(
+func NewHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
 	tls *transport.TLSConfig,
