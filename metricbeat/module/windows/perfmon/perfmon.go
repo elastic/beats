@@ -66,12 +66,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	for _, value := range config.CounterConfig {
 		form := strings.ToLower(value.Format)
 		switch form {
-		case "":
+		case "", "float":
 			value.Format = "float"
-		case "float", "long", "large":
+		case "long", "large":
 		default:
 			return nil, errors.Errorf("initialization failed: format '%s' "+
-				"for counter '%s' is invalid (must be float or long)",
+				"for counter '%s' is invalid (must be float, large or long)",
 				value.Format, value.InstanceLabel)
 		}
 

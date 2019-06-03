@@ -20,6 +20,7 @@
 package perfmon
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -329,6 +330,45 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotEqual(t, "TestInstanceName", pct)
+
+	t.Log(values)
+}
+
+func TestWildcardQueryNoInstanceName(t *testing.T) {
+	config := Config{
+		CounterConfig: make([]CounterConfig, 1),
+	}
+	config.CounterConfig[0].InstanceLabel = "process_private_bytes"
+	config.CounterConfig[0].MeasurementLabel = "process.private.bytes"
+	config.CounterConfig[0].Query = `\Process(*)\Private Bytes`
+	handle, err := NewReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.query.Close()
+
+	values, _ := handle.Read()
+
+	time.Sleep(time.Millisecond * 1000)
+
+	values, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pctKey, err := values[0].MetricSetFields.HasKey("process.private.bytes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	for _, s := range values {
+		pct, err := s.MetricSetFields.GetValue("process_private_bytes")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.False(t, strings.Contains(pct.(string), "*"))
+	}
 
 	t.Log(values)
 }
