@@ -3,6 +3,8 @@ package elb
 import (
 	"sync"
 
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+
 	"go.uber.org/multierr"
 
 	"github.com/aws/aws-sdk-go-v2/service/elbv2"
@@ -18,10 +20,10 @@ type fetcher interface {
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
-	client *elbv2.ELBV2
+	client *elasticloadbalancingv2.Client
 }
 
-func newAPIFetcher(client *elbv2.ELBV2) fetcher {
+func newAPIFetcher(client *elasticloadbalancingv2.Client) fetcher {
 	return &apiFetcher{client}
 }
 
@@ -32,7 +34,7 @@ func newAPIFetcher(client *elbv2.ELBV2) fetcher {
 // a sync.Pool to limit the number of in-flight requests.
 func (f *apiFetcher) fetch() ([]*lbListener, error) {
 	var pageSize int64 = 50
-	req := f.client.DescribeLoadBalancersRequest(&elbv2.DescribeLoadBalancersInput{PageSize: &pageSize})
+	req := f.client.DescribeLoadBalancersRequest(&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize})
 
 	// Limit concurrency against the AWS API by creating a pool of objects
 	// This is hard coded for now. If, in the future, we decide to uncape this
@@ -41,9 +43,8 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 	for i := 0; i < 6; i++ {
 		taskPool.Put(nil)
 	}
-
 	ir := &fetchRequest{
-		req.Paginate(),
+		req.Paginator(),
 		f.client,
 		atomic.MakeBool(true),
 		[]*lbListener{},
@@ -59,8 +60,8 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 // fetchRequest provides a way to get all pages from a
 // elbv2.DescribeLoadBalancersPager and all listeners for the given LoadBalancers.
 type fetchRequest struct {
-	paginator    elbv2.DescribeLoadBalancersPager
-	client       *elbv2.ELBV2
+	paginator    elasticloadbalancingv2.DescribeLoadBalancersPaginator
+	client       *elasticloadbalancingv2.Client
 	running      atomic.Bool
 	lbListeners  []*lbListener
 	errs         []error

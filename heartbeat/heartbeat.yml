@@ -19,15 +19,23 @@ heartbeat.config.monitors:
   # How often to check for changes
   reload.period: 5s
 
+heartbeat.autodiscover:
+  providers:
+    - type: aws_elb
+      region: us-east-1
+      templates:
+        - config:
+          - type: tcp
+            hosts: ["${data.host}:${data.port}"]
+            schedule: "@every 5s"
+            timeout: 1s
+
 # Configure monitors inline
-heartbeat.monitors:
-  - type: icmp
-    hosts: "toeueouhnouehnoeuhnt.com"
-    schedule: "@every 3s"
-  - type: aws_elbv2
-    arns: ["arn:aws:elasticloadbalancing:us-east-1:114575138929:loadbalancer/app/test-lb/e35147785f6cc9a4"]
-    region: "us-east-1"
-    schedule: "@every 10s"
+#heartbeat.monitors:
+#  - type: aws_elbv2
+#    arns: ["arn:aws:elasticloadbalancing:us-east-1:114575138929:loadbalancer/app/test-l#b/e35147785f6cc9a4"]
+#    region: "us-east-1"
+#    schedule: "@every 10s"
 
 #heartbeat.autodiscover:
 #  providers:
