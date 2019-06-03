@@ -70,6 +70,7 @@ func (Update) FieldDocs() error {
 	return mage.Docs.FieldDocs(mage.FieldsAllYML)
 }
 
+// ModuleDocs collects and updates the module documentation.
 func (Update) ModuleDocs() error {
 	return moduleDocs()
 }
