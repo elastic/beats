@@ -11,11 +11,11 @@ system activity to the event log. Sysmon is not bundled with Windows or
 Winlogbeat and must be installed independently.
 
 The default configuration file includes configuration for Sysmon. If you do not
-have Sysmon installed Winlogbeat will log a warning that you can ignore stating
-that it could not read from the `Microsoft-Windows-Sysmon/Operational` channel.
-It will continue to read from the other configured channels. If you do install
-Sysmon at a later time then a restart of Winlogbeat is required to make it begin
-reading from the channel.
+have Sysmon installed Winlogbeat will log a warning that it could not read from
+the `Microsoft-Windows-Sysmon/Operational` channel. It will continue to read
+from the other configured channels. If you do install Sysmon at a later time
+then a restart of Winlogbeat is required to make it begin reading from the
+channel.
 
 This module was built based on Sysmon v9 event manifests. It contains
 transformations for each of the defined event IDs.

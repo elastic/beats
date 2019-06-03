@@ -13,8 +13,8 @@ Winlogbeat modules are constructed using the
 Winlogbeat before the events are delivered to the output.
 
 The general goal of each module is to transform events by renaming fields to
-comply with the Elastic Common Schema (ECS). The modules may also apply
-additional categorization, tagging, and parsing as necessary.
+comply with the {ecs-ref}/index.html[Elastic Common Schema] (ECS). The modules
+may also apply additional categorization, tagging, and parsing as necessary.
 
 The default configuration file included in packages has each of the modules
 configured. To apply the modules to your own configuration file you must add
