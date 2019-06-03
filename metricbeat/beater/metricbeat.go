@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
 
@@ -69,6 +70,14 @@ func WithModuleOptions(options ...module.Option) Option {
 	}
 }
 
+// WithLightModules enables light modules support
+func WithLightModules() Option {
+	return func(*Metricbeat) {
+		path := paths.Resolve(paths.Home, "module")
+		mb.Registry.SetChild(mb.NewLightModulesRegistry(path))
+	}
+}
+
 // Creator returns a beat.Creator for instantiating a new instance of the
 // Metricbeat framework with the given options.
 func Creator(options ...Option) beat.Creator {
@@ -90,6 +99,7 @@ func Creator(options ...Option) beat.Creator {
 //     )
 func DefaultCreator() beat.Creator {
 	return Creator(
+		WithLightModules(),
 		WithModuleOptions(
 			module.WithMetricSetInfo(),
 			module.WithServiceName(),
@@ -99,12 +109,6 @@ func DefaultCreator() beat.Creator {
 
 // newMetricbeat creates and returns a new Metricbeat instance.
 func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbeat, error) {
-	// Add light modules support
-	mb.Registry.SetChild(mb.NewLightModulesRegistry("module"))
-
-	// List all registered modules and metricsets.
-	logp.Debug("modules", "%s", mb.Registry.String())
-
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "error reading configuration file")
@@ -122,6 +126,9 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	for _, applyOption := range options {
 		applyOption(metricbeat)
 	}
+
+	// List all registered modules and metricsets.
+	logp.Debug("modules", "%s", mb.Registry.String())
 
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
