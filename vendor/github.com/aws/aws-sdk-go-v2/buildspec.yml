@@ -5,15 +5,8 @@ phases:
     commands:
       - echo Build started on `date`
       - export GOPATH=/go
-      - export SDK_CB_ROOT=`pwd`
-      - export SDK_GO_ROOT=/go/src/github.com/aws/aws-sdk-go-v2
-      - mkdir -p /go/src/github.com/aws
-      - ln -s $SDK_CB_ROOT $SDK_GO_ROOT
-      - cd $SDK_GO_ROOT
-      - go get -u github.com/golang/dep/cmd/dep
-      - dep ensure
-      - make unit
-      - cd $SDK_CB_ROOT
+      - export SDK_CODEBUILD_ROOT=`pwd`
+      - make get-deps-verify ci-test
   post_build:
     commands:
       - echo Build completed on `date`

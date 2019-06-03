@@ -10,16 +10,16 @@ We'll be expanding out the [Issues] and [Projects] sections with additional chan
 
 ## Getting started
 
-The best way to get started working with the SDK is to use `go get` to add the SDK to your Go Workspace manually.
+The best way to get started working with the SDK is to use `go get` to add the SDK to your Go Workspace or application using Go modules.
 
 ```sh
-go get -u github.com/aws/aws-sdk-go-v2
+go get github.com/aws/aws-sdk-go-v2
 ```
 
-You could also use [Dep] to add the SDK to your application's dependencies. Using [Dep] will simplify your update story and help your application keep pinned to specific version of the SDK
+Without Go Modules, or in a GOPATH with Go 1.11 or 1.12 use the `/...` suffix on the `go get` to retrieve all of the SDK's depdnencies.
 
 ```sh
-dep ensure -add github.com/aws/aws-sdk-go-v2
+go get github.com/aws/aws-sdk-go-v2/...
 ```
 
 ### Hello AWS
@@ -30,6 +30,8 @@ This example shows how you can use the v2 SDK to make an API request using the S
 package main
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/endpoints"
 	"github.com/aws/aws-sdk-go-v2/aws/external"

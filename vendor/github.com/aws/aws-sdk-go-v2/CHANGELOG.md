@@ -1,4 +1,118 @@
-Release v2.0.0-preview.5 (2018-09-19)
+Release v0.9.0 (2019-05-28)
+===
+
+### Services
+* Synced the V2 SDK with latest AWS service API definitions.
+* Fixes [#304](https://github.com/aws/aws-sdk-go-v2/issues/304)
+* Fixes [#295](https://github.com/aws/aws-sdk-go-v2/issues/295)
+
+### SDK Breaking changes
+This update includes multiple breaking changes to the SDK. These updates improve the SDK's usability, consistency.
+
+#### Client type name
+The API client type is renamed to `Client` for consistency, and remove stutter between package and client type name. Using Amazon S3 API client as an example, the `s3.S3` type is renamed to `s3.Client`.
+
+#### New API operation response type
+API operations' `Request.Send` method now returns a Response type for the specific operation. The Response type wraps the operation's Output parameter, and includes a method for the response's metadata such as RequestID. The Output type is an anonymous embedded field within the Output type. If your application was passing the Output value around you'll need to extract it directly, or pass the Response type instead.
+
+#### New API operation paginator utility
+This change removes the `Paginate` method from API operation Request types, (e.g. ListObjectsRequest). A new Paginator constructor is added that can be used to page these operations. To update your application to use the new pattern, where `Paginate` was being called, replace this with the Paginator type's constructor. The usage of the returned Paginator type is unchanged.
+
+```go
+req := svc.ListObjectsRequest(params)
+p := req.Paginate()
+```
+
+Is updated to to use the Paginator constructor instead of Paginate method.
+
+```go
+req := svc.ListObjectsRequest(params)
+p := s3.NewListObjectsPaginator(req)
+```
+
+#### Other changes
+  * Standardizes API client package name to be based on the API model's `ServiceID`.
+  * Standardizes API client operation input and output type names.
+  * Removes `endpoints` package's service identifier constants. These values were unstable. Each API client package contains an `EndpointsID` constant that can be used for service specific endpoint lookup.
+  * Fix API endpoint lookups to use the API's modeled `EndpointsID` (aka `enpdointPrefix`). Searching for API endpoints in the `endpoints` package should use the API client package's, `EndpointsID`.
+
+### SDK Enhancements
+*  Update CI tests to ensure all codegen changes are accounted for in PR ([#183](https://github.com/aws/aws-sdk-go-v2/issues/183))
+  * Updates the CI tests to ensure that any code generation changes are accounted for in the PR, and that there were no mistaken changes made without also running code generation. This change should also help ensure that code generation order is stable, and there are no ordering issues with the SDK's codegen.
+  * Related [aws/aws-sdk-go#1966](https://github.com/aws/aws-sdk-go/issues/1966)
+
+### SDK Bugs
+* `service/dynamodb/expression`: Fix Builder with KeyCondition example ([#306](https://github.com/aws/aws-sdk-go-v2/issues/306))
+  * Fixes the ExampleBuilder_WithKeyCondition example to include the ExpressionAttributeNames member being set.
+  * Fixes [#285](https://github.com/aws/aws-sdk-go-v2/issues/285)
+* `aws/defaults`: Fix UserAgent execution environment key ([#307](https://github.com/aws/aws-sdk-go-v2/issues/307))
+  * Fixes the SDK's UserAgent key for the execution environment.
+  * Fixes [#276](https://github.com/aws/aws-sdk-go-v2/issues/276)
+* `private/model/api`: Improve SDK API reference doc generation ([#309](https://github.com/aws/aws-sdk-go-v2/issues/309))
+  * Improves the SDK's generated documentation for API client, operation, and types. This fixes several bugs in the doc generation causing poor formatting, an difficult to read reference documentation.
+  * Fix [#308](https://github.com/aws/aws-sdk-go-v2/issues/308)
+  * Related [aws/aws-sdk-go#2617](https://github.com/aws/aws-sdk-go/issues/2617)
+
+Release v0.8.0 (2019-04-25)
+===
+
+### Services
+* Synced the V2 SDK with latests AWS service API definitions.
+
+### SDK Breaking changes
+* Update SDK API operation request send to required Context ([#265](https://github.com/aws/aws-sdk-go-v2/pull/265))
+  * Updates the SDK's API operation request Send method to require a context.Context value when called. This is done to encourage best applications to use Context for cancellation and request tracing.  Standardizing on this pattern will also help reduce code paths which accidentally do not have the Context causing the cancellation and tracing chain to be lost. Leading to difficult to trace down losses of cancellation and tracing within an application.
+  * Fixes [#264](https://github.com/aws/aws-sdk-go-v2/pull/264)
+
+### SDK Enhancements
+* Update README.md for getting SDK without Go Modules
+  * Updates the README.md with instructions how to get the SDK without Go Modules enabled, or using the SDK within a GOPATH with Go 1.11, and Go 1.12.
+* Refactor SDK's integration tests to be code generated ([#283](https://github.com/aws/aws-sdk-go-v2/pull/283))
+* `aws`: Add RequestThrottledException to set of throttled exceptions ([#292](https://github.com/aws/aws-sdk-go-v2/pull/292))
+* `private/model/api`: Backfill authtype, STS and Cognito Identity ([#293](https://github.com/aws/aws-sdk-go-v2/pull/293))
+  * Backfills the authtype=none modeled trait for STS and Cognito Identity services. This removes the in code customization for these two services' APIs that should not be signed.
+
+### SDK Bugs
+* Fix HTTP endpoint credential provider test for unresolved hosts ([#262](https://github.com/aws/aws-sdk-go-v2/pull/262))
+  * Fixes the HTTP endpoint credential provider's tests to check for a host that resolves to no addresses.
+* `example/service/s3/mockPaginator`: Update example to not use internal pkg ([#278](https://github.com/aws/aws-sdk-go-v2/pull/278))
+  * Updates the SDK's S3 Mock Paginator example to not use internal SDK packages and instead use the SDK's provided defaults package for default configuration.
+  * Fixes [#116](https://github.com/aws/aws-sdk-go-v2/issues/116)
+* Cleanup go mod unused dependencies ([#284](https://github.com/aws/aws-sdk-go-v2/pull/284))
+* `service/s3/s3manager`: Fix brittle Upload unit test ([#288](https://github.com/aws/aws-sdk-go-v2/pull/288))
+* `aws/ec2metadata`: Fix EC2 Metadata client panic with debug logging ([#290](https://github.com/aws/aws-sdk-go-v2/pull/290))
+  * Fixes a panic that could occur within the EC2 Metadata client when both AWS_EC2_METADATA_DISABLED env var is set and log level is LogDebugWithHTTPBody. The SDK's client response body debug functionality would panic because the Request.HTTPResponse value was not specified.
+* `aws`: Fix RequestUserAgent test to be stable ([#289](https://github.com/aws/aws-sdk-go-v2/pull/289))
+* `private/protocol/rest`: Trim space in header key and value ([#291](https://github.com/aws/aws-sdk-go-v2/pull/291))
+  * Fixes a bug when using S3 metadata where metadata values with leading spaces would trigger request signature validation errors when the request is received by the service.
+
+
+Release v0.7.0 (2019-01-03)
+===
+
+### Services
+* Synced the V2 SDK with latests AWS service API definitions.
+
+### SDK Enhancements
+* deps: Update SDK to latest go-jmespath ([#254](https://github.com/aws/aws-sdk-go-v2/pull/254))
+
+### SDK Bugs
+* `internal/ini`: Fix bug on trimming rhs spaces closes ([#260](https://github.com/aws/aws-sdk-go-v2/pull/260))
+  * Fixes a bug trimming RHS spaces not being read correctly from the ini file.
+  * Fix [#259](https://github.com/aws/aws-sdk-go-v2/pull/259)
+
+Release v0.6.0 (2018-12-03)
+===
+
+### Services
+* Synced the V2 SDK with latests AWS service API definitions.
+
+### SDK Bugs
+* Updates the SDK's release tagging scheme to use `v0` until the v2 SDK reaches
+	* General Availability (GA). This allows the SDK to be used with Go 1.11 modules. Post GA, v2 SDK's release tagging version will most likely follow a `v1.<x>.<y>` patter.
+	* Fixes [#221](https://github.com/aws/aws-sdk-go-v2/issues/221)
+
+Release v0.5.0 (2018-09-19)
 ===
 
 ### Services
@@ -23,7 +137,7 @@ Release v2.0.0-preview.5 (2018-09-19)
 * `internal/ini`: Add custom INI parser for shared config/credentials file (#209)
 	* Related to: aws/aws-sdk-go#2024
 
-Release v2.0.0-preview.4 (2018-05-25)
+Release v0.4.0 (2018-05-25)
 ===
 
 ### Services
@@ -50,7 +164,7 @@ Release v2.0.0-preview.4 (2018-05-25)
 	* Fixes [#155](https://github.com/aws/aws-sdk-go-v2/issues/155)
 
 
-Release v2.0.0-preview.3 (2018-03-08)
+Release v0.3.0 (2018-03-08)
 ===
 
 ### Services
@@ -92,7 +206,7 @@ Release v2.0.0-preview.3 (2018-03-08)
 * Add code of conduct ([#138](https://github.com/aws/aws-sdk-go-v2/pull/138))
 * Update SDK README dep usage ([#140](https://github.com/aws/aws-sdk-go-v2/pull/140))
 
-Release v2.0.0-preview.2 (2018-01-15)
+Release v0.2.0 (2018-01-15)
 ===
 
 ### Services
@@ -105,7 +219,7 @@ Release v2.0.0-preview.2 (2018-01-15)
 	* Fixes [#84](https://github.com/aws/aws-sdk-go-v2/issues/84)
 
 
-Release v2.0.0-preview.1 (2017-12-21)
+Release v0.1.0 (2017-12-21)
 ===
 
 ## What has changed?
