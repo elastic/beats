@@ -49,7 +49,7 @@ http://golang.org/[Go] which is being used for Beats development.
 
 After https://golang.org/doc/install[installing Go], set the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your workspace location, and make sure the Go `bin` directory is in your PATH.
+your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
 The location where you clone is important. Make a directory structure under
 `GOPATH` that matches the URL used for Elastic repositories, then clone the
