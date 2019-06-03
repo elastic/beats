@@ -1263,6 +1263,16 @@ Name of the project in Google Cloud.
 
 --
 
+*`cloud.image.id`*::
++
+--
+example: ami-abcd1234
+
+Image ID for the cloud instance.
+
+
+--
+
 *`meta.cloud.provider`*::
 +
 --
