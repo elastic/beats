@@ -79,7 +79,7 @@ class Test(AuditbeatXPackTest):
         socket metricset collects information about open sockets on a system.
         """
 
-        fields = ["socket.entity_id", "destination.port"]
+        fields = ["socket.entity_id", "destination.port", "network.direction", "network.transport"]
 
         # errors_allowed=True - The socket metricset fills the `error` field if the process enrichment fails
         # (e.g. process has exited). This should not fail the test.
