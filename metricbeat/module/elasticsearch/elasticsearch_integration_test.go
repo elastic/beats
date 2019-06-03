@@ -261,7 +261,7 @@ func createCCRStats(host string) error {
 		return checkCCRStatsExists(host)
 	}
 
-	exists, err := waitForSuccess(checkCCRStats, 200, 5)
+	exists, err := waitForSuccess(checkCCRStats, 300, 5)
 	if err != nil {
 		return errors.Wrap(err, "error checking if CCR stats exist")
 	}
