@@ -29,21 +29,26 @@ func init() {
 			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
 			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
 
-			"kubeproxy_sync_proxy_rules_latency_microseconds": prometheus.Metric("sync.rules.latency.us"),
+			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
+			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
+			"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
 
-			"rest_client_request_latency_seconds": prometheus.Metric("client.request.latency.us",
+			"kubeproxy_sync_proxy_rules_duration_seconds": prometheus.Metric("sync.rules.duration.us",
+				prometheus.OpMultiplyBuckets(1000000)),
+
+			"rest_client_request_duration_seconds": prometheus.Metric("client.request.duration.us",
 				prometheus.OpMultiplyBuckets(1000000)),
 			"rest_client_requests_total": prometheus.Metric("client.request.count"),
 		},
 
 		Labels: map[string]prometheus.LabelMap{
-			"code": prometheus.KeyLabel("client.request.status_code"),
-			"host": prometheus.KeyLabel("client.request.host"),
-			// TODO method and verb are used to store the same info at different buckets
-			// We need to make sure this doesn't overwrites data at the prometheus helper
+			"code":   prometheus.KeyLabel("client.request.status_code"),
+			"host":   prometheus.KeyLabel("client.request.host"),
 			"method": prometheus.KeyLabel("client.request.method"),
 			"verb":   prometheus.KeyLabel("client.request.verb"),
 			"url":    prometheus.KeyLabel("client.request.url"),
+
+			"handler": prometheus.KeyLabel("client.request.url"),
 		},
 	}
 
