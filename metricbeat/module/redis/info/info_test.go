@@ -27,6 +27,22 @@ import (
 )
 
 func TestNewMetricSet(t *testing.T) {
+	t.Run("regular url", func(t *testing.T) {
+		c, err := common.NewConfigFrom(map[string]interface{}{
+			"module":     "redis",
+			"metricsets": []string{"info"},
+			"hosts": []string{
+				"127.0.0.1:6379",
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ms := mbtest.NewReportingMetricSetV2Error(t, c)
+		assert.Equal(t, "127.0.0.1:6379", ms.HostData().Host)
+	})
+
 	t.Run("pass in host", func(t *testing.T) {
 		c, err := common.NewConfigFrom(map[string]interface{}{
 			"module":     "redis",
@@ -39,7 +55,7 @@ func TestNewMetricSet(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		ms := mbtest.NewReportingMetricSetV2(t, c)
+		ms := mbtest.NewReportingMetricSetV2Error(t, c)
 		assert.Equal(t, "secret", ms.HostData().Password)
 	})
 
@@ -56,7 +72,7 @@ func TestNewMetricSet(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		ms := mbtest.NewReportingMetricSetV2(t, c)
+		ms := mbtest.NewReportingMetricSetV2Error(t, c)
 		assert.Equal(t, "secret", ms.HostData().Password)
 	})
 }
