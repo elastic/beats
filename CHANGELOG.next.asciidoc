@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
 - Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
+- Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Fix queue.spool.write.flush.events config type. {pull}12080[12080]
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 - Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
@@ -109,8 +110,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Skipping unparsable log entries from docker json reader {pull}12268[12268]
+- Parse timezone in PostgreSQL logs as part of the timestamp {pull}12338[12338]
 - Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
 - Require certificate authorities, certificate file, and key when SSL is enabled for the TCP input. {pull}12355[12355]
+- Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
 
 *Heartbeat*
 
@@ -207,6 +210,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New module `panw` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
 - Add RabbitMQ module. {pull}12032[12032]
 - Add new `container` input. {pull}12162[12162]
+- Add timeouts on communication with docker daemon. {pull}12310[12310]
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
 - Add MSSQL module {pull}12079[12079]
@@ -236,6 +240,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add overview dashboard to Consul module {pull}10665[10665]
 - New fields were added in the mysql/status metricset. {pull}12227[12227]
 - Added kubernetes metricset `kubeproxy`. {pull}12312[12312]
+- Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
 
 *Packetbeat*
 
@@ -256,6 +261,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - `docker` input is deprecated in favour `container`. {pull}12162[12162]
+- `postgresql.log.timestamp` field is deprecated in favour of `@timestamp`. {pull}12338[12338]
 
 *Heartbeat*
 
