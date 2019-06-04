@@ -7458,8 +7458,11 @@ type: keyword
 Information about the running thread where the log originate.
 
 
+<<<<<<< HEAD
 type: keyword
 
+=======
+>>>>>>> [DOCS] More fixes for asciidoctor migration
 --
 
 *`logstash.log.thread.text`*::
@@ -7520,8 +7523,11 @@ type: keyword
 Information about the running thread where the log originate.
 
 
+<<<<<<< HEAD
 type: keyword
 
+=======
+>>>>>>> [DOCS] More fixes for asciidoctor migration
 --
 
 *`logstash.slowlog.thread.text`*::
@@ -7537,8 +7543,11 @@ type: text
 Raw dump of the original event
 
 
+<<<<<<< HEAD
 type: keyword
 
+=======
+>>>>>>> [DOCS] More fixes for asciidoctor migration
 --
 
 *`logstash.slowlog.event.text`*::
@@ -7584,8 +7593,11 @@ type: long
 String value of the plugin configuration
 
 
+<<<<<<< HEAD
 type: keyword
 
+=======
+>>>>>>> [DOCS] More fixes for asciidoctor migration
 --
 
 *`logstash.slowlog.plugin_params.text`*::
