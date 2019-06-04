@@ -18,7 +18,7 @@ var security = (function () {
     var addAuthFailed = new processor.AddFields({
         fields: {
             "event.category": "authentication",
-            "event.type": "authentication_failed",
+            "event.type": "authentication_failure",
         },
         target: "",
     });

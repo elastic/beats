@@ -97,6 +97,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	// Converts hash list to slice
 	for _, e := range eventList {
-		reporter.Event(mb.Event{ModuleFields: e})
+		reporter.Event(mb.Event{
+			RootFields: common.MapStr{"prometheus": e},
+		})
 	}
 }
