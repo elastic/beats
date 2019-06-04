@@ -160,7 +160,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 			return err
 		}
 
-		// When running the subcommand setup, configuration from modules.d directories are
+		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
 		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
 		modulesFactory := fileset.NewSetupFactory(b.Info.Version, pipelineLoaderFactory)
