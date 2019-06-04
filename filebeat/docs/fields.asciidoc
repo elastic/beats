@@ -7453,12 +7453,12 @@ type: keyword
 Information about the running thread where the log originate.
 
 
+--
+
 *`logstash.log.thread.text`*::
 +
 --
 type: text
-
---
 
 --
 
@@ -7515,12 +7515,12 @@ type: keyword
 Information about the running thread where the log originate.
 
 
+--
+
 *`logstash.slowlog.thread.text`*::
 +
 --
 type: text
-
---
 
 --
 
@@ -7532,12 +7532,12 @@ type: keyword
 Raw dump of the original event
 
 
+--
+
 *`logstash.slowlog.event.text`*::
 +
 --
 type: text
-
---
 
 --
 
@@ -7579,12 +7579,12 @@ type: keyword
 String value of the plugin configuration
 
 
+--
+
 *`logstash.slowlog.plugin_params.text`*::
 +
 --
 type: text
-
---
 
 --
 
