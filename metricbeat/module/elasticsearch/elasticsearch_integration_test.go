@@ -85,8 +85,8 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
-			events, errs := mbtest.ReportingFetchV2Error(f)
+			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
+			events, errs := mbtest.ReportingFetchV2(f)
 
 			assert.Empty(t, errs)
 			if !assert.NotEmpty(t, events) {
@@ -111,8 +111,8 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
-			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
+			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
+			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
 			if err != nil {
 				t.Fatal("write", err)
 			}
