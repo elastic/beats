@@ -732,7 +732,7 @@ The `add_locale` processor enriches each event with the machine's time zone
 offset from UTC or with the name of the time zone. It supports one configuration
 option named `format` that controls whether an offset or time zone abbreviation
 is added to the event. The default format is `offset`. The processor adds the
-a `beat.timezone` value to each event.
+a `event.timezone` value to each event.
 
 The configuration below enables the processor with the default settings.
 
