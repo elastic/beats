@@ -32,6 +32,7 @@ func init() {
 			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
 			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
 			"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
+			"http_requests_total":                prometheus.Metric("http.request.count"),
 
 			"kubeproxy_sync_proxy_rules_duration_seconds": prometheus.Metric("sync.rules.duration.us",
 				prometheus.OpMultiplyBuckets(1000000)),
@@ -42,13 +43,12 @@ func init() {
 		},
 
 		Labels: map[string]prometheus.LabelMap{
-			"code":   prometheus.KeyLabel("client.request.status_code"),
-			"host":   prometheus.KeyLabel("client.request.host"),
-			"method": prometheus.KeyLabel("client.request.method"),
-			"verb":   prometheus.KeyLabel("client.request.verb"),
-			"url":    prometheus.KeyLabel("client.request.url"),
-
-			"handler": prometheus.KeyLabel("client.request.url"),
+			"code":    prometheus.KeyLabel("status_code"),
+			"host":    prometheus.KeyLabel("host"),
+			"method":  prometheus.KeyLabel("method"),
+			"verb":    prometheus.KeyLabel("verb"),
+			"url":     prometheus.KeyLabel("url"),
+			"handler": prometheus.KeyLabel("handler"),
 		},
 	}
 

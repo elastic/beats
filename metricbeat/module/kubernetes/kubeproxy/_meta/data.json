@@ -1,90 +1,75 @@
 {
-  "@timestamp": "2019-06-01T08:08:00.885Z",
-  "@metadata": {
-    "beat": "metricbeat",
-    "type": "_doc",
-    "version": "8.0.0"
-  },
-  "ecs": {
-    "version": "1.0.0"
-  },
-  "host": {
-    "hostname": "pl51",
-    "name": "pl51",
-    "architecture": "x86_64",
-    "os": {
-      "name": "Ubuntu",
-      "kernel": "4.15.0-48-generic",
-      "codename": "bionic",
-      "platform": "ubuntu",
-      "version": "18.04.2 LTS (Bionic Beaver)",
-      "family": "debian"
+    "@timestamp": "2019-06-04T14:05:28.379Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "_doc",
+      "version": "8.0.0"
     },
-    "id": "07ed8f34c84f4e6aa92e212a931f2efa",
-    "containerized": false
-  },
-  "service": {
-    "address": "192.168.205.12:10249",
-    "type": "kubernetes"
-  },
-  "kubernetes": {
-    "kubeproxy": {
-      "process": {
-        "cpu": {
-          "sec": 199
-        },
-        "memory": {
-          "resident": {
-            "bytes": 3.4369536e+07
-          },
-          "virtual": {
-            "bytes": 1.42323712e+08
-          }
-        }
-      },
-      "sync": {
-        "rules": {
-          "latency": {
-            "us": {
-              "bucket": {
-                "128000": 4857,
-                "256000": 4858,
-                "8192000": 4862,
-                "32000": 627,
-                "16384000": 4862,
-                "2000": 1,
-                "1024000": 4858,
-                "512000": 4858,
-                "2048000": 4862,
-                "8000": 1,
-                "64000": 3460,
-                "4096000": 4862,
-                "1000": 1,
-                "4000": 1,
-                "16000": 1,
-                "+Inf": 4862
-              },
-              "sum": 2.74657781e+08,
-              "count": 4862
+    "metricset": {
+      "name": "kubeproxy"
+    },
+    "service": {
+      "address": "192.168.205.12:10249",
+      "type": "kubernetes"
+    },
+    "kubernetes": {
+      "kubeproxy": {
+        "url": "https://192.168.205.10:6443/%7Bprefix%7D",
+        "verb": "POST",
+        "client": {
+          "request": {
+            "duration": {
+              "us": {
+                "sum": 4560.874000000001,
+                "count": 1,
+                "bucket": {
+                  "2000": 0,
+                  "512000": 1,
+                  "+Inf": 1,
+                  "32000": 1,
+                  "4000": 0,
+                  "64000": 1,
+                  "128000": 1,
+                  "256000": 1,
+                  "1000": 0,
+                  "8000": 1,
+                  "16000": 1
+                }
+              }
             }
           }
         }
       }
+    },
+    "ecs": {
+      "version": "1.0.0"
+    },
+    "host": {
+      "name": "pl51",
+      "containerized": false,
+      "hostname": "pl51",
+      "architecture": "x86_64",
+      "os": {
+        "platform": "ubuntu",
+        "version": "18.04.2 LTS (Bionic Beaver)",
+        "family": "debian",
+        "name": "Ubuntu",
+        "kernel": "4.15.0-48-generic",
+        "codename": "bionic"
+      },
+      "id": "07ed8f34c84f4e6aa92e212a931f2efa"
+    },
+    "agent": {
+      "type": "metricbeat",
+      "ephemeral_id": "fc27b2c2-b0e8-43c8-8b09-c912c64e0bba",
+      "hostname": "pl51",
+      "id": "4c2cd952-4b86-4601-9ca4-9ea0df445715",
+      "version": "8.0.0"
+    },
+    "event": {
+      "module": "kubernetes",
+      "duration": 2421013,
+      "dataset": "kubernetes.kubeproxy"
     }
-  },
-  "event": {
-    "duration": 9167393,
-    "dataset": "kubernetes.kubeproxy",
-    "module": "kubernetes"
-  },
-  "metricset": {
-    "name": "kubeproxy"
-  },
-  "agent": {
-    "ephemeral_id": "1175b320-036a-46d5-8549-153c434b910b",
-    "hostname": "pl51",
-    "id": "4c2cd952-4b86-4601-9ca4-9ea0df445715",
-    "version": "8.0.0",
-    "type": "metricbeat"
   }
-}
+  

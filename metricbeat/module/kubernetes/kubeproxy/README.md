@@ -2,7 +2,7 @@
 
 ## Version history
 
-- June 2019, `v1.13.0`
+- June 2019, `v1.14.0`
 
 ## Resources
 
@@ -11,23 +11,26 @@
 
 ## Metrics insight
 
-process_cpu_seconds_total
-process_resident_memory_bytes
-process_virtual_memory_bytes
+Process metrics:
+- process_cpu_seconds_total
+- process_resident_memory_bytes
+- process_virtual_memory_bytes
 
-kubeproxy_sync_proxy_rules_latency_microseconds_bucket
+Network rules syncing metrics:
+kubeproxy_sync_proxy_rules_duration_seconds_bucket
     - le
 
+HTTP server metrics:
 http_request_duration_microseconds
     - handler
     - quantile
 
-rest_client_request_latency_seconds_bucket (integer)
+Rest client metrics:
+rest_client_request_duration_seconds_bucket
     - url
     - verb
     - le
-
-rest_client_requests_total (integer)
+rest_client_requests_total
     - code
     - host
     - method
@@ -36,16 +39,3 @@ rest_client_requests_total (integer)
 
 - Create a kubernetes cluster
 - Deploy metricbeat as a daemonset + host network
-
-
-
-
-
-
-
-
-
-
-
-
-

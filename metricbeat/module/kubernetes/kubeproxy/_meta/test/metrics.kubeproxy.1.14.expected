@@ -3,6 +3,101 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
+			"handler": "prometheus",
+			"http": {
+				"request": {
+					"duration": {
+						"us": {
+							"count": 5719,
+							"percentile": {
+								"50": 3724.635,
+								"90": 6009.016,
+								"99": 15081.009
+							},
+							"sum": 21201441.986
+						}
+					},
+					"size": {
+						"bytes": {
+							"count": 5719,
+							"percentile": {
+								"50": 86,
+								"90": 86,
+								"99": 86
+							},
+							"sum": 491766
+						}
+					}
+				},
+				"response": {
+					"size": {
+						"bytes": {
+							"count": 5719,
+							"percentile": {
+								"50": 2965,
+								"90": 2970,
+								"99": 2973
+							},
+							"sum": 16977903
+						}
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"duration": {
+						"us": {
+							"bucket": {
+								"+Inf": 1,
+								"1000": 0,
+								"128000": 1,
+								"16000": 1,
+								"2000": 0,
+								"256000": 1,
+								"32000": 1,
+								"4000": 0,
+								"512000": 1,
+								"64000": 1,
+								"8000": 1
+							},
+							"count": 1,
+							"sum": 4560.874000000001
+						}
+					}
+				}
+			},
+			"url": "https://192.168.205.10:6443/%7Bprefix%7D",
+			"verb": "POST"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
 			"process": {
 				"cpu": {
 					"sec": 121
@@ -18,7 +113,7 @@
 			},
 			"sync": {
 				"rules": {
-					"latency": {
+					"duration": {
 						"us": {
 							"bucket": {
 								"+Inf": 2654,
@@ -39,7 +134,7 @@
 								"8192000": 2654
 							},
 							"count": 2654,
-							"sum": 149424589
+							"sum": 149421694.93599978
 						}
 					}
 				}
@@ -61,29 +156,12 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"latency": {
-						"us": {
-							"bucket": {
-								"+Inf": 1,
-								"1000": 0,
-								"128000": 1,
-								"16000": 1,
-								"2000": 0,
-								"256000": 1,
-								"32000": 1,
-								"4000": 0,
-								"512000": 1,
-								"64000": 1,
-								"8000": 1
-							},
-							"count": 1,
-							"sum": 4560.874000000001
-						}
-					},
-					"url": "https://192.168.205.10:6443/%7Bprefix%7D",
-					"verb": "POST"
+					"count": 1
 				}
-			}
+			},
+			"host": "192.168.205.10:6443",
+			"method": "POST",
+			"status_code": "201"
 		},
 		"Index": "",
 		"ID": "",
@@ -101,7 +179,30 @@
 		"MetricSetFields": {
 			"client": {
 				"request": {
-					"latency": {
+					"count": 356
+				}
+			},
+			"host": "192.168.205.10:6443",
+			"method": "GET",
+			"status_code": "200"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"client": {
+				"request": {
+					"duration": {
 						"us": {
 							"bucket": {
 								"+Inf": 3,
@@ -119,11 +220,11 @@
 							"count": 3,
 							"sum": 10105.426
 						}
-					},
-					"url": "https://192.168.205.10:6443/%7Bprefix%7D",
-					"verb": "GET"
+					}
 				}
-			}
+			},
+			"url": "https://192.168.205.10:6443/%7Bprefix%7D",
+			"verb": "GET"
 		},
 		"Index": "",
 		"ID": "",
@@ -139,37 +240,14 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"client": {
+			"handler": "prometheus",
+			"http": {
 				"request": {
-					"count": 356,
-					"host": "192.168.205.10:6443",
-					"method": "GET",
-					"status_code": "200"
+					"count": 5719
 				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"client": {
-				"request": {
-					"count": 1,
-					"host": "192.168.205.10:6443",
-					"method": "POST",
-					"status_code": "201"
-				}
-			}
+			},
+			"method": "get",
+			"status_code": "200"
 		},
 		"Index": "",
 		"ID": "",
