@@ -18,7 +18,9 @@
 package logstash
 
 import (
+	"errors"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -37,6 +39,9 @@ type asyncClient struct {
 	win      *window
 
 	connect func() error
+
+	closed bool
+	sync.Mutex
 }
 
 type msgRef struct {
@@ -113,6 +118,9 @@ func (c *asyncClient) Connect() error {
 }
 
 func (c *asyncClient) Close() error {
+	c.Lock()
+	defer c.Unlock()
+	c.closed = true
 	logp.Debug("logstash", "close connection")
 	if c.client != nil {
 		err := c.client.Close()
@@ -197,6 +205,12 @@ func (c *asyncClient) publishWindowed(
 }
 
 func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
+	c.Lock()
+	defer c.Unlock()
+	if c.closed {
+		return errors.New("could not send events client is closed")
+	}
+
 	window := make([]interface{}, len(events))
 	for i := range events {
 		window[i] = &events[i].Content
