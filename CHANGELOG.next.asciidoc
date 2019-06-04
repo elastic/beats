@@ -52,7 +52,6 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 - Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
-- Require certificate authorities, certificate file, and key when SSL is enabled for the TCP input. {pull}12355[12355]
 
 *Heartbeat*
 
