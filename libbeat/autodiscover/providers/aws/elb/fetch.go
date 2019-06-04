@@ -1,13 +1,12 @@
 package elb
 
 import (
+	"context"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
 	"go.uber.org/multierr"
-
-	"github.com/aws/aws-sdk-go-v2/service/elbv2"
 
 	"github.com/elastic/beats/libbeat/common/atomic"
 )
@@ -34,6 +33,7 @@ func newAPIFetcher(client *elasticloadbalancingv2.Client) fetcher {
 // a sync.Pool to limit the number of in-flight requests.
 func (f *apiFetcher) fetch() ([]*lbListener, error) {
 	var pageSize int64 = 50
+
 	req := f.client.DescribeLoadBalancersRequest(&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize})
 
 	// Limit concurrency against the AWS API by creating a pool of objects
@@ -44,7 +44,7 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 		taskPool.Put(nil)
 	}
 	ir := &fetchRequest{
-		req.Paginator(),
+		elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(req),
 		f.client,
 		atomic.MakeBool(true),
 		[]*lbListener{},
@@ -92,7 +92,7 @@ func (p *fetchRequest) fetchNextPage() {
 		return
 	}
 
-	if p.paginator.Next() {
+	if p.paginator.Next(context.TODO()) {
 		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
 			p.dispatch(func() { p.fetchListeners(lb) })
 		}
@@ -118,10 +118,10 @@ func (p *fetchRequest) dispatch(fn func()) {
 	}()
 }
 
-func (p *fetchRequest) fetchListeners(lb elbv2.LoadBalancer) {
-	listenReq := p.client.DescribeListenersRequest(&elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
-	listen := listenReq.Paginate()
-	for listen.Next() && p.running.Load() {
+func (p *fetchRequest) fetchListeners(lb elasticloadbalancingv2.LoadBalancer) {
+	listenReq := p.client.DescribeListenersRequest(&elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
+	listen := elasticloadbalancingv2.NewDescribeListenersPaginator(listenReq)
+	for listen.Next(context.TODO()) && p.running.Load() {
 		for _, listener := range listen.CurrentPage().Listeners {
 			p.recordGoodResult(&lb, &listener)
 		}
@@ -131,7 +131,7 @@ func (p *fetchRequest) fetchListeners(lb elbv2.LoadBalancer) {
 	}
 }
 
-func (p *fetchRequest) recordGoodResult(lb *elbv2.LoadBalancer, lbl *elbv2.Listener) {
+func (p *fetchRequest) recordGoodResult(lb *elasticloadbalancingv2.LoadBalancer, lbl *elasticloadbalancingv2.Listener) {
 	p.resultsLock.Lock()
 	defer p.resultsLock.Unlock()
 

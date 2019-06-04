@@ -1,10 +1,14 @@
 package elb
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/gofrs/uuid"
+
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/elbv2"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -29,10 +33,11 @@ type Provider struct {
 	startListener bus.Listener
 	stopListener  bus.Listener
 	watcher       *watcher
+	uuid          uuid.UUID
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("aws_elb autodiscover is beta")
 
 	config := defaultConfig()
@@ -47,18 +52,18 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 	}
 
-	return internalBuilder(bus, config, newAPIFetcher(elbv2.New(cfg)))
+	return internalBuilder(uuid, bus, config, newAPIFetcher(elasticloadbalancingv2.New(cfg)))
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
 // it can be configured to use a fetcher that doesn't actually hit the AWS API.
-func internalBuilder(bus bus.Bus, config *Config, fetcher fetcher) (*Provider, error) {
+func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *Config, fetcher fetcher) (*Provider, error) {
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -68,13 +73,16 @@ func internalBuilder(bus bus.Bus, config *Config, fetcher fetcher) (*Provider, e
 		return nil, err
 	}
 
+	fmt.Printf("\n\nINIT AUTOELB PROVIDER %v %v\n\n", uuid, config)
+
 	return &Provider{
 		fetcher:   fetcher,
 		config:    config,
 		bus:       bus,
 		builders:  builders,
 		appenders: appenders,
-		templates: mapper,
+		templates: &mapper,
+		uuid:      uuid,
 	}, nil
 }
 
@@ -94,17 +102,21 @@ func (p *Provider) Stop() {
 	p.watcher.stop()
 }
 
-func (p *Provider) onWatcherStart(uuid string, lbl *lbListener) {
+func (p *Provider) onWatcherStart(arn string, lbl *lbListener) {
 	lblMap := lbl.toMap()
 	e := bus.Event{
-		"start":   true,
-		"hashKey": uuid,
-		"host":    lblMap["host"],
-		"port":    lblMap["port"],
+		"start":    true,
+		"provider": p.uuid,
+		"id":       arn,
+		"host":     lblMap["host"],
+		"port":     lblMap["port"],
 		"meta": common.MapStr{
 			"elb": lbl.toMap(),
 		},
 	}
+
+	fmt.Printf("EMIT START EVENT %v\n", e)
+
 	if configs := p.templates.GetConfig(e); configs != nil {
 		e["config"] = configs
 	}
@@ -112,10 +124,11 @@ func (p *Provider) onWatcherStart(uuid string, lbl *lbListener) {
 	p.bus.Publish(e)
 }
 
-func (p *Provider) onWatcherStop(uuid string) {
+func (p *Provider) onWatcherStop(arn string) {
 	e := bus.Event{
-		"stop":    true,
-		"hashKey": uuid,
+		"stop":     true,
+		"id":       arn,
+		"provider": p.uuid,
 	}
 	p.bus.Publish(e)
 }

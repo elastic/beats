@@ -1,15 +1,15 @@
 package elb
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/elbv2"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// lbListener is a tuple type representing an elbv2.Listener and its associated elbv2.LoadBalancer.
+// lbListener is a tuple type representing an elasticloadbalancingv2.Listener and its associated elasticloadbalancingv2.LoadBalancer.
 type lbListener struct {
-	lb       *elbv2.LoadBalancer
-	listener *elbv2.Listener
+	lb       *elasticloadbalancingv2.LoadBalancer
+	listener *elasticloadbalancingv2.Listener
 }
 
 // toMap converts this lbListener into the form consumed as metadata in the autodiscovery process.
@@ -34,8 +34,8 @@ func (l *lbListener) toMap() common.MapStr {
 	return m
 }
 
-// uuid returns a globally unique ID. In the case of an lbListener, that would be its listenerArn.
-func (l *lbListener) uuid() string {
+// arn returns a globally unique ID. In the case of an lbListener, that would be its listenerArn.
+func (l *lbListener) arn() string {
 	return *l.listener.ListenerArn
 }
 

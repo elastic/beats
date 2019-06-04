@@ -18,6 +18,7 @@
 package elb
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -76,6 +77,7 @@ func (w *watcher) forever() {
 // This is mostly useful for testing.
 func (w *watcher) once() error {
 	fetchedLbls, err := w.fetcher.fetch()
+	fmt.Printf("DID FETCH %v | %v \n\n", fetchedLbls, err)
 	if err != nil {
 		return err
 	}
@@ -85,13 +87,13 @@ func (w *watcher) once() error {
 
 	// Increment the generation of all ELBs returned by the API request
 	for _, lbl := range fetchedLbls {
-		uuid := lbl.uuid()
-		if _, exists := w.lbListeners[uuid]; !exists {
+		arn := lbl.arn()
+		if _, exists := w.lbListeners[arn]; !exists {
 			if w.onStart != nil {
-				w.onStart(uuid, lbl)
+				w.onStart(arn, lbl)
 			}
 		}
-		w.lbListeners[uuid] = w.gen
+		w.lbListeners[arn] = w.gen
 	}
 
 	// ELBs not seen in the API request get deleted

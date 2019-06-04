@@ -100,7 +100,7 @@ func Test_internalBuilder(t *testing.T) {
 
 	expectedStartEvent := bus.Event{
 		"start":   true,
-		"hashKey": lbl.uuid(),
+		"hashKey": lbl.arn(),
 		"host":    *lbl.lb.DNSName,
 		"port":    *lbl.listener.Port,
 		"meta":    common.MapStr{"elb": lbl.toMap()},
@@ -119,7 +119,7 @@ func Test_internalBuilder(t *testing.T) {
 
 	expectedStopEvent := bus.Event{
 		"stop":    true,
-		"hashKey": lbl.uuid(),
+		"hashKey": lbl.arn(),
 	}
 
 	require.Equal(t, expectedStopEvent, events.get()[1])
