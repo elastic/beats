@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-03-03T14:37:06.157Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.heap.size_kb": "253440",
         "elasticsearch.gc.heap.used_kb": "142444",
         "elasticsearch.gc.jvm_runtime_sec": "14597.826",
@@ -22,7 +21,6 @@
     },
     {
         "@timestamp": "2018-06-11T01:53:11.382Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.jvm_runtime_sec": "1396138.752",
         "elasticsearch.gc.stopping_threads_time_sec": "0.0000702",
         "elasticsearch.gc.threads_total_stop_time_sec": "0.0083760",
@@ -36,7 +34,6 @@
     },
     {
         "@timestamp": "2018-06-30T11:35:26.632Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.heap.size_kb": "506816",
         "elasticsearch.gc.heap.used_kb": "391020",
         "elasticsearch.gc.jvm_runtime_sec": "224.671",
