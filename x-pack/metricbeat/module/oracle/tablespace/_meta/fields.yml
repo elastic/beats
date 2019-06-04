@@ -12,7 +12,7 @@
       fields:
         - name: id
           type: long
-          description: TODO
+          description: Tablespace unique identifier
         - name: name
           type: keyword
           description: Filename of the data file
@@ -51,15 +51,4 @@
           description: Tablespace used space, in bytes.
         - name: total.bytes
           type: long
-          description: Tablespace total size  , in bytes.
-
-    - name: temp
-      type: group
-      description: Information about the temp table
-      fields:
-      - name: used.bytes
-        type: long
-        description: Total used/allocated space, in bytes, including space that is currently allocated and used and space that is currently allocated and available for reuse
-      - name: bytes
-        type: long
-        description: Total size of the tablespace, in bytes
+          description: Tablespace total size, in bytes.
