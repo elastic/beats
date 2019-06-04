@@ -40,8 +40,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		Network     string        `config:"network"`
 		MaxConn     int           `config:"maxconn" validate:"min=1"`
 	}{
-		Network:  "tcp",
-		MaxConn:  10,
+		Network: "tcp",
+		MaxConn: 10,
 	}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
