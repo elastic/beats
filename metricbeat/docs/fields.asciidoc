@@ -2392,6 +2392,16 @@ Name of the project in Google Cloud.
 
 --
 
+*`cloud.image.id`*::
++
+--
+example: ami-abcd1234
+
+Image ID for the cloud instance.
+
+
+--
+
 *`meta.cloud.provider`*::
 +
 --
@@ -4538,6 +4548,49 @@ Total number of existing images.
 Memory metrics.
 
 
+
+[float]
+== commit fields
+
+Committed bytes on Windows
+
+
+
+*`docker.memory.commit.total`*::
++
+--
+type: long
+
+format: bytes
+
+Total bytes
+
+
+--
+
+*`docker.memory.commit.peak`*::
++
+--
+type: long
+
+format: bytes
+
+Peak committed bytes on Windows
+
+
+--
+
+*`docker.memory.private_working_set.total`*::
++
+--
+type: long
+
+format: bytes
+
+private working sets on Windows
+
+
+--
 
 *`docker.memory.fail.count`*::
 +
@@ -27139,6 +27192,16 @@ Host name
 type: keyword
 
 Virtual Machine name
+
+
+--
+
+*`vsphere.virtualmachine.os`*::
++
+--
+type: keyword
+
+Virtual Machine Operating System name
 
 
 --

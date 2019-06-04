@@ -363,7 +363,9 @@ func (ms *MetricSet) socketEvent(socket *Socket, eventType string, action eventA
 	event.RootFields.Put("event.action", action.String())
 	event.RootFields.Put("message", socketMessage(socket, action))
 
-	event.RootFields.Put("socket.entity_id", socket.entityID(ms.HostID()))
+	if ms.HostID() != "" {
+		event.RootFields.Put("socket.entity_id", socket.entityID(ms.HostID()))
+	}
 
 	return event
 }
