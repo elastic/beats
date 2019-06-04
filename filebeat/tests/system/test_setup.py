@@ -1,7 +1,7 @@
 import unittest
 import os
 import yaml
-from shutil import copyfile
+from shutil import copytree, copyfile
 
 from elasticsearch import Elasticsearch
 
@@ -33,31 +33,31 @@ class Test(BaseTest):
             },
         )
 
-        modules_d_path = self.working_dir + "/modules.d"
-        if not os.path.isdir(modules_d_path):
-            os.mkdir(modules_d_path)
-        copyfile(self.beat_path + "/tests/system/input/system.yml", modules_d_path + "/system.yml")
+        self._setup_dummy_module()
 
         beat_setup_modules_pipelines = self.start_beat(
             extra_args=[
                 "setup",
                 "--pipelines",
-                "-path.home=" + self.beat_path,
-                "-E", "filebeat.config.modules.path=" + modules_d_path + "/*.yml",
+                "-E", "filebeat.config.modules.path=" + self.working_dir + "/modules.d/*.yml",
             ],
-            configure_home=False,
         )
         beat_setup_modules_pipelines.check_wait(exit_code=0)
 
         version = self.get_beat_version()
-        system_syslog_pipeline_name = "filebeat-" + version + "-system-syslog-pipeline"
-        system_syslog_pipeline = self.es.transport.perform_request("GET",
-                                                                   "/_ingest/pipeline/" + system_syslog_pipeline_name)
+        pipeline_name = "filebeat-" + version + "-template-test-module-test-pipeline"
+        pipeline = self.es.transport.perform_request("GET", "/_ingest/pipeline/" + pipeline_name)
 
-        assert "timezone" in system_syslog_pipeline[system_syslog_pipeline_name]["processors"][4]["date"]
+        assert "date" in pipeline[pipeline_name]["processors"][0]
+        assert "remove" in pipeline[pipeline_name]["processors"][1]
 
-        system_auth_pipeline_name = "filebeat-" + version + "-system-auth-pipeline"
-        system_auth_pipeline = self.es.transport.perform_request("GET",
-                                                                 "/_ingest/pipeline/" + system_auth_pipeline_name)
+    def _setup_dummy_module(self):
+        modules_d_path = self.working_dir + "/modules.d"
+        modules_path = self.working_dir + "/module"
 
-        assert "timezone" not in system_auth_pipeline[system_auth_pipeline_name]["processors"][4]["date"]
+        for directory in [modules_d_path, modules_path]:
+            if not os.path.isdir(directory):
+                os.mkdir(directory)
+
+        copytree(self.beat_path + "/tests/system/input/template-test-module", modules_path + "/template-test-module")
+        copyfile(self.beat_path + "/tests/system/input/template-test-module/_meta/config.yml", modules_d_path + "/test.yml")

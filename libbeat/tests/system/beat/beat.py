@@ -181,7 +181,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                    logging_args=["-e", "-v", "-d", "*"],
                    extra_args=[],
                    env={},
-                   configure_home=True):
+                   home=""):
         """
         Starts beat and returns the process handle. The
         caller is responsible for stopping / waiting for the
@@ -205,12 +205,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 
-        if configure_home:
-            args += [
-                "-path.home", os.path.normpath(self.working_dir),
-            ]
+        path_home = os.path.normpath(self.working_dir)
+        if home:
+            path_home = home
 
         args += [
+            "-path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
