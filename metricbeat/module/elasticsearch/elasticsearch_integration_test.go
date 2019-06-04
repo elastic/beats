@@ -29,6 +29,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -78,8 +79,8 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, host)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			events, errs := mbtest.ReportingFetchV2(f)
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			events, errs := mbtest.ReportingFetchV2Error(f)
 
 			assert.Empty(t, errs)
 			if !assert.NotEmpty(t, events) {
@@ -98,8 +99,8 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, host)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			if err != nil {
 				t.Fatal("write", err)
 			}
@@ -130,9 +131,9 @@ func getEnvPort() string {
 // GetConfig returns config for elasticsearch module
 func getConfig(metricset string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":     elasticsearch.ModuleName,
-		"metricsets": []string{metricset},
-		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+		"module":                     elasticsearch.ModuleName,
+		"metricsets":                 []string{metricset},
+		"hosts":                      []string{getEnvHost() + ":" + getEnvPort()},
 		"index_recovery.active_only": false,
 	}
 }
@@ -226,10 +227,46 @@ func createCCRStats(host string) error {
 
 	err = createCCRFollowerIndex(host)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error creating CCR follower index")
+	}
+
+	// Give ES sufficient time to do the replication and produce stats
+	checkCCRStats := func() (bool, error) {
+		return checkCCRStatsExists(host)
+	}
+
+	exists, err := waitForSuccess(checkCCRStats, 300, 5)
+	if err != nil {
+		return errors.Wrap(err, "error checking if CCR stats exist")
+	}
+
+	if !exists {
+		return fmt.Errorf("expected to find CCR stats but not found")
 	}
 
 	return nil
+}
+
+func checkCCRStatsExists(host string) (bool, error) {
+	resp, err := http.Get("http://" + host + "/_ccr/stats")
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+	var data struct {
+		FollowStats struct {
+			Indices []map[string]interface{} `json:"indices"`
+		} `json:"follow_stats"`
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return false, err
+	}
+	return len(data.FollowStats.Indices) > 0, nil
 }
 
 func setupCCRRemote(host string) error {
