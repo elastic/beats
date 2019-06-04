@@ -1,0 +1,29 @@
+[[winlogbeat-module-security]]
+[role="xpack"]
+== Security Module
+
+beta[]
+
+The security module processes event log records from the Security log.
+
+The module has transformations for the following event IDs:
+
+* 4624 - An account was successfully logged on.
+* 4625 - An account failed to log on.
+* 4648 - A logon was attempted using explicit credentials.
+
+More event IDs will be added.
+
+[float]
+=== Configuration
+
+[source,yaml]
+----
+winlogbeat.event_logs:
+  - name: Security
+    processors:
+      - script:
+          lang: javascript
+          id: security
+          file: ${path.home}/module/security/config/winlogbeat-security.js
+----

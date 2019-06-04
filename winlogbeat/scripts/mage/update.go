@@ -32,7 +32,7 @@ func init() {
 
 	dashboards.RegisterImportDeps(build.Build, Update.Dashboards)
 
-	docs.RegisterDeps(Update.FieldDocs)
+	docs.RegisterDeps(Update.FieldDocs, Update.ModuleDocs)
 }
 
 var (
@@ -45,7 +45,7 @@ type Update mg.Namespace
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.Dashboards, Update.Config, Update.FieldDocs)
+	mg.Deps(Update.Fields, Update.Dashboards, Update.Config, Update.FieldDocs, Update.ModuleDocs)
 }
 
 // Config updates the Beat's config files.
@@ -68,4 +68,9 @@ func (Update) Fields() {
 func (Update) FieldDocs() error {
 	mg.Deps(fb.FieldsAllYML)
 	return mage.Docs.FieldDocs(mage.FieldsAllYML)
+}
+
+// ModuleDocs collects and updates the module documentation.
+func (Update) ModuleDocs() error {
+	return moduleDocs()
 }
