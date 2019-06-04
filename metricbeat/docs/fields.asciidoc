@@ -13409,59 +13409,62 @@ Kubernetes proxy server metrics
 
 
 
-[float]
-== client fields
-
-kubeproxy HTTP client labels
-
-
-
-*`kubernetes.kubeproxy.client.request.status_code`*::
+*`kubernetes.kubeproxy.status_code`*::
 +
 --
 type: keyword
 
-HTTP Code returned to kubeproxy
+HTTP Code
 
 
 --
 
-*`kubernetes.kubeproxy.client.request.host`*::
+*`kubernetes.kubeproxy.host`*::
 +
 --
 type: keyword
 
-Host addressing the request from kubeproxy
+Host address
 
 
 --
 
-*`kubernetes.kubeproxy.client.request.method`*::
+*`kubernetes.kubeproxy.method`*::
 +
 --
 type: keyword
 
-HTTP method issued from kubeproxy (used at client.request.count)
+HTTP method
 
 
 --
 
-*`kubernetes.kubeproxy.client.request.verb`*::
+*`kubernetes.kubeproxy.verb`*::
 +
 --
 type: keyword
 
-HTTP method issued from kubeproxy (used at sync.rules.latency.us)
+HTTP method
 
 
 --
 
-*`kubernetes.kubeproxy.client.request.url`*::
+*`kubernetes.kubeproxy.url`*::
 +
 --
 type: keyword
 
-URL requested from kubeproxy
+URL requested
+
+
+--
+
+*`kubernetes.kubeproxy.handler`*::
++
+--
+type: keyword
+
+HTTP request handler
 
 
 --
@@ -13504,38 +13507,85 @@ Resident memory size in bytes
 --
 
 [float]
+== http fields
+
+HTTP server metrics
+
+
+
+*`kubernetes.kubeproxy.http.request.duration.us`*::
++
+--
+type: float
+
+HTTP request duration
+
+
+--
+
+*`kubernetes.kubeproxy.http.request.size.bytes`*::
++
+--
+type: long
+
+HTTP request size
+
+
+--
+
+*`kubernetes.kubeproxy.http.response.size.bytes`*::
++
+--
+type: long
+
+HTTP response size
+
+
+--
+
+*`kubernetes.kubeproxy.http.request.count`*::
++
+--
+type: long
+
+Number of HTTP requests
+
+
+--
+
+[float]
 == client fields
 
 kubeproxy REST client metrics
 
 
 
-*`kubernetes.kubeproxy.client.request.latency.us.sum`*::
+*`kubernetes.kubeproxy.client.request.duration.us.sum`*::
 +
 --
 type: long
 
-Requests latency, sum of latencies in microseconds
+Requests duration, sum of durations in microseconds
 
 
 --
 
-*`kubernetes.kubeproxy.client.request.latency.us.count`*::
+*`kubernetes.kubeproxy.client.request.duration.us.count`*::
 +
 --
 type: long
 
-Request latency, number of requests
+Request duration, number of requests
 
 
 --
 
-*`kubernetes.kubeproxy.client.request.latency.us.bucket.*`*::
+*`kubernetes.kubeproxy.client.request.duration.us.bucket.*`*::
 +
 --
 type: object
 
-Request latency, histogram buckets
+Request duration, histogram buckets
 
 
 --
@@ -13545,7 +13595,7 @@ Request latency, histogram buckets
 --
 type: long
 
-Number of HTTP requests, partitioned by status code, method, and host
+Number of Rest requests, broken down by URL and verb
 
 
 --
@@ -13557,32 +13607,32 @@ kubeproxy proxy rules metrics
 
 
 
-*`kubernetes.kubeproxy.sync.rules.latency.us.sum`*::
+*`kubernetes.kubeproxy.sync.rules.duration.us.sum`*::
 +
 --
 type: long
 
-SyncProxyRules latency, sum of latencies in microseconds
+SyncProxyRules duration, sum of durations in microseconds
 
 
 --
 
-*`kubernetes.kubeproxy.sync.rules.latency.us.count`*::
+*`kubernetes.kubeproxy.sync.rules.duration.us.count`*::
 +
 --
 type: long
 
-SyncProxyRules latency, number of operations
+SyncProxyRules duration, number of operations
 
 
 --
 
-*`kubernetes.kubeproxy.sync.rules.latency.us.bucket.*`*::
+*`kubernetes.kubeproxy.sync.rules.duration.us.bucket.*`*::
 +
 --
 type: object
 
-SyncProxyRules latency, histogram buckets
+SyncProxyRules duration, histogram buckets
 
 
 --
