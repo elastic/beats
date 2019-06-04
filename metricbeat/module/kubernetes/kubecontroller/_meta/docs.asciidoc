@@ -1,0 +1,1 @@
+`kubecontroller` metricset for the Kubernetes module.

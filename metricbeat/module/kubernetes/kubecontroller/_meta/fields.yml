@@ -1,0 +1,11 @@
+- name: kubecontroller
+  type: group
+  description: >
+    Kubernetes controller manager metrics
+  release: beta
+  fields:
+
+    - name: TODO
+      type: group
+      description: >
+        TODO

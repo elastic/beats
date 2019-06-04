@@ -1,0 +1,44 @@
+# Node metrics, from kubelet:
+- module: kubernetes
+  #metricsets:
+  #  - node
+  #  - system
+  #  - pod
+  #  - container
+  #  - volume
+  period: 10s
+  hosts: ["localhost:10250"]
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.certificate_authorities:
+    - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+  #username: "user"
+  #password: "secret"
+
+  # Enriching parameters:
+  #add_metadata: true
+  #in_cluster: true
+  #labels.dedot: true
+  #annotations.dedot: true
+  # When used outside the cluster:
+  #in_cluster: false
+  #host: node_name
+  #kube_config: ~/.kube/config
+
+# State metrics from kube-state-metrics service:
+#- module: kubernetes
+#  metricsets:
+#    - state_node
+#    - state_deployment
+#    - state_replicaset
+#    - state_statefulset
+#    - state_pod
+#    - state_container
+#  period: 10s
+#  hosts: ["kube-state-metrics:8080"]
+#  add_metadata: true
+#  in_cluster: true
+
+# Kubernetes events
+#- module: kubernetes
+#  metricsets:
+#    - event
