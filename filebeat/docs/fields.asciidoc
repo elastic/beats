@@ -12187,6 +12187,9 @@ Fields from the PostgreSQL log files.
 *`postgresql.log.timestamp`*::
 +
 --
+
+deprecated[7.3.0]
+
 The timestamp from the log line.
 
 
