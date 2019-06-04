@@ -34,6 +34,8 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Filebeat*
 
+- Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
+
 *Heartbeat*
 
 *Journalbeat*
