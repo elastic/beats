@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2016-10-25T14:49:34.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "nginx.error",
         "event.module": "nginx",
         "event.timezone": "+00:00",
@@ -17,7 +16,6 @@
     },
     {
         "@timestamp": "2016-10-25T14:50:44.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "nginx.error",
         "event.module": "nginx",
         "event.timezone": "+00:00",

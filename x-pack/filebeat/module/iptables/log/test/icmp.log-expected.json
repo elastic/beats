@@ -3,7 +3,6 @@
         "@timestamp": "2019-01-08T03:37:09.000Z",
         "destination.ip": "192.0.2.83",
         "destination.mac": "90:10:28:5f:62:24",
-        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "event.timezone": "+00:00",
