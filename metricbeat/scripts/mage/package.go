@@ -141,7 +141,7 @@ func prepareModulePackaging(files ...struct{ Src, Dst string }) error {
 
 const modulesDHeader = "# Module: {{ .Module }}\n# Docs: https://www.elastic.co/guide/en/beats/{{ .BeatName }}/{{ .BeatDocBranch }}/{{ .BeatName }}-module-{{ .Module }}.html"
 
-// Generate modules.d directory
+// GenerateDirModulesD generates the modules.d directory
 func GenerateDirModulesD() error {
 	if err := os.RemoveAll("modules.d"); err != nil {
 		return err
