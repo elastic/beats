@@ -24569,6 +24569,23 @@ Percentage of CPU time during which I/O requests were issued to the device (band
 --
 
 [float]
+== entropy fields
+
+entropy
+
+
+
+*`system.entropy.entropy`*::
++
+--
+type: object
+
+Available system entropy
+
+
+--
+
+[float]
 == filesystem fields
 
 `filesystem` contains local filesystem stats.
