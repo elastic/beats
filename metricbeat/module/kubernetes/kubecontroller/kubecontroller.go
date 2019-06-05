@@ -25,16 +25,35 @@ import (
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
+			// Process metrics
+			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
+			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
+			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
+			"process_open_fds":  prometheus.Metric("process.fds.open"),
+			"process_start_time_seconds": prometheus.Metric("process.started.sec"),
+			
 			// HTTP server metrics
 			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
-			"http_request_size_bytes":            prometheus.Metric("http.request.bytes"),
-			"http_response_size_bytes":           prometheus.Metric("http.response.bytes"),
-			"http_requests_total":                prometheus.Metric("http.response.count"),
+			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
+			"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
+			"http_requests_total":                prometheus.Metric("http.request.count"),
 
 			// REST metrics
 			"rest_client_request_duration_seconds": prometheus.Metric("client.request.duration.us",
 				prometheus.OpMultiplyBuckets(1000000)),
-			"rest_client_requests_total": prometheus.Metric("client.response.count"),
+			"rest_client_requests_total": prometheus.Metric("client.request.count"),
+
+			// Work Queue metrics
+			"workqueue_work_duration_seconds": prometheus.Metric("workqueue.work.duration.us",
+				prometheus.OpMultiplyBuckets(1000000)),
+			"workqueue_queue_duration_seconds": prometheus.Metric("workqueue.queue.duration.us",
+				prometheus.OpMultiplyBuckets(1000000)),
+			"workqueue_unfinished_work_seconds": prometheus.Metric("workqueue.queue.duration.sec"),
+			"workqueue_retries_total" : prometheus.Metric("workqueue.retries.count"),
+
+			"node_collector_evictions_number": prometheus.Metric("node.collector.eviction.count"),
+			"node_collector_unhealthy_nodes_in_zone" : prometheus.Metric("node.collector.unhealthy.count"),
+			"node_collector_zone_size": prometheus.Metric("node.collector.count"),
 		},
 
 		Labels: map[string]prometheus.LabelMap{
@@ -44,6 +63,8 @@ func init() {
 			"verb":    prometheus.KeyLabel("verb"),
 			"method":  prometheus.KeyLabel("method"),
 			"host":    prometheus.KeyLabel("host"),
+			"name":    prometheus.KeyLabel("name"),
+			"zone": prometheus.KeyLabel("zone"),
 		},
 	}
 

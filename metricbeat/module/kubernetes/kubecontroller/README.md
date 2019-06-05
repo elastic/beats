@@ -39,12 +39,10 @@ rest_client_requests_total: Number of HTTP requests, partitioned by status code,
     - host
     - method
 
---> yes
 workqueue_work_duration_seconds_bucket: How long in seconds processing an item from workqueue takes
     - name: object name
     - le
 
---> yes
 workqueue_queue_duration_seconds_bucket: How long in seconds an item stays in workqueue before being requested
     - name: 
     - le:
@@ -55,20 +53,11 @@ workqueue_unfinished_work_seconds: How many seconds of work has done that is in 
 workqueue_retries_total: Total number of retries handled by workqueue
     - name:
 
-
 process_cpu_seconds_total: Total user and system CPU time spent in seconds.
-process_max_fds Maximum number of open file descriptors.
 process_open_fds Number of open file descriptors.
 process_resident_memory_bytes Resident memory size in bytes.
 process_start_time_seconds Start time of the process since unix epoch in seconds.
 process_virtual_memory_bytes Virtual memory size in bytes
-
-
-
-go_goroutines
-go_threads
-go_memstats_alloc_bytes
-
 
 node_collector_evictions_number Number of Node evictions that happened since current instance of NodeController started.
     - zone
