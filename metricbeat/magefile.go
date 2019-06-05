@@ -23,15 +23,14 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 )
 
 func init() {
@@ -78,9 +77,9 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatOSSPackaging()
-	customizePackaging()
+	metricbeat.CustomizePackaging()
 
-	mg.Deps(Update)
+	mg.Deps(Update, metricbeat.PrepareModulePackagingOSS)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
@@ -156,74 +155,4 @@ func FieldsDocs() error {
 		return err
 	}
 	return mage.Docs.FieldDocs(output)
-}
-
-// -----------------------------------------------------------------------------
-// Customizations specific to Metricbeat.
-// - Include modules.d directory in packages.
-// - Disable system/load metricset for Windows.
-
-// customizePackaging modifies the package specs to add the modules.d directory.
-// And for Windows it comments out the system/load metricset because it's
-// not supported.
-func customizePackaging() {
-	var (
-		archiveModulesDir = "modules.d"
-		unixModulesDir    = "/etc/{{.BeatName}}/modules.d"
-
-		modulesDir = mage.PackageFile{
-			Mode:    0644,
-			Source:  "modules.d",
-			Config:  true,
-			Modules: true,
-		}
-		windowsModulesDir = mage.PackageFile{
-			Mode:    0644,
-			Source:  "{{.PackageDir}}/modules.d",
-			Config:  true,
-			Modules: true,
-			Dep: func(spec mage.PackageSpec) error {
-				if err := mage.Copy("modules.d", spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
-					return errors.Wrap(err, "failed to copy modules.d dir")
-				}
-
-				return mage.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/modules.d/system.yml"),
-					regexp.MustCompile(`- load`), `#- load`)
-			},
-		}
-		windowsReferenceConfig = mage.PackageFile{
-			Mode:   0644,
-			Source: "{{.PackageDir}}/metricbeat.reference.yml",
-			Dep: func(spec mage.PackageSpec) error {
-				err := mage.Copy("metricbeat.reference.yml",
-					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"))
-				if err != nil {
-					return errors.Wrap(err, "failed to copy reference config")
-				}
-
-				return mage.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"),
-					regexp.MustCompile(`- load`), `#- load`)
-			},
-		}
-	)
-
-	for _, args := range mage.Packages {
-		switch args.OS {
-		case "windows":
-			args.Spec.Files[archiveModulesDir] = windowsModulesDir
-			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", windowsReferenceConfig)
-		default:
-			pkgType := args.Types[0]
-			switch pkgType {
-			case mage.TarGz, mage.Zip, mage.Docker:
-				args.Spec.Files[archiveModulesDir] = modulesDir
-			case mage.Deb, mage.RPM, mage.DMG:
-				args.Spec.Files[unixModulesDir] = modulesDir
-			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
-			}
-		}
-	}
 }
