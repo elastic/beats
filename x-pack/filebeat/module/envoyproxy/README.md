@@ -46,7 +46,7 @@ kubectl apply -f filebeat
     providers:
       - type: kubernetes
         hints.enabled: true
-        default.disable: true
+        hints.default_config.enabled: false
 
   processors:
     - add_kubernetes_metadata:
