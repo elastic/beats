@@ -40,7 +40,7 @@ the same {es} cluster, specify the following minimal configuration:
 --
 ["source","yml",subs="attributes"]
 --------------------
-xpack.monitoring:
+monitoring:
   enabled: true
   elasticsearch:
     username: {beat_monitoring_user}
