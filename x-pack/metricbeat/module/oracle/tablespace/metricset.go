@@ -64,7 +64,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 	for _, event := range events {
 		if reported := reporter.Event(event); !reported {
-			m.Logger().Debug("event wasn't reported")
+			return nil
 		}
 	}
 
