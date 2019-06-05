@@ -19,7 +19,6 @@ package tlscommon
 
 import (
 	"crypto/tls"
-	"errors"
 
 	"github.com/joeshaw/multierror"
 
@@ -92,7 +91,6 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 	}, nil
 }
 
-// Unpack unpacks the TLS Server configuration.
 func (c *ServerConfig) Unpack(cfg common.Config) error {
 	clientAuthKey := "client_authentication"
 	if !cfg.HasField(clientAuthKey) {
@@ -103,11 +101,6 @@ func (c *ServerConfig) Unpack(cfg common.Config) error {
 	if err := cfg.Unpack(&sCfg); err != nil {
 		return err
 	}
-
-	if sCfg.VerificationMode != VerifyNone && len(sCfg.CAs) == 0 {
-		return errors.New("certificate_authorities not configured")
-	}
-
 	*c = ServerConfig(sCfg)
 	return nil
 }
