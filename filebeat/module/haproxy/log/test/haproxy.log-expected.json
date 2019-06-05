@@ -1,6 +1,5 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.duration": 2000000,
         "event.module": "haproxy",

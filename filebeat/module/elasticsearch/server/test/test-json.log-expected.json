@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2019-01-18T07:55:08.159Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.e.NodeEnvironment",
         "elasticsearch.node.name": "node-0",
@@ -17,7 +16,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:08.163Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.e.NodeEnvironment",
         "elasticsearch.node.name": "node-0",
@@ -33,7 +31,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:08.165Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "node-0",
@@ -49,7 +46,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:08.166Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "node-0",
@@ -65,7 +61,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:08.166Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "node-0",
@@ -81,7 +76,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:08.167Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "node-0",
@@ -97,7 +91,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.492Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -113,7 +106,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.493Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -129,7 +121,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.493Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -145,7 +136,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.493Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -161,7 +151,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.494Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -177,7 +166,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.494Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -193,7 +181,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.494Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -209,7 +196,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.495Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -225,7 +211,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.495Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -241,7 +226,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.495Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -257,7 +241,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.495Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -273,7 +256,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.496Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -289,7 +271,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.496Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -305,7 +286,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.496Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -321,7 +301,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.497Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -337,7 +316,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.497Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -353,7 +331,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.497Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -369,7 +346,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.498Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -385,7 +361,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.498Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -401,7 +376,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.498Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -417,7 +391,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.498Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -433,7 +406,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.499Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -449,7 +421,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.499Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -465,7 +436,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.499Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -481,7 +451,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.499Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -497,7 +466,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.500Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -513,7 +481,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.500Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -529,7 +496,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.500Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -545,7 +511,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:09.501Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.p.PluginsService",
         "elasticsearch.node.name": "node-0",
@@ -561,7 +526,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:12.057Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.x.s.a.s.FileRolesStore",
         "elasticsearch.node.name": "node-0",
@@ -577,7 +541,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:12.426Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.x.m.p.l.CppLogMessageHandler",
         "elasticsearch.index.id": "25947",
@@ -595,7 +558,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:12.709Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.a.ActionModule",
         "elasticsearch.node.name": "node-0",
@@ -611,7 +573,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:12.922Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.d.DiscoveryModule",
         "elasticsearch.node.name": "node-0",
@@ -627,7 +588,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.507Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "node-0",
@@ -643,7 +603,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.508Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "node-0",
@@ -659,7 +618,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.642Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.t.TransportService",
         "elasticsearch.node.name": "node-0",
@@ -675,7 +633,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.675Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.d.z.FileBasedUnicastHostsProvider",
         "elasticsearch.node.name": "node-0",
@@ -691,7 +648,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.796Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.c.s.MasterService",
         "elasticsearch.node.name": "node-0",
@@ -707,7 +663,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.871Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.component": "o.e.c.s.ClusterApplierService",
         "elasticsearch.node.name": "node-0",
@@ -723,7 +678,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.922Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.h.AbstractHttpServerTransport",
@@ -741,7 +695,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:13.923Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.n.Node",
@@ -759,7 +712,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:14.105Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.l.LicenseService",
@@ -777,7 +729,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:14.134Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.g.GatewayService",
@@ -795,7 +746,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:51.725Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.x.m.p.NativeController",
@@ -813,7 +763,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:51.726Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.n.Node",
@@ -831,7 +780,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:51.739Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.x.w.WatcherService",
@@ -849,7 +797,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:52.141Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.n.Node",
@@ -867,7 +814,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:52.141Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.n.Node",
@@ -885,7 +831,6 @@
     },
     {
         "@timestamp": "2019-01-18T07:55:52.150Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "GmvrbHlNTiSVYiPf8kxg9g",
         "elasticsearch.component": "o.e.n.Node",
@@ -903,7 +848,6 @@
     },
     {
         "@timestamp": "2019-01-10T10:18:58.523Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "elasticsearch",
         "elasticsearch.component": "test",
         "elasticsearch.node.name": "sample-name",
@@ -971,7 +915,6 @@
     },
     {
         "@timestamp": "2019-01-10T10:18:58.537Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "elasticsearch",
         "elasticsearch.component": "o.e.c.l.JsonLoggerTests",
         "elasticsearch.node.name": "sample-name",
@@ -987,7 +930,6 @@
     },
     {
         "@timestamp": "2019-01-10T10:18:58.560Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "elasticsearch",
         "elasticsearch.component": "test",
         "elasticsearch.node.name": "sample-name",

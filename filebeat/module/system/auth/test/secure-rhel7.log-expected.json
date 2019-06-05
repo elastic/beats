@@ -1,6 +1,5 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -28,7 +27,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -42,7 +40,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -70,7 +67,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -84,7 +80,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -112,7 +107,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -126,7 +120,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -140,7 +133,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -154,7 +146,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -168,7 +159,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -182,7 +172,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -210,7 +199,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -224,7 +212,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -252,7 +239,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -266,7 +252,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -294,7 +279,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -308,7 +292,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -336,7 +319,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -350,7 +332,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -378,7 +359,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -392,7 +372,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -406,7 +385,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -420,7 +398,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -434,7 +411,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -448,7 +424,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -462,7 +437,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -476,7 +450,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -504,7 +477,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -518,7 +490,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -546,7 +517,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -560,7 +530,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -588,7 +557,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -602,7 +570,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -630,7 +597,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -644,7 +610,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -672,7 +637,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -686,7 +650,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -714,7 +677,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -728,7 +690,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -742,7 +703,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -770,7 +730,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -784,7 +743,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -812,7 +770,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -826,7 +783,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -840,7 +796,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -854,7 +809,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -868,7 +822,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -882,7 +835,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -910,7 +862,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -924,7 +875,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -952,7 +902,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -966,7 +915,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -994,7 +942,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1008,7 +955,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1036,7 +982,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1050,7 +995,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1078,7 +1022,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1092,7 +1035,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1106,7 +1048,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1120,7 +1061,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1134,7 +1074,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1148,7 +1087,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1176,7 +1114,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1190,7 +1127,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1218,7 +1154,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1232,7 +1167,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1260,7 +1194,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1274,7 +1207,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1302,7 +1234,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1316,7 +1247,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1344,7 +1274,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1358,7 +1287,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1372,7 +1300,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1386,7 +1313,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1400,7 +1326,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1414,7 +1339,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1442,7 +1366,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1456,7 +1379,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1484,7 +1406,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1498,7 +1419,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1526,7 +1446,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1540,7 +1459,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1554,7 +1472,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1568,7 +1485,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1582,7 +1498,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1610,7 +1525,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1624,7 +1538,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1652,7 +1565,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1666,7 +1578,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1694,7 +1605,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1708,7 +1618,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1736,7 +1645,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1750,7 +1658,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1778,7 +1685,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1792,7 +1698,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1806,7 +1711,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1820,7 +1724,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1834,7 +1737,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1848,7 +1750,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
@@ -1876,7 +1777,6 @@
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
         "event.timezone": "+00:00",

@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-10-31T15:09:30.451Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
