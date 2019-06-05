@@ -151,6 +151,11 @@ func GenerateDirModulesD() error {
 	if err != nil {
 		return err
 	}
+	flavorConfigs, err := filepath.Glob("module/*/_meta/config-*.yml")
+	if err != nil {
+		return err
+	}
+	shortConfigs = append(shortConfigs, flavorConfigs...)
 
 	docBranch, err := mage.BeatDocBranch()
 	if err != nil {
@@ -159,17 +164,16 @@ func GenerateDirModulesD() error {
 
 	mode := 0644
 	for _, f := range shortConfigs {
-		parts := strings.Split(filepath.ToSlash(f), "/")
-		if len(parts) < 2 {
+		moduleName, configName, ok := moduleConfigParts(f)
+		if !ok {
 			continue
 		}
-		moduleName := parts[1]
 
 		suffix := ".yml.disabled"
-		if moduleName == "system" {
+		if configName == "system" {
 			suffix = ".yml"
 		}
-		path := filepath.Join("modules.d", moduleName+suffix)
+		path := filepath.Join("modules.d", configName+suffix)
 
 		headerArgs := map[string]interface{}{
 			"Module":        moduleName,
@@ -184,6 +188,25 @@ func GenerateDirModulesD() error {
 		}
 	}
 	return nil
+}
+
+// moduleConfigParts obtain the moduleName and the configName from a config path.
+// The configName includes the flavor
+func moduleConfigParts(f string) (moduleName string, configName string, ok bool) {
+	parts := strings.Split(filepath.ToSlash(f), "/")
+	if len(parts) < 4 {
+		return
+	}
+	moduleName = parts[1]
+	configName = moduleName
+	ok = true
+
+	fileName := strings.TrimSuffix(parts[3], ".yml")
+	parts = strings.SplitN(fileName, "-", 2)
+	if len(parts) > 1 {
+		configName = moduleName + "-" + parts[1] // module + flavor
+	}
+	return
 }
 
 func copyWithHeader(header, src, dst string, mode os.FileMode) error {

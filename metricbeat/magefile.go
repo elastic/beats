@@ -106,8 +106,7 @@ func Update() error {
 
 // NewUpdate reimplements update using magefile
 // TODO:
-// - [ ] Generate docs/fields.asciidoc
-// - [ ] Support config flavours
+// - Generate docs/fields.asciidoc
 func NewUpdate() {
 	mg.SerialDeps(Fields, Dashboards, Config,
 		metricbeat.PrepareModulePackagingOSS,
