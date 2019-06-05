@@ -79,7 +79,6 @@ def document_field(output, field, field_path):
     output.write("--\n\n")
 
     if "multi_fields" in field:
-        output.write("--\n\n")
         for subfield in field["multi_fields"]:
             document_field(output, subfield, field_path + "." +
                            subfield["name"])
