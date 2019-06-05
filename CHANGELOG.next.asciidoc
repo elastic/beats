@@ -91,23 +91,6 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
-- Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
-- Add s3_daily_storage metricset. {pull}10940[10940] {issue}10055[10055]
-- Add `coredns` metricbeat module. {pull}10585[10585]
-- Add SSL support for Metricbeat HTTP server. {pull}11482[11482] {issue}11457[11457]
-- The `elasticsearch.index` metricset (with `xpack.enabled: true`) now collects `refresh.external_total_time_in_millis` fields from Elasticsearch. {pull}11616[11616]
-- Allow module configurations to have variants {pull}9118[9118]
-- Add `timeseries.instance` field calculation. {pull}10293[10293]
-- Added new disk states and raid level to the system/raid metricset. {pull}11613[11613]
-- Added `path_name` and `start_name` to service metricset on windows module {issue}8364[8364] {pull}11877[11877]
-- Add check on object name in the counter path if the instance name is missing {issue}6528[6528] {pull}11878[11878]
-- Add AWS cloudwatch metricset. {pull}11798[11798] {issue}11734[11734]
-- Add `regions` in aws module config to specify target regions for querying cloudwatch metrics. {issue}11932[11932] {pull}11956[11956]
-- Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
-- Add overview dashboard to Consul module {pull}10665[10665]
-- New fields were added in the mysql/status metricset. {pull}12227[12227]
-- Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
 - Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
 
 *Packetbeat*
