@@ -11,13 +11,13 @@
     "oracle": {
         "tablespace": {
             "data_file": {
-                "id": 17,
-                "name": "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/system01.dbf",
-                "online_status": "SYSTEM",
+                "id": 19,
+                "name": "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/undotbs01.dbf",
+                "online_status": "ONLINE",
                 "size": {
-                    "bytes": 283115520,
+                    "bytes": 188743680,
                     "free": {
-                        "bytes": 282066944
+                        "bytes": 187695104
                     },
                     "max": {
                         "bytes": 34359721984
@@ -25,19 +25,19 @@
                 },
                 "status": "AVAILABLE"
             },
-            "name": "SYSTEM",
+            "name": "UNDOTBS1",
             "space": {
                 "free": {
-                    "bytes": 3211264
+                    "bytes": 10092544
                 },
                 "used": {
-                    "bytes": 283115520
+                    "bytes": 188743680
                 }
             }
         }
     },
     "service": {
-        "address": "localhost:1521",
+        "address": "oracle://sys:Oradoc_db1@localhost:1521/ORCLPDB1.localdomain?connectionClass=\u0026poolIncrement=0\u0026poolMaxSessions=0\u0026poolMinSessions=0\u0026sysdba=1\u0026sysoper=0\u0026sysasm=0\u0026standaloneConnection=0\u0026enableEvents=0\u0026heterogeneousPool=0\u0026prelim=0",
         "type": "oracle"
     }
 }

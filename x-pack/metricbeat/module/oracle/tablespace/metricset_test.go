@@ -7,6 +7,7 @@
 package tablespace
 
 import (
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,6 @@ import (
 	_ "gopkg.in/goracle.v2"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 )
 
 func TestData(t *testing.T) {
@@ -33,12 +33,10 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":                "oracle",
-		"metricsets":            []string{"tablespace"},
-		"hosts":                 []string{oracle.GetOracleEnvHost() + ":" + oracle.GetOracleEnvPort()},
-		"service_name":          "ORCLPDB1.localdomain",
-		"username":              "sys",
-		"password":              "Oradoc_db1",
-		"sid_connection_suffix": " AS SYSDBA",
+		"module":     "oracle",
+		"metricsets": []string{"tablespace"},
+		"hosts":      []string{oracle.GetOracleConnectionDetails()},
+		"username":   "sys",
+		"password":   "Oradoc_db1",
 	}
 }

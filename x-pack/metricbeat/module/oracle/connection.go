@@ -6,7 +6,7 @@ package oracle
 
 import (
 	"database/sql"
-	"fmt"
+	"gopkg.in/goracle.v2"
 
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -20,12 +20,9 @@ import (
 // ConnectionDetails contains all possible data that can be used to create a connection with
 // an Oracle db
 type ConnectionDetails struct {
-	Username    string   `config:"username"    validate:"nonzero"`
-	Password    string   `config:"password"    validate:"nonzero"`
-	Hosts       []string `config:"hosts"    validate:"nonzero"`
-	ServiceName string   `config:"service_name"    validate:"nonzero"`
-	Prefix      string   `config:"sid_connection_prefix"`
-	Suffix      string   `config:"sid_connection_suffix"`
+	Username string   `config:"username"    validate:"nonzero"`
+	Password string   `config:"password"    validate:"nonzero"`
+	Hosts    []string `config:"hosts"    validate:"nonzero"`
 }
 
 // HostParser parsers the host value as a URL
@@ -42,8 +39,24 @@ func init() {
 
 // NewConnection returns a connection already established with Oracle
 func NewConnection(c *ConnectionDetails) (*sql.DB, error) {
-	sid := fmt.Sprintf("%s%s/%s@%s/%s%s", c.Prefix, c.Username, c.Password, c.Hosts[0], c.ServiceName, c.Suffix)
-	db, err := sql.Open("goracle", sid)
+	params, err := goracle.ParseConnString(c.Hosts[0])
+	if err != nil {
+		return nil, errors.Wrap(err, "error trying to parse connection string in field 'hosts'")
+	}
+
+	if params.Username == "" {
+		params.Username = c.Username
+	}
+
+	if params.Password == "" {
+		params.Password = c.Password
+	}
+
+	if params.IsSysDBA == false {
+		return nil, errors.New("a user with DBA permissions are required, check your connection details on field `hosts`")
+	}
+
+	db, err := sql.Open("goracle", params.StringWithPassword())
 	if err != nil {
 		return nil, errors.Wrap(err, "could not open database")
 	}
