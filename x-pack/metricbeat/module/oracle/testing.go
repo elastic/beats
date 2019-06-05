@@ -6,8 +6,9 @@ package oracle
 
 import (
 	"fmt"
-	"gopkg.in/goracle.v2"
 	"os"
+
+	"gopkg.in/goracle.v2"
 )
 
 // GetOracleConnectionDetails return a valid SID to use for testing

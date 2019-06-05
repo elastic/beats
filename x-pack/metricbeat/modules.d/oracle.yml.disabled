@@ -6,11 +6,4 @@
 
   # username: ""
   # password: ""
-  # service_name: ""
-
-  # An string to prepend to the sid connection
-  # sid_connection_prefix: ""
-
-  # An string to append to the sid connection
-  # sid_connection_suffix: ""
 

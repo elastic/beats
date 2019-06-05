@@ -7,8 +7,9 @@
 package tablespace
 
 import (
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 	"testing"
+
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 
 	"github.com/stretchr/testify/assert"
 
