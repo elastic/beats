@@ -125,9 +125,12 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 				t.Fatalf("%v while processing event:\n%v", err, record.Fields.StringToPrint())
 			}
 
-			// Ensure timezone is UTC. In the normal Beats output this is handled
-			// by the encoder (go-structform).
-			evt.PutValue("@timestamp", evt.Timestamp.UTC())
+			// Copy the timestamp to the beat.Event.Fields because this is what
+			// we write to the golden data for testing purposes. In the normal
+			// Beats output this the handled by the encoder (go-structform).
+			if !evt.Timestamp.IsZero() {
+				evt.Fields["@timestamp"] = evt.Timestamp.UTC()
+			}
 
 			events = append(events, filterEvent(evt.Fields, p.ignoreFields))
 		}

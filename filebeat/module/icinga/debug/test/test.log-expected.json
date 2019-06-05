@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2017-04-04T11:43:09.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "icinga.debug",
         "event.module": "icinga",
         "fileset.name": "debug",
@@ -14,7 +13,6 @@
     },
     {
         "@timestamp": "2017-04-04T11:43:09.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "icinga.debug",
         "event.module": "icinga",
         "fileset.name": "debug",
@@ -27,7 +25,6 @@
     },
     {
         "@timestamp": "2017-04-04T11:43:11.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "icinga.debug",
         "event.module": "icinga",
         "fileset.name": "debug",
