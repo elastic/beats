@@ -56,7 +56,9 @@ func TestNewMetricSet(t *testing.T) {
 		}
 
 		ms := mbtest.NewReportingMetricSetV2Error(t, c)
+		assert.Equal(t, "me", ms.HostData().User)
 		assert.Equal(t, "secret", ms.HostData().Password)
+		assert.Equal(t, "localhost:123", ms.HostData().Host)
 	})
 
 	t.Run("password in config", func(t *testing.T) {
