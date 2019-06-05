@@ -9,6 +9,9 @@ class KafkaTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['kafka']
     VERSION = "2.0.0"
 
+    PRODUCER_USERNAME = "producer"
+    PRODUCER_PASSWORD = "producer-secret"
+
     USERNAME = "stats"
     PASSWORD = "test-secret"
 
@@ -26,8 +29,8 @@ class KafkaTest(metricbeat.BaseTest):
             "hosts": self.get_hosts(),
             "period": "1s",
             "version": self.VERSION,
-            "username": "stats",
-            "password": "test-secret",
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
@@ -47,8 +50,8 @@ class KafkaTest(metricbeat.BaseTest):
             bootstrap_servers=self.get_hosts()[0],
             security_protocol="SASL_PLAINTEXT",
             sasl_mechanism="PLAIN",
-            sasl_plain_username=self.USERNAME,
-            sasl_plain_password=self.PASSWORD,
+            sasl_plain_username=self.PRODUCER_USERNAME,
+            sasl_plain_password=self.PRODUCER_PASSWORD,
             retries=20, retry_backoff_ms=500)
         producer.send('foobar', b'some_message_bytes')
 
