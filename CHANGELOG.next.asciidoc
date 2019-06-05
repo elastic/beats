@@ -91,6 +91,8 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
+
 *Packetbeat*
 
 *Winlogbeat*
