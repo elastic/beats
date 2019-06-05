@@ -78,6 +78,7 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 			m.Logger().Debug("error getting tablespace name")
 			continue
 		}
+
 		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
@@ -97,6 +98,7 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 			m.Logger().Debug("error getting tablespace name")
 			continue
 		}
+
 		name := val.(string)
 		if name != "" {
 			for _, freeSpaceTable := range freeSpaces {
@@ -110,26 +112,20 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 }
 
 // addDataFileData is a specific data file which generates a JSON output.
-func (m *MetricSet) addDataFileData(res tablespaceNameGetter, output map[string]common.MapStr) {
-	if _, found := output[res.hash()]; !found {
-		output[res.hash()] = common.MapStr{}
+func (m *MetricSet) addDataFileData(d *dataFile, output map[string]common.MapStr) {
+	if _, found := output[d.hash()]; !found {
+		output[d.hash()] = common.MapStr{}
 	}
 
-	val, ok := res.(*dataFile)
-	if !ok {
-		m.Logger().Debug("error trying to type assert a dataFile type")
-		return
-	}
+	_, _ = output[d.hash()].Put("name", d.eventKey())
 
-	_, _ = output[res.hash()].Put("name", res.eventKey())
-
-	m.checkNullString(output, res.hash(), "data_file.name", val.FileName)
-	m.checkNullInt64(output, res.hash(), "data_file.id", val.FileID)
-	m.checkNullInt64(output, res.hash(), "data_file.size.bytes", val.FileSizeBytes)
-	m.checkNullInt64(output, res.hash(), "data_file.size.max.bytes", val.MaxFileSizeBytes)
-	m.checkNullInt64(output, res.hash(), "data_file.size.free.bytes", val.AvailableForUserBytes)
-	m.checkNullString(output, res.hash(), "data_file.status", val.Status)
-	m.checkNullString(output, res.hash(), "data_file.online_status", val.OnlineStatus)
+	m.checkNullString(output, d.hash(), "data_file.name", d.FileName)
+	m.checkNullInt64(output, d.hash(), "data_file.id", d.FileID)
+	m.checkNullInt64(output, d.hash(), "data_file.size.bytes", d.FileSizeBytes)
+	m.checkNullInt64(output, d.hash(), "data_file.size.max.bytes", d.MaxFileSizeBytes)
+	m.checkNullInt64(output, d.hash(), "data_file.size.free.bytes", d.AvailableForUserBytes)
+	m.checkNullString(output, d.hash(), "data_file.status", d.Status)
+	m.checkNullString(output, d.hash(), "data_file.online_status", d.OnlineStatus)
 
 }
 
