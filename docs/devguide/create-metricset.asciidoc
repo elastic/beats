@@ -276,16 +276,20 @@ var (
 	}
 )
 
-	data, err := schema.apply(input)
+	data, err := schema.Apply(input)
 	if err != nil {
 		return err
 	}
 
 	if m.parseMoreData{
-		additionalSchema.ApplyTo(data, input)
+		_, err := additionalSchema.ApplyTo(data, input)
+		if len(err) > 0 { <1>
+			return err.Err()
+		}
 	}
 
 ----
+<1> `ApplyTo` returns a raw MultiError object, making it suitable for finer-grained error handling.
 
 
 [float]
