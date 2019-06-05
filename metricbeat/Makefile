@@ -13,13 +13,6 @@ DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
-# Collects all module dashboards
-.PHONY: kibana
-kibana:
-	@rm -rf _meta/kibana.generated
-	@mkdir -p _meta/kibana.generated
-	@-cp -pr module/*/_meta/kibana/* _meta/kibana.generated
-
 # Collects all module docs
 .PHONY: collect-docs
 collect-docs: python-env
@@ -50,7 +43,7 @@ imports: python-env
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: assets collect-docs configs kibana imports
+collect: assets collect-docs configs imports
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
