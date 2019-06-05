@@ -30,7 +30,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
+	compose.EnsureUpWithTimeout(t, 570, "elasticsearch", "kibana")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, mtest.GetConfig("status"))
 	events, errs := mbtest.ReportingFetchV2Error(f)

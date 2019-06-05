@@ -851,12 +851,12 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
-			"checksumSHA1": "pxGrmqkuwRcyb0iOKEum1b3ciqU=",
+			"checksumSHA1": "rXP3Wn/PiAk8DQLcy9Bjz7wT7Po=",
 			"path": "github.com/elastic/ecs/code/go/ecs",
-			"revision": "b9f735dd33b0bbb95dbca4229397c9b7f81f8f53",
-			"revisionTime": "2019-03-11T19:22:16Z",
-			"version": "1.0",
-			"versionExact": "1.0"
+			"revision": "ab5e966864a6e2d4bc9fd6e2343e8d7f05f648fb",
+			"revisionTime": "2019-05-24T17:14:36Z",
+			"version": "v1.0.1",
+			"versionExact": "v1.0.1"
 		},
 		{
 			"checksumSHA1": "vNnw1bUS8Ct+8H64QuA2DWRJ9SQ=",

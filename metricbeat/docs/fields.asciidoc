@@ -27196,6 +27196,16 @@ Virtual Machine name
 
 --
 
+*`vsphere.virtualmachine.os`*::
++
+--
+type: keyword
+
+Virtual Machine Operating System name
+
+
+--
+
 *`vsphere.virtualmachine.cpu.used.mhz`*::
 +
 --
