@@ -50,7 +50,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		pool: CreatePool(base.Host(), base.HostData().Password, config.Network,
+		pool: CreatePool(base.HostData().URI,
 			config.MaxConn, config.IdleTimeout, base.Module().Config().Timeout),
 	}, nil
 }
