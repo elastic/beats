@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -138,7 +139,9 @@ func prepareModulePackaging(files ...struct{ Src, Dst string }) error {
 	return nil
 }
 
-// Generate
+const modulesDHeader = "# Module: {{ .Module }}\n# Docs: https://www.elastic.co/guide/en/beats/{{ .BeatName }}/{{ .BeatDocBranch }}/{{ .BeatName }}-module-{{ .Module }}.html"
+
+// Generate modules.d directory
 func GenerateDirModulesD() error {
 	if err := os.RemoveAll("modules.d"); err != nil {
 		return err
@@ -149,6 +152,12 @@ func GenerateDirModulesD() error {
 		return err
 	}
 
+	docBranch, err := mage.BeatDocBranch()
+	if err != nil {
+		errors.Wrap(err, "failed to get doc branch")
+	}
+
+	mode := 0644
 	for _, f := range shortConfigs {
 		parts := strings.Split(filepath.ToSlash(f), "/")
 		if len(parts) < 2 {
@@ -160,15 +169,41 @@ func GenerateDirModulesD() error {
 		if moduleName == "system" {
 			suffix = ".yml"
 		}
+		path := filepath.Join("modules.d", moduleName+suffix)
 
-		cp := mage.CopyTask{
-			Source: f,
-			Dest:   filepath.Join("modules.d", moduleName+suffix),
-			Mode:   0644,
+		headerArgs := map[string]interface{}{
+			"Module":        moduleName,
+			"BeatName":      mage.BeatName,
+			"BeatDocBranch": docBranch,
 		}
-		if err = cp.Execute(); err != nil {
+		header := mage.MustExpand(modulesDHeader, headerArgs)
+
+		err := copyWithHeader(header, f, path, os.FileMode(mode))
+		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func copyWithHeader(header, src, dst string, mode os.FileMode) error {
+	dstFile, err := os.OpenFile(mage.CreateDir(dst), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode&os.ModePerm)
+	if err != nil {
+		return errors.Wrap(err, "failed to open copy destination")
+	}
+	defer dstFile.Close()
+
+	_, err = io.WriteString(dstFile, header+"\n\n")
+	if err != nil {
+		return errors.Wrap(err, "failed to write header")
+	}
+
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return errors.Wrap(err, "failed to open copy source")
+	}
+	defer srcFile.Close()
+
+	_, err = io.Copy(dstFile, srcFile)
+	return errors.Wrap(err, "failed to copy file")
 }

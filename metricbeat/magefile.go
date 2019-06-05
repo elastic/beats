@@ -89,9 +89,29 @@ func TestPackages() error {
 	return mage.TestPackages(mage.WithModulesD())
 }
 
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return mage.KibanaDashboards("module")
+}
+
+// Config generates both the short and reference configs.
+func Config() {
+	mg.Deps(metricbeat.ConfigOSS, metricbeat.GenerateDirModulesD)
+}
+
 // Update updates the generated files (aka make update).
 func Update() error {
 	return sh.Run("make", "update")
+}
+
+// NewUpdate reimplements update using magefile
+// TODO:
+// - [ ] Generate docs/fields.asciidoc
+// - [ ] Support config flavours
+func NewUpdate() {
+	mg.SerialDeps(Fields, Dashboards, Config,
+		metricbeat.PrepareModulePackagingOSS,
+		mage.GenerateModuleIncludeListGo)
 }
 
 // MockedTests runs the HTTP tests using the mocked data inside each {module}/{metricset}/testdata folder.
