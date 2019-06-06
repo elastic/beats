@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"go.uber.org/multierr"
 
@@ -36,10 +38,9 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 	req := f.client.DescribeLoadBalancersRequest(&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize})
 
 	// Limit concurrency against the AWS API by creating a pool of objects
-	// This is hard coded for now. If, in the future, we decide to uncape this
-	// we can do this elsewhere.
+	// This is hard coded for now. The concurrency limit of 10 was set semi-arbitrarily.
 	taskPool := sync.Pool{}
-	for i := 0; i < 6; i++ {
+	for i := 0; i < 10; i++ {
 		taskPool.Put(nil)
 	}
 	ir := &fetchRequest{
@@ -70,8 +71,9 @@ type fetchRequest struct {
 }
 
 func (p *fetchRequest) fetch() ([]*lbListener, error) {
-	p.dispatch(p.fetchNextPage)
+	p.dispatch(p.fetchAllPages)
 
+	// Only fetch future pages when there are no longer requests in-flight from a previous page
 	p.pendingTasks.Wait()
 
 	// Acquire the results lock to ensure memory
@@ -79,6 +81,7 @@ func (p *fetchRequest) fetch() ([]*lbListener, error) {
 	p.resultsLock.Lock()
 	defer p.resultsLock.Unlock()
 
+	// Since everything is async we have to retrieve any errors that occurred from here
 	if len(p.errs) > 0 {
 		return nil, multierr.Combine(p.errs...)
 	}
@@ -86,12 +89,17 @@ func (p *fetchRequest) fetch() ([]*lbListener, error) {
 	return p.lbListeners, nil
 }
 
-func (p *fetchRequest) fetchNextPage() {
-	if !p.running.Load() {
-		return
+func (p *fetchRequest) fetchAllPages() {
+	// Keep fetching pages unless we're stopped OR there are no pages left
+	for p.running.Load() && p.fetchNextPage() {
+		logp.Debug("autodiscover-elb", "API page fetched")
 	}
+}
 
-	if p.paginator.Next(context.TODO()) {
+func (p *fetchRequest) fetchNextPage() (more bool) {
+	success := p.paginator.Next(context.TODO())
+
+	if success {
 		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
 			p.dispatch(func() { p.fetchListeners(lb) })
 		}
@@ -100,6 +108,8 @@ func (p *fetchRequest) fetchNextPage() {
 	if p.paginator.Err() != nil {
 		p.recordErrResult(p.paginator.Err())
 	}
+
+	return success
 }
 
 // dispatch runs the given func in a new goroutine, properly throttling requests
