@@ -146,22 +146,30 @@ func getCounterValue(counter *Counter) CounterValue {
 	case PdhFmtLong:
 		_, value, err := PdhGetFormattedCounterValueLong(counter.handle)
 		if err != nil {
-			return CounterValue{Err: err}
+			counterValue.Err = err
+		} else {
+			counterValue.Measurement = value.Value
 		}
-		counterValue.Measurement = value.Value
 	case PdhFmtLarge:
 		_, value, err := PdhGetFormattedCounterValueLarge(counter.handle)
 		if err != nil {
-			return CounterValue{Err: err}
+			counterValue.Err = err
+		} else {
+			counterValue.Measurement = value.Value
 		}
-		counterValue.Measurement = value.Value
-	default:
+	case PdhFmtDouble:
 		_, value, err := PdhGetFormattedCounterValueDouble(counter.handle)
 		if err != nil {
-			return CounterValue{Err: err}
+			counterValue.Err = err
+		} else {
+			counterValue.Measurement = value.Value
 		}
-		counterValue.Measurement = value.Value
+	default:
+		counterValue.Err = errors.Errorf("initialization failed: format '%#v' "+
+			"for instance '%s' is invalid (must be PdhFmtDouble, PdhFmtLarge or PdhFmtLong)",
+			counter.format, counter.instanceName)
 	}
+
 	return counterValue
 }
 
