@@ -41,7 +41,7 @@ type Connection struct {
 	Username string
 	Password string
 
-	Http    *http.Client
+	HTTP    *http.Client
 	Version common.Version
 }
 
@@ -134,7 +134,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
-			Http: &http.Client{
+			HTTP: &http.Client{
 				Transport: &http.Transport{
 					Dial:    dialer.Dial,
 					DialTLS: tlsDialer.Dial,
@@ -209,7 +209,7 @@ func (conn *Connection) Send(method, extraPath string,
 
 // Implements RoundTrip interface
 func (conn *Connection) RoundTrip(r *http.Request) (*http.Response, error) {
-	return conn.Http.Do(r)
+	return conn.HTTP.Do(r)
 }
 
 func (client *Client) readVersion() error {
