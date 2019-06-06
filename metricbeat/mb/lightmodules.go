@@ -32,7 +32,7 @@ const (
 	manifestYML = "manifest.yml"
 )
 
-// LightModulesRegistry reads module definitions from files
+// LightModulesRegistry reads module definitions from files in the provided paths
 type LightModulesRegistry struct {
 	paths []string
 }
@@ -44,10 +44,12 @@ func NewLightModulesRegistry(paths ...string) *LightModulesRegistry {
 	}
 }
 
+// Modules lists the light modules available on the configured paths
 func (r *LightModulesRegistry) Modules() ([]string, error) {
 	return r.listModules()
 }
 
+// DefaultMetricSets list the default metricsets for a given module
 func (r *LightModulesRegistry) DefaultMetricSets(moduleName string) ([]string, error) {
 	module, found, err := r.readModule(moduleName)
 	if err != nil {
@@ -65,6 +67,7 @@ func (r *LightModulesRegistry) DefaultMetricSets(moduleName string) ([]string, e
 	return metricsets, nil
 }
 
+// MetricSets list the available metricsets for a given module
 func (r *LightModulesRegistry) MetricSets(moduleName string) ([]string, error) {
 	module, found, err := r.readModule(moduleName)
 	if err != nil || !found {
@@ -77,6 +80,7 @@ func (r *LightModulesRegistry) MetricSets(moduleName string) ([]string, error) {
 	return metricsets, nil
 }
 
+// MetricSetRegistration obtains a registration for a light module
 func (r *LightModulesRegistry) MetricSetRegistration(parent *Register, module, name string) (MetricSetRegistration, bool, error) {
 	lightModule, found, err := r.readModule(module)
 	if err != nil || !found {
@@ -97,11 +101,13 @@ type lightModuleConfig struct {
 	MetricSets []string `config:"metricsets"`
 }
 
+// LightModule contains the definition of a light module
 type LightModule struct {
 	Name       string
 	MetricSets map[string]LightMetricSet
 }
 
+// LightMetricSet contains the definition of the metric set of a light module
 type LightMetricSet struct {
 	Name    string
 	Module  string
@@ -113,6 +119,9 @@ type LightMetricSet struct {
 	} `config:"input" validate:"required"`
 }
 
+// Registration obtains a metric set registration for this light metric set, this registration
+// contains a metric set factory that reprocess metric set creation taking into account the
+// light metric set defaults
 func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error) {
 	registration, err := r.metricSetRegistration(m.Input.Module, m.Input.MetricSet)
 	if err != nil {
@@ -169,6 +178,8 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	return registration, nil
 }
 
+// baseModule does the configuration overrides in the base module configuration
+// taking into account the light metric set default configurations
 func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 	baseModule := BaseModule{
 		name:   m.Module,
