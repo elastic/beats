@@ -169,13 +169,13 @@ func (r *LightModulesRegistry) readModule(moduleName string) (*LightModule, bool
 	for _, metricSet := range moduleConfig.MetricSets {
 		manifestPath := filepath.Join(filepath.Dir(modulePath), metricSet, manifestYML)
 
-		metricSetConfig := LightMetricSet{
-			Name:   metricSet,
-			Module: moduleName,
-		}
-		if err := r.readMetricSetConfig(&metricSetConfig, manifestPath); err != nil {
+		metricSetConfig, err := r.readMetricSetConfig(manifestPath)
+		if err != nil {
 			return nil, true, errors.Wrapf(err, "failed to load light metricset '%s/%s' definition", moduleName, metricSet)
 		}
+		metricSetConfig.Name = metricSet
+		metricSetConfig.Module = moduleName
+
 		metricSets[metricSet] = metricSetConfig
 	}
 
@@ -205,16 +205,16 @@ func (r *LightModulesRegistry) readModuleConfig(modulePath string) (*lightModule
 	return &moduleConfig, nil
 }
 
-func (r *LightModulesRegistry) readMetricSetConfig(ms *LightMetricSet, manifestPath string) error {
+func (r *LightModulesRegistry) readMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
 	c, err := common.LoadFile(manifestPath)
 	if err != nil {
-		return err
+		return ms, err
 	}
 
-	if err := c.Unpack(ms); err != nil {
-		return errors.Wrapf(err, "failed to parse metricset manifest from '%s'", manifestPath)
+	if err := c.Unpack(&ms); err != nil {
+		return ms, errors.Wrapf(err, "failed to parse metricset manifest from '%s'", manifestPath)
 	}
-	return nil
+	return
 }
 
 func (r *LightModulesRegistry) listModules() ([]string, error) {
