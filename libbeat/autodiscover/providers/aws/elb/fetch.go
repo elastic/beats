@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/libbeat/common/atomic"

@@ -18,7 +18,6 @@
 package elb
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -77,7 +76,6 @@ func (w *watcher) forever() {
 // This is mostly useful for testing.
 func (w *watcher) once() error {
 	fetchedLbls, err := w.fetcher.fetch()
-	fmt.Printf("DID FETCH %v | %v \n\n", fetchedLbls, err)
 	if err != nil {
 		return err
 	}
