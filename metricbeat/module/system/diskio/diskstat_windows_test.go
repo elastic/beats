@@ -37,8 +37,8 @@ func TestCDriveFilterOnWindowsTestEnv(t *testing.T) {
 		"diskio.include_devices": []string{"C:"},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, conf)
-	data, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
 	assert.Equal(t, 1, len(data))
 	assert.Equal(t, data[0].MetricSetFields["name"], "C:")
@@ -69,8 +69,8 @@ func TestAllDrivesOnWindowsTestEnv(t *testing.T) {
 		"metricsets": []string{"diskio"},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, conf)
-	data, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
 	assert.True(t, len(data) >= 1)
 	drives, err := getLogicalDriveStrings()
