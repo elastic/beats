@@ -242,6 +242,26 @@ func TestNewModuleFromConfig(t *testing.T) {
 	}
 }
 
+func TestNewModulesCallModuleFactory(t *testing.T) {
+	r := NewRegister()
+	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
+	r.SetChild(NewLightModulesRegistry("testdata/lightmodules"))
+
+	called := false
+	r.AddModule("foo", func(base BaseModule) (Module, error) {
+		called = true
+		return DefaultModuleFactory(base)
+	})
+
+	config, err := common.NewConfigFrom(common.MapStr{"module": "service"})
+	require.NoError(t, err)
+
+	_, _, err = NewModule(config, r)
+	assert.NoError(t, err)
+
+	assert.True(t, called, "module factory must be called if registered")
+}
+
 type metricSetWithOption struct {
 	BaseMetricSet
 	Option string

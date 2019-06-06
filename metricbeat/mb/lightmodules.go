@@ -18,6 +18,7 @@
 package mb
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -125,10 +126,20 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	originalFactory := registration.Factory
 	registration.IsDefault = m.Default
 
-	// Override metricset factory to use defaults and reprocess host data before
-	// calling the real factory
+	// Light modules factory has to override defaults and reproduce builder
+	// functionality with the resulting configuration, it does:
+	// - Override defaults
+	// - Call module factory if registered (it wouldn't have been called
+	//   if light module is really a registered mixed module)
+	// - Call host parser if defined (it would have already been called
+	//   without the light module defaults)
+	// - Finally, call the original factory for the registered metricset
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
-		baseModule := base.module.(*BaseModule)
+		baseModule, ok := base.module.(*BaseModule)
+		if !ok {
+			return nil, fmt.Errorf("cannot override base module of type %T", base.module)
+		}
+
 		baseModule.name = m.Module
 		base.name = m.Name
 
@@ -137,6 +148,17 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		config.Merge(baseModule.rawConfig)
 		config.Unpack(&baseModule.config)
 		baseModule.rawConfig = config
+
+		// Run module factory if registered, it will be called once per
+		// metricset, but it should be idempotent
+		moduleFactory := r.moduleFactory(m.Input.Module)
+		if moduleFactory != nil {
+			m, err := moduleFactory(*baseModule)
+			if err != nil {
+				return nil, err
+			}
+			base.module = m
+		}
 
 		// At this point host parser was already run, we need to run this again
 		// with the overriden defaults
