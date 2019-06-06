@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package decompress_gzip_fields
+package gzip
 
 import (
 	"testing"
