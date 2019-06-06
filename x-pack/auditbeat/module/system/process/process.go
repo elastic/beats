@@ -361,7 +361,9 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 		event.RootFields.Put("error.message", process.Error.Error())
 	}
 
-	event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
+	if ms.HostID() != "" {
+		event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
+	}
 
 	return event
 }
