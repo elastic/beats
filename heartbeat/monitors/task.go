@@ -162,7 +162,7 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 		}
 	}
 
-	if len(conts) == 0 {
+	if !hasContinuations {
 		return nil
 	}
 
