@@ -16,7 +16,9 @@ type lbListener struct {
 func (l *lbListener) toMap() common.MapStr {
 	m := common.MapStr{}
 
-	m["arn"] = l.listener.ListenerArn
+	// We fully spell out listener_arn to avoid confusion with the ARN for the whole ELB
+	m["listener_arn"] = l.listener.ListenerArn
+	m["load_balancer_arn"] = *l.lb.LoadBalancerArn
 	m["host"] = *l.lb.DNSName
 	m["port"] = *l.listener.Port
 	m["protocol"] = l.listener.Protocol
@@ -25,7 +27,6 @@ func (l *lbListener) toMap() common.MapStr {
 	m["availability_zones"] = l.azStrings()
 	m["created"] = l.lb.CreatedTime
 	m["state"] = l.stateMap()
-	m["load_balancer_arn"] = *l.lb.LoadBalancerArn
 	m["ip_address_type"] = string(l.lb.IpAddressType)
 	m["security_groups"] = l.lb.SecurityGroups
 	m["vpc_id"] = *l.lb.VpcId
@@ -39,6 +40,7 @@ func (l *lbListener) arn() string {
 	return *l.listener.ListenerArn
 }
 
+// azStrings transforms the weird list of availability zone string pointers to a slice of plain strings.
 func (l *lbListener) azStrings() []string {
 	azs := l.lb.AvailabilityZones
 	res := make([]string, 0, len(azs))
@@ -48,6 +50,7 @@ func (l *lbListener) azStrings() []string {
 	return res
 }
 
+// stateMap converts the State part of the lb struct into a friendlier map with 'reason' and 'code' fields.
 func (l *lbListener) stateMap() (stateMap common.MapStr) {
 	state := l.lb.State
 	stateMap = common.MapStr{}
