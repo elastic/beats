@@ -30,8 +30,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
@@ -42,11 +42,11 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, ".")
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 
 	// Do a first fetch to have a sample
-	mbtest.ReportingFetchV2(f)
+	mbtest.ReportingFetchV2Error(f)
 	time.Sleep(1 * time.Second)
 
 	if err != nil {
