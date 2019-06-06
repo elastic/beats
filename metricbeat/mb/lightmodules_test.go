@@ -223,13 +223,17 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config, err := common.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
-			modules, metricSets, err := NewModule(config, r)
+			module, metricSets, err := NewModule(config, r)
 			if c.err {
 				assert.Error(t, err)
 				return
 			}
 
-			assert.NotEmpty(t, modules)
+			assert.Equal(t, c.config["module"].(string), module.Config().Module)
+			if metricSetNames, ok := c.config["metricsets"].([]string); ok {
+				assert.ElementsMatch(t, metricSetNames, module.Config().MetricSets)
+			}
+
 			assert.NotEmpty(t, metricSets)
 			assert.NoError(t, err)
 			for _, ms := range metricSets {

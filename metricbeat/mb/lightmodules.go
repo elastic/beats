@@ -18,7 +18,6 @@
 package mb
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -135,19 +134,13 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	//   without the light module defaults)
 	// - Finally, call the original factory for the registered metricset
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
-		baseModule, ok := base.module.(*BaseModule)
-		if !ok {
-			return nil, fmt.Errorf("cannot override base module of type %T", base.module)
-		}
-
-		baseModule.name = m.Module
+		// Override default config on base module and metricset
 		base.name = m.Name
-
-		// Override defaults
-		config, _ := common.NewConfigFrom(m.Input.Defaults)
-		config.Merge(baseModule.rawConfig)
-		config.Unpack(&baseModule.config)
-		baseModule.rawConfig = config
+		baseModule, err := m.baseModule(base.module)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create base module for light module")
+		}
+		base.module = baseModule
 
 		// Run module factory if registered, it will be called once per
 		// metricset, but it should be idempotent
@@ -163,7 +156,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		// At this point host parser was already run, we need to run this again
 		// with the overriden defaults
 		if registration.HostParser != nil {
-			base.hostData, err = registration.HostParser(baseModule, base.host)
+			base.hostData, err = registration.HostParser(base.module, base.host)
 			if err != nil {
 				return nil, err
 			}
@@ -174,6 +167,27 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	}
 
 	return registration, nil
+}
+
+func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
+	baseModule := BaseModule{
+		name:   m.Module,
+		config: from.Config(),
+	}
+	var err error
+	// Set defaults
+	if baseModule.rawConfig, err = common.NewConfigFrom(m.Input.Defaults); err != nil {
+		return nil, errors.Wrap(err, "invalid input defaults")
+	}
+	// Copy values from user configuration
+	if err = from.UnpackConfig(baseModule.rawConfig); err != nil {
+		return nil, errors.Wrap(err, "failed to copy values from user configuration")
+	}
+	// Update module configuration
+	if err = baseModule.UnpackConfig(&baseModule.config); err != nil {
+		return nil, errors.Wrap(err, "failed to set module configuration")
+	}
+	return &baseModule, nil
 }
 
 func (r *LightModulesRegistry) readModule(moduleName string) (*LightModule, bool, error) {
