@@ -68,8 +68,7 @@ func newHTTPMonitorHostJob(
 	}), nil
 }
 
-// NewHTTPMonitorIPsJob creates a new http job.
-func NewHTTPMonitorIPsJob(
+func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
 	tls *transport.TLSConfig,
