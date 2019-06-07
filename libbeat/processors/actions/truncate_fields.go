@@ -85,12 +85,10 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	for _, field := range f.config.Fields {
 		event, err := f.truncateSingleField(field, event)
-		if err != nil {
+		if err != nil && f.config.FailOnError {
 			logp.Debug("truncate_fields", "Failed to truncate fields: %s", err)
-			if f.config.FailOnError {
-				event.Fields = backup
-				return event, err
-			}
+			event.Fields = backup
+			return event, err
 		}
 	}
 
