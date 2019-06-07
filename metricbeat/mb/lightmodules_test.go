@@ -101,7 +101,7 @@ func TestLightModulesAsRegistryChild(t *testing.T) {
 			}
 			r.MustAddMetricSet(m.module, m.name, fakeMetricSetFactory, opts...)
 		}
-		r.SetChild(NewLightModulesRegistry("testdata/lightmodules"))
+		r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 		return r
 	}
 
@@ -159,9 +159,9 @@ func TestReadModule(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		r := NewLightModulesRegistry("testdata/lightmodules")
+		r := NewLightModulesSource("testdata/lightmodules")
 		t.Run(c.name, func(t *testing.T) {
-			_, found, err := r.readModule(c.name)
+			_, found, err := r.loadModule(c.name)
 			if c.err {
 				assert.Error(t, err)
 			}
@@ -216,7 +216,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 
 	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
-	r.SetChild(NewLightModulesRegistry("testdata/lightmodules"))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
@@ -249,7 +249,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 func TestNewModulesCallModuleFactory(t *testing.T) {
 	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
-	r.SetChild(NewLightModulesRegistry("testdata/lightmodules"))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	called := false
 	r.AddModule("foo", func(base BaseModule) (Module, error) {

@@ -107,16 +107,21 @@ type Register struct {
 	modules map[string]ModuleFactory
 	// A map of module name to nested map of MetricSet name to MetricSetRegistration.
 	metricSets map[string]map[string]MetricSetRegistration
-	// Child registry that can contain additional modules
-	child ChildRegister
+	// Additional source of non-registered modules
+	secondarySource ModulesSource
 }
 
-// ChildRegister contains an additional source of modules
-type ChildRegister interface {
+// RegistrationBuilder is an interface for objects that can provide metricset registrations
+type RegistrationBuilder interface {
+	Registration(r *Register) (MetricSetRegistration, error)
+}
+
+// ModulesSource contains a source of non-registered modules
+type ModulesSource interface {
 	Modules() ([]string, error)
 	MetricSets(module string) ([]string, error)
 	DefaultMetricSets(module string) ([]string, error)
-	MetricSetRegistration(parent *Register, module, name string) (MetricSetRegistration, bool, error)
+	MetricSetRegistrationBuilder(module, name string) (RegistrationBuilder, bool)
 }
 
 // NewRegister creates and returns a new Register.
@@ -241,12 +246,13 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 		}
 	}
 
-	if r.child != nil {
-		registration, found, err := r.child.MetricSetRegistration(r, module, name)
-		if err != nil {
-			return MetricSetRegistration{}, err
-		}
+	if r.secondarySource != nil {
+		builder, found := r.secondarySource.MetricSetRegistrationBuilder(module, name)
 		if found {
+			registration, err := builder.Registration(r)
+			if err != nil {
+				return MetricSetRegistration{}, err
+			}
 			return registration, nil
 		}
 	}
@@ -273,8 +279,8 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 		}
 	}
 
-	if r.child != nil {
-		childDefaults, err := r.child.DefaultMetricSets(module)
+	if r.secondarySource != nil {
+		childDefaults, err := r.secondarySource.DefaultMetricSets(module)
 		if err != nil {
 			logp.Error(err)
 		}
@@ -322,8 +328,8 @@ func (r *Register) MetricSets(module string) []string {
 		}
 	}
 
-	if r.child != nil {
-		childMetricSets, err := r.child.MetricSets(module)
+	if r.secondarySource != nil {
+		childMetricSets, err := r.secondarySource.MetricSets(module)
 		if err != nil {
 			logp.Error(errors.Wrap(err, "failed to get metricsets from child registry"))
 		}
@@ -333,12 +339,12 @@ func (r *Register) MetricSets(module string) []string {
 	return metricsets
 }
 
-// SetChild sets a child register with an additional source of modules
-func (r *Register) SetChild(child ChildRegister) {
+// SetSecondarySource sets an additional source of modules
+func (r *Register) SetSecondarySource(source ModulesSource) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
-	r.child = child
+	r.secondarySource = source
 }
 
 // String return a string representation of the registered ModuleFactory's and
@@ -359,12 +365,12 @@ func (r *Register) String() string {
 		}
 	}
 
-	if r.child != nil {
-		childModules, _ := r.child.Modules()
+	if r.secondarySource != nil {
+		childModules, _ := r.secondarySource.Modules()
 		modules = append(modules, childModules...)
 
 		for _, module := range childModules {
-			childMetricSets, _ := r.child.MetricSets(module)
+			childMetricSets, _ := r.secondarySource.MetricSets(module)
 			for _, name := range childMetricSets {
 				metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 			}

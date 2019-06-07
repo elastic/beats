@@ -32,26 +32,26 @@ const (
 	manifestYML = "manifest.yml"
 )
 
-// LightModulesRegistry reads module definitions from files in the provided paths
-type LightModulesRegistry struct {
+// LightModulesSource loads module definitions from files in the provided paths
+type LightModulesSource struct {
 	paths []string
 }
 
-// NewLightModulesRegistry creates a new LightModulesRegistry
-func NewLightModulesRegistry(paths ...string) *LightModulesRegistry {
-	return &LightModulesRegistry{
+// NewLightModulesSource creates a new LightModulesSource
+func NewLightModulesSource(paths ...string) *LightModulesSource {
+	return &LightModulesSource{
 		paths: paths,
 	}
 }
 
 // Modules lists the light modules available on the configured paths
-func (r *LightModulesRegistry) Modules() ([]string, error) {
+func (r *LightModulesSource) Modules() ([]string, error) {
 	return r.listModules()
 }
 
 // DefaultMetricSets list the default metricsets for a given module
-func (r *LightModulesRegistry) DefaultMetricSets(moduleName string) ([]string, error) {
-	module, found, err := r.readModule(moduleName)
+func (r *LightModulesSource) DefaultMetricSets(moduleName string) ([]string, error) {
+	module, found, err := r.loadModule(moduleName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get default metricsets for module '%s'", moduleName)
 	}
@@ -68,8 +68,8 @@ func (r *LightModulesRegistry) DefaultMetricSets(moduleName string) ([]string, e
 }
 
 // MetricSets list the available metricsets for a given module
-func (r *LightModulesRegistry) MetricSets(moduleName string) ([]string, error) {
-	module, found, err := r.readModule(moduleName)
+func (r *LightModulesSource) MetricSets(moduleName string) ([]string, error) {
+	module, found, err := r.loadModule(moduleName)
 	if err != nil || !found {
 		return nil, errors.Wrapf(err, "failed to get metricsets for module '%s'", moduleName)
 	}
@@ -80,20 +80,15 @@ func (r *LightModulesRegistry) MetricSets(moduleName string) ([]string, error) {
 	return metricsets, nil
 }
 
-// MetricSetRegistration obtains a registration for a light module
-func (r *LightModulesRegistry) MetricSetRegistration(parent *Register, module, name string) (MetricSetRegistration, bool, error) {
-	lightModule, found, err := r.readModule(module)
+// MetricSetRegistrationBuilder obtains a registration builder for a light metric set
+func (r *LightModulesSource) MetricSetRegistrationBuilder(module, name string) (RegistrationBuilder, bool) {
+	lightModule, found, err := r.loadModule(module)
 	if err != nil || !found {
-		return MetricSetRegistration{}, found, err
+		return nil, false
 	}
 
 	ms, found := lightModule.MetricSets[name]
-	if !found {
-		return MetricSetRegistration{}, false, nil
-	}
-
-	registration, err := ms.Registration(parent)
-	return registration, true, err
+	return &ms, found
 }
 
 type lightModuleConfig struct {
@@ -201,35 +196,26 @@ func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 	return &baseModule, nil
 }
 
-func (r *LightModulesRegistry) readModule(moduleName string) (*LightModule, bool, error) {
+func (r *LightModulesSource) loadModule(moduleName string) (*LightModule, bool, error) {
 	modulePath, found := r.findModulePath(moduleName)
 	if !found {
 		return nil, false, nil
 	}
 
-	moduleConfig, err := r.readModuleConfig(modulePath)
+	moduleConfig, err := r.loadModuleConfig(modulePath)
 	if err != nil {
 		return nil, true, errors.Wrapf(err, "failed to load light module '%s' definition", moduleName)
 	}
 
-	metricSets := make(map[string]LightMetricSet)
-	for _, metricSet := range moduleConfig.MetricSets {
-		manifestPath := filepath.Join(filepath.Dir(modulePath), metricSet, manifestYML)
-
-		metricSetConfig, err := r.readMetricSetConfig(manifestPath)
-		if err != nil {
-			return nil, true, errors.Wrapf(err, "failed to load light metricset '%s/%s' definition", moduleName, metricSet)
-		}
-		metricSetConfig.Name = metricSet
-		metricSetConfig.Module = moduleName
-
-		metricSets[metricSet] = metricSetConfig
+	metricSets, err := r.loadMetricSets(moduleConfig.Name, filepath.Dir(modulePath), moduleConfig.MetricSets)
+	if err != nil {
+		return nil, true, errors.Wrapf(err, "failed to load metric sets for light module '%s'", moduleName)
 	}
 
 	return &LightModule{Name: moduleName, MetricSets: metricSets}, true, nil
 }
 
-func (r *LightModulesRegistry) findModulePath(moduleName string) (string, bool) {
+func (r *LightModulesSource) findModulePath(moduleName string) (string, bool) {
 	for _, dir := range r.paths {
 		p := filepath.Join(dir, moduleName, moduleYML)
 		if _, err := os.Stat(p); err == nil {
@@ -239,7 +225,7 @@ func (r *LightModulesRegistry) findModulePath(moduleName string) (string, bool) 
 	return "", false
 }
 
-func (r *LightModulesRegistry) readModuleConfig(modulePath string) (*lightModuleConfig, error) {
+func (r *LightModulesSource) loadModuleConfig(modulePath string) (*lightModuleConfig, error) {
 	c, err := common.LoadFile(modulePath)
 	if err != nil {
 		return nil, err
@@ -252,7 +238,24 @@ func (r *LightModulesRegistry) readModuleConfig(modulePath string) (*lightModule
 	return &moduleConfig, nil
 }
 
-func (r *LightModulesRegistry) readMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
+func (r *LightModulesSource) loadMetricSets(moduleName, moduleDirPath string, metricSetNames []string) (map[string]LightMetricSet, error) {
+	metricSets := make(map[string]LightMetricSet)
+	for _, metricSet := range metricSetNames {
+		manifestPath := filepath.Join(moduleDirPath, metricSet, manifestYML)
+
+		metricSetConfig, err := r.loadMetricSetConfig(manifestPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to load light metricset '%s'", metricSet)
+		}
+		metricSetConfig.Name = metricSet
+		metricSetConfig.Module = moduleName
+
+		metricSets[metricSet] = metricSetConfig
+	}
+	return metricSets, nil
+}
+
+func (r *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
 	c, err := common.LoadFile(manifestPath)
 	if err != nil {
 		return ms, err
@@ -264,7 +267,7 @@ func (r *LightModulesRegistry) readMetricSetConfig(manifestPath string) (ms Ligh
 	return
 }
 
-func (r *LightModulesRegistry) listModules() ([]string, error) {
+func (r *LightModulesSource) listModules() ([]string, error) {
 	modules := make(map[string]bool)
 	for _, dir := range r.paths {
 		files, err := ioutil.ReadDir(dir)
