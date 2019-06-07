@@ -1,12 +1,11 @@
 [
     {
-        "@timestamp": "2018-07-13T07:06:03.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'LOGGER-IO' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the LOGGER-IO task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -24,13 +23,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:03.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7229",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7229",
         "ibmmq.errorlog.errordescription": "5 log records accessed on queue manager 'QM1' during the log replay phase.",
         "ibmmq.errorlog.explanation": "5 log records have been accessed so far on queue manager QM1 during the log replay phase in order to bring the queue manager back to a previously known state.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -48,13 +46,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:03.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7230",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7230",
         "ibmmq.errorlog.errordescription": "Log replay for queue manager 'QM1' complete.",
         "ibmmq.errorlog.explanation": "The log replay phase of the queue manager restart process has been completed for queue manager QM1.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -72,13 +69,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:03.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7231",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7231",
         "ibmmq.errorlog.errordescription": "0 log records accessed on queue manager 'QM1' during the recovery phase.",
         "ibmmq.errorlog.explanation": "0 log records have been accessed so far on queue manager QM1 during the recovery phase of the transactions manager state.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -96,13 +92,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:03.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7232",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7232",
         "ibmmq.errorlog.errordescription": "Transaction manager state recovered for queue manager 'QM1'.",
         "ibmmq.errorlog.explanation": "The state of transactions at the time the queue manager ended has been recovered for queue manager QM1.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -120,13 +115,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7233",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7233",
         "ibmmq.errorlog.errordescription": "0 out of 0 in-flight transactions resolved for queue manager 'QM1'.",
         "ibmmq.errorlog.explanation": "0 transactions out of 0 in-flight at the time queue manager QM1 ended have been resolved.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -144,13 +138,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'CHECKPOINT' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the CHECKPOINT task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -168,13 +161,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ERROR-LOG' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the ERROR-LOG task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -192,13 +184,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 2 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -216,13 +207,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 3 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -240,13 +230,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -264,13 +253,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 4 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -288,13 +276,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ8003",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ8003",
         "ibmmq.errorlog.errordescription": "IBM MQ queue manager 'QM1' started using V9.0.0.2.",
         "ibmmq.errorlog.explanation": "IBM MQ queue manager 'QM1' started using V9.0.0.2.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -312,13 +299,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DEFERRED_DELIVERY' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the DEFERRED_DELIVERY task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -336,13 +322,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DEFERRED-MSG' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the DEFERRED-MSG task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -360,13 +345,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ACTVTRC' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the ACTVTRC task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -384,13 +368,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9410",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ9410",
         "ibmmq.errorlog.errordescription": "Repository manager started.",
         "ibmmq.errorlog.explanation": "The repository manager started successfully.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -408,13 +391,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'STATISTICS' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the STATISTICS task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -432,13 +414,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ASYNCQ' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the ASYNCQ task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -456,13 +437,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'EXPIRER' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the EXPIRER task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -480,13 +460,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DUR-SUBS-MGR' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the DUR-SUBS-MGR task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -504,13 +483,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'TOPIC-TREE' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the TOPIC-TREE task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -528,13 +506,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'RESOURCE_MONITOR' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the RESOURCE_MONITOR task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -552,13 +529,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5052",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5052",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-CTRLR' has started.",
         "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the QPUBSUB-CTRLR task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -576,13 +552,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5052",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5052",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-QUEUE-NLCACHE' has started.",
         "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the QPUBSUB-QUEUE-NLCACHE task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -600,13 +575,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'MARKINTSCAN' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the MARKINTSCAN task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -624,13 +598,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5052",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5052",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-SUBPT-NLCACHE' has started.",
         "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the QPUBSUB-SUBPT-NLCACHE task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -648,13 +621,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5052",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5052",
         "ibmmq.errorlog.errordescription": "The queue manager task 'PUBSUB-DAEMON' has started.",
         "ibmmq.errorlog.explanation": "The publish/subscribe utility task manager has started the PUBSUB-DAEMON task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -672,13 +644,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'Q-DELETION' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the Q-DELETION task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -696,13 +667,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5022",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5022",
         "ibmmq.errorlog.errordescription": "The channel initiator has started. ProcessId(8832).",
         "ibmmq.errorlog.explanation": "The channel initiator process has started.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -720,13 +690,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'PRESERVED-Q' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the PRESERVED-Q task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -744,13 +713,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'MULTICAST' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the MULTICAST task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -768,13 +736,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5024",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5024",
         "ibmmq.errorlog.errordescription": "The command server has started. ProcessId(22112).",
         "ibmmq.errorlog.explanation": "The command server process has started.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -792,13 +759,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5806",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5806",
         "ibmmq.errorlog.errordescription": "Queued Publish/Subscribe Daemon started for queue manager QM1.",
         "ibmmq.errorlog.explanation": "Queued Publish/Subscribe Daemon started for queue manager QM1.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -816,13 +782,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ8024",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ8024",
         "ibmmq.errorlog.errordescription": "IBM MQ channel initiator started.",
         "ibmmq.errorlog.explanation": "The channel initiator for queue SYSTEM.CHANNEL.INITQ has been started.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -840,13 +805,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-13T07:06:04.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5026",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5026",
         "ibmmq.errorlog.errordescription": "The listener 'LISTENER.TCP' has started. ProcessId(9172).",
         "ibmmq.errorlog.explanation": "The listener process has started.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -864,13 +828,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T11:24:26.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9780",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Tell the systems administrator, who should attempt to identify the cause of the channel failure using problem determination techniques. For example, look for FFST files, and examine the error logs on the local and remote systems where there may be messages explaining the cause of failure. More information may be obtained by repeating the operation with tracing enabled.",
-        "ibmmq.errorlog.errorcode": "AMQ9780",
         "ibmmq.errorlog.errordescription": "Channel to remote machine '127.0.0.1' is ending due to an error.",
         "ibmmq.errorlog.explanation": "Channel 'LOGSTASH.CHL' between this machine and the remote machine '127.0.0.1' encountered an error and will now end. In some cases the channel name can not be determined and so is shown as '????'. This message will be accompanied by other messages which explain the cause of the error.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -888,13 +851,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T11:24:26.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9519",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Check that the name is specified correctly and the channel definition is available.",
-        "ibmmq.errorlog.errorcode": "AMQ9519",
         "ibmmq.errorlog.errordescription": "Channel 'LOGSTASH.CHL' not found.",
         "ibmmq.errorlog.explanation": "The requested operation failed because the program could not find a definition of channel 'LOGSTASH.CHL'.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -912,13 +874,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T11:24:26.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9999",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Look at previous error messages for the channel program in the error logs to determine the cause of the failure. Note that this message can be excluded completely or suppressed by tuning the \"ExcludeMessage\" or \"SuppressMessage\" attributes under the \"QMErrorLog\" stanza in qm.ini. Further information can be found in the System Administration Guide.",
-        "ibmmq.errorlog.errorcode": "AMQ9999",
         "ibmmq.errorlog.errordescription": "Channel 'LOGSTASH.CHL' to host 'felix-elastic (127.0.0.1)' ended abnormally.",
         "ibmmq.errorlog.explanation": "The channel program running under process ID 8544(29244) for channel 'LOGSTASH.CHL' ended abnormally. The host name is 'felix-elastic (127.0.0.1)'; in some cases the host name cannot be determined and so is shown as '????'.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -936,13 +897,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T14:25:37.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9780",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Tell the systems administrator, who should attempt to identify the cause of the channel failure using problem determination techniques. For example, look for FFST files, and examine the error logs on the local and remote systems where there may be messages explaining the cause of failure. More information may be obtained by repeating the operation with tracing enabled.",
-        "ibmmq.errorlog.errorcode": "AMQ9780",
         "ibmmq.errorlog.errordescription": "Channel to remote machine '127.0.0.1' is ending due to an error.",
         "ibmmq.errorlog.explanation": "Channel 'LOGSTASH.CHL' between this machine and the remote machine '127.0.0.1' encountered an error and will now end. In some cases the channel name can not be determined and so is shown as '????'. This message will be accompanied by other messages which explain the cause of the error.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -960,13 +920,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T14:25:37.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9519",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Check that the name is specified correctly and the channel definition is available.",
-        "ibmmq.errorlog.errorcode": "AMQ9519",
         "ibmmq.errorlog.errordescription": "Channel 'LOGSTASH.CHL' not found.",
         "ibmmq.errorlog.explanation": "The requested operation failed because the program could not find a definition of channel 'LOGSTASH.CHL'.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -984,13 +943,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T14:25:37.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9999",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Look at previous error messages for the channel program in the error logs to determine the cause of the failure. Note that this message can be excluded completely or suppressed by tuning the \"ExcludeMessage\" or \"SuppressMessage\" attributes under the \"QMErrorLog\" stanza in qm.ini. Further information can be found in the System Administration Guide.",
-        "ibmmq.errorlog.errorcode": "AMQ9999",
         "ibmmq.errorlog.errordescription": "Channel 'LOGSTASH.CHL' to host 'felix-elastic (127.0.0.1)' ended abnormally.",
         "ibmmq.errorlog.explanation": "The channel program running under process ID 8544(28140) for channel 'LOGSTASH.CHL' ended abnormally. The host name is 'felix-elastic (127.0.0.1)'; in some cases the host name cannot be determined and so is shown as '????'.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1008,13 +966,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T14:25:47.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9780",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Tell the systems administrator, who should attempt to identify the cause of the channel failure using problem determination techniques. For example, look for FFST files, and examine the error logs on the local and remote systems where there may be messages explaining the cause of failure. More information may be obtained by repeating the operation with tracing enabled.",
-        "ibmmq.errorlog.errorcode": "AMQ9780",
         "ibmmq.errorlog.errordescription": "Channel to remote machine '127.0.0.1' is ending due to an error.",
         "ibmmq.errorlog.explanation": "Channel 'LOGSTASH.CHL' between this machine and the remote machine '127.0.0.1' encountered an error and will now end. In some cases the channel name can not be determined and so is shown as '????'. This message will be accompanied by other messages which explain the cause of the error.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1032,13 +989,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T14:25:47.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9519",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Check that the name is specified correctly and the channel definition is available.",
-        "ibmmq.errorlog.errorcode": "AMQ9519",
         "ibmmq.errorlog.errordescription": "Channel 'LOGSTASH.CHL' not found.",
         "ibmmq.errorlog.explanation": "The requested operation failed because the program could not find a definition of channel 'LOGSTASH.CHL'.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1056,13 +1012,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-18T14:25:47.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9999",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "Look at previous error messages for the channel program in the error logs to determine the cause of the failure. Note that this message can be excluded completely or suppressed by tuning the \"ExcludeMessage\" or \"SuppressMessage\" attributes under the \"QMErrorLog\" stanza in qm.ini. Further information can be found in the System Administration Guide.",
-        "ibmmq.errorlog.errorcode": "AMQ9999",
         "ibmmq.errorlog.errordescription": "Channel 'LOGSTASH.CHL' to host 'felix-elastic (127.0.0.1)' ended abnormally.",
         "ibmmq.errorlog.explanation": "The channel program running under process ID 8544(20284) for channel 'LOGSTASH.CHL' ended abnormally. The host name is 'felix-elastic (127.0.0.1)'; in some cases the host name cannot be determined and so is shown as '????'.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1080,13 +1035,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9411",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ9411",
         "ibmmq.errorlog.errordescription": "Repository manager ended normally.",
         "ibmmq.errorlog.explanation": "The repository manager ended normally.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1104,13 +1058,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ9542",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ9542",
         "ibmmq.errorlog.errordescription": "Queue manager is ending.",
         "ibmmq.errorlog.explanation": "The program will end because the queue manager is quiescing.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1128,13 +1081,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5025",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5025",
         "ibmmq.errorlog.errordescription": "The command server has ended. ProcessId(22112).",
         "ibmmq.errorlog.explanation": "The command server process has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1152,13 +1104,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DEFERRED_DELIVERY' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task DEFERRED_DELIVERY has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1176,13 +1127,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ACTVTRC' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task ACTVTRC has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1200,13 +1150,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5027",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5027",
         "ibmmq.errorlog.errordescription": "The listener 'LISTENER.TCP' has ended. ProcessId(9172).",
         "ibmmq.errorlog.explanation": "The listener process has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1224,13 +1173,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ASYNCQ' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task ASYNCQ has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1248,13 +1196,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5023",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5023",
         "ibmmq.errorlog.errordescription": "The channel initiator has ended. ProcessId(8832).",
         "ibmmq.errorlog.explanation": "The channel initiator process has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1272,13 +1219,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'EXPIRER' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task EXPIRER has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1296,13 +1242,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DUR-SUBS-MGR' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task DUR-SUBS-MGR has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1320,13 +1265,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'TOPIC-TREE' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task TOPIC-TREE has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1344,13 +1288,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'RESOURCE_MONITOR' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task RESOURCE_MONITOR has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1368,13 +1311,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'Q-DELETION' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task Q-DELETION has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1392,13 +1334,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'PRESERVED-Q' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task PRESERVED-Q has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1416,13 +1357,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'MULTICAST' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task MULTICAST has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1440,13 +1380,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-CTRLR' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-CTRLR has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1464,13 +1403,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-QUEUE-NLCACHE' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-QUEUE-NLCACHE has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1488,13 +1426,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task APP-SIGNAL has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1512,13 +1449,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-SUBPT-NLCACHE' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-SUBPT-NLCACHE has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1536,13 +1472,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DEFERRED-MSG' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task DEFERRED-MSG has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1560,13 +1495,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'PUBSUB-DAEMON' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task PUBSUB-DAEMON has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1584,13 +1518,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'STATISTICS' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task STATISTICS has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1608,13 +1541,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'MARKINTSCAN' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task MARKINTSCAN has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1632,13 +1564,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5807",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5807",
         "ibmmq.errorlog.errordescription": "Queued Publish/Subscribe Daemon for queue manager QM1 ended.",
         "ibmmq.errorlog.explanation": "The Queued Publish/Subscribe Daemon on queue manager QM1 has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1656,13 +1587,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ACTVTRC' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task ACTVTRC has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1680,13 +1610,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ASYNCQ' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task ASYNCQ has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1704,13 +1633,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'EXPIRER' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task EXPIRER has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1728,13 +1656,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DUR-SUBS-MGR' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task DUR-SUBS-MGR has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1752,13 +1679,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'TOPIC-TREE' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task TOPIC-TREE has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1776,13 +1702,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'RESOURCE_MONITOR' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task RESOURCE_MONITOR has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1800,13 +1725,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'Q-DELETION' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task Q-DELETION has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1824,13 +1748,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'PRESERVED-Q' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task PRESERVED-Q has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1848,13 +1771,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'MULTICAST' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task MULTICAST has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1872,13 +1794,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task APP-SIGNAL has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1896,13 +1817,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'DEFERRED-MSG' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task DEFERRED-MSG has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1920,13 +1840,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'MARKINTSCAN' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task MARKINTSCAN has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1944,13 +1863,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-CTRLR' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-CTRLR has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1968,13 +1886,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-QUEUE-NLCACHE' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-QUEUE-NLCACHE has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -1992,13 +1909,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'QPUBSUB-SUBPT-NLCACHE' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task QPUBSUB-SUBPT-NLCACHE has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2016,13 +1932,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'PUBSUB-DAEMON' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task PUBSUB-DAEMON has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2040,13 +1955,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'STATISTICS' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task STATISTICS has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2064,13 +1978,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ERROR-LOG' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task ERROR-LOG has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2088,13 +2001,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'CHECKPOINT' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task CHECKPOINT has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2112,13 +2024,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5041",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5041",
         "ibmmq.errorlog.errordescription": "The queue manager task 'LOGGER-IO' has ended.",
         "ibmmq.errorlog.explanation": "The queue manager task LOGGER-IO has ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2136,13 +2047,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:17.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ8004",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ8004",
         "ibmmq.errorlog.errordescription": "IBM MQ queue manager 'QM1' ended.",
         "ibmmq.errorlog.explanation": "IBM MQ queue manager 'QM1' ended.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2160,13 +2070,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'LOGGER-IO' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the LOGGER-IO task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2184,13 +2093,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7229",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7229",
         "ibmmq.errorlog.errordescription": "5 log records accessed on queue manager 'QM1' during the log replay phase.",
         "ibmmq.errorlog.explanation": "5 log records have been accessed so far on queue manager QM1 during the log replay phase in order to bring the queue manager back to a previously known state.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2208,13 +2116,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7230",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7230",
         "ibmmq.errorlog.errordescription": "Log replay for queue manager 'QM1' complete.",
         "ibmmq.errorlog.explanation": "The log replay phase of the queue manager restart process has been completed for queue manager QM1.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2232,13 +2139,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7231",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7231",
         "ibmmq.errorlog.errordescription": "0 log records accessed on queue manager 'QM1' during the recovery phase.",
         "ibmmq.errorlog.explanation": "0 log records have been accessed so far on queue manager QM1 during the recovery phase of the transactions manager state.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2256,13 +2162,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7232",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7232",
         "ibmmq.errorlog.errordescription": "Transaction manager state recovered for queue manager 'QM1'.",
         "ibmmq.errorlog.explanation": "The state of transactions at the time the queue manager ended has been recovered for queue manager QM1.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2280,13 +2185,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ7233",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ7233",
         "ibmmq.errorlog.errordescription": "0 out of 0 in-flight transactions resolved for queue manager 'QM1'.",
         "ibmmq.errorlog.explanation": "0 transactions out of 0 in-flight at the time queue manager QM1 ended have been resolved.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2304,13 +2208,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5051",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5051",
         "ibmmq.errorlog.errordescription": "The queue manager task 'CHECKPOINT' has started.",
         "ibmmq.errorlog.explanation": "The critical utility task manager has started the CHECKPOINT task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2328,13 +2231,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2352,13 +2254,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'ERROR-LOG' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the ERROR-LOG task. This task has now started 1 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
@@ -2376,13 +2277,12 @@
         "service.type": "ibmmq"
     },
     {
-        "@timestamp": "2018-07-20T15:40:53.000Z",
         "ecs.version": "1.0.0",
+        "error.id": "AMQ5037",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "ibmmq.errorlog.action": "None.",
-        "ibmmq.errorlog.errorcode": "AMQ5037",
         "ibmmq.errorlog.errordescription": "The queue manager task 'APP-SIGNAL' has started.",
         "ibmmq.errorlog.explanation": "The restartable utility task manager has started the APP-SIGNAL task. This task has now started 2 times.",
         "ibmmq.errorlog.hostname": "FELIX-ELASTIC",

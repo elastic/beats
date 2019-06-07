@@ -31,9 +31,6 @@
     description: Please add description
     example: Please add example
     type: text
-  - name: iso8601_timestamp
-    description: Please add description
-    example: Please add example
   - name: remotehost
     description: Please add description
     example: Please add example
@@ -58,18 +55,13 @@
     description: Please add description
     example: Please add example
     type: text
-  - name: errorcode
-    description: Please add description
-    example: Please add example
-    type: text
   - name: errordescription
     description: Please add description
     example: Please add example
     type: text
   - name: explanation
-    description: Please add description
-    example: Please add example
-    type: text
+    description: Explaines the error in more detail
+    type: keyword
   - name: action
     description: Please add description
     example: Please add example
