@@ -19,39 +19,18 @@ heartbeat.config.monitors:
   # How often to check for changes
   reload.period: 5s
 
-heartbeat.autodiscover:
-  providers:
-    - type: aws_elb
-      region: us-east-1
-      credentials:
-        #access_key_id: my-access-key
-        #secret_access_key: my-secret-access-key
-      templates:
-        - config:
-          - type: tcp
-            hosts: ["${data.host}:${data.port}"]
-            schedule: "@every 5s"
-            timeout: 1s
-
 # Configure monitors inline
-#heartbeat.monitors:
-#  - type: aws_elbv2
-#    arns: ["arn:aws:elasticloadbalancing:us-east-1:114575138929:loadbalancer/app/test-l#b/e35147785f6cc9a4"]
-#    region: "us-east-1"
-#    schedule: "@every 10s"
+heartbeat.monitors:
+- type: http
 
-#heartbeat.autodiscover:
-#  providers:
-#  - type: aws_elb
-#    region: us-east-1
-#    templates:
-#    - condition:
-#        has_fields: ["port"]
-#      config:
-#      - type: tcp
-#        hosts: ["${data.host}:${data.port}"]
-#        schedule: "@every 5s"
-#        timeout: 1s
+  # List or urls to query
+  urls: ["http://localhost:9200"]
+
+  # Configure task schedule
+  schedule: '@every 10s'
+
+  # Total test connection and data exchange timeout
+  #timeout: 16s
 
 #==================== Elasticsearch template setting ==========================
 
@@ -123,8 +102,6 @@ setup.kibana:
 # Configure what output to use when sending the data collected by the beat.
 
 #-------------------------- Elasticsearch output ------------------------------
-#output.console:
-#  pretty: false
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
@@ -165,7 +142,7 @@ processors:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-logging.level: info
+#logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
