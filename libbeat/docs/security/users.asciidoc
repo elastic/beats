@@ -62,6 +62,12 @@ ifeval::["{beatname_lc}"=="filebeat"]
 |`ingest_admin` role
 endif::[]
 
+ifdef::apm-server[]
+.2+|Set up ingest pipelines
+|`monitor` on cluster
+|`ingest_admin` role
+endif::apm-server[]
+
 .2+|Set up index lifecycle policies
 |`manage_ilm`, `manage_index_templates`, and `monitor` on cluster
 |`manage` on +{beat_default_index_prefix}-*+ indices
