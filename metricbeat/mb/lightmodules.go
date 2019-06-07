@@ -18,6 +18,7 @@
 package mb
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -80,15 +81,41 @@ func (r *LightModulesSource) MetricSets(moduleName string) ([]string, error) {
 	return metricsets, nil
 }
 
-// MetricSetRegistrationBuilder obtains a registration builder for a light metric set
-func (r *LightModulesSource) MetricSetRegistrationBuilder(module, name string) (RegistrationBuilder, bool) {
-	lightModule, found, err := r.loadModule(module)
-	if err != nil || !found {
-		return nil, false
+func (r *LightModulesSource) HasMetricSet(moduleName, metricSetName string) (bool, error) {
+	modulePath, found := r.findModulePath(moduleName)
+	if !found {
+		return false, nil
 	}
 
-	ms, found := lightModule.MetricSets[name]
-	return &ms, found
+	moduleConfig, err := r.loadModuleConfig(modulePath)
+	if err != nil {
+		return false, errors.Wrapf(err, "failed to load module config for module '%s'", moduleName)
+	}
+
+	for _, name := range moduleConfig.metricSets {
+		if name == metricSetName {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// MetricSetRegistration obtains a registration for a light metric set
+func (r *LightModulesSource) MetricSetRegistration(register *Register, moduleName, metricSetName string) (MetricSetRegistration, error) {
+	lightModule, found, err := r.loadModule(moduleName)
+	if err != nil {
+		return MetricSetRegistration{}, errors.Wrapf(err, "failed to load module '%s'", moduleName)
+	}
+	if !found {
+		return MetricSetRegistration{}, fmt.Errorf("module '%s' not found", moduleName)
+	}
+
+	ms, found := lightModule.MetricSets[metricSetName]
+	if !found {
+		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", moduleName, metricSetName)
+	}
+
+	return ms.Registration(register)
 }
 
 type lightModuleConfig struct {

@@ -111,17 +111,13 @@ type Register struct {
 	secondarySource ModulesSource
 }
 
-// RegistrationBuilder is an interface for objects that can provide metricset registrations
-type RegistrationBuilder interface {
-	Registration(r *Register) (MetricSetRegistration, error)
-}
-
 // ModulesSource contains a source of non-registered modules
 type ModulesSource interface {
 	Modules() ([]string, error)
 	MetricSets(module string) ([]string, error)
 	DefaultMetricSets(module string) ([]string, error)
-	MetricSetRegistrationBuilder(module, name string) (RegistrationBuilder, bool)
+	HasMetricSet(module, name string) (bool, error)
+	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 }
 
 // NewRegister creates and returns a new Register.
@@ -247,13 +243,13 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 	}
 
 	if r.secondarySource != nil {
-		builder, found := r.secondarySource.MetricSetRegistrationBuilder(module, name)
-		if found {
-			registration, err := builder.Registration(r)
-			if err != nil {
-				return MetricSetRegistration{}, err
-			}
-			return registration, nil
+		exists, err := r.secondarySource.HasMetricSet(module, name)
+		if err != nil {
+			return MetricSetRegistration{}, errors.Wrap(err, "failed to check if non-registered metricset exists")
+		}
+		if exists {
+			registration, err := r.secondarySource.MetricSetRegistration(r, module, name)
+			return registration, errors.Wrap(err, "failed to obtain registration for non-registered metricset")
 		}
 	}
 
