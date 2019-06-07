@@ -13944,7 +13944,7 @@ Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or
 *`kubernetes.container.cpu.limit.cores`*::
 +
 --
-type: long
+type: float
 
 Container CPU cores limit
 
@@ -13954,7 +13954,7 @@ Container CPU cores limit
 *`kubernetes.container.cpu.request.cores`*::
 +
 --
-type: long
+type: float
 
 Container CPU requested cores
 
