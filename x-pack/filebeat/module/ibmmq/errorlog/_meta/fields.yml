@@ -1,6 +1,5 @@
 - name: errorlog
   description: IBM MQ error logs
-  example: Please add example
   type: group
   fields:
   - name: installation
