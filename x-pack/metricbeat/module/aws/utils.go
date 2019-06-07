@@ -5,10 +5,13 @@
 package aws
 
 import (
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -144,4 +147,40 @@ func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time
 	}
 
 	return timestamp
+}
+
+// GetResourcesTags function queries AWS resource groupings tagging API
+// to get a resource tag mapping with specific resource type filters
+func GetResourcesTags(svc resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI, resourceTypeFilters []string) (map[string][]resourcegroupstaggingapi.Tag, error) {
+	resourceTagMap := make(map[string][]resourcegroupstaggingapi.Tag)
+	getResourcesInput := &resourcegroupstaggingapi.GetResourcesInput{
+		PaginationToken:     nil,
+		ResourceTypeFilters: resourceTypeFilters,
+	}
+
+	init := true
+	for init || *getResourcesInput.PaginationToken != "" {
+		init = false
+		getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
+		output, err := getResourcesRequest.Send()
+		if err != nil {
+			err = errors.Wrap(err, "Error GetResources")
+			return nil, err
+		}
+
+		getResourcesInput.PaginationToken = output.PaginationToken
+		if len(resourceTypeFilters) == 0 || len(output.ResourceTagMappingList) == 0 {
+			return nil, nil
+		}
+
+		for _, resourceTag := range output.ResourceTagMappingList {
+			resourceARNSplit := strings.Split(*resourceTag.ResourceARN, ":")
+			if strings.Contains(resourceARNSplit[len(resourceARNSplit)-1], "/") {
+				resourceARNSplit = strings.Split(resourceARNSplit[len(resourceARNSplit)-1], "/")
+			}
+			identifier := resourceARNSplit[len(resourceARNSplit)-1]
+			resourceTagMap[identifier] = resourceTag.Tags
+		}
+	}
+	return resourceTagMap, nil
 }
