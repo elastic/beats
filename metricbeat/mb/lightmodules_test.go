@@ -140,24 +140,29 @@ func TestLoadModule(t *testing.T) {
 	logp.TestingSetup()
 
 	cases := []struct {
-		name string
-		err  bool
+		name   string
+		exists bool
+		err    bool
 	}{
 		{
-			name: "service",
-			err:  false,
+			name:   "service",
+			exists: true,
+			err:    false,
 		},
 		{
-			name: "broken",
-			err:  true,
+			name:   "broken",
+			exists: true,
+			err:    true,
 		},
 		{
-			name: "empty",
-			err:  false,
+			name:   "empty",
+			exists: false,
+			err:    false,
 		},
 		{
-			name: "notexists",
-			err:  false,
+			name:   "notexists",
+			exists: false,
+			err:    false,
 		},
 	}
 
@@ -168,6 +173,7 @@ func TestLoadModule(t *testing.T) {
 			if c.err {
 				assert.Error(t, err)
 			}
+			assert.Equal(t, c.exists, r.HasModule(c.name))
 		})
 	}
 }
