@@ -275,11 +275,11 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
 		exists = true
-		childDefaults, err := source.DefaultMetricSets(module)
+		sourceDefaults, err := source.DefaultMetricSets(module)
 		if err != nil {
 			logp.Error(err)
-		} else if len(childDefaults) > 0 {
-			defaults = append(defaults, childDefaults...)
+		} else if len(sourceDefaults) > 0 {
+			defaults = append(defaults, sourceDefaults...)
 		}
 	}
 
@@ -322,11 +322,11 @@ func (r *Register) MetricSets(module string) []string {
 	}
 
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
-		childMetricSets, err := source.MetricSets(module)
+		sourceMetricSets, err := source.MetricSets(module)
 		if err != nil {
 			logp.Error(errors.Wrap(err, "failed to get metricsets from secondary source"))
 		}
-		metricsets = append(metricsets, childMetricSets...)
+		metricsets = append(metricsets, sourceMetricSets...)
 	}
 
 	return metricsets
@@ -359,12 +359,12 @@ func (r *Register) String() string {
 	}
 
 	if source := r.secondarySource; source != nil {
-		childModules, _ := source.Modules()
-		modules = append(modules, childModules...)
+		sourceModules, _ := source.Modules()
+		modules = append(modules, sourceModules...)
 
-		for _, module := range childModules {
-			childMetricSets, _ := source.MetricSets(module)
-			for _, name := range childMetricSets {
+		for _, module := range sourceModules {
+			sourceMetricSets, _ := source.MetricSets(module)
+			for _, name := range sourceMetricSets {
 				metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 			}
 		}
