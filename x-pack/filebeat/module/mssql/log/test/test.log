@@ -1,0 +1,21 @@
+2019-05-03 09:01:09.99 Server      Microsoft SQL Server 2017 (RTM-CU13) (KB4466404) - 14.0.3048.4 (X64)
+	Nov 30 2018 12:57:58
+	Copyright (C) 2017 Microsoft Corporation
+	Developer Edition (64-bit) on Linux (Ubuntu 16.04.5 LTS)
+2019-05-03 09:01:09.99 Server      UTC adjustment: 0:00
+2019-05-03 09:01:09.99 Server      (c) Microsoft Corporation.
+2019-05-03 09:01:09.99 Server      All rights reserved.
+2019-05-03 09:01:10.00 Server      Server process ID is 4124.
+2019-05-03 09:01:10.00 Server      Logging SQL Server messages in file '/var/opt/mssql/log/errorlog'.
+2019-05-03 09:01:10.00 Server      Registry startup parameters:
+	 -d /var/opt/mssql/data/master.mdf
+	 -l /var/opt/mssql/data/mastlog.ldf
+	 -e /var/opt/mssql/log/errorlog
+2019-05-03 09:01:10.00 Server      SQL Server detected 1 sockets with 6 cores per socket and 12 logical processors per socket, 12 total logical processors; using 12 logical processors based on SQL Server licensing. This is an informational message; no user action is required.
+2019-05-03 09:01:10.00 Server      SQL Server is starting at normal priority base (=7). This is an informational message only. No user action is required.
+2019-05-03 09:01:10.00 Server      Detected 25445 MB of RAM. This is an informational message; no user action is required.
+2019-05-03 09:01:10.00 Server      Using conventional memory in the memory manager.
+2019-05-03 09:01:10.01 Server      Large Page Allocated: 32MB
+2019-05-03 09:01:10.20 Server      Buffer pool extension is already disabled. No action is n
+2019-05-03 09:01:11.93 spid22s     Service Broker manager has started.
+2019-05-03 09:01:12.03 spid6s      Recovery is complete. This is an informational message only. No user action is required.

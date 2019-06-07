@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 15000223000,
         "event.module": "mysql",
@@ -23,7 +22,6 @@
     },
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 153000,
         "event.module": "mysql",
@@ -44,7 +42,6 @@
     },
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 4071491000,
         "event.module": "mysql",
@@ -67,7 +64,6 @@
     },
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 10346539000,
         "event.module": "mysql",

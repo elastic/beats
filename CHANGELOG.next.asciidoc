@@ -12,7 +12,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Update to Golang 1.12.4. {pull}11782[11782]
-- Update to ECS 1.0.1. {pull}12284[12284]
+- Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
 
 *Auditbeat*
 
@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 - Add read_buffer configuration option. {pull}11739[11739]
+- `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
 
 *Heartbeat*
 
@@ -38,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
+- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 
 *Packetbeat*
 
@@ -54,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix typo in TLS renegotiation configuration and setting the option correctly {issue}10871[10871], {pull}12354[12354]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
 - Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
 - decode_json_field: process objects and arrays only {pull}11312[11312]
@@ -73,12 +76,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix initialization of the TCP input logger. {pull}11605[11605]
 - Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
 - Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
+- Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 - Fix queue.spool.write.flush.events config type. {pull}12080[12080]
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 - Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
 - Fixed Beat ID being reported by GET / API. {pull}12180[12180]
 - Fixed setting bulk max size in kafka output. {pull}12254[12254]
 - Add host.os.codename to fields.yml. {pull}12261[12261]
+- Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
+  processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 
 *Auditbeat*
 
@@ -92,6 +98,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 - Package dataset: Close librpm handle. {pull}12215[12215]
 - Package dataset: Auto-detect package directories. {pull}12289[12289]
+- Package dataset: Improve dpkg parsing. {pull}12325[12325]
+- System module: Start system module without host ID. {pull}12373[12373]
 
 *Filebeat*
 
@@ -107,8 +115,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Skipping unparsable log entries from docker json reader {pull}12268[12268]
+- Parse timezone in PostgreSQL logs as part of the timestamp {pull}12338[12338]
 - Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
 - Require certificate authorities, certificate file, and key when SSL is enabled for the TCP input. {pull}12355[12355]
+- Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
 
 *Heartbeat*
 
@@ -138,7 +148,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 - In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12265[12265]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
-- Require certificate authorities, certificate file, and key when SSL is enabled for module http metricset server. {pull}12355[12355]
 
 *Packetbeat*
 
@@ -206,8 +215,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New module `panw` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
 - Add RabbitMQ module. {pull}12032[12032]
 - Add new `container` input. {pull}12162[12162]
+- Add timeouts on communication with docker daemon. {pull}12310[12310]
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
+- Add MSSQL module {pull}12079[12079]
 
 *Heartbeat*
 
@@ -233,12 +244,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
 - Add overview dashboard to Consul module {pull}10665[10665]
 - New fields were added in the mysql/status metricset. {pull}12227[12227]
+- Always report Pod UID in the `pod` metricset. {pull}12345[12345]
+- Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
+- Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
 
 *Packetbeat*
 
 *Functionbeat*
 
 - New options to configure roles and VPC. {pull}11779[11779]
+- Export automation templates used to create functions. {pull}11923[11923]
+- Configurable Amazon endpoint. {pull}12369[12369]
 
 *Winlogbeat*
 
@@ -251,6 +267,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - `docker` input is deprecated in favour `container`. {pull}12162[12162]
+- `postgresql.log.timestamp` field is deprecated in favour of `@timestamp`. {pull}12338[12338]
 
 *Heartbeat*
 
