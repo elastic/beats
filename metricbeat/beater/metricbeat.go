@@ -74,7 +74,7 @@ func WithModuleOptions(options ...module.Option) Option {
 func WithLightModules() Option {
 	return func(*Metricbeat) {
 		path := paths.Resolve(paths.Home, "module")
-		mb.Registry.SetChild(mb.NewLightModulesRegistry(path))
+		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(path))
 	}
 }
 
