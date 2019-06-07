@@ -94,6 +94,7 @@ func (r *LightModulesSource) MetricSets(moduleName string) ([]string, error) {
 	return metricsets, nil
 }
 
+// HasMetricSet checks if the given metricset exists
 func (r *LightModulesSource) HasMetricSet(moduleName, metricSetName string) bool {
 	modulePath, found := r.findModulePath(moduleName)
 	if !found {
@@ -188,11 +189,11 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		// metricset, but it should be idempotent
 		moduleFactory := r.moduleFactory(m.Input.Module)
 		if moduleFactory != nil {
-			m, err := moduleFactory(*baseModule)
+			module, err := moduleFactory(*baseModule)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrapf(err, "module factory for module '%s' failed while creating light metricset '%s/%s'", m.Input.Module, m.Module, m.Name)
 			}
-			base.module = m
+			base.module = module
 		}
 
 		// At this point host parser was already run, we need to run this again
@@ -200,7 +201,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		if registration.HostParser != nil {
 			base.hostData, err = registration.HostParser(base.module, base.host)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrapf(err, "host parser failed on light metricset factory for '%s/%s'", m.Module, m.Name)
 			}
 			base.host = base.hostData.Host
 		}
@@ -266,7 +267,7 @@ func (r *LightModulesSource) findModulePath(moduleName string) (string, bool) {
 func (r *LightModulesSource) loadModuleConfig(modulePath string) (*lightModuleConfig, error) {
 	config, err := common.LoadFile(modulePath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to load module configuration from '%s'", modulePath)
 	}
 
 	var moduleConfig lightModuleConfig
@@ -296,7 +297,7 @@ func (r *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, me
 func (r *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
 	config, err := common.LoadFile(manifestPath)
 	if err != nil {
-		return ms, err
+		return ms, errors.Wrapf(err, "failed to load metricset manifest from '%s'", manifestPath)
 	}
 
 	if err := config.Unpack(&ms); err != nil {
