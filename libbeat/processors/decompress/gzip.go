@@ -55,7 +55,7 @@ func init() {
 	processors.RegisterPlugin("decompress_gzip_fields",
 		checks.ConfigChecked(NewDecompressGzipFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "ignore_missing", "overwrite_keys", "overwrite_keys", "fail_on_error", "when")))
+			checks.AllowedFields("fields", "ignore_missing", "overwrite_keys", "overwrite_keys", "fail_on_error")))
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.
@@ -64,7 +64,7 @@ func NewDecompressGzipFields(c *common.Config) (processors.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the decompress_gzip_fields configuration: %s", err)
+		return nil, fmt.Errorf("failed to unpack the decompress_gzip_fields configuration: %+v", err)
 	}
 	if len(config.Fields) == 0 {
 		return nil, errors.New("no fields to decompress configured")
@@ -118,13 +118,15 @@ func (f *decompressGzipFields) decompressGzipField(src, dest string, event *beat
 
 	var r io.Reader
 	r, err = gzip.NewReader(b)
-
 	if err != nil {
 		return errors.Wrapf(err, "error decompressing field %s", src)
 	}
 
 	var resB bytes.Buffer
-	resB.ReadFrom(r)
+	_, err = resB.ReadFrom(r)
+	if err != nil {
+		return errors.Wrapf(err, "error reading in decompressed field %s", src)
+	}
 
 	decompressed := string(resB.Bytes())
 
@@ -142,6 +144,5 @@ func (f *decompressGzipFields) decompressGzipField(src, dest string, event *beat
 
 // String returns a string representation of this processor.
 func (f decompressGzipFields) String() string {
-	json, _ := json.Marshal(f.decompressGzipFieldsConfig)
-	return "decompress_gzip_fields=" + string(json)
+	return "decompress_gzip_fields=" + string(f.fields)
 }
