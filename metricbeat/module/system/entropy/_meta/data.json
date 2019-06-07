@@ -13,10 +13,8 @@
     },
     "system": {
         "entropy": {
-            "entropy": {
-                "available_bits": 2801,
-                "pct": 0.683837890625
-            }
+            "available_bits": 2801,
+            "pct": 0.683837890625
         }
     }
 }

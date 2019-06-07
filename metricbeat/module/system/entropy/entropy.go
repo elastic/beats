@@ -81,10 +81,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 	report.Event(mb.Event{
 		MetricSetFields: common.MapStr{
-			"entropy": common.MapStr{
-				"available_bits": entropy,
-				"pct":            float64(entropy) / float64(poolsize),
-			},
+			"available_bits": entropy,
+			"pct":            float64(entropy) / float64(poolsize),
 		},
 	})
 
