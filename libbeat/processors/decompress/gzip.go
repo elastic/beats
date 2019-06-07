@@ -145,7 +145,7 @@ func (f *decompressGzipFields) decompressGzipField(src, dest string, event *beat
 // String returns a string representation of this processor.
 func (f decompressGzipFields) String() string {
 	var returnString []string
-	for k, _ := range f.fields {
+	for k := range f.fields {
 		returnString = append(returnString, k)
 	}
 	sort.Strings(returnString)
