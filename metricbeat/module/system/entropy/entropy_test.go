@@ -24,7 +24,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/system"
 )
@@ -49,7 +48,7 @@ func TestFetch(t *testing.T) {
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
-	assert.Equal(t, events[0].MetricSetFields["entropy"].(common.MapStr)["available_bits"], 2801)
+	assert.Equal(t, events[0].MetricSetFields["available_bits"], 2801)
 }
 
 func getConfig() map[string]interface{} {
