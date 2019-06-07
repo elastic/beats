@@ -6,23 +6,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert1": "90",
         "ibmmq.errorlog.errordescription": "There are 90 days left in the trial period for this copy of IBM MQ.",
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "16776.1",
-        "ibmmq.errorlog.program": "strmqm.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 2025,
-        "service.type": "ibmmq"
+        "process.pid": "16776.1",
+        "process.title": "strmqm.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-11T08:46:26.343Z",
@@ -31,22 +31,22 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
         "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "8480.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 2569,
-        "service.type": "ibmmq"
+        "process.pid": "8480.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-11T08:46:26.346Z",
@@ -55,24 +55,24 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert1": "8480",
         "ibmmq.errorlog.commentinsert1": "QM1",
         "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 8480.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "8480.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 3932,
-        "service.type": "ibmmq"
+        "process.pid": "8480.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-28T14:12:07.685Z",
@@ -81,23 +81,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert1": "73",
         "ibmmq.errorlog.errordescription": "There are 73 days left in the trial period for this copy of IBM MQ.",
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7160.1",
-        "ibmmq.errorlog.program": "strmqm.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 6718,
-        "service.type": "ibmmq"
+        "process.pid": "7160.1",
+        "process.title": "strmqm.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-28T14:12:07.789Z",
@@ -106,23 +106,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert1": "73",
         "ibmmq.errorlog.errordescription": "There are 73 days left in the trial period for this copy of IBM MQ.",
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7144.1",
-        "ibmmq.errorlog.program": "strmqm.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 7261,
-        "service.type": "ibmmq"
+        "process.pid": "7144.1",
+        "process.title": "strmqm.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-28T14:12:08.663Z",
@@ -131,22 +131,22 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
         "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7360.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 7804,
-        "service.type": "ibmmq"
+        "process.pid": "7360.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-28T14:12:08.665Z",
@@ -155,24 +155,24 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert1": "7360",
         "ibmmq.errorlog.commentinsert1": "QM1",
         "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 7360.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7360.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 9167,
-        "service.type": "ibmmq"
+        "process.pid": "7360.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:48:52.594Z",
@@ -181,23 +181,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7356.1",
-        "ibmmq.errorlog.program": "strmqm.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 10273,
-        "service.type": "ibmmq"
+        "process.pid": "7356.1",
+        "process.title": "strmqm.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:48:52.663Z",
@@ -206,23 +206,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7364.1",
-        "ibmmq.errorlog.program": "strmqm.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 10816,
-        "service.type": "ibmmq"
+        "process.pid": "7364.1",
+        "process.title": "strmqm.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:48:53.368Z",
@@ -231,22 +231,22 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
         "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7660.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 11359,
-        "service.type": "ibmmq"
+        "process.pid": "7660.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:48:53.369Z",
@@ -255,24 +255,24 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert1": "7660",
         "ibmmq.errorlog.commentinsert1": "QM1",
         "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 7660.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7660.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 12722,
-        "service.type": "ibmmq"
+        "process.pid": "7660.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:49:35.477Z",
@@ -281,23 +281,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "7032.1",
-        "ibmmq.errorlog.program": "strmqm.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 13828,
-        "service.type": "ibmmq"
+        "process.pid": "7032.1",
+        "process.title": "strmqm.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:49:35.553Z",
@@ -306,23 +306,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "6984.1",
-        "ibmmq.errorlog.program": "strmqm.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 14371,
-        "service.type": "ibmmq"
+        "process.pid": "6984.1",
+        "process.title": "strmqm.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:49:36.447Z",
@@ -331,22 +331,22 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
         "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "6780.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 14914,
-        "service.type": "ibmmq"
+        "process.pid": "6780.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     },
     {
         "@timestamp": "2018-10-29T15:49:36.448Z",
@@ -355,23 +355,23 @@
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert1": "6780",
         "ibmmq.errorlog.commentinsert1": "QM1",
         "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 6780.",
-        "ibmmq.errorlog.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.installation": "Installation1",
-        "ibmmq.errorlog.process": "6780.1",
-        "ibmmq.errorlog.program": "amqzxma0.exe",
-        "ibmmq.errorlog.user": "MUSR_MQADMIN",
-        "ibmmq.errorlog.vrmf": "9.1.0.0",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
         "log.level": "",
         "log.offset": 16277,
-        "service.type": "ibmmq"
+        "process.pid": "6780.1",
+        "process.title": "amqzxma0.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "MUSR_MQADMIN"
     }
 ]
