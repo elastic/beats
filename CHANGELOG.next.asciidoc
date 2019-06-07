@@ -166,6 +166,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Decouple Debug logging from fail_on_error logic for rename, copy, truncate processors {pull}12451[12451]
 - Add an option to append to existing logs rather than always rotate on start. {pull}11953[11953]
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
