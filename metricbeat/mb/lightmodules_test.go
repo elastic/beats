@@ -26,11 +26,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
-// TestLightModulesAsRegistryChild checks that registry correctly lists
+// TestLightModulesAsModuleSource checks that registry correctly lists
 // metricsets when used with light modules
-func TestLightModulesAsRegistryChild(t *testing.T) {
+func TestLightModulesAsModuleSource(t *testing.T) {
+	logp.TestingSetup()
+
 	type testMetricSet struct {
 		name       string
 		module     string
@@ -117,12 +120,15 @@ func TestLightModulesAsRegistryChild(t *testing.T) {
 			}
 
 			// Check default metricsets
-			for module, metricSets := range c.expectedDefaultMetricSets {
+			for module, expected := range c.expectedDefaultMetricSets {
 				t.Run("default metricsets for "+module, func(t *testing.T) {
 					found, err := r.DefaultMetricSets(module)
-					assert.ElementsMatch(t, metricSets, found)
-					if len(metricSets) == 0 {
+					if len(expected) > 0 {
+						assert.NoError(t, err)
+						assert.ElementsMatch(t, expected, found)
+					} else {
 						assert.Error(t, err, "error expected when there are no default metricsets")
+
 					}
 				})
 			}
@@ -130,47 +136,45 @@ func TestLightModulesAsRegistryChild(t *testing.T) {
 	}
 }
 
-func TestReadModule(t *testing.T) {
+func TestLoadModule(t *testing.T) {
+	logp.TestingSetup()
+
 	cases := []struct {
-		name  string
-		found bool
-		err   bool
+		name string
+		err  bool
 	}{
 		{
-			name:  "service",
-			found: true,
-			err:   false,
+			name: "service",
+			err:  false,
 		},
 		{
-			name:  "broken",
-			found: true,
-			err:   true,
+			name: "broken",
+			err:  true,
 		},
 		{
-			name:  "empty",
-			found: false,
-			err:   false,
+			name: "empty",
+			err:  false,
 		},
 		{
-			name:  "notexists",
-			found: false,
-			err:   false,
+			name: "notexists",
+			err:  false,
 		},
 	}
 
 	for _, c := range cases {
 		r := NewLightModulesSource("testdata/lightmodules")
 		t.Run(c.name, func(t *testing.T) {
-			_, found, err := r.loadModule(c.name)
+			_, err := r.loadModule(c.name)
 			if c.err {
 				assert.Error(t, err)
 			}
-			assert.Equal(t, c.found, found)
 		})
 	}
 }
 
 func TestNewModuleFromConfig(t *testing.T) {
+	logp.TestingSetup()
+
 	cases := []struct {
 		title          string
 		config         common.MapStr
@@ -247,6 +251,8 @@ func TestNewModuleFromConfig(t *testing.T) {
 }
 
 func TestNewModulesCallModuleFactory(t *testing.T) {
+	logp.TestingSetup()
+
 	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))

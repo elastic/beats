@@ -114,9 +114,10 @@ type Register struct {
 // ModulesSource contains a source of non-registered modules
 type ModulesSource interface {
 	Modules() ([]string, error)
+	HasModule(module string) bool
 	MetricSets(module string) ([]string, error)
 	DefaultMetricSets(module string) ([]string, error)
-	HasMetricSet(module, name string) (bool, error)
+	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 }
 
@@ -242,15 +243,12 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 		}
 	}
 
-	if r.secondarySource != nil {
-		exists, err := r.secondarySource.HasMetricSet(module, name)
+	if source := r.secondarySource; source != nil && source.HasMetricSet(module, name) {
+		registration, err := source.MetricSetRegistration(r, module, name)
 		if err != nil {
-			return MetricSetRegistration{}, errors.Wrap(err, "failed to check if non-registered metricset exists")
+			return MetricSetRegistration{}, errors.Wrapf(err, "failed to obtain registration for non-registered metricset '%s/%s'", module, name)
 		}
-		if exists {
-			registration, err := r.secondarySource.MetricSetRegistration(r, module, name)
-			return registration, errors.Wrap(err, "failed to obtain registration for non-registered metricset")
-		}
+		return registration, nil
 	}
 
 	return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", module, name)
@@ -275,13 +273,12 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 		}
 	}
 
-	if r.secondarySource != nil {
-		childDefaults, err := r.secondarySource.DefaultMetricSets(module)
+	if source := r.secondarySource; source != nil && source.HasModule(module) {
+		exists = true
+		childDefaults, err := source.DefaultMetricSets(module)
 		if err != nil {
 			logp.Error(err)
-		}
-		if len(childDefaults) > 0 {
-			exists = true
+		} else if len(childDefaults) > 0 {
 			defaults = append(defaults, childDefaults...)
 		}
 	}
@@ -324,10 +321,10 @@ func (r *Register) MetricSets(module string) []string {
 		}
 	}
 
-	if r.secondarySource != nil {
-		childMetricSets, err := r.secondarySource.MetricSets(module)
+	if source := r.secondarySource; source != nil && source.HasModule(module) {
+		childMetricSets, err := source.MetricSets(module)
 		if err != nil {
-			logp.Error(errors.Wrap(err, "failed to get metricsets from child registry"))
+			logp.Error(errors.Wrap(err, "failed to get metricsets from secondary source"))
 		}
 		metricsets = append(metricsets, childMetricSets...)
 	}
@@ -361,12 +358,12 @@ func (r *Register) String() string {
 		}
 	}
 
-	if r.secondarySource != nil {
-		childModules, _ := r.secondarySource.Modules()
+	if source := r.secondarySource; source != nil {
+		childModules, _ := source.Modules()
 		modules = append(modules, childModules...)
 
 		for _, module := range childModules {
-			childMetricSets, _ := r.secondarySource.MetricSets(module)
+			childMetricSets, _ := source.MetricSets(module)
 			for _, name := range childMetricSets {
 				metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 			}
