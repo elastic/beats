@@ -207,8 +207,9 @@ func (r *Reader) Next() (*beat.Event, error) {
 			}
 			if !hasNewEntry {
 				r.backoff.Wait()
-				continue
 			}
+
+			continue
 		}
 
 		entry, err := r.journal.GetEntry()
