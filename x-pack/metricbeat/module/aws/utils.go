@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -164,7 +165,7 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ResourceGroupsTaggingAPI
 		getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
 		output, err := getResourcesRequest.Send()
 		if err != nil {
-			err = errors.Wrap(err, "Error GetResources")
+			err = errors.Wrap(err, "error GetResources")
 			return nil, err
 		}
 
@@ -174,13 +175,30 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ResourceGroupsTaggingAPI
 		}
 
 		for _, resourceTag := range output.ResourceTagMappingList {
-			resourceARNSplit := strings.Split(*resourceTag.ResourceARN, ":")
-			if strings.Contains(resourceARNSplit[len(resourceARNSplit)-1], "/") {
-				resourceARNSplit = strings.Split(resourceARNSplit[len(resourceARNSplit)-1], "/")
+			identifier, err := findIdentifierFromARN(*resourceTag.ResourceARN)
+			if err != nil {
+				err = errors.Wrap(err, "error findIdentifierFromARN")
+				return nil, err
 			}
-			identifier := resourceARNSplit[len(resourceARNSplit)-1]
 			resourceTagMap[identifier] = resourceTag.Tags
 		}
 	}
 	return resourceTagMap, nil
+}
+
+func findIdentifierFromARN(resourceARN string) (string, error) {
+	arnParsed, err := arn.Parse(resourceARN)
+	if err != nil {
+		err = errors.Wrap(err, "error Parse arn")
+		return "", err
+	}
+
+	resourceARNSplit := []string{arnParsed.Resource}
+	if strings.Contains(arnParsed.Resource, ":") {
+		resourceARNSplit = strings.Split(arnParsed.Resource, ":")
+	} else if strings.Contains(arnParsed.Resource, "/") {
+		resourceARNSplit = strings.Split(arnParsed.Resource, "/")
+	}
+	identifier := resourceARNSplit[len(resourceARNSplit)-1]
+	return identifier, nil
 }
