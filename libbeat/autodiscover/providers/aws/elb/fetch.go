@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
+
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -20,10 +22,10 @@ type fetcher interface {
 
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
-	client *elasticloadbalancingv2.Client
+	client elasticloadbalancingv2iface.ClientAPI
 }
 
-func newAPIFetcher(client *elasticloadbalancingv2.Client) fetcher {
+func newAPIFetcher(client elasticloadbalancingv2iface.ClientAPI) fetcher {
 	return &apiFetcher{client}
 }
 
@@ -61,7 +63,7 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 // elbv2.DescribeLoadBalancersPager and all listeners for the given LoadBalancers.
 type fetchRequest struct {
 	paginator    elasticloadbalancingv2.DescribeLoadBalancersPaginator
-	client       *elasticloadbalancingv2.Client
+	client       elasticloadbalancingv2iface.ClientAPI
 	running      atomic.Bool
 	lbListeners  []*lbListener
 	errs         []error

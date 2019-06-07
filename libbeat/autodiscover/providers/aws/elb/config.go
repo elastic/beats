@@ -24,8 +24,9 @@ import (
 
 // Config for the aws_elb autodiscover provider.
 type Config struct {
-	Region       string                  `config:"region" validate:"required"`
-	Type         string                  `config:"type"`
+	Region string `config:"region" validate:"required"`
+	Type   string `config:"type"`
+	// Hints are currently not supported, but may be implemented in a later release
 	HintsEnabled bool                    `config:"hints.enabled"`
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
