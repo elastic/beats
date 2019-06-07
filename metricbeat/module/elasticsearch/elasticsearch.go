@@ -50,6 +50,19 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
+// XPackMetricsets is the list of metricsets expected when xpack.enabled
+// is set to true
+var XPackMetricsets = []string{
+	"ccr",
+	"cluster_stats",
+	"index",
+	"index_recovery",
+	"index_summary",
+	"ml_job",
+	"node_stats",
+	"shard",
+}
+
 // Validate that correct metricsets have been specified if xpack.enabled = true.
 func validateXPackMetricsets(base mb.BaseModule) error {
 	config := struct {
@@ -65,19 +78,8 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 		return nil
 	}
 
-	expectedXPackMetricsets := []string{
-		"ccr",
-		"cluster_stats",
-		"index",
-		"index_recovery",
-		"index_summary",
-		"ml_job",
-		"node_stats",
-		"shard",
-	}
-
-	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
-		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
+	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(XPackMetricsets...)) {
+		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, XPackMetricsets)
 	}
 
 	return nil

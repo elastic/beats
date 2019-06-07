@@ -35,8 +35,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/tests/compose"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
+	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ccr"
@@ -121,6 +121,49 @@ func TestData(t *testing.T) {
 	}
 }
 
+func TestXPack(t *testing.T) {
+	// compose.EnsureUp(t, "elasticsearch")
+
+	host := net.JoinHostPort(getEnvHost(), getEnvPort())
+
+	version, err := getElasticsearchVersion(host)
+	if err != nil {
+		t.Fatal("getting elasticsearch version", err)
+	}
+
+	err = enableTrialLicense(host, version)
+	assert.NoError(t, err)
+
+	config := getXPackConfig()
+	c, err := common.NewConfigFrom(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	m, metricsets, err := mb.NewModule(c, mb.Registry)
+	if err != nil {
+		t.Fatal("failed to create new MetricSet", err)
+	}
+	if m == nil {
+		t.Fatal("no module instantiated")
+	}
+
+	for _, metricset := range metricsets {
+		fmt.Println(metricset.Name())
+		reportingMetricSetV2Error, ok := metricset.(mb.ReportingMetricSetV2Error)
+		if !ok {
+			t.Fatal("MetricSet does not implement ReportingMetricSetV2Error")
+		}
+
+		r := &mbtest.CapturingReporterV2{}
+		err := reportingMetricSetV2Error.Fetch(r)
+		fmt.Println(err)
+		if err != nil {
+			t.Fatalf("metricset %v failed to fetch with error: %v", metricset.Name(), err)
+		}
+	}
+}
+
 // GetEnvHost returns host for Elasticsearch
 func getEnvHost() string {
 	host := os.Getenv("ES_HOST")
@@ -148,6 +191,15 @@ func getConfig(metricset string) map[string]interface{} {
 		"metricsets":                 []string{metricset},
 		"hosts":                      []string{getEnvHost() + ":" + getEnvPort()},
 		"index_recovery.active_only": false,
+	}
+}
+
+func getXPackConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":        elasticsearch.ModuleName,
+		"metricsets":    elasticsearch.XPackMetricsets,
+		"hosts":         []string{getEnvHost() + ":" + getEnvPort()},
+		"xpack.enabled": true,
 	}
 }
 
@@ -181,11 +233,18 @@ func createIndex(host string) error {
 func enableTrialLicense(host string, version *common.Version) error {
 	client := &http.Client{}
 
-	var enableXPackURL string
+	var licenseURL, enableXPackURL string
 	if version.Major < 7 {
+		licenseURL = "_xpack/license"
 		enableXPackURL = "/_xpack/license/start_trial?acknowledge=true"
 	} else {
+		licenseURL = "/_license"
 		enableXPackURL = "/_license/start_trial?acknowledge=true"
+	}
+
+	req, err := http.NewRequest("GET", "http://"+host+licenseURL, nil)
+	if err != nil {
+		return err
 	}
 
 	req, err := http.NewRequest("POST", "http://"+host+enableXPackURL, nil)
