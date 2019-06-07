@@ -6,9 +6,25 @@ import yaml
 
 
 def document_fields(output, section, sections, path):
-    if "anchor" in section and "description" in section:
+    if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
-        output.write("== {} fields\n\n".format(section["name"]))
+
+    if "prefix" in section:
+        output.write("{}\n".format(section["prefix"]))
+
+    # Intermediate level titles
+    if "description" in section and "prefix" not in section and "anchor" not in section:
+        output.write("[float]\n")
+
+    #if "description" in section:
+        #output.write("== {} fields\n\n".format(section["name"]))
+        #output.write("{}\n\n".format(section["description"]))
+
+    if "description" in section:
+        if "anchor" in section:
+            output.write("== {} fields\n\n".format(section["name"]))
+        else:
+            output.write("=== {}\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
@@ -63,11 +79,11 @@ def document_field(output, field, field_path):
         if not field["enabled"]:
             output.write("{}\n\n".format("Object is not enabled."))
 
+    output.write("--\n\n")
+
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
             document_field(output, subfield, field_path + "." + subfield["name"])
-    output.write("--\n\n")
-
 
 def fields_to_asciidoc(input, output, beat):
 

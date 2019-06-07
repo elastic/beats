@@ -71,7 +71,30 @@ Aerospike module
 
 
 
+[float]
+=== aerospike
 
+
+
+
+[float]
+=== namespace
+
+namespace
+
+
+
+[float]
+=== client
+
+Client stats.
+
+
+
+[float]
+=== delete
+
+Client delete transactions stats.
 
 
 
@@ -115,6 +138,12 @@ Number of client delete transactions that timed out.
 
 --
 
+[float]
+=== read
+
+Client read transactions stats.
+
+
 
 *`aerospike.namespace.client.read.error`*::
 +
@@ -156,6 +185,12 @@ Number of client read transaction that timed out.
 
 --
 
+[float]
+=== write
+
+Client write transactions stats.
+
+
 
 *`aerospike.namespace.client.write.error`*::
 +
@@ -186,6 +221,12 @@ Number of client write transactions that timed out.
 
 
 --
+
+[float]
+=== device
+
+Disk storage stats
+
 
 
 *`aerospike.namespace.device.available.pct`*::
@@ -245,6 +286,12 @@ If true, Aerospike has breached 'high-water-[disk|memory]-pct' for this namespac
 
 
 --
+
+[float]
+=== memory
+
+Memory storage stats.
+
 
 
 *`aerospike.namespace.memory.free.pct`*::
@@ -337,6 +384,12 @@ Node name
 
 --
 
+[float]
+=== objects
+
+Records stats.
+
+
 
 *`aerospike.namespace.objects.master`*::
 +
@@ -374,6 +427,18 @@ If true this namespace is currently not allowing writes.
 Apache HTTPD server metricsets collected from the Apache web server.
 
 
+
+[float]
+=== apache
+
+`apache` contains the metrics that were scraped from Apache.
+
+
+
+[float]
+=== status
+
+`status` contains the metrics that were scraped from the Apache status page.
 
 
 
@@ -457,6 +522,12 @@ Number of idle workers.
 
 --
 
+[float]
+=== uptime
+
+Uptime stats.
+
+
 
 *`apache.status.uptime.server_uptime`*::
 +
@@ -477,6 +548,12 @@ Server uptime.
 
 
 --
+
+[float]
+=== cpu
+
+CPU stats.
+
 
 
 *`apache.status.cpu.load`*::
@@ -529,6 +606,12 @@ CPU of children system.
 
 --
 
+[float]
+=== connections
+
+Connection stats.
+
+
 
 *`apache.status.connections.total`*::
 +
@@ -570,6 +653,12 @@ Async closed connections.
 
 --
 
+[float]
+=== load
+
+Load averages.
+
+
 
 *`apache.status.load.1`*::
 +
@@ -600,6 +689,12 @@ Load average for the last 15 minutes.
 
 
 --
+
+[float]
+=== scoreboard
+
+Scoreboard metrics.
+
 
 
 *`apache.status.scoreboard.starting_up`*::
@@ -730,12 +825,18 @@ Total.
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 [float]
 == aws fields
+=======
+[float]
+=== aws
+>>>>>>> Clean up headings to make content easier to scan
 
 
 
 
+<<<<<<< HEAD
 *`aws.tags.*`*::
 +
 --
@@ -753,6 +854,13 @@ Tag key value pairs from aws resources.
 
 =======
 >>>>>>> [Docs] Remove extraneous section levels from field docs
+=======
+[float]
+=== cloudwatch
+
+`cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
+
+>>>>>>> Clean up headings to make content easier to scan
 
 
 *`aws.cloudwatch.namespace`*::
@@ -784,6 +892,12 @@ Cloudwatch metric dimensions.
 
 
 --
+
+[float]
+=== ec2
+
+`ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
+
 
 
 *`aws.ec2.cpu.total.pct`*::
@@ -1054,6 +1168,12 @@ The number of threads per CPU core.
 
 --
 
+[float]
+=== s3_daily_storage
+
+`s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
+
 
 *`aws.s3_daily_storage.bucket.name`*::
 +
@@ -1086,6 +1206,12 @@ The total number of objects stored in a bucket for all storage classes.
 
 
 --
+
+[float]
+=== s3_request
+
+`s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
 
 
 *`aws.s3_request.bucket.name`*::
@@ -1270,6 +1396,12 @@ The elapsed per-request time from the first byte received to the last byte sent 
 
 --
 
+[float]
+=== sqs
+
+`sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
+
+
 
 *`aws.sqs.oldest_message_age.sec`*::
 +
@@ -1410,6 +1542,12 @@ Contains user configurable fields.
 
 --
 
+[float]
+=== error
+
+Error fields containing additional info in case of errors.
+
+
 
 *`error.type`*::
 +
@@ -1455,6 +1593,18 @@ Ceph module
 
 
 
+[float]
+=== ceph
+
+`ceph` contains the metrics that were scraped from CEPH.
+
+
+
+[float]
+=== cluster_disk
+
+cluster_disk
+
 
 
 *`ceph.cluster_disk.available.bytes`*::
@@ -1492,6 +1642,12 @@ Used bytes of the cluster
 
 
 --
+
+[float]
+=== cluster_health
+
+cluster_health
+
 
 
 *`ceph.cluster_health.overall_status`*::
@@ -1533,6 +1689,12 @@ Status of the round
 
 
 --
+
+[float]
+=== cluster_status
+
+cluster_status
+
 
 
 *`ceph.cluster_status.version`*::
@@ -1801,6 +1963,12 @@ epoch number
 
 --
 
+[float]
+=== monitor_health
+
+monitor_health stats data
+
+
 
 *`ceph.monitor_health.available.pct`*::
 +
@@ -1930,6 +2098,12 @@ Last updated
 
 --
 
+[float]
+=== osd_df
+
+ceph osd disk usage information
+
+
 
 *`ceph.osd_df.id`*::
 +
@@ -2018,6 +2192,12 @@ osd disk usage percentage
 
 
 --
+
+[float]
+=== osd_tree
+
+ceph osd tree info
+
 
 
 *`ceph.osd_tree.id`*::
@@ -2149,6 +2329,12 @@ the parent node of this osd or bucket node
 
 
 --
+
+[float]
+=== pool_disk
+
+pool_disk
+
 
 
 *`ceph.pool_disk.id`*::
@@ -2378,6 +2564,12 @@ Consul module
 
 
 
+[float]
+=== agent
+
+Agent Metricset fetches metrics information from a Consul instance running as Agent
+
+
 
 
 *`consul.agent.autopilot.healthy`*::
@@ -2388,6 +2580,11 @@ type: boolean
 Overall health of the local server cluster
 
 --
+
+[float]
+=== runtime
+
+Runtime related metrics
 
 
 
@@ -2437,6 +2634,11 @@ Bytes allocated by the Consul process.
 
 --
 
+[float]
+=== garbage_collector
+
+Garbage collector metrics
+
 
 *`consul.agent.runtime.garbage_collector.runs`*::
 +
@@ -2446,6 +2648,11 @@ type: long
 Garbage collector total executions
 
 --
+
+[float]
+=== pause
+
+Time that the garbage collector has paused the app
 
 
 
@@ -2474,6 +2681,18 @@ Nanoseconds consumed by stop-the-world garbage collection pauses since Consul st
 coredns Module
 
 
+
+[float]
+=== coredns
+
+`coredns` contains statistics that were read from coreDNS
+
+
+
+[float]
+=== stats
+
+Contains statistics related to the coreDNS service
 
 
 
@@ -2706,6 +2925,18 @@ Metrics collected from Couchbase servers.
 
 
 
+[float]
+=== couchbase
+
+`couchbase` contains the metrics that were scraped from Couchbase.
+
+
+
+[float]
+=== bucket
+
+Couchbase bucket metrics.
+
 
 
 *`couchbase.bucket.name`*::
@@ -2817,6 +3048,12 @@ Number of items associated with the bucket.
 
 
 --
+
+[float]
+=== cluster
+
+Couchbase cluster metrics.
+
 
 
 *`couchbase.cluster.hdd.free.bytes`*::
@@ -2992,6 +3229,12 @@ RAM used by the data in the cluster (bytes).
 
 
 --
+
+[float]
+=== node
+
+Couchbase node metrics.
+
 
 
 *`couchbase.node.cmd_get`*::
@@ -3237,6 +3480,23 @@ couchdb module
 
 
 
+[float]
+=== couchdb
+
+
+
+
+[float]
+=== server
+
+Contains CouchDB server stats
+
+
+
+[float]
+=== httpd
+
+HTTP statistics
 
 
 
@@ -3289,6 +3549,12 @@ Number of HTTP requests
 
 
 --
+
+[float]
+=== httpd_request_methods
+
+HTTP request methods
+
 
 
 *`couchdb.server.httpd_request_methods.COPY`*::
@@ -3350,6 +3616,12 @@ Number of HTTP PUT requests
 
 
 --
+
+[float]
+=== httpd_status_codes
+
+HTTP status codes statistics
+
 
 
 *`couchdb.server.httpd_status_codes.200`*::
@@ -3482,6 +3754,12 @@ Number of HTTP 500 Internal Server Error responses
 
 --
 
+[float]
+=== couchdb
+
+couchdb statistics
+
+
 
 *`couchdb.server.couchdb.database_writes`*::
 +
@@ -3605,6 +3883,18 @@ Docker stats collected from Docker.
 
 
 
+[float]
+=== docker
+
+Information and statistics about docker's running containers.
+
+
+
+[float]
+=== container
+
+Docker container metrics.
+
 
 
 *`docker.container.command`*::
@@ -3647,6 +3937,12 @@ Container IP addresses.
 
 --
 
+[float]
+=== size
+
+Container size metrics.
+
+
 
 *`docker.container.size.root_fs`*::
 +
@@ -3677,6 +3973,12 @@ Image tags.
 
 
 --
+
+[float]
+=== cpu
+
+Runtime CPU metrics.
+
 
 
 *`docker.cpu.kernel.pct`*::
@@ -3779,6 +4081,18 @@ Number of CPU ticks in this core.
 
 --
 
+[float]
+=== diskio
+
+Disk I/O metrics.
+
+
+
+[float]
+=== read
+
+Accumulated reads during the life of the container
+
 
 
 *`docker.diskio.read.ops`*::
@@ -3826,6 +4140,12 @@ Number of current reads per second
 
 --
 
+[float]
+=== write
+
+Accumulated writes during the life of the container
+
+
 
 *`docker.diskio.write.ops`*::
 +
@@ -3872,6 +4192,12 @@ Number of current writes per second
 
 --
 
+[float]
+=== summary
+
+Accumulated reads and writes during the life of the container
+
+
 
 *`docker.diskio.summary.ops`*::
 +
@@ -3917,6 +4243,12 @@ Number of reads and writes per second
 
 
 --
+
+[float]
+=== event
+
+Docker event
+
 
 
 *`docker.event.status`*::
@@ -3969,6 +4301,12 @@ The type of event
 
 --
 
+[float]
+=== actor
+
+Actor
+
+
 
 *`docker.event.actor.id`*::
 +
@@ -3990,6 +4328,13 @@ Various key/value attributes of the object, depending on its type
 
 --
 
+[float]
+=== healthcheck
+
+Docker healthcheck metrics.
+Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
+
+
 
 *`docker.healthcheck.failingstreak`*::
 +
@@ -4010,6 +4355,12 @@ Healthcheck status code
 
 
 --
+
+[float]
+=== event
+
+event fields.
+
 
 
 *`docker.healthcheck.event.end_date`*::
@@ -4052,6 +4403,18 @@ Healthcheck status code
 
 --
 
+[float]
+=== image
+
+Docker image metrics.
+
+
+
+[float]
+=== id
+
+The image layers identifier.
+
 
 
 *`docker.image.id.current`*::
@@ -4083,6 +4446,12 @@ Date and time when the image was created.
 
 
 --
+
+[float]
+=== size
+
+Image size layers.
+
 
 
 *`docker.image.size.virtual`*::
@@ -4124,6 +4493,18 @@ Image tags.
 
 
 --
+
+[float]
+=== info
+
+Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
+
+
+
+[float]
+=== containers
+
+Overall container stats.
 
 
 
@@ -4186,6 +4567,12 @@ Total number of existing images.
 
 
 --
+
+[float]
+=== memory
+
+Memory metrics.
+
 
 
 [float]
@@ -4253,6 +4640,12 @@ Memory limit.
 
 --
 
+[float]
+=== rss
+
+RSS memory stats.
+
+
 
 *`docker.memory.rss.total`*::
 +
@@ -4277,6 +4670,12 @@ Memory resident set size percentage.
 
 
 --
+
+[float]
+=== usage
+
+Usage memory stats.
+
 
 
 *`docker.memory.usage.max`*::
@@ -4315,6 +4714,12 @@ Total memory usage.
 
 --
 
+[float]
+=== network
+
+Network metrics.
+
+
 
 *`docker.network.interface`*::
 +
@@ -4325,6 +4730,12 @@ Network interface name.
 
 
 --
+
+[float]
+=== in
+
+Incoming network stats per second.
+
 
 
 *`docker.network.in.bytes`*::
@@ -4369,6 +4780,12 @@ Total number of incoming packets.
 
 --
 
+[float]
+=== out
+
+Outgoing network stats per second.
+
+
 
 *`docker.network.out.bytes`*::
 +
@@ -4412,6 +4829,12 @@ Total number of outgoing packets.
 
 --
 
+[float]
+=== inbound
+
+Incoming network stats since the container started.
+
+
 
 *`docker.network.inbound.bytes`*::
 +
@@ -4454,6 +4877,12 @@ Total number of incoming packets.
 
 
 --
+
+[float]
+=== outbound
+
+Outgoing network stats since the container started.
+
 
 
 *`docker.network.outbound.bytes`*::
@@ -4502,6 +4931,11 @@ Total number of outgoing packets.
 == Dropwizard fields
 
 Stats collected from Dropwizard.
+
+
+
+[float]
+=== dropwizard
 
 
 
@@ -4565,6 +4999,12 @@ List of keywords used to tag each event.
 
 --
 
+[float]
+=== agent
+
+The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host.
+Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
+
 
 *`agent.ephemeral_id`*::
 +
@@ -4627,6 +5067,7 @@ Version of the agent.
 --
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 [float]
 == client fields
 
@@ -4636,6 +5077,15 @@ Client / server representations can add semantic context to an exchange, which i
 
 =======
 >>>>>>> [Docs] Remove extraneous section levels from field docs
+=======
+[float]
+=== client
+
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
+
+>>>>>>> Clean up headings to make content easier to scan
 
 *`client.address`*::
 +
@@ -4868,6 +5318,11 @@ Short name or login of the user.
 
 --
 
+[float]
+=== cloud
+
+Fields related to the cloud or infrastructure the events are coming from.
+
 
 *`cloud.account.id`*::
 +
@@ -4945,6 +5400,12 @@ Region in which this host is running.
 
 --
 
+[float]
+=== container
+
+Container fields are used for meta information about the specific container that is the source of information.
+These fields help correlate data based containers from any runtime.
+
 
 *`container.id`*::
 +
@@ -5001,6 +5462,12 @@ example: docker
 Runtime managing this container.
 
 --
+
+[float]
+=== destination
+
+Destination fields describe details about the destination of a packet/event.
+Destination fields are usually populated in conjunction with source fields.
 
 
 *`destination.address`*::
@@ -5234,6 +5701,11 @@ Short name or login of the user.
 
 --
 
+[float]
+=== ecs
+
+Meta-information specific to ECS.
+
 
 *`ecs.version`*::
 +
@@ -5248,6 +5720,12 @@ ECS version this event conforms to. `ecs.version` is a required field and must e
 When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
 
 --
+
+[float]
+=== error
+
+These fields can represent errors of any kind.
+Use them for errors that happen while fetching events or in cases where the event itself contains an error.
 
 
 *`error.code`*::
@@ -5276,6 +5754,12 @@ type: text
 Error message.
 
 --
+
+[float]
+=== event
+
+The event fields are used for context information about the log or metric event itself.
+A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
 
 
 *`event.action`*::
@@ -5478,6 +5962,12 @@ Please avoid using this field for user data.
 
 --
 
+[float]
+=== file
+
+A file is defined as a set of information that has been created on, or has existed on a filesystem.
+File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
+
 
 *`file.ctime`*::
 +
@@ -5610,6 +6100,12 @@ The user ID (UID) or security identifier (SID) of the file owner.
 
 --
 
+[float]
+=== geo
+
+Geo fields can carry data about a specific location related to an event.
+This geolocation information can be derived from techniques such as Geo IP, or be user-supplied.
+
 
 *`geo.city_name`*::
 +
@@ -5701,6 +6197,11 @@ Region name.
 
 --
 
+[float]
+=== group
+
+The group fields are meant to represent groups that are relevant to the event.
+
 
 *`group.id`*::
 +
@@ -5719,6 +6220,12 @@ type: keyword
 Name of the group.
 
 --
+
+[float]
+=== host
+
+A host is defined as a general computing instance.
+ECS host.* fields should be populated with details about the host on which the event happened, or from which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
 
 
 *`host.architecture`*::
@@ -6015,6 +6522,11 @@ Short name or login of the user.
 
 --
 
+[float]
+=== http
+
+Fields related to HTTP activity. Use the `url` field set to store the url of the request.
+
 
 *`http.request.body.bytes`*::
 +
@@ -6137,6 +6649,11 @@ HTTP version.
 
 --
 
+[float]
+=== log
+
+Fields which are specific to log events.
+
 
 *`log.level`*::
 +
@@ -6162,6 +6679,12 @@ In contrast to the `message` field which can contain an extracted part of the lo
 This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
 
 --
+
+[float]
+=== network
+
+The network is defined as the communication path over which a host or network event happens.
+The network.* fields should be populated with details about the network activity associated with an event.
 
 
 *`network.application`*::
@@ -6302,6 +6825,12 @@ In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
 The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
+
+[float]
+=== observer
+
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
+This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 *`observer.geo.city_name`*::
@@ -6526,6 +7055,12 @@ Observer version.
 
 --
 
+[float]
+=== organization
+
+The organization fields enrich data with information about the company or entity the data is associated with.
+These fields help you arrange or filter data stored in an index by one or multiple organizations.
+
 
 *`organization.id`*::
 +
@@ -6544,6 +7079,11 @@ type: keyword
 Organization name.
 
 --
+
+[float]
+=== os
+
+The OS fields contain information about the operating system.
 
 
 *`os.family`*::
@@ -6611,6 +7151,12 @@ example: 10.14.1
 Operating system version as a raw string.
 
 --
+
+[float]
+=== process
+
+These fields contain information about a process.
+These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
 
 
 *`process.args`*::
@@ -6719,6 +7265,13 @@ The working directory of the process.
 
 --
 
+[float]
+=== related
+
+This field set is meant to facilitate pivoting around a piece of data.
+Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
+A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+
 
 *`related.ip`*::
 +
@@ -6728,6 +7281,13 @@ type: ip
 All of the IPs seen on your event.
 
 --
+
+[float]
+=== server
+
+A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records.
+For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
 *`server.address`*::
@@ -6961,6 +7521,12 @@ Short name or login of the user.
 
 --
 
+[float]
+=== service
+
+The service fields describe the service for or from which the data was collected.
+These fields help you find and correlate logs for a specific service and version.
+
 
 *`service.ephemeral_id`*::
 +
@@ -7034,6 +7600,12 @@ Version of the service the data was collected from.
 This allows to look at a data set only for a specific version of a service.
 
 --
+
+[float]
+=== source
+
+Source fields describe details about the source of a packet/event.
+Source fields are usually populated in conjunction with destination fields.
 
 
 *`source.address`*::
@@ -7267,6 +7839,11 @@ Short name or login of the user.
 
 --
 
+[float]
+=== url
+
+URL fields provide support for complete or partial URLs, and supports the breaking down into scheme, domain, path, and so on.
+
 
 *`url.domain`*::
 +
@@ -7376,6 +7953,12 @@ Username of the request.
 
 --
 
+[float]
+=== user
+
+The user fields describe information about the user that is relevant to the event.
+Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
+
 
 *`user.email`*::
 +
@@ -7444,6 +8027,12 @@ example: albert
 Short name or login of the user.
 
 --
+
+[float]
+=== user_agent
+
+The user_agent fields normally come from a browser request.
+They often show up in web service logs coming from the parsed user agent string.
 
 
 *`user_agent.device.name`*::
@@ -7563,6 +8152,11 @@ Elasticsearch module
 
 
 
+[float]
+=== elasticsearch
+
+
+
 
 *`elasticsearch.cluster.name`*::
 +
@@ -7613,6 +8207,12 @@ Node name.
 
 
 --
+
+[float]
+=== ccr
+
+Cross-cluster replication stats
+
 
 
 
@@ -7687,6 +8287,12 @@ Global checkpoint value on follower shard
 
 --
 
+[float]
+=== cluster.stats
+
+Cluster stats
+
+
 
 *`elasticsearch.cluster.stats.status`*::
 +
@@ -7697,6 +8303,12 @@ Cluster status (green, yellow, red).
 
 
 --
+
+[float]
+=== nodes
+
+Nodes statistics.
+
 
 
 *`elasticsearch.cluster.stats.nodes.count`*::
@@ -7729,6 +8341,12 @@ Number of data nodes in cluster.
 
 --
 
+[float]
+=== indices
+
+Indices statistics.
+
+
 
 *`elasticsearch.cluster.stats.indices.count`*::
 +
@@ -7739,6 +8357,12 @@ Total number of indices in cluster.
 
 
 --
+
+[float]
+=== shards
+
+Shard statistics.
+
 
 
 *`elasticsearch.cluster.stats.indices.shards.count`*::
@@ -7770,6 +8394,12 @@ Memory used for fielddata.
 
 
 --
+
+[float]
+=== index
+
+index
+
 
 
 *`elasticsearch.index.name`*::
@@ -7836,6 +8466,12 @@ Total number of memory used by the segments in bytes.
 
 
 --
+
+[float]
+=== index.recovery
+
+index
+
 
 
 *`elasticsearch.index.recovery.id`*::
@@ -7937,6 +8573,12 @@ Source node name.
 
 
 --
+
+[float]
+=== index.summary
+
+index
+
 
 
 
@@ -8049,6 +8691,12 @@ Total number of memory used by the segments in bytes.
 
 --
 
+[float]
+=== ml.job
+
+ml
+
+
 
 *`elasticsearch.ml.job.id`*::
 +
@@ -8090,6 +8738,12 @@ The number of records with either a missing date field or a date that could not 
 
 --
 
+[float]
+=== node
+
+node
+
+
 
 *`elasticsearch.node.version`*::
 +
@@ -8100,6 +8754,12 @@ Node version.
 
 
 --
+
+[float]
+=== jvm
+
+JVM Info.
+
 
 
 *`elasticsearch.node.jvm.version`*::
@@ -8170,6 +8830,18 @@ If process locked in memory.
 
 --
 
+[float]
+=== node.stats
+
+node_stats
+
+
+
+[float]
+=== indices
+
+Node indices stats
+
 
 
 *`elasticsearch.node.stats.indices.docs.count`*::
@@ -8224,6 +8896,18 @@ Total size of the store in bytes.
 
 --
 
+[float]
+=== jvm.mem.pools
+
+JVM memory pool stats
+
+
+
+[float]
+=== old
+
+Old memory pool stats.
+
 
 
 *`elasticsearch.node.stats.jvm.mem.pools.old.max.bytes`*::
@@ -8270,6 +8954,12 @@ Used bytes.
 
 --
 
+[float]
+=== young
+
+Young memory pool stats.
+
+
 
 *`elasticsearch.node.stats.jvm.mem.pools.young.max.bytes`*::
 +
@@ -8314,6 +9004,12 @@ format: bytes
 Used bytes.
 
 --
+
+[float]
+=== survivor
+
+Survivor memory pool stats.
+
 
 
 *`elasticsearch.node.stats.jvm.mem.pools.survivor.max.bytes`*::
@@ -8360,6 +9056,18 @@ Used bytes.
 
 --
 
+[float]
+=== jvm.gc.collectors
+
+GC collector stats.
+
+
+
+[float]
+=== old.collection
+
+Old collection gc.
+
 
 
 *`elasticsearch.node.stats.jvm.gc.collectors.old.collection.count`*::
@@ -8380,6 +9088,12 @@ type: long
 
 --
 
+[float]
+=== young.collection
+
+Young collection gc.
+
+
 
 *`elasticsearch.node.stats.jvm.gc.collectors.young.collection.count`*::
 +
@@ -8398,6 +9112,12 @@ type: long
 
 
 --
+
+[float]
+=== fs.summary
+
+File system summary
+
 
 
 *`elasticsearch.node.stats.fs.summary.total.bytes`*::
@@ -8432,6 +9152,12 @@ format: bytes
 
 
 --
+
+[float]
+=== cluster.pending_task
+
+`cluster.pending_task` contains a pending task description.
+
 
 
 *`elasticsearch.cluster.pending_task.insert_order`*::
@@ -8473,6 +9199,12 @@ Time in queue
 
 
 --
+
+[float]
+=== shard
+
+shard fields
+
 
 
 *`elasticsearch.shard.primary`*::
@@ -8521,6 +9253,17 @@ The node the shard was relocated from.
 envoyproxy module
 
 
+
+[float]
+=== envoyproxy
+
+
+
+
+[float]
+=== server
+
+Contains envoy proxy server stats
 
 
 
@@ -8959,6 +9702,12 @@ etcd Module
 
 
 
+[float]
+=== etcd
+
+`etcd` contains statistics that were read from Etcd
+
+
 
 *`etcd.api_version`*::
 +
@@ -8969,6 +9718,18 @@ Etcd API version for metrics retrieval
 
 
 --
+
+[float]
+=== leader
+
+Contains etcd leader statistics.
+
+
+
+[float]
+=== followers.counts
+
+The number of failed and successful Raft RPC requests.
 
 
 
@@ -8989,6 +9750,12 @@ type: integer
 failed Raft RPC requests
 
 --
+
+[float]
+=== followers.latency
+
+latency to each peer in the cluster
+
 
 
 *`etcd.leader.followers.latency.followers.latency.average`*::
@@ -9034,6 +9801,12 @@ type: keyword
 ID of actual leader
 
 --
+
+[float]
+=== server
+
+Server metrics from the Etcd V3 /metrics endpoint
+
 
 
 *`etcd.server.has_leader`*::
@@ -9105,6 +9878,12 @@ Number of received gRPC requests
 
 
 --
+
+[float]
+=== disk
+
+Disk metrics from the Etcd V3 /metrics endpoint
+
 
 
 *`etcd.disk.mvcc_db_total_size.bytes`*::
@@ -9179,6 +9958,12 @@ Backend commits latency sum
 
 --
 
+[float]
+=== memory
+
+Memory metrics from the Etcd V3 /metrics endpoint
+
+
 
 *`etcd.memory.go_memstats_alloc.bytes`*::
 +
@@ -9191,6 +9976,12 @@ Memory allocated bytes as of MemStats Go
 
 
 --
+
+[float]
+=== network
+
+Network metrics from the Etcd V3 /metrics endpoint
+
 
 
 *`etcd.network.client_grpc_sent.bytes`*::
@@ -9216,6 +10007,12 @@ gRPC received bytes total
 
 
 --
+
+[float]
+=== self
+
+Contains etcd self statistics.
+
 
 
 *`etcd.self.id`*::
@@ -9348,6 +10145,12 @@ either leader or follower
 
 --
 
+[float]
+=== store
+
+The store statistics include information about the operations that this node has handled.
+
+
 
 *`etcd.store.gets.success`*::
 +
@@ -9468,6 +10271,17 @@ Golang module
 
 
 
+[float]
+=== golang
+
+
+
+
+[float]
+=== expvar
+
+expvar
+
 
 
 *`golang.expvar.cmdline`*::
@@ -9480,6 +10294,12 @@ The cmdline of this Go program start with.
 
 --
 
+[float]
+=== heap
+
+The Go program heap information exposed by expvar.
+
+
 
 *`golang.heap.cmdline`*::
 +
@@ -9490,6 +10310,18 @@ The cmdline of this Go program start with.
 
 
 --
+
+[float]
+=== gc
+
+Garbage collector summary.
+
+
+
+[float]
+=== total_pause
+
+Total GC pause duration over lifetime of process.
 
 
 
@@ -9535,6 +10367,12 @@ Fraction of CPU time used by GC.
 
 --
 
+[float]
+=== pause
+
+Last GC pause durations during the monitoring period.
+
+
 
 *`golang.heap.gc.pause.count`*::
 +
@@ -9545,6 +10383,12 @@ Count of GC pause duration during this collect period.
 
 
 --
+
+[float]
+=== sum
+
+Total GC pause duration during this collect period.
+
 
 
 *`golang.heap.gc.pause.sum.ns`*::
@@ -9557,6 +10401,12 @@ Duration in Ns.
 
 --
 
+[float]
+=== max
+
+Max GC pause duration during this collect period.
+
+
 
 *`golang.heap.gc.pause.max.ns`*::
 +
@@ -9568,6 +10418,12 @@ Duration in Ns.
 
 --
 
+[float]
+=== avg
+
+Average GC pause duration during this collect period.
+
+
 
 *`golang.heap.gc.pause.avg.ns`*::
 +
@@ -9578,6 +10434,12 @@ Duration in Ns.
 
 
 --
+
+[float]
+=== system
+
+Heap summary,which bytes was obtained from system.
+
 
 
 *`golang.heap.system.total`*::
@@ -9627,6 +10489,12 @@ Bytes released to the OS.
 
 
 --
+
+[float]
+=== allocations
+
+Heap allocations summary.
+
 
 
 *`golang.heap.allocations.mallocs`*::
@@ -9714,6 +10582,17 @@ graphite Module
 
 
 
+[float]
+=== graphite
+
+
+
+
+[float]
+=== server
+
+server
+
 
 
 *`graphite.server.example`*::
@@ -9732,6 +10611,18 @@ Example field
 HAProxy Module
 
 
+
+[float]
+=== haproxy
+
+HAProxy metrics.
+
+
+
+[float]
+=== info
+
+General information about HAProxy processes.
 
 
 
@@ -9817,6 +10708,16 @@ Maximum number of open files for the process.
 
 --
 
+[float]
+=== compress
+
+
+
+
+[float]
+=== bps
+
+
 
 
 *`haproxy.info.compress.bps.in`*::
@@ -9845,6 +10746,16 @@ type: long
 
 
 --
+
+[float]
+=== connection
+
+
+
+
+[float]
+=== rate
+
 
 
 
@@ -9971,6 +10882,11 @@ type: long
 
 --
 
+[float]
+=== pipes
+
+
+
 
 *`haproxy.info.pipes.used`*::
 +
@@ -9998,6 +10914,11 @@ type: integer
 
 
 --
+
+[float]
+=== session
+
+None
 
 
 *`haproxy.info.session.rate.value`*::
@@ -10027,6 +10948,11 @@ type: integer
 
 --
 
+[float]
+=== ssl
+
+None
+
 
 *`haproxy.info.ssl.rate.value`*::
 +
@@ -10054,6 +10980,11 @@ type: integer
 None
 
 --
+
+[float]
+=== frontend
+
+None
 
 
 *`haproxy.info.ssl.frontend.key_rate.value`*::
@@ -10084,6 +11015,11 @@ format: percent
 None
 
 --
+
+[float]
+=== backend
+
+None
 
 
 *`haproxy.info.ssl.backend.key_rate.value`*::
@@ -10122,6 +11058,11 @@ None
 
 --
 
+[float]
+=== zlib_mem_usage
+
+
+
 
 *`haproxy.info.zlib_mem_usage.value`*::
 +
@@ -10151,6 +11092,12 @@ format: percent
 
 
 --
+
+[float]
+=== stat
+
+Stats collected from HAProxy processes.
+
 
 
 *`haproxy.stat.status`*::
@@ -10383,6 +11330,11 @@ Number of requests that encountered an error trying to connect to a server. For 
 
 --
 
+[float]
+=== rate
+
+
+
 
 *`haproxy.stat.request.rate.value`*::
 +
@@ -10445,6 +11397,11 @@ Responses denied because of security concerns. For HTTP this is because of a mat
 
 
 --
+
+[float]
+=== http
+
+
 
 
 *`haproxy.stat.response.http.1xx`*::
@@ -10569,6 +11526,11 @@ Maximum number of new sessions per second.
 
 --
 
+[float]
+=== check
+
+
+
 
 *`haproxy.stat.check.status`*::
 +
@@ -10676,6 +11638,11 @@ Number of data transfers aborted by the client.
 
 --
 
+[float]
+=== server
+
+
+
 
 *`haproxy.stat.server.id`*::
 +
@@ -10716,6 +11683,11 @@ Number of backend servers that are backup servers.
 
 
 --
+
+[float]
+=== compressor
+
+
 
 
 *`haproxy.stat.compressor.in.bytes`*::
@@ -10766,6 +11738,11 @@ Number of HTTP responses that were compressed.
 
 --
 
+[float]
+=== proxy
+
+
+
 
 *`haproxy.stat.proxy.id`*::
 +
@@ -10786,6 +11763,11 @@ Proxy name.
 
 
 --
+
+[float]
+=== queue
+
+
 
 
 *`haproxy.stat.queue.limit`*::
@@ -10857,6 +11839,17 @@ HTTP module
 
 
 
+[float]
+=== http
+
+
+
+
+[float]
+=== request
+
+HTTP request information
+
 
 
 *`http.request.headers`*::
@@ -10868,6 +11861,12 @@ The HTTP headers sent
 
 
 --
+
+[float]
+=== response
+
+HTTP response information
+
 
 
 *`http.response.headers`*::
@@ -10904,11 +11903,29 @@ The HTTP status phrase
 
 --
 
+[float]
+=== json
+
+json metricset
+
+
+[float]
+=== server
+
+server
+
+
 [[exported-fields-jolokia]]
 == Jolokia fields
 
 Jolokia module
 
+
+
+[float]
+=== jolokia
+
+jolokia contains metrics exposed via jolokia agent
 
 
 
@@ -10996,6 +12013,17 @@ Kafka module
 
 
 
+[float]
+=== kafka
+
+
+
+
+[float]
+=== broker
+
+Broker Consumer Group Information have been read from (Broker handling the consumer group).
+
 
 
 *`kafka.broker.id`*::
@@ -11065,6 +12093,18 @@ type: keyword
 Unique id of the partition in the topic and the broker.
 
 --
+
+[float]
+=== consumergroup
+
+consumergroup
+
+
+
+[float]
+=== broker
+
+Broker Consumer Group Information have been read from (Broker handling the consumer group).
 
 
 
@@ -11149,6 +12189,12 @@ kafka consumer/partition error code.
 
 --
 
+[float]
+=== client
+
+Assigned client reading events from partition
+
+
 
 *`kafka.consumergroup.client.id`*::
 +
@@ -11177,6 +12223,18 @@ internal consumer group member ID
 
 --
 
+[float]
+=== partition
+
+partition
+
+
+
+[float]
+=== offset
+
+Available offsets of the given partition.
+
 
 
 *`kafka.partition.offset.newest`*::
@@ -11198,6 +12256,12 @@ Oldest offset of the partition.
 
 
 --
+
+[float]
+=== partition
+
+Partition data.
+
 
 
 *`kafka.partition.partition.id`*::
@@ -11332,6 +12396,17 @@ Kibana module
 
 
 
+[float]
+=== kibana
+
+
+
+
+[float]
+=== stats
+
+Kibana stats and run-time metrics.
+
 
 
 *`kibana.stats.uuid`*::
@@ -11430,6 +12505,12 @@ Number of client connections made to the server. Note that browsers can send mul
 
 --
 
+[float]
+=== process
+
+Process metrics
+
+
 
 *`kibana.stats.process.event_loop_delay.ms`*::
 +
@@ -11440,6 +12521,12 @@ Event loop delay in milliseconds
 
 
 --
+
+[float]
+=== memory.heap
+
+Process heap metrics
+
 
 
 *`kibana.stats.process.memory.heap.total.bytes`*::
@@ -11488,6 +12575,12 @@ Uptime of process in milliseconds
 
 --
 
+[float]
+=== request
+
+Request count metrics
+
+
 
 *`kibana.stats.request.disconnects`*::
 +
@@ -11509,6 +12602,12 @@ Total number of requests
 
 --
 
+[float]
+=== response_time
+
+Response times metrics
+
+
 
 *`kibana.stats.response_time.avg.ms`*::
 +
@@ -11529,6 +12628,12 @@ Maximum response time in milliseconds
 
 
 --
+
+[float]
+=== status
+
+Status fields
+
 
 
 *`kibana.status.name`*::
@@ -11575,6 +12680,12 @@ Kibana overall state.
 
 --
 
+[float]
+=== metrics
+
+Metrics fields
+
+
 
 *`kibana.status.metrics.concurrent_connections`*::
 +
@@ -11585,6 +12696,12 @@ Current concurrent connections.
 
 
 --
+
+[float]
+=== requests
+
+Request statistics.
+
 
 
 *`kibana.status.metrics.requests.disconnects`*::
@@ -11732,6 +12849,18 @@ Kubernetes metrics
 
 
 
+[float]
+=== kubernetes
+
+Information and statistics of pods managed by kubernetes.
+
+
+
+[float]
+=== apiserver
+
+Kubernetes API server metrics
+
 
 
 *`kubernetes.apiserver.request.client`*::
@@ -11824,6 +12953,12 @@ Request latency histogram buckets
 
 --
 
+[float]
+=== container
+
+kubernetes container metrics
+
+
 
 *`kubernetes.container.start_time`*::
 +
@@ -11834,6 +12969,12 @@ Start time
 
 
 --
+
+[float]
+=== cpu
+
+CPU usage metrics
+
 
 
 
@@ -11881,6 +13022,12 @@ CPU usage as a percentage of the defined limit for the container (or total node 
 
 
 --
+
+[float]
+=== logs
+
+Logs info
+
 
 
 
@@ -12101,6 +13248,12 @@ Used inodes
 
 --
 
+[float]
+=== event
+
+The Kubernetes events metricset collects events that are generated by objects running inside of Kubernetes
+
+
 
 *`kubernetes.event.count`*::
 +
@@ -12162,6 +13315,12 @@ Type of the given event
 
 
 --
+
+[float]
+=== metadata
+
+Metadata associated with the given event
+
 
 
 
@@ -12225,6 +13384,12 @@ URL representing the event
 
 --
 
+[float]
+=== involved_object
+
+Metadata associated with the given involved object
+
+
 
 *`kubernetes.event.involved_object.api_version`*::
 +
@@ -12276,6 +13441,12 @@ UUID version of the object
 
 --
 
+[float]
+=== node
+
+kubernetes node metrics
+
+
 
 *`kubernetes.node.start_time`*::
 +
@@ -12286,6 +13457,12 @@ Start time
 
 
 --
+
+[float]
+=== cpu
+
+CPU usage metrics
+
 
 
 
@@ -12542,6 +13719,12 @@ Image filesystem total used in bytes
 
 --
 
+[float]
+=== pod
+
+kubernetes pod metrics
+
+
 
 *`kubernetes.pod.start_time`*::
 +
@@ -12599,6 +13782,12 @@ Tx errors
 
 
 --
+
+[float]
+=== cpu
+
+CPU usage metrics
+
 
 
 
@@ -12733,6 +13922,12 @@ Total major page faults
 
 --
 
+[float]
+=== container
+
+kubernetes container metrics
+
+
 
 *`kubernetes.container.id`*::
 +
@@ -12856,6 +14051,12 @@ Container requested memory in bytes
 
 --
 
+[float]
+=== deployment
+
+kubernetes deployment metrics
+
+
 
 *`kubernetes.deployment.paused`*::
 +
@@ -12866,6 +14067,12 @@ Kubernetes deployment paused status
 
 
 --
+
+[float]
+=== replicas
+
+Kubernetes deployment replicas info
+
 
 
 *`kubernetes.deployment.replicas.desired`*::
@@ -12907,6 +14114,12 @@ Deployment updated replicas
 
 
 --
+
+[float]
+=== node
+
+kubernetes node metrics
+
 
 
 
@@ -12997,6 +14210,12 @@ Node pod capacity
 
 --
 
+[float]
+=== pod
+
+kubernetes pod metrics
+
+
 
 *`kubernetes.pod.ip`*::
 +
@@ -13017,6 +14236,12 @@ Kubernetes pod host IP
 
 
 --
+
+[float]
+=== status
+
+Kubernetes pod status metrics
+
 
 
 *`kubernetes.pod.status.phase`*::
@@ -13048,6 +14273,18 @@ Kubernetes pod scheduled status (true, false, unknown)
 
 
 --
+
+[float]
+=== replicaset
+
+kubernetes replica set metrics
+
+
+
+[float]
+=== replicas
+
+Kubernetes replica set paused status
 
 
 
@@ -13101,6 +14338,12 @@ The number of fully labeled replicas per ReplicaSet
 
 --
 
+[float]
+=== statefulset
+
+kubernetes stateful set metrics
+
+
 
 *`kubernetes.statefulset.created`*::
 +
@@ -13111,6 +14354,12 @@ The creation timestamp (epoch) for StatefulSet
 
 
 --
+
+[float]
+=== replicas
+
+Kubernetes stateful set replicas status
+
 
 
 *`kubernetes.statefulset.replicas.observed`*::
@@ -13133,6 +14382,12 @@ The number of desired replicas per StatefulSet
 
 --
 
+[float]
+=== generation
+
+Kubernetes stateful set generation information
+
+
 
 *`kubernetes.statefulset.generation.observed`*::
 +
@@ -13154,6 +14409,12 @@ The desired generation per StatefulSet
 
 --
 
+[float]
+=== system
+
+kubernetes system containers metrics
+
+
 
 *`kubernetes.system.container`*::
 +
@@ -13174,6 +14435,12 @@ Start time
 
 
 --
+
+[float]
+=== cpu
+
+CPU usage metrics
+
 
 
 
@@ -13257,6 +14524,12 @@ Number of major page faults
 
 
 --
+
+[float]
+=== volume
+
+kubernetes volume metrics
+
 
 
 *`kubernetes.volume.name`*::
@@ -13347,6 +14620,23 @@ kvm module
 
 
 
+[float]
+=== kvm
+
+
+
+
+[float]
+=== dommemstat
+
+dommemstat
+
+
+
+[float]
+=== stat
+
+Memory stat
 
 
 
@@ -13397,6 +14687,17 @@ Logstash module
 
 
 
+[float]
+=== logstash
+
+
+
+
+[float]
+=== node
+
+node
+
 
 
 *`logstash.node.host`*::
@@ -13423,6 +14724,12 @@ Logstash Version
 
 --
 
+[float]
+=== jvm
+
+JVM Info
+
+
 
 *`logstash.node.jvm.version`*::
 +
@@ -13445,6 +14752,18 @@ Process ID
 
 
 --
+
+[float]
+=== node.stats
+
+node_stats metrics.
+
+
+
+[float]
+=== events
+
+Events stats
 
 
 
@@ -13484,6 +14803,17 @@ Filtered events counter.
 Memcached module
 
 
+
+[float]
+=== memcached
+
+
+
+
+[float]
+=== stats
+
+stats
 
 
 
@@ -13653,6 +14983,18 @@ Number of bytes this server is allowed to use for storage.
 Metrics collected from MongoDB servers.
 
 
+
+[float]
+=== mongodb
+
+MongoDB metrics.
+
+
+
+[float]
+=== collstats
+
+MongoDB collection statistics metrics.
 
 
 
@@ -13867,6 +15209,12 @@ Number of database commands executed.
 
 --
 
+[float]
+=== dbstats
+
+dbstats provides an overview of a particular mongo database. This document is most concerned with data volumes of a database.
+
+
 
 *`mongodb.dbstats.avg_obj_size.bytes`*::
 +
@@ -13986,6 +15334,19 @@ type: long
 format: bytes
 
 --
+
+[float]
+=== metrics
+
+Statistics that reflect the current use and state of a running `mongod` instance for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
+
+
+
+[float]
+=== commands
+
+Reports on the use of database commands. The fields in metrics.commands are the names of database commands and each value is a document that reports the total number of commands executed as well as the number of failed executions.
+metrics.commands.<command>.failed shows the number of times <command> failed on this mongod. metrics.commands.<command>.total shows the number of times <command> executed on this mongod.
 
 
 
@@ -14439,6 +15800,12 @@ type: long
 
 --
 
+[float]
+=== cursor
+
+Contains data regarding cursor state and use.
+
+
 
 *`mongodb.metrics.cursor.timed_out`*::
 +
@@ -14449,6 +15816,12 @@ The total number of cursors that have timed out since the server process started
 
 
 --
+
+[float]
+=== open
+
+Contains data regarding open cursors.
+
 
 
 *`mongodb.metrics.cursor.open.no_timeout`*::
@@ -14480,6 +15853,12 @@ The number of cursors that MongoDB is maintaining for clients.
 
 
 --
+
+[float]
+=== document
+
+Reflects document access and modification patterns.
+
 
 
 *`mongodb.metrics.document.deleted`*::
@@ -14522,6 +15901,12 @@ The total number of documents updated.
 
 --
 
+[float]
+=== get_last_error
+
+Returns the error status of the preceding write operation on the current connection.
+
+
 
 *`mongodb.metrics.get_last_error.write_wait.ms`*::
 +
@@ -14553,6 +15938,12 @@ The number of times that write concern operations have timed out as a result of 
 
 --
 
+[float]
+=== operation
+
+Holds counters for several types of update and query operations that MongoDB handles using special operation types.
+
+
 
 *`mongodb.metrics.operation.scan_and_order`*::
 +
@@ -14574,6 +15965,12 @@ The total number of queries that encountered write conflicts.
 
 --
 
+[float]
+=== query_executor
+
+Reports data from the query execution system.
+
+
 
 *`mongodb.metrics.query_executor.scanned_indexes`*::
 +
@@ -14594,6 +15991,18 @@ The total number of documents scanned during queries and query-plan evaluation.
 
 
 --
+
+[float]
+=== replication
+
+Reports metrics related to the replication process. metrics.replication appears on all mongod instances, even those that aren't members of replica sets.
+
+
+
+[float]
+=== executor
+
+Reports on various statistics for the replication executor.
 
 
 
@@ -14741,6 +16150,12 @@ type: keyword
 
 --
 
+[float]
+=== apply
+
+Reports on the application of operations from the replication oplog.
+
+
 
 *`mongodb.metrics.replication.apply.attempts_to_become_secondary`*::
 +
@@ -14748,6 +16163,12 @@ type: keyword
 type: long
 
 --
+
+[float]
+=== batches
+
+Reports on the oplog application process on secondaries members of replica sets.
+
 
 
 *`mongodb.metrics.replication.apply.batches.count`*::
@@ -14780,6 +16201,12 @@ The total number of oplog operations applied.
 
 --
 
+[float]
+=== buffer
+
+MongoDB buffers oplog operations from the replication sync source buffer before applying oplog entries in a batch. metrics.replication.buffer provides a way to track the oplog buffer.
+
+
 
 *`mongodb.metrics.replication.buffer.count`*::
 +
@@ -14811,6 +16238,12 @@ The current size of the contents of the oplog buffer.
 
 --
 
+[float]
+=== initial_sync
+
+Report initial sync status
+
+
 
 *`mongodb.metrics.replication.initial_sync.completed`*::
 +
@@ -14833,6 +16266,12 @@ type: long
 
 --
 
+[float]
+=== network
+
+Reports network use by the replication process.
+
+
 
 *`mongodb.metrics.replication.network.bytes`*::
 +
@@ -14843,6 +16282,12 @@ The total amount of data read from the replication sync source.
 
 
 --
+
+[float]
+=== getmores
+
+Reports on the getmore operations, which are requests for additional results from the oplog cursor as part of the oplog replication process.
+
 
 
 *`mongodb.metrics.replication.network.getmores.count`*::
@@ -14885,6 +16330,18 @@ The total number of oplog query processes created.
 
 --
 
+[float]
+=== preload
+
+Reports on the `pre-fetch` stage, where MongoDB loads documents and indexes into RAM to improve replication throughput.
+
+
+
+[float]
+=== docs
+
+Reports on the documents loaded into memory during the pre-fetch stage.
+
 
 
 *`mongodb.metrics.replication.preload.docs.count`*::
@@ -14903,6 +16360,12 @@ The total number of documents loaded during the pre-fetch stage of replication.
 type: long
 
 --
+
+[float]
+=== indexes
+
+Reports on the index items loaded into memory during the pre-fetch stage of replication.
+
 
 
 *`mongodb.metrics.replication.preload.indexes.count`*::
@@ -14956,6 +16419,12 @@ The number of available record allocations mongod has searched.
 
 --
 
+[float]
+=== ttl
+
+Reports on the operation of the resource use of the ttl index process.
+
+
 
 *`mongodb.metrics.ttl.deleted_documents`*::
 +
@@ -14976,6 +16445,18 @@ The number of times the background process removes documents from collections wi
 
 
 --
+
+[float]
+=== replstatus
+
+replstatus provides an overview of replica set status.
+
+
+
+[float]
+=== oplog
+
+oplog provides an overview of replication oplog status, which is retrieved from db.getReplicationInfo().
 
 
 
@@ -15084,6 +16565,12 @@ Information, from the viewpoint of this member, regarding the most recent operat
 
 --
 
+[float]
+=== lag
+
+Delay between a write operation on the primary and its copy to a secondary
+
+
 
 *`mongodb.replstatus.lag.max`*::
 +
@@ -15109,6 +16596,12 @@ Difference between optime of primary and fastest secondary
 
 --
 
+[float]
+=== headroom
+
+Difference between the primary's oplog window and the replication lag of the secondary
+
+
 
 *`mongodb.replstatus.headroom.max`*::
 +
@@ -15133,6 +16626,12 @@ Difference between primary's oplog window and the replication lag of the slowest
 
 
 --
+
+[float]
+=== members
+
+Provides information about members of replica set grouped by their state
+
 
 
 *`mongodb.replstatus.members.primary.host`*::
@@ -15322,6 +16821,12 @@ Count of unhealthy members
 
 --
 
+[float]
+=== status
+
+MongoDB server status metrics.
+
+
 
 *`mongodb.status.version`*::
 +
@@ -15417,6 +16922,12 @@ Number of rollovers assertions produced by the server.
 
 --
 
+[float]
+=== connections
+
+Data regarding the current status of incoming connections and availability of the database server.
+
+
 
 *`mongodb.status.connections.current`*::
 +
@@ -15448,6 +16959,12 @@ A count of all incoming connections created to the server. This number includes 
 
 --
 
+[float]
+=== extra_info
+
+Platform specific data.
+
+
 
 *`mongodb.status.extra_info.heap_usage.bytes`*::
 +
@@ -15471,6 +16988,12 @@ The total number of page faults that require disk operations. Page faults refer 
 
 --
 
+[float]
+=== global_lock
+
+Reports on lock state of the database.
+
+
 
 *`mongodb.status.global_lock.total_time.us`*::
 +
@@ -15481,6 +17004,12 @@ The time, in microseconds, since the database last started and created the globa
 
 
 --
+
+[float]
+=== current_queue
+
+The number of operations queued because of a lock.
+
 
 
 *`mongodb.status.global_lock.current_queue.total`*::
@@ -15513,6 +17042,12 @@ The number of operations that are currently queued and waiting for the write loc
 
 --
 
+[float]
+=== active_clients
+
+The number of connected clients and the read and write operations performed by these clients.
+
+
 
 *`mongodb.status.global_lock.active_clients.total`*::
 +
@@ -15543,6 +17078,13 @@ The number of the active client connections performing write operations.
 
 
 --
+
+[float]
+=== locks
+
+A document that reports for each lock <type>, data on lock <mode>s. The possible lock <type>s are global, database, collection, metadata and oplog. The possible <mode>s are r, w, R and W which respresent shared, exclusive, intent shared and intent exclusive.
+locks.<type>.acquire.count.<mode> shows the number of times the lock was acquired in the specified mode. locks.<type>.wait.count.<mode> shows the number of times the locks.acquireCount lock acquisitions encountered waits because the locks were held in a conflicting mode. locks.<type>.wait.us.<mode> shows the cumulative wait time in microseconds for the lock acquisitions. locks.<type>.deadlock.count.<mode> shows the number of times the lock acquisitions encountered deadlocks.
+
 
 
 
@@ -16110,6 +17652,12 @@ type: long
 
 --
 
+[float]
+=== network
+
+Platform specific data.
+
+
 
 *`mongodb.status.network.in.bytes`*::
 +
@@ -16144,6 +17692,12 @@ The total number of requests received by the server.
 
 
 --
+
+[float]
+=== ops.latencies
+
+Operation latencies for the database as a whole. Only mongod instances report this metric.
+
 
 
 *`mongodb.status.ops.latencies.reads.latency`*::
@@ -16206,6 +17760,12 @@ Total number of commands performed on the collection since startup.
 
 --
 
+[float]
+=== ops.counters
+
+An overview of database operations by type.
+
+
 
 *`mongodb.status.ops.counters.insert`*::
 +
@@ -16267,6 +17827,12 @@ The total number of commands issued to the database since the mongod instance la
 
 --
 
+[float]
+=== ops.replicated
+
+An overview of database replication operations by type.
+
+
 
 *`mongodb.status.ops.replicated.insert`*::
 +
@@ -16327,6 +17893,12 @@ The total number of replicated commands issued to the database since the mongod 
 
 
 --
+
+[float]
+=== memory
+
+Data about the current memory usage of the mongod server.
+
 
 
 *`mongodb.status.memory.bits`*::
@@ -16399,6 +17971,18 @@ A string that represents the name of the current storage engine.
 
 --
 
+[float]
+=== wired_tiger
+
+Statistics about the WiredTiger storage engine.
+
+
+
+[float]
+=== concurrent_transactions
+
+Statistics about the transactions currently in progress.
+
 
 
 *`mongodb.status.wired_tiger.concurrent_transactions.write.out`*::
@@ -16460,6 +18044,12 @@ Number of total read tickets.
 
 
 --
+
+[float]
+=== cache
+
+Statistics about the cache and page evictions from the cache.
+
 
 
 *`mongodb.status.wired_tiger.cache.maximum.bytes`*::
@@ -16527,6 +18117,12 @@ Number of pages evicted from the cache.
 
 
 --
+
+[float]
+=== log
+
+Statistics about the write ahead log used by WiredTiger.
+
 
 
 *`mongodb.status.wired_tiger.log.size.bytes`*::
@@ -16605,6 +18201,12 @@ Number of sync operations.
 
 --
 
+[float]
+=== background_flushing
+
+Data about the process MongoDB uses to write data to disk. This data is only available for instances that use the MMAPv1 storage engine.
+
+
 
 *`mongodb.status.background_flushing.flushes`*::
 +
@@ -16655,6 +18257,12 @@ A timestamp of the last completed flush operation.
 
 
 --
+
+[float]
+=== journaling
+
+Data about the journaling-related operations and performance. Journaling information only appears for mongod instances that use the MMAPv1 storage engine and have journaling enabled.
+
 
 
 *`mongodb.status.journaling.commits`*::
@@ -16716,6 +18324,12 @@ The number of times MongoDB requested a commit before the scheduled journal grou
 
 
 --
+
+[float]
+=== times
+
+Information about the performance of the mongod instance during the various phases of journaling in the last journal group commit interval.
+
 
 
 *`mongodb.status.journaling.times.dt.ms`*::
@@ -16794,6 +18408,16 @@ The amount of time spent for commits that occurred while a write lock was held.
 MS SQL module
 
 
+[float]
+=== mssql
+
+The root field containing all MSSQL fields
+
+
+[float]
+=== database
+
+The database that the metrics is being referred to
 
 
 *`mssql.database.id`*::
@@ -16813,6 +18437,11 @@ type: keyword
 Name of the database
 
 --
+
+[float]
+=== performance
+
+performance metricset fetches information about the Performance Counters
 
 
 *`mssql.performance.page_splits_per_sec`*::
@@ -16915,6 +18544,11 @@ Number of Transact-SQL command batches received per second. This statistic is af
 --
 
 
+[float]
+=== cache_hit
+
+Indicates the percentage of pages found in the buffer cache without having to read from disk.
+
 
 *`mssql.performance.buffer.cache_hit.pct`*::
 +
@@ -16924,6 +18558,11 @@ type: double
 The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high
 
 --
+
+[float]
+=== page_life_expectancy
+
+Indicates the number of seconds a page will stay in the buffer pool without references.
 
 
 *`mssql.performance.buffer.page_life_expectancy.sec`*::
@@ -16962,7 +18601,22 @@ Ideal number of pages in the buffer pool.
 
 --
 
+[float]
+=== transaction_log
 
+transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
+
+
+[float]
+=== space_usage
+
+Space usage information for the transaction log
+
+
+[float]
+=== since_last_backup
+
+The amount of space used since the last log backup
 
 
 *`mssql.transaction_log.space_usage.since_last_backup.bytes`*::
@@ -16974,6 +18628,11 @@ The amount of space used since the last log backup in bytes
 
 --
 
+[float]
+=== total
+
+The size of the log
+
 
 *`mssql.transaction_log.space_usage.total.bytes`*::
 +
@@ -16983,6 +18642,11 @@ type: long
 The size of the log in bytes
 
 --
+
+[float]
+=== used
+
+The occupied size of the log
 
 
 *`mssql.transaction_log.space_usage.used.bytes`*::
@@ -17003,6 +18667,16 @@ A percentage of the occupied size of the log as a percent of the total log size
 
 --
 
+[float]
+=== stats
+
+Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
+
+
+[float]
+=== active_size
+
+Total active transaction log size.
 
 
 *`mssql.transaction_log.stats.active_size.bytes`*::
@@ -17023,6 +18697,11 @@ Last transaction log backup time.
 
 --
 
+[float]
+=== recovery_size
+
+Log size since log recovery log sequence number (LSN).
+
 
 *`mssql.transaction_log.stats.recovery_size.bytes`*::
 +
@@ -17033,6 +18712,11 @@ Log size in bytes since log recovery log sequence number (LSN).
 
 --
 
+[float]
+=== since_last_checkpoint
+
+Log size since last checkpoint log sequence number (LSN).
+
 
 *`mssql.transaction_log.stats.since_last_checkpoint.bytes`*::
 +
@@ -17042,6 +18726,11 @@ type: long
 Log size in bytes since last checkpoint log sequence number (LSN).
 
 --
+
+[float]
+=== total_size
+
+Total transaction log size.
 
 
 *`mssql.transaction_log.stats.total_size.bytes`*::
@@ -17088,6 +18777,24 @@ MySQL server status metrics collected from MySQL.
 
 
 
+[float]
+=== mysql
+
+`mysql` contains the metrics that were obtained from MySQL query.
+
+
+
+[float]
+=== galera_status
+
+`galera_status` contains the metrics that were obtained by the status SQL query on Galera.
+
+
+
+[float]
+=== apply
+
+Apply status fields.
 
 
 
@@ -17121,6 +18828,12 @@ Average distance between highest and lowest concurrently applied seqno.
 
 --
 
+[float]
+=== cert
+
+Certification status fields.
+
+
 
 *`mysql.galera_status.cert.deps_distance`*::
 +
@@ -17151,6 +18864,12 @@ Average number of transactions received while a transaction replicates.
 
 
 --
+
+[float]
+=== cluster
+
+Cluster status fields.
+
 
 
 *`mysql.galera_status.cluster.conf_id`*::
@@ -17183,6 +18902,12 @@ Status of this cluster component. That is, whether the node is part of a PRIMARY
 
 --
 
+[float]
+=== commit
+
+Commit status fields.
+
+
 
 *`mysql.galera_status.commit.oooe`*::
 +
@@ -17214,6 +18939,12 @@ If the value is OFF, the node has not yet connected to any of the cluster compon
 
 --
 
+[float]
+=== evs
+
+Evs Fields.
+
+
 
 *`mysql.galera_status.evs.evict`*::
 +
@@ -17234,6 +18965,12 @@ Shows the internal state of the EVS Protocol.
 
 
 --
+
+[float]
+=== flow_ctl
+
+Flow Control fields.
+
 
 
 *`mysql.galera_status.flow_ctl.paused`*::
@@ -17286,6 +19023,12 @@ The sequence number, or seqno, of the last committed transaction.
 
 --
 
+[float]
+=== local
+
+Node specific Cluster status fields.
+
+
 
 *`mysql.galera_status.local.bf_aborts`*::
 +
@@ -17316,6 +19059,12 @@ Total number of local transactions committed.
 
 
 --
+
+[float]
+=== recv
+
+Node specific recv fields.
+
 
 
 *`mysql.galera_status.local.recv.queue`*::
@@ -17367,6 +19116,12 @@ Total number of transaction replays due to asymmetric lock granularity.
 
 
 --
+
+[float]
+=== send
+
+Node specific sent fields.
+
 
 
 *`mysql.galera_status.local.send.queue`*::
@@ -17429,6 +19184,12 @@ Whether the server is ready to accept queries.
 
 --
 
+[float]
+=== received
+
+Write-Set receive status fields.
+
+
 
 *`mysql.galera_status.received.count`*::
 +
@@ -17449,6 +19210,12 @@ Total size of write-sets received from other nodes.
 
 
 --
+
+[float]
+=== repl
+
+Replication status fields.
+
 
 
 *`mysql.galera_status.repl.data_bytes`*::
@@ -17511,6 +19278,18 @@ Total size of write-sets replicated.
 
 --
 
+[float]
+=== status
+
+`status` contains the metrics that were obtained by the status SQL query.
+
+
+
+[float]
+=== aborted
+
+Aborted status fields.
+
 
 
 *`mysql.status.aborted.clients`*::
@@ -17533,6 +19312,11 @@ The number of failed attempts to connect to the MySQL server.
 
 --
 
+[float]
+=== binlog
+
+
+
 
 *`mysql.status.binlog.cache.disk_use`*::
 +
@@ -17551,6 +19335,12 @@ type: long
 
 
 --
+
+[float]
+=== bytes
+
+Bytes stats.
+
 
 
 *`mysql.status.bytes.received`*::
@@ -17576,6 +19366,12 @@ The number of bytes sent to all clients.
 
 
 --
+
+[float]
+=== threads
+
+Threads stats.
+
 
 
 *`mysql.status.threads.cached`*::
@@ -17627,6 +19423,11 @@ type: long
 
 --
 
+[float]
+=== created
+
+
+
 
 *`mysql.status.created.tmp.disk_tables`*::
 +
@@ -17654,6 +19455,11 @@ type: long
 
 
 --
+
+[float]
+=== delayed
+
+
 
 
 *`mysql.status.delayed.errors`*::
@@ -17701,6 +19507,11 @@ type: long
 
 --
 
+[float]
+=== open
+
+
+
 
 *`mysql.status.open.files`*::
 +
@@ -17737,6 +19548,11 @@ type: long
 
 
 --
+
+[float]
+=== command
+
+
 
 
 *`mysql.status.command.delete`*::
@@ -18214,6 +20030,12 @@ nats Module
 
 
 
+[float]
+=== nats
+
+`nats` contains statistics that were read from Nats
+
+
 
 *`nats.server.id`*::
 +
@@ -18235,6 +20057,12 @@ Server time of metric creation
 
 --
 
+[float]
+=== connections
+
+Contains nats connection related metrics
+
+
 
 *`nats.connections.total`*::
 +
@@ -18246,6 +20074,12 @@ The number of currently active clients
 
 --
 
+[float]
+=== routes
+
+Contains nats route related metrics
+
+
 
 *`nats.routes.total`*::
 +
@@ -18256,6 +20090,12 @@ The number of registered routes
 
 
 --
+
+[float]
+=== stats
+
+Contains nats var related metrics
+
 
 
 *`nats.stats.uptime`*::
@@ -18324,6 +20164,12 @@ The number of registered remotes
 
 --
 
+[float]
+=== in
+
+The amount of incoming data
+
+
 
 *`nats.stats.in.messages`*::
 +
@@ -18346,6 +20192,12 @@ The amount of incoming bytes
 
 
 --
+
+[float]
+=== out
+
+The amount of outgoing data
+
 
 
 *`nats.stats.out.messages`*::
@@ -18380,6 +20232,24 @@ The number of slow consumers currently on NATS
 
 --
 
+[float]
+=== http
+
+The http metrics of NATS server
+
+
+
+[float]
+=== req_stats
+
+The requests statistics
+
+
+
+[float]
+=== uri
+
+The request distribution on monitoring URIS
 
 
 
@@ -18432,6 +20302,12 @@ The number of hits on root monitoring uri
 
 
 --
+
+[float]
+=== subscriptions
+
+Contains nats subscriptions related metrics
+
 
 
 *`nats.subscriptions.total`*::
@@ -18522,6 +20398,18 @@ The average fanout served by cache
 Nginx server status metrics collected from various modules.
 
 
+
+[float]
+=== nginx
+
+`nginx` contains the metrics that were scraped from nginx.
+
+
+
+[float]
+=== stubstatus
+
+`stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
 
 
 
@@ -18632,6 +20520,18 @@ PHP-FPM server status metrics collected from PHP-FPM.
 
 
 
+[float]
+=== php_fpm
+
+`php_fpm` contains the metrics that were obtained from PHP-FPM status page call.
+
+
+
+[float]
+=== pool
+
+`pool` contains the metrics that were obtained from the PHP-FPM process pool.
+
 
 
 *`php_fpm.pool.name`*::
@@ -18644,6 +20544,12 @@ The name of the pool.
 
 --
 
+[float]
+=== pool
+
+`pool` contains the metrics that were obtained from the PHP-FPM process pool.
+
+
 
 *`php_fpm.pool.process_manager`*::
 +
@@ -18654,6 +20560,12 @@ Static, dynamic or ondemand.
 
 
 --
+
+[float]
+=== connections
+
+Connection state specific statistics.
+
 
 
 *`php_fpm.pool.connections.accepted`*::
@@ -18695,6 +20607,12 @@ The size of the socket queue of pending connections.
 
 
 --
+
+[float]
+=== processes
+
+Process state specific statistics.
+
 
 
 *`php_fpm.pool.processes.idle`*::
@@ -18778,6 +20696,12 @@ The date and time FPM has started.
 
 
 --
+
+[float]
+=== process
+
+process contains the metrics that were obtained from the PHP-FPM process.
+
 
 
 *`php_fpm.process.pid`*::
@@ -18928,6 +20852,18 @@ The content length of the request (only with POST) (of the current request)
 Metrics collected from PostgreSQL servers.
 
 
+
+[float]
+=== postgresql
+
+PostgreSQL metrics.
+
+
+
+[float]
+=== activity
+
+One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
 
 
 
@@ -19089,6 +21025,12 @@ Text of this backend's most recent query. If state is active this field shows th
 
 --
 
+[float]
+=== bgwriter
+
+Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
+
+
 
 *`postgresql.bgwriter.checkpoints.scheduled`*::
 +
@@ -19199,6 +21141,12 @@ Time at which these statistics were last reset.
 
 
 --
+
+[float]
+=== database
+
+One row per database, showing database-wide statistics. Collected by querying pg_stat_database
+
 
 
 *`postgresql.database.oid`*::
@@ -19390,6 +21338,12 @@ Time at which these statistics were last reset.
 
 
 --
+
+[float]
+=== statement
+
+One document per query per user per database, showing information related invocation of that query, such as cpu usage and total time. Collected by querying pg_stat_statements.
+
 
 
 *`postgresql.statement.user.id`*::
@@ -19651,6 +21605,11 @@ RabbitMQ module
 
 
 
+[float]
+=== rabbitmq
+
+
+
 
 *`rabbitmq.vhost`*::
 +
@@ -19661,6 +21620,12 @@ Virtual host name with non-ASCII characters escaped as in C.
 
 
 --
+
+[float]
+=== connection
+
+connection
+
 
 
 *`rabbitmq.connection.name`*::
@@ -19841,6 +21806,12 @@ Number of octets received on the connection.
 
 --
 
+[float]
+=== exchange
+
+exchange
+
+
 
 *`rabbitmq.exchange.name`*::
 +
@@ -19945,6 +21916,12 @@ How much the exchange publish-out count has changed per second in the most recen
 
 
 --
+
+[float]
+=== node
+
+node
+
 
 
 *`rabbitmq.node.disk.free.bytes`*::
@@ -20328,6 +22305,12 @@ Node uptime.
 
 --
 
+[float]
+=== queue
+
+queue
+
+
 
 *`rabbitmq.queue.name`*::
 +
@@ -20544,6 +22527,24 @@ Redis metrics collected from Redis.
 
 
 
+[float]
+=== redis
+
+`redis` contains the information and statistics from Redis.
+
+
+
+[float]
+=== info
+
+`info` contains the information and statistics returned by the `INFO` command.
+
+
+
+[float]
+=== clients
+
+Redis client stats.
 
 
 
@@ -20613,6 +22614,12 @@ Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH).
 
 --
 
+[float]
+=== cluster
+
+Redis cluster information.
+
+
 
 *`redis.info.cluster.enabled`*::
 +
@@ -20623,6 +22630,12 @@ Indicates that the Redis cluster is enabled.
 
 
 --
+
+[float]
+=== cpu
+
+Redis CPU stats
+
 
 
 *`redis.info.cpu.used.sys`*::
@@ -20664,6 +22677,12 @@ User CPU consumed by the background processes.
 
 
 --
+
+[float]
+=== memory
+
+Redis memory stats.
+
 
 
 *`redis.info.memory.used.value`*::
@@ -20870,6 +22889,12 @@ Resident bytes
 
 --
 
+[float]
+=== persistence
+
+Redis CPU stats.
+
+
 
 *`redis.info.persistence.loading`*::
 +
@@ -20880,6 +22905,12 @@ Flag indicating if the load of a dump file is on-going
 
 
 --
+
+[float]
+=== rdb
+
+Provides information about RDB persistence
+
 
 
 *`redis.info.persistence.rdb.last_save.changes_since`*::
@@ -20957,6 +22988,12 @@ The size in bytes of copy-on-write allocations during the last RBD save operatio
 
 
 --
+
+[float]
+=== aof
+
+Provides information about AOF persitence
+
 
 
 *`redis.info.persistence.aof.enabled`*::
@@ -21112,6 +23149,12 @@ Delayed fsync counter
 
 
 --
+
+[float]
+=== replication
+
+Replication
+
 
 
 *`redis.info.replication.role`*::
@@ -21295,6 +23338,12 @@ Flag indicating if the slave is read-only
 
 --
 
+[float]
+=== server
+
+Server info
+
+
 
 *`redis.info.server.version`*::
 +
@@ -21445,6 +23494,12 @@ type: keyword
 None
 
 --
+
+[float]
+=== stats
+
+Redis stats.
+
 
 
 *`redis.info.stats.connections.received`*::
@@ -21692,6 +23747,12 @@ Count of slow operations
 
 --
 
+[float]
+=== key
+
+`key` contains information about keys.
+
+
 
 *`redis.key.name`*::
 +
@@ -21743,6 +23804,12 @@ Seconds to expire.
 
 --
 
+[float]
+=== keyspace
+
+`keyspace` contains the information about the keyspaces returned by the `INFO` command.
+
+
 
 *`redis.keyspace.id`*::
 +
@@ -21789,6 +23856,18 @@ type: long
 System status metrics, like CPU and memory usage, that are collected from the operating system.
 
 
+
+[float]
+=== system
+
+`system` contains local system metrics.
+
+
+
+[float]
+=== core
+
+`system-core` contains CPU metrics for a single core of a multi-core system.
 
 
 
@@ -21977,6 +24056,12 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 --
+
+[float]
+=== cpu
+
+`cpu` contains local CPU stats.
+
 
 
 *`system.cpu.cores`*::
@@ -22285,6 +24370,12 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 --
 
+[float]
+=== diskio
+
+`disk` contains disk IO metrics collected from the operating system.
+
+
 
 *`system.diskio.name`*::
 +
@@ -22545,6 +24636,12 @@ The percentage of available entropy, relative to the pool size of 4096
 
 --
 
+[float]
+=== filesystem
+
+`filesystem` contains local filesystem stats.
+
+
 
 *`system.filesystem.available`*::
 +
@@ -22656,6 +24753,12 @@ The percentage of used disk space.
 
 --
 
+[float]
+=== fsstat
+
+`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
+
+
 
 *`system.fsstat.count`*::
 +
@@ -22674,6 +24777,11 @@ type: long
 Total number of files.
 
 --
+
+[float]
+=== total_size
+
+Nested file system docs.
 
 
 *`system.fsstat.total_size.free`*::
@@ -22711,6 +24819,12 @@ Total space (used plus free).
 
 
 --
+
+[float]
+=== load
+
+CPU load averages.
+
 
 
 *`system.load.1`*::
@@ -22783,6 +24897,12 @@ The number of CPU cores present on the host.
 
 --
 
+[float]
+=== memory
+
+`memory` contains local memory stats.
+
+
 
 *`system.memory.total`*::
 +
@@ -22832,6 +24952,12 @@ The percentage of used memory.
 
 --
 
+[float]
+=== actual
+
+Actual memory used and free.
+
+
 
 *`system.memory.actual.used.bytes`*::
 +
@@ -22868,6 +24994,11 @@ The percentage of actual used memory.
 
 
 --
+
+[float]
+=== swap
+
+This group contains statistics related to the swap memory usage on the system.
 
 
 *`system.memory.swap.total`*::
@@ -22917,6 +25048,11 @@ The percentage of used swap memory.
 
 
 --
+
+[float]
+=== hugepages
+
+This group contains statistics related to huge pages usage on the system.
 
 
 *`system.memory.hugepages.total`*::
@@ -23002,6 +25138,12 @@ Default size for huge pages.
 
 
 --
+
+[float]
+=== network
+
+`network` contains network IO metrics for a single network interface.
+
 
 
 *`system.network.name`*::
@@ -23100,6 +25242,12 @@ The number of outgoing packets that were dropped. This value is always 0 on Darw
 
 --
 
+[float]
+=== process
+
+`process` contains process metadata, CPU metrics, and memory metrics.
+
+
 
 *`system.process.name`*::
 +
@@ -23185,6 +25333,11 @@ The environment variables used to start the process. The data is available on Fr
 
 --
 
+[float]
+=== cpu
+
+CPU-specific statistics per process.
+
 
 *`system.process.cpu.user.ticks`*::
 +
@@ -23260,6 +25413,11 @@ The time when the process was started.
 
 --
 
+[float]
+=== memory
+
+Memory-specific statistics per process.
+
 
 *`system.process.memory.size`*::
 +
@@ -23309,6 +25467,12 @@ The shared memory the process uses.
 
 --
 
+[float]
+=== fd
+
+File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
+
+
 
 *`system.process.fd.open`*::
 +
@@ -23339,6 +25503,12 @@ The hard limit on the number of file descriptors opened by the process. The hard
 
 --
 
+[float]
+=== cgroup
+
+Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
+
+
 
 *`system.process.cgroup.id`*::
 +
@@ -23359,6 +25529,12 @@ The path to the cgroup relative to the cgroup subsystem's mountpoint. If there i
 
 
 --
+
+[float]
+=== cpu
+
+The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period.
+
 
 
 *`system.process.cgroup.cpu.id`*::
@@ -23460,6 +25636,11 @@ The total time duration (in nanoseconds) for which tasks in a cgroup have been t
 
 --
 
+[float]
+=== cpuacct
+
+CPU accounting metrics.
+
 
 *`system.process.cgroup.cpuacct.id`*::
 +
@@ -23517,6 +25698,11 @@ CPU time (in nanoseconds) consumed on each CPU by all tasks in this cgroup.
 
 
 --
+
+[float]
+=== memory
+
+Memory limits and metrics.
 
 
 *`system.process.cgroup.memory.id`*::
@@ -23904,6 +26090,11 @@ Memory that cannot be reclaimed, in bytes.
 
 --
 
+[float]
+=== blkio
+
+Block IO metrics.
+
 
 *`system.process.cgroup.blkio.id`*::
 +
@@ -23945,6 +26136,12 @@ Total number of I/O operations performed on all devices by processes in the cgro
 
 
 --
+
+[float]
+=== process.summary
+
+Summary metrics for the processes running on the host.
+
 
 
 *`system.process.summary.total`*::
@@ -24026,6 +26223,12 @@ Number of processes for which the state couldn't be retrieved or is unknown.
 
 
 --
+
+[float]
+=== raid
+
+raid
+
 
 
 *`system.raid.name`*::
@@ -24137,6 +26340,12 @@ Number of blocks on the device that are in sync, in 1024-byte blocks.
 
 
 --
+
+[float]
+=== socket
+
+TCP sockets that are active.
+
 
 
 *`system.socket.direction`*::
@@ -24294,6 +26503,18 @@ alias to: user.full_name
 
 --
 
+[float]
+=== socket.summary
+
+Summary metrics of open sockets in the host system
+
+
+
+[float]
+=== all
+
+All connections
+
 
 
 *`system.socket.summary.all.count`*::
@@ -24316,6 +26537,12 @@ All listening ports
 
 --
 
+[float]
+=== tcp
+
+All TCP connections
+
+
 
 *`system.socket.summary.tcp.memory`*::
 +
@@ -24328,6 +26555,12 @@ Memory used by TCP sockets in bytes, based on number of allocated pages and syst
 
 
 --
+
+[float]
+=== all
+
+All TCP connections
+
 
 
 *`system.socket.summary.tcp.all.orphan`*::
@@ -24390,6 +26623,12 @@ Number of TCP connections in _time_wait_ state
 
 --
 
+[float]
+=== udp
+
+All UDP connections
+
+
 
 *`system.socket.summary.udp.memory`*::
 +
@@ -24403,6 +26642,12 @@ Memory used by UDP sockets in bytes, based on number of allocated pages and syst
 
 --
 
+[float]
+=== all
+
+All UDP connections
+
+
 
 *`system.socket.summary.udp.all.count`*::
 +
@@ -24413,6 +26658,12 @@ All open UDP connections
 
 
 --
+
+[float]
+=== uptime
+
+`uptime` contains the operating system uptime metric.
+
 
 
 *`system.uptime.duration.ms`*::
@@ -24434,6 +26685,18 @@ Traefik reverse proxy / load balancer metrics
 
 
 
+[float]
+=== traefik
+
+Traefik reverse proxy / load balancer metrics
+
+
+
+[float]
+=== health
+
+Metrics obtained from Traefik's health API endpoint
+
 
 
 *`traefik.health.uptime.sec`*::
@@ -24445,6 +26708,12 @@ Uptime of Traefik instance in seconds
 
 
 --
+
+[float]
+=== response
+
+Response metrics
+
 
 
 *`traefik.health.response.count`*::
@@ -24483,6 +26752,17 @@ Number of responses per status code
 uwsgi module
 
 
+
+[float]
+=== uwsgi
+
+
+
+
+[float]
+=== status
+
+uwsgi.status metricset fields
 
 
 
@@ -24783,6 +27063,17 @@ vSphere module
 
 
 
+[float]
+=== vsphere
+
+
+
+
+[float]
+=== datastore
+
+datastore
+
 
 
 *`vsphere.datastore.name`*::
@@ -24852,6 +27143,12 @@ Used percent of the datastore
 
 
 --
+
+[float]
+=== host
+
+host
+
 
 
 *`vsphere.host.name`*::
@@ -24939,6 +27236,12 @@ Network names
 
 
 --
+
+[float]
+=== virtualmachine
+
+virtualmachine
+
 
 
 *`vsphere.virtualmachine.host`*::
@@ -25055,6 +27358,17 @@ Network names
 Module for Windows
 
 
+
+[float]
+=== windows
+
+
+
+
+[float]
+=== service
+
+`service` contains the status for Windows services.
 
 
 
@@ -25179,6 +27493,18 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 
+[float]
+=== zookeeper
+
+`zookeeper` contains the metrics reported by ZooKeeper commands.
+
+
+
+[float]
+=== connection
+
+connections
+
 
 
 *`zookeeper.connection.interest_ops`*::
@@ -25220,6 +27546,12 @@ Connections sent
 
 
 --
+
+[float]
+=== mntr
+
+`mntr` contains the metrics reported by the four-letter `mntr` command.
+
 
 
 *`zookeeper.mntr.hostname`*::
@@ -25413,6 +27745,11 @@ Number of znodes reported by the local ZooKeeper process.
 
 
 --
+
+[float]
+=== server
+
+server contains the metrics reported by the four-letter `srvr` command.
 
 
 *`zookeeper.server.connections`*::
