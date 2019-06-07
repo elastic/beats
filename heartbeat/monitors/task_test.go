@@ -30,10 +30,13 @@ import (
 )
 
 func Test_runPublishJob(t *testing.T) {
-	simpleJob := func(event *beat.Event) (j []jobs.Job, e error) {
-		eventext.MergeEventFields(event, common.MapStr{"foo": "bar"})
-		return nil, nil
+	defineJob := func(fields common.MapStr) func(event *beat.Event) (j []jobs.Job, e error) {
+		return func(event *beat.Event) (j []jobs.Job, e error) {
+			eventext.MergeEventFields(event, fields)
+			return nil, nil
+		}
 	}
+	simpleJob := defineJob(common.MapStr{"foo": "bar"})
 
 	testCases := []struct {
 		name       string
@@ -56,6 +59,21 @@ func Test_runPublishJob(t *testing.T) {
 			[]mapval.Validator{
 				mapval.MustCompile(mapval.Map{"foo": "bar"}),
 				mapval.MustCompile(mapval.Map{"foo": "bar"}),
+			},
+		},
+		{
+			"multiple conts",
+			func(event *beat.Event) (j []jobs.Job, e error) {
+				simpleJob(event)
+				return []jobs.Job{
+					defineJob(common.MapStr{"baz": "bot"}),
+					defineJob(common.MapStr{"blah": "blargh"}),
+				}, nil
+			},
+			[]mapval.Validator{
+				mapval.MustCompile(mapval.Map{"foo": "bar"}),
+				mapval.MustCompile(mapval.Map{"baz": "bot"}),
+				mapval.MustCompile(mapval.Map{"blah": "blargh"}),
 			},
 		},
 		{
