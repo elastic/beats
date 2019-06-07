@@ -469,7 +469,6 @@ func (procStats *Stats) getSingleProcess1(pid int, newProcs ProcsMap) (*Process,
 		}
 		env = previousProc.Env
 	}
-
 	process, err := newProcess(pid, cmdline, env)
 	if err != nil {
 		return nil, errors.Errorf("Process: Skip process pid=%d: %v", pid, err)
@@ -482,7 +481,6 @@ func (procStats *Stats) getSingleProcess1(pid int, newProcs ProcsMap) (*Process,
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
 		return nil, errors.Errorf("Error getting process details. pid=%d: %v", process.Pid, err)
-		logp.Err("Error getting process details. pid=%d: %v", process.Pid, err)
 	}
 
 	newProcs[process.Pid] = process
@@ -490,7 +488,6 @@ func (procStats *Stats) getSingleProcess1(pid int, newProcs ProcsMap) (*Process,
 	process.cpuTotalPctNorm, process.cpuTotalPct, process.cpuSinceStart = GetProcCPUPercentage(last, process)
 	return process, nil
 }
-
 
 func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	var cmdline string
