@@ -23,6 +23,9 @@ heartbeat.autodiscover:
   providers:
     - type: aws_elb
       region: us-east-1
+      credentials:
+        #access_key_id: my-access-key
+        #secret_access_key: my-secret-access-key
       templates:
         - config:
           - type: tcp

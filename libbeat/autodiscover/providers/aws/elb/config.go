@@ -30,6 +30,12 @@ type Config struct {
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
 	Templates    template.MapperSettings `config:"templates"`
+	Credentials  *AWSCredentials         `config:credentials`
+}
+
+type AWSCredentials struct {
+	AccessKeyID     string `config:"access_key_id"`
+	SecretAccessKey string `config:"secret_access_key"`
 }
 
 func defaultConfig() *Config {

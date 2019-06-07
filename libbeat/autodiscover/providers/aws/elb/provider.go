@@ -1,8 +1,11 @@
 package elb
 
 import (
-	"fmt"
 	"time"
+
+	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/gofrs/uuid"
 
@@ -15,7 +18,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
@@ -46,13 +48,18 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
-	cfg, err := external.LoadDefaultAWSConfig()
-	cfg.Region = config.Region
+	awsCfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(elasticloadbalancingv2.New(cfg)))
+	awsCreds := config.Credentials
+	if awsCreds != nil && awsCreds.AccessKeyID != "" && awsCreds.SecretAccessKey != "" {
+		awsCfg.Credentials = aws.NewStaticCredentialsProvider(awsCreds.AccessKeyID, awsCreds.SecretAccessKey, "")
+	}
+	awsCfg.Region = config.Region
+
+	return internalBuilder(uuid, bus, config, newAPIFetcher(elasticloadbalancingv2.New(awsCfg)))
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
@@ -72,8 +79,6 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *Config, fetcher fetche
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("\n\nINIT AUTOELB PROVIDER %v %v\n\n", uuid, config)
 
 	return &Provider{
 		fetcher:   fetcher,
@@ -105,17 +110,13 @@ func (p *Provider) Stop() {
 func (p *Provider) onWatcherStart(arn string, lbl *lbListener) {
 	lblMap := lbl.toMap()
 	e := bus.Event{
-		"start":    true,
-		"provider": p.uuid,
-		"id":       arn,
-		"host":     lblMap["host"],
-		"port":     lblMap["port"],
-		"meta": common.MapStr{
-			"elb": lbl.toMap(),
-		},
+		"start":        true,
+		"provider":     p.uuid,
+		"id":           arn,
+		"host":         lblMap["host"],
+		"port":         lblMap["port"],
+		"elb_listener": lbl.toMap(),
 	}
-
-	fmt.Printf("EMIT START EVENT %v\n", e)
 
 	if configs := p.templates.GetConfig(e); configs != nil {
 		e["config"] = configs

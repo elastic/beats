@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/elbv2"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 )
 
 // mockFetcher is a fetcher that returns a customizable list of results, useful for testing.
@@ -48,28 +48,28 @@ func fakeLbl() *lbListener {
 	strVal := "strVal"
 	lbARN := "lb_arn"
 	listenerARN := "listen_arn"
-	state := elbv2.LoadBalancerState{Reason: &strVal, Code: elbv2.LoadBalancerStateEnumActive}
+	state := elasticloadbalancingv2.LoadBalancerState{Reason: &strVal, Code: elasticloadbalancingv2.LoadBalancerStateEnumActive}
 	now := time.Now()
 
-	lb := &elbv2.LoadBalancer{
+	lb := &elasticloadbalancingv2.LoadBalancer{
 		LoadBalancerArn:   &lbARN,
 		DNSName:           &dnsName,
-		Type:              elbv2.LoadBalancerTypeEnumApplication,
-		Scheme:            elbv2.LoadBalancerSchemeEnumInternetFacing,
-		AvailabilityZones: []elbv2.AvailabilityZone{{ZoneName: &strVal}},
+		Type:              elasticloadbalancingv2.LoadBalancerTypeEnumApplication,
+		Scheme:            elasticloadbalancingv2.LoadBalancerSchemeEnumInternetFacing,
+		AvailabilityZones: []elasticloadbalancingv2.AvailabilityZone{{ZoneName: &strVal}},
 		CreatedTime:       &now,
 		State:             &state,
-		IpAddressType:     elbv2.IpAddressTypeDualstack,
+		IpAddressType:     elasticloadbalancingv2.IpAddressTypeDualstack,
 		SecurityGroups:    []string{"foo-security-group"},
 		VpcId:             &strVal,
 	}
 
 	var port int64 = 1234
-	listener := &elbv2.Listener{
+	listener := &elasticloadbalancingv2.Listener{
 		ListenerArn:     &listenerARN,
 		LoadBalancerArn: lb.LoadBalancerArn,
 		Port:            &port,
-		Protocol:        elbv2.ProtocolEnumHttps,
+		Protocol:        elasticloadbalancingv2.ProtocolEnumHttps,
 		SslPolicy:       &strVal,
 	}
 

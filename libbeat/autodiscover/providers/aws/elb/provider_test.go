@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/pkg/errors"
 
 	"github.com/stretchr/testify/assert"
 
@@ -67,7 +67,8 @@ func Test_internalBuilder(t *testing.T) {
 		Region: "us-east-1",
 	}
 
-	provider, err := internalBuilder(pBus, cfg, fetcher)
+	uuid, _ := uuid.NewV4()
+	provider, err := internalBuilder(uuid, pBus, cfg, fetcher)
 	require.NoError(t, err)
 
 	provider.Start()
@@ -99,11 +100,12 @@ func Test_internalBuilder(t *testing.T) {
 	assert.Equal(t, 1, events.len())
 
 	expectedStartEvent := bus.Event{
-		"start":   true,
-		"hashKey": lbl.arn(),
-		"host":    *lbl.lb.DNSName,
-		"port":    *lbl.listener.Port,
-		"meta":    common.MapStr{"elb": lbl.toMap()},
+		"id":           lbl.arn(),
+		"provider":     uuid,
+		"start":        true,
+		"host":         *lbl.lb.DNSName,
+		"port":         *lbl.listener.Port,
+		"elb_listener": lbl.toMap(),
 	}
 
 	require.Equal(t, expectedStartEvent, events.get()[0])
@@ -118,8 +120,9 @@ func Test_internalBuilder(t *testing.T) {
 	require.Equal(t, 2, events.len())
 
 	expectedStopEvent := bus.Event{
-		"stop":    true,
-		"hashKey": lbl.arn(),
+		"stop":     true,
+		"id":       lbl.arn(),
+		"provider": uuid,
 	}
 
 	require.Equal(t, expectedStopEvent, events.get()[1])
