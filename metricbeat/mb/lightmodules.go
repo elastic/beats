@@ -46,7 +46,7 @@ func NewLightModulesSource(paths ...string) *LightModulesSource {
 
 // Modules lists the light modules available on the configured paths
 func (r *LightModulesSource) Modules() ([]string, error) {
-	return r.listModules()
+	return r.moduleNames()
 }
 
 // DefaultMetricSets list the default metricsets for a given module
@@ -207,7 +207,7 @@ func (r *LightModulesSource) loadModule(moduleName string) (*LightModule, bool, 
 		return nil, true, errors.Wrapf(err, "failed to load light module '%s' definition", moduleName)
 	}
 
-	metricSets, err := r.loadMetricSets(moduleConfig.Name, filepath.Dir(modulePath), moduleConfig.MetricSets)
+	metricSets, err := r.loadMetricSets(filepath.Dir(modulePath), moduleConfig.Name, moduleConfig.MetricSets)
 	if err != nil {
 		return nil, true, errors.Wrapf(err, "failed to load metric sets for light module '%s'", moduleName)
 	}
@@ -217,28 +217,28 @@ func (r *LightModulesSource) loadModule(moduleName string) (*LightModule, bool, 
 
 func (r *LightModulesSource) findModulePath(moduleName string) (string, bool) {
 	for _, dir := range r.paths {
-		p := filepath.Join(dir, moduleName, moduleYML)
-		if _, err := os.Stat(p); err == nil {
-			return p, true
+		candidate := filepath.Join(dir, moduleName, moduleYML)
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, true
 		}
 	}
 	return "", false
 }
 
 func (r *LightModulesSource) loadModuleConfig(modulePath string) (*lightModuleConfig, error) {
-	c, err := common.LoadFile(modulePath)
+	config, err := common.LoadFile(modulePath)
 	if err != nil {
 		return nil, err
 	}
 
 	var moduleConfig lightModuleConfig
-	if err = c.Unpack(&moduleConfig); err != nil {
+	if err = config.Unpack(&moduleConfig); err != nil {
 		return nil, errors.Wrapf(err, "failed to parse light module definition from '%s'", modulePath)
 	}
 	return &moduleConfig, nil
 }
 
-func (r *LightModulesSource) loadMetricSets(moduleName, moduleDirPath string, metricSetNames []string) (map[string]LightMetricSet, error) {
+func (r *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, metricSetNames []string) (map[string]LightMetricSet, error) {
 	metricSets := make(map[string]LightMetricSet)
 	for _, metricSet := range metricSetNames {
 		manifestPath := filepath.Join(moduleDirPath, metricSet, manifestYML)
@@ -256,18 +256,18 @@ func (r *LightModulesSource) loadMetricSets(moduleName, moduleDirPath string, me
 }
 
 func (r *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
-	c, err := common.LoadFile(manifestPath)
+	config, err := common.LoadFile(manifestPath)
 	if err != nil {
 		return ms, err
 	}
 
-	if err := c.Unpack(&ms); err != nil {
+	if err := config.Unpack(&ms); err != nil {
 		return ms, errors.Wrapf(err, "failed to parse metricset manifest from '%s'", manifestPath)
 	}
 	return
 }
 
-func (r *LightModulesSource) listModules() ([]string, error) {
+func (r *LightModulesSource) moduleNames() ([]string, error) {
 	modules := make(map[string]bool)
 	for _, dir := range r.paths {
 		files, err := ioutil.ReadDir(dir)
@@ -283,9 +283,9 @@ func (r *LightModulesSource) listModules() ([]string, error) {
 		}
 	}
 
-	list := make([]string, 0, len(modules))
-	for m := range modules {
-		list = append(list, m)
+	names := make([]string, 0, len(modules))
+	for name := range modules {
+		names = append(names, name)
 	}
-	return list, nil
+	return names, nil
 }
