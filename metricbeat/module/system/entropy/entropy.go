@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux
+
 package entropy
 
 import (
@@ -44,7 +46,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	availPath string
+	randomPath string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -57,11 +59,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.New("unexpected module type")
 	}
 
-	totalPath := path.Join(systemModule.HostFS, "/proc/sys/kernel/random/entropy_avail")
+	totalPath := path.Join(systemModule.HostFS, "/proc/sys/kernel/random")
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		availPath:     totalPath,
+		randomPath:    totalPath,
 	}, nil
 }
 
@@ -69,15 +71,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	entropy, err := getEntropy(m.availPath)
+	entropy, err := getEntropyData(path.Join(m.randomPath, "entropy_avail"))
 	if err != nil {
 		return errors.Wrap(err, "error getting entropy")
+	}
+	poolsize, err := getEntropyData(path.Join(m.randomPath, "poolsize"))
+	if err != nil {
+		return errors.Wrap(err, "error getting poolsize")
 	}
 	report.Event(mb.Event{
 		MetricSetFields: common.MapStr{
 			"entropy": common.MapStr{
 				"available_bits": entropy,
-				"pct":            float64(entropy) / float64(4096),
+				"pct":            float64(entropy) / float64(poolsize),
 			},
 		},
 	})
@@ -85,16 +91,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func getEntropy(path string) (int, error) {
+func getEntropyData(path string) (int, error) {
 	//This will be a number in the range 0 to 4096.
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
-		return 0, errors.Wrap(err, "error reading entropy_avail")
+		return 0, errors.Wrap(err, "error reading from random")
 	}
 
 	intval, err := strconv.ParseInt(string(raw), 10, 64)
 	if err != nil {
-		return 0, errors.Wrap(err, "error parsing entropy_avail")
+		return 0, errors.Wrap(err, "error parsing from random")
 	}
 
 	return int(intval), nil

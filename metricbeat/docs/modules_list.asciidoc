@@ -147,7 +147,7 @@ This file is generated! See scripts/docs_collector.py
 .15+| .15+|  |<<metricbeat-metricset-system-core,core>>   
 |<<metricbeat-metricset-system-cpu,cpu>>   
 |<<metricbeat-metricset-system-diskio,diskio>>   
-|<<metricbeat-metricset-system-entropy,entropy>> experimental[]  
+|<<metricbeat-metricset-system-entropy,entropy>>   
 |<<metricbeat-metricset-system-filesystem,filesystem>>   
 |<<metricbeat-metricset-system-fsstat,fsstat>>   
 |<<metricbeat-metricset-system-load,load>>   

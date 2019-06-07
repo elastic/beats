@@ -24571,18 +24571,11 @@ Percentage of CPU time during which I/O requests were issued to the device (band
 [float]
 == entropy fields
 
-entropy
-
-
-
-[float]
-== entropy fields
-
 Available system entropy
 
 
 
-*`system.entropy.entropy.available_bits`*::
+*`system.entropy.available_bits`*::
 +
 --
 type: long
@@ -24592,12 +24585,12 @@ The available bits of entropy
 
 --
 
-*`system.entropy.entropy.pct`*::
+*`system.entropy.pct`*::
 +
 --
 type: scaled_float
 
-format: percentage
+format: percent
 
 The percentage of available entropy, relative to the pool size of 4096
 
