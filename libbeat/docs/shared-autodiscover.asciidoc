@@ -257,6 +257,39 @@ the ones used for discovery probes, they have these settings:
 include::../../{beatname_lc}/docs/autodiscover-jolokia-config.asciidoc[]
 endif::autodiscoverJolokia[]
 
+ifdef::autodiscoverAWSELB[]
+[float]
+===== Amazon ELBs
+
+The Amazon ELB autodiscover provider discovers ELBs and their listeners. This is useful when you don't want to connect
+directly to a service, but rather to the ELB fronting a pool of services.
+
+This provider will yield one config block per ELB Listener. So, if you have one ELB exposing both ports 80 and 443, it
+will generate two configs, one for each port. Keep in mind that the beat will de-duplicate configs. So, if the generated
+configs are the same only one will actually run.
+
+This provider will load AWS credentials using the standard AWS environment variables and shared credentials files see https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html[Best Practices for Managing AWS Access Keys] for more information. If you do not wish to use these, you may explicitly set the `credentials.access_key_id` and `credentials.secret_access_key` variables.
+
+These are the available fields on every event
+
+  * host
+  * port
+  * elb_listener.listener_arn
+  * elb_listener.load_balancer_arn
+  * elb_listener.protocol
+  * elb_listener.type
+  * elb_listener.scheme
+  * elb_listener.availability_zones
+  * elb_listener.created
+  * elb_listener.state
+  * elb_listener.ip_address_type
+  * elb_listener.security_groups
+  * elb_listener.vpc_id
+  * elb_listener.ssl_policy
+
+endif::autodiscoverAWSELB[]
+
+
 ifdef::autodiscoverHints[]
 [[configuration-autodiscover-hints]]
 === Hints based autodiscover
