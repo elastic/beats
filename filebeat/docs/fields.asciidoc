@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-mssql>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-netflow>>
@@ -1258,6 +1259,16 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 example: project-x
 
 Name of the project in Google Cloud.
+
+
+--
+
+*`cloud.image.id`*::
++
+--
+example: ami-abcd1234
+
+Image ID for the cloud instance.
 
 
 --
@@ -7394,6 +7405,16 @@ alias to: event.created
 
 --
 
+*`docker.attrs`*::
++
+--
+type: object
+
+docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
+
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 
@@ -7655,6 +7676,33 @@ alias to: log.level
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-mssql]]
+== mssql fields
+
+MS SQL Filebeat Module
+
+
+[float]
+== mssql fields
+
+Fields from the MSSQL log files
+
+
+[float]
+== log fields
+
+Common log fields
+
+
+*`mssql.log.origin`*::
++
+--
+type: keyword
+
+Origin of the message, usually the server but it can also be a recovery process
 
 --
 
@@ -12139,6 +12187,9 @@ Fields from the PostgreSQL log files.
 *`postgresql.log.timestamp`*::
 +
 --
+
+deprecated[7.3.0]
+
 The timestamp from the log line.
 
 

@@ -4,7 +4,6 @@
         "destination.address": "192.168.86.1",
         "destination.ip": "192.168.86.1",
         "destination.port": 53,
-        "ecs.version": "1.0.0",
         "event.dataset": "zeek.dns",
         "event.id": "CAcJw21BbVedgFnYH3",
         "event.module": "zeek",

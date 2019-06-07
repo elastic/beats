@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-10-17T12:04:41.718Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -16,7 +15,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:14:41.719Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -31,7 +29,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:24:41.719Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -46,7 +43,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:34:41.719Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -61,7 +57,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:44:41.719Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -76,7 +71,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.313Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -91,7 +85,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.314Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -106,7 +99,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.321Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -121,7 +113,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.322Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -136,7 +127,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.322Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -151,7 +141,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.323Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -166,7 +155,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.323Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -181,7 +169,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.324Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -196,7 +183,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.331Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -211,7 +197,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.348Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -226,7 +211,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.348Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -241,7 +225,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.350Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -256,7 +239,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.351Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -271,7 +253,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.355Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -286,7 +267,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.360Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -301,7 +281,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.361Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -316,7 +295,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.421Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -331,7 +309,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:23.421Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -346,7 +323,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:50:24.508Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -361,7 +337,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:51:56.064Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -376,7 +351,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:51:56.091Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -391,7 +365,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:51:56.098Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -406,7 +379,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:51:56.104Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -421,7 +393,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.461Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -436,7 +407,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.481Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -451,7 +421,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.482Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -466,7 +435,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.483Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -481,7 +449,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.501Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -496,7 +463,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.504Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -511,7 +477,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.504Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -526,7 +491,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.508Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -541,7 +505,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:31.510Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -556,7 +519,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:32.043Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -571,7 +533,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:32.044Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -586,7 +547,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:54:41.719Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -601,7 +561,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.790Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -616,7 +575,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.809Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -631,7 +589,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.810Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -646,7 +603,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.812Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -661,7 +617,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.816Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -676,7 +631,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.816Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -691,7 +645,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.816Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -706,7 +659,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.816Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -721,7 +673,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.817Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -736,7 +687,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.833Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -751,7 +701,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.833Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -766,7 +715,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.835Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -781,7 +729,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.836Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -796,7 +743,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.836Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -811,7 +757,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.837Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -826,7 +771,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.838Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -841,7 +785,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.839Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -856,7 +799,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.896Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -871,7 +813,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:17.897Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -886,7 +827,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:57:18.400Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -906,7 +846,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.490Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -921,7 +860,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.492Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -936,7 +874,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.494Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -951,7 +888,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.547Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -966,7 +902,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.550Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -981,7 +916,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.556Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -996,7 +930,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.556Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1011,7 +944,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.558Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1026,7 +958,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.558Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1041,7 +972,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.561Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1056,7 +986,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.561Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1071,7 +1000,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.567Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1086,7 +1014,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.567Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1101,7 +1028,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.568Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1116,7 +1042,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.568Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1131,7 +1056,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.568Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1146,7 +1070,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.577Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1161,7 +1084,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.577Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1176,7 +1098,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.583Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1191,7 +1112,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.585Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1206,7 +1126,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.586Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1221,7 +1140,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.594Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1236,7 +1154,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.601Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1251,7 +1168,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.602Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1266,7 +1182,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.602Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1281,7 +1196,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.604Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1296,7 +1210,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.605Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1311,7 +1224,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.606Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1326,7 +1238,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.606Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1341,7 +1252,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.606Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1356,7 +1266,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.606Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1371,7 +1280,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.607Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1386,7 +1294,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.608Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1401,7 +1308,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.608Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1416,7 +1322,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.609Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1431,7 +1336,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.609Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1446,7 +1350,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.610Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1461,7 +1364,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.610Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1476,7 +1378,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.611Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",
@@ -1491,7 +1392,6 @@
     },
     {
         "@timestamp": "2018-10-17T12:58:47.611Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "event.timezone": "+00:00",

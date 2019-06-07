@@ -38,7 +38,7 @@ configured the {es} output and want to send {beatname_uc} monitoring events to
 the same {es} cluster, specify the following minimal configuration:
 +
 --
-[source, yml]
+["source","yml",subs="attributes"]
 --------------------
 xpack.monitoring:
   enabled: true

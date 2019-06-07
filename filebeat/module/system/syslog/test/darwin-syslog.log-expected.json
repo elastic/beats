@@ -1,6 +1,5 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -14,7 +13,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -31,7 +29,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -45,7 +42,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -59,7 +55,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -76,7 +71,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -90,7 +84,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -104,7 +97,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -121,7 +113,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -135,7 +126,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -149,7 +139,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -163,7 +152,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -177,7 +165,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -191,7 +178,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -205,7 +191,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -219,7 +204,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -233,7 +217,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -247,7 +230,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -261,7 +243,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -275,7 +256,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -289,7 +269,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -303,7 +282,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -317,7 +295,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -334,7 +311,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -348,7 +324,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -365,7 +340,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -379,7 +353,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -393,7 +366,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -407,7 +379,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -421,7 +392,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -435,7 +405,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -449,7 +418,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -463,7 +431,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -480,7 +447,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -494,7 +460,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -511,7 +476,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -525,7 +489,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -539,7 +502,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -553,7 +515,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -567,7 +528,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -580,7 +540,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -594,7 +553,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -608,7 +566,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -622,7 +579,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -635,7 +591,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -648,7 +603,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -662,7 +616,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -675,7 +628,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -689,7 +641,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -703,7 +654,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -716,7 +666,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -730,7 +679,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -744,7 +692,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -758,7 +705,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -771,7 +717,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -785,7 +730,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -798,7 +742,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -812,7 +755,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -825,7 +767,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -839,7 +780,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -853,7 +793,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -867,7 +806,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -880,7 +818,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -894,7 +831,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -907,7 +843,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -921,7 +856,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -935,7 +869,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -949,7 +882,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -962,7 +894,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -976,7 +907,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -990,7 +920,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1003,7 +932,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1017,7 +945,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1031,7 +958,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1044,7 +970,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1058,7 +983,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1072,7 +996,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1085,7 +1008,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1099,7 +1021,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1112,7 +1033,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1126,7 +1046,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1139,7 +1058,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1153,7 +1071,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1167,7 +1084,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1181,7 +1097,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1195,7 +1110,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1208,7 +1122,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1222,7 +1135,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1236,7 +1148,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1249,7 +1160,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1263,7 +1173,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1277,7 +1186,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1290,7 +1198,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1304,7 +1211,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1317,7 +1223,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1331,7 +1236,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1345,7 +1249,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1359,7 +1262,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1372,7 +1274,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",
@@ -1386,7 +1287,6 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
         "event.timezone": "+00:00",

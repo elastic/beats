@@ -21,9 +21,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
@@ -35,9 +32,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
@@ -313,6 +307,16 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#-------------------------------- Mssql Module --------------------------------
+- module: mssql
+  # Fileset for native deployment
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
   # Error logs
@@ -430,10 +434,10 @@ filebeat.modules:
     #input:
 
 #------------------------------- RabbitMQ Module -------------------------------
-#- module: rabbitmq
+- module: rabbitmq
   # All logs
-  #log:
-    #enabled: true
+  log:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

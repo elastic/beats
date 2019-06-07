@@ -51,8 +51,8 @@ func TestDataNameFilter(t *testing.T) {
 		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, conf)
-	data, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
 	assert.Equal(t, 3, len(data))
 }
@@ -70,8 +70,8 @@ func TestDataEmptyFilter(t *testing.T) {
 		"metricsets": []string{"diskio"},
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, conf)
-	data, errs := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
 	assert.Equal(t, 10, len(data))
 }
