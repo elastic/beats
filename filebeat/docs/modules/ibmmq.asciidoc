@@ -3,9 +3,9 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[filebeat-module-ibmmq]]
-:modulename: ibmmq
+:modulename: IBM MQ
 
-== ibmmq module
+== IBM MQ module
 
 This is the ibmmq module.
 
@@ -25,7 +25,8 @@ include::../include/running-modules.asciidoc[]
 This module comes with a sample dashboard. For example:
 
 [role="screenshot"]
-image::./images/kibana-apache.png[]
+image::./images/filebeat-ibmmq.png[]
+
 
 include::../include/configuring-intro.asciidoc[]
 

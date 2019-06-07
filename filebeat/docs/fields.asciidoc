@@ -5954,6 +5954,7 @@ ibmmq Module
 IBM MQ error logs
 
 
+<<<<<<< HEAD
 *`ibmmq.errorlog.process`*::
 +
 --
@@ -6005,21 +6006,12 @@ Please add description
 
 --
 
+=======
+>>>>>>> adjust json formatting
 *`ibmmq.errorlog.installation`*::
 +
 --
 type: keyword
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.vrmf`*::
-+
---
-type: text
 
 example: Please add example
 
@@ -6038,89 +6030,48 @@ Please add description
 
 --
 
-*`ibmmq.errorlog.iso8601_timestamp`*::
-+
---
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.remotehost`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
 *`ibmmq.errorlog.arithinsert1`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Changing content based on error.id
 
 --
 
 *`ibmmq.errorlog.arithinsert2`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Changing content based on error.id
 
 --
 
 *`ibmmq.errorlog.commentinsert1`*::
 +
 --
-type: text
+type: keyowrd
 
-example: Please add example
-
-Please add description
+Changing content based on error.id
 
 --
 
 *`ibmmq.errorlog.commentinsert2`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Changing content based on error.id
 
 --
 
 *`ibmmq.errorlog.commentinsert3`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.errorcode`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
+Changing content based on error.id
 
 --
 
@@ -6138,22 +6089,18 @@ Please add description
 *`ibmmq.errorlog.explanation`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Explaines the error in more detail
 
 --
 
 *`ibmmq.errorlog.action`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Defines what to do when the error occurs
 
 --
 
