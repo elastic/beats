@@ -163,7 +163,7 @@ filebeat.modules:
 #-------------------------------- Ibmmq Module --------------------------------
 - module: ibmmq
   # All logs
-  {fileset}:
+  errorlog:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
