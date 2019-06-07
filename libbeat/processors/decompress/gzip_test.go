@@ -273,5 +273,5 @@ func TestDecompressGzipField_String(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, "decompress_gzip_fields={\"Fields\":{\"a\":\"decompress.a\",\"b\":\"decompress.b\"},\"IgnoreMissing\":true,\"OverwriteKeys\":false,\"FailOnError\":true}", p.String())
+	assert.Equal(t, "decompress_gzip_fields=[a b]", p.String())
 }

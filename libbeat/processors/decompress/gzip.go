@@ -18,8 +18,8 @@
 package gzip
 
 import (
-	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/pkg/errors"
 
@@ -144,5 +144,10 @@ func (f *decompressGzipFields) decompressGzipField(src, dest string, event *beat
 
 // String returns a string representation of this processor.
 func (f decompressGzipFields) String() string {
-	return "decompress_gzip_fields=" + string(f.fields)
+	var returnString []string
+	for k, _ := range f.fields {
+		returnString = append(returnString, k)
+	}
+	sort.Strings(returnString)
+	return "decompress_gzip_fields=" + fmt.Sprint(returnString)
 }
