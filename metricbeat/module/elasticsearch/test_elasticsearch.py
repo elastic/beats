@@ -90,7 +90,7 @@ class Test(metricbeat.BaseTest):
             "hosts": self.get_hosts(),
             "period": "1s",
             "extras": {
-                "xpack.enabled":"true"
+                "xpack.enabled": "true"
             }
         }])
 
