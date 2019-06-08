@@ -1266,10 +1266,10 @@ example: project-x
 *`cloud.image.id`*::
 +
 --
-example: ami-abcd1234
-
 Image ID for the cloud instance.
 
+
+example: ami-abcd1234
 
 --
 
@@ -1615,26 +1615,13 @@ example: 6.0.0-rc2
 
 --
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 [float]
-== client fields
+=== client
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
 For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
 Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
-=======
->>>>>>> [Docs] Remove extraneous section levels from field docs
-=======
-[float]
-=== client
-
-A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
-For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
-Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
-
->>>>>>> Move description and run make update
 
 *`client.address`*::
 +
@@ -1791,16 +1778,11 @@ example: 12
 *`client.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the client.
 
 type: long
+
+format: string
 
 --
 
@@ -2179,16 +2161,11 @@ example: 12
 *`destination.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the destination.
 
 type: long
+
+format: string
 
 --
 
@@ -2488,13 +2465,8 @@ type: long
 
 example: 7
 
-<<<<<<< HEAD
 format: string
 
-Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`event.start`*::
@@ -3198,13 +3170,8 @@ type: long
 
 example: 404
 
-<<<<<<< HEAD
 format: string
 
-HTTP response status code.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`http.version`*::
@@ -3766,37 +3733,26 @@ example: ssh
 *`process.pid`*::
 +
 --
-<<<<<<< HEAD
+Process id.
+
 type: long
 
 example: 4242
 
 format: string
 
-=======
->>>>>>> Move description and run make update
-Process id.
-
-type: long
-
 --
 
 *`process.ppid`*::
 +
 --
-<<<<<<< HEAD
+Parent process' pid.
+
 type: long
 
 example: 4241
 
 format: string
-
-Parent process' pid.
-=======
-Process parent id.
->>>>>>> Move description and run make update
-
-type: long
 
 --
 
@@ -3820,13 +3776,8 @@ type: long
 
 example: 4242
 
-<<<<<<< HEAD
 format: string
 
-Thread ID.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`process.title`*::
@@ -4030,16 +3981,11 @@ example: 12
 *`server.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the server.
 
 type: long
+
+format: string
 
 --
 
@@ -4353,16 +4299,11 @@ example: 12
 *`source.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the source.
 
 type: long
+
+format: string
 
 --
 
@@ -4513,13 +4454,8 @@ type: long
 
 example: 443
 
-<<<<<<< HEAD
 format: string
 
-Port of the request, such as 443.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`url.query`*::
@@ -6024,12 +5960,12 @@ example: 18D109
 *`host.os.codename`*::
 +
 --
+OS codename, if any.
+
+
 type: keyword
 
 example: stretch
-
-OS codename, if any.
-
 
 --
 
@@ -7498,10 +7434,10 @@ alias to: event.created
 *`docker.attrs`*::
 +
 --
-type: object
-
 docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
 
+
+type: object
 
 --
 
@@ -7776,13 +7712,13 @@ MS SQL Filebeat Module
 
 
 [float]
-== mssql fields
+=== mssql
 
 Fields from the MSSQL log files
 
 
 [float]
-== log fields
+=== log
 
 Common log fields
 
@@ -7790,9 +7726,9 @@ Common log fields
 *`mssql.log.origin`*::
 +
 --
-type: keyword
-
 Origin of the message, usually the server but it can also be a recovery process
+
+type: keyword
 
 --
 
@@ -12009,36 +11945,18 @@ Module for Palo Alto Networks (PAN-OS)
 
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 [float]
-== panw fields
+=== panw
 
 Fields from the panw module.
-=======
-[float]
-=== palo_alto
-
-Fields from the palo_alto logs.
 
 
 
 [float]
-=== pan_os
+=== panos
 
 Fields for the Palo Alto Networks PAN-OS logs.
 
->>>>>>> Move description and run make update
-
-
-
-[float]
-== panos fields
-
-Fields for the Palo Alto Networks PAN-OS logs.
-
-=======
->>>>>>> [Docs] Remove extraneous section levels from field docs
 
 
 *`panw.panos.ruleset`*::

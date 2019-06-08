@@ -2421,10 +2421,10 @@ example: project-x
 *`cloud.image.id`*::
 +
 --
-example: ami-abcd1234
-
 Image ID for the cloud instance.
 
+
+example: ami-abcd1234
 
 --
 
@@ -4576,7 +4576,7 @@ Memory metrics.
 
 
 [float]
-== commit fields
+=== commit
 
 Committed bytes on Windows
 
@@ -4585,36 +4585,36 @@ Committed bytes on Windows
 *`docker.memory.commit.total`*::
 +
 --
+Total bytes
+
+
 type: long
 
 format: bytes
-
-Total bytes
-
 
 --
 
 *`docker.memory.commit.peak`*::
 +
 --
+Peak committed bytes on Windows
+
+
 type: long
 
 format: bytes
-
-Peak committed bytes on Windows
-
 
 --
 
 *`docker.memory.private_working_set.total`*::
 +
 --
+private working sets on Windows
+
+
 type: long
 
 format: bytes
-
-private working sets on Windows
-
 
 --
 
@@ -5066,26 +5066,13 @@ example: 6.0.0-rc2
 
 --
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 [float]
-== client fields
+=== client
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
 For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
 Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
-=======
->>>>>>> [Docs] Remove extraneous section levels from field docs
-=======
-[float]
-=== client
-
-A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
-For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
-Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
-
->>>>>>> Clean up headings to make content easier to scan
 
 *`client.address`*::
 +
@@ -5242,16 +5229,11 @@ example: 12
 *`client.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the client.
 
 type: long
+
+format: string
 
 --
 
@@ -5630,16 +5612,11 @@ example: 12
 *`destination.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the destination.
 
 type: long
+
+format: string
 
 --
 
@@ -5939,13 +5916,8 @@ type: long
 
 example: 7
 
-<<<<<<< HEAD
 format: string
 
-Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`event.start`*::
@@ -6649,13 +6621,8 @@ type: long
 
 example: 404
 
-<<<<<<< HEAD
 format: string
 
-HTTP response status code.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`http.version`*::
@@ -7217,37 +7184,26 @@ example: ssh
 *`process.pid`*::
 +
 --
-<<<<<<< HEAD
+Process id.
+
 type: long
 
 example: 4242
 
 format: string
 
-=======
->>>>>>> Move description and run make update
-Process id.
-
-type: long
-
 --
 
 *`process.ppid`*::
 +
 --
-<<<<<<< HEAD
+Parent process' pid.
+
 type: long
 
 example: 4241
 
 format: string
-
-Parent process' pid.
-=======
-Process parent id.
->>>>>>> Move description and run make update
-
-type: long
 
 --
 
@@ -7271,13 +7227,8 @@ type: long
 
 example: 4242
 
-<<<<<<< HEAD
 format: string
 
-Thread ID.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`process.title`*::
@@ -7481,16 +7432,11 @@ example: 12
 *`server.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the server.
 
 type: long
+
+format: string
 
 --
 
@@ -7804,16 +7750,11 @@ example: 12
 *`source.port`*::
 +
 --
-<<<<<<< HEAD
-type: long
-
-format: string
-
-=======
->>>>>>> Move description and run make update
 Port of the source.
 
 type: long
+
+format: string
 
 --
 
@@ -7964,13 +7905,8 @@ type: long
 
 example: 443
 
-<<<<<<< HEAD
 format: string
 
-Port of the request, such as 443.
-
-=======
->>>>>>> Move description and run make update
 --
 
 *`url.query`*::
@@ -11874,12 +11810,12 @@ example: 18D109
 *`host.os.codename`*::
 +
 --
+OS codename, if any.
+
+
 type: keyword
 
 example: stretch
-
-OS codename, if any.
-
 
 --
 
@@ -14034,30 +13970,20 @@ type: keyword
 *`kubernetes.container.cpu.limit.cores`*::
 +
 --
-<<<<<<< HEAD
-type: float
-
-=======
->>>>>>> Move description and run make update
 Container CPU cores limit
 
 
-type: long
+type: float
 
 --
 
 *`kubernetes.container.cpu.request.cores`*::
 +
 --
-<<<<<<< HEAD
-type: float
-
-=======
->>>>>>> Move description and run make update
 Container CPU requested cores
 
 
-type: long
+type: float
 
 --
 
@@ -19659,25 +19585,25 @@ type: long
 *`mysql.status.queries`*::
 +
 --
-type: long
-
 The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable. It does not count COM_PING or COM_STATISTICS commands.
 
+
+type: long
 
 --
 
 *`mysql.status.questions`*::
 +
 --
-type: long
-
 The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable. This variable does not count COM_PING, COM_STATISTICS, COM_STMT_PREPARE, COM_STMT_CLOSE, or COM_STMT_RESET commands.
 
+
+type: long
 
 --
 
 [float]
-== handler fields
+=== handler
 
 
 
@@ -19685,55 +19611,55 @@ The number of statements executed by the server. This includes only statements s
 *`mysql.status.handler.commit`*::
 +
 --
-type: long
-
 The number of internal COMMIT statements.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.delete`*::
 +
 --
-type: long
-
 The number of times that rows have been deleted from tables.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.external_lock`*::
 +
 --
-type: long
-
 The server increments this variable for each call to its external_lock() function, which generally occurs at the beginning and end of access to a table instance.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.mrr_init`*::
 +
 --
-type: long
-
 The number of times the server uses a storage engine's own Multi-Range Read implementation for table access.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.prepare`*::
 +
 --
-type: long
-
 A counter for the prepare phase of two-phase commit operations.
 
+
+type: long
 
 --
 
 [float]
-== read fields
+=== read
 
 
 
@@ -19741,131 +19667,131 @@ A counter for the prepare phase of two-phase commit operations.
 *`mysql.status.handler.read.first`*::
 +
 --
-type: long
-
 The number of times the first entry in an index was read.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.read.key`*::
 +
 --
-type: long
-
 The number of requests to read a row based on a key.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.read.last`*::
 +
 --
-type: long
-
 The number of requests to read the last key in an index. 
 
+
+type: long
 
 --
 
 *`mysql.status.handler.read.next`*::
 +
 --
-type: long
-
 The number of requests to read the next row in key order.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.read.prev`*::
 +
 --
-type: long
-
 The number of requests to read the previous row in key order.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.read.rnd`*::
 +
 --
-type: long
-
 The number of requests to read a row based on a fixed position. 
 
+
+type: long
 
 --
 
 *`mysql.status.handler.read.rnd_next`*::
 +
 --
-type: long
-
 The number of requests to read the next row in the data file. 
 
+
+type: long
 
 --
 
 *`mysql.status.handler.rollback`*::
 +
 --
-type: long
-
 The number of requests for a storage engine to perform a rollback operation.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.savepoint`*::
 +
 --
-type: long
-
 The number of requests for a storage engine to place a savepoint.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.savepoint_rollback`*::
 +
 --
-type: long
-
 The number of requests for a storage engine to roll back to a savepoint.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.update`*::
 +
 --
-type: long
-
 The number of requests to update a row in a table.
 
+
+type: long
 
 --
 
 *`mysql.status.handler.write`*::
 +
 --
-type: long
-
 The number of requests to insert a row in a table.
 
+
+type: long
 
 --
 
 [float]
-== innodb fields
+=== innodb
 
 
 
 
 [float]
-== buffer_pool fields
+=== buffer_pool
 
 
 
@@ -19873,25 +19799,25 @@ The number of requests to insert a row in a table.
 *`mysql.status.innodb.buffer_pool.dump_status`*::
 +
 --
-type: long
-
 The progress of an operation to record the pages held in the InnoDB buffer pool, triggered by the setting of innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.load_status`*::
 +
 --
-type: long
-
 The progress of an operation to warm up the InnoDB buffer pool by reading in a set of pages corresponding to an earlier point in time, triggered by the setting of innodb_buffer_pool_load_at_startup or innodb_buffer_pool_load_now.
 
+
+type: long
 
 --
 
 [float]
-== bytes fields
+=== bytes
 
 
 
@@ -19899,25 +19825,25 @@ The progress of an operation to warm up the InnoDB buffer pool by reading in a s
 *`mysql.status.innodb.buffer_pool.bytes.data`*::
 +
 --
-type: long
-
 The total number of bytes in the InnoDB buffer pool containing data. 
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.bytes.dirty`*::
 +
 --
-type: long
-
 The total current number of bytes held in dirty pages in the InnoDB buffer pool.
 
+
+type: long
 
 --
 
 [float]
-== pages fields
+=== pages
 
 
 
@@ -19925,75 +19851,75 @@ The total current number of bytes held in dirty pages in the InnoDB buffer pool.
 *`mysql.status.innodb.buffer_pool.pages.data`*::
 +
 --
-type: long
-
 he number of pages in the InnoDB buffer pool containing data.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pages.dirty`*::
 +
 --
-type: long
-
 The current number of dirty pages in the InnoDB buffer pool.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pages.flushed`*::
 +
 --
-type: long
-
 The number of requests to flush pages from the InnoDB buffer pool.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pages.free`*::
 +
 --
-type: long
-
 The number of free pages in the InnoDB buffer pool.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pages.latched`*::
 +
 --
-type: long
-
 The number of latched pages in the InnoDB buffer pool.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pages.misc`*::
 +
 --
-type: long
-
 The number of pages in the InnoDB buffer pool that are busy because they have been allocated for administrative overhead, such as row locks or the adaptive hash index.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pages.total`*::
 +
 --
-type: long
-
 The total size of the InnoDB buffer pool, in pages.
 
+
+type: long
 
 --
 
 [float]
-== read fields
+=== read
 
 
 
@@ -20001,45 +19927,45 @@ The total size of the InnoDB buffer pool, in pages.
 *`mysql.status.innodb.buffer_pool.read.ahead`*::
 +
 --
-type: long
-
 The number of pages read into the InnoDB buffer pool by the read-ahead background thread.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.read.ahead_evicted`*::
 +
 --
-type: long
-
 The number of pages read into the InnoDB buffer pool by the read-ahead background thread that were subsequently evicted without having been accessed by queries.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.read.ahead_rnd`*::
 +
 --
-type: long
-
 The number of "random" read-aheads initiated by InnoDB.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.read.requests`*::
 +
 --
-type: long
-
 The number of logical read requests.
 
+
+type: long
 
 --
 
 [float]
-== pool fields
+=== pool
 
 
 
@@ -20047,40 +19973,40 @@ The number of logical read requests.
 *`mysql.status.innodb.buffer_pool.pool.reads`*::
 +
 --
-type: long
-
 The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pool.resize_status`*::
 +
 --
-type: long
-
 The status of an operation to resize the InnoDB buffer pool dynamically, triggered by setting the innodb_buffer_pool_size parameter dynamically.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.pool.wait_free`*::
 +
 --
-type: long
-
 Normally, writes to the InnoDB buffer pool happen in the background. When InnoDB needs to read or create a page and no clean pages are available, InnoDB flushes some dirty pages first and waits for that operation to finish. This counter counts instances of these waits.
 
+
+type: long
 
 --
 
 *`mysql.status.innodb.buffer_pool.write_requests`*::
 +
 --
-type: long
-
 The number of writes done to the InnoDB buffer pool.
 
+
+type: long
 
 --
 
@@ -27328,10 +27254,10 @@ type: keyword
 *`vsphere.virtualmachine.os`*::
 +
 --
-type: keyword
-
 Virtual Machine Operating System name
 
+
+type: keyword
 
 --
 
