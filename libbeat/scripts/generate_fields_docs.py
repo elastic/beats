@@ -58,6 +58,8 @@ def document_field(output, field, field_path):
     if "deprecated" in field:
         output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
 
+    if "description" in field:
+        output.write("{}\n\n".format(field["description"]))
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
     if "example" in field:
@@ -68,8 +70,6 @@ def document_field(output, field, field_path):
         output.write("required: {}\n\n".format(field["required"]))
     if "path" in field:
         output.write("alias to: {}\n\n".format(field["path"]))
-    if "description" in field:
-        output.write("{}\n\n".format(field["description"]))
 
     if "index" in field:
         if not field["index"]:
