@@ -113,9 +113,8 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-. Download and install WinPcap from this
-http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
-a driver to enable packet capturing.
+. Download https://nmap.org/npcap/[Npcap] and install it in WinPcap
+API-compatible mode. Npcap is a packet sniffing library for Windows.
 
 . Download the Packetbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/packetbeat[downloads page].
