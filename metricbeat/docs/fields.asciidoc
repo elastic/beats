@@ -12904,10 +12904,20 @@ Request latency, number of requests
 
 --
 
-*`kubernetes.apiserver.request.latency.bucket.*`*::
+*`kubernetes.apiserver.request.latency.le`*::
 +
 --
-type: object
+type: long
+
+Request latency histogram buckets
+
+
+--
+
+*`kubernetes.apiserver.request.latency.value`*::
++
+--
+type: long
 
 Request latency histogram buckets
 
