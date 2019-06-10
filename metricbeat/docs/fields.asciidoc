@@ -12904,22 +12904,22 @@ Request latency, number of requests
 
 --
 
-*`kubernetes.apiserver.request.latency.le`*::
+*`kubernetes.apiserver.request.latency.le.key`*::
++
+--
+type: keyword
+
+Request latency, less or equal key
+
+
+--
+
+*`kubernetes.apiserver.request.latency.le.value`*::
 +
 --
 type: long
 
-Request latency histogram buckets
-
-
---
-
-*`kubernetes.apiserver.request.latency.value`*::
-+
---
-type: long
-
-Request latency histogram buckets
+Request latency, count value for the provided key
 
 
 --

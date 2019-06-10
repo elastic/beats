@@ -8,11 +8,15 @@
     "kubernetes": {
         "apiserver": {
             "request": {
-                "client": "kubectl/v1.6.1 (linux/amd64) kubernetes/b0b7a32",
-                "count": 4,
-                "resource": "configmaps",
-                "scope": "namespace",
-                "verb": "DELETE"
+                "latency": {
+                    "le": {
+                        "key": "500000",
+                        "value": 713
+                    }
+                },
+                "resource": "daemonsets",
+                "scope": "cluster",
+                "verb": "LIST"
             }
         }
     },

@@ -183,7 +183,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 
 func TestPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promMetrics}}
+	p := &prometheus{mockFetcher{response: promMetrics}, StandardLayout}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -862,7 +862,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &prometheus{mockFetcher{response: tc.prometheusResponse}}
+		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, StandardLayout}
 		p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {

@@ -36,11 +36,11 @@
       type: long
       description: >
         Request latency, number of requests
-    - name: request.latency.le
+    - name: request.latency.le.key
+      type: keyword
+      description: >
+        Request latency, less or equal key
+    - name: request.latency.le.value
       type: long
       description: >
-        Request latency histogram buckets
-    - name: request.latency.value
-      type: long
-      description: >
-        Request latency histogram buckets
+        Request latency, count value for the provided key
