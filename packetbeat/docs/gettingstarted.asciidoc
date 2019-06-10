@@ -114,7 +114,9 @@ endif::[]
 ifeval::["{release-state}"!="unreleased"]
 
 . Download https://nmap.org/npcap/[Npcap] and install it in WinPcap
-API-compatible mode. Npcap is a packet sniffing library for Windows.
+API-compatible mode. Npcap is a packet sniffing library for Windows. If you plan
+to capture traffic from the loopback device (127.0.0.1 traffic), also select the
+option to support loopback traffic. 
 
 . Download the Packetbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/packetbeat[downloads page].
