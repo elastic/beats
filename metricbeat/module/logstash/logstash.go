@@ -105,7 +105,7 @@ func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
 
 // GetPipelinesStats returns the list of pipelines (and their stats) running on a Logstash node
 func GetPipelinesStats(http *helper.HTTP, resetURI string) ([]PipelineStats, error) {
-	content, err := fetchPath(http, resetURI, "_node/stats/pipelines", "")
+	content, err := fetchPath(http, resetURI, "_node/stats", "vertices=true")
 	if err != nil {
 		return nil, errors.Wrap(err, "could not fetch node pipeline stats")
 	}

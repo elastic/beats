@@ -91,7 +91,6 @@ type PipelineStats struct {
 	Reloads     map[string]interface{}   `json:"reloads"`
 	Queue       map[string]interface{}   `json:"queue"`
 	Vertices    []map[string]interface{} `json:"vertices"`
-	ClusterIDs  []string                 `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
 }
 
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
@@ -168,20 +167,31 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 func makeClusterToPipelinesMap(pipelines []PipelineStats) map[string][]PipelineStats {
 	var clusterToPipelinesMap map[string][]PipelineStats
+	clusterToPipelinesMap = make(map[string][]PipelineStats)
 
 	for _, pipeline := range pipelines {
-		clusterUUIDs := pipeline.ClusterIDs
-		if clusterUUIDs == nil {
-			clusterUUIDs = []string{""}
+		var clusterUUIDs []string
+		for _, vertex := range pipeline.Vertices {
+			c, ok := vertex["cluster_uuid"]
+			if !ok {
+				continue
+			}
+
+			clusterUUID, ok := c.(string)
+			if !ok {
+				continue
+			}
+
+			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
 		for _, clusterUUID := range clusterUUIDs {
 			clusterPipelines := clusterToPipelinesMap[clusterUUID]
 			if clusterPipelines == nil {
-				clusterPipelines = []PipelineStats{}
+				clusterToPipelinesMap[clusterUUID] = []PipelineStats{}
 			}
 
-			clusterPipelines = append(clusterPipelines, pipeline)
+			clusterToPipelinesMap[clusterUUID] = append(clusterPipelines, pipeline)
 		}
 	}
 
