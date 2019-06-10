@@ -183,15 +183,15 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 
 func TestPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promMetrics}, StandardLayout}
-
 	tests := []struct {
 		mapping  *MetricsMapping
+		layout   EventLayout
 		msg      string
 		expected []common.MapStr
 	}{
 		{
-			msg: "Simple field map",
+			msg:    "Simple field map",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric": Metric("first.metric"),
@@ -206,7 +206,24 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Simple field map with labels",
+			msg:    "Simple field map using expanded layout",
+			layout: ExpandedBucketsLayout,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": Metric("first.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+				},
+			},
+		},
+		{
+			msg:    "Simple field map with labels",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric": Metric("first.metric"),
@@ -229,7 +246,8 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Several metrics",
+			msg:    "Several metrics",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric":  Metric("first.metric"),
@@ -259,7 +277,39 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Grouping by key labels",
+			msg:    "Several metrics using expanded layout",
+			layout: ExpandedBucketsLayout,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric":  Metric("first.metric"),
+					"second_metric": Metric("second.metric"),
+				},
+				Labels: map[string]LabelMap{
+					"label3": KeyLabel("labels.label3"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"first": common.MapStr{
+						"metric": 1.0,
+					},
+					"labels": common.MapStr{
+						"label3": "Value3",
+					},
+				},
+				common.MapStr{
+					"second": common.MapStr{
+						"metric": 0.0,
+					},
+					"labels": common.MapStr{
+						"label3": "othervalue",
+					},
+				},
+			},
+		},
+		{
+			msg:    "Grouping by key labels",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric":  Metric("first.metric"),
@@ -286,7 +336,8 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Keyword metrics",
+			msg:    "Keyword metrics",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric":  KeywordMetric("first.metric", "works"),
@@ -308,7 +359,8 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Boolean metrics",
+			msg:    "Boolean metrics",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric":  BooleanMetric("first.metric"),
@@ -333,7 +385,8 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Label metrics",
+			msg:    "Label metrics",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric": LabelMetric("first.metric", "label3"),
@@ -354,7 +407,8 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Label metrics, lowercase",
+			msg:    "Label metrics, lowercase",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric": LabelMetric("first.metric", "label4", OpLowercaseValue()),
@@ -375,7 +429,8 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Label metrics, filter",
+			msg:    "Label metrics, filter",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric": LabelMetric("first.metric", "label4", OpLowercaseValue(), OpFilter(map[string]string{
@@ -389,7 +444,8 @@ func TestPrometheus(t *testing.T) {
 			expected: []common.MapStr{},
 		},
 		{
-			msg: "Summary metric",
+			msg:    "Summary metric",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"summary_metric": Metric("summary.metric"),
@@ -412,7 +468,57 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Histogram metric",
+			msg:    "Summary metric using expanded layout",
+			layout: ExpandedBucketsLayout,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"summary_metric": Metric("summary.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"summary": common.MapStr{
+						"metric": common.MapStr{
+							"sum":   234892394.0,
+							"count": uint64(44000),
+						},
+					},
+				},
+				common.MapStr{
+					"summary": common.MapStr{
+						"metric": common.MapStr{
+							"quantile": common.MapStr{
+								"key":   "50",
+								"value": 29735.0,
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"summary": common.MapStr{
+						"metric": common.MapStr{
+							"quantile": common.MapStr{
+								"key":   "90",
+								"value": 47103.0,
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"summary": common.MapStr{
+						"metric": common.MapStr{
+							"quantile": common.MapStr{
+								"key":   "99",
+								"value": 50681.0,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Histogram metric",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"histogram_metric": Metric("histogram.metric"),
@@ -439,7 +545,99 @@ func TestPrometheus(t *testing.T) {
 			},
 		},
 		{
-			msg: "Histogram decimal metric",
+			msg:    "Histogram metric using expanded layout",
+			layout: ExpandedBucketsLayout,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"histogram_metric": Metric("histogram.metric"),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"count": uint64(1),
+							"sum":   117.0,
+						},
+					},
+				},
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"le": common.MapStr{
+								"key":   "+Inf",
+								"value": uint64(1),
+							},
+						},
+					},
+				},
+
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"le": common.MapStr{
+								"key":   "1000",
+								"value": uint64(1),
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"le": common.MapStr{
+								"key":   "10000",
+								"value": uint64(1),
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"le": common.MapStr{
+								"key":   "100000",
+								"value": uint64(1),
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"le": common.MapStr{
+								"key":   "1000000",
+								"value": uint64(1),
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"le": common.MapStr{
+								"key":   "100000000",
+								"value": uint64(1),
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"le": common.MapStr{
+								"key":   "1000000000",
+								"value": uint64(1),
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			msg:    "Histogram decimal metric",
+			layout: StandardLayout,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"histogram_decimal_metric": Metric("histogram.metric", OpMultiplyBuckets(1000)),
@@ -468,16 +666,19 @@ func TestPrometheus(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.msg, func(t *testing.T) {
 			reporter := &mbtest.CapturingReporterV2{}
+			p := &prometheus{mockFetcher{response: promMetrics}, test.layout}
 			p.ReportProcessedMetrics(test.mapping, reporter)
 			assert.Nil(t, reporter.GetErrors(), test.msg)
+
 			// Sort slice to avoid randomness
 			res := reporter.GetEvents()
 			sort.Slice(res, func(i, j int) bool {
 				return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 			})
-			assert.Equal(t, len(test.expected), len(res))
-			for j, ev := range res {
-				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
+			if assert.Equal(t, len(test.expected), len(res)) {
+				for j, ev := range res {
+					assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
+				}
 			}
 		})
 	}
