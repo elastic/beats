@@ -19,6 +19,7 @@ package index_summary
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -65,6 +66,17 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	err := json.Unmarshal(content, &all)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
+	}
+
+	p := all.Data["primaries"]
+	primaries, ok := p.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("primaries is not a map")
+	}
+
+	if len(primaries) == 0 {
+		// There is no data in the cluster, hence no metrics to parse or report
+		return nil
 	}
 
 	fields, err := xpackSchema.Apply(all.Data)
