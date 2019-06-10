@@ -152,11 +152,11 @@ func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time
 
 // GetResourcesTags function queries AWS resource groupings tagging API
 // to get a resource tag mapping with specific resource type filters
-func GetResourcesTags(svc resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI, resourceTypeFilters []string) (map[string][]resourcegroupstaggingapi.Tag, error) {
+func GetResourcesTags(svc resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI, resourceTypeFilter string) (map[string][]resourcegroupstaggingapi.Tag, error) {
 	resourceTagMap := make(map[string][]resourcegroupstaggingapi.Tag)
 	getResourcesInput := &resourcegroupstaggingapi.GetResourcesInput{
 		PaginationToken:     nil,
-		ResourceTypeFilters: resourceTypeFilters,
+		ResourceTypeFilters: []string{resourceTypeFilter},
 	}
 
 	init := true
@@ -170,7 +170,7 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ResourceGroupsTaggingAPI
 		}
 
 		getResourcesInput.PaginationToken = output.PaginationToken
-		if len(resourceTypeFilters) == 0 || len(output.ResourceTagMappingList) == 0 {
+		if resourceTypeFilter == "" || len(output.ResourceTagMappingList) == 0 {
 			return nil, nil
 		}
 

@@ -221,3 +221,28 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		assert.Equal(t, c.expectedNamespace, namespaces)
 	}
 }
+
+func TestGetResourceTypeUsingNamespace(t *testing.T) {
+	cases := []struct {
+		namespace            string
+		expectedResourceType string
+	}{
+		{
+			"AWS/EC2",
+			"ec2",
+		},
+		{
+			"AWS/Lambda",
+			"lambda",
+		},
+		{
+			"AWS/ELB",
+			"elasticloadbalancing",
+		},
+	}
+
+	for _, c := range cases {
+		resourceType := getResourceTypeUsingNamespace(c.namespace)
+		assert.Equal(t, c.expectedResourceType, resourceType)
+	}
+}

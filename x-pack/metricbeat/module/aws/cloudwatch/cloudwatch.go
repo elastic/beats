@@ -107,9 +107,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 		resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 		for _, listMetric := range listMetrics {
-			resourceTypeFilters := getResourceTypeUsingNamespace(*listMetric.Namespace)
-			if resourceTypeFilters != nil {
-				resourceTagMapPerMetric, err := aws.GetResourcesTags(svcResourceAPI, resourceTypeFilters)
+			resourceTypeFilter := strings.TrimPrefix(*listMetric.Namespace, "AWS/")
+			if resourceTypeFilter != "" {
+				resourceTagMapPerMetric, err := aws.GetResourcesTags(svcResourceAPI, resourceTypeFilter)
 				if err != nil {
 					err = errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName)
 					report.Error(err)
@@ -144,13 +144,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// Get tags
 			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
-			resourceTypeFilters := getResourceTypeUsingNamespace(namespace)
+			resourceTypeFilter := getResourceTypeUsingNamespace(namespace)
 			var resourceTagMap map[string][]resourcegroupstaggingapi.Tag
-			if resourceTypeFilters != nil {
-				resourceTagMap, err = aws.GetResourcesTags(svcResourceAPI, resourceTypeFilters)
+			if resourceTypeFilter != "" {
+				resourceTagMap, err = aws.GetResourcesTags(svcResourceAPI, resourceTypeFilter)
 				if err != nil {
 					err = errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName)
-					report.Error(err)
+					m.Logger().Error(err.Error())
 				}
 			}
 
@@ -368,15 +368,17 @@ func createEvents(svcCloudwatch cloudwatchiface.CloudWatchAPI, listMetricsTotal 
 	return nil
 }
 
-func getResourceTypeUsingNamespace(namespace string) []string {
-	// A namespace will have one to more resource types, define the map to be a
-	// map[string][]string for easier extension in the future.
+func getResourceTypeUsingNamespace(namespace string) string {
+	// Some resource name is similar to namespace name.
+	// For example:
+	// ec2 instances: "AWS/EC2" is the namespace name, "ec2" is the resource name.
+	// Some resource name is not as easy to get from namespace name.
+	// For example:
+	// load balancer: "AWS/ELB" is the namespace name, "elasticloadbalancing" is the resource name.
 	// https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
-	resourceTypeNamespaceMap := map[string][]string{
-		"AWS/EC2": {"ec2:instance"},
-		"AWS/RDS": {"rds:db"},
-		"AWS/S3":  {"s3:"},
-		"AWS/SQS": {"sqs:"},
+	if namespace == "AWS/ELB" {
+		return "elasticloadbalancing"
 	}
-	return resourceTypeNamespaceMap[namespace]
+
+	return strings.ToLower(strings.TrimPrefix(namespace, "AWS/"))
 }
