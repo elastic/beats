@@ -36,8 +36,11 @@
       type: long
       description: >
         Request latency, number of requests
-    - name: request.latency.bucket.*
-      type: object
-      object_type: long
+    - name: request.latency.le
+      type: long
+      description: >
+        Request latency histogram buckets
+    - name: request.latency.value
+      type: long
       description: >
         Request latency histogram buckets

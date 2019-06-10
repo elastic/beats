@@ -53,6 +53,6 @@ func init() {
 	}
 
 	mb.Registry.MustAddMetricSet("etcd", "metrics",
-		prometheus.MetricSetBuilder(mapping),
+		prometheus.MetricSetBuilder(mapping, prometheus.StandardLayout),
 		mb.WithHostParser(prometheus.HostParser))
 }

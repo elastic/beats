@@ -41,6 +41,6 @@ var mapping = &prometheus.MetricsMapping{
 
 func init() {
 	mb.Registry.MustAddMetricSet("coredns", "stats",
-		prometheus.MetricSetBuilder(mapping),
+		prometheus.MetricSetBuilder(mapping, prometheus.StandardLayout),
 		mb.WithHostParser(prometheus.HostParser))
 }

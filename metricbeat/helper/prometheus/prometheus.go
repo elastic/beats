@@ -40,8 +40,20 @@ type Prometheus interface {
 	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2)
 }
 
+// EventLayout defines the structural option of how metrics are transformed into events
+type EventLayout int
+
+const (
+	// StandardLayout will group metrics with same name and keylabels into an event
+	StandardLayout EventLayout = iota
+	//ExpandedBucketsLayout will use expand Histograms and Summaries from the standardlayout
+	// and generate an event for each histogram `le` value and summary `quantile`
+	ExpandedBucketsLayout
+)
+
 type prometheus struct {
 	httpfetcher
+	EventLayout EventLayout
 }
 
 type httpfetcher interface {
@@ -49,12 +61,12 @@ type httpfetcher interface {
 }
 
 // NewPrometheusClient creates new prometheus helper
-func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
+func NewPrometheusClient(base mb.BaseMetricSet, layout EventLayout) (Prometheus, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
-	return &prometheus{http}, nil
+	return &prometheus{http, layout}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
@@ -124,6 +136,7 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			field := m.GetField()
+
 			value := m.GetValue(metric)
 
 			// Ignore retrieval errors (bad conf)
@@ -161,6 +174,84 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
+				// TODO only if expanding values
+				if v, ok := value.(common.MapStr); ok && p.EventLayout == ExpandedBucketsLayout {
+					var expanded common.MapStr
+					// only checking "sum", not "count", since they are populated
+					// checking "sum" existence only at commonMetric.GetValue function
+					if _, ok := v["sum"]; ok {
+						expanded = common.MapStr{}
+						expanded["sum"] = v["sum"]
+						expanded["count"] = v["count"]
+
+						// create unique selector for the event
+						// and a new event starting with keyLabels map clone
+						selector := field + keyLabels.String() + "sum-count"
+						event := keyLabels.Clone()
+						eventsMap[selector] = event
+						update := common.MapStr{}
+						update.Put(field, expanded)
+						event.DeepUpdate(update)
+						event.DeepUpdate(labels)
+					}
+
+					// if data came from summary, create an event per "percentile" item
+					if p, ok := v["percentile"]; ok {
+						expanded = common.MapStr{}
+
+						percentile, ok := p.(common.MapStr)
+						if !ok {
+							// should never go through here
+							return nil, fmt.Errorf("error converting percentile at %s to event document", field)
+						}
+
+						for k, v := range percentile {
+							expanded = common.MapStr{}
+							expanded.Put("quantile.key", k)
+							expanded.Put("quantile.value", v)
+
+							// create unique selector for the event
+							// and a new event starting with keyLabels map clone
+							selector := field + keyLabels.String() + k
+							event := keyLabels.Clone()
+							eventsMap[selector] = event
+							update := common.MapStr{}
+							update.Put(field, expanded)
+							event.DeepUpdate(update)
+							event.DeepUpdate(labels)
+
+						}
+					}
+
+					// if data came from histogram, create an event per "le" item
+					if b, ok := v["bucket"]; ok {
+						bucket, ok := b.(common.MapStr)
+						if !ok {
+							// should never go through here
+							return nil, fmt.Errorf("error converting histogram at %s to event document", field)
+						}
+
+						for k, v := range bucket {
+							expanded = common.MapStr{}
+							expanded.Put("le.key", k)
+							expanded.Put("le.value", v)
+
+							// create unique selector for the event
+							// and a new event starting with keyLabels map clone
+							selector := field + keyLabels.String() + k
+							event := keyLabels.Clone()
+							eventsMap[selector] = event
+							update := common.MapStr{}
+							update.Put(field, expanded)
+							event.DeepUpdate(update)
+							event.DeepUpdate(labels)
+
+						}
+					}
+
+					continue
+
+				}
 				event := getEvent(eventsMap, keyLabels)
 				update := common.MapStr{}
 				update.Put(field, value)

@@ -52,7 +52,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	prometheus, err := p.NewPrometheusClient(base)
+	prometheus, err := p.NewPrometheusClient(base, p.StandardLayout)
 	if err != nil {
 		return nil, err
 	}

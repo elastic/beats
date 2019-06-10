@@ -39,6 +39,6 @@ func init() {
 	}
 
 	mb.Registry.MustAddMetricSet("kubernetes", "apiserver",
-		prometheus.MetricSetBuilder(mapping),
+		prometheus.MetricSetBuilder(mapping, prometheus.ExpandedBucketsLayout),
 		mb.WithHostParser(prometheus.HostParser))
 }

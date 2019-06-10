@@ -36,9 +36,9 @@ var (
 )
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using the given mapping
-func MetricSetBuilder(mapping *MetricsMapping) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+func MetricSetBuilder(mapping *MetricsMapping, layout EventLayout) func(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return func(base mb.BaseMetricSet) (mb.MetricSet, error) {
-		prometheus, err := NewPrometheusClient(base)
+		prometheus, err := NewPrometheusClient(base, layout)
 		if err != nil {
 			return nil, err
 		}
