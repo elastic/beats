@@ -21,9 +21,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
@@ -35,9 +32,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
@@ -81,6 +75,33 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+#-------------------------------- Cisco Module --------------------------------
+- module: cisco
+  asa:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+    # Set the log level from 1 (alerts only) to 7 (include all messages).
+    # Messages with a log level higher than the specified will be dropped.
+    # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
+    #var.log_level: 7
+
+#------------------------------- Coredns Module -------------------------------
+- module: coredns
+  # Fileset for native deployment
+  log: 
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #---------------------------- Elasticsearch Module ----------------------------
 - module: elasticsearch
@@ -128,6 +149,16 @@ filebeat.modules:
     # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
     #var.convert_timezone: false
 
+
+#------------------------------ Envoyproxy Module ------------------------------
+- module: envoyproxy
+  # Fileset for native deployment
+  log: 
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
@@ -276,6 +307,16 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#-------------------------------- Mssql Module --------------------------------
+- module: mssql
+  # Fileset for native deployment
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
   # Error logs
@@ -366,6 +407,18 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  panos:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input:
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs
@@ -379,6 +432,19 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+#------------------------------- RabbitMQ Module -------------------------------
+- module: rabbitmq
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths: ["/var/log/rabbitmq/rabbit@localhost.log*"]
+
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
 
 #-------------------------------- Redis Module --------------------------------
 #- module: redis
@@ -534,6 +600,10 @@ filebeat.inputs:
   # All bytes after max_bytes are discarded and not sent. The default is 10MB.
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
+
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
 
   ### Recursive glob configuration
 
@@ -696,6 +766,10 @@ filebeat.inputs:
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
+  # Size of the UDP read buffer in bytes
+  #read_buffer: 0
+
+
 #------------------------------ TCP input --------------------------------
 # Experimental: Config options for the TCP input
 #- type: tcp
@@ -840,6 +914,11 @@ filebeat.inputs:
   # processing.
   #queue_size: 8192
 
+  # Custom field definitions for NetFlow V9 / IPFIX.
+  # List of files with YAML fields definition.
+  #custom_definitions:
+  #- path/to/ipfix.yaml
+  #- path/to/netflow.yaml
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -873,6 +952,14 @@ filebeat.inputs:
 # to disk. When flush is set to 0s, the registry is written to disk after each
 # batch of events has been published successfully. The default value is 0s.
 #filebeat.registry.flush: 0s
+
+
+# Starting with Filebeat 7.0, the registry uses a new directory format to store
+# Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
+# registry file to use the new directory format. If you changed
+# filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
+# point to the old registry file.
+#filebeat.registry.migrate_file: ${path.data}/registry
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -1114,6 +1201,42 @@ filebeat.inputs:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+# The following example copies the value of message to message_copied
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: message_copied
+#    fail_on_error: true
+#    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
 
 #============================= Elastic Cloud ==================================
 
@@ -1179,6 +1302,11 @@ output.elasticsearch:
 
   # Proxy server URL
   #proxy_url: http://proxy:3128
+
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
 
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
@@ -1422,6 +1550,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -1922,24 +2054,30 @@ logging.files:
   # Unix epoch. Defaults to disabled.
   #interval: 0
 
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
+
 # Set to true to log messages in JSON format.
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# filebeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== Xpack Monitoring ===============================
+# filebeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
@@ -2051,5 +2189,5 @@ logging.files:
 
 #================================= Migration ==================================
 
-# This allows to enable migration aliases
-#migration.enabled: false
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: false

@@ -93,8 +93,11 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 
 // MetricsMapping defines mapping settings for Prometheus metrics, to be used with `GetProcessedMetrics`
 type MetricsMapping struct {
-	// Metrics translates from from prometheus metric name to Metricbeat fields
+	// Metrics translates from prometheus metric name to Metricbeat fields
 	Metrics map[string]MetricMap
+
+	// Namespace for metrics managed by this mapping
+	Namespace string
 
 	// Labels translate from prometheus label names to Metricbeat fields
 	Labels map[string]LabelMap
@@ -158,9 +161,12 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
-				// Put it in the event if it's a common metric
 				event := getEvent(eventsMap, keyLabels)
-				event.Put(field, value)
+				update := common.MapStr{}
+				update.Put(field, value)
+				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
+				event.DeepUpdate(update)
+
 				event.DeepUpdate(labels)
 			}
 		}
@@ -213,7 +219,10 @@ func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.Report
 		return
 	}
 	for _, event := range events {
-		r.Event(mb.Event{MetricSetFields: event})
+		r.Event(mb.Event{
+			MetricSetFields: event,
+			Namespace:       mapping.Namespace,
+		})
 	}
 }
 

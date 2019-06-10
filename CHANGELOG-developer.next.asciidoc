@@ -14,20 +14,31 @@ Note: This changelog documents the current changes which are not yet present in
 an actual release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-beta1..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-rc2..master[Check the HEAD diff]
 
-The list below covers the major changes between 7.0.0-beta1 and master only.
+The list below covers the major changes between 7.0.0-rc2 and master only.
 
 ==== Breaking changes
 
-- Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
+- Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
 
 ==== Bugfixes
-- Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
 
 ==== Added
 
 - Metricset generator generates beta modules by default now. {pull}10657[10657]
-- Move host name addition to a processor. {pull}10728[10728]
 - The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
 - Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
+- Support for Logger in the Metricset base instance. {pull}11106[11106]
+- Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
+- Added support for using PYTHON_EXE to control what Python interpreter is used
+  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
+- Prometheus helper for metricbeat contains now `Namespace` field for `prometheus.MetricsMappings` {pull}11424[11424]
+- Update Jinja2 version to 2.10.1. {pull}11817[11817]
+- Reduce idxmgmt.Supporter interface and rework export commands to reuse logic. {pull}11777[11777],{pull}12065[12065],{pull}12067[12067],{pull}12160[12160]
+- Update urllib3 version to 1.24.2 {pull}11930[11930]
+- Add libbeat/common/cleanup package. {pull}12134[12134]
+- New helper to check for leaked goroutines on tests. {pull}12106[12106]
+- Only Load minimal template if no fields are provided. {pull}12103[12103]
+- Add new option `IgnoreAllErrors` to `libbeat.common.schema` for skipping fields that failed while converting. {pull}12089[12089]
+- Deprecate setup cmds for `template` and `ilm-policy`. Add new setup cmd for `index-management`. {pull}12132[12132]

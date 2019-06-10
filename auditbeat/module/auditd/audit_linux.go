@@ -20,6 +20,7 @@ package auditd
 import (
 	"fmt"
 	"os"
+	"os/user"
 	"runtime"
 	"strconv"
 	"strings"
@@ -47,6 +48,7 @@ const (
 
 	unicast   = "unicast"
 	multicast = "multicast"
+	uidUnset  = "unset"
 
 	lostEventsUpdateInterval        = time.Second * 15
 	maxDefaultStreamBufferConsumers = 4
@@ -467,21 +469,28 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		aucoalesce.ResolveIDs(auditEvent)
 	}
 
+	eventOutcome := auditEvent.Result
+	if eventOutcome == "fail" {
+		eventOutcome = "failure"
+	}
 	out := mb.Event{
 		Timestamp: auditEvent.Timestamp,
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"category": auditEvent.Category.String(),
 				"action":   auditEvent.Summary.Action,
+				"outcome":  eventOutcome,
 			},
 		},
 		ModuleFields: common.MapStr{
 			"message_type": strings.ToLower(auditEvent.Type.String()),
 			"sequence":     auditEvent.Sequence,
 			"result":       auditEvent.Result,
-			"session":      auditEvent.Session,
 			"data":         createAuditdData(auditEvent.Data),
 		},
+	}
+	if auditEvent.Session != uidUnset {
+		out.ModuleFields.Put("session", auditEvent.Session)
 	}
 
 	// Add root level fields.
@@ -530,7 +539,59 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		m.Put("paths", auditEvent.Paths)
 	}
 
+	switch auditEvent.Category {
+	case aucoalesce.EventTypeUserLogin:
+		// Customize event.type / event.category to match unified values.
+		normalizeEventFields(out.RootFields)
+		// Set ECS user fields from the attempted login account.
+		if usernameOrID := auditEvent.Summary.Actor.Secondary; usernameOrID != "" {
+			if usr, err := resolveUsernameOrID(usernameOrID); err == nil {
+				out.RootFields.Put("user.name", usr.Username)
+				out.RootFields.Put("user.id", usr.Uid)
+			} else {
+				// The login account doesn't exists. Treat it as a user name
+				out.RootFields.Put("user.name", usernameOrID)
+				out.RootFields.Delete("user.id")
+			}
+		}
+	}
+
 	return out
+}
+
+func resolveUsernameOrID(userOrID string) (usr *user.User, err error) {
+	usr, err = user.Lookup(userOrID)
+	if err == nil {
+		// User found by name
+		return
+	}
+	if _, ok := err.(user.UnknownUserError); !ok {
+		// Lookup failed by a reason other than user not found
+		return
+	}
+	return user.LookupId(userOrID)
+}
+
+func normalizeEventFields(m common.MapStr) {
+	getFieldAsStr := func(key string) (s string, found bool) {
+		iface, err := m.GetValue(key)
+		if err != nil {
+			return
+		}
+		s, found = iface.(string)
+		return
+	}
+
+	category, ok1 := getFieldAsStr("event.category")
+	action, ok2 := getFieldAsStr("event.action")
+	outcome, ok3 := getFieldAsStr("event.outcome")
+	if !ok1 || !ok2 || !ok3 {
+		return
+	}
+	if category == "user-login" && action == "logged-in" { // USER_LOGIN
+		m.Put("event.category", "authentication")
+		m.Put("event.type", fmt.Sprintf("authentication_%s", outcome))
+	}
 }
 
 func addUser(u aucoalesce.User, m common.MapStr) {
@@ -538,6 +599,9 @@ func addUser(u aucoalesce.User, m common.MapStr) {
 	m.Put("user", user)
 
 	for id, value := range u.IDs {
+		if value == uidUnset {
+			continue
+		}
 		switch id {
 		case "uid":
 			user["id"] = value

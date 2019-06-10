@@ -23,11 +23,20 @@
       description: >
         All TCP connections
       fields:
+        - name: memory
+          type: integer
+          format: bytes
+          description: >
+            Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
         - name: all
           type: group
           description: >
             All TCP connections
           fields:
+            - name: orphan
+              type: integer
+              description: >
+                A count of all orphaned tcp sockets. Only available on Linux.
             - name: count
               type: integer
               description: >
@@ -53,6 +62,11 @@
       description: >
         All UDP connections
       fields:
+        - name: memory
+          type: integer
+          format: bytes
+          description: >
+            Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
         - name: all
           type: group
           description: >
@@ -61,7 +75,7 @@
             - name: count
               type: integer
               description: >
-                All open TCP connections
+                All open UDP connections
 
 
 

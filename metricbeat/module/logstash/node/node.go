@@ -19,7 +19,6 @@ package node
 
 import (
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
@@ -34,18 +33,22 @@ func init() {
 	)
 }
 
+const (
+	nodePath = "/_node"
+)
+
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		PathConfigKey: "path",
-		DefaultPath:   "_node",
+		DefaultPath:   nodePath,
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
-	http *helper.HTTP
+	*helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -69,16 +72,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	content, err := m.http.FetchContent()
-	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	if !m.MetricSet.XPack {
+		content, err := m.HTTP.FetchContent()
+		if err != nil {
+			return err
+		}
+
+		return eventMapping(r, content)
 	}
 
-	err = eventMapping(r, content)
+	pipelinesContent, err := logstash.GetPipelines(m.HTTP, m.HostData().SanitizedURI+nodePath)
 	if err != nil {
-		m.Log.Error(err)
-		return
+		m.Logger().Error(err)
+		return nil
 	}
+
+	err = eventMappingXPack(r, m, pipelinesContent)
+	if err != nil {
+		m.Logger().Error(err)
+	}
+
+	return nil
 }

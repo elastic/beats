@@ -1,9 +1,12 @@
-
 - key: beat
   title: Beat
   description: >
     Contains common beat fields available in all event types.
   fields:
+    - name: agent.hostname
+      type: keyword
+      description: Hostname of the agent.
+
     - name: beat.timezone
       type: alias
       path: event.timezone
@@ -34,3 +37,7 @@
       type: alias
       path: agent.hostname
       migration: true
+
+    - name: timeseries.instance
+      type: keyword
+      description: Time series instance id

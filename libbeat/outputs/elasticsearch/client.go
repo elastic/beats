@@ -65,6 +65,7 @@ type Client struct {
 type ClientSettings struct {
 	URL                string
 	Proxy              *url.URL
+	ProxyDisable       bool
 	TLS                *transport.TLSConfig
 	Username, Password string
 	EscapeHTML         bool
@@ -77,7 +78,8 @@ type ClientSettings struct {
 	Observer           outputs.Observer
 }
 
-type connectCallback func(client *Client) error
+// ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster
+type ConnectCallback func(client *Client) error
 
 // Connection manages the connection for a given client.
 type Connection struct {
@@ -139,9 +141,12 @@ func NewClient(
 	s ClientSettings,
 	onConnect *callbacksRegistry,
 ) (*Client, error) {
-	proxy := http.ProxyFromEnvironment
-	if s.Proxy != nil {
-		proxy = http.ProxyURL(s.Proxy)
+	var proxy func(*http.Request) (*url.URL, error)
+	if !s.ProxyDisable {
+		proxy = http.ProxyFromEnvironment
+		if s.Proxy != nil {
+			proxy = http.ProxyURL(s.Proxy)
+		}
 	}
 
 	pipeline := s.Pipeline
@@ -225,6 +230,16 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
+		globalCallbackRegistry.mutex.Lock()
+		defer globalCallbackRegistry.mutex.Unlock()
+
+		for _, callback := range globalCallbackRegistry.callbacks {
+			err := callback(client)
+			if err != nil {
+				return err
+			}
+		}
+
 		if onConnect != nil {
 			onConnect.mutex.Lock()
 			defer onConnect.mutex.Unlock()
@@ -251,10 +266,14 @@ func (client *Client) Clone() *Client {
 
 	c, _ := NewClient(
 		ClientSettings{
-			URL:              client.URL,
-			Index:            client.index,
-			Pipeline:         client.pipeline,
-			Proxy:            client.proxyURL,
+			URL:      client.URL,
+			Index:    client.index,
+			Pipeline: client.pipeline,
+			Proxy:    client.proxyURL,
+			// Without the following nil check on proxyURL, a nil Proxy field will try
+			// reloading proxy settings from the environment instead of leaving them
+			// empty.
+			ProxyDisable:     client.proxyURL == nil,
 			TLS:              client.tlsConfig,
 			Username:         client.Username,
 			Password:         client.Password,
@@ -721,7 +740,7 @@ func (conn *Connection) Ping() (string, error) {
 	}
 
 	debugf("Ping status code: %v", status)
-	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	logp.Info("Attempting to connect to Elasticsearch version %s", response.Version.Number)
 	return response.Version.Number, nil
 }
 

@@ -44,6 +44,8 @@ type Event struct {
 	Host      string        // Host from which the data was collected.
 	Service   string        // Service type
 	Took      time.Duration // Amount of time it took to collect the event data.
+
+	DisableTimeSeries bool // true if the event doesn't contain timeseries data
 }
 
 // BeatEvent returns a new beat.Event containing the data this Event. It does
@@ -58,8 +60,9 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 	}
 
 	b := beat.Event{
-		Timestamp: e.Timestamp,
-		Fields:    e.RootFields,
+		Timestamp:  e.Timestamp,
+		Fields:     e.RootFields,
+		TimeSeries: !e.DisableTimeSeries,
 	}
 
 	if len(e.ModuleFields) > 0 {

@@ -1,23 +1,20 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "destination": {
         "ip": "10.0.2.15",
         "port": 22
     },
     "event": {
-        "action": "existing_socket",
+        "action": "socket_closed",
         "dataset": "socket",
-        "id": "6aff69f8-7267-4604-9701-d7b67a7c65bc",
-        "kind": "state",
+        "kind": "event",
         "module": "system"
     },
-    "message": "Inbound socket (10.0.2.2:55270 -\u003e 10.0.2.15:22) OPEN by process sshd (PID: 22799) and user root (UID: 0)",
+    "message": "Inbound socket (10.0.2.2:55270 -\u003e 10.0.2.15:22) CLOSED by process sshd (PID: 22799) and user root (UID: 0)",
     "network": {
+        "community_id": "1:IXrg9Y06W7zrkqBlE30jpC/mzjo=",
         "direction": "inbound",
+        "transport": "tcp",
         "type": "ipv4"
     },
     "process": {
@@ -28,7 +25,7 @@
         "type": "system"
     },
     "socket": {
-        "entity_id": "d85bf25935c0ebbabc053024d4954ddd78979bd1390364ac46395c390ed7a6df"
+        "entity_id": "fIj66YRoGyoe8dML"
     },
     "source": {
         "ip": "10.0.2.2",

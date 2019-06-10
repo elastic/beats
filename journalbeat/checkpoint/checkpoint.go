@@ -140,6 +140,14 @@ func (c *Checkpoint) findRegistryFile() error {
 		return fmt.Errorf("error accessing previous registry file: %+v", err)
 	}
 
+	// if two files are the same, do not do anything
+	migratedFs, err := os.Stat(migratedPath)
+	if err == nil {
+		if os.SameFile(fs, migratedFs) {
+			return nil
+		}
+	}
+
 	f, err := os.Open(c.file)
 	if err != nil {
 		return err

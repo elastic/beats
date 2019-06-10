@@ -18,7 +18,6 @@
 package export
 
 import (
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -36,46 +35,33 @@ func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 
-			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
-			}
-			err = b.InitWithSettings(settings)
-			if err != nil {
-				fatalf("Error initializing beat: %+v", err)
+				fatalfInitCmd(err)
 			}
 
 			if version == "" {
 				version = b.Info.Version
 			}
 
-			var withMigration bool
-			if b.RawConfig.HasField("migration") {
-				sub, err := b.RawConfig.Child("migration", -1)
-				if err != nil {
-					fatalf("Failed to read migration setting: %+v", err)
-				}
-				withMigration = sub.Enabled()
-			}
-
 			// Index pattern generation
 			v, err := common.NewVersion(version)
 			if err != nil {
-				fatalf("Error creating version: %+v", err)
+				fatalf("Error creating version: %+v.", err)
 			}
-			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, settings.Version, *v, withMigration)
+			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, settings.Version, *v, b.Config.Migration.Enabled())
 			if err != nil {
-				log.Fatal(err)
+				fatalf("Error creating Kibana Generator: %+v.", err)
 			}
 
 			pattern, err := indexPattern.Generate()
 			if err != nil {
-				log.Fatalf("ERROR: %s", err)
+				fatalf("Error generating Index Pattern: %+v.", err)
 			}
 
 			_, err = os.Stdout.WriteString(pattern.StringToPrint() + "\n")
 			if err != nil {
-				fatalf("Error writing index pattern: %+v", err)
+				fatalf("Error writing Index Pattern: %+v.", err)
 			}
 		},
 	}

@@ -10,7 +10,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.4+| .4+|  |<<metricbeat-metricset-aws-ec2,ec2>>   
+.5+| .5+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>> beta[]  
+|<<metricbeat-metricset-aws-ec2,ec2>>   
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]  
 |<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>> beta[]  
@@ -22,8 +23,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
-|<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
+|<<metricbeat-module-coredns,coredns>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>> beta[]  
 |<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
@@ -56,7 +59,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-envoyproxy,envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>>   
+.4+| .4+|  |<<metricbeat-metricset-etcd-leader,leader>>   
+|<<metricbeat-metricset-etcd-metrics,metrics>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>>   
 |<<metricbeat-metricset-etcd-store,store>>   
 |<<metricbeat-module-golang,Golang>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -166,7 +170,8 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
 |<<metricbeat-metricset-windows-service,service>>   
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
+.3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>> beta[]  
+|<<metricbeat-metricset-zookeeper-mntr,mntr>>   
 |<<metricbeat-metricset-zookeeper-server,server>>   
 |================================
 
@@ -177,6 +182,7 @@ include::modules/apache.asciidoc[]
 include::modules/aws.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/consul.asciidoc[]
+include::modules/coredns.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/couchdb.asciidoc[]
 include::modules/docker.asciidoc[]

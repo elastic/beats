@@ -28,6 +28,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -85,8 +86,8 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			events, errs := mbtest.ReportingFetchV2(f)
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			events, errs := mbtest.ReportingFetchV2Error(f)
 
 			assert.Empty(t, errs)
 			if !assert.NotEmpty(t, events) {
@@ -111,8 +112,8 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			if err != nil {
 				t.Fatal("write", err)
 			}
@@ -255,7 +256,46 @@ func createCCRStats(host string) error {
 		return errors.Wrap(err, "error creating CCR follower index")
 	}
 
+	// Give ES sufficient time to do the replication and produce stats
+	checkCCRStats := func() (bool, error) {
+		return checkCCRStatsExists(host)
+	}
+
+	exists, err := waitForSuccess(checkCCRStats, 300, 5)
+	if err != nil {
+		return errors.Wrap(err, "error checking if CCR stats exist")
+	}
+
+	if !exists {
+		return fmt.Errorf("expected to find CCR stats but not found")
+	}
+
 	return nil
+}
+
+func checkCCRStatsExists(host string) (bool, error) {
+	resp, err := http.Get("http://" + host + "/_ccr/stats")
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	var data struct {
+		FollowStats struct {
+			Indices []map[string]interface{} `json:"indices"`
+		} `json:"follow_stats"`
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return false, err
+	}
+
+	return len(data.FollowStats.Indices) > 0, nil
 }
 
 func setupCCRRemote(host string) error {
@@ -363,4 +403,24 @@ func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error)
 	}
 
 	return body, resp, nil
+}
+
+type checkSuccessFunction func() (bool, error)
+
+func waitForSuccess(f checkSuccessFunction, retryIntervalMs time.Duration, numAttempts int) (bool, error) {
+	for numAttempts > 0 {
+		success, err := f()
+		if err != nil {
+			return false, err
+		}
+
+		if success {
+			return success, nil
+		}
+
+		time.Sleep(retryIntervalMs * time.Millisecond)
+		numAttempts--
+	}
+
+	return false, nil
 }

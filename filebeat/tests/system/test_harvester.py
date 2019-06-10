@@ -17,6 +17,7 @@ Test Harvesters
 
 class Test(BaseTest):
 
+    @unittest.skip('flaky test https://github.com/elastic/beats/issues/12037')
     def test_close_renamed(self):
         """
         Checks that a file is closed when its renamed / rotated
@@ -792,12 +793,12 @@ class Test(BaseTest):
 
         logfile = self.working_dir + "/log/test.log"
 
-        with io.open(logfile, 'w', encoding="utf-16") as file:
+        with io.open(logfile, 'w', encoding="utf-16le") as file:
             file.write(u'hello world1')
             file.write(u"\n")
-        with io.open(logfile, 'a', encoding="utf-16") as file:
+        with io.open(logfile, 'a', encoding="utf-16le") as file:
             file.write(u"\U00012345=Ra")
-        with io.open(logfile, 'a', encoding="utf-16") as file:
+        with io.open(logfile, 'a', encoding="utf-16le") as file:
             file.write(u"\n")
             file.write(u"hello world2")
             file.write(u"\n")

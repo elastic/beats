@@ -9,7 +9,8 @@
       description: >
         Name of a S3 bucket.
     - name: bucket.size.bytes
-      type: scaled_float
+      type: long
+      format: bytes
       description: >
         The amount of data in bytes stored in a bucket.
     - name: number_of_objects

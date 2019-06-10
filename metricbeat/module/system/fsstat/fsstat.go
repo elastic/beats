@@ -23,15 +23,12 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system/filesystem"
 
 	"github.com/pkg/errors"
 )
-
-var debugf = logp.MakeDebug("system-fsstat")
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "fsstat", New,
@@ -56,7 +53,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config.IgnoreTypes = filesystem.DefaultIgnoredTypes()
 	}
 	if len(config.IgnoreTypes) > 0 {
-		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
+		base.Logger().Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
 
 	return &MetricSet{
@@ -67,11 +64,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // a single event containing aggregated data.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	fss, err := filesystem.GetFileSystemList()
 	if err != nil {
-		r.Error(errors.Wrap(err, "filesystem list"))
-		return
+		return errors.Wrap(err, "filesystem list")
 	}
 
 	if len(m.config.IgnoreTypes) > 0 {
@@ -84,10 +80,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	for _, fs := range fss {
 		stat, err := filesystem.GetFileSystemStat(fs)
 		if err != nil {
-			debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+			m.Logger().Debug("error fetching filesystem stats for '%s': %v", fs.DirName, err)
 			continue
 		}
-		logp.Debug("fsstat", "filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
+		m.Logger().Debug("filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
 
 		totalFiles += stat.Files
 		totalSize += stat.Total
@@ -106,4 +102,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			"total_files": totalFiles,
 		},
 	})
+
+	return nil
 }

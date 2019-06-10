@@ -39,10 +39,11 @@ type fields struct {
 }
 
 type testDef struct {
-	name   string
-	fields fields
-	jobs   []jobs.Job
-	want   []mapval.Validator
+	name     string
+	fields   fields
+	jobs     []jobs.Job
+	want     []mapval.Validator
+	metaWant []mapval.Validator
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {
@@ -52,9 +53,16 @@ func testCommonWrap(t *testing.T, tt testDef) {
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
 
+		require.Equal(t, len(results), len(tt.want), "Expected test def wants to correspond exactly to number results.")
 		for idx, r := range results {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
-				mapval.Test(t, mapval.Strict(tt.want[idx]), r.Fields)
+				want := tt.want[idx]
+				mapval.Test(t, mapval.Strict(want), r.Fields)
+
+				if tt.metaWant != nil {
+					metaWant := tt.metaWant[idx]
+					mapval.Test(t, mapval.Strict(metaWant), r.Meta)
+				}
 			})
 		}
 	})
@@ -81,6 +89,7 @@ func TestSimpleJob(t *testing.T) {
 				}),
 				summaryValidator(1, 0),
 			)},
+		nil,
 	})
 }
 
@@ -114,6 +123,7 @@ func TestErrorJob(t *testing.T) {
 				errorJobValidator,
 				summaryValidator(0, 1),
 			)},
+		nil,
 	})
 }
 
@@ -144,6 +154,7 @@ func TestMultiJobNoConts(t *testing.T) {
 		fields,
 		[]jobs.Job{makeURLJob(t, "http://foo.com"), makeURLJob(t, "http://bar.com")},
 		[]mapval.Validator{validator("http://foo.com"), validator("http://bar.com")},
+		nil,
 	})
 }
 
@@ -200,6 +211,76 @@ func TestMultiJobConts(t *testing.T) {
 				contJobValidator("http://bar.com", "2nd"),
 				summaryValidator(2, 0),
 			),
+		},
+		nil,
+	})
+}
+
+func TestMultiJobContsCancelledEvents(t *testing.T) {
+	fields := fields{"myid", "myname", "mytyp"}
+
+	uniqScope := mapval.ScopedIsUnique()
+
+	makeContJob := func(t *testing.T, u string) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			eventext.MergeEventFields(event, common.MapStr{"cont": "1st"})
+			eventext.CancelEvent(event)
+			u, err := url.Parse(u)
+			require.NoError(t, err)
+			eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
+			return []jobs.Job{
+				func(event *beat.Event) ([]jobs.Job, error) {
+					eventext.MergeEventFields(event, common.MapStr{"cont": "2nd"})
+					eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
+					return nil, nil
+				},
+			}, nil
+		}
+	}
+
+	contJobValidator := func(u string, msg string) mapval.Validator {
+		return mapval.Compose(
+			urlValidator(t, u),
+			mapval.MustCompile(mapval.Map{"cont": msg}),
+			mapval.MustCompile(mapval.Map{
+				"monitor": mapval.Map{
+					"duration.us": mapval.IsDuration,
+					"id":          uniqScope.IsUniqueTo(u),
+					"name":        fields.name,
+					"type":        fields.typ,
+					"status":      "up",
+					"check_group": uniqScope.IsUniqueTo(u),
+				},
+			}),
+		)
+	}
+
+	metaCancelledValidator := mapval.MustCompile(mapval.Map{eventext.EventCancelledMetaKey: true})
+	testCommonWrap(t, testDef{
+		"multi-job-continuations",
+		fields,
+		[]jobs.Job{makeContJob(t, "http://foo.com"), makeContJob(t, "http://bar.com")},
+		[]mapval.Validator{
+			mapval.Compose(
+				contJobValidator("http://foo.com", "1st"),
+			),
+			mapval.Compose(
+				contJobValidator("http://foo.com", "2nd"),
+				summaryValidator(1, 0),
+			),
+			mapval.Compose(
+				contJobValidator("http://bar.com", "1st"),
+			),
+			mapval.Compose(
+				contJobValidator("http://bar.com", "2nd"),
+				summaryValidator(1, 0),
+			),
+		},
+		[]mapval.Validator{
+			metaCancelledValidator,
+			mapval.MustCompile(mapval.Map{}),
+			metaCancelledValidator,
+			mapval.MustCompile(mapval.Map{}),
 		},
 	})
 }

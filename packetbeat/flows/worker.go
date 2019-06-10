@@ -38,7 +38,7 @@ type flowsProcessor struct {
 }
 
 var (
-	ErrInvalidTimeout = errors.New("timeout must not <= 1s")
+	ErrInvalidTimeout = errors.New("timeout must be >= 1s")
 	ErrInvalidPeriod  = errors.New("report period must be -1 or >= 1s")
 )
 

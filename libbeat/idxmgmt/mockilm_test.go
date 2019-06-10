@@ -69,7 +69,7 @@ func (m *mockILMSupport) Policy() ilm.Policy {
 	return args.Get(0).(ilm.Policy)
 }
 
-func (m *mockILMSupport) Manager(_ ilm.APIHandler) ilm.Manager {
+func (m *mockILMSupport) Manager(_ ilm.ClientHandler) ilm.Manager {
 	return m
 }
 
@@ -86,9 +86,9 @@ func (m *mockILMSupport) EnsureAlias() error {
 }
 
 func onEnsurePolicy() onCall { return makeOnCall("EnsurePolicy") }
-func (m *mockILMSupport) EnsurePolicy(overwrite bool) error {
+func (m *mockILMSupport) EnsurePolicy(overwrite bool) (bool, error) {
 	args := m.Called()
-	return args.Error(0)
+	return args.Bool(0), args.Error(1)
 }
 
 func makeOnCall(name string, args ...interface{}) onCall {

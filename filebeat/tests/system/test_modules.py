@@ -123,6 +123,8 @@ class Test(BaseTest):
             "-M", "{module}.*.enabled=false".format(module=module),
             "-M", "{module}.{fileset}.enabled=true".format(
                 module=module, fileset=fileset),
+            "-M", "{module}.{fileset}.var.convert_timezone=true".format(
+                module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.input=file".format(
                 module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
@@ -138,7 +140,12 @@ class Test(BaseTest):
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
+
+        local_env = os.environ.copy()
+        local_env["TZ"] = 'Etc/UTC'
+
         subprocess.Popen(cmd,
+                         env=local_env,
                          stdin=None,
                          stdout=output,
                          stderr=subprocess.STDOUT,
@@ -167,8 +174,7 @@ class Test(BaseTest):
             else:
                 self.assert_fields_are_documented(obj)
 
-        if os.path.exists(test_file + "-expected.json"):
-            self._test_expected_events(test_file, objects)
+        self._test_expected_events(test_file, objects)
 
     def _test_expected_events(self, test_file, objects):
 
@@ -190,6 +196,7 @@ class Test(BaseTest):
             len(expected), len(objects))
 
         for ev in expected:
+            clean_keys(ev)
             found = False
             for obj in objects:
 
@@ -212,8 +219,10 @@ def clean_keys(obj):
     time_keys = ["event.created"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
+    # ECS versions change for any ECS release, large or small
+    ecs_key = ["ecs.version"]
 
-    for key in host_keys + time_keys + other_keys:
+    for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
     # Remove timestamp for comparison where timestamp is not part of the log line

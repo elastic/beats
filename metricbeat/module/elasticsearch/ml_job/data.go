@@ -50,9 +50,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
-		r.Error(err)
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
 	}
 
 	var errs multierror.Errors
@@ -69,8 +67,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		event.MetricSetFields, err = schema.Apply(job)
 		if err != nil {
-			event.Error = errors.Wrap(err, "failure applying ml job schema")
-			errs = append(errs, event.Error)
+			errs = append(errs, errors.Wrap(err, "failure applying ml job schema"))
+			continue
 		}
 
 		r.Event(event)

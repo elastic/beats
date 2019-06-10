@@ -6,6 +6,7 @@ package aws
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 	"unicode"
 
@@ -16,6 +17,7 @@ import (
 
 // Config expose the configuration option the AWS provider.
 type Config struct {
+	Endpoint     string `config:"endpoint" validate:"nonzero,required"`
 	DeployBucket bucket `config:"deploy_bucket" validate:"nonzero,required"`
 }
 
@@ -23,11 +25,17 @@ type Config struct {
 const maxMegabytes = 3008
 
 // DefaultLambdaConfig confguration for AWS lambda function.
-var DefaultLambdaConfig = &lambdaConfig{
-	MemorySize:  128 * 1024 * 1024,
-	Timeout:     time.Second * 3,
-	Concurrency: 5,
-}
+var (
+	DefaultLambdaConfig = &lambdaConfig{
+		MemorySize:  128 * 1024 * 1024,
+		Timeout:     time.Second * 3,
+		Concurrency: 5,
+	}
+
+	// Source: https://docs.aws.amazon.com/lambda/latest/dg/API_CreateFunction.html#SSS-CreateFunction-request-Role
+	arnRolePattern = "arn:(aws[a-zA-Z-]*)?:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+"
+	roleRE         = regexp.MustCompile(arnRolePattern)
+)
 
 type lambdaConfig struct {
 	Concurrency      int               `config:"concurrency" validate:"min=0,max=1000"`
@@ -35,6 +43,8 @@ type lambdaConfig struct {
 	Description      string            `config:"description"`
 	MemorySize       MemSizeFactor64   `config:"memory_size"`
 	Timeout          time.Duration     `config:"timeout" validate:"nonzero,positive"`
+	Role             string            `config:"role"`
+	VPCConfig        *vpcConfig        `config:"virtual_private_cloud"`
 }
 
 func (c *lambdaConfig) Validate() error {
@@ -46,11 +56,20 @@ func (c *lambdaConfig) Validate() error {
 		return fmt.Errorf("'memory_size' must be lower than %d", maxMegabytes)
 	}
 
+	if c.Role != "" && !roleRE.MatchString(c.Role) {
+		return fmt.Errorf("invalid role: '%s', name must match pattern %s", c.Role, arnRolePattern)
+	}
+
 	return nil
 }
 
 type deadLetterConfig struct {
 	TargetArn string `config:"target_arn"`
+}
+
+type vpcConfig struct {
+	SecurityGroupIDs []string `config:"security_group_ids" validate:"required"`
+	SubnetIDs        []string `config:"subnet_ids" validate:"required"`
 }
 
 // MemSizeFactor64 implements a human understandable format for bytes but also make sure that all

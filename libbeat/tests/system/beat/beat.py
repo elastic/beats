@@ -180,7 +180,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                    output=None,
                    logging_args=["-e", "-v", "-d", "*"],
                    extra_args=[],
-                   env={}):
+                   env={},
+                   home=""):
         """
         Starts beat and returns the process handle. The
         caller is responsible for stopping / waiting for the
@@ -203,8 +204,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
+
+        path_home = os.path.normpath(self.working_dir)
+        if home:
+            path_home = home
+
         args += [
-            "-path.home", os.path.normpath(self.working_dir),
+            "-path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
@@ -220,8 +226,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def render_config_template(self, template_name=None,
                                output=None, **kargs):
-
-        print("render config")
 
         # Init defaults
         if template_name is None:
@@ -360,6 +364,18 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         return data
 
+    def get_log_lines(self, logfile=None):
+        """
+        Returns the log lines as a list of strings
+        """
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+            data = f.readlines()
+
+        return data
+
     def wait_log_contains(self, msg, logfile=None,
                           max_timeout=10, poll_interval=0.1,
                           name="log_contains",
@@ -407,6 +423,30 @@ class TestCase(unittest.TestCase, ComposeMixin):
             counter = -1
 
         return counter
+
+    def log_contains_countmap(self, pattern, capture_group, logfile=None):
+        """
+        Returns a map of the number of appearances of each captured group in the log file
+        """
+        counts = {}
+
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        try:
+            with open(os.path.join(self.working_dir, logfile), "r") as f:
+                for line in f:
+                    res = pattern.search(line)
+                    if res is not None:
+                        capt = res.group(capture_group)
+                        if capt in counts:
+                            counts[capt] += 1
+                        else:
+                            counts[capt] = 1
+        except IOError:
+            pass
+
+        return counts
 
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
@@ -647,3 +687,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
             if is_documented(key, aliases):
                 raise Exception("Key '{}' found in event is documented as an alias!".format(key))
+
+    def get_beat_version(self):
+        proc = self.start_beat(extra_args=["version"], output="version")
+        proc.wait()
+
+        return self.get_log_lines(logfile="version")[0].split()[2]

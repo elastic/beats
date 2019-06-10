@@ -18,7 +18,7 @@ NO_COLLECT=true
 setup: pre-setup git-add
 
 pre-setup: copy-vendor git-init
-	$(MAKE) -f $(LIBBEAT_MAKEFILE) mage
+	$(MAKE) -f $(LIBBEAT_MAKEFILE) mage ES_BEATS=$(ES_BEATS)
 	$(MAKE) -f $(LIBBEAT_MAKEFILE) update BEAT_NAME=$(BEAT_NAME) ES_BEATS=$(ES_BEATS) NO_COLLECT=$(NO_COLLECT)
 
 # Copy beats into vendor directory

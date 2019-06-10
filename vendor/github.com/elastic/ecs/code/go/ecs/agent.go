@@ -21,14 +21,15 @@ package ecs
 
 // The agent fields contain the data about the software entity, if any, that
 // collects, detects, or observes events on a host, or takes measurements on a
-// host. Examples include Beats. Agents may also run on observers. ECS agent.*
-// fields shall be populated with details of the agent running on the host or
-// observer where the event happened or the measurement was taken.
+// host.
+// Examples include Beats. Agents may also run on observers. ECS agent.* fields
+// shall be populated with details of the agent running on the host or observer
+// where the event happened or the measurement was taken.
 type Agent struct {
 	// Version of the agent.
 	Version string `ecs:"version"`
 
-	// Name of the agent.
+	// Custom name of the agent.
 	// This is a name that can be given to an agent. This can be helpful if for
 	// example two Filebeat instances are running on the same host but a human
 	// readable separation is needed on which Filebeat instance data is coming

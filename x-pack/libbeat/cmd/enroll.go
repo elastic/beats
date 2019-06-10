@@ -18,16 +18,10 @@ import (
 )
 
 func getBeat(name, version string) (*instance.Beat, error) {
-	b, err := instance.NewBeat(name, "", version)
-
+	b, err := instance.NewInitializedBeat(instance.Settings{Name: name, Version: version})
 	if err != nil {
 		return nil, fmt.Errorf("error creating beat: %s", err)
 	}
-
-	if err = b.Init(); err != nil {
-		return nil, fmt.Errorf("error initializing beat: %s", err)
-	}
-
 	return b, nil
 }
 
@@ -67,6 +61,16 @@ func genEnrollCmd(name, version string) *cobra.Command {
 					return err
 				}
 
+				confirm, err := confirmConfigOverwrite(force)
+				if err != nil {
+					return err
+				}
+
+				if !confirm {
+					fmt.Println("Enrollment was canceled by the user")
+					return nil
+				}
+
 				var enrollmentToken string
 				if len(args) == 2 {
 					// use given enrollment token
@@ -90,16 +94,12 @@ func genEnrollCmd(name, version string) *cobra.Command {
 					}
 				}
 
-				enrolled, err := management.Enroll(beat, config, enrollmentToken, force)
+				err = management.Enroll(beat, config, enrollmentToken)
 				if err != nil {
 					return errors.Wrap(err, "Error while enrolling")
 				}
 
-				if enrolled {
-					fmt.Println("Enrolled and ready to retrieve settings from Kibana")
-				} else {
-					fmt.Println("Enrollment was canceled by the user")
-				}
+				fmt.Println("Enrolled and ready to retrieve settings from Kibana")
 				return nil
 			}),
 	}
@@ -120,4 +120,12 @@ func kibanaConfig(config *common.Config) (*common.Config, error) {
 		return sub, nil
 	}
 	return common.NewConfig(), nil
+}
+
+func confirmConfigOverwrite(force bool) (bool, error) {
+	if force {
+		return true, nil
+	}
+
+	return cli.Confirm("This will replace your current settings. Do you want to continue?", true)
 }

@@ -24,7 +24,12 @@
       type: long
       format: bytes
       description: >
-        The size of the query result.
+        The number of bytes sent to client.
+    - name: bytes_received
+      type: long
+      format: bytes
+      description: >
+        The number of bytes received from client.
     - name: query
       description: >
         The slow query.
@@ -98,6 +103,22 @@
       type: long
       description: >
         Number of merge passes executed for the query.
+    - name: sort_merge_passes
+      type: long
+      description: >
+        Number of merge passes that the sort algorithm has had to do.
+    - name: sort_range_count
+      type: long
+      description: >
+        Number of sorts that were done using ranges. 
+    - name: sort_rows
+      type: long
+      description: >
+        Number of sorted rows.
+    - name: sort_scan_count
+      type: long
+      description: >
+        Number of sorts that were done by scanning the table.
     - name: log_slow_rate_type
       type: keyword
       description: >
@@ -108,6 +129,34 @@
       description: >
         Slow log rate limit, a value of 100 means that one in a hundred queries
         or sessions are being logged.
+    - name: read_first
+      type: long
+      description: >
+        The number of times the first entry in an index was read.
+    - name: read_last
+      type: long
+      description: >
+        The number of times the last key in an index was read.
+    - name: read_key
+      type: long
+      description: >
+        The number of requests to read a row based on a key.
+    - name: read_next
+      type: long
+      description: >
+        The number of requests to read the next row in key order.
+    - name: read_prev
+      type: long
+      description: >
+        The number of requests to read the previous row in key order.
+    - name: read_rnd
+      type: long
+      description: >
+        The number of requests to read a row based on a fixed position. 
+    - name: read_rnd_next
+      type: long
+      description: >
+        The number of requests to read the next row in the data file.
 
     # https://www.percona.com/doc/percona-server/5.7/diagnostics/slow_extended.html
     - name: innodb

@@ -24,10 +24,11 @@ import (
 )
 
 // A file is defined as a set of information that has been created on, or has
-// existed on a filesystem. File objects can be associated with host events,
-// network events, and/or file events (e.g., those produced by File Integrity
-// Monitoring [FIM] products or services). File fields provide details about
-// the affected file associated with the event or metric.
+// existed on a filesystem.
+// File objects can be associated with host events, network events, and/or file
+// events (e.g., those produced by File Integrity Monitoring [FIM] products or
+// services). File fields provide details about the affected file associated
+// with the event or metric.
 type File struct {
 	// Path to the file.
 	Path string `ecs:"path"`

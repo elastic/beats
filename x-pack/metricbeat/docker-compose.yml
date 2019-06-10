@@ -10,8 +10,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
     env_file:
+      - ./module/coredns/_meta/env
       - ./module/mssql/_meta/env
 
   # Modules
+  coredns:
+    build: ./module/coredns/_meta
+    ports:
+      - 9153
+
   mssql:
     build: ./module/mssql/_meta
+    ports:
+      - 1433

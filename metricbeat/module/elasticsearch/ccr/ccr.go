@@ -18,7 +18,6 @@
 package ccr
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -56,60 +55,57 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch gathers stats for each follower shard from the _ccr/stats API
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		m.Log.Debug("trying to fetch ccr stats from a non-master node")
-		return
+		m.Logger().Debug("trying to fetch ccr stats from a non-master node")
+		return nil
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return err
 	}
 
 	// CCR is only available in Trial or Platinum license of Elasticsearch. So we check
 	// the license first.
 	ccrUnavailableMessage, err := m.checkCCRAvailability(info.Version.Number)
 	if err != nil {
-		err = errors.Wrap(err, "error determining if CCR is available")
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return errors.Wrap(err, "error determining if CCR is available")
 	}
 
 	if ccrUnavailableMessage != "" {
 		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
-			err := fmt.Errorf(ccrUnavailableMessage)
-			elastic.ReportAndLogError(err, r, m.Log)
 			m.lastCCRLicenseMessageTimestamp = time.Now()
+			m.Logger().Warn(ccrUnavailableMessage)
 		}
-		return
+		return nil
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return err
 	}
 
 	if m.XPack {
 		err = eventsMappingXPack(r, m, *info, content)
+		if err != nil {
+			// Since this is an x-pack code path, we log the error but don't
+			// return it. Otherwise it would get reported into `metricbeat-*`
+			// indices.
+			m.Logger().Error(err)
+			return nil
+		}
 	} else {
-		err = eventsMapping(r, *info, content)
+		return eventsMapping(r, *info, content)
 	}
 
-	if err != nil {
-		m.Log.Error(err)
-		return
-	}
+	return nil
 }
 
 func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {

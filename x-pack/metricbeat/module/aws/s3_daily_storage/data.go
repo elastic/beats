@@ -16,6 +16,6 @@ var (
 				"bytes": c.Float("BucketSizeBytes"),
 			},
 		},
-		"number_of_objects": c.Int("NumberOfObjects"),
+		"number_of_objects": c.Float("NumberOfObjects"),
 	}
 )

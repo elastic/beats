@@ -202,9 +202,13 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 
 	switch loginRecord.Type {
 	case userLoginRecord:
+		event.RootFields.Put("event.category", "authentication")
 		event.RootFields.Put("event.outcome", "success")
+		event.RootFields.Put("event.type", "authentication_success")
 	case userLoginFailedRecord:
+		event.RootFields.Put("event.category", "authentication")
 		event.RootFields.Put("event.outcome", "failure")
+		event.RootFields.Put("event.type", "authentication_failure")
 	}
 
 	return event

@@ -18,6 +18,8 @@
 package connection
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
@@ -44,13 +46,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch makes an HTTP request to fetch connections metrics from the connections endpoint.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 
 	if err != nil {
-		r.Error(err)
-		return
+		return errors.Wrap(err, "error in fetch")
 	}
 
-	eventsMapping(content, r)
+	return eventsMapping(content, r, m)
 }

@@ -14,7 +14,6 @@ import (
 	"unsafe"
 
 	"github.com/coreos/pkg/dlopen"
-	"github.com/joeshaw/multierror"
 )
 
 /*
@@ -25,7 +24,6 @@ import (
 #include <rpm/header.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
-#include <rpm/rpmsq.h>
 
 rpmts
 my_rpmtsCreate(void *f) {
@@ -33,6 +31,20 @@ my_rpmtsCreate(void *f) {
   rpmtsCreate = (rpmts (*)())f;
 
   return rpmtsCreate();
+}
+
+void
+my_rpmFreeMacros(void *f) {
+	void (*rpmFreeMacros)(void *);
+	rpmFreeMacros = (void(*)(void*))f;
+    rpmFreeMacros(NULL);
+}
+
+void
+my_rpmFreeRpmrc(void *f) {
+	void (*rpmFreeRpmrc)(void);
+	rpmFreeRpmrc = (void (*)(void))f;
+	rpmFreeRpmrc();
 }
 
 int
@@ -113,7 +125,7 @@ my_rpmtsFree(void *f, rpmts ts) {
 // By default, librpm is going to trap various UNIX signals including SIGINT and SIGTERM
 // which will prevent Beats from shutting down correctly.
 //
-// This disables that behavior. We should be very dilligent in
+// This disables that behavior by nullifying rpmsqEnable. We should be very dilligent in
 // cleaning up in our use of librpm.
 //
 // More recent versions of librpm have a new function rpmsqSetInterruptSafety()
@@ -121,19 +133,13 @@ my_rpmtsFree(void *f, rpmts ts) {
 //
 // See also:
 // - librpm traps signals and calls exit(1) to terminate the whole process incl. our Go code: https://github.com/rpm-software-management/rpm/blob/rpm-4.11.3-release/lib/rpmdb.c#L640
-// - has caused problems for gdb before, calling rpmsqEnable(_, NULL) is the workaround they also use: https://bugzilla.redhat.com/show_bug.cgi?id=643031
+// - has caused problems for gdb before, they also nullify rpmsqEnable: https://bugzilla.redhat.com/show_bug.cgi?id=643031
 // - the new rpmsqSetInterruptSafety(), unfortunately only available in librpm>=4.14.0 (CentOS 7 has 4.11.3): https://github.com/rpm-software-management/rpm/commit/56f49d7f5af7c1c8a3eb478431356195adbfdd25
-void
-my_disableLibrpmSignalTraps(void *f) {
-	int (*rpmsqEnable)(int, rpmsqAction_t);
-	rpmsqEnable = (int (*)(int, rpmsqAction_t))f;
-
-	// Disable all traps
-	rpmsqEnable(-SIGHUP, NULL);
-	rpmsqEnable(-SIGINT, NULL);
-	rpmsqEnable(-SIGTERM, NULL);
-	rpmsqEnable(-SIGQUIT, NULL);
-	rpmsqEnable(-SIGPIPE, NULL);
+extern int rpmsqEnable (int signum, void *handler);
+int
+rpmsqEnable (int signum, void *handler)
+{
+  return 0;
 }
 
 void
@@ -159,7 +165,22 @@ const (
 	RPMTAG_INSTALLTIME = 1008
 )
 
-type cFunctions struct {
+var openedLibrpm *librpm
+
+// closeDataset performs cleanup when the dataset is closed.
+func closeDataset() error {
+	if openedLibrpm != nil {
+		err := openedLibrpm.close()
+		openedLibrpm = nil
+		return err
+	}
+
+	return nil
+}
+
+type librpm struct {
+	handle *dlopen.LibHandle
+
 	rpmtsCreate             unsafe.Pointer
 	rpmReadConfigFiles      unsafe.Pointer
 	rpmtsInitIterator       unsafe.Pointer
@@ -170,87 +191,106 @@ type cFunctions struct {
 	headerFree              unsafe.Pointer
 	rpmdbFreeIterator       unsafe.Pointer
 	rpmtsFree               unsafe.Pointer
-	rpmsqEnable             unsafe.Pointer
 	rpmsqSetInterruptSafety unsafe.Pointer
+	rpmFreeRpmrc            unsafe.Pointer
+	rpmFreeMacros           unsafe.Pointer
 }
 
-var cFun *cFunctions
+func (lib *librpm) close() error {
+	if lib.handle != nil {
+		return lib.handle.Close()
+	}
 
-func dlopenCFunctions() (*cFunctions, error) {
+	return nil
+}
+
+func openLibrpm() (*librpm, error) {
 	var librpmNames = []string{
-		"/usr/lib64/librpm.so",
-	}
-	var cFun cFunctions
+		"librpm.so",   // with rpm-devel installed
+		"librpm.so.8", // Fedora 29
+		"librpm.so.3", // CentOS 7
+		"librpm.so.1", // CentOS 6
 
-	librpm, err := dlopen.GetHandle(librpmNames)
+		// Following for completeness, but not explicitly tested
+		"librpm.so.7",
+		"librpm.so.6",
+		"librpm.so.5",
+		"librpm.so.4",
+		"librpm.so.2",
+	}
+
+	var librpm librpm
+	var err error
+
+	librpm.handle, err = dlopen.GetHandle(librpmNames)
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.rpmtsCreate, err = librpm.GetSymbolPointer("rpmtsCreate")
+	librpm.rpmtsCreate, err = librpm.handle.GetSymbolPointer("rpmtsCreate")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.rpmReadConfigFiles, err = librpm.GetSymbolPointer("rpmReadConfigFiles")
+	librpm.rpmReadConfigFiles, err = librpm.handle.GetSymbolPointer("rpmReadConfigFiles")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.rpmtsInitIterator, err = librpm.GetSymbolPointer("rpmtsInitIterator")
+	librpm.rpmtsInitIterator, err = librpm.handle.GetSymbolPointer("rpmtsInitIterator")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.rpmdbNextIterator, err = librpm.GetSymbolPointer("rpmdbNextIterator")
+	librpm.rpmdbNextIterator, err = librpm.handle.GetSymbolPointer("rpmdbNextIterator")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.headerLink, err = librpm.GetSymbolPointer("headerLink")
+	librpm.headerLink, err = librpm.handle.GetSymbolPointer("headerLink")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.headerGetString, err = librpm.GetSymbolPointer("headerGetString")
+	librpm.headerGetString, err = librpm.handle.GetSymbolPointer("headerGetString")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.headerGetNumber, err = librpm.GetSymbolPointer("headerGetNumber")
+	librpm.headerGetNumber, err = librpm.handle.GetSymbolPointer("headerGetNumber")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.headerFree, err = librpm.GetSymbolPointer("headerFree")
+	librpm.headerFree, err = librpm.handle.GetSymbolPointer("headerFree")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.rpmdbFreeIterator, err = librpm.GetSymbolPointer("rpmdbFreeIterator")
+	librpm.rpmdbFreeIterator, err = librpm.handle.GetSymbolPointer("rpmdbFreeIterator")
 	if err != nil {
 		return nil, err
 	}
 
-	cFun.rpmtsFree, err = librpm.GetSymbolPointer("rpmtsFree")
+	librpm.rpmtsFree, err = librpm.handle.GetSymbolPointer("rpmtsFree")
+	if err != nil {
+		return nil, err
+	}
+
+	librpm.rpmFreeRpmrc, err = librpm.handle.GetSymbolPointer("rpmFreeRpmrc")
 	if err != nil {
 		return nil, err
 	}
 
 	// Only available in librpm>=4.13.0
-	cFun.rpmsqSetInterruptSafety, err = librpm.GetSymbolPointer("rpmsqSetInterruptSafety")
-	if err != nil {
-		var err2 error
-		// Only available in librpm<4.14.0
-		cFun.rpmsqEnable, err2 = librpm.GetSymbolPointer("rpmsqEnable")
-		if err2 != nil {
-			var errs multierror.Errors
-			errs = append(errs, err, err2)
-			return nil, errs.Err()
-		}
-	}
+	librpm.rpmsqSetInterruptSafety, err = librpm.handle.GetSymbolPointer("rpmsqSetInterruptSafety")
+	// no error check
 
-	return &cFun, nil
+	// Only available in librpm>=4.6.0
+	librpm.rpmFreeMacros, err = librpm.handle.GetSymbolPointer("rpmFreeMacros")
+	// no error check
+
+	return &librpm, nil
 }
 
 func listRPMPackages() ([]*Package, error) {
@@ -262,41 +302,43 @@ func listRPMPackages() ([]*Package, error) {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	if cFun == nil {
+	if openedLibrpm == nil {
 		var err error
-		cFun, err = dlopenCFunctions()
+		openedLibrpm, err = openLibrpm()
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if cFun.rpmsqSetInterruptSafety != nil {
-		C.my_rpmsqSetInterruptSafety(cFun.rpmsqSetInterruptSafety, 0)
+	if openedLibrpm.rpmsqSetInterruptSafety != nil {
+		C.my_rpmsqSetInterruptSafety(openedLibrpm.rpmsqSetInterruptSafety, 0)
 	}
 
-	rpmts := C.my_rpmtsCreate(cFun.rpmtsCreate)
+	rpmts := C.my_rpmtsCreate(openedLibrpm.rpmtsCreate)
 	if rpmts == nil {
 		return nil, fmt.Errorf("Failed to get rpmts")
 	}
-	defer C.my_rpmtsFree(cFun.rpmtsFree, rpmts)
-	res := C.my_rpmReadConfigFiles(cFun.rpmReadConfigFiles)
+	defer C.my_rpmtsFree(openedLibrpm.rpmtsFree, rpmts)
+
+	res := C.my_rpmReadConfigFiles(openedLibrpm.rpmReadConfigFiles)
 	if int(res) != 0 {
 		return nil, fmt.Errorf("Error: %d", int(res))
 	}
+	defer C.my_rpmFreeRpmrc(openedLibrpm.rpmFreeRpmrc)
+	if openedLibrpm.rpmFreeMacros != nil {
+		defer C.my_rpmFreeMacros(openedLibrpm.rpmFreeMacros)
+	}
 
-	mi := C.my_rpmtsInitIterator(cFun.rpmtsInitIterator, rpmts)
+	mi := C.my_rpmtsInitIterator(openedLibrpm.rpmtsInitIterator, rpmts)
 	if mi == nil {
 		return nil, fmt.Errorf("Failed to get match iterator")
 	}
-	if cFun.rpmsqEnable != nil {
-		C.my_disableLibrpmSignalTraps(cFun.rpmsqEnable)
-	}
-	defer C.my_rpmdbFreeIterator(cFun.rpmdbFreeIterator, mi)
+	defer C.my_rpmdbFreeIterator(openedLibrpm.rpmdbFreeIterator, mi)
 
 	var packages []*Package
-	for header := C.my_rpmdbNextIterator(cFun.rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(cFun.rpmdbNextIterator, mi) {
+	for header := C.my_rpmdbNextIterator(openedLibrpm.rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(openedLibrpm.rpmdbNextIterator, mi) {
 
-		pkg, err := packageFromHeader(header, cFun)
+		pkg, err := packageFromHeader(header, openedLibrpm)
 		if err != nil {
 			return nil, err
 		}
@@ -307,39 +349,39 @@ func listRPMPackages() ([]*Package, error) {
 	return packages, nil
 }
 
-func packageFromHeader(header C.Header, cFun *cFunctions) (*Package, error) {
+func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) {
 
-	header = C.my_headerLink(cFun.headerLink, header)
+	header = C.my_headerLink(openedLibrpm.headerLink, header)
 	if header == nil {
 		return nil, fmt.Errorf("Error calling headerLink")
 	}
-	defer C.my_headerFree(cFun.headerFree, header)
+	defer C.my_headerFree(openedLibrpm.headerFree, header)
 
 	pkg := Package{}
 
-	name := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_NAME)
+	name := C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_NAME)
 	if name != nil {
 		pkg.Name = C.GoString(name)
 	} else {
 		return nil, errors.New("Failed to get package name")
 	}
 
-	version := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_VERSION)
+	version := C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_VERSION)
 	if version != nil {
 		pkg.Version = C.GoString(version)
 	} else {
 		pkg.Error = errors.New("Failed to get package version")
 	}
 
-	pkg.Release = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_RELEASE))
-	pkg.License = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_LICENSE))
-	pkg.Arch = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_ARCH))
-	pkg.URL = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_URL))
-	pkg.Summary = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_SUMMARY))
+	pkg.Release = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_RELEASE))
+	pkg.License = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_LICENSE))
+	pkg.Arch = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_ARCH))
+	pkg.URL = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_URL))
+	pkg.Summary = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_SUMMARY))
 
-	pkg.Size = uint64(C.my_headerGetNumber(cFun.headerGetNumber, header, RPMTAG_SIZE))
+	pkg.Size = uint64(C.my_headerGetNumber(openedLibrpm.headerGetNumber, header, RPMTAG_SIZE))
 
-	installTime := C.my_headerGetNumber(cFun.headerGetNumber, header, RPMTAG_INSTALLTIME)
+	installTime := C.my_headerGetNumber(openedLibrpm.headerGetNumber, header, RPMTAG_INSTALLTIME)
 	if installTime != 0 {
 		pkg.InstallTime = time.Unix(int64(installTime), 0)
 	}

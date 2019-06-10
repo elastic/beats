@@ -35,10 +35,13 @@ var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "redis")
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, err := mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, err := mbtest.ReportingFetchV2Error(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
+	}
+	if len(events) == 0 {
+		t.Fatal("no events")
 	}
 	event := events[0].MetricSetFields
 
@@ -53,8 +56,8 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "redis")
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

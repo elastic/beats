@@ -18,10 +18,17 @@
 package cmd
 
 import (
-	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/winlogbeat/beater"
+
+	// Register fields.
+	_ "github.com/elastic/beats/winlogbeat/include"
+
+	// Import the script processor and supporting modules.
+	_ "github.com/elastic/beats/libbeat/processors/script"
+	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
-import "github.com/elastic/beats/winlogbeat/beater"
 
 // Name of this beat
 var Name = "winlogbeat"

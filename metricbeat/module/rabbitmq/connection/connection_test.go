@@ -33,7 +33,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
@@ -63,17 +63,6 @@ func TestFetchEventContents(t *testing.T) {
 	peer := event["peer"].(common.MapStr)
 	assert.EqualValues(t, "::1", peer["host"])
 	assert.EqualValues(t, 60938, peer["port"])
-}
-
-func TestData(t *testing.T) {
-	server := mtest.Server(t, mtest.DefaultServerConfig)
-	defer server.Close()
-
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
 }
 
 func getConfig(url string) map[string]interface{} {

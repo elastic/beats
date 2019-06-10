@@ -73,6 +73,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/envoyproxy/server"
 	_ "github.com/elastic/beats/metricbeat/module/etcd"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/leader"
+	_ "github.com/elastic/beats/metricbeat/module/etcd/metrics"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/self"
 	_ "github.com/elastic/beats/metricbeat/module/etcd/store"
 	_ "github.com/elastic/beats/metricbeat/module/golang"
@@ -180,6 +181,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/windows/perfmon"
 	_ "github.com/elastic/beats/metricbeat/module/windows/service"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
+	_ "github.com/elastic/beats/metricbeat/module/zookeeper/connection"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/server"
 )

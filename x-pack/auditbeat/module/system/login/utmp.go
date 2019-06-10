@@ -84,8 +84,10 @@ func NewUtmpFileReader(log *logp.Logger, bucket datastore.Bucket, config config)
 
 // Close performs any cleanup tasks when the UTMP reader is done.
 func (r *UtmpFileReader) Close() error {
-	err := r.bucket.Close()
-	return errors.Wrap(err, "error closing bucket")
+	if r.bucket != nil {
+		return r.bucket.Close()
+	}
+	return nil
 }
 
 // ReadNew returns any new UTMP entries in any files matching the configured pattern.
@@ -144,11 +146,10 @@ func (r *UtmpFileReader) findFiles(filePattern string, utmpType UtmpType) ([]Utm
 		}
 
 		utmpFiles = append(utmpFiles, UtmpFile{
-			Inode:  Inode(fileInfo.Sys().(*syscall.Stat_t).Ino),
-			Path:   path,
-			Size:   fileInfo.Size(),
-			Offset: 0,
-			Type:   utmpType,
+			Inode: Inode(fileInfo.Sys().(*syscall.Stat_t).Ino),
+			Path:  path,
+			Size:  fileInfo.Size(),
+			Type:  utmpType,
 		})
 	}
 
@@ -176,6 +177,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 	if !isKnownFile {
 		r.log.Debugf("Found new file: %v (utmpFile=%+v)", utmpFile.Path, utmpFile)
 	}
+	utmpFile.Offset = savedUtmpFile.Offset
 
 	size := utmpFile.Size
 	oldSize := savedUtmpFile.Size
@@ -209,7 +211,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 		defer func() {
 			// Once we start reading a file, we update the file record even if something fails -
 			// otherwise we will just keep trying to re-read very frequently forever.
-			r.updateSavedUtmpFile(utmpFile, f)
+			err := r.updateSavedUtmpFile(utmpFile, f)
 			if err != nil {
 				errorC <- errors.Wrapf(err, "error updating file record for file %v", utmpFile.Path)
 			}

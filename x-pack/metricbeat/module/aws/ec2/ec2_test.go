@@ -8,6 +8,7 @@ package ec2
 
 import (
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -15,10 +16,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 // MockEC2Client struct is used for unit tests.
@@ -123,7 +123,7 @@ func TestGetInstanceIDs(t *testing.T) {
 
 func TestCreateCloudWatchEvents(t *testing.T) {
 	mockModuleConfig := aws.Config{
-		Period:        "300s",
+		Period:        300 * time.Second,
 		DefaultRegion: regionName,
 	}
 
@@ -132,7 +132,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 			"service": common.MapStr{"name": "ec2"},
 			"cloud": common.MapStr{
 				"region":            regionName,
-				"provider":          "ec2",
+				"provider":          "aws",
 				"instance":          common.MapStr{"id": "i-123"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
@@ -165,35 +165,42 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.Equal(t, 1, len(instanceIDs))
 	instanceID := instanceIDs[0]
 	assert.Equal(t, instanceID, instanceID)
+	timestamp := time.Now()
 
 	getMetricDataOutput := []cloudwatch.MetricDataResult{
 		{
-			Id:     &id1,
-			Label:  &label1,
-			Values: []float64{0.25},
+			Id:         &id1,
+			Label:      &label1,
+			Values:     []float64{0.25},
+			Timestamps: []time.Time{timestamp},
 		},
 		{
-			Id:     &id2,
-			Label:  &label2,
-			Values: []float64{0.0},
+			Id:         &id2,
+			Label:      &label2,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
 		},
 		{
-			Id:     &id3,
-			Label:  &label3,
-			Values: []float64{0.0},
+			Id:         &id3,
+			Label:      &label3,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
 		},
 		{
-			Id:     &id4,
-			Label:  &label4,
-			Values: []float64{0.0},
+			Id:         &id4,
+			Label:      &label4,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
 		},
 	}
 
-	event, _, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
+	metricSet := MetricSet{}
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
-	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
-	assert.Equal(t, expectedEvent.MetricSetFields["instance"], event.MetricSetFields["instance"])
+	assert.Equal(t, 1, len(events))
+	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
+	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], events[instanceID].MetricSetFields["cpu"])
+	assert.Equal(t, expectedEvent.MetricSetFields["instance"], events[instanceID].MetricSetFields["instance"])
 }
 
 func TestConstructMetricQueries(t *testing.T) {
@@ -210,7 +217,7 @@ func TestConstructMetricQueries(t *testing.T) {
 	}
 
 	listMetricsOutput := []cloudwatch.Metric{listMetric}
-	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 300)
+	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 5*time.Minute)
 	assert.Equal(t, 1, len(metricDataQuery))
 	assert.Equal(t, "i-123 CPUUtilization", *metricDataQuery[0].Label)
 	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)

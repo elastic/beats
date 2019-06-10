@@ -47,6 +47,7 @@ import (
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/filebeat/processor/add_kubernetes_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/decode_csv_fields"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
@@ -145,20 +146,30 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	return fb, nil
 }
 
+// setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
-	if !fb.moduleRegistry.Empty() {
-		overwritePipelines := fb.config.OverwritePipelines
-		if b.InSetupCmd {
-			overwritePipelines = true
+	if b.Config.Output.Name() != "elasticsearch" {
+		logp.Warn(pipelinesWarning)
+		return nil
+	}
+
+	overwritePipelines := true
+	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
+		esClient, err := elasticsearch.NewConnectedClient(esConfig)
+		if err != nil {
+			return err
 		}
 
-		b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
-			esClient, err := elasticsearch.NewConnectedClient(esConfig)
-			if err != nil {
-				return err
-			}
-			return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
+		// When running the subcommand setup, configuration from modules.d directories
+		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
+		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
+		modulesFactory := fileset.NewSetupFactory(b.Info.Version, pipelineLoaderFactory)
+		if fb.config.ConfigModules.Enabled() {
+			modulesLoader := cfgfile.NewReloader(b.Publisher, fb.config.ConfigModules)
+			modulesLoader.Load(modulesFactory)
 		}
+
+		return fb.moduleRegistry.LoadPipelines(esClient, overwritePipelines)
 	}
 	return nil
 }
