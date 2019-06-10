@@ -59,7 +59,7 @@ type nodeInfo struct {
 	EphemeralID string                 `json:"ephemeral_id"`
 	Name        string                 `json:"name"`
 	Host        string                 `json:"host"`
-	Version     *common.Version        `json:"version"`
+	Version     string                 `json:"version"`
 	Snapshot    bool                   `json:"snapshot"`
 	Status      string                 `json:"status"`
 	HTTPAddress string                 `json:"http_address"`
