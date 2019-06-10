@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -96,7 +97,7 @@ func getEntropyData(path string) (int, error) {
 		return 0, errors.Wrap(err, "error reading from random")
 	}
 
-	intval, err := strconv.ParseInt(string(raw), 10, 64)
+	intval, err := strconv.ParseInt(strings.TrimSpace(string(raw)), 10, 64)
 	if err != nil {
 		return 0, errors.Wrap(err, "error parsing from random")
 	}
