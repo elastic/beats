@@ -32,12 +32,15 @@ type commonStats struct {
 	Events  map[string]interface{} `json:"events"`
 	JVM     map[string]interface{} `json:"jvm"`
 	Reloads map[string]interface{} `json:"reloads"`
+	Queue   struct {
+		EventsCount int `json:"events_count"`
+	} `json:"queue"`
 }
 
 type cpu struct {
-	Percent     int                    `json:"percent,omitempty"`
-	LoadAverage map[string]interface{} `json:"load_average,omitempty"`
-	NumCPUs     int                    `json:"num_cpus,omitempty"`
+	Percent     int                    `json:"percent"`
+	LoadAverage map[string]interface{} `json:"load_average"`
+	NumCPUs     int                    `json:"num_cpus"`
 }
 
 type process struct {
@@ -78,7 +81,6 @@ type LogstashStats struct {
 	OS        os                     `json:"os"`
 	Pipelines []PipelineStats        `json:"pipelines"`
 	Logstash  map[string]interface{} `json:"logstash"`
-	Queue     map[string]interface{} `json:"queue"`
 	Timestamp common.Time            `json:"timestamp"`
 }
 
@@ -124,8 +126,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		},
 	}
 
-	queue := map[string]interface{}{} // TODO: see https://github.com/elastic/logstash/issues/10610
-
 	var pipelines []PipelineStats
 	for pipelineID, pipeline := range nodeStats.Pipelines {
 		pipeline.ID = pipelineID
@@ -142,7 +142,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 			o,
 			clusterPipelines,
 			logstash,
-			queue,
 			timestamp,
 		}
 
