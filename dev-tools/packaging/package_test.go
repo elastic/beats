@@ -181,8 +181,8 @@ func checkDocker(t *testing.T, file string) {
 	}
 
 	checkDockerEntryPoint(t, p, info)
-	checkDockerLabels(t, info, file)
-	checkDockerUser(t, info)
+	checkDockerLabels(t, p, info, file)
+	checkDockerUser(t, p, info, *rootOwner)
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 }
@@ -384,29 +384,33 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 	})
 }
 
-func checkDockerLabels(t *testing.T, info *dockerInfo, file string) {
-	if vendor := info.Config.Labels["org.label-schema.vendor"]; vendor != "Elastic" {
-		t.Errorf("unexpected vendor label: %s", vendor)
-	}
+func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file string) {
+	t.Run(fmt.Sprintf("%s labels", p.Name), func(t *testing.T) {
+		if vendor := info.Config.Labels["org.label-schema.vendor"]; vendor != "Elastic" {
+			t.Errorf("unexpected vendor label: %s", vendor)
+		}
 
-	expectedLicense := "Elastic License"
-	ossPrefix := strings.Join([]string{
-		info.Config.Labels["org.label-schema.name"],
-		"oss",
-		info.Config.Labels["org.label-schema.version"],
-	}, "-")
-	if strings.HasPrefix(filepath.Base(file), ossPrefix) {
-		expectedLicense = "ASL 2.0"
-	}
-	if license, present := info.Config.Labels["license"]; !present || license != expectedLicense {
-		t.Errorf("unexpected license label: %s", license)
-	}
+		expectedLicense := "Elastic License"
+		ossPrefix := strings.Join([]string{
+			info.Config.Labels["org.label-schema.name"],
+			"oss",
+			info.Config.Labels["org.label-schema.version"],
+		}, "-")
+		if strings.HasPrefix(filepath.Base(file), ossPrefix) {
+			expectedLicense = "ASL 2.0"
+		}
+		if license, present := info.Config.Labels["license"]; !present || license != expectedLicense {
+			t.Errorf("unexpected license label: %s", license)
+		}
+	})
 }
 
-func checkDockerUser(t *testing.T, info *dockerInfo) {
-	if info.Config.User == "root" {
-		t.Errorf("unexpected docker user: %s", info.Config.User)
-	}
+func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot bool) {
+	t.Run(fmt.Sprintf("%s labels", p.Name), func(t *testing.T) {
+		if expectRoot != (info.Config.User == "root") {
+			t.Errorf("unexpected docker user: %s", info.Config.User)
+		}
+	})
 }
 
 // Helpers
