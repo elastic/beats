@@ -43,7 +43,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
 		PathConfigKey: "path",
-		DefaultPath:   "_node/stats",
+		DefaultPath:   nodeStatsPath,
 	}.Build()
 )
 
