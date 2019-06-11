@@ -263,7 +263,7 @@ func getParentPid(pid int) (int, error) {
 }
 
 func getProcCredName(pid int) (string, error) {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	handle, err := syscall.OpenProcess(syscall.PROCESS_QUERY_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return "", errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
 	}
@@ -298,7 +298,7 @@ func getProcCredName(pid int) (string, error) {
 }
 
 func (self *ProcMem) Get(pid int) error {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess|windows.PROCESS_VM_READ, false, uint32(pid))
 	if err != nil {
 		return errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
 	}
@@ -353,7 +353,7 @@ func (self *ProcArgs) Get(pid int) error {
 	if !version.IsWindowsVistaOrGreater() {
 		return ErrNotImplemented{runtime.GOOS}
 	}
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess|windows.PROCESS_VM_READ, false, uint32(pid))
 	if err != nil {
 		return errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
 	}
