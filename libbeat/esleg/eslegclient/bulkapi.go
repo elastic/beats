@@ -42,6 +42,10 @@ type BulkCreateAction struct {
 	Create BulkMeta `json:"create" struct:"create"`
 }
 
+type BulkDeleteAction struct {
+	Delete BulkMeta `json:"delete" struct:"delete"`
+}
+
 type BulkMeta struct {
 	Index    string `json:"_index" struct:"_index"`
 	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`

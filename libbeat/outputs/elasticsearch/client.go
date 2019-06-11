@@ -253,6 +253,20 @@ func (client *Client) publishEvents(
 	return nil, nil
 }
 
+func eventMetaValue(event *beat.Event, key string) string {
+	var val string
+	if m := event.Meta; m != nil {
+		if tmp := m[key]; tmp != nil {
+			if s, ok := tmp.(string); ok {
+				val = s
+			} else {
+				logp.Err("Event[%s] '%v' is no string value", key, val)
+			}
+		}
+	}
+	return val
+}
+
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
 func bulkEncodePublishRequest(
@@ -272,7 +286,13 @@ func bulkEncodePublishRequest(
 			log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		bulkItems = append(bulkItems, meta, event)
+		opType := eventMetaValue(event, "op_type")
+		if opType == "delete" {
+			// We don't include the event source in a bulk DELETE
+			bulkItems = append(bulkItems, meta, nil)
+		} else {
+			bulkItems = append(bulkItems, meta, event)
+		}
 		okEvents = append(okEvents, data[i])
 	}
 	return okEvents, bulkItems
@@ -302,16 +322,8 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	var id string
-	if m := event.Meta; m != nil {
-		if tmp := m["_id"]; tmp != nil {
-			if s, ok := tmp.(string); ok {
-				id = s
-			} else {
-				log.Errorf("Event ID '%v' is no string value", id)
-			}
-		}
-	}
+	id := eventMetaValue(event, "id")
+	opType := eventMetaValue(event, "op_type")
 
 	meta := eslegclient.BulkMeta{
 		Index:    index,
@@ -321,7 +333,11 @@ func createEventBulkMeta(
 	}
 
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		return eslegclient.BulkCreateAction{Create: meta}, nil
+		if opType == "" || opType == "create" {
+			return eslegclient.BulkCreateAction{Create: meta}, nil
+		} else if opType == "delete" {
+			return eslegclient.BulkDeleteAction{Delete: meta}, nil
+		}
 	}
 	return eslegclient.BulkIndexAction{Index: meta}, nil
 }
