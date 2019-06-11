@@ -7,9 +7,9 @@
     example: Please add example
     type: keyword
   - name: qmgr
-    description: Please add description
-    example: Please add example
-    type: text
+    description: >
+      Name of the queue manager. Queue managers provide queuing services to applications, and manages the queues that belong to them.
+    type: keyword
   - name: arithinsert
     description: Changing content based on error.id
     type: keyword

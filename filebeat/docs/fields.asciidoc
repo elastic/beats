@@ -6022,15 +6022,14 @@ Please add description
 *`ibmmq.errorlog.qmgr`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
+Name of the queue manager. Queue managers provide queuing services to applications, and manages the queues that belong to them.
 
-Please add description
 
 --
 
-*`ibmmq.errorlog.arithinsert1`*::
+*`ibmmq.errorlog.arithinsert`*::
 +
 --
 type: keyword
@@ -6039,37 +6038,10 @@ Changing content based on error.id
 
 --
 
-*`ibmmq.errorlog.arithinsert2`*::
-+
---
-type: keyword
-
-Changing content based on error.id
-
---
-
-*`ibmmq.errorlog.commentinsert1`*::
+*`ibmmq.errorlog.commentinsert`*::
 +
 --
 type: keyowrd
-
-Changing content based on error.id
-
---
-
-*`ibmmq.errorlog.commentinsert2`*::
-+
---
-type: keyword
-
-Changing content based on error.id
-
---
-
-*`ibmmq.errorlog.commentinsert3`*::
-+
---
-type: keyword
 
 Changing content based on error.id
 
@@ -6104,6 +6076,7 @@ Defines what to do when the error occurs
 
 --
 
+<<<<<<< HEAD
 *`ibmmq.severity`*::
 +
 --
@@ -6116,6 +6089,8 @@ Please add description
 
 --
 
+=======
+>>>>>>> update queue manager definition
 [[exported-fields-icinga]]
 == Icinga fields
 
