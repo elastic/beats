@@ -9,7 +9,5 @@ multiline.pattern: '^\d\d'
 multiline.negate: true
 multiline.match: after
 
-{{ if .convert_timezone }}
 processors:
 - add_locale: ~
-{{ end }}
