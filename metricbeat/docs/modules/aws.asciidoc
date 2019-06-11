@@ -77,7 +77,7 @@ metricbeat.modules:
 == Metricsets
 
 Currently, we have `ec2`, `sqs`, `s3_request`, `s3_daily_storage` and `cloudwatch` metricset in `aws` module. Collecting `tags`
-for some of the AWS services is supported. For example, `ec2`, `sqs` and `s3`.
+for EC2 instances is supported.
 
 * *tags.*: Tag key value pairs from aws resources. A tag is a label that user assigns to an AWS resource.
 

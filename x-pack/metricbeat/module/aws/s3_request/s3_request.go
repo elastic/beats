@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -108,17 +107,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// Create Cloudwatch Events for s3_request
 		bucketNames := getBucketNames(listMetricsOutputs)
-		svcS3 := s3.New(awsConfig)
 		for _, bucketName := range bucketNames {
-			// Get tags for each bucket
-			tagSet, err := aws.GetS3Tags(svcS3, bucketName)
-			if err != nil {
-				err = errors.Wrap(err, "failed GetS3Tags")
-				m.Logger().Error(err.Error())
-			}
-
 			// Call createS3RequestEvent
-			event, err := createS3RequestEvent(metricDataOutputs, regionName, bucketName, tagSet)
+			event, err := createS3RequestEvent(metricDataOutputs, regionName, bucketName)
 			if err != nil {
 				err = errors.Wrap(err, "failed createS3RequestEvent")
 				m.Logger().Error(err.Error())
@@ -198,7 +189,7 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 }
 
 // createS3RequestEvent creates s3_request event from Cloudwatch metric data per bucket.
-func createS3RequestEvent(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string, tagSet []s3.Tag) (mb.Event, error) {
+func createS3RequestEvent(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (mb.Event, error) {
 	// Initialize event
 	event := aws.InitEvent(metricsetName, regionName)
 	// AWS s3_request metrics
@@ -229,10 +220,5 @@ func createS3RequestEvent(outputs []cloudwatch.MetricDataResult, regionName stri
 
 	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
-
-	// Add tags
-	for _, tag := range tagSet {
-		event.ModuleFields.Put("tags."+*tag.Key, *tag.Value)
-	}
 	return event, nil
 }

@@ -118,15 +118,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		// Create Cloudwatch Events for SQS
 		for _, queueURL := range queueURLs {
-			// Get tags for each queueURL
-			tagSet, err := getTags(svcSQS, queueURL)
-			if err != nil {
-				err = errors.Wrap(err, "failed getTags")
-				m.Logger().Error(err.Error())
-			}
-
 			// Call createSQSEvent
-			event, err := createSQSEvent(queueURL, metricDataResults, regionName, tagSet)
+			event, err := createSQSEvent(queueURL, metricDataResults, regionName)
 			if err != nil {
 				m.Logger().Error(err.Error())
 				event.Error = err
@@ -193,7 +186,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 }
 
 // createSQSEvent creates sqs event from Cloudwatch metric data per queue.
-func createSQSEvent(queueURL string, metricDataResults []cloudwatch.MetricDataResult, regionName string, tagSet map[string]string) (mb.Event, error) {
+func createSQSEvent(queueURL string, metricDataResults []cloudwatch.MetricDataResult, regionName string) (mb.Event, error) {
 	// Initialize event
 	event := aws.InitEvent(metricsetName, regionName)
 
@@ -228,11 +221,6 @@ func createSQSEvent(queueURL string, metricDataResults []cloudwatch.MetricDataRe
 
 	event.MetricSetFields = resultMetricSetFields
 	event.MetricSetFields.Put("queue.name", queueName)
-
-	// Add tags
-	for tagKey, tagValue := range tagSet {
-		event.ModuleFields.Put("tags."+tagKey, tagValue)
-	}
 	return event, nil
 }
 

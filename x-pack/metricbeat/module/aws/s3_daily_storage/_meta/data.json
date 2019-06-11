@@ -5,14 +5,10 @@
             "bucket": {
                 "name": "test-s3-ks-2",
                 "size": {
-                    "bytes": 766083
+                    "bytes": 941811
                 }
             },
-            "number_of_objects": 64
-        },
-        "tags": {
-            "dep": "eng",
-            "owner": "ks"
+            "number_of_objects": 219
         }
     },
     "cloud": {

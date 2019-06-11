@@ -9,24 +9,20 @@
                 "not_visible": 0,
                 "received": 0,
                 "sent": 0,
-                "visible": 0
+                "visible": 2
             },
             "oldest_message_age": {
-                "sec": 0
+                "sec": 405895
             },
             "queue": {
-                "name": "mb-test-log"
+                "name": "test-s3-notification"
             },
             "sent_message_size": {}
-        },
-        "tags": {
-            "dep": "eng",
-            "owner": "ks"
         }
     },
     "cloud": {
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "ap-southeast-1"
     },
     "event": {
         "dataset": "aws.sqs",
