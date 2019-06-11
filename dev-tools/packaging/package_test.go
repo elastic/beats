@@ -385,11 +385,11 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 }
 
 func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file string) {
+	vendor := info.Config.Labels["org.label-schema.vendor"]
+	if vendor != "Elastic" {
+		return
+	}
 	t.Run(fmt.Sprintf("%s labels", p.Name), func(t *testing.T) {
-		if vendor := info.Config.Labels["org.label-schema.vendor"]; vendor != "Elastic" {
-			t.Errorf("unexpected vendor label: %s", vendor)
-		}
-
 		expectedLicense := "Elastic License"
 		ossPrefix := strings.Join([]string{
 			info.Config.Labels["org.label-schema.name"],
