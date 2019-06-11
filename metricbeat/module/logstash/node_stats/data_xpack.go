@@ -77,11 +77,11 @@ type NodeStats struct {
 // LogstashStats represents the logstash_stats sub-document indexed into .monitoring-logstash-*
 type LogstashStats struct {
 	commonStats
-	Process   process                `json:"process"`
-	OS        os                     `json:"os"`
-	Pipelines []PipelineStats        `json:"pipelines"`
-	Logstash  map[string]interface{} `json:"logstash"`
-	Timestamp common.Time            `json:"timestamp"`
+	Process   process         `json:"process"`
+	OS        os              `json:"os"`
+	Pipelines []PipelineStats `json:"pipelines"`
+	Logstash  nodeInfo        `json:"logstash"`
+	Timestamp common.Time     `json:"timestamp"`
 }
 
 // PipelineStats represents the stats of a Logstash pipeline
@@ -107,9 +107,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	// Massage Logstash node basic info
 	nodeStats.nodeInfo.UUID = nodeStats.nodeInfo.ID
 	nodeStats.nodeInfo.ID = ""
-	logstash := map[string]interface{}{
-		"logstash": nodeStats.nodeInfo,
-	}
 
 	proc := process{
 		nodeStats.Process.OpenFileDescriptors,
@@ -141,7 +138,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 			proc,
 			o,
 			clusterPipelines,
-			logstash,
+			nodeStats.nodeInfo,
 			timestamp,
 		}
 
