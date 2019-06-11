@@ -209,6 +209,7 @@ func moduleConfigParts(f string) (moduleName string, configName string, ok bool)
 	return
 }
 
+// copyWithHeader copies a file from `src` to `dst` adding a `header` in the destination file
 func copyWithHeader(header, src, dst string, mode os.FileMode) error {
 	dstFile, err := os.OpenFile(mage.CreateDir(dst), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode&os.ModePerm)
 	if err != nil {
