@@ -11,6 +11,7 @@
     - process
     - process_summary
     - socket_summary
+    #- entropy
     #- core
     #- diskio
     #- socket
