@@ -72,7 +72,7 @@ If we wanted to be able to search over both name fields in one go, we could copy
       description: >
         The surname and forenames combined into one field for easy searchability.
 ----------------------------------------------------------------------
-<1> Copy the value of `forenames` into `full_name`
+<1> Copy the value of `surname` into `full_name`
 <2> Copy the value of `forenames` into `full_name`
 
 There are also some Kibana-specific properties, not detailed here. These are: `analyzed`, `count`, `searchable`, `aggregatable`, `script`. Kibana parameters can also be described using the `pattern`, `input_format`, `output_format`, `output_precision`, `label_template`, `url_template` and `open_link_in_current_tab` parameters.
