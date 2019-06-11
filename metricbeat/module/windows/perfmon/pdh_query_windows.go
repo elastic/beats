@@ -66,7 +66,7 @@ func (q *Query) Open() error {
 // AddCounter adds the specified counter to the query.
 func (q *Query) AddCounter(counterPath string, counter CounterConfig, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
-		return errors.Errorf("Counter %s has been already added", counterPath)
+		return errors.Errorf("counter %s has been already added", counterPath)
 	}
 	var err error
 	var instanceName string
@@ -185,7 +185,7 @@ func getPDHFormat(format string) PdhCounterFormat {
 	}
 }
 
-// UTF16ToStringArray converts list of Windows API NULL terminated strings  to go string array.
+// UTF16ToStringArray converts list of Windows API NULL terminated strings  to Go string array.
 func UTF16ToStringArray(buf []uint16) []string {
 	var strings []string
 	nextLineStart := 0
@@ -199,7 +199,7 @@ func UTF16ToStringArray(buf []uint16) []string {
 	return strings
 }
 
-// UTF16PtrToString converts Windows API LPTSTR (pointer to string) to go string.
+// UTF16PtrToString converts Windows API LPTSTR (pointer to string) to Go string.
 func UTF16PtrToString(s *uint16) string {
 	if s == nil {
 		return ""
