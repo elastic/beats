@@ -19,6 +19,7 @@ package index_summary
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -32,42 +33,27 @@ import (
 )
 
 var (
-	schemaXPack = s.Schema{
-		"primaries": c.Dict("primaries", s.Schema{
-			"docs": c.Dict("docs", s.Schema{
-				"count": c.Int("count"),
-			}),
-			"store": c.Dict("store", s.Schema{
-				"size_in_bytes": c.Int("size_in_bytes"),
-			}),
-			"indexing": c.Dict("indexing", s.Schema{
-				"index_total":             c.Int("index_total"),
-				"index_time_in_millis":    c.Int("index_time_in_millis"),
-				"is_throttled":            c.Bool("is_throttled"),
-				"throttle_time_in_millis": c.Int("throttle_time_in_millis"),
-			}),
-			"search": c.Dict("search", s.Schema{
-				"query_total":          c.Int("query_total"),
-				"query_time_in_millis": c.Int("query_time_in_millis"),
-			}),
+	xpackSchema = s.Schema{
+		"primaries": c.Dict("primaries", indexStatsSchema),
+		"total":     c.Dict("total", indexStatsSchema),
+	}
+
+	indexStatsSchema = s.Schema{
+		"docs": c.Dict("docs", s.Schema{
+			"count": c.Int("count"),
 		}),
-		"total": c.Dict("total", s.Schema{
-			"docs": c.Dict("docs", s.Schema{
-				"count": c.Int("count"),
-			}),
-			"store": c.Dict("store", s.Schema{
-				"size_in_bytes": c.Int("size_in_bytes"),
-			}),
-			"indexing": c.Dict("indexing", s.Schema{
-				"index_total":             c.Int("index_total"),
-				"index_time_in_millis":    c.Int("index_time_in_millis"),
-				"is_throttled":            c.Bool("is_throttled"),
-				"throttle_time_in_millis": c.Int("throttle_time_in_millis"),
-			}),
-			"search": c.Dict("search", s.Schema{
-				"query_total":          c.Int("query_total"),
-				"query_time_in_millis": c.Int("query_time_in_millis"),
-			}),
+		"store": c.Dict("store", s.Schema{
+			"size_in_bytes": c.Int("size_in_bytes"),
+		}),
+		"indexing": c.Dict("indexing", s.Schema{
+			"index_total":             c.Int("index_total"),
+			"index_time_in_millis":    c.Int("index_time_in_millis"),
+			"is_throttled":            c.Bool("is_throttled"),
+			"throttle_time_in_millis": c.Int("throttle_time_in_millis"),
+		}),
+		"search": c.Dict("search", s.Schema{
+			"query_total":          c.Int("query_total"),
+			"query_time_in_millis": c.Int("query_time_in_millis"),
 		}),
 	}
 )
@@ -82,7 +68,18 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		return errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
 	}
 
-	fields, err := schemaXPack.Apply(all.Data)
+	p := all.Data["primaries"]
+	primaries, ok := p.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("primaries is not a map")
+	}
+
+	if len(primaries) == 0 {
+		// There is no data in the cluster, hence no metrics to parse or report
+		return nil
+	}
+
+	fields, err := xpackSchema.Apply(all.Data)
 	if err != nil {
 		return errors.Wrap(err, "failure applying stats schema")
 	}
