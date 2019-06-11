@@ -10,21 +10,12 @@
     description: Please add description
     example: Please add example
     type: text
-  - name: arithinsert1
+  - name: arithinsert
     description: Changing content based on error.id
     type: keyword
-  - name: arithinsert2
-    description: Changing content based on error.id
-    type: keyword
-  - name: commentinsert1
+  - name: commentinsert
     description: Changing content based on error.id
     type: keyowrd
-  - name: commentinsert2
-    description: Changing content based on error.id
-    type: keyword
-  - name: commentinsert3
-    description: Changing content based on error.id
-    type: keyword
   - name: errordescription
     description: Please add description
     example: Please add example
@@ -35,7 +26,3 @@
   - name: action
     description: Defines what to do when the error occurs
     type: keyword
-- name: severity
-  description: Please add description
-  example: Please add example
-  type: text

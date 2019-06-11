@@ -50,10 +50,34 @@
             }
         },
         {
+            "append": {
+                "field": "ibmmq.errorlog.commentinsert",
+                "value": [
+                    "{{ibmmq.errorlog.commentinsert1}}",
+                    "{{ibmmq.errorlog.commentinsert2}}",
+                    "{{ibmmq.errorlog.commentinsert3}}"
+                ]
+            }
+        },
+        {
+            "append": {
+                "field": "ibmmq.errorlog.arithinsert",
+                "value": [
+                    "{{ibmmq.errorlog.arithinsert1}}",
+                    "{{ibmmq.errorlog.arithinsert2}}"
+                ]
+            }
+        },
+        {
             "remove": {
                 "field": [
                     "log_timestamp",
-                    "message"
+                    "message",
+                    "ibmmq.errorlog.commentinsert1",
+                    "ibmmq.errorlog.commentinsert2",
+                    "ibmmq.errorlog.commentinsert3",
+                    "ibmmq.errorlog.arithinsert1",
+                    "ibmmq.errorlog.arithinsert2"
                 ]
             }
         }
