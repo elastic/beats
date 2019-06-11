@@ -3,8 +3,11 @@
   type: group
   fields:
   - name: installation
-    description: Please add description
-    example: Please add example
+    description: >
+      This is the installation name which can be given at installation time.
+
+      Each installation of IBM MQ on UNIX, Linux, and Windows, has a unique identifier known as an installation name. The installation name is used to associate things such as queue managers and configuration files with an installation.
+
     type: keyword
   - name: qmgr
     description: >
