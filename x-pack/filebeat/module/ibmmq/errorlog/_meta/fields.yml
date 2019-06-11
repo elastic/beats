@@ -18,7 +18,7 @@
     type: keyword
   - name: commentinsert
     description: Changing content based on error.id
-    type: keyowrd
+    type: keyword
   - name: errordescription
     description: Please add description
     example: Please add example

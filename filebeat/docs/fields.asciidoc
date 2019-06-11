@@ -6041,7 +6041,7 @@ Changing content based on error.id
 *`ibmmq.errorlog.commentinsert`*::
 +
 --
-type: keyowrd
+type: keyword
 
 Changing content based on error.id
 
@@ -6077,6 +6077,7 @@ Defines what to do when the error occurs
 --
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 *`ibmmq.severity`*::
 +
 --
@@ -6091,6 +6092,17 @@ Please add description
 
 =======
 >>>>>>> update queue manager definition
+=======
+*`ibmmq.errorlog.code`*::
++
+--
+type: keyword
+
+Error code.
+
+--
+
+>>>>>>> update error code
 [[exported-fields-icinga]]
 == Icinga fields
 
