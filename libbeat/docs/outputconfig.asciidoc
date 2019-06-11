@@ -1568,7 +1568,8 @@ endif::[]
 ++++
 
 ifdef::apm-server[]
-NOTE: This page refers to using a separate instance of APM Server with an existing Elasticsearch Service deployment.
+NOTE: This page refers to using a separate instance of APM Server with an existing
+https://www.elastic.co/cloud/elasticsearch-service[Elasticsearch Service deployment].
 If you want to use APM on Elastic Cloud, see the cloud docs:
 {cloud}/ec-create-deployment.html[Create your deployment] or
 {cloud}/ec-manage-apm-settings.html[Add APM user settings].
