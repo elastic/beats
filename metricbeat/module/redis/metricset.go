@@ -18,6 +18,9 @@
 package redis
 
 import (
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
@@ -48,10 +51,29 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to read configuration")
 	}
 
+	uriParsed, _ := url.Parse(base.HostData().URI)
+	if uriParsed.RawQuery != "" {
+		queries := strings.Split(uriParsed.RawQuery, "&")
+		pw := ""
+		db := 0
+		for _, query := range queries {
+			querySplit := strings.Split(query, "=")
+			if querySplit[0] == "password" {
+				pw = querySplit[1]
+			} else if querySplit[0] == "db" {
+				db, _ = strconv.Atoi(querySplit[1])
+			}
+		}
+		return &MetricSet{
+			BaseMetricSet: base,
+			pool: CreatePool(base.HostData().URI, pw, db,
+				config.MaxConn, config.IdleTimeout),
+		}, nil
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		pool: CreatePool(base.HostData().URI,
-			config.MaxConn, config.IdleTimeout, base.Module().Config().Timeout),
+		pool: CreatePool(base.HostData().URI, base.HostData().Password, 0,
+			config.MaxConn, config.IdleTimeout),
 	}, nil
 }
 
