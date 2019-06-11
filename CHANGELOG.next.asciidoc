@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 - Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
 - Fixed Beat ID being reported by GET / API. {pull}12180[12180]
+- Fixed setting bulk max size in kafka output. {pull}12254[12254]
 - Add host.os.codename to fields.yml. {pull}12261[12261]
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
@@ -184,6 +185,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add number of goroutines to reported metrics. {pull}12135[12135]
 - Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
 - Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
+- Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
 
 *Auditbeat*
 

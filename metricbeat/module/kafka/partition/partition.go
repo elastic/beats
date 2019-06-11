@@ -86,6 +86,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting topic metadata")
 	}
+	if len(topics) == 0 {
+		debugf("no topic could be read, check ACLs")
+		return nil
+	}
 
 	evtBroker := common.MapStr{
 		"id":      broker.ID(),
