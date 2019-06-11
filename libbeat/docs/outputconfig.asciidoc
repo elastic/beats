@@ -1147,6 +1147,10 @@ endif::[]
 
 The maximum number of events to bulk in a single Kafka request. The default is 2048.
 
+===== `bulk_flush_frequency`
+
+Duration to wait before sending bulk Kafka request. 0 is no delay. The default is 0.
+
 ===== `timeout`
 
 The number of seconds to wait for responses from the Kafka brokers before timing
