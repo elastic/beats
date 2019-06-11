@@ -123,9 +123,9 @@ endif::[]
 unless you've disabled automatic template loading
 
 .2+|Send data to a secured cluster that supports index lifecycle management
-|`manage_index_templates`, `manage_ilm`
-footnote:[Use `read_ilm` instead of `manage_ilm` if you pre-loaded the lifecycle policy]
-, and `monitor` on cluster
+|`manage_index_templates`, `manage_ilm` footnote:[Use `read_ilm` instead of
+`manage_ilm` if you pre-loaded the lifecycle policy], and `monitor`
+on cluster
 ifeval::["{beatname_lc}"=="filebeat"]
 (and `manage_pipeline` if {beatname_uc} modules are used)
 endif::[]
