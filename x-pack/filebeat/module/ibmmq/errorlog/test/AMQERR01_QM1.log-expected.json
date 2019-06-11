@@ -3,7 +3,6 @@
         "@timestamp": "2018-10-18T14:15:01.797Z",
         "destination.address": "127.0.0.1(1415)",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9208E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -13,6 +12,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9208E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)(1415)",
             "TCP/IP",
@@ -38,7 +38,6 @@
         "@timestamp": "2018-10-18T18:28:49.463Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -48,6 +47,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -73,7 +73,6 @@
         "@timestamp": "2018-10-19T05:58:22.323Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -83,6 +82,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -108,7 +108,6 @@
         "@timestamp": "2018-10-19T06:07:17.260Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -118,6 +117,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -143,7 +143,6 @@
         "@timestamp": "2018-10-19T06:35:17.329Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -153,6 +152,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -178,7 +178,6 @@
         "@timestamp": "2018-10-19T06:55:17.320Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -188,6 +187,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -213,7 +213,6 @@
         "@timestamp": "2018-10-22T07:03:34.011Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9208E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -223,6 +222,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9208E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -248,7 +248,6 @@
         "@timestamp": "2018-10-22T07:11:58.724Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -258,6 +257,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -283,7 +283,6 @@
         "@timestamp": "2018-10-22T07:20:58.842Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -293,6 +292,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -318,7 +318,6 @@
         "@timestamp": "2018-10-22T07:48:59.040Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -328,6 +327,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -353,7 +353,6 @@
         "@timestamp": "2018-10-22T08:08:59.145Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -363,6 +362,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -388,7 +388,6 @@
         "@timestamp": "2018-10-22T08:28:59.237Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -398,6 +397,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -423,7 +423,6 @@
         "@timestamp": "2018-10-22T08:48:59.073Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -433,6 +432,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -458,7 +458,6 @@
         "@timestamp": "2018-10-25T12:58:17.191Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -468,6 +467,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -493,7 +493,6 @@
         "@timestamp": "2018-10-25T13:07:17.382Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -503,6 +502,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -528,7 +528,6 @@
         "@timestamp": "2018-10-25T13:16:17.516Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -538,6 +537,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -563,7 +563,6 @@
         "@timestamp": "2018-10-25T13:43:17.723Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -573,6 +572,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -598,7 +598,6 @@
         "@timestamp": "2018-10-25T14:03:17.721Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -608,6 +607,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -633,7 +633,6 @@
         "@timestamp": "2018-10-25T14:23:17.752Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -643,6 +642,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -668,7 +668,6 @@
         "@timestamp": "2018-10-25T14:43:17.734Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -678,6 +677,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -703,7 +703,6 @@
         "@timestamp": "2018-10-25T15:03:17.765Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -713,6 +712,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -738,7 +738,6 @@
         "@timestamp": "2018-10-25T15:23:17.754Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -748,6 +747,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -773,7 +773,6 @@
         "@timestamp": "2018-10-25T15:43:17.687Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -783,6 +782,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -808,7 +808,6 @@
         "@timestamp": "2018-10-25T16:03:17.768Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -818,6 +817,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -843,7 +843,6 @@
         "@timestamp": "2018-10-25T16:23:17.743Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9206E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -853,6 +852,7 @@
             "10053",
             "10053"
         ],
+        "ibmmq.errorlog.code": "AMQ9206E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -878,7 +878,6 @@
         "@timestamp": "2018-10-26T13:57:07.951Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9208E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -888,6 +887,7 @@
             "10054",
             "10054"
         ],
+        "ibmmq.errorlog.code": "AMQ9208E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",
@@ -913,7 +913,6 @@
         "@timestamp": "2018-10-26T13:57:07.952Z",
         "destination.address": "127.0.0.1",
         "ecs.version": "1.0.0",
-        "error.id": "AMQ9208E",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
@@ -923,6 +922,7 @@
             "10054",
             "10054"
         ],
+        "ibmmq.errorlog.code": "AMQ9208E",
         "ibmmq.errorlog.commentinsert": [
             "picmention (127.0.0.1)",
             "TCP/IP",

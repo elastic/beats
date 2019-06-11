@@ -29,3 +29,6 @@
   - name: action
     description: Defines what to do when the error occurs
     type: keyword
+  - name: code
+    description: Error code.
+    type: keyword
