@@ -406,7 +406,7 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 }
 
 func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot bool) {
-	t.Run(fmt.Sprintf("%s labels", p.Name), func(t *testing.T) {
+	t.Run(fmt.Sprintf("%s user", p.Name), func(t *testing.T) {
 		if expectRoot != (info.Config.User == "root") {
 			t.Errorf("unexpected docker user: %s", info.Config.User)
 		}
@@ -439,7 +439,6 @@ func getFiles(t *testing.T, pattern *regexp.Regexp) []string {
 			files = append(files, f)
 		}
 	}
-
 	return files
 }
 
