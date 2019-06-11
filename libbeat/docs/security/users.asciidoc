@@ -121,24 +121,30 @@ endif::[]
 |`create_index` and `index` on +{beat_default_index_prefix}-*+ indices
 |also requires privileges to <<privileges-to-setup-beats,set up index templates>>
 unless you've disabled automatic template loading
-endif::apm-server[]
-
-ifdef::apm-server[]
-.2+|Send data to a secured cluster without index lifecycle management
-|`manage_index_templates` and `monitor` on cluster
-|`create_index` and `write` on +{beat_default_index_prefix}-*+ indices
-endif::apm-server[]
 
 .2+|Send data to a secured cluster that supports index lifecycle management
 |`manage_index_templates`, `manage_ilm`
-ifndef::apm-server[]
 footnote:[Use `read_ilm` instead of `manage_ilm` if you pre-loaded the lifecycle policy]
-endif::apm-server[]
 , and `monitor` on cluster
 ifeval::["{beatname_lc}"=="filebeat"]
 (and `manage_pipeline` if {beatname_uc} modules are used)
 endif::[]
 | `index` and `manage` on +{beat_default_index_prefix}-*+ indices
+endif::apm-server[]
+
+ifdef::apm-server[]
+.2+|Send data to a secured cluster without index lifecycle management
+|`monitor` on cluster
+|`create_index` and `write` on +{beat_default_index_prefix}-*+ indices
+|also requires privileges to <<privileges-to-setup-beats,set up index templates>>
+unless you've disabled automatic template loading: `setup.template.enabled=false`
+
+.2+|Send data to a secured cluster that supports index lifecycle management
+|`manage_ilm` and `monitor` on cluster
+| `index` and `manage` on +{beat_default_index_prefix}-*+ indices
+|also requires privileges to <<privileges-to-setup-beats,set up index templates>>
+unless you've disabled automatic template loading: `setup.template.enabled=false`
+endif::apm-server[]
 
 ifdef::has_central_config[]
 .2+|Read configurations from Beats central management
