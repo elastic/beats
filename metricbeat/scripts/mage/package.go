@@ -47,13 +47,13 @@ func CustomizePackaging() {
 			Config:  true,
 			Modules: true,
 		}
-		windowsModulesDir = mage.PackageFile{
+		windowsModulesD = mage.PackageFile{
 			Mode:    0644,
 			Source:  "{{.PackageDir}}/modules.d",
 			Config:  true,
 			Modules: true,
 			Dep: func(spec mage.PackageSpec) error {
-				if err := mage.Copy("modules.d", spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
+				if err := mage.Copy(dirModulesDGenerated, spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
 					return errors.Wrap(err, "failed to copy modules.d dir")
 				}
 
@@ -82,7 +82,7 @@ func CustomizePackaging() {
 	for _, args := range mage.Packages {
 		switch args.OS {
 		case "windows":
-			args.Spec.Files[modulesDTarget] = windowsModulesDir
+			args.Spec.Files[modulesDTarget] = windowsModulesD
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", windowsReferenceConfig)
 		default:
 			pkgType := args.Types[0]
