@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 - In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12265[12265]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
+- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
 
 *Packetbeat*
 
