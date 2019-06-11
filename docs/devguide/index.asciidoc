@@ -23,6 +23,8 @@ include::{libbeat-dir}/docs/communitybeats.asciidoc[]
 
 include::./newbeat.asciidoc[]
 
+include::./fields-yml.asciidoc[]
+
 include::./event-conventions.asciidoc[]
 
 include::./newdashboards.asciidoc[]
