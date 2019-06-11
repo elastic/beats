@@ -33,7 +33,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "{:plugin_params=>%{GREEDYDATA:logstash.slowlog.plugin_params}, :took_in_nanos=>%{NUMBER:event.duration}, :took_in_millis=>%{NUMBER:logstash.slowlog.took_in_millis}, :event=>%{GREEDYDATA:logstash.slowlog.event}}"
+                    "{:plugin_params=\u003e%{GREEDYDATA:logstash.slowlog.plugin_params}, :took_in_nanos=\u003e%{NUMBER:event.duration}, :took_in_millis=\u003e%{NUMBER:logstash.slowlog.took_in_millis}, :event=\u003e%{GREEDYDATA:logstash.slowlog.event}}"
                 ]
             }
         },
@@ -46,20 +46,29 @@
         {
             "date": {
                 "field": "logstash.slowlog.timestamp",
-                "target_field": "@timestamp",
                 "formats": [
-                  "ISO8601"
-              ],
-              "ignore_failure": true
+                    "ISO8601"
+                ],
+                "ignore_failure": true,
+                "target_field": "@timestamp"
             }
         },
         {
             "date": {
-                "if": "ctx.event.timezone != null",
                 "field": "@timestamp",
-                "formats": ["ISO8601"],
-                "timezone": "{{ event.timezone }}",
-                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+                "formats": [
+                    "ISO8601"
+                ],
+                "if": "ctx.event.timezone != null",
+                "on_failure": [
+                    {
+                        "append": {
+                            "field": "error.message",
+                            "value": "{{ _ingest.on_failure_message }}"
+                        }
+                    }
+                ],
+                "timezone": "{{ event.timezone }}"
             }
         },
         {

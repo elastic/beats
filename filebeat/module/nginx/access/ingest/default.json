@@ -1,26 +1,34 @@
 {
     "description": "Pipeline for parsing Nginx access logs. Requires the geoip and user_agent plugins.",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
     "processors": [
         {
             "grok": {
                 "field": "message",
-                "patterns": [
-                    "\"?(?:%{IP_LIST:nginx.access.remote_ip_list}|%{DATA:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{DATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\""
-                ],
+                "ignore_missing": true,
                 "pattern_definitions": {
                     "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
                 },
-                "ignore_missing": true
+                "patterns": [
+                    "\"?(?:%{IP_LIST:nginx.access.remote_ip_list}|%{DATA:source.address}) - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{DATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:user_agent.original}\""
+                ]
             }
         },
         {
             "grok": {
                 "field": "nginx.access.info",
+                "ignore_missing": true,
                 "patterns": [
                     "%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}",
                     ""
-                ],
-                "ignore_missing": true
+                ]
             }
         },
         {
@@ -31,15 +39,15 @@
         {
             "split": {
                 "field": "nginx.access.remote_ip_list",
-                "separator": "\"?,?\\s+",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "separator": "\"?,?\\s+"
             }
         },
         {
             "split": {
                 "field": "nginx.access.origin",
-                "separator": "\"?,?\\s+",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "separator": "\"?,?\\s+"
             }
         },
         {
@@ -51,10 +59,10 @@
         {
             "script": {
                 "lang": "painless",
-                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   try {    ctx.source.ip = null;    if (ctx.nginx.access.remote_ip_list == null) { return; }    def found = false;    for (def item : ctx.nginx.access.remote_ip_list) {        if (!isPrivate(params.dot, item)) {            ctx.source.ip = item;            found = true;            break;        }    }    if (!found) {     ctx.source.ip = ctx.nginx.access.remote_ip_list[0];   }} catch (Exception e) { ctx.source.ip = null; }",
                 "params": {
                     "dot": "."
-                }
+                },
+                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 \u0026\u0026 secondByte == 168) {         return true;       }       if (firstByte == 172 \u0026\u0026 secondByte \u003e= 16 \u0026\u0026 secondByte \u003c= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   try {    ctx.source.ip = null;    if (ctx.nginx.access.remote_ip_list == null) { return; }    def found = false;    for (def item : ctx.nginx.access.remote_ip_list) {        if (!isPrivate(params.dot, item)) {            ctx.source.ip = item;            found = true;            break;        }    }    if (!found) {     ctx.source.ip = ctx.nginx.access.remote_ip_list[0];   }} catch (Exception e) { ctx.source.ip = null; }"
             }
         },
         {
@@ -66,9 +74,9 @@
         {
             "convert": {
                 "field": "source.ip",
+                "ignore_missing": true,
                 "target_field": "source.address",
-                "type": "string",
-                "ignore_missing": true
+                "type": "string"
             }
         },
         {
@@ -85,20 +93,29 @@
         {
             "date": {
                 "field": "nginx.access.time",
-                "target_field": "@timestamp",
                 "formats": [
                     "dd/MMM/yyyy:H:m:s Z"
                 ],
-                "ignore_failure": true
+                "ignore_failure": true,
+                "target_field": "@timestamp"
             }
         },
         {
             "date": {
-                "if": "ctx.event.timezone != null",
                 "field": "@timestamp",
-                "formats": ["ISO8601"],
-                "timezone": "{{ event.timezone }}",
-                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+                "formats": [
+                    "ISO8601"
+                ],
+                "if": "ctx.event.timezone != null",
+                "on_failure": [
+                    {
+                        "append": {
+                            "field": "error.message",
+                            "value": "{{ _ingest.on_failure_message }}"
+                        }
+                    }
+                ],
+                "timezone": "{{ event.timezone }}"
             }
         },
         {
@@ -114,16 +131,8 @@
         {
             "geoip": {
                 "field": "source.ip",
-                "target_field": "source.geo",
-                "ignore_missing": true
-            }
-        }
-    ],
-    "on_failure": [
-        {
-            "set": {
-                "field": "error.message",
-                "value": "{{ _ingest.on_failure_message }}"
+                "ignore_missing": true,
+                "target_field": "source.geo"
             }
         }
     ]

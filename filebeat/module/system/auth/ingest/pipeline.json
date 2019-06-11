@@ -1,12 +1,20 @@
 {
     "description": "Pipeline for parsing system authorisation/secure logs",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
     "processors": [
         {
             "grok": {
                 "field": "message",
                 "ignore_missing": true,
-                "pattern_definitions" : {
-                    "GREEDYMULTILINE" : "(.|\n)*"
+                "pattern_definitions": {
+                    "GREEDYMULTILINE": "(.|\n)*"
                 },
                 "patterns": [
                     "%{SYSLOGTIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\\[%{POSINT:process.pid:long}\\])?: %{DATA:system.auth.ssh.event} %{DATA:system.auth.ssh.method} for (invalid user )?%{DATA:user.name} from %{IPORHOST:source.ip} port %{NUMBER:source.port:long} ssh2(: %{GREEDYDATA:system.auth.ssh.signature})?",
@@ -27,35 +35,44 @@
         {
             "rename": {
                 "field": "system.auth.message",
-                "target_field": "message",
-                "ignore_missing": true
+                "ignore_missing": true,
+                "target_field": "message"
             }
         },
         {
             "set": {
                 "field": "source.ip",
-                "value": "{{system.auth.ssh.dropped_ip}}",
-                "if": "ctx.containsKey('system') && ctx.system.containsKey('auth') && ctx.system.auth.containsKey('ssh') && ctx.system.auth.ssh.containsKey('dropped_ip')"
+                "if": "ctx.containsKey('system') \u0026\u0026 ctx.system.containsKey('auth') \u0026\u0026 ctx.system.auth.containsKey('ssh') \u0026\u0026 ctx.system.auth.ssh.containsKey('dropped_ip')",
+                "value": "{{system.auth.ssh.dropped_ip}}"
             }
         },
         {
             "date": {
                 "field": "system.auth.timestamp",
-                "target_field": "@timestamp",
                 "formats": [
                     "MMM  d HH:mm:ss",
                     "MMM dd HH:mm:ss"
                 ],
-                "ignore_failure": true
+                "ignore_failure": true,
+                "target_field": "@timestamp"
             }
         },
         {
             "date": {
-                "if": "ctx.event.timezone != null",
                 "field": "@timestamp",
-                "formats": ["ISO8601"],
-                "timezone": "{{ event.timezone }}",
-                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+                "formats": [
+                    "ISO8601"
+                ],
+                "if": "ctx.event.timezone != null",
+                "on_failure": [
+                    {
+                        "append": {
+                            "field": "error.message",
+                            "value": "{{ _ingest.on_failure_message }}"
+                        }
+                    }
+                ],
+                "timezone": "{{ event.timezone }}"
             }
         },
         {
@@ -66,22 +83,16 @@
         {
             "geoip": {
                 "field": "source.ip",
-                "target_field": "source.geo",
-                "ignore_failure": true
+                "ignore_failure": true,
+                "target_field": "source.geo"
             }
         },
         {
             "script": {
-                "lang": "painless",
                 "ignore_failure": true,
+                "lang": "painless",
                 "source": "if (ctx.system.auth.ssh.event == \"Accepted\") {                  if (!ctx.containsKey(\"event\")) {                    ctx.event = [:];                  }                  ctx.event.type = \"authentication_success\";                  ctx.event.category = \"authentication\";                  ctx.event.action = \"ssh_login\";                  ctx.event.outcome = \"success\";                } else if (ctx.system.auth.ssh.event == \"Invalid\" || ctx.system.auth.ssh.event == \"Failed\") {                  if (!ctx.containsKey(\"event\")) {                    ctx.event = [:];                  }                  ctx.event.type = \"authentication_failure\";                  ctx.event.category = \"authentication\";                  ctx.event.action = \"ssh_login\";                  ctx.event.outcome = \"failure\";                }"
             }
         }
-    ],
-    "on_failure" : [{
-        "set" : {
-            "field" : "error.message",
-            "value" : "{{ _ingest.on_failure_message }}"
-        }
-    }]
+    ]
 }
