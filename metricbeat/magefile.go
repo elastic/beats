@@ -101,16 +101,14 @@ func Config() {
 
 // Update updates the generated files (aka make update).
 func Update() error {
+	// TODO to replace by a pure mage implementation:
+	// - Generate docs/fields.asciidoc
+	/*
+		mg.SerialDeps(Fields, Dashboards, Config,
+			metricbeat.PrepareModulePackagingOSS,
+			mage.GenerateModuleIncludeListGo)
+	*/
 	return sh.Run("make", "update")
-}
-
-// NewUpdate reimplements update using magefile
-// TODO:
-// - Generate docs/fields.asciidoc
-func NewUpdate() {
-	mg.SerialDeps(Fields, Dashboards, Config,
-		metricbeat.PrepareModulePackagingOSS,
-		mage.GenerateModuleIncludeListGo)
 }
 
 // MockedTests runs the HTTP tests using the mocked data inside each {module}/{metricset}/testdata folder.
