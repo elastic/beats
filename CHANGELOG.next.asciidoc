@@ -145,7 +145,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
 - Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 - In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12265[12265]
-- Fix an issue listing all processes when run under Windows as a non-privileged user. {issue}12301[12301] {pull}12305[12305]
+- Fix an issue listing all processes when run under Windows as a non-privileged user. {issue}12301[12301] {pull}12475[12475]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
 
 *Packetbeat*
