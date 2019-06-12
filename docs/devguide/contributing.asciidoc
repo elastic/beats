@@ -114,7 +114,7 @@ https://virtualenv.pypa.io/en/latest/installation.html[here]. Both of these comm
 [[build-target-env-vars]]
 === Selecting Build Targets
 
-Beats is built using the `make release` target. By default, make will select from a limited number of default build targets:
+Beats is built using the `make release` target. By default, make will select from a limited number of preset build targets:
 
 - darwin/amd64
 - linux/386 
@@ -122,7 +122,9 @@ Beats is built using the `make release` target. By default, make will select fro
 - windows/386 
 - windows/amd64
 
-You can change build targets using the `PLATFORMS` environment variable. Targets set with the `PLATFORMS` variable can either be a GOOS value, or a GOOS/arch pair. For example, `linux` and `linux/amd64` are both valid targets. You can select multiple targets, and the `PLATFORMS` list is space delimited, for example `darwin windows` will build on all supported darwin and windows architectures. In addition, you can add or remove from the list of build targets by prepending `+` or `-` ot a given target, as such: `+bsd` or `-darwin`.
+You can change build targets using the `PLATFORMS` environment variable. Targets set with the `PLATFORMS` variable can either be a GOOS value, or a GOOS/arch pair. 
+For example, `linux` and `linux/amd64` are both valid targets. You can select multiple targets, and the `PLATFORMS` list is space delimited, for example `darwin windows` will build on all supported darwin and windows architectures. 
+In addition, you can add or remove from the list of build targets by prepending `+` or `-` ot a given target, as such: `+bsd` or `-darwin`.
 
 You can find the complete list of supported build targets with `go tool dist list`.
 
