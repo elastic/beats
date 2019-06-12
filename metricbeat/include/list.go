@@ -99,6 +99,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/container"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/event"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/kubescheduler"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/node"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/pod"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_container"

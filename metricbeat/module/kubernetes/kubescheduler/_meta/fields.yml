@@ -1,0 +1,11 @@
+- name: kubescheduler
+  type: group
+  description: >
+    Kubernetes scheduler manager metrics
+  release: beta
+  fields:
+
+    - name: TODO
+      type: group
+      description: >
+        TODO
