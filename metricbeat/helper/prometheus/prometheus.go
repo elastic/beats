@@ -174,7 +174,6 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 			}
 
 			if field != "" {
-				// TODO only if expanding values
 				if v, ok := value.(common.MapStr); ok && p.EventLayout == ExpandedBucketsLayout {
 					var expanded common.MapStr
 					// only checking "sum", not "count", since they are populated
