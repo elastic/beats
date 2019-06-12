@@ -196,9 +196,11 @@ endif::no_dashboards[]
 Exports the index template to stdout. You can specify the `--es.version` and
 `--index` flags to further define what gets exported.
 
+ifndef::apm-server[]
 [[ilm-policy-subcommand]]
 *`ilm-policy`*::
 Exports ILM policy to stdout.
+endif::apm-server[]
 
 *FLAGS*
 

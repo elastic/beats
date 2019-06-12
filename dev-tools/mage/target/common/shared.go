@@ -17,9 +17,9 @@
 
 package common
 
-import "github.com/elastic/beats/dev-tools/mage"
+import devtools "github.com/elastic/beats/dev-tools/mage"
 
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
-	return mage.DumpVariables()
+	return devtools.DumpVariables()
 }
