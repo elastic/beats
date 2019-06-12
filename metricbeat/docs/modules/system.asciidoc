@@ -116,6 +116,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-diskio,diskio>>
 
+* <<metricbeat-metricset-system-entropy,entropy>>
+
 * <<metricbeat-metricset-system-filesystem,filesystem>>
 
 * <<metricbeat-metricset-system-fsstat,fsstat>>
@@ -143,6 +145,8 @@ include::system/core.asciidoc[]
 include::system/cpu.asciidoc[]
 
 include::system/diskio.asciidoc[]
+
+include::system/entropy.asciidoc[]
 
 include::system/filesystem.asciidoc[]
 

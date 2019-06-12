@@ -27,23 +27,19 @@ For example: `ip link set enp5s0f1 promisc on`
 [[packetbeat-loopback-interface]]
 === Packetbeat can't capture traffic from Windows loopback interface?
 
-Packetbeat is unable to capture traffic from the loopback device (127.0.0.1 traffic)
-because the Windows TCP/IP stack does not implement a network loopback interface,
-making it difficult for Windows packet capture drivers like WinPcap to sniff traffic.
-
-As a workaround, you can try installing
-https://github.com/nmap/npcap/releases[Npcap], an update of WinPcap. Make sure
-you install Npcap in WinPcap API-compatible mode (`/winpcap_mode=yes`), or
-{beatname_uc} will be unable to find the required DLLs. After installing Npcap,
-restart Windows. Npcap creates an Npcap Loopback Adapter that you can select if
-you want to capture loopback traffic.
+The Windows TCP/IP stack does not implement a network loopback interface, making
+it difficult for Windows packet capture drivers to capture traffic from the
+loopback device (127.0.0.1 traffic). To resolve this issue, install
+https://nmap.org/npcap/[Npcap] in WinPcap API-compatible mode and select the
+option to support loopback traffic. When you restart Windows, Npcap creates an
+Npcap Loopback Adapter that you can select to capture loopback traffic.
 
 For the list of devices shown here, you would configure Packetbeat
 to use device `4`:
 
 ["source","sh"]
 ----------------------------------------------------------------------
-PS C:\Users\vagrant\Desktop\packetbeat-1.2.0-windows> .\packetbeat.exe -devices
+PS C:\Program Files\Packetbeat .\packetbeat.exe -devices
 0: \Device\NPF_NdisWanBh (NdisWan Adapter)
 1: \Device\NPF_NdisWanIp (NdisWan Adapter)
 2: \Device\NPF_NdisWanIpv6 (NdisWan Adapter)

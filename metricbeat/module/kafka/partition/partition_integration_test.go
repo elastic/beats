@@ -39,6 +39,11 @@ import (
 const (
 	kafkaDefaultHost = "localhost"
 	kafkaDefaultPort = "9092"
+
+	kafkaSASLProducerUsername = "producer"
+	kafkaSASLProducerPassword = "producer-secret"
+	kafkaSASLUsername         = "stats"
+	kafkaSASLPassword         = "test-secret"
 )
 
 func TestData(t *testing.T) {
@@ -71,7 +76,7 @@ func TestTopic(t *testing.T) {
 		t.Fatal("write", err)
 	}
 	if len(dataBefore) == 0 {
-		t.Errorf("No offsets fetched from topic (before): %v", testTopic)
+		t.Fatalf("No offsets fetched from topic (before): %v", testTopic)
 	}
 	t.Logf("before: %v", dataBefore)
 
@@ -87,7 +92,7 @@ func TestTopic(t *testing.T) {
 		t.Fatal("write", err)
 	}
 	if len(dataAfter) == 0 {
-		t.Errorf("No offsets fetched from topic (after): %v", testTopic)
+		t.Fatalf("No offsets fetched from topic (after): %v", testTopic)
 	}
 	t.Logf("after: %v", dataAfter)
 
@@ -128,6 +133,9 @@ func generateKafkaData(t *testing.T, topic string) {
 	config.Producer.Retry.Backoff = 500 * time.Millisecond
 	config.Metadata.Retry.Max = 20
 	config.Metadata.Retry.Backoff = 500 * time.Millisecond
+	config.Net.SASL.Enable = true
+	config.Net.SASL.User = kafkaSASLProducerUsername
+	config.Net.SASL.Password = kafkaSASLProducerPassword
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {
 		t.Errorf("%s", err)
@@ -167,6 +175,8 @@ func getConfig(topic string) map[string]interface{} {
 		"metricsets": []string{"partition"},
 		"hosts":      []string{getTestKafkaHost()},
 		"topics":     topics,
+		"username":   kafkaSASLUsername,
+		"password":   kafkaSASLPassword,
 	}
 }
 

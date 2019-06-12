@@ -78,7 +78,7 @@ include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
 :standalone!:
 
 :autodiscoverJolokia:
-:auNtodiscoverHints:
+:autodiscoverHints:
 include::{libbeat-dir}/docs/shared-autodiscover.asciidoc[]
 
 :standalone:
