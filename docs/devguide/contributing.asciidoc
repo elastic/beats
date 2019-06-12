@@ -124,7 +124,7 @@ Beats is built using the `make release` target. By default, make will select fro
 
 You can change build targets using the `PLATFORMS` environment variable. Targets set with the `PLATFORMS` variable can either be a GOOS value, or a GOOS/arch pair. 
 For example, `linux` and `linux/amd64` are both valid targets. You can select multiple targets, and the `PLATFORMS` list is space delimited, for example `darwin windows` will build on all supported darwin and windows architectures. 
-In addition, you can add or remove from the list of build targets by prepending `+` or `-` ot a given target, as such: `+bsd` or `-darwin`.
+In addition, you can add or remove from the list of build targets by prepending `+` or `-` to a given target. For example: `+bsd` or `-darwin`.
 
 You can find the complete list of supported build targets with `go tool dist list`.
 
