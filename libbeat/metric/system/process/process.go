@@ -483,7 +483,7 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		logp.Debug("Error getting details for process %s with pid=%s: %v", process.Name, process.Pid, err)
+		logp.Debug("processes", "Error getting details for process %s with pid=%s: %v", process.Name, process.Pid, err)
 		return nil
 	}
 
