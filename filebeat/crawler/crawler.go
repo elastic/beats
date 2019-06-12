@@ -59,7 +59,6 @@ func New(out channel.Factory, inputConfigs []*common.Config, beatVersion string,
 	}, nil
 }
 
-// Start starts the crawler with all inputs
 func (c *Crawler) Start(
 	pipeline beat.Pipeline,
 	r *registrar.Registrar,
