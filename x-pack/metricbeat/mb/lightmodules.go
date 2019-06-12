@@ -1,19 +1,6 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 package mb
 
@@ -27,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 const (
@@ -116,15 +104,15 @@ func (r *LightModulesSource) HasMetricSet(moduleName, metricSetName string) bool
 }
 
 // MetricSetRegistration obtains a registration for a light metric set
-func (r *LightModulesSource) MetricSetRegistration(register *Register, moduleName, metricSetName string) (MetricSetRegistration, error) {
+func (r *LightModulesSource) MetricSetRegistration(register *mb.Register, moduleName, metricSetName string) (mb.MetricSetRegistration, error) {
 	lightModule, err := r.loadModule(moduleName)
 	if err != nil {
-		return MetricSetRegistration{}, errors.Wrapf(err, "failed to load module '%s'", moduleName)
+		return mb.MetricSetRegistration{}, errors.Wrapf(err, "failed to load module '%s'", moduleName)
 	}
 
 	ms, found := lightModule.MetricSets[metricSetName]
 	if !found {
-		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", moduleName, metricSetName)
+		return mb.MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", moduleName, metricSetName)
 	}
 
 	return ms.Registration(register)
@@ -138,101 +126,7 @@ type lightModuleConfig struct {
 // LightModule contains the definition of a light module
 type LightModule struct {
 	Name       string
-	MetricSets map[string]LightMetricSet
-}
-
-// LightMetricSet contains the definition of the metric set of a light module
-type LightMetricSet struct {
-	Name    string
-	Module  string
-	Default bool `config:"default"`
-	Input   struct {
-		Module    string      `config:"module" validate:"required"`
-		MetricSet string      `config:"metricset" validate:"required"`
-		Defaults  interface{} `config:"defaults"`
-	} `config:"input" validate:"required"`
-}
-
-// Registration obtains a metric set registration for this light metric set, this registration
-// contains a metric set factory that reprocess metric set creation taking into account the
-// light metric set defaults
-func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error) {
-	registration, err := r.metricSetRegistration(m.Input.Module, m.Input.MetricSet)
-	if err != nil {
-		return registration, errors.Wrapf(err,
-			"failed to start light metricset '%s/%s' using '%s/%s' metricset as input",
-			m.Module, m.Name,
-			m.Input.Module, m.Input.MetricSet)
-	}
-
-	originalFactory := registration.Factory
-	registration.IsDefault = m.Default
-
-	// Light modules factory has to override defaults and reproduce builder
-	// functionality with the resulting configuration, it does:
-	// - Override defaults
-	// - Call module factory if registered (it wouldn't have been called
-	//   if light module is really a registered mixed module)
-	// - Call host parser if defined (it would have already been called
-	//   without the light module defaults)
-	// - Finally, call the original factory for the registered metricset
-	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
-		// Override default config on base module and metricset
-		base.name = m.Name
-		baseModule, err := m.baseModule(base.module)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to create base module for light module")
-		}
-		base.module = baseModule
-
-		// Run module factory if registered, it will be called once per
-		// metricset, but it should be idempotent
-		moduleFactory := r.moduleFactory(m.Input.Module)
-		if moduleFactory != nil {
-			module, err := moduleFactory(*baseModule)
-			if err != nil {
-				return nil, errors.Wrapf(err, "module factory for module '%s' failed while creating light metricset '%s/%s'", m.Input.Module, m.Module, m.Name)
-			}
-			base.module = module
-		}
-
-		// At this point host parser was already run, we need to run this again
-		// with the overriden defaults
-		if registration.HostParser != nil {
-			base.hostData, err = registration.HostParser(base.module, base.host)
-			if err != nil {
-				return nil, errors.Wrapf(err, "host parser failed on light metricset factory for '%s/%s'", m.Module, m.Name)
-			}
-			base.host = base.hostData.Host
-		}
-
-		return originalFactory(base)
-	}
-
-	return registration, nil
-}
-
-// baseModule does the configuration overrides in the base module configuration
-// taking into account the light metric set default configurations
-func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
-	baseModule := BaseModule{
-		name:   m.Module,
-		config: from.Config(),
-	}
-	var err error
-	// Set defaults
-	if baseModule.rawConfig, err = common.NewConfigFrom(m.Input.Defaults); err != nil {
-		return nil, errors.Wrap(err, "invalid input defaults")
-	}
-	// Copy values from user configuration
-	if err = from.UnpackConfig(baseModule.rawConfig); err != nil {
-		return nil, errors.Wrap(err, "failed to copy values from user configuration")
-	}
-	// Update module configuration
-	if err = baseModule.UnpackConfig(&baseModule.config); err != nil {
-		return nil, errors.Wrap(err, "failed to set module configuration")
-	}
-	return &baseModule, nil
+	MetricSets map[string]mb.LightMetricSet
 }
 
 func (r *LightModulesSource) loadModule(moduleName string) (*LightModule, error) {
@@ -277,8 +171,8 @@ func (r *LightModulesSource) loadModuleConfig(modulePath string) (*lightModuleCo
 	return &moduleConfig, nil
 }
 
-func (r *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, metricSetNames []string) (map[string]LightMetricSet, error) {
-	metricSets := make(map[string]LightMetricSet)
+func (r *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, metricSetNames []string) (map[string]mb.LightMetricSet, error) {
+	metricSets := make(map[string]mb.LightMetricSet)
 	for _, metricSet := range metricSetNames {
 		manifestPath := filepath.Join(moduleDirPath, metricSet, manifestYML)
 
@@ -294,7 +188,7 @@ func (r *LightModulesSource) loadMetricSets(moduleDirPath, moduleName string, me
 	return metricSets, nil
 }
 
-func (r *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms LightMetricSet, err error) {
+func (r *LightModulesSource) loadMetricSetConfig(manifestPath string) (ms mb.LightMetricSet, err error) {
 	config, err := common.LoadFile(manifestPath)
 	if err != nil {
 		return ms, errors.Wrapf(err, "failed to load metricset manifest from '%s'", manifestPath)

@@ -42,6 +42,6 @@ func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), instance.Settings{RunFlags: runFlags, Name: Name})
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
+	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
 }

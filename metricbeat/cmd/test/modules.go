@@ -53,7 +53,6 @@ func GenTestModulesCmd(name, beatVersion string) *cobra.Command {
 			// been disabled to workaround the fact that Modules() will return
 			// the static modules (not the dynamic ones) with a start delay.
 			create := beater.Creator(
-				beater.WithLightModules(),
 				beater.WithModuleOptions(
 					module.WithMetricSetInfo(),
 					module.WithMaxStartDelay(0),

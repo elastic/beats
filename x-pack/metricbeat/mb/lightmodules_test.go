@@ -1,19 +1,6 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 // +build !integration
 
@@ -27,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 // TestLightModulesAsModuleSource checks that registry correctly lists
@@ -38,7 +26,7 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 		name       string
 		module     string
 		isDefault  bool
-		hostParser HostParser
+		hostParser mb.HostParser
 	}
 
 	cases := []struct {
@@ -92,15 +80,19 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 		},
 	}
 
-	newRegistry := func(metricSets []testMetricSet) *Register {
-		r := NewRegister()
+	fakeMetricSetFactory := func(base mb.BaseMetricSet) (mb.MetricSet, error) {
+		return &base, nil
+	}
+
+	newRegistry := func(metricSets []testMetricSet) *mb.Register {
+		r := mb.NewRegister()
 		for _, m := range metricSets {
-			opts := []MetricSetOption{}
+			opts := []mb.MetricSetOption{}
 			if m.isDefault {
-				opts = append(opts, DefaultMetricSet())
+				opts = append(opts, mb.DefaultMetricSet())
 			}
 			if m.hostParser != nil {
-				opts = append(opts, WithHostParser(m.hostParser))
+				opts = append(opts, mb.WithHostParser(m.hostParser))
 			}
 			r.MustAddMetricSet(m.module, m.name, fakeMetricSetFactory, opts...)
 		}
@@ -224,7 +216,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		},
 	}
 
-	r := NewRegister()
+	r := mb.NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
@@ -233,7 +225,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config, err := common.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
-			module, metricSets, err := NewModule(config, r)
+			module, metricSets, err := mb.NewModule(config, r)
 			if c.err {
 				assert.Error(t, err)
 				return
@@ -259,31 +251,31 @@ func TestNewModuleFromConfig(t *testing.T) {
 func TestNewModulesCallModuleFactory(t *testing.T) {
 	logp.TestingSetup()
 
-	r := NewRegister()
+	r := mb.NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	called := false
-	r.AddModule("foo", func(base BaseModule) (Module, error) {
+	r.AddModule("foo", func(base mb.BaseModule) (mb.Module, error) {
 		called = true
-		return DefaultModuleFactory(base)
+		return mb.DefaultModuleFactory(base)
 	})
 
 	config, err := common.NewConfigFrom(common.MapStr{"module": "service"})
 	require.NoError(t, err)
 
-	_, _, err = NewModule(config, r)
+	_, _, err = mb.NewModule(config, r)
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")
 }
 
 type metricSetWithOption struct {
-	BaseMetricSet
+	mb.BaseMetricSet
 	Option string
 }
 
-func newMetricSetWithOption(base BaseMetricSet) (MetricSet, error) {
+func newMetricSetWithOption(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
 		Option string `config:"option"`
 	}{
@@ -300,4 +292,4 @@ func newMetricSetWithOption(base BaseMetricSet) (MetricSet, error) {
 	}, nil
 }
 
-func (*metricSetWithOption) Fetch(ReporterV2) error { return nil }
+func (*metricSetWithOption) Fetch(mb.ReporterV2) error { return nil }
