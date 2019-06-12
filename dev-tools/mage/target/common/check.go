@@ -20,7 +20,7 @@ package common
 import (
 	"github.com/magefile/mage/mg"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 var checkDeps []interface{}
@@ -34,8 +34,8 @@ func RegisterCheckDeps(deps ...interface{}) {
 // checks for any modified files.
 func Check() {
 	deps := make([]interface{}, 0, len(checkDeps)+2)
-	deps = append(deps, mage.Format)
+	deps = append(deps, devtools.Format)
 	deps = append(deps, checkDeps...)
-	deps = append(deps, mage.Check)
+	deps = append(deps, devtools.Check)
 	mg.SerialDeps(deps...)
 }
