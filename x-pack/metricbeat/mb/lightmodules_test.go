@@ -230,6 +230,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 				assert.Error(t, err)
 				return
 			}
+			require.NoError(t, err)
 
 			assert.Equal(t, c.config["module"].(string), module.Config().Module)
 			if metricSetNames, ok := c.config["metricsets"].([]string); ok {
