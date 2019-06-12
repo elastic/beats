@@ -205,6 +205,15 @@ metricbeat.modules:
   #  - us-east-1
   #  - us-east-2
 
+#-------------------------------- Azure Module --------------------------------
+- module: azure
+  metricsets: ["monitor"]
+  enabled: true
+  period: 30s
+  client_id: ''
+  client_secret: ''
+  tenant_id: ''
+
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]

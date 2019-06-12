@@ -26,10 +26,10 @@ func (client *AzureMonitorClient) New(config azure.Config) error{
 	if err != nil {
 		return err
 	}
-	metricsClient := insights.NewMetricsClient("SubscriptionId")
-	metricsDefinitionClient := insights.NewMetricDefinitionsClient("SubscriptionId")
+	metricsClient := insights.NewMetricsClient(config.SubscriptionId)
+	metricsDefinitionClient := insights.NewMetricDefinitionsClient(config.SubscriptionId)
 	metricsClient.Authorizer = authorizer
-	metricsClient.Authorizer= authorizer
+	metricsDefinitionClient.Authorizer= authorizer
 	client.metricDefinitionClient= &metricsDefinitionClient
 	client.metricsClient = &metricsClient
 	return nil
@@ -50,7 +50,7 @@ func (client *AzureMonitorClient)ListMetricDefinitions(resourceURI string) ([]st
 }
 
 // GetMetricsData returns the specified metric data points for the specified resource ID spanning the last five minutes.
-func (client *AzureMonitorClient)GetMetricsData(ctx context.Context, resourceID string, metrics []string) ([]string, error) {
+func (client *AzureMonitorClient)GetMetricsData(resourceID string, metrics []string) ([]string, error) {
 
 	endTime := time.Now().UTC()
 	startTime := endTime.Add(time.Duration(-5) * time.Minute)
