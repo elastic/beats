@@ -112,7 +112,7 @@ func PythonAutopep8() error {
 }
 
 // AddLicenseHeaders adds license headers to .go files. It applies the
-// appropriate license header based on the value of mage.BeatLicense.
+// appropriate license header based on the value of devtools.BeatLicense.
 func AddLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 

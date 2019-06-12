@@ -31,12 +31,12 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 	packetbeat "github.com/elastic/beats/packetbeat/scripts/mage"
 )
 
 func init() {
-	mage.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
+	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 }
 
 // Aliases provides compatibility with CI while we transition all Beats
@@ -47,32 +47,32 @@ var Aliases = map[string]interface{}{
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if dep, found := crossBuildDeps[mage.Platform.Name]; found {
+	if dep, found := crossBuildDeps[devtools.Platform.Name]; found {
 		mg.Deps(dep)
 	}
 
-	params := mage.DefaultGolangCrossBuildArgs()
-	if flags, found := libpcapLDFLAGS[mage.Platform.Name]; found {
+	params := devtools.DefaultGolangCrossBuildArgs()
+	if flags, found := libpcapLDFLAGS[devtools.Platform.Name]; found {
 		params.Env = map[string]string{
 			"CGO_LDFLAGS": flags,
 		}
 	}
-	if flags, found := libpcapCFLAGS[mage.Platform.Name]; found {
+	if flags, found := libpcapCFLAGS[devtools.Platform.Name]; found {
 		params.Env["CGO_CFLAGS"] = flags
 	}
 
-	return mage.GolangCrossBuild(params)
+	return devtools.GolangCrossBuild(params)
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -84,11 +84,11 @@ func CrossBuild() error {
 	// dir so they cannot be run in parallel. Changing to a different CWD does
 	// not change where the temp files get written so that cannot be used as a
 	// fix.
-	if err := mage.CrossBuild(mage.ForPlatforms("windows"), mage.Serially()); err != nil {
+	if err := devtools.CrossBuild(devtools.ForPlatforms("windows"), devtools.Serially()); err != nil {
 		return err
 	}
 
-	return mage.CrossBuild(mage.ForPlatforms("!windows"))
+	return devtools.CrossBuild(devtools.ForPlatforms("!windows"))
 }
 
 // CrossBuildXPack cross-builds the beat with XPack for all target platforms.
@@ -100,21 +100,21 @@ func CrossBuildXPack() error {
 	// dir so they cannot be run in parallel. Changing to a different CWD does
 	// not change where the temp files get written so that cannot be used as a
 	// fix.
-	if err := mage.CrossBuildXPack(mage.ForPlatforms("windows"), mage.Serially()); err != nil {
+	if err := devtools.CrossBuildXPack(devtools.ForPlatforms("windows"), devtools.Serially()); err != nil {
 		return err
 	}
 
-	return mage.CrossBuildXPack(mage.ForPlatforms("!windows"))
+	return devtools.CrossBuildXPack(devtools.ForPlatforms("!windows"))
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
+	return devtools.CrossBuildGoDaemon()
 }
 
 // Clean cleans all generated files and build artifacts.
 func Clean() error {
-	return mage.Clean()
+	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -125,18 +125,18 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseElasticBeatPackaging()
-	mage.PackageKibanaDashboardsFromBuildDir()
+	devtools.UseElasticBeatPackaging()
+	devtools.PackageKibanaDashboardsFromBuildDir()
 	customizePackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return devtools.TestPackages()
 }
 
 // Update updates the generated files.
@@ -146,11 +146,11 @@ func Update() {
 
 // Config generates the config files.
 func Config() error {
-	return mage.Config(mage.AllConfigTypes, packetbeat.ConfigFileParams(), ".")
+	return devtools.Config(devtools.AllConfigTypes, packetbeat.ConfigFileParams(), ".")
 }
 
 func includeList() error {
-	return mage.GenerateIncludeListGo([]string{"protos/*"}, nil)
+	return devtools.GenerateIncludeListGo([]string{"protos/*"}, nil)
 }
 
 // Fields generates fields.yml and fields.go files for the Beat.
@@ -162,39 +162,39 @@ func Fields() {
 // libbeatAndPacketbeatCommonFieldsGo generates a fields.go containing both
 // libbeat and packetbeat's common fields.
 func libbeatAndPacketbeatCommonFieldsGo() error {
-	if err := mage.GenerateFieldsYAML(); err != nil {
+	if err := devtools.GenerateFieldsYAML(); err != nil {
 		return err
 	}
-	return mage.GenerateAllInOneFieldsGo()
+	return devtools.GenerateAllInOneFieldsGo()
 }
 
 // protosFieldsGo generates a fields.go for each protocol.
 func protosFieldsGo() error {
-	return mage.GenerateModuleFieldsGo("protos")
+	return devtools.GenerateModuleFieldsGo("protos")
 }
 
 // fieldsYML generates the fields.yml file containing all fields.
 func fieldsYML() error {
-	return mage.GenerateFieldsYAML("protos")
+	return devtools.GenerateFieldsYAML("protos")
 }
 
 func fieldDocs() error {
-	return mage.Docs.FieldDocs("fields.yml")
+	return devtools.Docs.FieldDocs("fields.yml")
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
-	return mage.KibanaDashboards("protos")
+	return devtools.KibanaDashboards("protos")
 }
 
 // Fmt formats source code and adds file headers.
 func Fmt() {
-	mg.Deps(mage.Format)
+	mg.Deps(devtools.Format)
 }
 
 // Check runs fmt and update then returns an error if any modifications are found.
 func Check() {
-	mg.SerialDeps(mage.Format, Update, mage.Check)
+	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
@@ -211,13 +211,13 @@ func UnitTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoUnitTest(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
-	mg.SerialDeps(Fields, mage.BuildSystemTestBinary)
-	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
+	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
+	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
 }
 
 // -----------------------------------------------------------------------------
@@ -292,16 +292,16 @@ var crossBuildDeps = map[string]func() error{
 // to be compiled with -fPIC.
 // See https://github.com/elastic/beats/pull/4217.
 func buildLibpcapFromSource(params map[string]string) error {
-	tarFile, err := mage.DownloadFile(libpcapURL, "/libpcap")
+	tarFile, err := devtools.DownloadFile(libpcapURL, "/libpcap")
 	if err != nil {
 		return errors.Wrap(err, "failed to download libpcap source")
 	}
 
-	if err = mage.VerifySHA256(tarFile, libpcapSHA256); err != nil {
+	if err = devtools.VerifySHA256(tarFile, libpcapSHA256); err != nil {
 		return err
 	}
 
-	if err = mage.Extract(tarFile, "/libpcap"); err != nil {
+	if err = devtools.Extract(tarFile, "/libpcap"); err != nil {
 		return errors.Wrap(err, "failed to extract libpcap")
 	}
 
@@ -415,12 +415,12 @@ func installWinpcap() error {
 	log.Println("Install Winpcap")
 	const wpdpackURL = "https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip"
 
-	winpcapZip, err := mage.DownloadFile(wpdpackURL, "/")
+	winpcapZip, err := devtools.DownloadFile(wpdpackURL, "/")
 	if err != nil {
 		return err
 	}
 
-	if err = mage.Extract(winpcapZip, "/libpcap/win"); err != nil {
+	if err = devtools.Extract(winpcapZip, "/libpcap/win"); err != nil {
 		return err
 	}
 
@@ -433,15 +433,15 @@ func generateWin64StaticWinpcap() error {
 	// Notes: We are using absolute path to make sure the files
 	// are available for x-pack build.
 	// Ref: https://github.com/elastic/beats/issues/1259
-	defer mage.DockerChown(mage.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib"))
-	return mage.RunCmds(
+	defer devtools.DockerChown(devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib"))
+	return devtools.RunCmds(
 		// Requires mingw-w64-tools.
-		[]string{"gendef", mage.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.dll")},
-		[]string{"mv", "wpcap.def", mage.MustExpand("{{ elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
+		[]string{"gendef", devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.dll")},
+		[]string{"mv", "wpcap.def", devtools.MustExpand("{{ elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
 		[]string{"x86_64-w64-mingw32-dlltool", "--as-flags=--64",
 			"-m", "i386:x86-64", "-k",
 			"--output-lib", "/libpcap/win/WpdPack/Lib/x64/libwpcap.a",
-			"--input-def", mage.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
+			"--input-def", devtools.MustExpand("{{elastic_beats_dir}}/{{.BeatName}}/lib/windows-64/wpcap.def")},
 	)
 }
 
@@ -453,52 +453,52 @@ func patchCGODirectives() error {
 	// cgo directives do not support GOARM tags so we will clear the tags
 	// and set them via CGO_LDFLAGS and CGO_CFLAGS.
 	// Ref: https://github.com/golang/go/issues/7211
-	f := mage.MustExpand(pcapGoFile)
+	f := devtools.MustExpand(pcapGoFile)
 	log.Println("Patching", f, cgoDirectiveRegex.String())
-	return mage.FindReplace(f, cgoDirectiveRegex, "")
+	return devtools.FindReplace(f, cgoDirectiveRegex, "")
 }
 
 func undoPatchCGODirectives() error {
-	return sh.Run("git", "checkout", mage.MustExpand(pcapGoFile))
+	return sh.Run("git", "checkout", devtools.MustExpand(pcapGoFile))
 }
 
 // customizePackaging modifies the device in the configuration files based on
 // the target OS.
 func customizePackaging() {
 	var (
-		configYml = mage.PackageFile{
+		configYml = devtools.PackageFile{
 			Mode:   0600,
 			Source: "{{.PackageDir}}/{{.BeatName}}.yml",
 			Config: true,
-			Dep: func(spec mage.PackageSpec) error {
+			Dep: func(spec devtools.PackageSpec) error {
 				c := packetbeat.ConfigFileParams()
 				c.ExtraVars["GOOS"] = spec.OS
 				c.ExtraVars["GOARCH"] = spec.MustExpand("{{.GOARCH}}")
-				return mage.Config(mage.ShortConfigType, c, spec.MustExpand("{{.PackageDir}}"))
+				return devtools.Config(devtools.ShortConfigType, c, spec.MustExpand("{{.PackageDir}}"))
 			},
 		}
-		referenceConfigYml = mage.PackageFile{
+		referenceConfigYml = devtools.PackageFile{
 			Mode:   0644,
 			Source: "{{.PackageDir}}/{{.BeatName}}.reference.yml",
-			Dep: func(spec mage.PackageSpec) error {
+			Dep: func(spec devtools.PackageSpec) error {
 				c := packetbeat.ConfigFileParams()
 				c.ExtraVars["GOOS"] = spec.OS
 				c.ExtraVars["GOARCH"] = spec.MustExpand("{{.GOARCH}}")
-				return mage.Config(mage.ReferenceConfigType, c, spec.MustExpand("{{.PackageDir}}"))
+				return devtools.Config(devtools.ReferenceConfigType, c, spec.MustExpand("{{.PackageDir}}"))
 			},
 		}
 	)
 
-	for _, args := range mage.Packages {
+	for _, args := range devtools.Packages {
 		for _, pkgType := range args.Types {
 			switch pkgType {
-			case mage.TarGz, mage.Zip:
+			case devtools.TarGz, devtools.Zip:
 				args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
-			case mage.Deb, mage.RPM, mage.DMG:
+			case devtools.Deb, devtools.RPM, devtools.DMG:
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
-			case mage.Docker:
+			case devtools.Docker:
 				args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin=eip")
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
