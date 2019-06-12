@@ -175,7 +175,7 @@ perform:
 |====
 |Task | Required privileges and roles
 
-ifndef::no_dashboards[]
+ifndef::apm-server[]
 .2+|View {beatname_uc} dashboards
 |`read` on +{beat_default_index_prefix}-*+ indices
 |`kibana_dashboard_only_user` role
@@ -183,7 +183,7 @@ ifndef::no_dashboards[]
 .2+|View and edit {beatname_uc} dashboards
 |`read` on +{beat_default_index_prefix}-*+ indices
 |`kibana_user` role
-endif::no_dashboards[]
+endif::apm-server[]
 
 ifdef::apm-server[]
 |Use the APM UI
