@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/metricbeat/cmd/test"
 	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
 	"github.com/elastic/beats/x-pack/metricbeat/beater"
+	xpacktest "github.com/elastic/beats/x-pack/metricbeat/cmd/test"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/x-pack/metricbeat/include"
@@ -35,6 +36,6 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	RootCmd = cmd.GenRootCmdWithSettings(beater.XPackCreator(), instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
+	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", xpacktest.BeatCreator()))
 	xpackcmd.AddXPack(RootCmd, Name)
 }
