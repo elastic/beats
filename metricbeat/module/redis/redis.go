@@ -177,13 +177,13 @@ func CreatePool(
 	password string,
 	database int,
 	maxConn int,
-	idleTimeout time.Duration,
+	idleTimeout, connTimeout time.Duration,
 ) *rd.Pool {
 	return &rd.Pool{
 		MaxIdle:     maxConn,
 		IdleTimeout: idleTimeout,
 		Dial: func() (rd.Conn, error) {
-			return rd.DialURL(uri, rd.DialPassword(password), rd.DialDatabase(database))
+			return rd.DialURL(uri, rd.DialPassword(password), rd.DialDatabase(database), rd.DialConnectTimeout(connTimeout))
 		},
 	}
 }

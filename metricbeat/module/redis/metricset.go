@@ -20,7 +20,6 @@ package redis
 import (
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
@@ -46,34 +45,21 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		Network: "tcp",
 		MaxConn: 10,
 	}
+
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read configuration")
 	}
 
-	uriParsed, _ := url.Parse(base.HostData().URI)
-	if uriParsed.RawQuery != "" {
-		queries := strings.Split(uriParsed.RawQuery, "&")
-		pw := ""
-		db := 0
-		for _, query := range queries {
-			querySplit := strings.Split(query, "=")
-			if querySplit[0] == "password" {
-				pw = querySplit[1]
-			} else if querySplit[0] == "db" {
-				db, _ = strconv.Atoi(querySplit[1])
-			}
-		}
-		return &MetricSet{
-			BaseMetricSet: base,
-			pool: CreatePool(base.HostData().URI, pw, db,
-				config.MaxConn, config.IdleTimeout),
-		}, nil
+	password, database, err := getPasswordDatabase(base.HostData().URI, base.HostData().Password)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to getPasswordDatabase from URI")
 	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		pool: CreatePool(base.HostData().URI, base.HostData().Password, 0,
-			config.MaxConn, config.IdleTimeout),
+		pool: CreatePool(base.HostData().URI, password, database,
+			config.MaxConn, config.IdleTimeout, base.Module().Config().Timeout),
 	}, nil
 }
 
@@ -85,4 +71,31 @@ func (m *MetricSet) Connection() rd.Conn {
 // Close redis connections
 func (m *MetricSet) Close() error {
 	return m.pool.Close()
+}
+
+func getPasswordDatabase(uri string, password string) (string, int, error) {
+	uriParsed, err := url.Parse(uri)
+	if err != nil {
+		return "", 0, errors.Wrap(err, "failed to url.Parse")
+	}
+
+	database := 0
+	if uriParsed.RawQuery != "" {
+		queryParsed, err := url.ParseQuery(uriParsed.RawQuery)
+		if err != nil {
+			return "", 0, errors.Wrap(err, "failed to url.ParseQuery")
+		}
+		pw := queryParsed.Get("password")
+		if pw != "" {
+			password = pw
+		}
+		db := queryParsed.Get("db")
+		if db != "" {
+			database, err = strconv.Atoi(db)
+			if err != nil {
+				return "", 0, errors.Wrap(err, "failed to convert string to int using strconv.Atoi")
+			}
+		}
+	}
+	return password, database, nil
 }
