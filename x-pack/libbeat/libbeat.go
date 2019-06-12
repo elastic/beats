@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/mock"
-	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/elb"
 	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
 )
 

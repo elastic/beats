@@ -47,7 +47,7 @@ type Provider struct {
 
 // AutodiscoverBuilder is the main builder for this provider.
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Beta("aws_elb autodiscover is beta")
+	cfgwarn.Experimental("aws_elb autodiscover is experimental")
 
 	config := defaultConfig()
 	err := c.Unpack(&config)
@@ -120,12 +120,14 @@ func (p *Provider) Stop() {
 func (p *Provider) onWatcherStart(arn string, lbl *lbListener) {
 	lblMap := lbl.toMap()
 	e := bus.Event{
-		"start":        true,
-		"provider":     p.uuid,
-		"id":           arn,
-		"host":         lblMap["host"],
-		"port":         lblMap["port"],
-		"elb_listener": lbl.toMap(),
+		"start":    true,
+		"provider": p.uuid,
+		"id":       arn,
+		"host":     lblMap["host"],
+		"port":     lblMap["port"],
+		"meta": common.MapStr{
+			"elb_listener": lbl.toMap(),
+		},
 	}
 
 	if configs := p.templates.GetConfig(e); configs != nil {
