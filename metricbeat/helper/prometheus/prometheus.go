@@ -46,7 +46,7 @@ type EventLayout int
 const (
 	// StandardLayout will group metrics with same name and keylabels into an event
 	StandardLayout EventLayout = iota
-	//ExpandedBucketsLayout will use expand Histograms and Summaries from the standardlayout
+	// ExpandedBucketsLayout will use expand Histograms and Summaries from the StandardLayout
 	// and generate an event for each histogram `le` value and summary `quantile`
 	ExpandedBucketsLayout
 )
@@ -184,22 +184,21 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 						expanded["sum"] = v["sum"]
 						expanded["count"] = v["count"]
 
-						// create unique selector for the event
-						// and a new event starting with keyLabels map clone
-						selector := field + keyLabels.String() + "sum-count"
-						event := keyLabels.Clone()
-						eventsMap[selector] = event
-						update := common.MapStr{}
-						update.Put(field, expanded)
-						event.DeepUpdate(update)
-						event.DeepUpdate(labels)
+						p.createEventWithLabelsAtEventMap(
+							eventsMap,
+							keyLabels,
+							labels,
+							field,
+							"sum-count",
+							expanded,
+						)
 					}
 
 					// if data came from summary, create an event per "percentile" item
-					if p, ok := v["percentile"]; ok {
+					if pc, ok := v["percentile"]; ok {
 						expanded = common.MapStr{}
 
-						percentile, ok := p.(common.MapStr)
+						percentile, ok := pc.(common.MapStr)
 						if !ok {
 							// should never go through here
 							return nil, fmt.Errorf("error converting percentile at %s to event document", field)
@@ -210,16 +209,14 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 							expanded.Put("quantile.key", k)
 							expanded.Put("quantile.value", v)
 
-							// create unique selector for the event
-							// and a new event starting with keyLabels map clone
-							selector := field + keyLabels.String() + k
-							event := keyLabels.Clone()
-							eventsMap[selector] = event
-							update := common.MapStr{}
-							update.Put(field, expanded)
-							event.DeepUpdate(update)
-							event.DeepUpdate(labels)
-
+							p.createEventWithLabelsAtEventMap(
+								eventsMap,
+								keyLabels,
+								labels,
+								field,
+								k,
+								expanded,
+							)
 						}
 					}
 
@@ -236,16 +233,14 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 							expanded.Put("le.key", k)
 							expanded.Put("le.value", v)
 
-							// create unique selector for the event
-							// and a new event starting with keyLabels map clone
-							selector := field + keyLabels.String() + k
-							event := keyLabels.Clone()
-							eventsMap[selector] = event
-							update := common.MapStr{}
-							update.Put(field, expanded)
-							event.DeepUpdate(update)
-							event.DeepUpdate(labels)
-
+							p.createEventWithLabelsAtEventMap(
+								eventsMap,
+								keyLabels,
+								labels,
+								field,
+								k,
+								expanded,
+							)
 						}
 					}
 
@@ -294,6 +289,30 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	return events, nil
+
+}
+
+// createEventWithLabelsAtEventMap is not a meaningful method. It is meant to
+// group a snippet of code that adds an event to an event map by a key.
+// The event added contains labels and keylabels provided, and the `eventData`
+// common.MapStr at the `field` location.
+// The key used at the eventMap is formed by field + keylabel + provided suffix.
+// Only the eventMap argument is modified.
+func (p *prometheus) createEventWithLabelsAtEventMap(
+	eventsMap map[string]common.MapStr,
+	keyLabels common.MapStr,
+	labels common.MapStr,
+	field,
+	mapKeySuffix string,
+	eventData common.MapStr,
+) {
+	selector := field + keyLabels.String() + mapKeySuffix
+	event := keyLabels.Clone()
+	eventsMap[selector] = event
+	update := common.MapStr{}
+	update.Put(field, eventData)
+	event.DeepUpdate(update)
+	event.DeepUpdate(labels)
 
 }
 
