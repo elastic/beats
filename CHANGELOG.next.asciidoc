@@ -145,10 +145,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 - Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Refactored Windows perfmon metricset: replaced method to retrieve counter paths with PdhExpandWildCardPathW, separated code by responsibility, removed unused functions {pull}12212[12212]
 - Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
 - Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 - In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12265[12265]
+- Fix an issue listing all processes when run under Windows as a non-privileged user. {issue}12301[12301] {pull}12475[12475]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
+- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
 
 *Packetbeat*
 
@@ -248,6 +251,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Always report Pod UID in the `pod` metricset. {pull}12345[12345]
 - Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
 - Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
+- Add a system/entropy metricset {pull}12450[12450]
 
 *Packetbeat*
 
