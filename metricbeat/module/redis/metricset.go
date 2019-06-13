@@ -20,6 +20,7 @@ package redis
 import (
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
@@ -39,10 +40,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Unpack additional configuration options.
 	config := struct {
 		IdleTimeout time.Duration `config:"idle_timeout"`
-		Network     string        `config:"network"`
 		MaxConn     int           `config:"maxconn" validate:"min=1"`
 	}{
-		Network: "tcp",
 		MaxConn: 10,
 	}
 
@@ -51,9 +50,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to read configuration")
 	}
 
-	password, database, err := getPasswordDatabase(base.HostData().URI, base.HostData().Password)
+	password, database, err := getPasswordDBNumber(base.HostData())
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to getPasswordDatabase from URI")
+		return nil, errors.Wrap(err, "failed to getPasswordDBNumber from URI")
 	}
 
 	return &MetricSet{
@@ -73,27 +72,43 @@ func (m *MetricSet) Close() error {
 	return m.pool.Close()
 }
 
-func getPasswordDatabase(uri string, password string) (string, int, error) {
-	uriParsed, err := url.Parse(uri)
+func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
+	// If there are more than one place specified password/db-number, use password/db-number in query
+	uriParsed, err := url.Parse(hostData.URI)
 	if err != nil {
-		return "", 0, errors.Wrap(err, "failed to url.Parse")
+		return "", 0, errors.Wrapf(err, "failed to parse URL '%s'", hostData.URI)
 	}
 
+	// get db-number from URI if it exists
 	database := 0
+	if uriParsed.Path != "" && strings.HasPrefix(uriParsed.Path, "/") {
+		db := strings.TrimPrefix(uriParsed.Path, "/")
+		if db != "" {
+			database, err = strconv.Atoi(db)
+			if err != nil {
+				return "", 0, errors.Wrapf(err, "redis database in url should be an integer, found: %s", db)
+			}
+		}
+	}
+
+	// get password from query and also check db-number
+	password := hostData.Password
 	if uriParsed.RawQuery != "" {
 		queryParsed, err := url.ParseQuery(uriParsed.RawQuery)
 		if err != nil {
-			return "", 0, errors.Wrap(err, "failed to url.ParseQuery")
+			return "", 0, errors.Wrapf(err, "failed to parse query string in '%s'", hostData.URI)
 		}
+
 		pw := queryParsed.Get("password")
 		if pw != "" {
 			password = pw
 		}
+
 		db := queryParsed.Get("db")
 		if db != "" {
 			database, err = strconv.Atoi(db)
 			if err != nil {
-				return "", 0, errors.Wrap(err, "failed to convert string to int using strconv.Atoi")
+				return "", 0, errors.Wrapf(err, "redis database in query should be an integer, found: %s", db)
 			}
 		}
 	}

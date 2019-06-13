@@ -22,46 +22,68 @@ package redis
 import (
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetPasswordDatabase(t *testing.T) {
+func TestGetPasswordDBNumber(t *testing.T) {
 	cases := []struct {
-		uri              string
-		password         string
+		title            string
+		hostData         mb.HostData
 		expectedPassword string
 		expectedDatabase int
 	}{
 		{
-			"redis://127.0.0.1:6379",
-			"testpassword",
-			"testpassword",
-			0,
-		},
-		{
-			"redis://:testpassword@127.0.0.2:6379",
-			"testpassword",
-			"testpassword",
-			0,
-		},
-		{
-			"redis://127.0.0.1:6379?password=test",
+			"test redis://127.0.0.1:6379 without password",
+			mb.HostData{URI: "redis://127.0.0.1:6379", Password: ""},
 			"",
+			0,
+		},
+		{
+			"test redis uri with password in URI user info field",
+			mb.HostData{URI: "redis://:password@127.0.0.2:6379", Password: "password"},
+			"password",
+			0,
+		},
+		{
+			"test redis uri with password in query field",
+			mb.HostData{URI: "redis://127.0.0.1:6379?password=test", Password: ""},
 			"test",
 			0,
 		},
 		{
-			"redis://127.0.0.1:6379?password=test&db=1",
-			"",
+			"test redis uri with password and db in query field",
+			mb.HostData{URI: "redis://127.0.0.1:6379?password=test&db=1", Password: ""},
 			"test",
 			1,
+		},
+		{
+			"test redis uri with password in URI user info field and query field",
+			mb.HostData{URI: "redis://:password1@127.0.0.2:6379?password=password2", Password: "password1"},
+			"password2",
+			0,
+		},
+		{
+			"test redis uri with db number in URI",
+			mb.HostData{URI: "redis://:password1@127.0.0.2:6379/1", Password: "password1"},
+			"password1",
+			1,
+		},
+		{
+			"test redis uri with db number in URI and query field",
+			mb.HostData{URI: "redis://:password1@127.0.0.2:6379/1?password=password2&db=2", Password: "password1"},
+			"password2",
+			2,
 		},
 	}
 
 	for _, c := range cases {
-		password, database, err := getPasswordDatabase(c.uri, c.password)
-		assert.NoError(t, err)
-		assert.Equal(t, c.expectedPassword, password)
-		assert.Equal(t, c.expectedDatabase, database)
+		t.Run(c.title, func(t *testing.T) {
+			password, database, err := getPasswordDBNumber(c.hostData)
+			assert.NoError(t, err)
+			assert.Equal(t, c.expectedPassword, password)
+			assert.Equal(t, c.expectedDatabase, database)
+		})
 	}
 }

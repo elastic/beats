@@ -183,7 +183,12 @@ func CreatePool(
 		MaxIdle:     maxConn,
 		IdleTimeout: idleTimeout,
 		Dial: func() (rd.Conn, error) {
-			return rd.DialURL(uri, rd.DialPassword(password), rd.DialDatabase(database), rd.DialConnectTimeout(connTimeout))
+			return rd.DialURL(uri,
+				rd.DialPassword(password),
+				rd.DialDatabase(database),
+				rd.DialConnectTimeout(connTimeout),
+				rd.DialReadTimeout(connTimeout),
+				rd.DialWriteTimeout(connTimeout))
 		},
 	}
 }
