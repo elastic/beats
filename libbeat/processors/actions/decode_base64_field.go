@@ -112,8 +112,7 @@ func (f *decodeBase64Field) decodeField(from string, to string, fields common.Ma
 
 	text, ok := value.(string)
 	if !ok {
-		// ignore non string fields when unmarshaling
-		return nil
+		return fmt.Errorf("invalid type for `from`, expecting a string received %T", value)
 	}
 
 	decodedData, err := base64.StdEncoding.DecodeString(text)
