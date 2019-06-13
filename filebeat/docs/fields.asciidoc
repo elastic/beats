@@ -5932,9 +5932,18 @@ OS build information.
 
 --
 
-<<<<<<< HEAD
 *`host.os.codename`*::
-=======
++
+--
+type: keyword
+
+example: stretch
+
+OS codename, if any.
+
+
+--
+
 [[exported-fields-ibmmq]]
 == ibmmq fields
 
@@ -5954,37 +5963,7 @@ ibmmq Module
 IBM MQ error logs
 
 
-<<<<<<< HEAD
-*`ibmmq.errorlog.process`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.user`*::
->>>>>>> update docs
-+
---
-type: keyword
-
-<<<<<<< HEAD
-example: stretch
-
-OS codename, if any.
-
-=======
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.program`*::
+*`ibmmq.errorlog.installation`*::
 +
 --
 type: keyword
@@ -5992,30 +5971,6 @@ type: keyword
 This is the installation name which can be given at installation time.
 Each installation of IBM MQ on UNIX, Linux, and Windows, has a unique identifier known as an installation name. The installation name is used to associate things such as queue managers and configuration files with an installation.
 
-
---
-
-*`ibmmq.errorlog.hostname`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-=======
->>>>>>> adjust json formatting
-*`ibmmq.errorlog.installation`*::
-+
---
-type: keyword
-
-example: Please add example
-
-Please add description
 
 --
 
@@ -6076,23 +6031,6 @@ Defines what to do when the error occurs
 
 --
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-*`ibmmq.severity`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
->>>>>>> update docs
-
---
-
-=======
->>>>>>> update queue manager definition
-=======
 *`ibmmq.errorlog.code`*::
 +
 --
@@ -6102,7 +6040,6 @@ Error code.
 
 --
 
->>>>>>> update error code
 [[exported-fields-icinga]]
 == Icinga fields
 
