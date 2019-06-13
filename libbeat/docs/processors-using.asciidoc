@@ -1257,21 +1257,21 @@ It has the following settings:
 
 `cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
 
-`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+`geo.name`:: (Optional) User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
 
-`geo.location`:: Longitude and latitude in comma separated format.
+`geo.location`:: (Optional) Longitude and latitude in comma separated format.
 
-`geo.continent_name`:: Name of the continent.
+`geo.continent_name`:: (Optional) Name of the continent.
 
-`geo.country_name`:: Name of the country.
+`geo.country_name`:: (Optional) Name of the country.
 
-`geo.region_name`:: Name of the region.
+`geo.region_name`:: (Optional) Name of the region.
 
-`geo.city_name`:: Name of the city.
+`geo.city_name`:: (Optional) Name of the city.
 
-`geo.country_iso_code`:: ISO country code.
+`geo.country_iso_code`:: (Optional) ISO country code.
 
-`geo.region_iso_code`:: ISO region code.
+`geo.region_iso_code`:: (Optional) ISO region code.
 
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
@@ -1334,21 +1334,21 @@ It has the following settings:
 
 `cache.ttl`:: (Optional) The processor uses an internal cache for the observer metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
 
-`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+`geo.name`:: (Optional) User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
 
-`geo.location`:: Longitude and latitude in comma separated format.
+`geo.location`:: (Optional) Longitude and latitude in comma separated format.
 
-`geo.continent_name`:: Name of the continent.
+`geo.continent_name`:: (Optional) Name of the continent.
 
-`geo.country_name`:: Name of the country.
+`geo.country_name`:: (Optional) Name of the country.
 
-`geo.region_name`:: Name of the region.
+`geo.region_name`:: (Optional) Name of the region.
 
-`geo.city_name`:: Name of the city.
+`geo.city_name`:: (Optional) Name of the city.
 
-`geo.country_iso_code`:: ISO country code.
+`geo.country_iso_code`:: (Optional) ISO country code.
 
-`geo.region_iso_code`:: ISO region code.
+`geo.region_iso_code`:: (Optional) ISO region code.
 
 
 The `add_geo_metadata` processor annotates each event with relevant metadata from the observer machine.
