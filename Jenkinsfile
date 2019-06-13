@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-library identifier: 'apm@v1.0.2',
+library identifier: 'apm@current',
 retriever: modernSCM(
   [$class: 'GitSCMSource',
   credentialsId: 'f94e9298-83ae-417e-ba91-85c279771570',
@@ -13,7 +13,7 @@ pipeline {
     BASE_DIR="src/github.com/elastic/beats"
   }
   options {
-    timeout(time: 1, unit: 'HOURS') 
+    timeout(time: 1, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -49,10 +49,10 @@ pipeline {
     Updating generated files for Beat.
     Checks the GO environment.
     Checks the Python environment.
-    Checks YAML files are generated. 
+    Checks YAML files are generated.
     Validate that all updates were committed.
     */
-    stage('Intake') { 
+    stage('Intake') {
       agent { label 'linux && immutable' }
       options { skipDefaultCheckout() }
       environment {
@@ -109,7 +109,7 @@ pipeline {
     aborted {
       echoColor(text: '[ABORTED]', colorfg: 'magenta', colorbg: 'default')
     }
-    failure { 
+    failure {
       echoColor(text: '[FAILURE]', colorfg: 'red', colorbg: 'default')
       //step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: "${NOTIFY_TO}", sendToIndividuals: false])
     }
