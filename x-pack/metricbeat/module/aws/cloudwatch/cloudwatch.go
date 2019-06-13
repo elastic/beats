@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -54,10 +55,10 @@ type Dimension struct {
 
 // Config holds a configuration specific for cloudwatch metricset.
 type Config struct {
-	Namespace           string      `config:"namespace" validate:"nonzero,required"`
-	MetricName          string      `config:"metricname"`
-	Dimensions          []Dimension `config:"dimensions"`
-	ResourceTypeFilters []string    `config:"resource_type_filters"`
+	Namespace          string      `config:"namespace" validate:"nonzero,required"`
+	MetricName         string      `config:"metricname"`
+	Dimensions         []Dimension `config:"dimensions"`
+	ResourceTypeFilter string      `config:"resource_type_filter"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -98,36 +99,26 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get listMetrics and namespacesTotal from configuration
 	listMetrics, resourceTypes, namespaceResourceType := readCloudwatchConfig(m.CloudwatchConfigs)
 
-	// Create events based on listMetrics
+	// Create events based on listMetrics from configuration
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(awsConfig)
-
-		// Get tags
 		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
-		resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
-		resourceTagMapPerMetric, err := aws.GetResourcesTags(svcResourceAPI, resourceTypes)
-		if err != nil {
-			err = errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName)
-			report.Error(err)
-		}
-		for k, v := range resourceTagMapPerMetric {
-			resourceTagMap[k] = v
-		}
 
-		err = createEvents(svcCloudwatch, listMetrics, regionName, resourceTagMap, m.Period, startTime, endTime, report)
+		err := m.createEvents(svcCloudwatch, svcResourceAPI, resourceTypes, listMetrics, regionName, startTime, endTime, report)
 		if err != nil {
 			return errors.Wrap(err, "createEvents failed")
 		}
 	}
 
-	// Create events based on namespaces
+	// Create events based on namespaces from configuration
 	for namespace, resourceType := range namespaceResourceType {
 		for _, regionName := range m.MetricSet.RegionsList {
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
 			svcCloudwatch := cloudwatch.New(awsConfig)
+
 			listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 			if err != nil {
 				m.Logger().Info(err.Error())
@@ -138,16 +129,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			// Get tags
 			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
-			var resourceTagMap map[string][]resourcegroupstaggingapi.Tag
-			resourceTagMap, err = aws.GetResourcesTags(svcResourceAPI, resourceType)
-			if err != nil {
-				err = errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName)
-				m.Logger().Error(err.Error())
-			}
-
-			err = createEvents(svcCloudwatch, listMetricsOutput, regionName, resourceTagMap, m.Period, startTime, endTime, report)
+			err = m.createEvents(svcCloudwatch, svcResourceAPI, []string{resourceType}, listMetricsOutput, regionName, startTime, endTime, report)
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
@@ -157,32 +140,30 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func readCloudwatchConfig(cloudwatchConfigs []Config) ([]cloudwatch.Metric, []string, map[string][]string) {
+func readCloudwatchConfig(cloudwatchConfigs []Config) ([]cloudwatch.Metric, []string, map[string]string) {
 	var listMetrics []cloudwatch.Metric
 	var resourceTypes []string
-	namespaceResourceType := make(map[string][]string)
+	namespaceResourceType := make(map[string]string)
 
 	for _, cloudwatchConfig := range cloudwatchConfigs {
 		namespace := cloudwatchConfig.Namespace
+
+		// Check resourceTypeFilter
+		// If it's not specified, use getResourceTypeUsingNamespace method
+		resourceTypeFilter := cloudwatchConfig.ResourceTypeFilter
+		if resourceTypeFilter == "" {
+			resourceTypeFilter = getResourceTypeUsingNamespace(namespace)
+		}
+
 		if cloudwatchConfig.MetricName != "" {
 			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, namespace)
 			listMetrics = append(listMetrics, listMetricsOutput)
-
-			if cloudwatchConfig.ResourceTypeFilters == nil {
-				resourceTypeFilter := getResourceTypeUsingNamespace(namespace)
-				resourceTypes = append(resourceTypes, resourceTypeFilter)
-			} else {
-				resourceTypes = append(resourceTypes, cloudwatchConfig.ResourceTypeFilters...)
-			}
+			resourceTypes = append(resourceTypes, resourceTypeFilter)
 		} else {
-			if cloudwatchConfig.ResourceTypeFilters == nil {
-				resourceTypeFilter := getResourceTypeUsingNamespace(namespace)
-				namespaceResourceType[namespace] = []string{resourceTypeFilter}
-			} else {
-				namespaceResourceType[namespace] = cloudwatchConfig.ResourceTypeFilters
-			}
+			namespaceResourceType[namespace] = resourceTypeFilter
 		}
 	}
+
 	return listMetrics, resourceTypes, namespaceResourceType
 }
 
@@ -304,7 +285,14 @@ func convertConfigToListMetrics(cloudwatchConfig Config, namespace string) cloud
 	return listMetricsOutput
 }
 
-func createEvents(svcCloudwatch cloudwatchiface.CloudWatchAPI, listMetricsTotal []cloudwatch.Metric, regionName string, resourceTagMap map[string][]resourcegroupstaggingapi.Tag, period time.Duration, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.CloudWatchAPI, svcResourceAPI resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI, resourceTypes []string, listMetricsTotal []cloudwatch.Metric, regionName string, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
+	// Get tags
+	resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, resourceTypes)
+	if err != nil {
+		// If GetResourcesTags failed, continue report event just without tags.
+		m.Logger().Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
+	}
+
 	identifiers := getIdentifiers(listMetricsTotal)
 	// Initialize events map per region, which stores one event per identifierValue
 	events := map[string]mb.Event{}
@@ -317,7 +305,7 @@ func createEvents(svcCloudwatch cloudwatchiface.CloudWatchAPI, listMetricsTotal 
 	var eventsNoIdentifier []mb.Event
 
 	// Construct metricDataQueries
-	metricDataQueries := constructMetricQueries(listMetricsTotal, period)
+	metricDataQueries := constructMetricQueries(listMetricsTotal, m.Period)
 	if len(metricDataQueries) == 0 {
 		return nil
 	}
@@ -384,6 +372,10 @@ func getResourceTypeUsingNamespace(namespace string) string {
 	// https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
 	if namespace == "AWS/ELB" {
 		return "elasticloadbalancing"
+	}
+
+	if namespace == "AWS/EBS" {
+		return "ec2"
 	}
 
 	return strings.ToLower(strings.TrimPrefix(namespace, "AWS/"))

@@ -132,7 +132,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		cloudwatchMetricsConfig       []Config
 		expectedListMetric            []cloudwatch.Metric
 		expectedResourceTypes         []string
-		expectedNamespaceResourceType map[string][]string
+		expectedNamespaceResourceType map[string]string
 	}{
 		{
 			[]Config{
@@ -149,7 +149,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			[]cloudwatch.Metric{listMetric1},
 			[]string{"ec2"},
-			map[string][]string{},
+			map[string]string{},
 		},
 		{
 			[]Config{
@@ -169,7 +169,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			[]cloudwatch.Metric{listMetric1},
 			[]string{"ec2"},
-			map[string][]string{"AWS/EBS": {"ebs"}},
+			map[string]string{"AWS/EBS": "ebs"},
 		},
 		{
 			[]Config{
@@ -203,7 +203,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			[]cloudwatch.Metric{listMetric1, listMetric6},
 			[]string{"ec2", "rds"},
-			map[string][]string{"AWS/EBS": {"ebs"}},
+			map[string]string{"AWS/EBS": "ebs"},
 		},
 		{
 			[]Config{
@@ -217,7 +217,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			[]cloudwatch.Metric{listMetric7},
 			[]string{"ec2"},
-			map[string][]string{"AWS/EBS": {"ebs"}},
+			map[string]string{"AWS/EBS": "ebs"},
 		},
 		{
 			[]Config{
@@ -230,11 +230,11 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: instanceID1,
 						},
 					},
-					ResourceTypeFilters: []string{"ec2:instance"},
+					ResourceTypeFilter: "ec2:instance",
 				},
 				{
-					Namespace:           "AWS/S3",
-					ResourceTypeFilters: []string{"s3"},
+					Namespace:          "AWS/S3",
+					ResourceTypeFilter: "s3",
 				},
 				{
 					Namespace: "AWS/ELB",
@@ -256,9 +256,9 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			},
 			[]cloudwatch.Metric{listMetric1, listMetric6},
 			[]string{"ec2:instance", "rds"},
-			map[string][]string{
-				"AWS/S3":  {"s3"},
-				"AWS/ELB": {"elasticloadbalancing"},
+			map[string]string{
+				"AWS/S3":  "s3",
+				"AWS/ELB": "elasticloadbalancing",
 			},
 		},
 	}
