@@ -1,0 +1,23 @@
+[
+    {
+        "@timestamp": "2016-12-12T11:54:16.000Z",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 11004467000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 210,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 0.0,
+        "mysql.slowlog.query": "select sleep(11);",
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 1,
+        "mysql.thread_id": 2,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "user.name": "root"
+    }
+]

@@ -26,7 +26,6 @@ NOTE: Elastic provides no warranty or support for community-sourced Beats.
 https://github.com/awormuth/amazonbeat[amazonbeat]:: Reads data from a specified Amazon product.
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
 https://github.com/verticle-io/apexbeat[apexbeat]:: Extracts configurable contextual data and metrics from Java applications via the  http://toolkits.verticle.io[APEX] toolkit.
-https://github.com/goomzee/burrowbeat[burrowbeat]:: Monitors Kafka consumer lag using Burrow.
 https://github.com/hsngerami/hsnburrowbeat[hsnburrowbeat]:: Monitors Kafka consumer lag for Burrow V1.0.0(API V3).
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
 https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
@@ -67,6 +66,7 @@ https://github.com/consulthys/logstashbeat[logstashbeat]:: Collects data from Lo
 https://github.com/bozdag/macwifibeat[macwifibeat]:: Reads various indicators for a MacBook's WiFi Signal Strength
 https://github.com/yedamao/mcqbeat[mcqbeat]:: Reads the status of queues from memcacheq.
 https://developer.cisco.com/codeexchange/github/repo/CiscoDevNet/merakibeat[merakibeat]:: Collects https://dashboard.meraki.com/api_docs#wireless-health[wireless health] and users https://documentation.meraki.com/MR/Monitoring_and_Reporting/Scanning_API[location analytics] data using Cisco  Meraki APIs.
+https://github.com/berfinsari/mesosbeat[mesosbeat]:: Reads stats from the Mesos API and indexes them into Elasticsearch.
 https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances and can be configured to send multiple document types to Elasticsearch.
 https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
@@ -116,3 +116,4 @@ https://github.com/phenomenes/varnishstatbeat[varnishstatbeat]:: Reads stats dat
 https://gitlab.com/msvechla/vaultbeat[vaultbeat]:: Collects performance metrics and statistics from Hashicorp's Vault.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
 https://github.com/IBM/yarnbeat[yarnbeat]:: Polls YARN and MapReduce APIs for cluster and application metrics.
+https://github.com/maireanu/zfsbeat[zfsbeat]:: Querying ZFS Storage and Pool Status

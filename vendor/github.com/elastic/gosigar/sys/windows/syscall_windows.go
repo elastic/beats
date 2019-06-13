@@ -526,6 +526,10 @@ func ByteSliceToStringSlice(utf16 []byte) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Free memory allocated for CommandLineToArgvW arguments.
+	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(argsWide)))
+
 	args := make([]string, numArgs)
 	for idx := range args {
 		args[idx] = syscall.UTF16ToString(argsWide[idx][:])

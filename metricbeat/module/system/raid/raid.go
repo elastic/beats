@@ -87,11 +87,10 @@ func blockto1024(b int64) int64 {
 }
 
 // Fetch fetches one event for each device
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	devices, err := blockinfo.ListAll(m.sysblock)
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed to parse sysfs"))
-		return
+		return errors.Wrap(err, "failed to parse sysfs")
 	}
 
 	for _, blockDev := range devices {
@@ -125,8 +124,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			event["sync_action"] = blockDev.SyncAction
 		}
 
-		r.Event(mb.Event{
+		isOpen := r.Event(mb.Event{
 			MetricSetFields: event,
 		})
+		if !isOpen {
+			return nil
+		}
 	}
+
+	return nil
 }

@@ -37,7 +37,7 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "logstash")
+	compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {
 		f := mbtest.NewReportingMetricSetV2Error(t, logstash.GetConfig(metricSet))
