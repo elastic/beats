@@ -27,6 +27,7 @@ do
   echo "Index path: $index_path"
 
   dest_dir="$html_dir/${name}/${index_path}"
+  echo "Destination directory: $dest_dir"
   mkdir -p "$dest_dir"
   params="--chunk=1"
   if [ "$PREVIEW" = "1" ]; then
