@@ -27,29 +27,18 @@ import (
 )
 
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState) error {
-	for _, pipeline := range pipelines {
-		// Exclude internal pipelines
-		if pipeline.ID[0] == '.' {
-			continue
-		}
+	pipelines = getUserDefinedPipelines(pipelines)
+	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
+	for clusterUUID, pipelines := range clusterToPipelinesMap {
+		for _, pipeline := range pipelines {
+			// Rename key: graph -> representation
+			pipeline.Representation = pipeline.Graph
+			pipeline.Graph = nil
 
-		// Rename key: graph -> representation
-		pipeline.Representation = pipeline.Graph
-		pipeline.Graph = nil
+			logstashState := map[string]logstash.PipelineState{
+				"pipeline": pipeline,
+			}
 
-		// Extract cluster_uuids
-		clusterUUIDs := pipeline.ClusterIDs
-		pipeline.ClusterIDs = nil
-
-		logstashState := map[string]logstash.PipelineState{
-			"pipeline": pipeline,
-		}
-
-		if pipeline.ClusterIDs == nil {
-			pipeline.ClusterIDs = []string{""}
-		}
-
-		for _, clusterUUID := range clusterUUIDs {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{
 				"timestamp":      common.Time(time.Now()),
@@ -69,4 +58,47 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 	}
 
 	return nil
+}
+
+func makeClusterToPipelinesMap(pipelines []logstash.PipelineState) map[string][]logstash.PipelineState {
+	var clusterToPipelinesMap map[string][]logstash.PipelineState
+	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
+
+	for _, pipeline := range pipelines {
+		var clusterUUIDs []string
+		for _, vertex := range pipeline.Graph.Vertices {
+			c, ok := vertex["cluster_uuid"]
+			if !ok {
+				continue
+			}
+
+			clusterUUID, ok := c.(string)
+			if !ok {
+				continue
+			}
+
+			clusterUUIDs = append(clusterUUIDs, clusterUUID)
+		}
+
+		for _, clusterUUID := range clusterUUIDs {
+			clusterPipelines := clusterToPipelinesMap[clusterUUID]
+			if clusterPipelines == nil {
+				clusterToPipelinesMap[clusterUUID] = []logstash.PipelineState{}
+			}
+
+			clusterToPipelinesMap[clusterUUID] = append(clusterPipelines, pipeline)
+		}
+	}
+
+	return clusterToPipelinesMap
+}
+
+func getUserDefinedPipelines(pipelines []logstash.PipelineState) []logstash.PipelineState {
+	userDefinedPipelines := []logstash.PipelineState{}
+	for _, pipeline := range pipelines {
+		if pipeline.ID[0] != '.' {
+			userDefinedPipelines = append(userDefinedPipelines, pipeline)
+		}
+	}
+	return userDefinedPipelines
 }

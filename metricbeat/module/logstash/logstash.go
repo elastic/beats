@@ -80,16 +80,21 @@ type MetricSet struct {
 	XPack bool
 }
 
+type graph struct {
+	Vertices []map[string]interface{} `json:"vertices"`
+	Edges    []map[string]interface{} `json:"edges"`
+}
+
 // PipelineState represents the state (shape) of a Logstash pipeline
 type PipelineState struct {
-	ID             string                 `json:"id"`
-	Hash           string                 `json:"hash"`
-	EphemeralID    string                 `json:"ephemeral_id"`
-	Graph          map[string]interface{} `json:"graph,omitempty"`
-	Representation map[string]interface{} `json:"representation"`
-	BatchSize      int                    `json:"batch_size"`
-	Workers        int                    `json:"workers"`
-	ClusterIDs     []string               `json:"cluster_uuids,omitempty"`
+	ID             string   `json:"id"`
+	Hash           string   `json:"hash"`
+	EphemeralID    string   `json:"ephemeral_id"`
+	Graph          *graph   `json:"graph,omitempty"`
+	Representation *graph   `json:"representation"`
+	BatchSize      int      `json:"batch_size"`
+	Workers        int      `json:"workers"`
+	ClusterIDs     []string `json:"cluster_uuids,omitempty"`
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
