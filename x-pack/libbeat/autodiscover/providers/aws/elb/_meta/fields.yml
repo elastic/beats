@@ -12,72 +12,58 @@
       fields:
         - name: ip_address_type
           type: keyword
-          level: core
           required: true
           example: "ipv4"
           description: Whether this is an ipv4 or dual-stack IP
         - name: state
           type: keyword
-          level: core
           example: active
           description: Current state of the ELB
         - name: type
           type: keyword
-          level: core
           example: application
           description: Whether this is an application or network loadbalancer
         - name: protocol
           type: keyword
-          level: core
           example: HTTP
           description: The application layer protocol
         - name: vpc_id
           type: keyword
-          level: core
           example: vpc-123456
           description: ID of the VPC
         - name: ssl_policy
           type: keyword
-          level: core
           description: The specific SSL policy
         - name: load_balancer_arn
           type: keyword
-          level: core
           example: arn:aws:elasticloadbalancing:us-east-1:331574139922:loadbalancer/app/testytesty/a14c9934d2a6e438
           description: ARN for the ELB itself
         - name: security_groups
           type: keyword
-          level: core
           example: sg-a1b555d4
           description: List of security groups for this
         - name: created
           type: date
-          level: core
           example: 2019-06-12T21:55:14.490Z
           description: Date of creation
         - name: availability_zones
           type: keyword
-          level: core
           example: "us-east-1e"
           description: List of AZs this is active in
         - name: host
           type: keyword
-          level: core
           example: testytesty-141141146.us-east-1.elb.amazonaws.com
           description: the hostname for this ELB
         - name: listener_arn
           type: keyword
-          level: core
           example: arn:aws:elasticloadbalancing:us-east-1:334575128422:listener/app/testytesty/b74b9934c5a6e438/0e8425ad18d4d529
           description: ARN for this ELB listener
         - name: scheme
           type: keyword
-          level: core
           example: internet-facing
           description: whether this ELB is internet facing or internal-only
         - name: port
           type: number
-          level: core
           example: 8080
           description: Port number for this listener
 

@@ -7,23 +7,18 @@ package elb
 import (
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
-
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
-
-	"github.com/gofrs/uuid"
-
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-
 	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
