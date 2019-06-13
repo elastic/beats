@@ -21,8 +21,8 @@ func WithLightModules() beater.Option {
 	}
 }
 
-// XPackCreator creates a metricbeat with licensed features
-func XPackCreator() beat.Creator {
+// Creator creates a metricbeat with licensed features
+func Creator() beat.Creator {
 	return beater.Creator(
 		WithLightModules(),
 		beater.WithModuleOptions(

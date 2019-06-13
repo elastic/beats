@@ -34,7 +34,7 @@ var RootCmd *cmd.BeatsRootCmd
 func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	RootCmd = cmd.GenRootCmdWithSettings(beater.XPackCreator(), instance.Settings{RunFlags: runFlags, Name: Name})
+	RootCmd = cmd.GenRootCmdWithSettings(beater.Creator(), instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", xpacktest.BeatCreator()))
 	xpackcmd.AddXPack(RootCmd, Name)
