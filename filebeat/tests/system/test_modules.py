@@ -220,13 +220,21 @@ def clean_keys(obj):
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
 
+    # Keep filename for exceptions
+    filename = None
+    if "log.file.path" in obj:
+        filename = os.path.basename(obj["log.file.path"])
+
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
     # Remove timestamp for comparison where timestamp is not part of the log line
-    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]):
+    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth"]):
         delete_key(obj, "@timestamp")
 
+    # Remove timestamp from syslog tests except for the log file that needs it.
+    if (obj["event.dataset"] == "system.syslog" and filename != "tz-offset.log"):
+        delete_key(obj, "@timestamp")
 
 def delete_key(obj, key):
     if key in obj:
