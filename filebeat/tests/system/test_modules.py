@@ -162,7 +162,7 @@ class Test(BaseTest):
             assert obj["event"]["module"] == module, "expected event.module={} but got {}".format(
                 module, obj["event"]["module"])
 
-            #assert "error" not in obj, "not error expected but got: {}".format(
+            # assert "error" not in obj, "not error expected but got: {}".format(
             #    obj)
 
             if (module == "auditd" and fileset == "log") \
