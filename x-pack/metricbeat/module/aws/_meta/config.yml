@@ -42,6 +42,9 @@
         - name: InstanceId
           value: i-0686946e22cf9494a
     - namespace: AWS/EBS
+    - namespace: AWS/ELB
+      resource_type_filters:
+        - elasticloadbalancing
   #regions:
   #  - us-east-1
   #  - us-east-2

@@ -129,9 +129,10 @@ func TestConstructLabel(t *testing.T) {
 
 func TestReadCloudwatchConfig(t *testing.T) {
 	cases := []struct {
-		cloudwatchMetricsConfig []Config
-		expectedListMetric      []cloudwatch.Metric
-		expectedNamespace       []string
+		cloudwatchMetricsConfig       []Config
+		expectedListMetric            []cloudwatch.Metric
+		expectedResourceTypes         []string
+		expectedNamespaceResourceType map[string][]string
 	}{
 		{
 			[]Config{
@@ -147,7 +148,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			[]cloudwatch.Metric{listMetric1},
-			nil,
+			[]string{"ec2"},
+			map[string][]string{},
 		},
 		{
 			[]Config{
@@ -166,7 +168,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			[]cloudwatch.Metric{listMetric1},
-			[]string{"AWS/EBS"},
+			[]string{"ec2"},
+			map[string][]string{"AWS/EBS": {"ebs"}},
 		},
 		{
 			[]Config{
@@ -199,7 +202,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			[]cloudwatch.Metric{listMetric1, listMetric6},
-			[]string{"AWS/EBS"},
+			[]string{"ec2", "rds"},
+			map[string][]string{"AWS/EBS": {"ebs"}},
 		},
 		{
 			[]Config{
@@ -212,13 +216,57 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			[]cloudwatch.Metric{listMetric7},
-			[]string{"AWS/EBS"},
+			[]string{"ec2"},
+			map[string][]string{"AWS/EBS": {"ebs"}},
+		},
+		{
+			[]Config{
+				{
+					Namespace:  "AWS/EC2",
+					MetricName: "CPUUtilization",
+					Dimensions: []Dimension{
+						{
+							Name:  "InstanceId",
+							Value: instanceID1,
+						},
+					},
+					ResourceTypeFilters: []string{"ec2:instance"},
+				},
+				{
+					Namespace:           "AWS/S3",
+					ResourceTypeFilters: []string{"s3"},
+				},
+				{
+					Namespace: "AWS/ELB",
+				},
+				{
+					Namespace:  "AWS/RDS",
+					MetricName: "CommitThroughput",
+					Dimensions: []Dimension{
+						{
+							Name:  "DBClusterIdentifier",
+							Value: "test1-cluster",
+						},
+						{
+							Name:  "Role",
+							Value: "READER",
+						},
+					},
+				},
+			},
+			[]cloudwatch.Metric{listMetric1, listMetric6},
+			[]string{"ec2:instance", "rds"},
+			map[string][]string{
+				"AWS/S3":  {"s3"},
+				"AWS/ELB": {"elasticloadbalancing"},
+			},
 		},
 	}
 	for _, c := range cases {
-		listMetrics, namespaces := readCloudwatchConfig(c.cloudwatchMetricsConfig)
+		listMetrics, resourceTypes, namespaceResourceType := readCloudwatchConfig(c.cloudwatchMetricsConfig)
 		assert.Equal(t, c.expectedListMetric, listMetrics)
-		assert.Equal(t, c.expectedNamespace, namespaces)
+		assert.Equal(t, c.expectedResourceTypes, resourceTypes)
+		assert.Equal(t, c.expectedNamespaceResourceType, namespaceResourceType)
 	}
 }
 

@@ -9,4 +9,5 @@ Some specific AWS permissions are required for IAM user to collect AWS SQS metri
 ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
+tag:getResources
 ----

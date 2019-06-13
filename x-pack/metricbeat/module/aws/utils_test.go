@@ -343,6 +343,10 @@ func TestFindIdentifierFromARN(t *testing.T) {
 			"arn:aws:ec2:us-east-1:123456789012:instance/i-123",
 			"i-123",
 		},
+		{
+			"arn:aws:sns:us-east-1:627959692251:notification-topic-1",
+			"notification-topic-1",
+		},
 	}
 
 	for _, c := range cases {
@@ -355,7 +359,7 @@ func TestFindIdentifierFromARN(t *testing.T) {
 
 func TestGetResourcesTags(t *testing.T) {
 	mockSvc := &MockResourceGroupsTaggingClient{}
-	resourceTagMap, err := GetResourcesTags(mockSvc, "rds")
+	resourceTagMap, err := GetResourcesTags(mockSvc, []string{"rds"})
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(resourceTagMap))
 
