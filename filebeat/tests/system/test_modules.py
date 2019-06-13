@@ -220,10 +220,10 @@ def clean_keys(obj):
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
 
-    # Keep filename for exceptions
+    # Keep source log filename for exceptions
     filename = None
     if "log.file.path" in obj:
-        filename = os.path.basename(obj["log.file.path"])
+        filename = os.path.basename(obj["log.file.path"]).lower()
 
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
@@ -232,9 +232,20 @@ def clean_keys(obj):
     if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth"]):
         delete_key(obj, "@timestamp")
 
+    # Hack:
+    #
     # Remove timestamp from syslog tests except for the log file that needs it.
-    if (obj["event.dataset"] == "system.syslog" and filename != "tz-offset.log"):
-        delete_key(obj, "@timestamp")
+    # This is needed because in most syslog logs, the year is missing from the
+    # timestamp so Elasticsearch will set it to the current year and that will
+    # cause the tests to fail every new year.
+    #
+    # The log.file.path key needs to be kept so that it is stored in the golden
+    # data, to prevent @timestamp to be removed from it before comparison.
+    if obj["event.dataset"] == "system.syslog":
+        if filename == "tz-offset.log":
+            obj["log.file.path"] = filename
+        else:
+            delete_key(obj, "@timestamp")
 
 
 def delete_key(obj, key):
