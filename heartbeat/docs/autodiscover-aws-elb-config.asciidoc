@@ -6,7 +6,7 @@ heartbeat.autodiscover:
   providers:
   - type: aws_elb
     period: 1m
-    regions: us-east-1, us-east-2
+    regions: ["us-east-1", "us-east-2"]
     # If you don't wish to use env vars or shared credentials files explicitly put credentials here.
     #access_key_id: my-access-key
     #secret_access_key: my-secret-access-key
