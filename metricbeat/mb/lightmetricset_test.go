@@ -61,7 +61,7 @@ func TestLightMetricSetRegistration(t *testing.T) {
 		},
 	}
 
-	fakeMetricSetFactory = func(b BaseMetricSet) (MetricSet, error) { return &b, nil }
+	fakeMetricSetFactory := func(b BaseMetricSet) (MetricSet, error) { return &b, nil }
 
 	moduleName := "foo"
 	metricSetName := "bar"
