@@ -61,10 +61,12 @@ pipeline {
         GOPATH = "${env.WORKSPACE}"
       }
       steps {
-        withEnvWrapper() {
-          unstash 'source'
-          dir("${BASE_DIR}"){
-            sh './dev-tools/jenkins_intake.sh'
+        withGithubNotify(context: 'Intake') {
+          withEnvWrapper() {
+            unstash 'source'
+            dir("${BASE_DIR}"){
+              sh './dev-tools/jenkins_intake.sh'
+            }
           }
         }
       }
@@ -84,10 +86,12 @@ pipeline {
             GOPATH = "${env.WORKSPACE}"
           }
           steps {
-            withEnvWrapper() {
-              unstash 'source'
-              dir("${BASE_DIR}"){
-                sh './filebeat/scripts/jenkins/unit-test.sh'
+            withGithubNotify(context: 'Test', tab: 'tests') {
+              withEnvWrapper() {
+                unstash 'source'
+                dir("${BASE_DIR}"){
+                  sh './filebeat/scripts/jenkins/unit-test.sh'
+                }
               }
             }
           }
