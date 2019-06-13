@@ -21,10 +21,11 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/elastic/go-lookslike/lookslike"
+	"github.com/elastic/go-lookslike/lookslike/testslike"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
 )
 
 func TestURLFields(t *testing.T) {
@@ -84,7 +85,7 @@ func TestURLFields(t *testing.T) {
 			require.NoError(t, err)
 
 			got := URLFields(parsed)
-			mapval.Test(t, mapval.MustCompile(mapval.Map(tt.want)), got)
+			testslike.Test(t, lookslike.MustCompile(map[string]interface{}(tt.want)), got)
 		})
 	}
 }
