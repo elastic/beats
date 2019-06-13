@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/version"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,72 +32,63 @@ import (
 func TestFileLoader_Load(t *testing.T) {
 	ver := "7.0.0"
 	prefix := "mock"
-	order := 1
 	info := beat.Info{Version: ver, IndexPrefix: prefix}
-	tmplName := fmt.Sprintf("%s-%s", prefix, ver)
 
 	for name, test := range map[string]struct {
-		settings TemplateSettings
-		body     common.MapStr
+		cfg       TemplateConfig
+		fields    []byte
+		migration bool
+
+		name string
 	}{
-		"load minimal config info": {
-			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0-*"},
-				"order":          order,
-				"settings":       common.MapStr{"index": nil}},
+		"default config": {
+			cfg:       DefaultConfig(),
+			name:      fmt.Sprintf("%s-%s", prefix, ver),
+			migration: false,
 		},
-		"load minimal config with index settings": {
-			settings: TemplateSettings{Index: common.MapStr{"code": "best_compression"}},
-			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0-*"},
-				"order":          order,
-				"settings":       common.MapStr{"index": common.MapStr{"code": "best_compression"}}},
-		},
-		"load minimal config with source settings": {
-			settings: TemplateSettings{Source: common.MapStr{"enabled": false}},
-			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0-*"},
-				"order":          order,
-				"settings":       common.MapStr{"index": nil},
-				"mappings": common.MapStr{
-					"_source":           common.MapStr{"enabled": false},
-					"_meta":             common.MapStr{"beat": prefix, "version": ver},
-					"date_detection":    false,
-					"dynamic_templates": nil,
-					"properties":        nil,
-				}},
+		"default config with migration": {
+			cfg:       DefaultConfig(),
+			name:      fmt.Sprintf("%s-%s", prefix, ver),
+			migration: true,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			fc, err := newFileClient(ver)
 			require.NoError(t, err)
 			fl := NewFileLoader(fc)
-
-			cfg := DefaultConfig()
-			cfg.Settings = test.settings
-
-			err = fl.Load(cfg, info, nil, false)
+			err = fl.Load(test.cfg, info, test.fields, false)
 			require.NoError(t, err)
-			assert.Equal(t, "template", fc.component)
-			assert.Equal(t, tmplName, fc.name)
-			assert.Equal(t, test.body.StringToPrint()+"\n", fc.body)
+
+			tmpl, err := New(ver, prefix, *common.MustNewVersion(ver), test.cfg, test.migration)
+			require.NoError(t, err)
+			body, err := buildBody(tmpl, test.cfg, test.fields)
+			require.NoError(t, err)
+			assert.Equal(t, common.MapStr{test.name: body}.StringToPrint()+"\n", fc.body)
 		})
 	}
 }
 
 type fileClient struct {
-	component, name, body, ver string
+	ver  common.Version
+	body string
 }
 
 func newFileClient(ver string) (*fileClient, error) {
-	return &fileClient{ver: ver}, nil
+	if ver == "" {
+		ver = version.GetDefaultVersion()
+	}
+	v, err := common.NewVersion(ver)
+	if err != nil {
+		return nil, err
+	}
+	return &fileClient{ver: *v}, nil
 }
 
 func (c *fileClient) GetVersion() common.Version {
-	return *common.MustNewVersion(c.ver)
+	return c.ver
 }
 
-func (c *fileClient) Write(component string, name string, body string) error {
-	c.component, c.name, c.body = component, name, body
+func (c *fileClient) Write(name string, body string) error {
+	c.body = body
 	return nil
 }

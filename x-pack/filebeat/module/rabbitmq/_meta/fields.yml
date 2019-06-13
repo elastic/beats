@@ -1,9 +1,0 @@
-- key: rabbitmq
-  title: "RabbitMQ"
-  description: >
-    RabbitMQ Module
-  fields:
-    - name: rabbitmq
-      type: group
-      description: >
-      fields:

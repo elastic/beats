@@ -26,7 +26,7 @@ type config struct {
 
 func defaultConfig() config {
 	rawCfg := map[string]interface{}{
-		"type": "container",
+		"type": "docker",
 		"containers": map[string]interface{}{
 			"paths": []string{
 				// To be able to use this builder with CRI-O replace paths with:

@@ -39,7 +39,8 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // A manager instantiated via Supporter is responsible for instantiating/configuring
 // the index throughout the Elastic Stack.
 type Supporter interface {
-	// Enabled checks if index management is configured to setup templates or ILM
+	// Enalbed checks if index management is configured to configure templates,
+	// ILM, or aliases.
 	Enabled() bool
 
 	// BuildSelector create an index selector.
@@ -61,9 +62,6 @@ type Asseter interface {
 // Manager is used to initialize indices, ILM policies, and aliases within the
 // Elastic Stack.
 type Manager interface {
-	VerifySetup(template, ilm LoadMode) (bool, string)
-	// When supporting index lifecycle management, ensure templates and policies
-	// are created before write aliases, to ensure templates are applied to the indices.
 	Setup(template, ilm LoadMode) error
 }
 
@@ -76,14 +74,12 @@ const (
 	// LoadModeUnset indicates that no specific mode is set.
 	// Instead the decision about loading data will be derived from the config or their respective default values.
 	LoadModeUnset LoadMode = iota //unset
-	// LoadModeDisabled indicates no loading
-	LoadModeDisabled //disabled
 	// LoadModeEnabled indicates loading if not already available
 	LoadModeEnabled //enabled
-	// LoadModeOverwrite indicates overwriting existing components, if loading is not generally disabled.
-	LoadModeOverwrite //overwrite
-	// LoadModeForce indicates forcing to load components in any case, independent of general loading configurations.
+	// LoadModeForce indicates loading in any case.
 	LoadModeForce //force
+	// LoadModeDisabled indicates no loading
+	LoadModeDisabled //disabled
 )
 
 // Enabled returns whether or not the LoadMode should be considered enabled

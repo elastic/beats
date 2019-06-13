@@ -24,7 +24,6 @@ type Process interface {
 	Info() (ProcessInfo, error)
 	Memory() (MemoryInfo, error)
 	User() (UserInfo, error)
-	Parent() (Process, error)
 	PID() int
 }
 

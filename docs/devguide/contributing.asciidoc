@@ -83,28 +83,21 @@ recommend that you install it.
 === Update scripts
 
 The Beats use a variety of scripts based on Python to generate configuration files
-and documentation. The primary command used for this is:
+and documentation. The command used for this is:
 
 [source,shell]
 --------------------------------------------------------------------------------
 make update
 --------------------------------------------------------------------------------
 
-Another command properly formats go source files and adds a copyright header:
-
-[source,shell]
---------------------------------------------------------------------------------
-make fmt
---------------------------------------------------------------------------------
-
-These commands have the following dependencies:
+This command has the following dependencies:
 
 * Python >= {python}
 * https://virtualenv.pypa.io/en/latest/[virtualenv] for Python
 
 Virtualenv can be installed with the command `easy_install virtualenv` or `pip
 install virtualenv`. More details can be found
-https://virtualenv.pypa.io/en/latest/installation.html[here]. Both of these commands should be run before submitting a PR.
+https://virtualenv.pypa.io/en/latest/installation.html[here].
 
 [float]
 [[running-testsuite]]

@@ -2,25 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-
-### Added
-
-### Fixed
-
-### Changed
-
-### Deprecated
-
-## [0.10.2]
-
-### Fixed
-- Fix memory leak when getting process arguments. #119
-
 ## [0.10.1]
 
 ### Fixed
-- Replaced the WMI queries with win32 apis due to high CPU usage. #116
+- Replaced the WMI queries with win32 apis due to high CPU usage. #11840
 
 ## [0.10.0]
 

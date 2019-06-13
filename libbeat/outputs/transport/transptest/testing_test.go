@@ -22,7 +22,6 @@ package transptest
 import (
 	"fmt"
 	"net"
-	"sync"
 	"testing"
 	"time"
 
@@ -35,9 +34,9 @@ import (
 // netSOCKS5Proxy starts a new SOCKS5 proxy server that listens on localhost.
 //
 // Usage:
-//  l, teardown := newSOCKS5Proxy(t)
-//  defer teardown()
-func newSOCKS5Proxy(t *testing.T) (net.Listener, func()) {
+//  l, tcpAddr := newSOCKS5Proxy(t)
+//  defer l.Close()
+func newSOCKS5Proxy(t *testing.T) (net.Listener, transport.ProxyConfig) {
 	// Create a SOCKS5 server
 	conf := &socks5.Config{}
 	server, err := socks5.New(conf)
@@ -51,42 +50,31 @@ func newSOCKS5Proxy(t *testing.T) (net.Listener, func()) {
 		t.Fatalf("err: %v", err)
 	}
 
-	// Listen and serve
-	var wg sync.WaitGroup
-	wg.Add(1)
+	// Listen
 	go func() {
-		defer wg.Done()
 		err := server.Serve(l)
 		if err != nil {
-			t.Logf("Server error (%T): %+v", err, err)
+			t.Log(err)
 		}
 	}()
 
-	cleanup := func() {
-		defer wg.Wait()
-		l.Close()
-	}
-
-	return l, cleanup
-}
-
-func listenerProxyConfig(l net.Listener) *transport.ProxyConfig {
-	if l == nil {
-		return nil
-	}
-
 	tcpAddr := l.Addr().(*net.TCPAddr)
-	return &transport.ProxyConfig{
-		URL: fmt.Sprintf("socks5://%s", tcpAddr.String()),
-	}
+	config := transport.ProxyConfig{URL: fmt.Sprintf("socks5://%s", tcpAddr.String())}
+	return l, config
 }
 
 func TestTransportReconnectsOnConnect(t *testing.T) {
+	l, config := newSOCKS5Proxy(t)
+	defer l.Close()
+
 	certName := "ca_test"
 	timeout := 2 * time.Second
 	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
 
-	testServer(t, timeout, certName, func(t *testing.T, server *MockServer) {
+	testServer(t, &config, func(t *testing.T, makeServer MockServerFactory, proxy *transport.ProxyConfig) {
+		server := makeServer(t, timeout, certName, proxy)
+		defer server.Close()
+
 		transp, err := server.Transp()
 		if err != nil {
 			t.Fatalf("Failed to create client: %v", err)
@@ -114,54 +102,50 @@ func TestTransportReconnectsOnConnect(t *testing.T) {
 }
 
 func TestTransportFailConnectUnknownAddress(t *testing.T) {
-	timeout := 100 * time.Millisecond
+	l, config := newSOCKS5Proxy(t)
+	defer l.Close()
+
 	certName := "ca_test"
 	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
 
-	transports := map[string]TransportFactory{
-		"tcp": connectTCP(timeout),
-		"tls": connectTLS(timeout, certName),
-	}
+	invalidAddr := "invalid.dns.fqdn-unknown.invalid:100"
 
-	modes := map[string]struct {
-		withProxy bool
-	}{
-		"connect": {withProxy: false},
-		"socks5":  {withProxy: true},
-	}
-
-	const invalidAddr = "invalid.dns.fqdn-unknown.invalid:100"
-
-	for name, factory := range transports {
-		t.Run(name, func(t *testing.T) {
-			for mode, test := range modes {
-				t.Run(mode, func(t *testing.T) {
-					var listener net.Listener
-					if test.withProxy {
-						var teardown func()
-						listener, teardown = newSOCKS5Proxy(t)
-						defer teardown()
-					}
-
-					transp, err := factory(invalidAddr, listenerProxyConfig(listener))
-					if err != nil {
-						t.Fatalf("failed to generate transport client: %v", err)
-					}
-
-					err = transp.Connect()
-					assert.NotNil(t, err)
-				})
+	run := func(makeTransp TransportFactory, proxy *transport.ProxyConfig) func(*testing.T) {
+		return func(t *testing.T) {
+			transp, err := makeTransp(invalidAddr, proxy)
+			if err != nil {
+				t.Fatalf("failed to generate transport client: %v", err)
 			}
-		})
+
+			err = transp.Connect()
+			assert.NotNil(t, err)
+		}
 	}
+
+	factoryTests := func(f TransportFactory) func(*testing.T) {
+		return func(t *testing.T) {
+			t.Run("connect", run(f, nil))
+			t.Run("socks5", run(f, &config))
+		}
+	}
+
+	timeout := 100 * time.Millisecond
+	t.Run("tcp", factoryTests(connectTCP(timeout)))
+	t.Run("tls", factoryTests(connectTLS(timeout, certName)))
 }
 
 func TestTransportClosedOnWriteReadError(t *testing.T) {
+	l, config := newSOCKS5Proxy(t)
+	defer l.Close()
+
 	certName := "ca_test"
 	timeout := 2 * time.Second
 	GenCertForTestingPurpose(t, "127.0.0.1", certName, "")
 
-	testServer(t, timeout, certName, func(t *testing.T, server *MockServer) {
+	testServer(t, &config, func(t *testing.T, makeServer MockServerFactory, proxy *transport.ProxyConfig) {
+		server := makeServer(t, timeout, certName, proxy)
+		defer server.Close()
+
 		client, transp, err := server.ConnectPair()
 		if err != nil {
 			t.Fatalf("Failed to create client: %v", err)
@@ -175,35 +159,20 @@ func TestTransportClosedOnWriteReadError(t *testing.T) {
 	})
 }
 
-func testServer(t *testing.T, timeout time.Duration, cert string, fn func(t *testing.T, server *MockServer)) {
-	transports := map[string]MockServerFactory{
-		"tcp": NewMockServerTCP,
-		"tls": NewMockServerTLS,
+func testServer(t *testing.T, config *transport.ProxyConfig, run func(*testing.T, MockServerFactory, *transport.ProxyConfig)) {
+	runner := func(f MockServerFactory, c *transport.ProxyConfig) func(t *testing.T) {
+		return func(t *testing.T) {
+			run(t, f, config)
+		}
 	}
 
-	modes := map[string]struct {
-		withProxy bool
-	}{
-		"connect": {withProxy: false},
-		"socks5":  {withProxy: true},
+	factoryTests := func(f MockServerFactory) func(t *testing.T) {
+		return func(t *testing.T) {
+			t.Run("connect", runner(f, nil))
+			t.Run("socks5", runner(f, config))
+		}
 	}
 
-	for name, factory := range transports {
-		t.Run(name, func(t *testing.T) {
-			for mode, test := range modes {
-				t.Run(mode, func(t *testing.T) {
-					var listener net.Listener
-					if test.withProxy {
-						var teardown func()
-						listener, teardown = newSOCKS5Proxy(t)
-						defer teardown()
-					}
-
-					server := factory(t, timeout, cert, listenerProxyConfig(listener))
-					defer server.Close()
-					fn(t, server)
-				})
-			}
-		})
-	}
+	t.Run("tcp", factoryTests(NewMockServerTCP))
+	t.Run("tls", factoryTests(NewMockServerTLS))
 }

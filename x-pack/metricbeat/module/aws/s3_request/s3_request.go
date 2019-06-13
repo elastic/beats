@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
@@ -55,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// Check if period is set to be multiple of 60s
-	remainder := int(metricSet.Period.Seconds()) % 60
+	remainder := metricSet.PeriodInSec % 60
 	if remainder != 0 {
 		err := errors.New("period needs to be set to 60s (or a multiple of 60s). " +
 			"To avoid data missing or extra costs, please make sure period is set correctly " +
@@ -74,7 +73,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
+	if err != nil {
+		return errors.Wrap(err, "Error ParseDuration")
+	}
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.MetricSet.RegionsList {
@@ -92,7 +94,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.Period)
+		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.PeriodInSec)
 		// This happens when S3 cloudwatch request metrics are not enabled.
 		if len(metricDataQueries) == 0 {
 			continue
@@ -141,9 +143,9 @@ func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []strin
 	return
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Sum"
-	periodInSec := int64(period.Seconds())
+	period := int64(periodInSec)
 	id := "s3r" + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 	bucketName := ""
@@ -160,7 +162,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index
 	metricDataQuery = cloudwatch.MetricDataQuery{
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
-			Period: &periodInSec,
+			Period: &period,
 			Stat:   &statistic,
 			Metric: &metric,
 		},
@@ -169,7 +171,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index
 	return
 }
 
-func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, periodInSec int) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	dailyMetricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
@@ -178,7 +180,7 @@ func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, period time.
 			continue
 		}
 
-		metricDataQuery := createMetricDataQuery(listMetric, period, i)
+		metricDataQuery := createMetricDataQuery(listMetric, periodInSec, i)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}

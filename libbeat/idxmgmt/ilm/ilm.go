@@ -59,7 +59,7 @@ type Manager interface {
 // See: [Policy phases and actions documentation](https://www.elastic.co/guide/en/elasticsearch/reference/master/ilm-policy-definition.html).
 type Policy struct {
 	Name string
-	Body common.MapStr
+	Body map[string]interface{}
 }
 
 // Alias describes the alias to be created in Elasticsearch.
@@ -70,22 +70,6 @@ type Alias struct {
 
 // DefaultSupport configures a new default ILM support implementation.
 func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
-	cfg := defaultConfig(info)
-	if config != nil {
-		if err := config.Unpack(&cfg); err != nil {
-			return nil, err
-		}
-	}
-
-	if cfg.Mode == ModeDisabled {
-		return NewNoopSupport(info, config)
-	}
-
-	return StdSupport(log, info, config)
-}
-
-// StdSupport configures a new std ILM support implementation.
-func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
 	if log == nil {
 		log = logp.NewLogger("ilm")
 	} else {
@@ -97,6 +81,10 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		if err := config.Unpack(&cfg); err != nil {
 			return nil, err
 		}
+	}
+
+	if cfg.Mode == ModeDisabled {
+		return NoopSupport(info, config)
 	}
 
 	name, err := applyStaticFmtstr(info, &cfg.PolicyName)
@@ -127,13 +115,8 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		policy.Body = body
 	}
 
-	return NewStdSupport(log, cfg.Mode, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
-}
-
-// NoopSupport configures a new noop ILM support implementation,
-// should be used when ILM is disabled
-func NoopSupport(_ *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
-	return NewNoopSupport(info, config)
+	log.Infof("Policy name: %v", name)
+	return NewDefaultSupport(log, cfg.Mode, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
 }
 
 func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {

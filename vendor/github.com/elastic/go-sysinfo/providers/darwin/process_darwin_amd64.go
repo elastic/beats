@@ -85,7 +85,6 @@ func (s darwinSystem) Self() (types.Process, error) {
 }
 
 type process struct {
-	info *types.ProcessInfo
 	pid  int
 	cwd  string
 	exe  string
@@ -97,20 +96,7 @@ func (p *process) PID() int {
 	return p.pid
 }
 
-func (p *process) Parent() (types.Process, error) {
-	info, err := p.Info()
-	if err != nil {
-		return nil, err
-	}
-
-	return &process{pid: info.PPID}, nil
-}
-
 func (p *process) Info() (types.ProcessInfo, error) {
-	if p.info != nil {
-		return *p.info, nil
-	}
-
 	var task procTaskAllInfo
 	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
 		return types.ProcessInfo{}, err
@@ -125,7 +111,7 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		return types.ProcessInfo{}, err
 	}
 
-	p.info = &types.ProcessInfo{
+	return types.ProcessInfo{
 		Name: int8SliceToString(task.Pbsd.Pbi_name[:]),
 		PID:  p.pid,
 		PPID: int(task.Pbsd.Pbi_ppid),
@@ -134,9 +120,7 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		Args: p.args,
 		StartTime: time.Unix(int64(task.Pbsd.Pbi_start_tvsec),
 			int64(task.Pbsd.Pbi_start_tvusec)*int64(time.Microsecond)),
-	}
-
-	return *p.info, nil
+	}, nil
 }
 
 func (p *process) User() (types.UserInfo, error) {

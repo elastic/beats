@@ -27,7 +27,6 @@ import (
 
 	// Import the script processor and supporting modules.
 	_ "github.com/elastic/beats/libbeat/processors/script"
-	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
 // Name of this beat

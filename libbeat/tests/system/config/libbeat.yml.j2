@@ -25,9 +25,7 @@ setup.template.pattern: "{{setup_template_pattern}}"
 {% if ilm %}
 setup.ilm:
   enabled: {{ ilm.enabled | default("auto") }}
-  {% if ilm.policy_name %}
-  policy_name: {{ ilm.policy_name }}
-  {% endif %}
+  policy_name: libbeat-test-default-policy
   {% if ilm.pattern %}
   pattern: {{ ilm.pattern }}
   {% endif %}

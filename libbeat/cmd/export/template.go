@@ -20,9 +20,12 @@ package export
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // GenTemplateConfigCmd is the command used to export the elasticsearch template.
@@ -36,10 +39,7 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 			noILM, _ := cmd.Flags().GetBool("noilm")
 
 			if noILM {
-				settings.ILM = ilm.NoopSupport
-			}
-			if settings.ILM == nil {
-				settings.ILM = ilm.StdSupport
+				settings.ILM = ilmNoopSupport
 			}
 
 			b, err := instance.NewInitializedBeat(settings)
@@ -49,7 +49,7 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 
 			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
-			if err := idxManager.Setup(idxmgmt.LoadModeForce, idxmgmt.LoadModeDisabled); err != nil {
+			if err := idxManager.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeDisabled); err != nil {
 				fatalf("Error exporting template: %+v.", err)
 			}
 		},
@@ -60,4 +60,8 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd.Flags().String("dir", "", "Specify directory for printing template files. By default templates are printed to stdout.")
 
 	return genTemplateConfigCmd
+}
+
+func ilmNoopSupport(_ *logp.Logger, info beat.Info, config *common.Config) (ilm.Supporter, error) {
+	return ilm.NoopSupport(info, config)
 }

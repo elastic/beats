@@ -1,13 +1,13 @@
+// +build go1.8
+
 package pq
 
 import (
 	"context"
-	"database/sql"
 	"database/sql/driver"
-	"fmt"
+	"errors"
 	"io"
 	"io/ioutil"
-	"time"
 )
 
 // Implement the "QueryerContext" interface
@@ -19,9 +19,6 @@ func (cn *conn) QueryContext(ctx context.Context, query string, args []driver.Na
 	finish := cn.watchCancel(ctx)
 	r, err := cn.query(query, list)
 	if err != nil {
-		if finish != nil {
-			finish()
-		}
 		return nil, err
 	}
 	r.finish = finish
@@ -44,47 +41,18 @@ func (cn *conn) ExecContext(ctx context.Context, query string, args []driver.Nam
 
 // Implement the "ConnBeginTx" interface
 func (cn *conn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, error) {
-	var mode string
-
-	switch sql.IsolationLevel(opts.Isolation) {
-	case sql.LevelDefault:
-		// Don't touch mode: use the server's default
-	case sql.LevelReadUncommitted:
-		mode = " ISOLATION LEVEL READ UNCOMMITTED"
-	case sql.LevelReadCommitted:
-		mode = " ISOLATION LEVEL READ COMMITTED"
-	case sql.LevelRepeatableRead:
-		mode = " ISOLATION LEVEL REPEATABLE READ"
-	case sql.LevelSerializable:
-		mode = " ISOLATION LEVEL SERIALIZABLE"
-	default:
-		return nil, fmt.Errorf("pq: isolation level not supported: %d", opts.Isolation)
+	if opts.Isolation != 0 {
+		return nil, errors.New("isolation levels not supported")
 	}
-
 	if opts.ReadOnly {
-		mode += " READ ONLY"
-	} else {
-		mode += " READ WRITE"
+		return nil, errors.New("read-only transactions not supported")
 	}
-
-	tx, err := cn.begin(mode)
+	tx, err := cn.Begin()
 	if err != nil {
 		return nil, err
 	}
 	cn.txnFinish = cn.watchCancel(ctx)
 	return tx, nil
-}
-
-func (cn *conn) Ping(ctx context.Context) error {
-	if finish := cn.watchCancel(ctx); finish != nil {
-		defer finish()
-	}
-	rows, err := cn.simpleQuery("SELECT 'lib/pq ping test';")
-	if err != nil {
-		return driver.ErrBadConn // https://golang.org/pkg/database/sql/driver/#Pinger
-	}
-	rows.Close()
-	return nil
 }
 
 func (cn *conn) watchCancel(ctx context.Context) func() {
@@ -93,14 +61,7 @@ func (cn *conn) watchCancel(ctx context.Context) func() {
 		go func() {
 			select {
 			case <-done:
-				// At this point the function level context is canceled,
-				// so it must not be used for the additional network
-				// request to cancel the query.
-				// Create a new context to pass into the dial.
-				ctxCancel, cancel := context.WithTimeout(context.Background(), time.Second*10)
-				defer cancel()
-
-				_ = cn.cancel(ctxCancel)
+				_ = cn.cancel()
 				finished <- struct{}{}
 			case <-finished:
 			}
@@ -115,8 +76,8 @@ func (cn *conn) watchCancel(ctx context.Context) func() {
 	return nil
 }
 
-func (cn *conn) cancel(ctx context.Context) error {
-	c, err := dial(ctx, cn.dialer, cn.opts)
+func (cn *conn) cancel() error {
+	c, err := dial(cn.dialer, cn.opts)
 	if err != nil {
 		return err
 	}
@@ -126,10 +87,7 @@ func (cn *conn) cancel(ctx context.Context) error {
 		can := conn{
 			c: c,
 		}
-		err = can.ssl(cn.opts)
-		if err != nil {
-			return err
-		}
+		can.ssl(cn.opts)
 
 		w := can.writeBuf(0)
 		w.int32(80877102) // cancel request code

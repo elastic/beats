@@ -25,9 +25,9 @@ import (
 type noopSupport struct{}
 type noopManager struct{}
 
-// NewNoopSupport creates a noop ILM implementation with ILM support being always
+// NoopSupport creates a noop ILM implementation with ILM support being always
 // disabled.  Attempts to install a policy or create a write alias will fail.
-func NewNoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
+func NoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 

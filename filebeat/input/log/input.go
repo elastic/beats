@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/filebeat/channel"
@@ -69,7 +68,6 @@ type Input struct {
 	done          chan struct{}
 	numHarvesters atomic.Uint32
 	meta          map[string]string
-	stopOnce      sync.Once
 }
 
 // NewInput instantiates a new Log
@@ -78,12 +76,6 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	cleanupNeeded := true
-	cleanupIfNeeded := func(f func() error) {
-		if cleanupNeeded {
-			f()
-		}
-	}
 
 	// Note: underlying output.
 	//  The input and harvester do have different requirements
@@ -95,13 +87,11 @@ func NewInput(
 	if err != nil {
 		return nil, err
 	}
-	defer cleanupIfNeeded(out.Close)
 
 	// stateOut will only be unblocked if the beat is shut down.
 	// otherwise it can block on a full publisher pipeline, so state updates
 	// can be forwarded correctly to the registrar.
 	stateOut := channel.CloseOnSignal(channel.SubOutlet(out), context.BeatDone)
-	defer cleanupIfNeeded(stateOut.Close)
 
 	meta := context.Meta
 	if len(meta) == 0 {
@@ -146,9 +136,6 @@ func NewInput(
 	}
 
 	logp.Info("Configured paths: %v", p.config.Paths)
-
-	cleanupNeeded = false
-	go p.stopWhenDone()
 
 	return p, nil
 }
@@ -731,27 +718,14 @@ func (p *Input) Wait() {
 
 // Stop stops all harvesters and then stops the input
 func (p *Input) Stop() {
-	p.stopOnce.Do(func() {
-		// Stop all harvesters
-		// In case the beatDone channel is closed, this will not wait for completion
-		// Otherwise Stop will wait until output is complete
-		p.harvesters.Stop()
+	// Stop all harvesters
+	// In case the beatDone channel is closed, this will not wait for completion
+	// Otherwise Stop will wait until output is complete
+	p.harvesters.Stop()
 
-		// close state updater
-		p.stateOutlet.Close()
+	// close state updater
+	p.stateOutlet.Close()
 
-		// stop all communication between harvesters and publisher pipeline
-		p.outlet.Close()
-	})
-}
-
-// stopWhenDone takes care of stopping the input if some of the contexts are done
-func (p *Input) stopWhenDone() {
-	select {
-	case <-p.done:
-	case <-p.stateOutlet.Done():
-	case <-p.outlet.Done():
-	}
-
-	p.Wait()
+	// stop all communication between harvesters and publisher pipeline
+	p.outlet.Close()
 }

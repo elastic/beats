@@ -46,7 +46,7 @@ type pathConfig struct {
 
 type writeConfig struct {
 	BufferSize   cfgtype.ByteSize `config:"buffer_size"`
-	FlushEvents  int              `config:"flush.events"`
+	FlushEvents  time.Duration    `config:"flush.events"`
 	FlushTimeout time.Duration    `config:"flush.timeout"`
 	Codec        codecID          `config:"codec"`
 }

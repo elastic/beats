@@ -91,7 +91,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
+	if err != nil {
+		return errors.Wrap(err, "error GetStartTimeEndTime")
+	}
 
 	// Get listMetrics and namespacesTotal from configuration
 	listMetrics, namespacesTotal := readCloudwatchConfig(m.CloudwatchConfigs)
@@ -99,7 +102,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(awsConfig)
-		err := createEvents(svcCloudwatch, listMetrics, regionName, m.Period, startTime, endTime, report)
+		err := createEvents(svcCloudwatch, listMetrics, regionName, m.PeriodInSec, startTime, endTime, report)
 		if err != nil {
 			return errors.Wrap(err, "createEvents failed")
 		}
@@ -121,7 +124,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			err = createEvents(svcCloudwatch, listMetricsOutput, regionName, m.Period, startTime, endTime, report)
+			err = createEvents(svcCloudwatch, listMetricsOutput, regionName, m.PeriodInSec, startTime, endTime, report)
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
@@ -147,7 +150,7 @@ func readCloudwatchConfig(cloudwatchConfigs []Config) ([]cloudwatch.Metric, []st
 	return listMetrics, namespacesTotal
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, i, period)
@@ -178,16 +181,15 @@ func constructLabel(metric cloudwatch.Metric) string {
 	return label
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Average"
 	id := "cw" + strconv.Itoa(index)
 	label := constructLabel(metric)
-	periodInSec := int64(period.Seconds())
 
 	metricDataQuery = cloudwatch.MetricDataQuery{
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
-			Period: &periodInSec,
+			Period: &period,
 			Stat:   &statistic,
 			Metric: &metric,
 		},
@@ -265,7 +267,7 @@ func convertConfigToListMetrics(cloudwatchConfig Config, namespace string) cloud
 	return listMetricsOutput
 }
 
-func createEvents(svc cloudwatchiface.CloudWatchAPI, listMetricsTotal []cloudwatch.Metric, regionName string, period time.Duration, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
+func createEvents(svc cloudwatchiface.CloudWatchAPI, listMetricsTotal []cloudwatch.Metric, regionName string, period int, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
 	identifiers := getIdentifiers(listMetricsTotal)
 	// Initialize events map per region, which stores one event per identifierValue
 	events := map[string]mb.Event{}
@@ -278,7 +280,7 @@ func createEvents(svc cloudwatchiface.CloudWatchAPI, listMetricsTotal []cloudwat
 	var eventsNoIdentifier []mb.Event
 
 	// Construct metricDataQueries
-	metricDataQueries := constructMetricQueries(listMetricsTotal, period)
+	metricDataQueries := constructMetricQueries(listMetricsTotal, int64(period))
 	if len(metricDataQueries) == 0 {
 		return nil
 	}

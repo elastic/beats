@@ -15,15 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !windows
-
 package socket
 
 import (
 	"os"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
@@ -42,10 +39,10 @@ type Proc struct {
 
 // ProcTable contains all of the active processes (if the current user is root).
 type ProcTable struct {
-	fs         procfs.FS
-	procs      map[int]*Proc
-	inodes     map[uint32]*Proc
-	privileged bool
+	fs     procfs.FS
+	procs  map[int]*Proc
+	inodes map[uint32]*Proc
+	euid   int
 }
 
 // NewProcTable returns a new ProcTable that reads data from the /proc
@@ -61,20 +58,9 @@ func NewProcTable(mountpoint string) (*ProcTable, error) {
 		return nil, err
 	}
 
-	privileged, err := isPrivileged()
-	if err != nil {
-		return nil, err
-	}
-
-	p := &ProcTable{fs: fs, privileged: privileged}
+	p := &ProcTable{fs: fs, euid: os.Geteuid()}
 	p.Refresh()
 	return p, nil
-}
-
-// Privileged returns true if the process has enough permissions to read
-// sockets of all users
-func (t *ProcTable) Privileged() bool {
-	return t.privileged
 }
 
 // Refresh updates the process table with new processes and removes processes
@@ -82,9 +68,19 @@ func (t *ProcTable) Privileged() bool {
 // If running as non-root, only information from the current process will be
 // collected.
 func (t *ProcTable) Refresh() error {
-	procs, err := t.accessibleProcs()
-	if err != nil {
-		return err
+	var err error
+	var procs []procfs.Proc
+	if t.euid == 0 {
+		procs, err = t.fs.AllProcs()
+		if err != nil {
+			return err
+		}
+	} else {
+		proc, err := t.fs.Self()
+		if err != nil {
+			return err
+		}
+		procs = append(procs, proc)
 	}
 
 	var errs multierror.Errors
@@ -126,35 +122,6 @@ func (t *ProcTable) Refresh() error {
 	t.procs = cachedProcs
 	t.inodes = inodes
 	return errs.Err()
-}
-
-func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
-	procs, err := t.fs.AllProcs()
-	if err != nil {
-		return nil, err
-	}
-	if t.privileged {
-		return procs, nil
-	}
-
-	// Filter out not owned processes
-	k := 0
-	euid := uint32(os.Geteuid())
-	for i := 0; i < len(procs); i++ {
-		p := t.fs.Path(strconv.Itoa(procs[i].PID))
-		info, err := os.Stat(p)
-		if err != nil {
-			continue
-		}
-		stat, ok := info.Sys().(*syscall.Stat_t)
-		if !ok || stat.Uid != euid {
-			continue
-		}
-		procs[k] = procs[i]
-		k++
-	}
-
-	return procs[:k], nil
 }
 
 func socketInodes(p *procfs.Proc) ([]uint32, error) {

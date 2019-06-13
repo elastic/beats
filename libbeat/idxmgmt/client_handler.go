@@ -45,7 +45,7 @@ type ESClient interface {
 // prepare a policy and write alias.
 type FileClient interface {
 	GetVersion() common.Version
-	Write(component string, name string, body string) error
+	Write(name string, body string) error
 }
 
 // NewClientHandler initializes and returns a new instance of ClientHandler

@@ -65,7 +65,7 @@ func (s linuxSystem) Self() (types.Process, error) {
 
 type process struct {
 	procfs.Proc
-	fs   procFS
+	fs   procfs.FS
 	info *types.ProcessInfo
 }
 
@@ -73,22 +73,8 @@ func (p *process) PID() int {
 	return p.Proc.PID
 }
 
-func (p *process) Parent() (types.Process, error) {
-	info, err := p.Info()
-	if err != nil {
-		return nil, err
-	}
-
-	proc, err := p.fs.NewProc(info.PPID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &process{Proc: proc, fs: p.fs}, nil
-}
-
 func (p *process) path(pa ...string) string {
-	return p.fs.path(append([]string{strconv.Itoa(p.PID())}, pa...)...)
+	return p.fs.Path(append([]string{strconv.Itoa(p.PID())}, pa...)...)
 }
 
 func (p *process) CWD() (string, error) {
@@ -126,7 +112,7 @@ func (p *process) Info() (types.ProcessInfo, error) {
 		return types.ProcessInfo{}, err
 	}
 
-	bootTime, err := bootTime(p.fs.FS)
+	bootTime, err := bootTime(p.fs)
 	if err != nil {
 		return types.ProcessInfo{}, err
 	}
