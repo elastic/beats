@@ -236,6 +236,7 @@ def clean_keys(obj):
     if (obj["event.dataset"] == "system.syslog" and filename != "tz-offset.log"):
         delete_key(obj, "@timestamp")
 
+
 def delete_key(obj, key):
     if key in obj:
         del obj[key]
