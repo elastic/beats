@@ -232,12 +232,11 @@ def clean_keys(obj):
     if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth"]):
         delete_key(obj, "@timestamp")
 
-    # Hack:
+    # HACK: This keeps @timestamp for the tz-offset.log in system.syslog.
     #
-    # Remove timestamp from syslog tests except for the log file that needs it.
-    # This is needed because in most syslog logs, the year is missing from the
-    # timestamp so Elasticsearch will set it to the current year and that will
-    # cause the tests to fail every new year.
+    # This can't be done for all syslog logs because most of them lack the year
+    # in their timestamp, so Elasticsearch will set it to the current year and
+    # that will cause the tests to fail every new year.
     #
     # The log.file.path key needs to be kept so that it is stored in the golden
     # data, to prevent @timestamp to be removed from it before comparison.
