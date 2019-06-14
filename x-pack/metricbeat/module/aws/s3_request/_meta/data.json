@@ -6,19 +6,19 @@
                 "name": "test-s3-ks"
             },
             "downloaded": {
-                "bytes": 975
+                "bytes": 2606
             },
             "errors": {
                 "4xx": 0,
                 "5xx": 0
             },
             "latency": {
-                "first_byte.ms": 251,
-                "total_request.ms": 251
+                "first_byte.ms": 1032,
+                "total_request.ms": 1032
             },
             "requests": {
-                "list": 1,
-                "total": 1
+                "list": 2,
+                "total": 2
             },
             "uploaded": {}
         }

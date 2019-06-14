@@ -15,9 +15,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	s "github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -117,22 +117,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// Create Cloudwatch Events for SQS
-		for _, queueURL := range queueURLs {
-			// Call createSQSEvent
-			event, err := createSQSEvent(queueURL, metricDataResults, regionName)
-			if err != nil {
-				m.Logger().Error(err.Error())
-				event.Error = err
-				report.Event(event)
-				continue
-			}
-
-			if reported := report.Event(event); !reported {
-				m.Logger().Debug("Fetch interrupted, failed to emit event")
-				return nil
-			}
+		err = createSQSEvents(queueURLs, metricDataResults, regionName, report)
+		if err != nil {
+			m.Logger().Debug("Error trying to emit event")
+			return nil
 		}
-
 	}
 
 	return nil
@@ -185,21 +174,19 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 	return
 }
 
-// createSQSEvent creates sqs event from Cloudwatch metric data per queue.
-func createSQSEvent(queueURL string, metricDataResults []cloudwatch.MetricDataResult, regionName string) (mb.Event, error) {
-	// Initialize event
-	event := aws.InitEvent(metricsetName, regionName)
-
-	queueURLParsed := strings.Split(queueURL, "/")
-	queueName := queueURLParsed[len(queueURLParsed)-1]
+func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
+	event.Service = metricsetName
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", metricsetName)
+	event.RootFields.Put("cloud.region", regionName)
 
 	// AWS sqs metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 
 	// Find a timestamp for all metrics in output
-	timestamp := aws.FindTimestamp(metricDataResults)
+	timestamp := aws.FindTimestamp(getMetricDataResults)
 	if !timestamp.IsZero() {
-		for _, output := range metricDataResults {
+		for _, output := range getMetricDataResults {
 			if len(output.Values) == 0 {
 				continue
 			}
@@ -213,31 +200,32 @@ func createSQSEvent(queueURL string, metricDataResults []cloudwatch.MetricDataRe
 		}
 	}
 
-	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
+	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricFields)
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schemaMetricSetFields in AWS SQS metricbeat module.")
-		return event, err
+		return
 	}
 
 	event.MetricSetFields = resultMetricSetFields
 	event.MetricSetFields.Put("queue.name", queueName)
-	return event, nil
+	return
 }
 
-func getTags(svcSQS sqsiface.SQSAPI, queueURL string) (map[string]string, error) {
-	listQueueTagsInput := &sqs.ListQueueTagsInput{
-		QueueUrl: awssdk.String(queueURL),
-	}
-	req := svcSQS.ListQueueTagsRequest(listQueueTagsInput)
-	output, err := req.Send()
-	if err != nil {
-		err = errors.Wrap(err, "Error ListQueueTags")
-		return nil, err
+func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) error {
+	for _, queueURL := range queueURLs {
+		queueURLParsed := strings.Split(queueURL, "/")
+		queueName := queueURLParsed[len(queueURLParsed)-1]
+		event, err := createEventPerQueue(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields)
+		if err != nil {
+			event.Error = err
+			report.Event(event)
+			continue
+		}
+
+		if reported := report.Event(event); !reported {
+			return errors.Wrap(err, "Fetch interrupted, failed to emit event")
+		}
 	}
 
-	var tagSet map[string]string
-	if output != nil {
-		tagSet = output.Tags
-	}
-	return tagSet, nil
+	return nil
 }

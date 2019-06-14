@@ -7,7 +7,6 @@ https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.html[S3 Cl
 Some specific AWS permissions are required for IAM user to collect AWS s3_request metrics.
 ----
 ec2:DescribeRegions
-s3:GetBucketTagging
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
 ----

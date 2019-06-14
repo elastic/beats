@@ -13,6 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -105,8 +107,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Create Cloudwatch Events for s3_daily_storage
 		bucketNames := getBucketNames(listMetricsOutputs)
 		for _, bucketName := range bucketNames {
-			// Call createS3DailyStorageEvent
-			event, err := createS3DailyStorageEvent(metricDataOutputs, regionName, bucketName)
+			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName)
 			if err != nil {
 				err = errors.Wrap(err, "createCloudWatchEvents failed")
 				m.Logger().Error(err)
@@ -186,10 +187,13 @@ func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index
 	return
 }
 
-// createS3DailyStorageEvent creates s3_daily_storage event from Cloudwatch metric data per bucket.
-func createS3DailyStorageEvent(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	// Initialize event
-	event = aws.InitEvent(metricsetName, regionName)
+func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
+	event.Service = metricsetName
+	event.RootFields = common.MapStr{}
+	// Cloud fields in ECS
+	event.RootFields.Put("service.name", metricsetName)
+	event.RootFields.Put("cloud.region", regionName)
+	event.RootFields.Put("cloud.provider", "aws")
 
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
