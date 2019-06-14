@@ -18,7 +18,6 @@
         "destination.ip": "204.232.231.46",
         "destination.packets": 1,
         "destination.port": 80,
-        "ecs.version": "1.0.0",
         "event.action": "flow_started",
         "event.category": "network_traffic",
         "event.dataset": "panw.panos",
