@@ -11,8 +11,6 @@ pipeline {
   agent none
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
-    NOTIFY_TO = credentials('notify-to')
-    JOB_GCS_BUCKET = credentials('gcs-bucket')
   }
   options {
     timeout(time: 1, unit: 'HOURS')
