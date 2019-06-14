@@ -4904,6 +4904,13 @@ alias to: user.name
 
 --
 
+*`elasticsearch.audit.message`*::
++
+--
+type: text
+
+--
+
 [float]
 == deprecation fields
 
