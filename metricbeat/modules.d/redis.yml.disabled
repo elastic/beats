@@ -4,7 +4,6 @@
 - module: redis
   #metricsets:
   #  - info
-  #  - key
   #  - keyspace
   period: 10s
 
