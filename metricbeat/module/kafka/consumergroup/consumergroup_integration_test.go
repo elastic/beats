@@ -30,12 +30,18 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
+	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 const (
 	kafkaDefaultHost = "localhost"
 	kafkaDefaultPort = "9092"
+
+	kafkaSASLConsumerUsername = "consumer"
+	kafkaSASLConsumerPassword = "consumer-secret"
+	kafkaSASLUsername         = "stats"
+	kafkaSASLPassword         = "test-secret"
 )
 
 func TestData(t *testing.T) {
@@ -58,10 +64,42 @@ func TestData(t *testing.T) {
 	t.Fatal("write", err)
 }
 
+func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "kafka")
+
+	c, err := startConsumer(t, "metricbeat-test")
+	if err != nil {
+		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
+	}
+	defer c.Close()
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+
+	var data []mb.Event
+	var errors []error
+	for retries := 0; retries < 3; retries++ {
+		data, errors = mbtest.ReportingFetchV2Error(f)
+		if len(data) > 0 {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	if len(errors) > 0 {
+		t.Fatalf("fetch %v", errors)
+	}
+	if len(data) == 0 {
+		t.Fatalf("No consumer groups fetched")
+	}
+}
+
 func startConsumer(t *testing.T, topic string) (io.Closer, error) {
 	brokers := []string{getTestKafkaHost()}
 	topics := []string{topic}
-	return saramacluster.NewConsumer(brokers, "test-group", topics, nil)
+	config := saramacluster.NewConfig()
+	config.Net.SASL.Enable = true
+	config.Net.SASL.User = kafkaSASLConsumerUsername
+	config.Net.SASL.Password = kafkaSASLConsumerPassword
+	return saramacluster.NewConsumer(brokers, "test-group", topics, config)
 }
 
 func getConfig() map[string]interface{} {
@@ -69,6 +107,8 @@ func getConfig() map[string]interface{} {
 		"module":     "kafka",
 		"metricsets": []string{"consumergroup"},
 		"hosts":      []string{getTestKafkaHost()},
+		"username":   kafkaSASLUsername,
+		"password":   kafkaSASLPassword,
 	}
 }
 

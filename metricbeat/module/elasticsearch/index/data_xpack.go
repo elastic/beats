@@ -81,7 +81,7 @@ var (
 			"size_in_bytes": c.Int("size_in_bytes"),
 		}),
 		"refresh": c.Dict("refresh", s.Schema{
-			"external_total_time_in_millis": c.Int("external_total_time_in_millis"),
+			"external_total_time_in_millis": c.Int("external_total_time_in_millis", s.Optional),
 			"total_time_in_millis":          c.Int("total_time_in_millis"),
 		}),
 	}

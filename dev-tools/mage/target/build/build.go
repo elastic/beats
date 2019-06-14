@@ -18,31 +18,31 @@
 package build
 
 import (
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
+	return devtools.CrossBuild()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
+	return devtools.CrossBuildGoDaemon()
 }

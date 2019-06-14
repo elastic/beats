@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-07-04T21:51:29.536Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -24,7 +23,6 @@
     },
     {
         "@timestamp": "2018-07-04T21:51:29.537Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -47,7 +45,6 @@
     },
     {
         "@timestamp": "2018-07-04T21:51:29.538Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -70,7 +67,6 @@
     },
     {
         "@timestamp": "2018-07-04T21:51:30.411Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -92,7 +88,6 @@
     },
     {
         "@timestamp": "2018-07-04T21:51:30.963Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",
@@ -115,7 +110,6 @@
     },
     {
         "@timestamp": "2018-07-04T21:51:30.965Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg",
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04",
         "elasticsearch.node.name": "v_VJhjV",

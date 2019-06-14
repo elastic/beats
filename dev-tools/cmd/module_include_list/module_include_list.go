@@ -32,7 +32,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/licenses"
 )
 
@@ -91,7 +91,7 @@ func main() {
 	}
 
 	// Get the current directories Go import path.
-	repo, err := mage.GetProjectRepoInfo()
+	repo, err := devtools.GetProjectRepoInfo()
 	if err != nil {
 		log.Fatalf("Failed to determine import path: %v", err)
 	}
@@ -124,7 +124,7 @@ func main() {
 		importDir := dir
 		if filepath.IsAbs(dir) {
 			// Make it relative to the current package if it's absolute.
-			importDir, err = filepath.Rel(mage.CWD(), dir)
+			importDir, err = filepath.Rel(devtools.CWD(), dir)
 			if err != nil {
 				log.Fatalf("Failure creating import for dir=%v: %v", dir, err)
 			}
@@ -202,7 +202,7 @@ func findModuleAndDatasets() ([]string, error) {
 	var dirs []string
 	for _, moduleDir := range moduleDirs {
 		// Find modules and datasets as indicated by the _meta dir.
-		metaDirs, err := mage.FindFiles(
+		metaDirs, err := devtools.FindFiles(
 			filepath.Join(moduleDir, "*/_meta"),
 			filepath.Join(moduleDir, "*/*/_meta"),
 		)
@@ -220,7 +220,7 @@ func findModuleAndDatasets() ([]string, error) {
 
 // findImports expands the given import values in case they contain globs.
 func findImports() ([]string, error) {
-	return mage.FindFiles(importDirs...)
+	return devtools.FindFiles(importDirs...)
 }
 
 // hasInitMethod returns true if the file contains 'func init()'.

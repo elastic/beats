@@ -20,7 +20,7 @@ package mage
 import (
 	"github.com/magefile/mage/mg"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/dev-tools/mage/target/build"
 	"github.com/elastic/beats/dev-tools/mage/target/common"
 	"github.com/elastic/beats/dev-tools/mage/target/dashboards"
@@ -37,7 +37,7 @@ func init() {
 
 var (
 	// SelectLogic configures the types of project logic to use (OSS vs X-Pack).
-	SelectLogic mage.ProjectType
+	SelectLogic devtools.ProjectType
 )
 
 // Update target namespace.
@@ -56,7 +56,7 @@ func (Update) Config() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func (Update) Dashboards() error {
 	mg.Deps(fb.FieldsYML)
-	return mage.KibanaDashboards()
+	return devtools.KibanaDashboards()
 }
 
 // Fields updates all fields files (.go, .yml).
@@ -67,7 +67,7 @@ func (Update) Fields() {
 // FieldDocs updates the field documentation.
 func (Update) FieldDocs() error {
 	mg.Deps(fb.FieldsAllYML)
-	return mage.Docs.FieldDocs(mage.FieldsAllYML)
+	return devtools.Docs.FieldDocs(devtools.FieldsAllYML)
 }
 
 // ModuleDocs collects and updates the module documentation.

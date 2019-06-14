@@ -29,43 +29,43 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
-	"github.com/elastic/beats/dev-tools/mage"
-	mbmage "github.com/elastic/beats/metricbeat/scripts/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 )
 
 func init() {
-	mage.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
+	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
 // Build builds the Beat binary.
 func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
 func BuildGoDaemon() error {
-	return mage.BuildGoDaemon()
+	return devtools.BuildGoDaemon()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return mage.CrossBuild()
+	return devtools.CrossBuild()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
-	return mage.CrossBuildGoDaemon()
+	return devtools.CrossBuildGoDaemon()
 }
 
 // Clean cleans all generated files and build artifacts.
 func Clean() error {
-	return mage.Clean()
+	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -76,27 +76,27 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	mage.UseElasticBeatOSSPackaging()
-	mbmage.CustomizePackaging()
+	devtools.UseElasticBeatOSSPackaging()
+	metricbeat.CustomizePackaging()
 
-	mg.Deps(Update, mbmage.PrepareModulePackagingOSS)
+	mg.Deps(Update, metricbeat.PrepareModulePackagingOSS)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(mage.Package, TestPackages)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages(mage.WithModulesD())
+	return devtools.TestPackages(devtools.WithModulesD())
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
-	return mage.KibanaDashboards("module")
+	return devtools.KibanaDashboards("module")
 }
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(mbmage.ConfigOSS, mbmage.GenerateDirModulesD)
+	mg.Deps(metricbeat.ConfigOSS, metricbeat.GenerateDirModulesD)
 }
 
 // Update updates the generated files (aka make update).
@@ -105,8 +105,8 @@ func Update() error {
 	// - Generate docs/fields.asciidoc
 	/*
 		mg.SerialDeps(Fields, Dashboards, Config,
-			mbmage.PrepareModulePackagingOSS,
-			mage.GenerateModuleIncludeListGo)
+			metricbeat.PrepareModulePackagingOSS,
+			devtools.GenerateModuleIncludeListGo)
 	*/
 	return sh.Run("make", "update")
 }
@@ -115,7 +115,7 @@ func Update() error {
 // Use MODULE={module_name} to run only mocked tests with a single module.
 // Use GENERATE=true or GENERATE=1 to regenerate JSON files.
 func MockedTests(ctx context.Context) error {
-	params := mage.DefaultGoTestUnitArgs()
+	params := devtools.DefaultGoTestUnitArgs()
 
 	params.ExtraFlags = []string{"github.com/elastic/beats/metricbeat/mb/testing/data/."}
 
@@ -129,26 +129,26 @@ func MockedTests(ctx context.Context) error {
 
 	params.Packages = nil
 
-	return mage.GoTest(ctx, params)
+	return devtools.GoTest(ctx, params)
 }
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return mage.GenerateFieldsYAML("module")
+	return devtools.GenerateFieldsYAML("module")
 }
 
 // GoTestUnit executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestUnit(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // GoTestIntegration executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory
@@ -157,19 +157,19 @@ func GoTestIntegration(ctx context.Context) error {
 // * MODULE: Name of the module
 // * ID: Dashboard id
 func ExportDashboard() error {
-	return mage.ExportDashboard()
+	return devtools.ExportDashboard()
 }
 
 // FieldsDocs generates docs/fields.asciidoc containing all fields
 // (including x-pack).
 func FieldsDocs() error {
 	inputs := []string{
-		mage.OSSBeatDir("module"),
-		mage.XPackBeatDir("module"),
+		devtools.OSSBeatDir("module"),
+		devtools.XPackBeatDir("module"),
 	}
-	output := mage.CreateDir("build/fields/fields.all.yml")
-	if err := mage.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+	output := devtools.CreateDir("build/fields/fields.all.yml")
+	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {
 		return err
 	}
-	return mage.Docs.FieldDocs(output)
+	return devtools.Docs.FieldDocs(output)
 }

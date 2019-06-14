@@ -27,6 +27,7 @@ output.elasticsearch:
 <2> The example shows a hard-coded password, but you should store sensitive
 values in the <<keystore,secrets keystore>>.
 --
+ifndef::apm-server[]
 +
 If you've configured the {kib} endpoint, also specify credentials for
 authenticating with {kib}. For example:
@@ -39,6 +40,7 @@ setup.kibana:
   password: "{pwd}" 
 ----
 <1> Let's assume this user has the privileges required to set up dashboards.
+endif::apm-server[]
 
 * To use Public Key Infrastructure (PKI) certificates to authenticate users,
 configure the `certificate` and `key` settings. These settings assume that the

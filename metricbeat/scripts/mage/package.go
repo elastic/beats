@@ -27,7 +27,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 const (
@@ -41,45 +41,45 @@ const (
 func CustomizePackaging() {
 	var (
 		modulesDTarget = "modules.d"
-		modulesD       = mage.PackageFile{
+		modulesD       = devtools.PackageFile{
 			Mode:    0644,
 			Source:  dirModulesDGenerated,
 			Config:  true,
 			Modules: true,
 		}
-		windowsModulesD = mage.PackageFile{
+		windowsModulesD = devtools.PackageFile{
 			Mode:    0644,
 			Source:  "{{.PackageDir}}/modules.d",
 			Config:  true,
 			Modules: true,
-			Dep: func(spec mage.PackageSpec) error {
-				if err := mage.Copy(dirModulesDGenerated, spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
+			Dep: func(spec devtools.PackageSpec) error {
+				if err := devtools.Copy(dirModulesDGenerated, spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
 					return errors.Wrap(err, "failed to copy modules.d dir")
 				}
 
-				return mage.FindReplace(
+				return devtools.FindReplace(
 					spec.MustExpand("{{.PackageDir}}/modules.d/system.yml"),
 					regexp.MustCompile(`- load`), `#- load`)
 			},
 		}
-		windowsReferenceConfig = mage.PackageFile{
+		windowsReferenceConfig = devtools.PackageFile{
 			Mode:   0644,
 			Source: "{{.PackageDir}}/metricbeat.reference.yml",
-			Dep: func(spec mage.PackageSpec) error {
-				err := mage.Copy("metricbeat.reference.yml",
+			Dep: func(spec devtools.PackageSpec) error {
+				err := devtools.Copy("metricbeat.reference.yml",
 					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"))
 				if err != nil {
 					return errors.Wrap(err, "failed to copy reference config")
 				}
 
-				return mage.FindReplace(
+				return devtools.FindReplace(
 					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"),
 					regexp.MustCompile(`- load`), `#- load`)
 			},
 		}
 	)
 
-	for _, args := range mage.Packages {
+	for _, args := range devtools.Packages {
 		switch args.OS {
 		case "windows":
 			args.Spec.Files[modulesDTarget] = windowsModulesD
@@ -87,9 +87,9 @@ func CustomizePackaging() {
 		default:
 			pkgType := args.Types[0]
 			switch pkgType {
-			case mage.TarGz, mage.Zip, mage.Docker:
+			case devtools.TarGz, devtools.Zip, devtools.Docker:
 				args.Spec.Files[modulesDTarget] = modulesD
-			case mage.Deb, mage.RPM, mage.DMG:
+			case devtools.Deb, devtools.RPM, devtools.DMG:
 				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
@@ -102,7 +102,7 @@ func CustomizePackaging() {
 // build/package/modules.d directories for use in packaging.
 func PrepareModulePackagingOSS() error {
 	return prepareModulePackaging([]struct{ Src, Dst string }{
-		{mage.OSSBeatDir("modules.d"), dirModulesDGenerated},
+		{devtools.OSSBeatDir("modules.d"), dirModulesDGenerated},
 	}...)
 }
 
@@ -110,7 +110,7 @@ func PrepareModulePackagingOSS() error {
 // build/package/modules.d directories for use in packaging.
 func PrepareModulePackagingXPack() error {
 	return prepareModulePackaging([]struct{ Src, Dst string }{
-		{mage.OSSBeatDir("modules.d"), dirModulesDGenerated},
+		{devtools.OSSBeatDir("modules.d"), dirModulesDGenerated},
 		{"modules.d", dirModulesDGenerated},
 	}...)
 }
@@ -118,7 +118,7 @@ func PrepareModulePackagingXPack() error {
 func prepareModulePackaging(files ...struct{ Src, Dst string }) error {
 	mg.Deps(GenerateDirModulesD)
 
-	err := mage.Clean([]string{
+	err := devtools.Clean([]string{
 		dirModulesDGenerated,
 	})
 	if err != nil {
@@ -126,7 +126,7 @@ func prepareModulePackaging(files ...struct{ Src, Dst string }) error {
 	}
 
 	for _, copyAction := range files {
-		err := (&mage.CopyTask{
+		err := (&devtools.CopyTask{
 			Source:  copyAction.Src,
 			Dest:    copyAction.Dst,
 			Mode:    0644,
@@ -157,7 +157,7 @@ func GenerateDirModulesD() error {
 	}
 	shortConfigs = append(shortConfigs, flavorConfigs...)
 
-	docBranch, err := mage.BeatDocBranch()
+	docBranch, err := devtools.BeatDocBranch()
 	if err != nil {
 		errors.Wrap(err, "failed to get doc branch")
 	}
@@ -177,10 +177,10 @@ func GenerateDirModulesD() error {
 
 		headerArgs := map[string]interface{}{
 			"Module":        moduleName,
-			"BeatName":      mage.BeatName,
+			"BeatName":      devtools.BeatName,
 			"BeatDocBranch": docBranch,
 		}
-		header := mage.MustExpand(modulesDHeader, headerArgs)
+		header := devtools.MustExpand(modulesDHeader, headerArgs)
 
 		err := copyWithHeader(header, f, path, os.FileMode(mode))
 		if err != nil {
@@ -211,7 +211,7 @@ func moduleConfigParts(f string) (moduleName string, configName string, ok bool)
 
 // copyWithHeader copies a file from `src` to `dst` adding a `header` in the destination file
 func copyWithHeader(header, src, dst string, mode os.FileMode) error {
-	dstFile, err := os.OpenFile(mage.CreateDir(dst), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode&os.ModePerm)
+	dstFile, err := os.OpenFile(devtools.CreateDir(dst), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode&os.ModePerm)
 	if err != nil {
 		return errors.Wrap(err, "failed to open copy destination")
 	}

@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-06-13T14:04:36.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 2000652000,
         "event.module": "mysql",

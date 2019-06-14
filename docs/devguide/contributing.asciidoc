@@ -47,16 +47,19 @@ Beats].
 The Beats are Go programs, so install the {go-version} version of
 http://golang.org/[Go] which is being used for Beats development.
 
-The location where you clone is important. Please clone under the source
-directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
-simply set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
+After https://golang.org/doc/install[installing Go], set the
+https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
+your workspace location, and make sure `$GOPATH/bin` is in your PATH.
+
+The location where you clone is important. Make a directory structure under
+`GOPATH` that matches the URL used for Elastic repositories, then clone the
+beats repository under the new directory: 
 
 [source,shell]
---------------------------------------------------------------------------------
+----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
-cd ${GOPATH}/src/github.com/elastic
-git clone https://github.com/elastic/beats.git
---------------------------------------------------------------------------------
+git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beats
+----------------------------------------------------------------------
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
@@ -104,7 +107,28 @@ These commands have the following dependencies:
 
 Virtualenv can be installed with the command `easy_install virtualenv` or `pip
 install virtualenv`. More details can be found
-https://virtualenv.pypa.io/en/latest/installation.html[here]. Both of these commands should be run before submitting a PR.
+https://virtualenv.pypa.io/en/latest/installation.html[here]. Both of these commands should be run before submitting a PR. You can view all the available make targets with `make help`.
+
+
+[float]
+[[build-target-env-vars]]
+=== Selecting Build Targets
+
+Beats is built using the `make release` target. By default, make will select from a limited number of preset build targets:
+
+- darwin/amd64
+- linux/386 
+- linux/amd64
+- windows/386 
+- windows/amd64
+
+You can change build targets using the `PLATFORMS` environment variable. Targets set with the `PLATFORMS` variable can either be a GOOS value, or a GOOS/arch pair. 
+For example, `linux` and `linux/amd64` are both valid targets. You can select multiple targets, and the `PLATFORMS` list is space delimited, for example `darwin windows` will build on all supported darwin and windows architectures. 
+In addition, you can add or remove from the list of build targets by prepending `+` or `-` to a given target. For example: `+bsd` or `-darwin`.
+
+You can find the complete list of supported build targets with `go tool dist list`.
+
+
 
 [float]
 [[running-testsuite]]
