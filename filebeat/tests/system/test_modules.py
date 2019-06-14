@@ -217,12 +217,31 @@ def clean_keys(obj):
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
 
+    # Keep source log filename for exceptions
+    filename = None
+    if "log.file.path" in obj:
+        filename = os.path.basename(obj["log.file.path"]).lower()
+
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
 
     # Remove timestamp for comparison where timestamp is not part of the log line
-    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]):
+    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth"]):
         delete_key(obj, "@timestamp")
+
+    # HACK: This keeps @timestamp for the tz-offset.log in system.syslog.
+    #
+    # This can't be done for all syslog logs because most of them lack the year
+    # in their timestamp, so Elasticsearch will set it to the current year and
+    # that will cause the tests to fail every new year.
+    #
+    # The log.file.path key needs to be kept so that it is stored in the golden
+    # data, to prevent @timestamp to be removed from it before comparison.
+    if obj["event.dataset"] == "system.syslog":
+        if filename == "tz-offset.log":
+            obj["log.file.path"] = filename
+        else:
+            delete_key(obj, "@timestamp")
 
 
 def delete_key(obj, key):

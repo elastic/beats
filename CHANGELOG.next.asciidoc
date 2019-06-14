@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
+- Fix timezone offset parsing in system/syslog. {pull}12529[12529]
 
 *Heartbeat*
 

@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "1986-04-25T21:23:45.101Z",
+        "ecs.version": "1.0.0",
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "fileset.name": "syslog",
+        "host.hostname": "rmbkmonitor04",
+        "input.type": "log",
+        "log.file.path": "tz-offset.log",
+        "log.offset": 0,
+        "message": "shutting down for system halt",
+        "process.name": "shutdown",
+        "process.pid": 2649,
+        "service.type": "system"
+    },
+    {
+        "@timestamp": "1986-04-25T21:23:45.388Z",
+        "ecs.version": "1.0.0",
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "fileset.name": "syslog",
+        "host.hostname": "rmbkmonitor04",
+        "input.type": "log",
+        "log.file.path": "tz-offset.log",
+        "log.offset": 89,
+        "message": "constraint_0_power_limit_uw exceeded.",
+        "process.name": "thermald",
+        "service.type": "system"
+    }
+]
