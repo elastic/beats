@@ -10,7 +10,9 @@ retriever: modernSCM(
 pipeline {
   agent none
   environment {
-    BASE_DIR="src/github.com/elastic/beats"
+    BASE_DIR = 'src/github.com/elastic/beats'
+    NOTIFY_TO = credentials('notify-to')
+    JOB_GCS_BUCKET = credentials('gcs-bucket')
   }
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -19,6 +21,9 @@ pipeline {
     ansiColor('xterm')
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
+  }
+  triggers {
+    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
   }
   parameters {
     booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
@@ -62,11 +67,10 @@ pipeline {
       }
       steps {
         withGithubNotify(context: 'Intake') {
-          withEnvWrapper() {
-            unstash 'source'
-            dir("${BASE_DIR}"){
-              sh './dev-tools/jenkins_intake.sh'
-            }
+          deleteDir()
+          unstash 'source'
+          dir("${BASE_DIR}"){
+            sh './dev-tools/jenkins_intake.sh'
           }
         }
       }
@@ -87,11 +91,10 @@ pipeline {
           }
           steps {
             withGithubNotify(context: 'Test', tab: 'tests') {
-              withEnvWrapper() {
-                unstash 'source'
-                dir("${BASE_DIR}"){
-                  sh './filebeat/scripts/jenkins/unit-test.sh'
-                }
+              deleteDir()
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh './filebeat/scripts/jenkins/unit-test.sh'
               }
             }
           }
