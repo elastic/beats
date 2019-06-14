@@ -64,10 +64,12 @@ pipeline {
         GOPATH = "${env.WORKSPACE}"
       }
       steps {
-        deleteDir()
-        unstash 'source'
-        dir("${BASE_DIR}"){
-          sh './dev-tools/jenkins_intake.sh'
+        withGithubNotify(context: 'Intake') {
+          deleteDir()
+          unstash 'source'
+          dir("${BASE_DIR}"){
+            sh './dev-tools/jenkins_intake.sh'
+          }
         }
       }
     }
@@ -86,10 +88,12 @@ pipeline {
             GOPATH = "${env.WORKSPACE}"
           }
           steps {
-            deleteDir()
-            unstash 'source'
-            dir("${BASE_DIR}"){
-              sh './filebeat/scripts/jenkins/unit-test.sh'
+            withGithubNotify(context: 'Test', tab: 'tests') {
+              deleteDir()
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh './filebeat/scripts/jenkins/unit-test.sh'
+              }
             }
           }
           post {
