@@ -243,6 +243,7 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 		}
 	}
 
+	// Fallback to secondary source if module is not registered
 	if source := r.secondarySource; source != nil && source.HasMetricSet(module, name) {
 		registration, err := source.MetricSetRegistration(r, module, name)
 		if err != nil {
@@ -273,11 +274,12 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 		}
 	}
 
+	// List also default metrics from secondary sources
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
 		exists = true
 		sourceDefaults, err := source.DefaultMetricSets(module)
 		if err != nil {
-			logp.Error(err)
+			logp.Error(errors.Wrapf(err, "failed to get default metric sets for module '%s' from secondary source", module))
 		} else if len(sourceDefaults) > 0 {
 			defaults = append(defaults, sourceDefaults...)
 		}
@@ -321,6 +323,7 @@ func (r *Register) MetricSets(module string) []string {
 		}
 	}
 
+	// List also metric sets from secondary sources
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
 		sourceMetricSets, err := source.MetricSets(module)
 		if err != nil {
