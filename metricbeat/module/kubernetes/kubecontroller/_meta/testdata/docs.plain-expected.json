@@ -1,0 +1,2949 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "handler": "prometheus",
+                "http": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "count": 4,
+                                "percentile": {
+                                    "50": 12285.837,
+                                    "90": 12285.837,
+                                    "99": 12285.837
+                                },
+                                "sum": 37076.665
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "count": 4,
+                                "percentile": {
+                                    "50": 69,
+                                    "90": 69,
+                                    "99": 69
+                                },
+                                "sum": 271
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "count": 4,
+                                "percentile": {
+                                    "50": 192971,
+                                    "90": 192971,
+                                    "99": 192971
+                                },
+                                "sum": 771764
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 12
+                    }
+                },
+                "code": "409",
+                "host": "192.168.205.10:6443",
+                "method": "PUT"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 172664
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "PUT"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "noexec_taint_pod",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 35,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 2,
+                                    "10": 32,
+                                    "1000": 33,
+                                    "10000": 33,
+                                    "100000": 33,
+                                    "1000000": 35,
+                                    "10000000": 35,
+                                    "99.99999999999999": 33
+                                },
+                                "count": 35,
+                                "sum": 661698.5819999998
+                            }
+                        }
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 35,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 13,
+                                    "1000": 35,
+                                    "10000": 35,
+                                    "100000": 35,
+                                    "1000000": 35,
+                                    "10000000": 35,
+                                    "99.99999999999999": 33
+                                },
+                                "count": 35,
+                                "sum": 950.3679999999999
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "deployment",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 46,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 23,
+                                    "1000": 37,
+                                    "10000": 39,
+                                    "100000": 44,
+                                    "1000000": 46,
+                                    "10000000": 46,
+                                    "99.99999999999999": 30
+                                },
+                                "count": 46,
+                                "sum": 982629.6849999996
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 11
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 46,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 21,
+                                    "10000": 41,
+                                    "100000": 46,
+                                    "1000000": 46,
+                                    "10000000": 46,
+                                    "99.99999999999999": 2
+                                },
+                                "count": 46,
+                                "sum": 232898.42399999997
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "garbage_collector_attempt_to_orphan",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 18,
+                                    "1000": 0,
+                                    "128000": 18,
+                                    "16000": 13,
+                                    "2000": 0,
+                                    "256000": 18,
+                                    "32000": 16,
+                                    "4000": 3,
+                                    "512000": 18,
+                                    "64000": 18,
+                                    "8000": 9
+                                },
+                                "count": 18,
+                                "sum": 243822.98700000002
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/%7Bprefix%7D",
+                "verb": "PATCH"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "endpoint",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 26,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 13,
+                                    "1000": 22,
+                                    "10000": 23,
+                                    "100000": 26,
+                                    "1000000": 26,
+                                    "10000000": 26,
+                                    "99.99999999999999": 19
+                                },
+                                "count": 26,
+                                "sum": 269252.0600000001
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 26,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 2,
+                                    "1000": 15,
+                                    "10000": 21,
+                                    "100000": 26,
+                                    "1000000": 26,
+                                    "10000000": 26,
+                                    "99.99999999999999": 10
+                                },
+                                "count": 26,
+                                "sum": 111353.881
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "noexec_taint_node",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 12,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 11,
+                                    "1000": 11,
+                                    "10000": 11,
+                                    "100000": 12,
+                                    "1000000": 12,
+                                    "10000000": 12,
+                                    "99.99999999999999": 11
+                                },
+                                "count": 12,
+                                "sum": 41855.234000000004
+                            }
+                        }
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 12,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 8,
+                                    "100000": 12,
+                                    "1000000": 12,
+                                    "10000000": 12,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 12,
+                                "sum": 119376.19299999998
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "serviceaccount_tokens_service",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 68,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 40,
+                                    "1000": 61,
+                                    "10000": 67,
+                                    "100000": 68,
+                                    "1000000": 68,
+                                    "10000000": 68,
+                                    "99.99999999999999": 45
+                                },
+                                "count": 68,
+                                "sum": 105515.79500000001
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 68,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 1,
+                                    "1000": 34,
+                                    "10000": 42,
+                                    "100000": 68,
+                                    "1000000": 68,
+                                    "10000000": 68,
+                                    "99.99999999999999": 33
+                                },
+                                "count": 68,
+                                "sum": 654837.5060000003
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "ttlcontroller",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 17424,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 16913,
+                                    "1000": 17413,
+                                    "10000": 17421,
+                                    "100000": 17424,
+                                    "1000000": 17424,
+                                    "10000000": 17424,
+                                    "99.99999999999999": 17362
+                                },
+                                "count": 17424,
+                                "sum": 260124.84000000096
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 17424,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 9941,
+                                    "1000": 17406,
+                                    "10000": 17421,
+                                    "100000": 17424,
+                                    "1000000": 17424,
+                                    "10000000": 17424,
+                                    "99.99999999999999": 17306
+                                },
+                                "count": 17424,
+                                "sum": 357941.3709999998
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 23031,
+                                    "1000": 705,
+                                    "128000": 23031,
+                                    "16000": 23026,
+                                    "2000": 3249,
+                                    "256000": 23031,
+                                    "32000": 23031,
+                                    "4000": 21454,
+                                    "512000": 23031,
+                                    "64000": 23031,
+                                    "8000": 22939
+                                },
+                                "count": 23031,
+                                "sum": 67973921.32900035
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/api?timeout=32s",
+                "verb": "GET"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 145
+                    }
+                },
+                "code": "201",
+                "host": "192.168.205.10:6443",
+                "method": "POST"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "certificate",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 12,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 9,
+                                    "1000": 10,
+                                    "10000": 11,
+                                    "100000": 12,
+                                    "1000000": 12,
+                                    "10000000": 12,
+                                    "99.99999999999999": 9
+                                },
+                                "count": 12,
+                                "sum": 38108.969
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 12,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 6,
+                                    "1000": 9,
+                                    "10000": 10,
+                                    "100000": 12,
+                                    "1000000": 12,
+                                    "10000000": 12,
+                                    "99.99999999999999": 9
+                                },
+                                "count": 12,
+                                "sum": 51641.981999999996
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "daemonset",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 78,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 1,
+                                    "10": 39,
+                                    "1000": 52,
+                                    "10000": 67,
+                                    "100000": 76,
+                                    "1000000": 78,
+                                    "10000000": 78,
+                                    "99.99999999999999": 45
+                                },
+                                "count": 78,
+                                "sum": 1559540.4020000002
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 3
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 78,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 40,
+                                    "10000": 62,
+                                    "100000": 78,
+                                    "1000000": 78,
+                                    "10000000": 78,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 78,
+                                "sum": 548410.3609999999
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "disruption",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "garbage_collector_graph_changes",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 468043,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 37,
+                                    "10": 389208,
+                                    "1000": 467897,
+                                    "10000": 467963,
+                                    "100000": 467965,
+                                    "1000000": 467965,
+                                    "10000000": 467965,
+                                    "99.99999999999999": 466108
+                                },
+                                "count": 468043,
+                                "sum": 1054354282.4003452
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 468043,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 10992,
+                                    "1000": 467766,
+                                    "10000": 468042,
+                                    "100000": 468043,
+                                    "1000000": 468043,
+                                    "10000000": 468043,
+                                    "99.99999999999999": 458596
+                                },
+                                "count": 468043,
+                                "sum": 16815317.16700019
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 23031,
+                                    "1000": 2736,
+                                    "128000": 23031,
+                                    "16000": 23029,
+                                    "2000": 17044,
+                                    "256000": 23031,
+                                    "32000": 23031,
+                                    "4000": 22773,
+                                    "512000": 23031,
+                                    "64000": 23031,
+                                    "8000": 22994
+                                },
+                                "count": 23031,
+                                "sum": 41157108.99300018
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/apis?timeout=32s",
+                "verb": "GET"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "resourcequota_primary",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "claims",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 1113352
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "serviceaccount_tokens_secret",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 34,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 31,
+                                    "1000": 34,
+                                    "10000": 34,
+                                    "100000": 34,
+                                    "1000000": 34,
+                                    "10000000": 34,
+                                    "99.99999999999999": 34
+                                },
+                                "count": 34,
+                                "sum": 185.251
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 34,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 6,
+                                    "1000": 34,
+                                    "10000": 34,
+                                    "100000": 34,
+                                    "1000000": 34,
+                                    "10000000": 34,
+                                    "99.99999999999999": 33
+                                },
+                                "count": 34,
+                                "sum": 673.381
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "service",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "node": {
+                    "collector": {
+                        "count": 2,
+                        "eviction": {
+                            "count": 7
+                        },
+                        "unhealthy": {
+                            "count": 0
+                        }
+                    }
+                },
+                "process": {
+                    "cpu": {
+                        "sec": 6265
+                    },
+                    "fds": {
+                        "open": 14
+                    },
+                    "memory": {
+                        "resident": {
+                            "bytes": 100958208
+                        },
+                        "virtual": {
+                            "bytes": 222724096
+                        }
+                    },
+                    "started": {
+                        "sec": 1559227199.05
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "pvcprotection",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "code": "200",
+                "handler": "prometheus",
+                "http": {
+                    "request": {
+                        "count": 4
+                    }
+                },
+                "method": "get"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "pvprotection",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 28
+                    }
+                },
+                "code": "404",
+                "host": "192.168.205.10:6443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "garbage_collector_attempt_to_delete",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 13,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 5,
+                                    "1000": 8,
+                                    "10000": 8,
+                                    "100000": 10,
+                                    "1000000": 13,
+                                    "10000000": 13,
+                                    "99.99999999999999": 7
+                                },
+                                "count": 13,
+                                "sum": 1387289.7999999998
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 13,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 3,
+                                    "1000": 3,
+                                    "10000": 5,
+                                    "100000": 9,
+                                    "1000000": 13,
+                                    "10000000": 13,
+                                    "99.99999999999999": 3
+                                },
+                                "count": 13,
+                                "sum": 1165676.818
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 6
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "DELETE"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 172676,
+                                    "1000": 0,
+                                    "128000": 172676,
+                                    "16000": 164080,
+                                    "2000": 161,
+                                    "256000": 172676,
+                                    "32000": 172452,
+                                    "4000": 12560,
+                                    "512000": 172676,
+                                    "64000": 172672,
+                                    "8000": 36621
+                                },
+                                "count": 172676,
+                                "sum": 1774312260.579011
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/%7Bprefix%7D",
+                "verb": "PUT"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "replicationmanager",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "resourcequota_priority",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "resource_quota_controller_resource_changes",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 132,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 1,
+                                    "10": 39,
+                                    "1000": 132,
+                                    "10000": 132,
+                                    "100000": 132,
+                                    "1000000": 132,
+                                    "10000000": 132,
+                                    "99.99999999999999": 129
+                                },
+                                "count": 132,
+                                "sum": 3766.253999999999
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 132,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 75,
+                                    "1000": 132,
+                                    "10000": 132,
+                                    "100000": 132,
+                                    "1000000": 132,
+                                    "10000000": 132,
+                                    "99.99999999999999": 132
+                                },
+                                "count": 132,
+                                "sum": 1429.8970000000002
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "ClusterRoleAggregator",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 68,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 7,
+                                    "1000": 49,
+                                    "10000": 64,
+                                    "100000": 68,
+                                    "1000000": 68,
+                                    "10000000": 68,
+                                    "99.99999999999999": 18
+                                },
+                                "count": 68,
+                                "sum": 286458.001
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 2
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 68,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 39,
+                                    "10000": 67,
+                                    "100000": 68,
+                                    "1000000": 68,
+                                    "10000000": 68,
+                                    "99.99999999999999": 4
+                                },
+                                "count": 68,
+                                "sum": 113814.97699999998
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 145,
+                                    "1000": 2,
+                                    "128000": 145,
+                                    "16000": 138,
+                                    "2000": 29,
+                                    "256000": 145,
+                                    "32000": 144,
+                                    "4000": 70,
+                                    "512000": 145,
+                                    "64000": 145,
+                                    "8000": 106
+                                },
+                                "count": 145,
+                                "sum": 891847.9449999998
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/%7Bprefix%7D",
+                "verb": "POST"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "token_cleaner",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 2,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 2,
+                                    "10000000": 2,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 2,
+                                "sum": 200106.169
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 2,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 1,
+                                    "1000": 2,
+                                    "10000": 2,
+                                    "100000": 2,
+                                    "1000000": 2,
+                                    "10000000": 2,
+                                    "99.99999999999999": 2
+                                },
+                                "count": 2,
+                                "sum": 70.293
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 1
+                    }
+                },
+                "code": "403",
+                "host": "192.168.205.10:6443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "count": 18
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "PATCH"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "serviceaccount",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 4,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 2,
+                                    "1000000": 4,
+                                    "10000000": 4,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 4,
+                                "sum": 388663.017
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 4,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 3,
+                                    "100000": 4,
+                                    "1000000": 4,
+                                    "10000000": 4,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 4,
+                                "sum": 30522.504999999997
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "job",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "horizontalpodautoscaler",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 1,
+                                    "1000": 0,
+                                    "128000": 1,
+                                    "16000": 1,
+                                    "2000": 0,
+                                    "256000": 1,
+                                    "32000": 1,
+                                    "4000": 0,
+                                    "512000": 1,
+                                    "64000": 1,
+                                    "8000": 1
+                                },
+                                "count": 1,
+                                "sum": 5862.051
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/healthz?timeout=32s",
+                "verb": "GET"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "bootstrap_signer_queue",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 2,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 1,
+                                    "10000": 1,
+                                    "100000": 1,
+                                    "1000000": 1,
+                                    "10000000": 1,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 2,
+                                "sum": 14401751.724999998
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 2,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 1,
+                                    "10000": 2,
+                                    "100000": 2,
+                                    "1000000": 2,
+                                    "10000000": 2,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 2,
+                                "sum": 3579.92
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 6,
+                                    "1000": 0,
+                                    "128000": 6,
+                                    "16000": 5,
+                                    "2000": 0,
+                                    "256000": 6,
+                                    "32000": 6,
+                                    "4000": 1,
+                                    "512000": 6,
+                                    "64000": 6,
+                                    "8000": 3
+                                },
+                                "count": 6,
+                                "sum": 53191.28999999999
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/%7Bprefix%7D",
+                "verb": "DELETE"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "statefulset",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "node_lifecycle_controller",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 17427,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 16347,
+                                    "1000": 17418,
+                                    "10000": 17426,
+                                    "100000": 17427,
+                                    "1000000": 17427,
+                                    "10000000": 17427,
+                                    "99.99999999999999": 17350
+                                },
+                                "count": 17427,
+                                "sum": 186822.2499999999
+                            }
+                        }
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 17427,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 2106,
+                                    "1000": 17400,
+                                    "10000": 17426,
+                                    "100000": 17427,
+                                    "1000000": 17427,
+                                    "10000000": 17427,
+                                    "99.99999999999999": 17204
+                                },
+                                "count": 17427,
+                                "sum": 483890.12999999913
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "disruption_recheck",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 1020268,
+                                    "1000": 10478,
+                                    "128000": 1020267,
+                                    "16000": 878653,
+                                    "2000": 49873,
+                                    "256000": 1020267,
+                                    "32000": 1019228,
+                                    "4000": 181102,
+                                    "512000": 1020267,
+                                    "64000": 1020240,
+                                    "8000": 478929
+                                },
+                                "count": 1020268,
+                                "sum": 9770739176.39141
+                            }
+                        }
+                    }
+                },
+                "url": "https://192.168.205.10:6443/%7Bprefix%7D",
+                "verb": "GET"
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "pvcs",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "namespace",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "volumes",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 0,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 0,
+                                    "10000": 0,
+                                    "100000": 0,
+                                    "1000000": 0,
+                                    "10000000": 0,
+                                    "99.99999999999999": 0
+                                },
+                                "count": 0,
+                                "sum": 0
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.kubecontroller",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "kubecontroller": {
+                "name": "replicaset",
+                "workqueue": {
+                    "queue": {
+                        "duration": {
+                            "sec": 0,
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 51,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 27,
+                                    "1000": 41,
+                                    "10000": 46,
+                                    "100000": 51,
+                                    "1000000": 51,
+                                    "10000000": 51,
+                                    "99.99999999999999": 34
+                                },
+                                "count": 51,
+                                "sum": 113092.52500000002
+                            }
+                        }
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "work": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 51,
+                                    "0.01": 0,
+                                    "0.09999999999999999": 0,
+                                    "1": 0,
+                                    "10": 0,
+                                    "1000": 38,
+                                    "10000": 44,
+                                    "100000": 51,
+                                    "1000000": 51,
+                                    "10000000": 51,
+                                    "99.99999999999999": 32
+                                },
+                                "count": 51,
+                                "sum": 203478.916
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "kubecontroller"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

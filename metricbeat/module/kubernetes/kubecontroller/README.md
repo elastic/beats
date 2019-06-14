@@ -2,7 +2,7 @@
 
 ## Version history
 
-- June 2019, `v1.13.0`
+- June 2019, `v1.14.0`
 
 ## Resources
 
