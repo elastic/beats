@@ -1,9 +1,9 @@
 [
     {
         "@timestamp": "1986-04-25T21:23:45.101Z",
+        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
         "fileset.name": "syslog",
         "host.hostname": "rmbkmonitor04",
         "input.type": "log",
@@ -16,9 +16,9 @@
     },
     {
         "@timestamp": "1986-04-25T21:23:45.388Z",
+        "ecs.version": "1.0.0",
         "event.dataset": "system.syslog",
         "event.module": "system",
-        "event.timezone": "+00:00",
         "fileset.name": "syslog",
         "host.hostname": "rmbkmonitor04",
         "input.type": "log",
