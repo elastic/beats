@@ -25,9 +25,11 @@ import (
 	"github.com/elastic/beats/metricbeat/module/redis"
 )
 
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()
+
 func init() {
 	mb.Registry.MustAddMetricSet("redis", "keyspace", New,
-		mb.WithHostParser(parse.PassThruHostParser),
+		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
 }
