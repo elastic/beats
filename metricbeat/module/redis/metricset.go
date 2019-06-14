@@ -40,8 +40,10 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Unpack additional configuration options.
 	config := struct {
 		IdleTimeout time.Duration `config:"idle_timeout"`
+		Network     string        `config:"network"`
 		MaxConn     int           `config:"maxconn" validate:"min=1"`
 	}{
+		Network: "tcp",
 		MaxConn: 10,
 	}
 
@@ -50,14 +52,14 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, errors.Wrap(err, "failed to read configuration")
 	}
 
-	password, database, err := getPasswordDBNumber(base.HostData())
+	password, dbNumber, err := getPasswordDBNumber(base.HostData())
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to getPasswordDBNumber from URI")
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		pool: CreatePool(base.HostData().URI, password, database,
+		pool: CreatePool(base.Host(), password, config.Network, dbNumber,
 			config.MaxConn, config.IdleTimeout, base.Module().Config().Timeout),
 	}, nil
 }

@@ -173,9 +173,8 @@ func Select(c rd.Conn, keyspace uint) error {
 
 // CreatePool creates a redis connection pool
 func CreatePool(
-	uri string,
-	password string,
-	database int,
+	host, password, network string,
+	dbNumber int,
 	maxConn int,
 	idleTimeout, connTimeout time.Duration,
 ) *rd.Pool {
@@ -183,9 +182,9 @@ func CreatePool(
 		MaxIdle:     maxConn,
 		IdleTimeout: idleTimeout,
 		Dial: func() (rd.Conn, error) {
-			return rd.DialURL(uri,
+			return rd.Dial(network, host,
 				rd.DialPassword(password),
-				rd.DialDatabase(database),
+				rd.DialDatabase(dbNumber),
 				rd.DialConnectTimeout(connTimeout),
 				rd.DialReadTimeout(connTimeout),
 				rd.DialWriteTimeout(connTimeout))
