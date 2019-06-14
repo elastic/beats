@@ -368,18 +368,18 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
-			"checksumSHA1": "yo32Zcq1rjutOJYfrSqKDGx/i44=",
+			"checksumSHA1": "PKzWnwKTiLmXB2b3PAplL0zLyCM=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation",
-			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
-			"revisionTime": "2018-09-27T22:51:20Z",
+			"revision": "da6472f8447d3fef65272d1e396e892df15310d5",
+			"revisionTime": "2019-05-29T23:50:13Z",
 			"version": "v2.0.0-preview.5",
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
-			"checksumSHA1": "TsYe4THK6mTAH52LC3xVkq9VE0Q=",
+			"checksumSHA1": "PfI5CDu8P1Gr+iZnGUWlL27uqU8=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface",
-			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
-			"revisionTime": "2018-09-27T22:51:20Z",
+			"revision": "da6472f8447d3fef65272d1e396e892df15310d5",
+			"revisionTime": "2019-05-29T23:50:13Z",
 			"version": "v2.0.0-preview.5",
 			"versionExact": "v2.0.0-preview.5"
 		},
@@ -444,10 +444,10 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
-			"checksumSHA1": "/1ueZe/ATSjk0EEVbEkkROXC/hk=",
+			"checksumSHA1": "H0fRQXfKJ5ZjJC7d0NgWgEcW2iI=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/s3",
-			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
-			"revisionTime": "2018-09-27T22:51:20Z",
+			"revision": "da6472f8447d3fef65272d1e396e892df15310d5",
+			"revisionTime": "2019-05-29T23:50:13Z",
 			"version": "v2.0.0-preview.5",
 			"versionExact": "v2.0.0-preview.5"
 		},
