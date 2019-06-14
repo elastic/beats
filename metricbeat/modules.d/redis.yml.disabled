@@ -2,8 +2,8 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-redis.html
 
 - module: redis
-  metricsets:
-    - info
+  #metricsets:
+  #  - info
   #  - key
   #  - keyspace
   period: 10s
