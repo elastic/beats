@@ -62,6 +62,12 @@ ifeval::["{beatname_lc}"=="filebeat"]
 |`ingest_admin` role
 endif::[]
 
+ifdef::apm-server[]
+.2+|Set up ingest pipelines
+|`monitor` on cluster
+|`ingest_admin` role
+endif::apm-server[]
+
 .2+|Set up index lifecycle policies
 |`manage_ilm`, `manage_index_templates`, and `monitor` on cluster
 |`manage` on +{beat_default_index_prefix}-*+ indices
@@ -106,6 +112,7 @@ need to perform:
 |====
 |Task | Required privileges and roles
 
+ifndef::apm-server[]
 .3+|Send data to a secured cluster without index lifecycle management
 |`monitor` on cluster
 ifeval::["{beatname_lc}"=="filebeat"]
@@ -116,13 +123,28 @@ endif::[]
 unless you've disabled automatic template loading
 
 .2+|Send data to a secured cluster that supports index lifecycle management
-|`manage_index_templates`,`manage_ilm` footnote:[Use `read_ilm` instead of
+|`manage_index_templates`, `manage_ilm` footnote:[Use `read_ilm` instead of
 `manage_ilm` if you pre-loaded the lifecycle policy], and `monitor`
 on cluster
 ifeval::["{beatname_lc}"=="filebeat"]
 (and `manage_pipeline` if {beatname_uc} modules are used)
 endif::[]
 | `index` and `manage` on +{beat_default_index_prefix}-*+ indices
+endif::apm-server[]
+
+ifdef::apm-server[]
+.3+|Send data to a secured cluster without index lifecycle management
+|`monitor` on cluster
+|`create_index` and `write` on +{beat_default_index_prefix}-*+ indices
+|also requires privileges to <<privileges-to-setup-beats,set up index templates>>
+unless you've disabled automatic template loading: `setup.template.enabled=false`
+
+.3+|Send data to a secured cluster that supports index lifecycle management
+|`manage_ilm` and `monitor` on cluster
+| `index` and `manage` on +{beat_default_index_prefix}-*+ indices
+|also requires privileges to <<privileges-to-setup-beats,set up index templates>>
+unless you've disabled automatic template loading: `setup.template.enabled=false`
+endif::apm-server[]
 
 ifdef::has_central_config[]
 .2+|Read configurations from Beats central management
@@ -153,6 +175,7 @@ perform:
 |====
 |Task | Required privileges and roles
 
+ifndef::apm-server[]
 .2+|View {beatname_uc} dashboards
 |`read` on +{beat_default_index_prefix}-*+ indices
 |`kibana_dashboard_only_user` role
@@ -160,6 +183,12 @@ perform:
 .2+|View and edit {beatname_uc} dashboards
 |`read` on +{beat_default_index_prefix}-*+ indices
 |`kibana_user` role
+endif::apm-server[]
+
+ifdef::apm-server[]
+|Use the APM UI
+|`kibana_user` and `apm_user` roles
+endif::apm-server[]
 
 ifdef::has_central_config[]
 .2+|Create and manage configurations in Beats central management

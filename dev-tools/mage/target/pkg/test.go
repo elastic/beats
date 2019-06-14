@@ -17,10 +17,10 @@
 
 package pkg
 
-import "github.com/elastic/beats/dev-tools/mage"
+import devtools "github.com/elastic/beats/dev-tools/mage"
 
 // PackageTest tests the generated packages in build/distributions. It checks
 // things like file ownership/mode, package attributes, etc.
 func PackageTest() error {
-	return mage.TestPackages()
+	return devtools.TestPackages()
 }

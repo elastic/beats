@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-05-17T08:29:12.177Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.c.m.MetaDataCreateIndexService",
         "elasticsearch.index.name": "test-filebeat-modules",
         "elasticsearch.node.name": "vWNJsZ3",
@@ -17,7 +16,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:19:35.939Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "",
         "event.dataset": "elasticsearch.server",
@@ -32,7 +30,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:19:36.089Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.e.NodeEnvironment",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
@@ -47,7 +44,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:19:36.090Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.e.NodeEnvironment",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
@@ -62,7 +58,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:19:36.116Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.n.Node",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
@@ -76,7 +71,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:23:48.941Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.c.r.a.DiskThresholdMonitor",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
@@ -91,7 +85,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:29:09.245Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.c.m.MetaDataCreateIndexService",
         "elasticsearch.index.name": "filebeat-test-input",
         "elasticsearch.node.name": "vWNJsZ3",
@@ -107,7 +100,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:29:09.576Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.c.m.MetaDataMappingService",
         "elasticsearch.index.id": "aOGgDwbURfCV57AScqbCgw",
         "elasticsearch.index.name": "filebeat-test-input",
@@ -124,7 +116,6 @@
     },
     {
         "@timestamp": "2018-07-09T12:47:33.959Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.c.m.MetaDataMappingService",
         "elasticsearch.index.id": "3tWftqb4RLKdyCAga9syGA",
         "elasticsearch.index.name": ".kibana",
@@ -141,7 +132,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:29:25.598Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
@@ -156,7 +146,6 @@
     },
     {
         "@timestamp": "2018-05-17T08:29:25.612Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.n.Node",
         "elasticsearch.node.name": "vWNJsZ3",
         "event.dataset": "elasticsearch.server",
@@ -171,7 +160,6 @@
     },
     {
         "@timestamp": "2018-07-03T11:45:48.548Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.d.z.ZenDiscovery",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",
@@ -186,7 +174,6 @@
     },
     {
         "@timestamp": "2018-07-03T11:45:48.548Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.d.z.ZenDiscovery",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",
@@ -204,7 +191,6 @@
     },
     {
         "@timestamp": "2018-07-03T11:45:52.666Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "r.suppressed",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
@@ -221,7 +207,6 @@
     },
     {
         "@timestamp": "2018-07-03T11:48:02.552Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "r.suppressed",
         "event.dataset": "elasticsearch.server",
         "event.module": "elasticsearch",
@@ -238,7 +223,6 @@
     },
     {
         "@timestamp": "2018-07-03T11:45:27.896Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.m.j.JvmGcMonitorService",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "elasticsearch.server.gc.young.one": "3449979",
@@ -258,7 +242,6 @@
     },
     {
         "@timestamp": "2018-07-03T11:45:45.604Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.m.j.JvmGcMonitorService",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "elasticsearch.server.gc.collection_duration.ms": 1600.0,
@@ -276,7 +259,6 @@
     },
     {
         "@timestamp": "2018-07-03T11:48:02.541Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.a.b.TransportShardBulkAction",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",
@@ -291,7 +273,6 @@
     },
     {
         "@timestamp": "2018-07-03T20:10:07.376Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.x.m.MonitoringService",
         "elasticsearch.node.name": "srvmulpvlsk252_md",
         "event.dataset": "elasticsearch.server",

@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2016-12-26T14:16:29.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -19,7 +18,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:13.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -45,7 +43,6 @@
     },
     {
         "@timestamp": "2016-12-26T14:16:48.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -59,7 +56,6 @@
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -83,7 +79,6 @@
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -107,7 +102,6 @@
     },
     {
         "@timestamp": "2019-02-02T04:38:45.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",

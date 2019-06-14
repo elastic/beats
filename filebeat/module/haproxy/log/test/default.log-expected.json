@@ -2,7 +2,6 @@
     {
         "destination.ip": "1.2.3.4",
         "destination.port": 5000,
-        "ecs.version": "1.0.0",
         "event.dataset": "haproxy.log",
         "event.module": "haproxy",
         "fileset.name": "log",

@@ -4,7 +4,6 @@
         "destination.address": "::1%0",
         "destination.ip": "::1",
         "destination.port": 80,
-        "ecs.version": "1.0.0",
         "event.dataset": "iis.error",
         "event.module": "iis",
         "fileset.name": "error",

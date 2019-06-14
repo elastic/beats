@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -22,7 +21,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -56,7 +54,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -77,7 +74,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -98,7 +94,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -119,7 +114,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -140,7 +134,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -161,7 +154,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -182,7 +174,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -203,7 +194,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -224,7 +214,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -245,7 +234,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -266,7 +254,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -287,7 +274,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -308,7 +294,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -329,7 +314,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -350,7 +334,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -371,7 +354,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -392,7 +374,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -413,7 +394,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:58:59.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -434,7 +414,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -454,7 +433,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -477,7 +455,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -501,7 +478,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -523,7 +499,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -547,7 +522,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -571,7 +545,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -595,7 +568,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -619,7 +591,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -641,7 +612,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -665,7 +635,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -689,7 +658,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -713,7 +681,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -737,7 +704,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -759,7 +725,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -781,7 +746,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -803,7 +767,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -825,7 +788,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -847,7 +809,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -869,7 +830,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -892,7 +852,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -914,7 +873,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -936,7 +894,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -958,7 +915,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -980,7 +936,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1003,7 +958,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1027,7 +981,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1051,7 +1004,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1075,7 +1027,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1099,7 +1050,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1119,7 +1069,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1139,7 +1088,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1163,7 +1111,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1187,7 +1134,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1211,7 +1157,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1235,7 +1180,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1261,7 +1205,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1285,7 +1228,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1309,7 +1251,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1332,7 +1273,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1356,7 +1296,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1379,7 +1318,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1400,7 +1338,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:01.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1421,7 +1358,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1441,7 +1377,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1461,7 +1396,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1485,7 +1419,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1505,7 +1438,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1525,7 +1457,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1546,7 +1477,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1568,7 +1498,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1589,7 +1518,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1611,7 +1539,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1632,7 +1559,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1652,7 +1578,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1672,7 +1597,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1696,7 +1620,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1717,7 +1640,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1738,7 +1660,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1758,7 +1679,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1782,7 +1702,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1806,7 +1725,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1830,7 +1748,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1854,7 +1771,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1878,7 +1794,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1902,7 +1817,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1926,7 +1840,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1950,7 +1863,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1974,7 +1886,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -1998,7 +1909,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2019,7 +1929,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2040,7 +1949,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2061,7 +1969,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2082,7 +1989,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2103,7 +2009,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2124,7 +2029,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2145,7 +2049,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2166,7 +2069,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:04.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2201,7 +2103,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:04.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",
@@ -2222,7 +2123,6 @@
     },
     {
         "@timestamp": "2018-05-09T10:59:04.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "kibana.log",
         "event.module": "kibana",
         "fileset.name": "log",

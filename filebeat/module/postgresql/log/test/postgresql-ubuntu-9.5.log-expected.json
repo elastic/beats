@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2017-04-03T20:32:14.322Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -18,7 +17,6 @@
     },
     {
         "@timestamp": "2017-04-03T20:32:14.322Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -35,7 +33,6 @@
     },
     {
         "@timestamp": "2017-04-03T20:35:22.389Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -52,7 +49,6 @@
     },
     {
         "@timestamp": "2017-04-03T20:36:56.464Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -69,7 +65,6 @@
     },
     {
         "@timestamp": "2017-04-03T20:37:12.961Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -86,7 +81,6 @@
     },
     {
         "@timestamp": "2017-04-07T19:05:28.549Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -103,7 +97,6 @@
     },
     {
         "@timestamp": "2017-04-07T19:09:41.345Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -120,7 +113,6 @@
     },
     {
         "@timestamp": "2017-04-07T20:45:30.218Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -137,7 +129,6 @@
     },
     {
         "@timestamp": "2017-04-07T20:45:30.218Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -154,7 +145,6 @@
     },
     {
         "@timestamp": "2017-04-07T20:45:30.218Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -171,7 +161,6 @@
     },
     {
         "@timestamp": "2017-04-07T20:46:09.751Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -188,7 +177,6 @@
     },
     {
         "@timestamp": "2017-04-07T20:46:09.751Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -205,7 +193,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:02:51.199Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -222,7 +209,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:02:51.199Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -239,7 +225,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:04:36.087Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -256,7 +241,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:04:36.087Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -273,7 +257,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:04:51.462Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -290,7 +273,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:04:51.462Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -307,7 +289,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:05:06.217Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -324,7 +305,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:05:06.217Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -341,7 +321,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:05:18.295Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -358,7 +337,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:05:18.295Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -375,7 +353,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:13:47.505Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -392,7 +369,6 @@
     },
     {
         "@timestamp": "2017-04-07T21:13:47.505Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -409,7 +385,6 @@
     },
     {
         "@timestamp": "2017-04-08T10:32:51.056Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -426,7 +401,6 @@
     },
     {
         "@timestamp": "2017-04-08T10:32:51.056Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -443,7 +417,6 @@
     },
     {
         "@timestamp": "2017-04-08T10:32:51.056Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -460,7 +433,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:54:37.443Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -477,7 +449,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:54:37.468Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -494,7 +465,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:54:37.618Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -509,7 +479,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:54:37.618Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -524,7 +493,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:54:37.618Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -539,7 +507,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:54:37.622Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -554,7 +521,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:54:37.644Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -569,7 +535,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:56:02.932Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -584,7 +549,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:56:02.944Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -599,7 +563,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:56:02.946Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -614,7 +577,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:56:02.947Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -629,7 +591,6 @@
     },
     {
         "@timestamp": "2017-04-08T19:56:03.362Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -646,7 +607,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:07:53.007Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -661,7 +621,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:07:53.010Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -676,7 +635,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:07:53.015Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -691,7 +649,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:07:53.016Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -706,7 +663,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:07:53.463Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -723,7 +679,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:08:13.661Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -740,7 +695,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:59:26.553Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -757,7 +711,6 @@
     },
     {
         "@timestamp": "2017-05-27T14:59:26.555Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "UTC",
@@ -774,7 +727,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:54:13.753Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -789,7 +741,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:54:13.753Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -804,7 +755,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:54:13.753Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -819,7 +769,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:54:13.755Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -834,7 +783,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:54:13.816Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -849,7 +797,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:55:39.725Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -864,7 +811,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:55:39.736Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -879,7 +825,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:55:39.739Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -894,7 +839,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:55:39.739Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -909,7 +853,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:55:40.155Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -926,7 +869,6 @@
     },
     {
         "@timestamp": "2017-06-06T05:55:40.156Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -943,7 +885,6 @@
     },
     {
         "@timestamp": "2017-06-10T17:37:30.681Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -958,7 +899,6 @@
     },
     {
         "@timestamp": "2017-06-10T17:37:30.695Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -973,7 +913,6 @@
     },
     {
         "@timestamp": "2017-06-10T17:37:30.702Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -988,7 +927,6 @@
     },
     {
         "@timestamp": "2017-06-10T17:37:30.702Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1003,7 +941,6 @@
     },
     {
         "@timestamp": "2017-06-10T17:37:31.104Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1020,7 +957,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:55.911Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1035,7 +971,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:55.911Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1050,7 +985,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:55.911Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1065,7 +999,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:55.914Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1080,7 +1013,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:55.973Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1095,7 +1027,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:57.022Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1110,7 +1041,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:57.032Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1125,7 +1055,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:57.035Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1140,7 +1069,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:57.035Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1155,7 +1083,6 @@
     },
     {
         "@timestamp": "2017-06-10T18:27:57.475Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1172,7 +1099,6 @@
     },
     {
         "@timestamp": "2017-06-17T14:58:03.937Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1187,7 +1113,6 @@
     },
     {
         "@timestamp": "2017-06-17T14:58:03.937Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1202,7 +1127,6 @@
     },
     {
         "@timestamp": "2017-06-17T14:58:03.938Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1217,7 +1141,6 @@
     },
     {
         "@timestamp": "2017-06-17T14:58:03.940Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -1232,7 +1155,6 @@
     },
     {
         "@timestamp": "2017-06-17T14:58:04.040Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",

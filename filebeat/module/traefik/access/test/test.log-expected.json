@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2017-10-02T20:22:07.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 2000000,
         "event.module": "traefik",
@@ -30,7 +29,6 @@
     },
     {
         "@timestamp": "2017-10-02T20:22:08.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 3000000,
         "event.module": "traefik",
@@ -66,7 +64,6 @@
     },
     {
         "@timestamp": "2018-02-28T17:30:33.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 247000000,
         "event.module": "traefik",
@@ -103,7 +100,6 @@
     },
     {
         "@timestamp": "2018-11-29T15:03:51.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 0,
         "event.module": "traefik",
@@ -131,7 +127,6 @@
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 13000000,
         "event.module": "traefik",
@@ -165,7 +160,6 @@
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 8000000,
         "event.module": "traefik",
@@ -199,7 +193,6 @@
     },
     {
         "@timestamp": "2000-10-10T20:55:36.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.module": "traefik",
         "fileset.name": "access",

@@ -13944,7 +13944,7 @@ Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or
 *`kubernetes.container.cpu.limit.cores`*::
 +
 --
-type: long
+type: float
 
 Container CPU cores limit
 
@@ -13954,7 +13954,7 @@ Container CPU cores limit
 *`kubernetes.container.cpu.request.cores`*::
 +
 --
-type: long
+type: float
 
 Container CPU requested cores
 
@@ -24564,6 +24564,35 @@ The average service time (in milliseconds) for I/O requests that were issued to 
 type: float
 
 Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
+
+
+--
+
+[float]
+== entropy fields
+
+Available system entropy
+
+
+
+*`system.entropy.available_bits`*::
++
+--
+type: long
+
+The available bits of entropy
+
+
+--
+
+*`system.entropy.pct`*::
++
+--
+type: scaled_float
+
+format: percent
+
+The percentage of available entropy, relative to the pool size of 4096
 
 
 --

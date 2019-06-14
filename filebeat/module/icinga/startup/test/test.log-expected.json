@@ -1,6 +1,5 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "icinga.startup",
         "event.module": "icinga",
         "fileset.name": "startup",
@@ -12,7 +11,6 @@
         "service.type": "icinga"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "icinga.startup",
         "event.module": "icinga",
         "fileset.name": "startup",

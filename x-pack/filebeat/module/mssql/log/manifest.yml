@@ -10,13 +10,6 @@ var:
       - c:\ProgramFiles\Microsoft SQL Server\MSSQL.1MSSQL\LOG\ERRORLOG*
     os.linux:
       - /var/opt/mssql/log/error*
-  - name: convert_timezone
-    default: true
-  # if ES < 6.1.0, this flag switches to false automatically when evaluating the
-  # pipeline
-    min_elasticsearch_version:
-      version: 6.1.0
-      value: false
 
 ingest_pipeline: ingest/pipeline.json
 input: config/config.yml
