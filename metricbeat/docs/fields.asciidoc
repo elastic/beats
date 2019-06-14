@@ -13403,6 +13403,19 @@ UUID version of the object
 --
 
 [float]
+== kubecontroller fields
+
+Kubernetes controller manager metrics
+
+
+
+[float]
+== TODO fields
+
+TODO
+
+
+[float]
 == node fields
 
 kubernetes node metrics

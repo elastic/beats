@@ -101,6 +101,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-event,event>>
 
+* <<metricbeat-metricset-kubernetes-kubecontroller,kubecontroller>>
+
 * <<metricbeat-metricset-kubernetes-node,node>>
 
 * <<metricbeat-metricset-kubernetes-pod,pod>>
@@ -126,6 +128,8 @@ include::kubernetes/apiserver.asciidoc[]
 include::kubernetes/container.asciidoc[]
 
 include::kubernetes/event.asciidoc[]
+
+include::kubernetes/kubecontroller.asciidoc[]
 
 include::kubernetes/node.asciidoc[]
 
