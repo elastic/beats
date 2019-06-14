@@ -21,9 +21,10 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/go-lookslike/lookslike"
 	"github.com/elastic/go-lookslike/lookslike/testslike"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
 )
