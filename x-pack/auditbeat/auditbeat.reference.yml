@@ -482,6 +482,11 @@ output.elasticsearch:
   # Proxy server URL
   #proxy_url: http://proxy:3128
 
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
+
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
   # dropped. The default is 3.
@@ -724,6 +729,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.

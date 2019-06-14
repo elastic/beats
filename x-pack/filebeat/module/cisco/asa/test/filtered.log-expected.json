@@ -2,11 +2,11 @@
     {
         "@timestamp": "2019-01-01T01:00:27.000Z",
         "cisco.asa.message_id": "999999",
-        "ecs.version": "1.0.0",
         "event.action": "firewall-rule",
         "event.dataset": "cisco.asa",
         "event.module": "cisco",
         "event.severity": 7,
+        "event.timezone": "+00:00",
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "debug",

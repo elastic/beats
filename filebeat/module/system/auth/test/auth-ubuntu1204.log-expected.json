@@ -1,8 +1,8 @@
 [
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -13,9 +13,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -29,9 +29,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -41,9 +41,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -53,9 +53,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -66,9 +66,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -82,9 +82,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -94,9 +94,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -106,9 +106,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -119,9 +119,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -135,9 +135,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -147,9 +147,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -159,9 +159,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -172,9 +172,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -188,9 +188,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -200,9 +200,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -212,9 +212,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -225,9 +225,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -241,9 +241,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -253,9 +253,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -265,9 +265,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -278,9 +278,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "input.type": "log",
         "log.offset": 3355,
@@ -290,9 +290,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -306,9 +306,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -318,9 +318,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -330,9 +330,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -343,9 +343,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -359,9 +359,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -371,9 +371,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -383,9 +383,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -396,9 +396,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -412,9 +412,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -424,9 +424,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -436,9 +436,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -449,9 +449,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -465,9 +465,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -477,9 +477,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -489,9 +489,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -502,9 +502,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -518,9 +518,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -530,9 +530,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -542,9 +542,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -555,9 +555,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -571,9 +571,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -583,9 +583,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -595,9 +595,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -608,9 +608,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -624,9 +624,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -636,9 +636,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -648,9 +648,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -661,9 +661,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -677,9 +677,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -689,9 +689,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -701,9 +701,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -714,9 +714,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -730,9 +730,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -742,9 +742,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -754,9 +754,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -767,9 +767,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -783,9 +783,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -795,9 +795,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -807,9 +807,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -823,9 +823,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -835,9 +835,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -847,9 +847,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -859,9 +859,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -872,9 +872,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -885,9 +885,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -901,9 +901,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -913,9 +913,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -925,9 +925,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -938,9 +938,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -954,9 +954,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -966,9 +966,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -978,9 +978,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -991,9 +991,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1007,9 +1007,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1019,9 +1019,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1031,9 +1031,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1044,9 +1044,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1060,9 +1060,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1072,9 +1072,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1084,9 +1084,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1097,9 +1097,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1113,9 +1113,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1125,9 +1125,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1137,9 +1137,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1150,9 +1150,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1166,9 +1166,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1178,9 +1178,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1190,9 +1190,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1203,9 +1203,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1219,9 +1219,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1231,9 +1231,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1243,9 +1243,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1256,9 +1256,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1272,9 +1272,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1284,9 +1284,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1296,9 +1296,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -1309,9 +1309,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",

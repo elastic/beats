@@ -20,7 +20,6 @@
 package fileset
 
 import (
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"runtime"
@@ -28,10 +27,8 @@ import (
 	"text/template"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
@@ -230,51 +227,6 @@ func TestGetPipelineNginx(t *testing.T) {
 	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipeline.id)
 	assert.Contains(t, pipeline.contents, "description")
 	assert.Contains(t, pipeline.contents, "processors")
-}
-
-func TestGetPipelineConvertTS(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("fileset", "modules"))
-
-	// load system/syslog
-	modulesPath, err := filepath.Abs("../module")
-	assert.NoError(t, err)
-	fs, err := New(modulesPath, "syslog", &ModuleConfig{Module: "system"}, &FilesetConfig{
-		Var: map[string]interface{}{
-			"convert_timezone": true,
-		},
-	})
-	assert.NoError(t, err)
-	assert.NoError(t, fs.Read("6.1.0"))
-
-	cases := map[string]struct {
-		Beat     string
-		Timezone bool
-	}{
-		"6.0.0": {Timezone: false},
-		"6.1.0": {Timezone: true},
-		"6.2.0": {Timezone: true},
-	}
-
-	for esVersion, cfg := range cases {
-		pipelineName := "filebeat-6.1.0-system-syslog-pipeline"
-
-		t.Run(fmt.Sprintf("es=%v", esVersion), func(t *testing.T) {
-			ver := common.MustNewVersion(esVersion)
-			pipelines, err := fs.GetPipelines(*ver)
-			require.NoError(t, err)
-
-			pipeline := pipelines[0]
-			assert.Equal(t, pipelineName, pipeline.id)
-
-			marshaled, err := json.Marshal(pipeline.contents)
-			require.NoError(t, err)
-			if cfg.Timezone {
-				assert.Contains(t, string(marshaled), "event.timezone")
-			} else {
-				assert.NotContains(t, string(marshaled), "event.timezone")
-			}
-		})
-	}
 }
 
 func TestGetTemplateFunctions(t *testing.T) {

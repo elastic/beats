@@ -17,11 +17,12 @@ class Test(AuditbeatXPackTest):
         host metricset collects general information about a server.
         """
 
-        fields = ["system.audit.host.id", "system.audit.host.uptime", "system.audit.host.ip",
+        fields = ["host.name", "host.architecture", "host.hostname", "host.id", "host.ip", "host.mac",
+                  "host.os.family", "host.os.kernel", "host.os.name", "host.os.platform", "host.os.version",
+                  "system.audit.host.id", "system.audit.host.uptime", "system.audit.host.ip",
                   "system.audit.host.os.name"]
 
-        # Metricset is beta and that generates a warning, TODO: remove later
-        self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
+        self.check_metricset("system", "host", COMMON_FIELDS + fields)
 
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
     @unittest.skipIf(sys.byteorder != "little", "Test only implemented for little-endian systems")
@@ -79,7 +80,7 @@ class Test(AuditbeatXPackTest):
         socket metricset collects information about open sockets on a system.
         """
 
-        fields = ["socket.entity_id", "destination.port"]
+        fields = ["socket.entity_id", "destination.port", "network.direction", "network.transport"]
 
         # errors_allowed=True - The socket metricset fills the `error` field if the process enrichment fails
         # (e.g. process has exited). This should not fail the test.

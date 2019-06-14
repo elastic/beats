@@ -46,8 +46,8 @@ func testFetch(t *testing.T, collect string) {
 		"node.collect": collect,
 	}
 
-	ms := mbtest.NewReportingMetricSetV2(t, config)
-	events, errors := mbtest.ReportingFetchV2(ms)
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errors := mbtest.ReportingFetchV2Error(ms)
 	if !assert.True(t, len(errors) == 0, "There shouldn't be errors") {
 		t.Log(errors)
 	}
@@ -76,11 +76,11 @@ func testFetch(t *testing.T, collect string) {
 	assert.EqualValues(t, 27352751800, reclaimed["bytes"])
 
 	io := event["io"].(common.MapStr)
-	file_handle := io["file_handle"].(common.MapStr)
-	open_attempt := file_handle["open_attempt"].(common.MapStr)
-	avg := open_attempt["avg"].(common.MapStr)
+	fileHandle := io["file_handle"].(common.MapStr)
+	openAttempt := fileHandle["open_attempt"].(common.MapStr)
+	avg := openAttempt["avg"].(common.MapStr)
 	assert.EqualValues(t, 0, avg["ms"])
-	assert.EqualValues(t, 597670, open_attempt["count"])
+	assert.EqualValues(t, 597670, openAttempt["count"])
 
 	read := io["read"].(common.MapStr)
 	avg = read["avg"].(common.MapStr)
@@ -122,10 +122,10 @@ func testFetch(t *testing.T, collect string) {
 	assert.EqualValues(t, 92, tx["count"])
 
 	msg := event["msg"].(common.MapStr)
-	store_read := msg["store_read"].(common.MapStr)
-	assert.EqualValues(t, 0, store_read["count"])
-	store_write := msg["store_write"].(common.MapStr)
-	assert.EqualValues(t, 0, store_write["count"])
+	storeRead := msg["store_read"].(common.MapStr)
+	assert.EqualValues(t, 0, storeRead["count"])
+	storeWrite := msg["store_write"].(common.MapStr)
+	assert.EqualValues(t, 0, storeWrite["count"])
 
 	assert.EqualValues(t, "rabbit@e2b1ae6390fd", event["name"])
 
@@ -137,8 +137,8 @@ func testFetch(t *testing.T, collect string) {
 
 	queue := event["queue"].(common.MapStr)
 	index := queue["index"].(common.MapStr)
-	journal_write := index["journal_write"].(common.MapStr)
-	assert.EqualValues(t, 448230, journal_write["count"])
+	journalWrite := index["journal_write"].(common.MapStr)
+	assert.EqualValues(t, 448230, journalWrite["count"])
 	read = index["read"].(common.MapStr)
 	assert.EqualValues(t, 0, read["count"])
 	write = index["write"].(common.MapStr)
