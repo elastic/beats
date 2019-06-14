@@ -30,7 +30,7 @@ import (
 	"github.com/magefile/mage/sh"
 
 	"github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	mbmage "github.com/elastic/beats/metricbeat/scripts/mage"
 )
 
 func init() {
@@ -77,9 +77,9 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatOSSPackaging()
-	metricbeat.CustomizePackaging()
+	mbmage.CustomizePackaging()
 
-	mg.Deps(Update, metricbeat.PrepareModulePackagingOSS)
+	mg.Deps(Update, mbmage.PrepareModulePackagingOSS)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
@@ -96,7 +96,7 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(metricbeat.ConfigOSS, metricbeat.GenerateDirModulesD)
+	mg.Deps(mbmage.ConfigOSS, mbmage.GenerateDirModulesD)
 }
 
 // Update updates the generated files (aka make update).
@@ -105,7 +105,7 @@ func Update() error {
 	// - Generate docs/fields.asciidoc
 	/*
 		mg.SerialDeps(Fields, Dashboards, Config,
-			metricbeat.PrepareModulePackagingOSS,
+			mbmage.PrepareModulePackagingOSS,
 			mage.GenerateModuleIncludeListGo)
 	*/
 	return sh.Run("make", "update")

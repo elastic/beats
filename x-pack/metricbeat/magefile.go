@@ -14,7 +14,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	"github.com/elastic/beats/dev-tools/mage"
-	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+	mbmage "github.com/elastic/beats/metricbeat/scripts/mage"
 )
 
 func init() {
@@ -62,10 +62,10 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	mage.UseElasticBeatXPackPackaging()
-	metricbeat.CustomizePackaging()
+	mbmage.CustomizePackaging()
 	mage.PackageKibanaDashboardsFromBuildDir()
 
-	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
+	mg.Deps(Update, mbmage.PrepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
@@ -96,13 +96,13 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(metricbeat.ConfigXPack, metricbeat.GenerateDirModulesD)
+	mg.Deps(mbmage.ConfigXPack, mbmage.GenerateDirModulesD)
 }
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
 	mg.SerialDeps(Fields, Dashboards, Config,
-		metricbeat.PrepareModulePackagingXPack,
+		mbmage.PrepareModulePackagingXPack,
 		mage.GenerateModuleIncludeListGo)
 }
 
