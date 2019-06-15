@@ -246,6 +246,8 @@ in the _Beats Platform Reference_.
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
 
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+
 *win:*
 
 ["source","sh",subs="attributes"]
