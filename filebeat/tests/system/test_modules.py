@@ -235,11 +235,15 @@ def clean_keys(obj):
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
-    # Remove timestamp for comparison where timestamp is not part of the log line
+    # Most logs from syslog need their timestamp removed because it doesn't
+    # include a year.
     if obj["event.dataset"] in remove_timestamp:
         if not (obj['event.dataset'], filename) in remove_timestamp_exception:
             delete_key(obj, "@timestamp")
         else:
+            # excluded events need to have their filename saved to the expected.json
+            # so that the exception mechanism can be triggered when the json is
+            # loaded.
             obj["log.file.path"] = filename
 
 
