@@ -46,7 +46,7 @@ possible. For example `system.memory.total.bytes` or `system.diskio.read.count`:
 [options="header"]
 |=======================
 |Suffix     |Units
-|count      |number of items
+|count      |item count
 |pct        |percentage
 |day        |days
 |sec        |seconds
