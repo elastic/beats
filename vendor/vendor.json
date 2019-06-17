@@ -899,48 +899,6 @@
 			"versionExact": "v0.4.0"
 		},
 		{
-			"checksumSHA1": "MoaRUe93GE1OgLan2X3MeBUupks=",
-			"path": "github.com/elastic/go-lookslike",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z"
-		},
-		{
-			"checksumSHA1": "dTShai62DYGnT6ZF+S2T7l0lnq0=",
-			"path": "github.com/elastic/go-lookslike/internal/llreflect",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z"
-		},
-		{
-			"checksumSHA1": "PuOdI3WC3N5DrpG+kx6Sm9VL2BA=",
-			"path": "github.com/elastic/go-lookslike/isdef",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z"
-		},
-		{
-			"checksumSHA1": "1KwOC12nhB4dn2qQraLMaBST6aI=",
-			"path": "github.com/elastic/go-lookslike/llpath",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z"
-		},
-		{
-			"checksumSHA1": "trXIj1e3qQ2OFKd3CjHcZww1jxI=",
-			"path": "github.com/elastic/go-lookslike/llresult",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z"
-		},
-		{
-			"checksumSHA1": "BygJH0YnqV1EjcJoF9y0B2cYq5Q=",
-			"path": "github.com/elastic/go-lookslike/testslike",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z"
-		},
-		{
-			"checksumSHA1": "1tsI2t0GZS0hmjKwER0ZI8dPFew=",
-			"path": "github.com/elastic/go-lookslike/validator",
-			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
-			"revisionTime": "2019-06-17T15:05:19Z"
-		},
-		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
 			"path": "github.com/elastic/go-lumber/client/v2",
 			"revision": "616041e345fc33c97bc0eb0fa6b388aa07bca3e1",
