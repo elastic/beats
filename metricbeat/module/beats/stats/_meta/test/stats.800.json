@@ -1,0 +1,155 @@
+{
+  "beat": {
+    "cpu": {
+      "system": {
+        "ticks": 95,
+        "time": {
+          "ms": 95
+        }
+      },
+      "total": {
+        "ticks": 458,
+        "time": {
+          "ms": 458
+        },
+        "value": 458
+      },
+      "user": {
+        "ticks": 363,
+        "time": {
+          "ms": 363
+        }
+      }
+    },
+    "info": {
+      "ephemeral_id": "f32e9a62-56c2-4cde-87be-de5869b2d7b7",
+      "uptime": {
+        "ms": 21557
+      }
+    },
+    "memstats": {
+      "gc_next": 10723216,
+      "memory_alloc": 6145008,
+      "memory_total": 360839144,
+      "rss": 44339200
+    },
+    "runtime": {
+      "goroutines": 40
+    }
+  },
+  "libbeat": {
+    "config": {
+      "module": {
+        "running": 0,
+        "starts": 0,
+        "stops": 0
+      },
+      "reloads": 1
+    },
+    "output": {
+      "events": {
+        "acked": 0,
+        "active": 0,
+        "batches": 0,
+        "dropped": 0,
+        "duplicates": 0,
+        "failed": 0,
+        "toomany": 0,
+        "total": 0
+      },
+      "read": {
+        "bytes": 0,
+        "errors": 0
+      },
+      "type": "elasticsearch",
+      "write": {
+        "bytes": 0,
+        "errors": 0
+      }
+    },
+    "pipeline": {
+      "clients": 3,
+      "events": {
+        "active": 37,
+        "dropped": 0,
+        "failed": 0,
+        "filtered": 1,
+        "published": 37,
+        "retry": 69,
+        "total": 38
+      },
+      "queue": {
+        "acked": 0
+      }
+    }
+  },
+  "metricbeat": {
+    "system": {
+      "cpu": {
+        "events": 2,
+        "failures": 0,
+        "success": 2
+      },
+      "filesystem": {
+        "events": 7,
+        "failures": 0,
+        "success": 7
+      },
+      "fsstat": {
+        "events": 1,
+        "failures": 0,
+        "success": 1
+      },
+      "load": {
+        "events": 3,
+        "failures": 0,
+        "success": 3
+      },
+      "memory": {
+        "events": 3,
+        "failures": 0,
+        "success": 3
+      },
+      "network": {
+        "events": 0,
+        "failures": 0,
+        "success": 0
+      },
+      "process": {
+        "events": 17,
+        "failures": 0,
+        "success": 17
+      },
+      "process_summary": {
+        "events": 2,
+        "failures": 0,
+        "success": 2
+      },
+      "socket_summary": {
+        "events": 2,
+        "failures": 0,
+        "success": 2
+      },
+      "uptime": {
+        "events": 1,
+        "failures": 0,
+        "success": 1
+      }
+    }
+  },
+  "system": {
+    "cpu": {
+      "cores": 8
+    },
+    "load": {
+      "1": 1.6753,
+      "15": 1.8076,
+      "5": 1.8257,
+      "norm": {
+        "1": 0.2094,
+        "15": 0.226,
+        "5": 0.2282
+      }
+    }
+  }
+}
