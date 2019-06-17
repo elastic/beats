@@ -3,6 +3,320 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.2.0]]
+=== Beats version 7.2.0
+https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Update to Golang 1.12.4. {pull}11782[11782]
+
+*Auditbeat*
+
+- Auditd module: Normalized value of `event.category` field from `user-login` to `authentication`. {pull}11432[11432]
+- Auditd module: Unset `auditd.session` and `user.audit.id` fields are removed from audit events. {issue}11431[11431] {pull}11815[11815]
+- Socket dataset: Exclude localhost by default {pull}11993[11993]
+
+*Filebeat*
+
+- Add read_buffer configuration option. {pull}11739[11739]
+
+*Heartbeat*
+
+- Removed the `add_host_metadata` and `add_cloud_metadata` processors from the default config. These don't fit well with ECS for Heartbeat and were rarely used.
+
+*Journalbeat*
+
+*Metricbeat*
+
+- Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
+- system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
+
+*Packetbeat*
+
+- Add support for mongodb opcode 2013 (OP_MSG). {issue}6191[6191] {pull}8594[8594]
+- NFSv4: Always use opname `ILLEGAL` when failed to match request to a valid nfs operation. {pull}11503[11503]
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Ensure all beat commands respect configured settings. {pull}10721[10721]
+- Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
+- decode_json_field: process objects and arrays only {pull}11312[11312]
+- decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
+- Report faulting file when config reload fails. {pull}11304[11304]
+- Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
+- Management configuration backup file will now have a timestamps in their name. {pull}11034[11034]
+- [CM] Parse enrollment_token response correctly {pull}11648[11648]
+- Not hiding error in case of http failure using elastic fetcher {pull}11604[11604]
+- Escape BOM on JsonReader before trying to decode line {pull}11661[11661]
+- Fix matching of string arrays in contains condition. {pull}11691[11691]
+- Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
+- Fix queue.spool.write.flush.events config type. {pull}12080[12080]
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+- Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
+- Fixed Beat ID being reported by GET / API. {pull}12180[12180]
+- Add host.os.codename to fields.yml. {pull}12261[12261]
+- Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
+  processor (or by any code utilizing `PutValue()` on a `beat.Event`).
+
+*Auditbeat*
+
+- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
+- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
+- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
+- Fix formatting of config files on macOS and Windows. {pull}12148[12148]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Package dataset: Auto-detect package directories. {pull}12289[12289]
+- System module: Start system module without host ID. {pull}12373[12373]
+
+*Filebeat*
+
+- Add support for Cisco syslog format used by their switch. {pull}10760[10760]
+- Cover empty request data, url and version in Apache2 module{pull}10730[10730]
+- Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
+- Improve detection of file deletion on Windows. {pull}10747[10747]
+- Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
+- Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
+- Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
+- Fix timezone offset parsing in system/syslog. {pull}12529[12529]
+
+*Heartbeat*
+
+- Fix NPEs / resource leaks when executing config checks. {pull}11165[11165]
+- Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
+
+*Journalbeat*
+
+- Use backoff when no new events are found. {pull}11861[11861]
+
+*Metricbeat*
+
+- Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
+- Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
+- Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Check permissions in system socket metricset based on capabilities. {pull}12039[12039]
+- Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
+- Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
+- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
+
+*Packetbeat*
+
+- Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
+- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
+- Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
+
+*Winlogbeat*
+
+*Functionbeat*
+
+- Fix function name reference for Kinesis streams in CloudFormation templates {pull}11646[11646]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add an option to append to existing logs rather than always rotate on start. {pull}11953[11953]
+- Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
+- Add if/then/else support to processors. {pull}10744[10744]
+- Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
+- Add output test to kafka output {pull}10834[10834]
+- Gracefully shut down on SIGHUP {pull}10704[10704]
+- New processor: `copy_fields`. {pull}11303[11303]
+- Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
+- New processor: `truncate_fields`. {pull}11297[11297]
+- Allow a beat to ship monitoring data directly to an Elasticsearch monitoring clsuter. {pull}9260[9260]
+- Updated go-seccomp-bpf library to v1.1.0 which updates syscall lists for Linux v5.0. {pull}NNNN[NNNN]
+- Add `add_observer_metadata` processor. {pull}11394[11394]
+- Add `decode_csv_fields` processor. {pull}11753[11753]
+- Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
+- New `extract_array` processor. {pull}11761[11761]
+- Add number of goroutines to reported metrics. {pull}12135[12135]
+
+*Auditbeat*
+
+- Auditd module: Add `event.outcome` and `event.type` for ECS. {pull}11432[11432]
+- Process: Add file hash of process executable. {pull}11722[11722]
+- Socket: Add network.transport and network.community_id. {pull}12231[12231]
+- Host: Fill top-level host fields. {pull}12259[12259]
+
+*Filebeat*
+
+- Add more info to message logged when a duplicated symlink file is found {pull}10845[10845]
+- Add option to configure docker input with paths {pull}10687[10687]
+- Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
+- Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
+- Allow custom default settings with autodiscover (for example, use of CRI paths for logs). {pull}12193[12193]
+- Allow to disable hints based autodiscover default behavior (fetching all logs). {pull}12193[12193]
+- Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
+- Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
+- New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
+- New module for Cisco ASA logs. {issue}9200[9200] {pull}11171[11171]
+- Added support for Cisco ASA fields to the netflow input. {pull}11201[11201]
+- Configurable line terminator. {pull}11015[11015]
+- Add Filebeat envoyproxy module. {pull}11700[11700]
+- Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
+- Add support to new MongoDB additional diagnostic information {pull}11952[11952]
+- New module `panw` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
+- Add RabbitMQ module. {pull}12032[12032]
+- Add new `container` input. {pull}12162[12162]
+
+*Heartbeat*
+
+- Enable `add_observer_metadata` processor in default config. {pull}11394[11394]
+
+*Journalbeat*
+
+*Metricbeat*
+
+- Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
+- Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
+- Add s3_daily_storage metricset. {pull}10940[10940] {issue}10055[10055]
+- Add `coredns` metricbeat module. {pull}10585[10585]
+- Add SSL support for Metricbeat HTTP server. {pull}11482[11482] {issue}11457[11457]
+- The `elasticsearch.index` metricset (with `xpack.enabled: true`) now collects `refresh.external_total_time_in_millis` fields from Elasticsearch. {pull}11616[11616]
+- Allow module configurations to have variants {pull}9118[9118]
+- Add `timeseries.instance` field calculation. {pull}10293[10293]
+- Added new disk states and raid level to the system/raid metricset. {pull}11613[11613]
+- Added `path_name` and `start_name` to service metricset on windows module {issue}8364[8364] {pull}11877[11877]
+- Add check on object name in the counter path if the instance name is missing {issue}6528[6528] {pull}11878[11878]
+- Add AWS cloudwatch metricset. {pull}11798[11798] {issue}11734[11734]
+- Add `regions` in aws module config to specify target regions for querying cloudwatch metrics. {issue}11932[11932] {pull}11956[11956]
+- Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
+- Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
+
+*Packetbeat*
+
+*Functionbeat*
+
+- New options to configure roles and VPC. {pull}11779[11779]
+
+*Winlogbeat*
+
+- Add support for reading from .evtx files. {issue}4450[4450]
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+- `docker` input is deprecated in favour `container`. {pull}12162[12162]
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+[[release-notes-7.1.1]]
+=== Beats version 7.1.1
+https://github.com/elastic/beats/compare/v7.1.0...v7.1.1[View commits]
+
+No changes in this release.
+
+[[release-notes-7.1.0]]
+=== Beats version 7.1.0
+https://github.com/elastic/beats/compare/v7.0.0...v7.1.0[View commits]
+
+* Updates to support changes to licensing of security features.
++
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and
+role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
+
+[[release-notes-7.0.1]]
+=== Beats version 7.0.1
+https://github.com/elastic/beats/compare/v7.0.0...v7.0.1[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
+- Fix initialization of the TCP input logger. {pull}11605[11605]
+
+*Auditbeat*
+
+- Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+
+*Heartbeat*
+
+- Fix NPE on some monitor configuration errors. {pull}11910[11910]
+
+*Metricbeat*
+
+- Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
+
+==== Added
+
+*Auditbeat*
+
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+
+==== Deprecated
+
+*Metricbeat*
+
+- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
+
+include::libbeat/docs/release-notes/7.0.0.asciidoc[]
+
+[[release-notes-7.0.0-ga]]
+=== Beats version 7.0.0-GA
+https://github.com/elastic/beats/compare/v7.0.0-rc2...v7.0.0[View commits]
+
+The list below covers the changes between 7.0.0-rc2 and 7.0.0 GA only.
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Fix ILM policy always being overwritten. {pull}11671[11671]
+- Fix template always being overwritten. {pull}11671[11671]
+
+*Auditbeat*
+
+- Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+
+*Filebeat*
+
+- Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
+
 [[release-notes-7.0.0-rc2]]
 === Beats version 7.0.0-rc2
 https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD diff]
@@ -24,10 +338,19 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD 
 
 - Fixed OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
 
+*Auditbeat*
+
+- Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
+
 *Filebeat*
 
 - Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 - Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543] {pull}11549[11549]
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
+
+*Metricbeat*
+
+- Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
 
 ==== Added
 
@@ -486,7 +809,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the 
 
 - Mark Functionbeat  as GA. {pull}10564[10564]
 
-
 [[release-notes-7.0.0-alpha2]]
 === Beats version 7.0.0-alpha2
 https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the HEAD diff]
@@ -723,6 +1045,49 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Add support to decode HTTP bodies compressed with `gzip` and `deflate`. {pull}7915[7915]
 - Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 - Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
+
+[[release-notes-6.8.0]]
+=== Beats version 6.8.0
+
+* Updates to support changes to licensing of security features.
++
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and 
+role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
+
+[[release-notes-6.7.2]]
+=== Beats version 6.7.2
+https://github.com/elastic/beats/compare/v6.7.1...v6.7.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Fix OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
+- Fix false positives reported in the `host.containerized` field added by `add_host_metadata`. {pull}11494[11494]
+- Fix the add_host_metadata's `host.id` field on older Linux versions. {pull}11494[11494]
+
+*Auditbeat*
+
+- Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
+- Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+
+*Filebeat*
+
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
+- Fix initialization of the TCP input logger. {pull}11605[11605]
+
+*Metricbeat*
+
+- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
+
+==== Added
+
+*Auditbeat*
+
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
 
 [[release-notes-6.7.1]]
 === Beats version 6.7.1
