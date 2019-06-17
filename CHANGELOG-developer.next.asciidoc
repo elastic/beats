@@ -14,7 +14,7 @@ Note: This changelog documents the current changes which are not yet present in
 an actual release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.8.0..6.8[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.8.1..6.8[Check the HEAD diff]
 
 ==== Breaking changes
 
