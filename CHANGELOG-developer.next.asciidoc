@@ -31,8 +31,6 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
 - Support for Logger in the Metricset base instance. {pull}11106[11106]
 - Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
-- Added support for using PYTHON_EXE to control what Python interpreter is used
-  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]
 - Prometheus helper for metricbeat contains now `Namespace` field for `prometheus.MetricsMappings` {pull}11424[11424]
 - Update Jinja2 version to 2.10.1. {pull}11817[11817]
 - Reduce idxmgmt.Supporter interface and rework export commands to reuse logic. {pull}11777[11777],{pull}12065[12065],{pull}12067[12067],{pull}12160[12160]
