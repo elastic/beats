@@ -27,5 +27,19 @@
         "message": "constraint_0_power_limit_uw exceeded.",
         "process.name": "thermald",
         "service.type": "system"
+    },
+    {
+        "@timestamp": "2019-06-14T10:40:20.912Z",
+        "event.dataset": "system.syslog",
+        "event.module": "system",
+        "event.timezone": "+00:00",
+        "fileset.name": "syslog",
+        "host.hostname": "localhost",
+        "input.type": "log",
+        "log.file.path": "tz-offset.log",
+        "log.offset": 184,
+        "message": "pam_unix(sudo-i:session): session opened for user root by userauth3(uid=0)",
+        "process.name": "sudo",
+        "service.type": "system"
     }
 ]

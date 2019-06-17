@@ -225,6 +225,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
 - Add MSSQL module {pull}12079[12079]
+- Add full ISO8601 date parsing support for system/syslog module. {pull}12568[12568]
 
 *Heartbeat*
 
