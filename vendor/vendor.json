@@ -899,10 +899,10 @@
 			"versionExact": "v0.4.0"
 		},
 		{
-			"checksumSHA1": "LHbwLv9gnMXaRzDVxTo/lVTjfCQ=",
+			"checksumSHA1": "y6K+55aJkUzWwYw6RngnekLqy04=",
 			"path": "github.com/elastic/go-lookslike/lookslike",
-			"revision": "a630971388aa1737fee1f6f65e6daf949801632c",
-			"revisionTime": "2019-06-13T19:15:53Z"
+			"revision": "81cc31cd798e42be7e5a95e9a72b46cd5e2a7a42",
+			"revisionTime": "2019-06-14T16:21:56Z"
 		},
 		{
 			"checksumSHA1": "90DDPd9eV+64lnnTJted5hmDdcQ=",
