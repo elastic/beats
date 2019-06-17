@@ -27,7 +27,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the H
 - Add (*common.Config).Has and (*common.Config).Remove. {pull}10363[10363]
 - Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]
 - Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]
-- Add helper to get configurations from hints {pull}10952[10952]
 
 === Beats version 7.0.0-alpha2
 https://github.com/elastic/beats/compare/v6.3.0..v7.0.0-alpha2[Check the HEAD diff]
