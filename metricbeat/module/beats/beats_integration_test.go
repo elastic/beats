@@ -20,13 +20,15 @@
 package beats_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/metricbeat/module/beats/node"
+	"github.com/elastic/beats/metricbeat/module/beats"
+	_ "github.com/elastic/beats/metricbeat/module/beats/stats"
 )
 
 var metricSets = []string{
@@ -34,7 +36,7 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "metricbeat")
+	compose.EnsureUp(t, "beats")
 
 	for _, metricSet := range metricSets {
 		f := mbtest.NewReportingMetricSetV2Error(t, beats.GetConfig(metricSet))
@@ -51,14 +53,40 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "metricbeat")
+	compose.EnsureUp(t, "beats")
 
 	for _, metricSet := range metricSets {
-		config := beats.GetConfig(metricSet)
+		config := getConfig(metricSet)
 		f := mbtest.NewReportingMetricSetV2Error(t, config)
 		err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 		if err != nil {
 			t.Fatal("write", err)
 		}
 	}
+}
+
+func getConfig(metricset string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     beats.ModuleName,
+		"metricsets": []string{metricset},
+		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+	}
+}
+
+func getEnvHost() string {
+	host := os.Getenv("BEATS_HOST")
+
+	if len(host) == 0 {
+		host = "127.0.0.1"
+	}
+	return host
+}
+
+func getEnvPort() string {
+	port := os.Getenv("BEATS_PORT")
+
+	if len(port) == 0 {
+		port = "5066"
+	}
+	return port
 }
