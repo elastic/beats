@@ -27,10 +27,10 @@
                 }
             },
             "runtime": {
-                "goroutines": 39
+                "goroutines": 64
             },
             "uptime": {
-                "ms": 207906
+                "ms": 1631
             }
         },
         "type": "metricbeat"
