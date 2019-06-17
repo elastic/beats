@@ -40,6 +40,9 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 - Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
+- Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
+- Fix timezone offset parsing in system/syslog. {pull}12529[12529]
+- When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 
 *Heartbeat*
 
@@ -52,6 +55,8 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 - Change some field type from scaled_float to long in aws module. {pull}11982[11982]
 - Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
+- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
+- When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 
 *Packetbeat*
 
