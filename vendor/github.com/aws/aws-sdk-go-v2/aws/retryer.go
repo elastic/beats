@@ -37,7 +37,6 @@ var throttleCodes = map[string]struct{}{
 	"ThrottlingException":                    {},
 	"RequestLimitExceeded":                   {},
 	"RequestThrottled":                       {},
-	"RequestThrottledException":              {},
 	"TooManyRequestsException":               {}, // Lambda functions
 	"PriorRequestNotComplete":                {}, // Route53
 }

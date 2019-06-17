@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -82,7 +81,7 @@ type Waiter struct {
 
 	RequestOptions   []Option
 	NewRequest       func([]Option) (*Request, error)
-	SleepWithContext func(context.Context, time.Duration) error
+	SleepWithContext func(Context, time.Duration) error
 }
 
 // ApplyOptions updates the waiter with the list of waiter options provided.
@@ -152,14 +151,14 @@ func (m WaiterMatchMode) String() string {
 	}
 }
 
-// Wait will make requests for the API operation using NewRequest to
+// WaitWithContext will make requests for the API operation using NewRequest to
 // build API requests. The request's response will be compared against the
 // Waiter's Acceptors to determine the successful state of the resource the
 // waiter is inspecting.
 //
 // The passed in context must not be nil. If it is nil a panic will occur. The
 // Context will be used to cancel the waiter's pending requests and retry delays.
-// Use context.Background or context.TODO if no context is available.
+// Use BackgroundContext if no context is available.
 //
 // The waiter will continue until the target state defined by the Acceptors,
 // or the max attempts expires.
@@ -167,7 +166,8 @@ func (m WaiterMatchMode) String() string {
 // Will return the WaiterResourceNotReadyErrorCode error code if the waiter's
 // retryer ShouldRetry returns false. This normally will happen when the max
 // wait attempts expires.
-func (w Waiter) Wait(ctx context.Context) error {
+func (w Waiter) WaitWithContext(ctx Context) error {
+
 	for attempt := 1; ; attempt++ {
 		req, err := w.NewRequest(w.RequestOptions)
 		if err != nil {

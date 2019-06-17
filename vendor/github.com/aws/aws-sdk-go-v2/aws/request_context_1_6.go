@@ -1,4 +1,4 @@
-// +build go1.7
+// +build !go1.7
 
 package aws
 
@@ -8,5 +8,5 @@ package aws
 // Creates shallow copy of the http.Request with the WithContext method.
 func setRequestContext(r *Request, ctx Context) {
 	r.context = ctx
-	r.HTTPRequest = r.HTTPRequest.WithContext(ctx)
+	r.HTTPRequest.Cancel = ctx.Done()
 }
