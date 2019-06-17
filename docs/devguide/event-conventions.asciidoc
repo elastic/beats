@@ -41,7 +41,7 @@ workers.idle
 ==== Units
 
 These are well-known suffixes to represent units of stored values, use them as a dotted suffix when
-possible. For example `system.memory.total.bytes` or `system.diskio.read.count`:
+possible. For example `system.memory.used.bytes` or `system.diskio.read.count`:
 
 [options="header"]
 |=======================
