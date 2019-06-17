@@ -90,7 +90,7 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages()
+	return devtools.TestPackages(devtools.WithRootUserContainer())
 }
 
 // Update is an alias for running fields, dashboards, config, includes.
