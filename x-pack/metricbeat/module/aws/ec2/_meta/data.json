@@ -3,12 +3,8 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 144,
-                "credit_usage": 0.005318,
-                "surplus_credit_balance": 0,
-                "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.133333333333212
+                    "pct": 0.7000000000116418
                 }
             },
             "diskio": {
@@ -26,33 +22,32 @@
                     "count": 1
                 },
                 "image": {
-                    "id": "ami-05b3bcf7f311194b3"
+                    "id": "ami-62d35c02"
                 },
                 "monitoring": {
-                    "state": "disabled"
+                    "state": "enabled"
                 },
                 "private": {
-                    "dns_name": "ip-172-31-10-23.ap-southeast-1.compute.internal",
-                    "ip": "172.31.10.23"
+                    "dns_name": "ip-10-240-32-59.us-west-2.compute.internal",
+                    "ip": "10.240.32.59"
                 },
                 "public": {
-                    "dns_name": "ec2-18-136-198-93.ap-southeast-1.compute.amazonaws.com",
-                    "ip": "18.136.198.93"
+                    "dns_name": ""
                 },
                 "state": {
                     "code": 16,
                     "name": "running"
                 },
-                "threads_per_core": 1
+                "threads_per_core": 2
             },
             "network": {
                 "in": {
-                    "bytes": 583,
-                    "packets": 4.8
+                    "bytes": 16598.6,
+                    "packets": 127.8
                 },
                 "out": {
-                    "bytes": 746.4,
-                    "packets": 5
+                    "bytes": 29934.4,
+                    "packets": 225.4
                 }
             },
             "status": {
@@ -60,18 +55,22 @@
                 "check_failed_instance": 0,
                 "check_failed_system": 0
             }
+        },
+        "tags": {
+            "Name": "service-node",
+            "aws:autoscaling:groupName": "service-asg"
         }
     },
     "cloud": {
-        "availability_zone": "ap-southeast-1b",
+        "availability_zone": "us-west-2b",
         "instance": {
-            "id": "i-0c68eeb552231a8d0"
+            "id": "i-05cb8b44489d276f4"
         },
         "machine": {
-            "type": "t2.micro"
+            "type": "c4.large"
         },
         "provider": "aws",
-        "region": "ap-southeast-1"
+        "region": "us-west-2"
     },
     "event": {
         "dataset": "aws.ec2",
