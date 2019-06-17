@@ -47,6 +47,7 @@ class Test(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_xpack(self):
         """
         kibana-xpack module tests
