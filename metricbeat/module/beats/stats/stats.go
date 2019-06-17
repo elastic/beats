@@ -18,8 +18,6 @@
 package stats
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/beats"
@@ -60,7 +58,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		fmt.Println("here")
 		return err
 	}
 

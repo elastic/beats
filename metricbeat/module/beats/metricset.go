@@ -18,8 +18,6 @@
 package beats
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -44,15 +42,11 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	fmt.Println("uri: ", http.GetURI())
-
 	ms := &MetricSet{
 		base,
 		http,
 		config.XPackEnabled,
 	}
-
-	fmt.Println("uri 2: ", http.GetURI())
 
 	return ms, nil
 }
