@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -33,26 +33,9 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
-
 *Auditbeat*
 
-- Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
-- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
-- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
-- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
-- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
-- Package dataset: Auto-detect package directories. {pull}12289[12289]
-- System module: Start system module without host ID. {pull}12373[12373]
-
 *Filebeat*
-
-- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
-- Fix initialization of the TCP input logger. {pull}11605[11605]
-- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
-- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
-- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
-- Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
 
 *Heartbeat*
 
@@ -60,18 +43,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Metricbeat*
 
-- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
-- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
-- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
-- Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
-- Require certificate authorities, certificate file, and key when SSL is enabled for module http metricset server. {pull}12355[12355]
-- In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12353[12353]
-- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
-
 *Packetbeat*
-
-- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
-- Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
 
 *Winlogbeat*
 
@@ -83,8 +55,6 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 
 *Auditbeat*
 
-- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
-
 *Filebeat*
 
 *Heartbeat*
@@ -92,8 +62,6 @@ https://github.com/elastic/beats/compare/v6.7.2...6.8[Check the HEAD diff]
 *Journalbeat*
 
 *Metricbeat*
-
-- Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
 
 *Packetbeat*
 
