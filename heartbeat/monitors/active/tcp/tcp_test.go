@@ -28,12 +28,12 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/go-lookslike/lookslike/isdef"
+	"github.com/elastic/go-lookslike/isdef"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike/lookslike"
-	"github.com/elastic/go-lookslike/lookslike/testslike"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"

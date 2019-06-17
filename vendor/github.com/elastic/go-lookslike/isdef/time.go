@@ -3,8 +3,8 @@ package isdef
 import (
 	"time"
 
-	"github.com/elastic/go-lookslike/lookslike/llpath"
-	"github.com/elastic/go-lookslike/lookslike/llresult"
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
 )
 
 // IsEqualToTime ensures that the actual value is the given time, regardless of zone.

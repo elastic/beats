@@ -30,12 +30,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/go-lookslike/lookslike/isdef"
-	"github.com/elastic/go-lookslike/lookslike/validator"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/go-lookslike/lookslike"
 
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/common/x509util"

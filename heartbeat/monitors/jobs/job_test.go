@@ -22,12 +22,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike/lookslike"
-	"github.com/elastic/go-lookslike/lookslike/testslike"
-
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
 )
 
 func TestWrapAll(t *testing.T) {

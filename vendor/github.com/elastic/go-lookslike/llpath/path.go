@@ -19,7 +19,7 @@ package llpath
 
 import (
 	"fmt"
-	"github.com/elastic/go-lookslike/lookslike/internal/llreflect"
+	"github.com/elastic/go-lookslike/internal/llreflect"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -118,6 +118,14 @@ func (p Path) Last() *PathComponent {
 
 // GetFrom takes a map and fetches the given Path from it.
 func (p Path) GetFrom(m interface{}) (value interface{}, exists bool) {
+	// nil values are handled specially. If we're fetching from a nil
+	// there's one case where it exists, when comparing it to another nil.
+	if m == nil {
+		// since another nil would be scalar, we just check that the
+		// path length is 0.
+		return nil, len(p) == 0
+	}
+
 	value = m
 	exists = true
 	for _, pc := range p {
@@ -163,6 +171,12 @@ func (ps InvalidPathString) Error() string {
 // ParsePath parses a Path of form key.[0].otherKey.[1] into a Path object.
 func ParsePath(in string) (p Path, err error) {
 	keyParts := strings.Split(in, ".")
+
+	// We return empty paths for empty strings
+	// Empty paths are valid when working with scalar values
+	if in == "" {
+		return Path{}, nil
+	}
 
 	p = make(Path, len(keyParts))
 	for idx, part := range keyParts {

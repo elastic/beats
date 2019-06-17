@@ -23,12 +23,12 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/go-lookslike/lookslike/isdef"
-	"github.com/elastic/go-lookslike/lookslike/validator"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike/lookslike"
+	"github.com/elastic/go-lookslike"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/hbtest"

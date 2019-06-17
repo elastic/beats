@@ -20,7 +20,7 @@ package llresult
 import (
 	"fmt"
 
-	"github.com/elastic/go-lookslike/lookslike/llpath"
+	"github.com/elastic/go-lookslike/llpath"
 )
 
 // Results the results of executing a schema.

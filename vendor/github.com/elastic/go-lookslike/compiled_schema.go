@@ -15,33 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package testslike
+package lookslike
 
 import (
-	"testing"
-
-	"github.com/elastic/go-lookslike/lookslike/llresult"
-	"github.com/elastic/go-lookslike/lookslike/validator"
-
-	"github.com/davecgh/go-spew/spew"
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
 )
 
-// Test takes the output from a validator.Validator invocation and runs test assertions on the result.
-// If you are using this library for testing you will probably want to run Test(t, Compile(map[string]interface{}{...}), actual) as a pattern.
-func Test(t *testing.T, validator validator.Validator, value interface{}) *llresult.Results {
-	r := validator(value)
+type flatValidator struct {
+	path  llpath.Path
+	isDef isdef.IsDef
+}
 
-	if !r.Valid {
-		assert.Fail(
-			t,
-			"lookslike could not validate map",
-			"%d errors validating source: \n%s", len(r.Errors()), spew.Sdump(value),
-		)
+// CompiledSchema represents a compiled definition for driving a validator.Validator.
+type CompiledSchema []flatValidator
+
+// Check executes the the checks within the CompiledSchema
+func (cs CompiledSchema) Check(actual interface{}) *llresult.Results {
+	res := llresult.NewResults()
+	for _, pv := range cs {
+		actualV, actualKeyExists := pv.path.GetFrom(actual)
+
+		if !pv.isDef.Optional || pv.isDef.Optional && actualKeyExists {
+			var checkRes *llresult.Results
+			checkRes = pv.isDef.Check(pv.path, actualV, actualKeyExists)
+			res.Merge(checkRes)
+		}
 	}
 
-	for _, err := range r.Errors() {
-		assert.NoError(t, err)
-	}
-	return r
+	return res
 }

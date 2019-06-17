@@ -17,7 +17,7 @@
 
 package llresult
 
-import "github.com/elastic/go-lookslike/lookslike/llpath"
+import "github.com/elastic/go-lookslike/llpath"
 
 // ValidResult is a convenience value for Valid results.
 func ValidResult(p llpath.Path) *Results {

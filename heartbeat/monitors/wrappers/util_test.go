@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/go-lookslike/lookslike"
-	"github.com/elastic/go-lookslike/lookslike/testslike"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/elastic/beats/libbeat/common"
 )
