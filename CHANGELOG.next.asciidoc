@@ -30,31 +30,7 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Ensure all beat commands respect configured settings. {pull}10721[10721]
-- Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
-- decode_json_field: process objects and arrays only {pull}11312[11312]
-- decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
-- Report faulting file when config reload fails. {pull}[11304]11304
-- Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
-- Management configuration backup file will now have a timestamps in their name. {pull}11034[11034]
-- [CM] Parse enrollment_token response correctly {pull}11648[11648]
-- Not hiding error in case of http failure using elastic fetcher {pull}11604[11604]
-- Relax validation of the X-Pack license UID value. {issue}11640[11640]
-- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
-- Escape BOM on JsonReader before trying to decode line {pull}11661[11661]
-- Fix ILM policy always being overwritten. {pull}11671[11671]
-- Fix template always being overwritten. {pull}11671[11671]
-- Fix matching of string arrays in contains condition. {pull}11691[11691]
-- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
-- Fix initialization of the TCP input logger. {pull}11605[11605]
-- Fix flaky service_integration_windows_test test by introducing a confidence factor and enriching the error message with more service details. {issue}8880[8880] and {issue}7977[7977]
-- Replace wmi queries with win32 api calls as they were consuming CPU resources {issue}3249[3249] and {issue}11840[11840]
 - Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
-- Fix queue.spool.write.flush.events config type. {pull}12080[12080]
-- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
-- Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
-- Fixed Beat ID being reported by GET / API. {pull}12180[12180]
-- Add host.os.codename to fields.yml. {pull}12261[12261]
 
 *Auditbeat*
 
