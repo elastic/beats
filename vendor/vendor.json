@@ -386,12 +386,6 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
-			"checksumSHA1": "glCzRHKY3rNJua7zOZrYeHkJ3DE=",
-			"path": "github.com/aws/aws-sdk-go-v2/service",
-			"revision": "db223f6d5a456d1c9dfaeb7ef865cc63e03ec2ce",
-			"revisionTime": "2019-06-11T23:54:58Z"
-		},
-		{
 			"checksumSHA1": "yo32Zcq1rjutOJYfrSqKDGx/i44=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
