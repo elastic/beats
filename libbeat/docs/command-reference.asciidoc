@@ -207,7 +207,7 @@ to which the policy should be exported as a file rather than exporting to `stdou
 *`--es.version VERSION`*::
 When used with <<template-subcommand,`template`>>, exports an index
 template that is compatible with the specified version.
-When used with <<ilm-policy-subcommand,`ilm-policy`>> exports the ilm policy
+When used with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ilm policy
 if the specified ES version is enabled for ILM.
 
 *`-h, --help`*::
