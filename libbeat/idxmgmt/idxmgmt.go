@@ -105,6 +105,9 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory, dfSupport dataframes.Supp
 	if ilmSupport == nil {
 		ilmSupport = ilm.DefaultSupport
 	}
+	if dfSupport == nil {
+		dfSupport = dataframes.DefaultSupport
+	}
 
 	return func(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
 		const logName = "index-management"

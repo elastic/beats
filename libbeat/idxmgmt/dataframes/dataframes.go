@@ -1,7 +1,6 @@
 package dataframes
 
 import (
-	"github.com/elastic/apm-server/beater"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -11,5 +10,8 @@ import (
 type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
 
 type Supporter interface {
-	Mode() beater.Mode
+	Mode() Mode
+}
+
+func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
 }
