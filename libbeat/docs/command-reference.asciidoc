@@ -17,7 +17,7 @@
 :deploy-command-short-desc: Deploys the specified function to your serverless environment
 
 ifndef::no_dashboards[]
-:export-command-short-desc: Exports the configuration, index template, ilm-policy or a dashboard to stdout
+:export-command-short-desc: Exports the configuration, index template, ilm-policy, or a dashboard to stdout
 endif::no_dashboards[]
 
 ifdef::no_dashboards[]
