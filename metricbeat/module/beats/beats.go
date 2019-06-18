@@ -27,10 +27,22 @@ import (
 // ModuleName is the name of this module.
 const ModuleName = "beats"
 
-// Info construct contains the data from the Beats / endpoint
+// Info construct contains the relevant data from the Beats / endpoint
 type Info struct {
-	UUID string `json:"uuid"`
-	Beat string `json:"beat"`
+	UUID     string `json:"uuid"`
+	Beat     string `json:"beat"`
+	Name     string `json:"name"`
+	Hostname string `json:"hostname"`
+	Version  string `json:"version"`
+}
+
+// State construct contains the relevant data from the Beats /state endpoint
+type State struct {
+	Outputs struct {
+		Elasticsearch struct {
+			ClusterUUID string `json:"cluster_uuid"`
+		} `json:"elasticsearch"`
+	} `json:"outputs"`
 }
 
 // GetInfo returns the data for the Beats / endpoint.
@@ -41,6 +53,22 @@ func GetInfo(m *MetricSet) (*Info, error) {
 	}
 
 	info := &Info{}
+	err = json.Unmarshal(content, &info)
+	if err != nil {
+		return nil, err
+	}
+
+	return info, nil
+}
+
+// GetState returns the data for the Beats /state endpoint.
+func GetState(m *MetricSet) (*State, error) {
+	content, err := fetchPath(m.HTTP, "/state", "")
+	if err != nil {
+		return nil, err
+	}
+
+	info := &State{}
 	err = json.Unmarshal(content, &info)
 	if err != nil {
 		return nil, err
