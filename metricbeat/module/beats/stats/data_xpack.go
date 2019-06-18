@@ -18,7 +18,10 @@
 package stats
 
 import (
+	"encoding/json"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 
@@ -29,11 +32,29 @@ import (
 
 func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beats.Info, content []byte) error {
 	now := time.Now()
-	clusterUUID := "TODO: Get from GET /state API response"
+	clusterUUID, err := m.getClusterUUID()
+	if err != nil {
+		return errors.Wrap(err, "could not determine cluster UUID")
+	}
+
+	// Massage info into beat
+	beat := common.MapStr{
+		"name":    info.Name,
+		"host":    info.Hostname,
+		"type":    info.Beat,
+		"uuid":    info.UUID,
+		"version": info.Version,
+	}
+
+	var metrics map[string]interface{}
+	err = json.Unmarshal(content, &metrics)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Beats Stats API response")
+	}
 
 	fields := common.MapStr{
-		"metrics":   "TODO: parse / construct from content",
-		"beat":      "TODO: parse / construct from info",
+		"metrics":   metrics,
+		"beat":      beat,
 		"timestamp": now,
 	}
 
@@ -54,4 +75,13 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beats.Info, content [
 
 func (m *MetricSet) calculateIntervalMs() int64 {
 	return m.Module().Config().Period.Nanoseconds() / 1000 / 1000
+}
+
+func (m *MetricSet) getClusterUUID() (string, error) {
+	state, err := beats.GetState(m.MetricSet)
+	if err != nil {
+		return "", errors.Wrap(err, "could not get state information")
+	}
+
+	return state.Outputs.Elasticsearch.ClusterUUID, nil
 }
