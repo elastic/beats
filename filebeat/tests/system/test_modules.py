@@ -194,6 +194,7 @@ class Test(BaseTest):
             len(expected), len(objects))
 
         for ev in expected:
+            clean_keys(ev)
             found = False
             for obj in objects:
 
@@ -216,13 +217,34 @@ def clean_keys(obj):
     time_keys = ["event.created"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
+    # ECS versions change for any ECS release, large or small
+    ecs_key = ["ecs.version"]
+    # datasets for which @timestamp is removed due to date missing
+    remove_timestamp = {"icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"}
+    # dataset + log file pairs for which @timestamp is kept as an exception from above
+    remove_timestamp_exception = {
+        ('system.syslog', 'tz-offset.log'),
+        ('system.auth', 'timestamp.log')
+    }
 
-    for key in host_keys + time_keys + other_keys:
+    # Keep source log filename for exceptions
+    filename = None
+    if "log.file.path" in obj:
+        filename = os.path.basename(obj["log.file.path"]).lower()
+
+    for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
-    # Remove timestamp for comparison where timestamp is not part of the log line
-    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]):
-        delete_key(obj, "@timestamp")
+    # Most logs from syslog need their timestamp removed because it doesn't
+    # include a year.
+    if obj["event.dataset"] in remove_timestamp:
+        if not (obj['event.dataset'], filename) in remove_timestamp_exception:
+            delete_key(obj, "@timestamp")
+        else:
+            # excluded events need to have their filename saved to the expected.json
+            # so that the exception mechanism can be triggered when the json is
+            # loaded.
+            obj["log.file.path"] = filename
 
 
 def delete_key(obj, key):

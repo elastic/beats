@@ -71,10 +71,31 @@ metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 
 `
 
+	promGaugeKeyLabelWithNaNInf = `
+# TYPE metrics_one_count_errors gauge
+metrics_one_count_errors{name="jane",surname="foster"} 0
+# TYPE metrics_one_count_total gauge
+metrics_one_count_total{name="jane",surname="foster"} NaN
+metrics_one_count_total{name="foo",surname="bar"} +Inf
+metrics_one_count_total{name="john",surname="williams"} -Inf
+metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
+
+`
+
 	promCounterKeyLabel = `
 # TYPE metrics_one_count_total counter
 metrics_one_count_total{name="jane",surname="foster"} 1
 metrics_one_count_total{name="john",surname="williams"} 2
+metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
+
+`
+
+	promCounterKeyLabelWithNaNInf = `
+# TYPE metrics_one_count_errors counter
+metrics_one_count_errors{name="jane",surname="foster"} 1
+# TYPE metrics_one_count_total counter
+metrics_one_count_total{name="jane",surname="foster"} NaN
+metrics_one_count_total{name="john",surname="williams"} +Inf
 metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 
 `
@@ -100,6 +121,19 @@ metrics_one_midichlorians_count{rank="padawan",alive="yes"} 28
 
 `
 
+	promHistogramKeyLabelWithNaNInf = `
+# TYPE metrics_one_midichlorians histogram
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="2000"} NaN
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="4000"} +Inf
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="8000"} -Inf
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="16000"} 84
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="32000"} 86
+metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="+Inf"} 86
+metrics_one_midichlorians_sum{rank="youngling",alive="yes"} 1000001
+metrics_one_midichlorians_count{rank="youngling",alive="yes"} 86
+
+`
+
 	promSummaryKeyLabel = `
 # TYPE metrics_force_propagation_ms summary
 metrics_force_propagation_ms{kind="jedi",quantile="0"} 35
@@ -116,6 +150,18 @@ metrics_force_propagation_ms{kind="sith",quantile="0.75"} 21
 metrics_force_propagation_ms{kind="sith",quantile="1"} 29
 metrics_force_propagation_ms_sum{kind="sith"} 112
 metrics_force_propagation_ms_count{kind="sith"} 711
+
+`
+
+	promSummaryKeyLabelWithNaNInf = `
+# TYPE metrics_force_propagation_ms summary
+metrics_force_propagation_ms{kind="jedi",quantile="0"} NaN
+metrics_force_propagation_ms{kind="jedi",quantile="0.25"} +Inf
+metrics_force_propagation_ms{kind="jedi",quantile="0.5"} -Inf
+metrics_force_propagation_ms{kind="jedi",quantile="0.75"} 20
+metrics_force_propagation_ms{kind="jedi",quantile="1"} 30
+metrics_force_propagation_ms_sum{kind="jedi"} 50
+metrics_force_propagation_ms_count{kind="jedi"} 651
 
 `
 )
@@ -497,6 +543,47 @@ func TestPrometheusKeyLabels(t *testing.T) {
 		},
 
 		{
+			testName:           "Test gauge with KeyLabel With NaN Inf",
+			prometheusResponse: promGaugeKeyLabelWithNaNInf,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_one_count_errors": Metric("metrics.one.count"),
+					"metrics_one_count_total":  Metric("metrics.one.count"),
+				},
+				Labels: map[string]LabelMap{
+					"name":    KeyLabel("metrics.one.labels.name"),
+					"surname": KeyLabel("metrics.one.labels.surname"),
+					"age":     KeyLabel("metrics.one.labels.age"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 0.0,
+							"labels": common.MapStr{
+								"name":    "jane",
+								"surname": "foster",
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": 3.0,
+							"labels": common.MapStr{
+								"name":    "jahn",
+								"surname": "baldwin",
+								"age":     "30",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
 			testName:           "Test counter with KeyLabel",
 			prometheusResponse: promCounterKeyLabel,
 			mapping: &MetricsMapping{
@@ -528,6 +615,47 @@ func TestPrometheusKeyLabels(t *testing.T) {
 							"labels": common.MapStr{
 								"name":    "john",
 								"surname": "williams",
+							},
+						},
+					},
+				},
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": int64(3),
+							"labels": common.MapStr{
+								"name":    "jahn",
+								"surname": "baldwin",
+								"age":     "30",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			testName:           "Test counter with KeyLabel With NaN Inf",
+			prometheusResponse: promCounterKeyLabelWithNaNInf,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_one_count_errors": Metric("metrics.one.count"),
+					"metrics_one_count_total":  Metric("metrics.one.count"),
+				},
+				Labels: map[string]LabelMap{
+					"name":    KeyLabel("metrics.one.labels.name"),
+					"surname": KeyLabel("metrics.one.labels.surname"),
+					"age":     KeyLabel("metrics.one.labels.age"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"count": int64(1),
+							"labels": common.MapStr{
+								"name":    "jane",
+								"surname": "foster",
 							},
 						},
 					},
@@ -605,6 +733,40 @@ func TestPrometheusKeyLabels(t *testing.T) {
 		},
 
 		{
+			testName:           "Test histogram with KeyLabel With NaN Inf",
+			prometheusResponse: promHistogramKeyLabelWithNaNInf,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_one_midichlorians": Metric("metrics.one.midichlorians"),
+				},
+				Labels: map[string]LabelMap{
+					"rank":  KeyLabel("metrics.one.midichlorians.rank"),
+					"alive": KeyLabel("metrics.one.midichlorians.alive"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"one": common.MapStr{
+							"midichlorians": common.MapStr{
+								"count": uint64(86),
+								"sum":   1000001.0,
+								"bucket": common.MapStr{
+									"16000": uint64(84),
+									"32000": uint64(86),
+									"+Inf":  uint64(86),
+								},
+
+								"rank":  "youngling",
+								"alive": "yes",
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
 			testName:           "Test summary with KeyLabel",
 			prometheusResponse: promSummaryKeyLabel,
 			mapping: &MetricsMapping{
@@ -654,6 +816,40 @@ func TestPrometheusKeyLabels(t *testing.T) {
 									},
 									"labels": common.MapStr{
 										"kind": "sith",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			testName:           "Test summary with KeyLabel With NaN Inf",
+			prometheusResponse: promSummaryKeyLabelWithNaNInf,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_force_propagation_ms": Metric("metrics.force.propagation.ms"),
+				},
+				Labels: map[string]LabelMap{
+					"kind": KeyLabel("metrics.force.propagation.ms.labels.kind"),
+				},
+			},
+			expectedEvents: []common.MapStr{
+				common.MapStr{
+					"metrics": common.MapStr{
+						"force": common.MapStr{
+							"propagation": common.MapStr{
+								"ms": common.MapStr{
+									"count": uint64(651),
+									"sum":   50.0,
+									"percentile": common.MapStr{
+										"75":  20.0,
+										"100": 30.0,
+									},
+									"labels": common.MapStr{
+										"kind": "jedi",
 									},
 								},
 							},

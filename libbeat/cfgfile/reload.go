@@ -98,12 +98,11 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	pipeline      beat.Pipeline
-	runnerFactory RunnerFactory
-	config        DynamicConfig
-	path          string
-	done          chan struct{}
-	wg            sync.WaitGroup
+	pipeline beat.Pipeline
+	config   DynamicConfig
+	path     string
+	done     chan struct{}
+	wg       sync.WaitGroup
 }
 
 // NewReloader creates new Reloader instance for the given config
@@ -232,6 +231,37 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			}
 		}
 	}
+}
+
+// Load loads configuration files once.
+func (rl *Reloader) Load(runnerFactory RunnerFactory) {
+	list := NewRunnerList("load", runnerFactory, rl.pipeline)
+
+	rl.wg.Add(1)
+	defer rl.wg.Done()
+
+	// Stop all running modules when method finishes
+	defer list.Stop()
+
+	gw := NewGlobWatcher(rl.path)
+
+	debugf("Scan for config files")
+	files, _, err := gw.Scan()
+	if err != nil {
+		logp.Err("Error fetching new config files: %v", err)
+	}
+
+	// Load all config objects
+	configs, _ := rl.loadConfigs(files)
+
+	debugf("Number of module configs found: %v", len(configs))
+
+	if err := list.Reload(configs); err != nil {
+		logp.Err("Error loading configuration files: %+v", err)
+		return
+	}
+
+	logp.Info("Loading of config files completed.")
 }
 
 func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error) {

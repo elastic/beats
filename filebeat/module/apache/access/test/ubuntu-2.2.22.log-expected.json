@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2016-12-26T16:18:09.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -24,7 +23,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -50,7 +48,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:00.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -76,7 +73,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -102,7 +98,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -128,7 +123,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -154,7 +148,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -180,7 +173,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:13.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -206,7 +198,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:22:17.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",

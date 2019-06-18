@@ -36,29 +36,17 @@ language, and very few people are experts in it. In fact, several
 people learned Go by contributing to Packetbeat and libbeat, including the
 original Packetbeat authors.
 
-For general information about contributing to Beats, see <<beats-contributing>>.
+*Before you begin:* Set up your Go environment as described under
+<<setting-up-dev-environment>> in <<beats-contributing>>.
 
-After you have https://golang.org/doc/install[installed Go] and set up the
-https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location, clone the Beats repository in the correct location
-under `GOPATH`:
-
-[source,shell]
-----------------------------------------------------------------------
-mkdir -p ${GOPATH}/src/github.com/elastic
-git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beats
-----------------------------------------------------------------------
-
-To build your beat
-on a specific version of libbeat, check out the specific branch ({branch} in the example below):
+To build your Beat on a specific version of libbeat, check out the specific
+branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
-cd ${GOPATH}/src/github.com/elastic/beats
+cd $\{GOPATH\}/src/github.com/elastic/beats
 git checkout {branch}
 ----
-
-NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
 [[newbeat-overview]]
 === Overview
@@ -121,9 +109,9 @@ Now that you have the big picture, let's dig into the code.
 === Generating Your Beat
 
 To generate your own Beat, you use the Beat generator available in the beats repo on GitHub. If you haven't
-downloaded the Beats source code yet, follow the instructions in <<newbeat-getting-ready>>.
+downloaded the Beats source code yet, follow the instructions in <<setting-up-dev-environment>>.
 
-Before running beat generator, you must decide on a name for your beat. The name should be one word with
+Before running the Beat generator, you must decide on a name for your Beat. The name should be one word with
 the first letter capitalized. In our example, we use `Countbeat`.
 
 Now create a directory under $GOPATH for your repository and change to the new directory:

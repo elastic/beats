@@ -1,3 +1,6 @@
+# Module: aws
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-aws.html
+
 - module: aws
   period: 300s
   metricsets:

@@ -33,7 +33,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
@@ -64,8 +64,8 @@ func TestData(t *testing.T) {
 	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
-	err := mbtest.WriteEventsReporterV2Cond(ms, t, "", func(e common.MapStr) bool {
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	err := mbtest.WriteEventsReporterV2ErrorCond(ms, t, "", func(e common.MapStr) bool {
 		hasIn, _ := e.HasKey("rabbitmq.exchange.messages.publish_in")
 		hasOut, _ := e.HasKey("rabbitmq.exchange.messages.publish_out")
 		return hasIn && hasOut
