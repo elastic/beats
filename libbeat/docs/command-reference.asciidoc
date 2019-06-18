@@ -21,7 +21,7 @@ ifndef::no_dashboards[]
 endif::no_dashboards[]
 
 ifdef::no_dashboards[]
-:export-command-short-desc: Exports the configuration, index template or ilm-policy to stdout
+:export-command-short-desc: Exports the configuration, index template, or ilm-policy to stdout
 endif::no_dashboards[]
 
 :help-command-short-desc: Shows help for any command
