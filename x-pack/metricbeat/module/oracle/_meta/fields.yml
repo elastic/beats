@@ -2,7 +2,7 @@
   title: "Oracle"
   description: Oracle database module
   short_config: false
-  release: experimental
+  release: beta
   fields:
     - name: oracle
       type: group
