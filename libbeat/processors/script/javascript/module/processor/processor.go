@@ -54,6 +54,7 @@ var constructors = map[string]processors.Constructor{
 	"CommunityID":           communityid.New,
 	"Convert":               convert.New,
 	"CopyFields":            actions.NewCopyFields,
+	"DecodeBase64Field":     actions.NewDecodeBase64Field,
 	"DecodeCSVField":        decode_csv_fields.NewDecodeCSVField,
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,

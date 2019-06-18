@@ -268,7 +268,9 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	// Report reboots separately
-	if !currentHost.info.BootTime.Equal(ms.lastHost.info.BootTime) {
+	// On Windows, BootTime is not fully accurate and can vary by a few milliseconds.
+	// So we only report a reboot if the new BootTime is at least 1 second after the old.
+	if currentHost.info.BootTime.After(ms.lastHost.info.BootTime.Add(1 * time.Second)) {
 		events = append(events, hostEvent(currentHost, eventTypeEvent, eventActionReboot))
 	}
 
