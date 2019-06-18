@@ -30,6 +30,8 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
+
 *Auditbeat*
 
 - Host dataset: Fix reboot detection logic. {pull}12591[12591]
