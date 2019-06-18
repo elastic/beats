@@ -362,10 +362,13 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.CloudWatchAPI, sv
 	return nil
 }
 
+// getResourceTypeUsingNamespace function is used to get resourceTypeFilter from
+// a given namespace only when resourceTypeFilter is not specified in configuration.
 func getResourceTypeUsingNamespace(namespace string) string {
 	// Some resource name is similar to namespace name.
 	// For example:
 	// ec2 instances: "AWS/EC2" is the namespace name, "ec2" is the resource name.
+
 	// Some resource name is not as easy to get from namespace name.
 	// For example:
 	// load balancer: "AWS/ELB" is the namespace name, "elasticloadbalancing" is the resource name.
