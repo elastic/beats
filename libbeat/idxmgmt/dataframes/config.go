@@ -1,6 +1,23 @@
 package dataframes
 
-//Mode is used for enumerating the ilm mode.
+import (
+	"fmt"
+
+	"github.com/elastic/beats/libbeat/beat"
+)
+
+// Config is used for unpacking a common.Config.
+type Config struct {
+	Mode        Mode                   `config:enabled`
+	Source      string                 `config:source`
+	Dest        string                 `config:dest`
+	Interval    string                 `config:timespan`
+	Transform   map[string]interface{} `config:transform`
+	CheckExists bool                   `config:"check_exists"`
+	// Enable always overwrite policy mode. This required manage_ilm privileges.
+	Overwrite bool `config:"overwrite"`
+}
+
 type Mode uint8
 
 const (
@@ -14,18 +31,15 @@ const (
 	ModeDisabled
 )
 
-// Config is used for unpacking a common.Config.
-type Config struct {
-	Mode     Mode   `config:"enabled"`
-	Source   string `config:"source"`
-	Dest     string `config:"dest"`
-	Interval string `config:"interval"`
+func defaultConfig(info beat.Info) Config {
+	source := fmt.Sprintf("%s-%s", info.Beat, info.Version)
+	dest := fmt.Sprintf("%s-states", info.Beat)
 
-	// CheckExists can disable the check for an existing policy. Check required
-	// read_ilm privileges.  If check is disabled the policy will only be
-	// installed if Overwrite is enabled.
-	CheckExists bool `config:"check_exists"`
-
-	// Enable always overwrite policy mode. This required manage_ilm privileges.
-	Overwrite bool `config:"overwrite"`
+	return Config{
+		Source:    source,
+		Dest:      dest,
+		Interval:  "10s",
+		Mode:      ModeAuto,
+		Transform: map[string]interface{}{},
+	}
 }

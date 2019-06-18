@@ -13,5 +13,36 @@ type Supporter interface {
 	Mode() Mode
 }
 
+// DefaultSupport configures a new default ILM support implementation.
 func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+	cfg := defaultConfig(info)
+	if config != nil {
+		if err := config.Unpack(&cfg); err != nil {
+			return nil, err
+		}
+	}
+
+	// TODO: IMPLEMENT THIS
+	//if cfg.Mode == ModeDisabled {
+	//	return NewNoopSupport(info, config)
+	//}
+
+	return StdSupport(log, info, config)
+}
+
+func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+	if log == nil {
+		log = logp.NewLogger("dataframe")
+	} else {
+		log = log.Named("dataframe")
+	}
+
+	cfg := defaultConfig(info)
+	if config != nil {
+		if err := config.Unpack(&cfg); err != nil {
+			return nil, err
+		}
+	}
+
+	return NewStdSupport(log, cfg.Mode, cfg.Source, cfg.Dest, cfg.Interval, cfg.Transform), nil
 }
