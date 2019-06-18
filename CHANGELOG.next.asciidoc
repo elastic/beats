@@ -35,6 +35,8 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Auditbeat*
 
+- Host dataset: Fix reboot detection logic. {pull}12591[12591]
+
 *Filebeat*
 
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
