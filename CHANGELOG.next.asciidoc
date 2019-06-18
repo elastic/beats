@@ -58,7 +58,7 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Filebeat*
 
-- Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12579[12579]
 
 *Heartbeat*
 
