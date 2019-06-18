@@ -8,6 +8,7 @@ package rds
 
 import (
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
@@ -25,7 +26,7 @@ type MockRDSClient struct {
 var (
 	metricName           = "Queries"
 	namespace            = "AWS/RDS"
-	periodInSec          = 60
+	period               = 60 * time.Second
 	index                = 0
 	dimName1             = "DatabaseClass"
 	dbInstanceClass      = "db.r5.large"
@@ -43,12 +44,12 @@ func TestCreateMetricDataQuery(t *testing.T) {
 		Namespace:  &namespace,
 	}
 
-	metricDataQuery := createMetricDataQuery(metric, index, dbInstanceArn, periodInSec)
+	metricDataQuery := createMetricDataQuery(metric, index, dbInstanceArn, period)
 	assert.Equal(t, "arn:aws:rds:us-east-2:627959692251:db:test1 Queries", *metricDataQuery.Label)
 	assert.Equal(t, "Average", *metricDataQuery.MetricStat.Stat)
 	assert.Equal(t, metricName, *metricDataQuery.MetricStat.Metric.MetricName)
 	assert.Equal(t, namespace, *metricDataQuery.MetricStat.Metric.Namespace)
-	assert.Equal(t, int64(periodInSec), *metricDataQuery.MetricStat.Period)
+	assert.Equal(t, int64(60), *metricDataQuery.MetricStat.Period)
 }
 
 func (m *MockRDSClient) DescribeDBInstancesRequest(input *rds.DescribeDBInstancesInput) rds.DescribeDBInstancesRequest {
@@ -151,7 +152,7 @@ func TestConstructMetricQueries(t *testing.T) {
 	}
 
 	listMetricsOutput := []cloudwatch.Metric{listMetric1, listMetric2}
-	metricDataQueries := constructMetricQueries(listMetricsOutput, dbInstanceArn, 60)
+	metricDataQueries := constructMetricQueries(listMetricsOutput, dbInstanceArn, period)
 	assert.Equal(t, 2, len(metricDataQueries))
 
 	assert.Equal(t, "rds0", *metricDataQueries[0].Id)

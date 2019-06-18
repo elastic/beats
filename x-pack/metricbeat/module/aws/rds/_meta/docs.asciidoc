@@ -10,3 +10,10 @@ cloudwatch:GetMetricData
 ec2:DescribeRegions
 rds:DescribeDBInstances
 ----
+
+[float]
+=== Dashboard
+
+The aws rds metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-rds-overview.png[]

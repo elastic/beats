@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
 
@@ -113,7 +114,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// Get MetricDataQuery for all dbInstances per region
 		var metricDataQueriesTotal []cloudwatch.MetricDataQuery
 		for _, dbInstanceARN := range dbInstanceARNs {
-			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, dbInstanceARN, m.PeriodInSec)...)
+			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, dbInstanceARN, m.Period)...)
 		}
 
 		var metricDataOutput []cloudwatch.MetricDataResult
@@ -154,8 +155,7 @@ func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetail
 	req := svc.DescribeDBInstancesRequest(describeInstanceInput)
 	output, err := req.Send()
 	if err != nil {
-		err = errors.Wrap(err, "Error DescribeDBInstancesRequest")
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "Error DescribeDBInstancesRequest")
 	}
 
 	var dbInstanceARNs []string
@@ -174,11 +174,11 @@ func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetail
 	return dbInstanceARNs, dbDetailsMap, nil
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn string, periodInSec int) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn string, period time.Duration) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, i, dbInstanceArn, periodInSec)
+		metricDataQuery := createMetricDataQuery(listMetric, i, dbInstanceArn, period)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
@@ -187,16 +187,16 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, dbInstanceArn
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceARN string, periodInSec int) cloudwatch.MetricDataQuery {
+func createMetricDataQuery(metric cloudwatch.Metric, index int, dbInstanceARN string, period time.Duration) cloudwatch.MetricDataQuery {
 	statistic := "Average"
-	period := int64(periodInSec)
+	periodInSeconds := int64(period.Seconds())
 	id := metricsetName + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 
 	metricDataQuery := cloudwatch.MetricDataQuery{
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
-			Period: &period,
+			Period: &periodInSeconds,
 			Stat:   &statistic,
 			Metric: &metric,
 		},
