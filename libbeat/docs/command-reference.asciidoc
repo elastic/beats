@@ -36,7 +36,7 @@ ifdef::has_ml_jobs[]
 endif::[]
 
 ifdef::no_dashboards[]
-:setup-command-short-desc: Sets up the initial environment, including the ES index template, ilm policy and write alias
+:setup-command-short-desc: Sets up the initial environment, including the ES index template, and ilm policy and write alias
 endif::no_dashboards[]
 
 ifndef::has_ml_jobs,no_dashboards[]
