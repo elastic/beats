@@ -40,7 +40,7 @@ ifdef::no_dashboards[]
 endif::no_dashboards[]
 
 ifndef::has_ml_jobs,no_dashboards[]
-:setup-command-short-desc: Sets up the initial environment, including the index template, ilm policy and write alias and {kib} dashboards (when available)
+:setup-command-short-desc: Sets up the initial environment, including the index template, ilm policy and write alias, and {kib} dashboards (when available)
 endif::[]
 
 :update-command-short-desc: Updates the specified function
