@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package dataset: Auto-detect package directories. {pull}12289[12289]
 - Package dataset: Improve dpkg parsing. {pull}12325[12325]
 - System module: Start system module without host ID. {pull}12373[12373]
+- Host dataset: Fix reboot detection logic. {pull}12591[12591]
 
 *Filebeat*
 
