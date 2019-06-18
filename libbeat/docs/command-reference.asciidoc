@@ -648,7 +648,7 @@ endif::[]
 
 *`--index-management`*::
 Sets up components related to Elasticsearch index management including
-template, ilm policy and write alias.
+template, ilm policy, and write alias.
 
 *`--template`*::
 deprecated[7.2]
