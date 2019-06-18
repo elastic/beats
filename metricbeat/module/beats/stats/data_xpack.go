@@ -67,7 +67,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beats.Info, content [
 		"beats_stats":  fields,
 	}
 
-	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
+	event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Beats)
 
 	r.Event(event)
 	return nil
