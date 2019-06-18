@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 - Add host.os.codename to fields.yml. {pull}12261[12261]
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
+- Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
 
 *Auditbeat*
 
