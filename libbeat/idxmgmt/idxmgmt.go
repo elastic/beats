@@ -21,6 +21,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/idxmgmt/dataframes"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
@@ -93,13 +95,13 @@ func (m *LoadMode) Enabled() bool {
 
 // DefaultSupport initializes the default index management support used by most Beats.
 func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
-	factory := MakeDefaultSupport(nil)
+	factory := MakeDefaultSupport(nil, nil)
 	return factory(log, info, configRoot)
 }
 
 // MakeDefaultSupport creates some default index management support, with a
 // custom ILM support implementation.
-func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
+func MakeDefaultSupport(ilmSupport ilm.SupportFactory, dfSupport dataframes.SupportFactory) SupportFactory {
 	if ilmSupport == nil {
 		ilmSupport = ilm.DefaultSupport
 	}
@@ -108,10 +110,11 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 		const logName = "index-management"
 
 		cfg := struct {
-			ILM       *common.Config         `config:"setup.ilm"`
-			Template  *common.Config         `config:"setup.template"`
-			Output    common.ConfigNamespace `config:"output"`
-			Migration *common.Config         `config:"migration.6_to_7"`
+			ILM        *common.Config         `config:"setup.ilm"`
+			Template   *common.Config         `config:"setup.template"`
+			DataFrames *common.Config         `config:"setup.dataframes"`
+			Output     common.ConfigNamespace `config:"output"`
+			Migration  *common.Config         `config:"migration.6_to_7"`
 		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
@@ -129,7 +132,7 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 			return nil, err
 		}
 
-		return newIndexSupport(log, info, ilmSupport, cfg.Template, cfg.ILM, cfg.Migration.Enabled())
+		return newIndexSupport(log, info, ilmSupport, dfSupport, cfg.Template, cfg.ILM, cfg.DataFrames, cfg.Migration.Enabled())
 	}
 }
 

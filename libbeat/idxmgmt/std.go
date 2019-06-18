@@ -21,6 +21,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/idxmgmt/dataframes"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -34,6 +36,7 @@ import (
 type indexSupport struct {
 	log          *logp.Logger
 	ilm          ilm.Supporter
+	df           dataframes.Supporter
 	info         beat.Info
 	migration    bool
 	templateCfg  template.TemplateConfig
@@ -93,8 +96,10 @@ func newIndexSupport(
 	log *logp.Logger,
 	info beat.Info,
 	ilmFactory ilm.SupportFactory,
+	dfFactory dataframes.SupportFactory,
 	tmplConfig *common.Config,
 	ilmConfig *common.Config,
+	dfConfig *common.Config,
 	migration bool,
 ) (*indexSupport, error) {
 	if ilmFactory == nil {
@@ -111,9 +116,15 @@ func newIndexSupport(
 		return nil, err
 	}
 
+	dfSupporter, err := dfFactory(log, info, dfConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	return &indexSupport{
 		log:          log,
 		ilm:          ilmSupporter,
+		df:           dfSupporter,
 		info:         info,
 		templateCfg:  tmplCfg,
 		migration:    migration,

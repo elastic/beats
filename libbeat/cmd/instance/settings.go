@@ -20,6 +20,8 @@ package instance
 import (
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/beats/libbeat/idxmgmt/dataframes"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
@@ -41,6 +43,7 @@ type Settings struct {
 	// load custom index manager. The config object will be the Beats root configuration.
 	IndexManagement idxmgmt.SupportFactory
 	ILM             ilm.SupportFactory
+	DataFrames      dataframes.SupportFactory
 
 	Processing processing.SupportFactory
 }
