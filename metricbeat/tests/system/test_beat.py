@@ -6,15 +6,15 @@ import time
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['beats']
+    COMPOSE_SERVICES = ['beat']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
-        beats stats metricset test
+        beat stats metricset test
         """
         self.render_config_template(modules=[{
-            "name": "beats",
+            "name": "beat",
             "metricsets": ["stats"],
             "hosts": self.get_hosts(),
             "period": "1s",
