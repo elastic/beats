@@ -1,4 +1,4 @@
-- module: beat
+- module: beats
   metricsets:
     - stats
   period: 10s
