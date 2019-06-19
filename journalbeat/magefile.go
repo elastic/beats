@@ -229,5 +229,5 @@ func selectImage(platform string) (string, error) {
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
-	return mage.Config(mage.AllConfigTypes, mage.ConfigFileParams{}, ".")
+	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
 }

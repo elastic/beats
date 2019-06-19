@@ -97,6 +97,8 @@ func (c ConfigFileParams) Empty() bool {
 func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error {
 	if args.Empty() {
 		args = defaultConfigFileParams
+	}
+
 	if err := makeConfigTemplates(types, args); err != nil {
 		return errors.Wrap(err, "failed making config templates")
 	}

@@ -99,5 +99,5 @@ func GoTestIntegration(ctx context.Context) error {
 
 // Config generates both the short and reference configs.
 func Config() error {
-	return mage.Config(mage.ShortConfigType|mage.ReferenceConfigType, functionbeat.XPackConfigFileParams(), ".")
+	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, functionbeat.XPackConfigFileParams(), ".")
 }
