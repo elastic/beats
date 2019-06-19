@@ -1,3 +1,6 @@
+# Module: oracle
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-oracle.html
+
 - module: oracle
   metricsets: ["tablespace"]
   enabled: false
