@@ -36,7 +36,7 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "beat")
+	compose.EnsureUp(t, "metricbeat")
 
 	for _, metricSet := range metricSets {
 		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet))
@@ -53,7 +53,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "beat")
+	compose.EnsureUp(t, "metricbeat")
 
 	for _, metricSet := range metricSets {
 		config := getConfig(metricSet)
