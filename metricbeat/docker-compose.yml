@@ -14,7 +14,7 @@ services:
     env_file:
       - ./module/aerospike/_meta/env
       - ./module/apache/_meta/env
-      - ./module/beats/_meta/env
+      - ./module/beat/_meta/env
       - ./module/ceph/_meta/env
       - ./module/consul/_meta/env
       - ./module/couchbase/_meta/env
