@@ -205,7 +205,7 @@ metricbeat.modules:
   #  - us-east-1
   #  - us-east-2
 
-#-------------------------------- Beats Module --------------------------------
+#--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
     - stats
