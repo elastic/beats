@@ -38,8 +38,11 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/common/mapval"
 	btesting "github.com/elastic/beats/libbeat/testing"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 func testRequest(t *testing.T, testURL string) *beat.Event {
@@ -87,24 +90,24 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 
 // The minimum response is just the URL. Only to be used for unreachable server
 // tests.
-func httpBaseChecks(urlStr string) mapval.Validator {
+func httpBaseChecks(urlStr string) validator.Validator {
 	u, _ := url.Parse(urlStr)
-	return mapval.MustCompile(mapval.Map{
+	return lookslike.MustCompile(map[string]interface{}{
 		"url": wrappers.URLFields(u),
 	})
 }
 
-func respondingHTTPChecks(url string, statusCode int) mapval.Validator {
-	return mapval.Compose(
+func respondingHTTPChecks(url string, statusCode int) validator.Validator {
+	return lookslike.Compose(
 		httpBaseChecks(url),
-		mapval.MustCompile(mapval.Map{
-			"http": mapval.Map{
+		lookslike.MustCompile(map[string]interface{}{
+			"http": map[string]interface{}{
 				"response.status_code":   statusCode,
-				"rtt.content.us":         mapval.IsDuration,
-				"rtt.response_header.us": mapval.IsDuration,
-				"rtt.total.us":           mapval.IsDuration,
-				"rtt.validate.us":        mapval.IsDuration,
-				"rtt.write_request.us":   mapval.IsDuration,
+				"rtt.content.us":         isdef.IsDuration,
+				"rtt.response_header.us": isdef.IsDuration,
+				"rtt.total.us":           isdef.IsDuration,
+				"rtt.validate.us":        isdef.IsDuration,
+				"rtt.write_request.us":   isdef.IsDuration,
 			},
 		}),
 	)
@@ -193,9 +196,9 @@ func TestUpStatuses(t *testing.T) {
 		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
 			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
 
-			mapval.Test(
+			testslike.Test(
 				t,
-				mapval.Strict(mapval.Compose(
+				lookslike.Strict(lookslike.Compose(
 					hbtest.BaseChecks("127.0.0.1", "up", "http"),
 					hbtest.RespondingTCPChecks(),
 					hbtest.SummaryChecks(1, 0),
@@ -213,9 +216,9 @@ func TestDownStatuses(t *testing.T) {
 		t.Run(fmt.Sprintf("test down status %d", status), func(t *testing.T) {
 			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
 
-			mapval.Test(
+			testslike.Test(
 				t,
-				mapval.Strict(mapval.Compose(
+				lookslike.Strict(lookslike.Compose(
 					hbtest.BaseChecks("127.0.0.1", "down", "http"),
 					hbtest.RespondingTCPChecks(),
 					hbtest.SummaryChecks(0, 1),
@@ -250,9 +253,9 @@ func TestLargeResponse(t *testing.T) {
 	_, err = job(event)
 	require.NoError(t, err)
 
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SummaryChecks(1, 0),
@@ -292,9 +295,9 @@ func runHTTPSServerCheck(
 		time.Sleep(time.Millisecond * 500)
 	}
 
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.TLSChecks(0, 0, cert),
@@ -358,9 +361,9 @@ func TestConnRefusedJob(t *testing.T) {
 
 	event := testRequest(t, url)
 
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
@@ -380,9 +383,9 @@ func TestUnreachableJob(t *testing.T) {
 
 	event := testRequest(t, url)
 
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
