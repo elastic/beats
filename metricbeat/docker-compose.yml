@@ -65,7 +65,7 @@ services:
       - 80
 
   beats:
-    build: ./module/beats/_meta
+    build: ./module/beat/_meta
     ports:
       - 5066
 
