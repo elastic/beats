@@ -12884,6 +12884,76 @@ Request HTTP verb
 
 --
 
+*`kubernetes.apiserver.request.code`*::
++
+--
+type: keyword
+
+Request HTTP code
+
+
+--
+
+*`kubernetes.apiserver.request.content_type`*::
++
+--
+type: keyword
+
+Request HTTP content type
+
+
+--
+
+*`kubernetes.apiserver.request.dry_run`*::
++
+--
+type: keyword
+
+Wether the request used dry run
+
+
+--
+
+*`kubernetes.apiserver.request.kind`*::
++
+--
+type: keyword
+
+Kind of request
+
+
+--
+
+*`kubernetes.apiserver.api.component`*::
++
+--
+type: keyword
+
+Component handling the task
+
+
+--
+
+*`kubernetes.apiserver.api.group`*::
++
+--
+type: keyword
+
+API group for the resource
+
+
+--
+
+*`kubernetes.apiserver.api.version`*::
++
+--
+type: keyword
+
+version for the group
+
+
+--
+
 *`kubernetes.apiserver.request.count`*::
 +
 --
@@ -12920,6 +12990,56 @@ Request latency, number of requests
 type: object
 
 Request latency histogram buckets
+
+
+--
+
+*`kubernetes.apiserver.request.current.count`*::
++
+--
+type: long
+
+Inflight requests
+
+
+--
+
+*`kubernetes.apiserver.request.longrunning.count`*::
++
+--
+type: long
+
+Number of requests active long running requests
+
+
+--
+
+*`kubernetes.apiserver.etcd.object.count`*::
++
+--
+type: long
+
+Number of kubernetes objects at etcd
+
+
+--
+
+*`kubernetes.apiserver.audit.event.count`*::
++
+--
+type: long
+
+Number of audit events
+
+
+--
+
+*`kubernetes.apiserver.audit.rejected.count`*::
++
+--
+type: long
+
+Number of audit rejected events
 
 
 --

@@ -24,6 +24,34 @@
       type: keyword
       description: >
         Request HTTP verb
+    - name: request.code
+      type: keyword
+      description: >
+        Request HTTP code
+    - name: request.content_type
+      type: keyword
+      description: >
+        Request HTTP content type
+    - name: request.dry_run
+      type: keyword
+      description: >
+        Wether the request used dry run
+    - name: request.kind
+      type: keyword
+      description: >
+        Kind of request
+    - name: api.component
+      type: keyword
+      description: >
+        Component handling the task
+    - name: api.group
+      type: keyword
+      description: >
+        API group for the resource
+    - name: api.version
+      type: keyword
+      description: >
+        version for the group
     - name: request.count
       type: long
       description: >
@@ -41,3 +69,24 @@
       object_type: long
       description: >
         Request latency histogram buckets
+    - name: request.current.count
+      type: long
+      description: >
+        Inflight requests
+    - name: request.longrunning.count
+      type: long
+      description: >
+        Number of requests active long running requests
+    - name: etcd.object.count
+      type: long
+      description: >
+        Number of kubernetes objects at etcd
+    - name: audit.event.count
+      type: long
+      description: >
+        Number of audit events
+    - name: audit.rejected.count
+      type: long
+      description: >
+        Number of audit rejected events
+
