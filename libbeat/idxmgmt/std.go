@@ -52,6 +52,7 @@ type indexState struct {
 type indexManager struct {
 	support *indexSupport
 	ilm     ilm.Manager
+	df      dataframes.Manager
 
 	clientHandler ClientHandler
 	assets        Asseter
@@ -153,6 +154,7 @@ func (s *indexSupport) Manager(
 	return &indexManager{
 		support:       s,
 		ilm:           s.ilm.Manager(clientHandler),
+		df:            s.df.Manager(clientHandler),
 		clientHandler: clientHandler,
 		assets:        assets,
 	}

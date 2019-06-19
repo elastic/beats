@@ -19,6 +19,7 @@ package idxmgmt
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/idxmgmt/dataframes"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/template"
 )
@@ -26,12 +27,22 @@ import (
 // ClientHandler defines the interface between a remote service and the Manager for ILM and templates.
 type ClientHandler interface {
 	ilm.ClientHandler
+	dataframes.ClientHandler
 	template.Loader
 }
 
 type clientHandler struct {
 	ilm.ClientHandler
+	dfClientHandler dataframes.ClientHandler
 	template.Loader
+}
+
+func (ch *clientHandler) CheckDataFramesEnabled(m dataframes.Mode) (bool, error) {
+	return ch.dfClientHandler.CheckDataFramesEnabled(m)
+}
+
+func (ch *clientHandler) EnsureDataFrames() (bool, error) {
+	return ch.dfClientHandler.EnsureDataFrames()
 }
 
 // ESClient defines the minimal interface required for the index manager to
@@ -49,18 +60,18 @@ type FileClient interface {
 }
 
 // NewClientHandler initializes and returns a new instance of ClientHandler
-func NewClientHandler(ilm ilm.ClientHandler, template template.Loader) ClientHandler {
-	return &clientHandler{ilm, template}
+func NewClientHandler(ilm ilm.ClientHandler, df dataframes.ClientHandler, template template.Loader) ClientHandler {
+	return &clientHandler{ilm, df, template}
 }
 
 // NewESClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
 func NewESClientHandler(c ESClient) ClientHandler {
-	return NewClientHandler(ilm.NewESClientHandler(c), template.NewESLoader(c))
+	return NewClientHandler(ilm.NewESClientHandler(c), dataframes.NewESClientHandler(c), template.NewESLoader(c))
 }
 
 // NewFileClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
 func NewFileClientHandler(c FileClient) ClientHandler {
-	return NewClientHandler(ilm.NewFileClientHandler(c), template.NewFileLoader(c))
+	return NewClientHandler(ilm.NewFileClientHandler(c), dataframes.NewFileClientHandler(c), template.NewFileLoader(c))
 }

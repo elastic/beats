@@ -11,6 +11,14 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 
 type Supporter interface {
 	Mode() Mode
+	Manager(h ClientHandler) Manager
+}
+
+// Manager uses a ClientHandler to install a policy.
+type Manager interface {
+	Enabled() (bool, error)
+
+	EnsureDataframes() error
 }
 
 // DefaultSupport configures a new default ILM support implementation.

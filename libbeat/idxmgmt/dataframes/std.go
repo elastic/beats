@@ -1,10 +1,12 @@
 package dataframes
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type stdSupport struct {
+type dfSupport struct {
 	log       *logp.Logger
 	mode      Mode
 	source    string
@@ -13,23 +15,57 @@ type stdSupport struct {
 	transform map[string]interface{}
 }
 
-func (s *stdSupport) Mode() Mode {
+type stdManager struct {
+	mode   Mode
+	client ClientHandler
+}
+
+func (m *stdManager) Enabled() (bool, error) {
+	if m.mode == ModeDisabled {
+		return false, nil
+	}
+
+	enabled, err := m.client.CheckDataFramesEnabled(m.mode)
+	if err != nil {
+		return enabled, err
+	}
+
+	if !enabled && m.mode == ModeEnabled {
+		return false, ErrESDFDisabled
+	}
+
+	return enabled, nil
+}
+
+func (m *stdManager) EnsureDataframes() error {
+	fmt.Printf("ENSURING DATA FRAMES")
+	return m.EnsureDataframes()
+}
+
+func (s *dfSupport) Manager(h ClientHandler) Manager {
+	return &stdManager{
+		mode:   s.mode,
+		client: h,
+	}
+}
+
+func (s *dfSupport) Mode() Mode {
 	return s.mode
 }
 
-func (s *stdSupport) Source() string {
+func (s *dfSupport) Source() string {
 	return s.source
 }
 
-func (s *stdSupport) Dest() string {
+func (s *dfSupport) Dest() string {
 	return s.dest
 }
 
-func (s *stdSupport) Timespan() string {
+func (s *dfSupport) Timespan() string {
 	return s.timespan
 }
 
-func (s *stdSupport) Transform() map[string]interface{} {
+func (s *dfSupport) Transform() map[string]interface{} {
 	return s.transform
 }
 
@@ -41,7 +77,7 @@ func NewStdSupport(
 	timespan string,
 	transform map[string]interface{},
 ) Supporter {
-	return &stdSupport{
+	return &dfSupport{
 		log:       log,
 		mode:      mode,
 		source:    source,
