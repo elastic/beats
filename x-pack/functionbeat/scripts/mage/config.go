@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/dev-tools/mage"
 )
 
+// XPackConfigFileParams returns the configuration of sample and reference configuration data.
 func XPackConfigFileParams() mage.ConfigFileParams {
 	return mage.ConfigFileParams{
 		ShortParts: []string{

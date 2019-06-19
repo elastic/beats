@@ -88,6 +88,7 @@ type ConfigFileParams struct {
 	ExtraVars      map[string]interface{}
 }
 
+// Empty checks if configuration files are set.
 func (c ConfigFileParams) Empty() bool {
 	return len(c.ShortParts) == len(c.ReferenceDeps) && len(c.ReferenceParts) == len(c.DockerParts) && len(c.DockerParts) == 0
 }
