@@ -1831,6 +1831,53 @@ Beat type.
 --
 
 [float]
+== state fields
+
+Beat state
+
+
+
+*`beat.state.management.enabled`*::
++
+--
+type: bool
+
+Is central management enabled?
+
+
+--
+
+*`beat.state.module.count`*::
++
+--
+type: int
+
+Number of modules enabled
+
+
+--
+
+*`beat.state.output.name`*::
++
+--
+type: keyword
+
+Name of output used by Beat
+
+
+--
+
+*`beat.state.queue.name`*::
++
+--
+type: keyword
+
+Name of queue being used by Beat
+
+
+--
+
+[float]
 == stats fields
 
 Beat stats
