@@ -206,7 +206,7 @@ metricbeat.modules:
   #  - us-east-2
 
 #-------------------------------- Beats Module --------------------------------
-- module: beats
+- module: beat
   metricsets:
     - stats
   period: 10s
