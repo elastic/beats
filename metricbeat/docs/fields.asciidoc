@@ -1571,20 +1571,20 @@ Time series instance id
 
 --
 
-[[exported-fields-beats]]
-== Beats fields
+[[exported-fields-beat]]
+== Beat fields
 
-Beats module
+Beat module
 
 
 
 [float]
-== beats fields
+== beat fields
 
 
 
 
-*`beats.id`*::
+*`beat.id`*::
 +
 --
 type: keyword
@@ -1594,7 +1594,7 @@ Beat ID.
 
 --
 
-*`beats.type`*::
+*`beat.type`*::
 +
 --
 type: keyword
@@ -1611,7 +1611,7 @@ Beat stats
 
 
 
-*`beats.stats.uptime.ms`*::
+*`beat.stats.uptime.ms`*::
 +
 --
 type: long
@@ -1621,7 +1621,7 @@ Beat uptime
 
 --
 
-*`beats.stats.runtime.goroutines`*::
+*`beat.stats.runtime.goroutines`*::
 +
 --
 type: long
@@ -1645,7 +1645,7 @@ Output stats
 
 
 
-*`beats.stats.libbeat.output.type`*::
+*`beat.stats.libbeat.output.type`*::
 +
 --
 type: keyword
@@ -1662,7 +1662,7 @@ Event counters
 
 
 
-*`beats.stats.libbeat.output.events.acked`*::
+*`beat.stats.libbeat.output.events.acked`*::
 +
 --
 type: long
@@ -1672,7 +1672,7 @@ Number of events acknowledged
 
 --
 
-*`beats.stats.libbeat.output.events.active`*::
+*`beat.stats.libbeat.output.events.active`*::
 +
 --
 type: long
@@ -1682,7 +1682,7 @@ Number of active events
 
 --
 
-*`beats.stats.libbeat.output.events.batches`*::
+*`beat.stats.libbeat.output.events.batches`*::
 +
 --
 type: long
@@ -1692,7 +1692,7 @@ Number of event batches
 
 --
 
-*`beats.stats.libbeat.output.events.dropped`*::
+*`beat.stats.libbeat.output.events.dropped`*::
 +
 --
 type: long
@@ -1702,7 +1702,7 @@ Number of events dropped
 
 --
 
-*`beats.stats.libbeat.output.events.duplicates`*::
+*`beat.stats.libbeat.output.events.duplicates`*::
 +
 --
 type: long
@@ -1712,7 +1712,7 @@ Number of events duplicated
 
 --
 
-*`beats.stats.libbeat.output.events.failed`*::
+*`beat.stats.libbeat.output.events.failed`*::
 +
 --
 type: long
@@ -1722,7 +1722,7 @@ Number of events failed
 
 --
 
-*`beats.stats.libbeat.output.events.toomany`*::
+*`beat.stats.libbeat.output.events.toomany`*::
 +
 --
 type: long
@@ -1732,7 +1732,7 @@ Number of too many events
 
 --
 
-*`beats.stats.libbeat.output.events.total`*::
+*`beat.stats.libbeat.output.events.total`*::
 +
 --
 type: long
@@ -1749,7 +1749,7 @@ Read stats
 
 
 
-*`beats.stats.libbeat.output.read.bytes`*::
+*`beat.stats.libbeat.output.read.bytes`*::
 +
 --
 type: long
@@ -1759,7 +1759,7 @@ Number of bytes read
 
 --
 
-*`beats.stats.libbeat.output.read.errors`*::
+*`beat.stats.libbeat.output.read.errors`*::
 +
 --
 type: long
@@ -1776,7 +1776,7 @@ Write stats
 
 
 
-*`beats.stats.libbeat.output.write.bytes`*::
+*`beat.stats.libbeat.output.write.bytes`*::
 +
 --
 type: long
@@ -1786,7 +1786,7 @@ Number of bytes written
 
 --
 
-*`beats.stats.libbeat.output.write.errors`*::
+*`beat.stats.libbeat.output.write.errors`*::
 +
 --
 type: long

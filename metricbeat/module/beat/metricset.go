@@ -15,41 +15,38 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-
-package stats
+package beat
 
 import (
-	"io/ioutil"
-	"path/filepath"
-	"testing"
-
-	"github.com/elastic/beats/metricbeat/module/beats"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func TestEventMapping(t *testing.T) {
+// MetricSet can be used to build other metricsets within the Beat module.
+type MetricSet struct {
+	mb.BaseMetricSet
+	*helper.HTTP
+	XPackEnabled bool
+}
 
-	files, err := filepath.Glob("./_meta/test/stats.*.json")
-	assert.NoError(t, err)
-
-	info := beats.Info{
-		UUID: "1234",
-		Beat: "helloworld",
+// NewMetricSet creates a metricset that can be used to build other metricsets
+// within the Beat module.
+func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+	config := DefaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
 	}
 
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
-
-		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, info, input)
-
-		assert.NoError(t, err, f)
-		assert.True(t, len(reporter.GetEvents()) >= 1, f)
-		assert.Equal(t, 0, len(reporter.GetErrors()), f)
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
 	}
+
+	ms := &MetricSet{
+		base,
+		http,
+		config.XPackEnabled,
+	}
+
+	return ms, nil
 }

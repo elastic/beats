@@ -15,16 +15,35 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beats
+package beat
 
-// Config defines the structure for the Beats module configuration options
-type Config struct {
-	XPackEnabled bool `config:"xpack.enabled"`
+import "os"
+
+// GetEnvHost for Metricbeat
+func GetEnvHost() string {
+	host := os.Getenv("METRICBEAT_HOST")
+
+	if len(host) == 0 {
+		host = "127.0.0.1"
+	}
+	return host
 }
 
-// DefaultConfig returns the default configuration for the Beats module
-func DefaultConfig() Config {
-	return Config{
-		XPackEnabled: false,
+// GetEnvPort for Metricbeat
+func GetEnvPort() string {
+	port := os.Getenv("METRICBEAT_HOST")
+
+	if len(port) == 0 {
+		port = "5066"
+	}
+	return port
+}
+
+// GetConfig for Metricbeat
+func GetConfig(metricset string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     ModuleName,
+		"metricsets": []string{metricset},
+		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
 	}
 }

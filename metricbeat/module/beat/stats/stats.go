@@ -20,11 +20,11 @@ package stats
 import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/beats"
+	"github.com/elastic/beats/metricbeat/module/beat"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet(beats.ModuleName, "stats", New,
+	mb.Registry.MustAddMetricSet(beat.ModuleName, "stats", New,
 		mb.WithHostParser(hostParser),
 	)
 }
@@ -42,12 +42,12 @@ var (
 
 // MetricSet defines all fields of the MetricSet
 type MetricSet struct {
-	*beats.MetricSet
+	*beat.MetricSet
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := beats.NewMetricSet(base)
+	ms, err := beat.NewMetricSet(base)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	info, err := beats.GetInfo(m.MetricSet)
+	info, err := beat.GetInfo(m.MetricSet)
 	if err != nil {
 		return err
 	}

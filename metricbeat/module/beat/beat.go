@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beats
+package beat
 
 import (
 	"encoding/json"
@@ -25,9 +25,9 @@ import (
 )
 
 // ModuleName is the name of this module.
-const ModuleName = "beats"
+const ModuleName = "beat"
 
-// Info construct contains the relevant data from the Beats / endpoint
+// Info construct contains the relevant data from the Beat's / endpoint
 type Info struct {
 	UUID     string `json:"uuid"`
 	Beat     string `json:"beat"`
@@ -36,7 +36,7 @@ type Info struct {
 	Version  string `json:"version"`
 }
 
-// State construct contains the relevant data from the Beats /state endpoint
+// State construct contains the relevant data from the Beat's /state endpoint
 type State struct {
 	Outputs struct {
 		Elasticsearch struct {
@@ -45,7 +45,7 @@ type State struct {
 	} `json:"outputs"`
 }
 
-// GetInfo returns the data for the Beats / endpoint.
+// GetInfo returns the data for the Beat's / endpoint.
 func GetInfo(m *MetricSet) (*Info, error) {
 	content, err := fetchPath(m.HTTP, "/", "")
 	if err != nil {
@@ -61,7 +61,7 @@ func GetInfo(m *MetricSet) (*Info, error) {
 	return info, nil
 }
 
-// GetState returns the data for the Beats /state endpoint.
+// GetState returns the data for the Beat's /state endpoint.
 func GetState(m *MetricSet) (*State, error) {
 	content, err := fetchPath(m.HTTP, "/state", "")
 	if err != nil {

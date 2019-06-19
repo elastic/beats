@@ -1,2 +1,0 @@
-BEATS_HOST=metricbeat
-BEATS_PORT=5066

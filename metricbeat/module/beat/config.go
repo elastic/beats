@@ -15,38 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beats
+package beat
 
-import (
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/mb"
-)
-
-// MetricSet can be used to build other metricsets within the Beats module.
-type MetricSet struct {
-	mb.BaseMetricSet
-	*helper.HTTP
-	XPackEnabled bool
+// Config defines the structure for the Beat module configuration options
+type Config struct {
+	XPackEnabled bool `config:"xpack.enabled"`
 }
 
-// NewMetricSet creates a metricset that can be used to build other metricsets
-// within the Beats module.
-func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
-	config := DefaultConfig()
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
+// DefaultConfig returns the default configuration for the Beat module
+func DefaultConfig() Config {
+	return Config{
+		XPackEnabled: false,
 	}
-
-	http, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-
-	ms := &MetricSet{
-		base,
-		http,
-		config.XPackEnabled,
-	}
-
-	return ms, nil
 }

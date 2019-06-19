@@ -26,7 +26,7 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/beats"
+	"github.com/elastic/beats/metricbeat/module/beat"
 )
 
 var (
@@ -63,10 +63,10 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info beats.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 	var event mb.Event
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", beats.ModuleName)
+	event.RootFields.Put("service.name", beat.ModuleName)
 
 	event.ModuleFields = common.MapStr{}
 	event.ModuleFields.Put("id", info.UUID)
@@ -75,7 +75,7 @@ func eventMapping(r mb.ReporterV2, info beats.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Beats Stats API response")
+		return errors.Wrap(err, "failure parsing Beat's Stats API response")
 	}
 
 	event.MetricSetFields, err = schema.Apply(data)

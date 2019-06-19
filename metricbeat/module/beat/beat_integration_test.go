@@ -17,7 +17,7 @@
 
 // +build integration
 
-package beats_test
+package beat_test
 
 import (
 	"os"
@@ -27,8 +27,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/beats"
-	_ "github.com/elastic/beats/metricbeat/module/beats/stats"
+	"github.com/elastic/beats/metricbeat/module/beat"
+	_ "github.com/elastic/beats/metricbeat/module/beat/stats"
 )
 
 var metricSets = []string{
@@ -36,10 +36,10 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "beats")
+	compose.EnsureUp(t, "beat")
 
 	for _, metricSet := range metricSets {
-		f := mbtest.NewReportingMetricSetV2Error(t, beats.GetConfig(metricSet))
+		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet))
 		events, errs := mbtest.ReportingFetchV2Error(f)
 
 		assert.Empty(t, errs)
@@ -48,12 +48,12 @@ func TestFetch(t *testing.T) {
 		}
 
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-			events[0].BeatEvent("beats", metricSet).Fields.StringToPrint())
+			events[0].BeatEvent("beat", metricSet).Fields.StringToPrint())
 	}
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "beats")
+	compose.EnsureUp(t, "beat")
 
 	for _, metricSet := range metricSets {
 		config := getConfig(metricSet)
@@ -67,14 +67,14 @@ func TestData(t *testing.T) {
 
 func getConfig(metricset string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":     beats.ModuleName,
+		"module":     beat.ModuleName,
 		"metricsets": []string{metricset},
 		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
 	}
 }
 
 func getEnvHost() string {
-	host := os.Getenv("BEATS_HOST")
+	host := os.Getenv("BEAT_HOST")
 
 	if len(host) == 0 {
 		host = "127.0.0.1"
@@ -83,7 +83,7 @@ func getEnvHost() string {
 }
 
 func getEnvPort() string {
-	port := os.Getenv("BEATS_PORT")
+	port := os.Getenv("BEAT_PORT")
 
 	if len(port) == 0 {
 		port = "5066"

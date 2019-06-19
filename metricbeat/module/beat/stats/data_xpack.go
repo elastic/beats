@@ -27,10 +27,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/beats"
+	"github.com/elastic/beats/metricbeat/module/beat"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beats.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []byte) error {
 	now := time.Now()
 	clusterUUID, err := m.getClusterUUID()
 	if err != nil {
@@ -49,7 +49,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beats.Info, content [
 	var metrics map[string]interface{}
 	err = json.Unmarshal(content, &metrics)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Beats Stats API response")
+		return errors.Wrap(err, "failure parsing Beat's Stats API response")
 	}
 
 	fields := common.MapStr{
@@ -78,7 +78,7 @@ func (m *MetricSet) calculateIntervalMs() int64 {
 }
 
 func (m *MetricSet) getClusterUUID() (string, error) {
-	state, err := beats.GetState(m.MetricSet)
+	state, err := beat.GetState(m.MetricSet)
 	if err != nil {
 		return "", errors.Wrap(err, "could not get state information")
 	}

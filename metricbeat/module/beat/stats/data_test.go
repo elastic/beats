@@ -15,35 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beats
+// +build !integration
 
-import "os"
+package stats
 
-// GetEnvHost for Metricbeat
-func GetEnvHost() string {
-	host := os.Getenv("METRICBEAT_HOST")
+import (
+	"io/ioutil"
+	"path/filepath"
+	"testing"
 
-	if len(host) == 0 {
-		host = "127.0.0.1"
+	"github.com/elastic/beats/metricbeat/module/beat"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestEventMapping(t *testing.T) {
+
+	files, err := filepath.Glob("./_meta/test/stats.*.json")
+	assert.NoError(t, err)
+
+	info := beat.Info{
+		UUID: "1234",
+		Beat: "helloworld",
 	}
-	return host
-}
 
-// GetEnvPort for Metricbeat
-func GetEnvPort() string {
-	port := os.Getenv("METRICBEAT_HOST")
+	for _, f := range files {
+		input, err := ioutil.ReadFile(f)
+		assert.NoError(t, err)
 
-	if len(port) == 0 {
-		port = "5066"
-	}
-	return port
-}
+		reporter := &mbtest.CapturingReporterV2{}
+		err = eventMapping(reporter, info, input)
 
-// GetConfig for Metricbeat
-func GetConfig(metricset string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     ModuleName,
-		"metricsets": []string{metricset},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+		assert.NoError(t, err, f)
+		assert.True(t, len(reporter.GetEvents()) >= 1, f)
+		assert.Equal(t, 0, len(reporter.GetErrors()), f)
 	}
 }
