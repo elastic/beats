@@ -468,16 +468,10 @@
 		{
 			"checksumSHA1": "qUIf77TBORA1MZoNFNdiR5kFRjI=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2",
-			"revision": "db223f6d5a456d1c9dfaeb7ef865cc63e03ec2ce",
-			"revisionTime": "2019-06-11T23:54:58Z"
-		},
-		{
-			"checksumSHA1": "kCyrtNPVHzoajcxIYke+pHqWkR0=",
-			"path": "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface",
-			"revision": "db223f6d5a456d1c9dfaeb7ef865cc63e03ec2ce",
-			"revisionTime": "2019-06-11T23:54:58Z",
-			"tree": true,
-			"version": "v2.0.0-preview.9"
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
 		},
 		{
 			"path": "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2iface",
