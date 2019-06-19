@@ -28,13 +28,17 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/elastic/go-lookslike/isdef"
+
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
 	btesting "github.com/elastic/beats/libbeat/testing"
 )
 
@@ -103,17 +107,17 @@ func TestUpEndpointJob(t *testing.T) {
 
 	event := testTCPCheck(t, "localhost", port)
 
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "tcp"),
 			hbtest.SummaryChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "tcp", "localhost", port),
 			hbtest.RespondingTCPChecks(),
-			mapval.MustCompile(mapval.Map{
-				"resolve": mapval.Map{
+			lookslike.MustCompile(map[string]interface{}{
+				"resolve": map[string]interface{}{
 					"ip":     "127.0.0.1",
-					"rtt.us": mapval.IsDuration,
+					"rtt.us": isdef.IsDuration,
 				},
 			}),
 		)),
@@ -146,9 +150,9 @@ func TestTLSConnection(t *testing.T) {
 	defer os.Remove(certFile.Name())
 
 	event := testTLSTCPCheck(t, ip, port, certFile.Name())
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "up", "tcp"),
@@ -167,9 +171,9 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 	event := testTCPCheck(t, ip, port)
 
 	dialErr := fmt.Sprintf("dial tcp %s:%d", ip, port)
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
@@ -185,9 +189,9 @@ func TestUnreachableEndpointJob(t *testing.T) {
 	event := testTCPCheck(t, ip, port)
 
 	dialErr := fmt.Sprintf("dial tcp %s:%d", ip, port)
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
@@ -212,20 +216,20 @@ func TestCheckUp(t *testing.T) {
 
 	event := testTCPConfigCheck(t, configMap, host, port)
 
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "up", "tcp"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(1, 0),
-			mapval.MustCompile(mapval.Map{
-				"resolve": mapval.Map{
+			lookslike.MustCompile(map[string]interface{}{
+				"resolve": map[string]interface{}{
 					"ip":     ip,
-					"rtt.us": mapval.IsDuration,
+					"rtt.us": isdef.IsDuration,
 				},
-				"tcp": mapval.Map{
-					"rtt.validate.us": mapval.IsDuration,
+				"tcp": map[string]interface{}{
+					"rtt.validate.us": isdef.IsDuration,
 				},
 			}),
 		)),
@@ -248,22 +252,22 @@ func TestCheckDown(t *testing.T) {
 
 	event := testTCPConfigCheck(t, configMap, host, port)
 
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(0, 1),
-			mapval.MustCompile(mapval.Map{
-				"resolve": mapval.Map{
+			lookslike.MustCompile(map[string]interface{}{
+				"resolve": map[string]interface{}{
 					"ip":     ip,
-					"rtt.us": mapval.IsDuration,
+					"rtt.us": isdef.IsDuration,
 				},
-				"tcp": mapval.Map{
-					"rtt.validate.us": mapval.IsDuration,
+				"tcp": map[string]interface{}{
+					"rtt.validate.us": isdef.IsDuration,
 				},
-				"error": mapval.Map{
+				"error": map[string]interface{}{
 					"type":    "validate",
 					"message": "received string mismatch",
 				},
@@ -277,9 +281,9 @@ func TestNXDomainJob(t *testing.T) {
 	event := testTCPCheck(t, host, port)
 
 	dialErr := fmt.Sprintf("lookup %s", host)
-	mapval.Test(
+	testslike.Test(
 		t,
-		mapval.Strict(mapval.Compose(
+		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("", "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
