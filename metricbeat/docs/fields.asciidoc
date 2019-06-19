@@ -824,43 +824,27 @@ type: long
 
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-[float]
-== aws fields
-=======
 [float]
 === aws
->>>>>>> Clean up headings to make content easier to scan
 
 
 
 
-<<<<<<< HEAD
 *`aws.tags.*`*::
 +
 --
-type: object
-
 Tag key value pairs from aws resources.
 
 
+type: object
+
 --
 
-[float]
-== cloudwatch fields
-
-`cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
-
-=======
->>>>>>> [Docs] Remove extraneous section levels from field docs
-=======
 [float]
 === cloudwatch
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
 
->>>>>>> Clean up headings to make content easier to scan
 
 
 *`aws.cloudwatch.namespace`*::

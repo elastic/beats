@@ -4939,8 +4939,6 @@ alias to: user.name
 
 --
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 *`elasticsearch.audit.message`*::
 +
 --
@@ -4949,39 +4947,22 @@ type: text
 --
 
 [float]
-== deprecation fields
-=======
-[float]
 === deprecation
->>>>>>> Move description and run make update
 
 
 
 [float]
-<<<<<<< HEAD
-== gc fields
-=======
 === gc
->>>>>>> Move description and run make update
 
 GC fileset fields.
 
 
 
 [float]
-<<<<<<< HEAD
-== phase fields
-
-Fields specific to GC phase.
-
-=======
->>>>>>> [Docs] Remove extraneous section levels from field docs
-=======
 === phase
 
 Fields specific to GC phase.
 
->>>>>>> Move description and run make update
 
 
 *`elasticsearch.gc.phase.name`*::
