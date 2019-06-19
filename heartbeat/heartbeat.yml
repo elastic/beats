@@ -127,6 +127,7 @@ output.elasticsearch:
   #ssl.key: "/etc/pki/client/cert.key"
 
 #================================ Processors =====================================
+
 processors:
   - add_observer_metadata: 
   # Optional, but recommended geo settings for the location heartbeat is running in 
@@ -136,7 +137,6 @@ processors:
 
     # Lat, Lon "
     #location: "37.926868, -78.024902"
-
 
 #================================ Logging =====================================
 

@@ -138,3 +138,8 @@ func customizePackaging() {
 		}
 	}
 }
+
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	return mage.Config(mage.AllConfigTypes, mage.ConfigFileParams{}, ".")
+}

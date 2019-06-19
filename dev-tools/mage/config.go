@@ -38,6 +38,21 @@ var (
 	shortTemplate     = filepath.Join("build", BeatName+".yml.tmpl")
 	referenceTemplate = filepath.Join("build", BeatName+".reference.yml.tmpl")
 	dockerTemplate    = filepath.Join("build", BeatName+".docker.yml.tmpl")
+
+	defaultConfigFileParams = ConfigFileParams{
+		ShortParts: []string{
+			OSSBeatDir("_meta/beat.yml"),
+			LibbeatDir("_meta/config.yml.tmpl"),
+		},
+		ReferenceParts: []string{
+			OSSBeatDir("_meta/beat.reference.yml"),
+			LibbeatDir("_meta/config.reference.yml.tmpl"),
+		},
+		DockerParts: []string{
+			OSSBeatDir("_meta/beat.docker.yml"),
+			LibbeatDir("_meta/config.docker.yml"),
+		},
+	}
 )
 
 // ConfigFileType is a bitset that indicates what types of config files to
@@ -73,9 +88,15 @@ type ConfigFileParams struct {
 	ExtraVars      map[string]interface{}
 }
 
+func (c ConfigFileParams) Empty() bool {
+	return len(c.ShortParts) == len(c.ReferenceDeps) && len(c.ReferenceParts) == len(c.DockerParts) && len(c.DockerParts) == 0
+}
+
 // Config generates config files. Set DEV_OS and DEV_ARCH to change the target
 // host for the generated configs. Defaults to linux/amd64.
 func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error {
+	if args.Empty() {
+		args = defaultConfigFileParams
 	if err := makeConfigTemplates(types, args); err != nil {
 		return errors.Wrap(err, "failed making config templates")
 	}

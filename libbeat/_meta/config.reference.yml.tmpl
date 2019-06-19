@@ -381,8 +381,7 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
-
+{{if not .ExcludeLogstash}}
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -490,7 +489,7 @@ output.elasticsearch:
   # The number of seconds to wait for responses from the Logstash server before
   # timing out. The default is 30s.
   #timeout: 30s
-
+{{end}}{{if not .ExcludeKafka}}
 #------------------------------- Kafka output ----------------------------------
 #output.kafka:
   # Boolean flag to enable or disable the output module.
@@ -644,7 +643,7 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
+{{end}}{{if not .ExcludeRedis}}
 #------------------------------- Redis output ----------------------------------
 #output.redis:
   # Boolean flag to enable or disable the output module.
@@ -760,7 +759,7 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
+{{end}}{{if not .ExcludeFileOutput}}
 #------------------------------- File output -----------------------------------
 #output.file:
   # Boolean flag to enable or disable the output module.
@@ -794,8 +793,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
-
+{{end}}{{if not .ExcludeConsole}}
 #----------------------------- Console output ---------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -808,7 +806,7 @@ output.elasticsearch:
 
     # Configure escaping HTML symbols in strings.
     #escape_html: false
-
+{{end}}
 #================================= Paths ======================================
 
 # The home path for the beatname installation. This is the default base path

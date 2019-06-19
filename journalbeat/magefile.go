@@ -226,3 +226,8 @@ func selectImage(platform string) (string, error) {
 
 	return devtools.BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
 }
+
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	return mage.Config(mage.AllConfigTypes, mage.ConfigFileParams{}, ".")
+}
