@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2018-03-01/insights"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
 	"strings"
@@ -16,6 +17,19 @@ type AzureMonitorClient struct {
 	metricDefinitionClient *insights.MetricDefinitionsClient
 	accessToken          string
 	accessTokenExpiresOn time.Time
+	resources []AzureMonitorResource
+}
+
+type AzureMonitorResource struct {
+	name string
+	uri string
+	metricNamespace string
+	metrics []AzureMonitorMetric
+}
+
+type AzureMonitorMetric struct {
+	name string
+	value int64
 }
 
 // New instantiates the an Azure monitoring client
@@ -32,7 +46,28 @@ func (client *AzureMonitorClient) New(config azure.Config) error{
 	metricsDefinitionClient.Authorizer= authorizer
 	client.metricDefinitionClient= &metricsDefinitionClient
 	client.metricsClient = &metricsClient
+
+
+resourceClient := resources.NewClient(config.SubscriptionId)
+resourceClient.Authorizer= authorizer
+	for _, resource := range config.Resources{
+    res:= GetResourceInfo(resourceClient, resource, config)
+_= res
+	}
+
 	return nil
+}
+
+
+func GetResourceInfo(client resources.Client, name string, config azure.Config) AzureMonitorResource{
+	var monitorResource AzureMonitorResource
+	monitorResource.name= name
+	test, err:= client.Get(context.Background(), "obs-infrastructure", "", "", "", name)
+	if err!= nil{
+		_= test
+		monitorResource.uri= "dsfs"
+	}
+	return monitorResource
 }
 
 // ListMetricDefinitions returns the list of metrics available for the specified resource in the form "Localized Name (metric name)".

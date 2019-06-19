@@ -27,10 +27,11 @@ import (
 
 // Config options
 type Config struct {
-	ClientId       string `config:"client_id"    validate:"required"`
-	ClientSecret   string `config:"client_secret"`
-	TenantId       string `config:"tenant_id" validate:"required"`
-	SubscriptionId string `config:"subscription_id" validate:"required"`
+	ClientId       string   `config:"client_id"    validate:"required"`
+	ClientSecret   string   `config:"client_secret"`
+	TenantId       string   `config:"tenant_id" validate:"required"`
+	SubscriptionId string   `config:"subscription_id" validate:"required"`
+	Resources      []string `config:"resources"`
 }
 
 func init() {
