@@ -36,7 +36,7 @@ var (
 		}),
 		"runtime": c.Dict("beat.runtime", s.Schema{
 			"goroutines": c.Int("goroutines"),
-		}, c.DictOptional),
+		}),
 		"libbeat": c.Dict("libbeat", s.Schema{
 			"output": c.Dict("output", s.Schema{
 				"type": c.Str("type"),
