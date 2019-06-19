@@ -157,7 +157,7 @@ metricbeat.modules:
   #password: password
 
 #-------------------------------- Beat Module --------------------------------
-- module: beats
+- module: beat
   metricsets:
     - stats
   period: 10s
