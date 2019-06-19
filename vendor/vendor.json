@@ -1641,12 +1641,6 @@
 			"revisionTime": "2017-03-27T23:54:44Z"
 		},
 		{
-			"checksumSHA1": "fMtE9NnJqBmETy1wH+ByyucE8bU=",
-			"path": "github.com/go-goracle/goracle",
-			"revision": "0a45a710690db3e5c692a9d6f371b0c4f7fd0fd5",
-			"revisionTime": "2019-04-12T06:59:33Z"
-		},
-		{
 			"checksumSHA1": "wDZdTaY9JiqqqnF4c3pHP71nWmk=",
 			"path": "github.com/go-ole/go-ole",
 			"revision": "de8695c8edbf8236f30d6e1376e20b198a028d42",
@@ -2620,6 +2614,12 @@
 			"revision": "release-branch.go1.10",
 			"version": "release-branch.go1.10",
 			"versionExact": "release-branch.go1.10"
+		},
+		{
+			"checksumSHA1": "+/UD9mGRnKxOhZW3+B+VJdIIPn8=",
+			"path": "gopkg.in/goracle.v2",
+			"revision": "3222d7159b45fce95150f06a57e1bcc2868108d3",
+			"revisionTime": "2019-05-30T18:40:54Z"
 		},
 		{
 			"checksumSHA1": "6f8MEU31llHM1sLM/GGH4/Qxu0A=",
