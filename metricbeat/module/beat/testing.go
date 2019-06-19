@@ -21,7 +21,7 @@ import "os"
 
 // GetEnvHost for Metricbeat
 func GetEnvHost() string {
-	host := os.Getenv("BEAT_HOST")
+	host := os.Getenv("METRICBEAT_HOST")
 
 	if len(host) == 0 {
 		host = "127.0.0.1"
@@ -31,7 +31,7 @@ func GetEnvHost() string {
 
 // GetEnvPort for Metricbeat
 func GetEnvPort() string {
-	port := os.Getenv("BEAT_PORT")
+	port := os.Getenv("METRICBEAT_HOST")
 
 	if len(port) == 0 {
 		port = "5066"
