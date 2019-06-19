@@ -64,7 +64,7 @@ services:
     ports:
       - 80
 
-  beat:
+  metricbeat:
     build: ./module/beat/_meta
     ports:
       - 5066

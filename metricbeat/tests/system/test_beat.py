@@ -6,7 +6,7 @@ import time
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['beat']
+    COMPOSE_SERVICES = ['metricbeat']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
