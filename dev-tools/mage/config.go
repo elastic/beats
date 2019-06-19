@@ -102,10 +102,15 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 	}
 
 	params := map[string]interface{}{
-		"GOOS":      EnvOr("DEV_OS", "linux"),
-		"GOARCH":    EnvOr("DEV_ARCH", "amd64"),
-		"Reference": false,
-		"Docker":    false,
+		"GOOS":              EnvOr("DEV_OS", "linux"),
+		"GOARCH":            EnvOr("DEV_ARCH", "amd64"),
+		"Reference":         false,
+		"Docker":            false,
+		"ExcludeConsole":    false,
+		"ExcludeFileOutput": false,
+		"ExcludeKafka":      false,
+		"ExcludeLogstash":   false,
+		"ExcludeRedis":      false,
 	}
 	for k, v := range args.ExtraVars {
 		params[k] = v
