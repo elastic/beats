@@ -20,7 +20,6 @@
 package beat_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -58,37 +57,10 @@ func TestData(t *testing.T) {
 	compose.EnsureUp(t, "metricbeat")
 
 	for _, metricSet := range metricSets {
-		config := getConfig(metricSet)
-		f := mbtest.NewReportingMetricSetV2Error(t, config)
+		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet))
 		err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 		if err != nil {
 			t.Fatal("write", err)
 		}
 	}
-}
-
-func getConfig(metricset string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     beat.ModuleName,
-		"metricsets": []string{metricset},
-		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
-	}
-}
-
-func getEnvHost() string {
-	host := os.Getenv("BEAT_HOST")
-
-	if len(host) == 0 {
-		host = "localhost"
-	}
-	return host
-}
-
-func getEnvPort() string {
-	port := os.Getenv("BEAT_PORT")
-
-	if len(port) == 0 {
-		port = "5066"
-	}
-	return port
 }
