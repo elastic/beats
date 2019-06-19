@@ -44,7 +44,7 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 
 			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
-			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce); err != nil {
+			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce, idxmgmt.LoadModeDisabled); err != nil {
 				fatalf("Error exporting ilm-policy: %+v.", err)
 			}
 		},

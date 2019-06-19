@@ -489,18 +489,21 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				return err
 			}
 
-			var loadTemplate, loadILM = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
+			var loadTemplate, loadILM, loadDataFrames = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
 			if setup.IndexManagement || setup.Template {
 				loadTemplate = idxmgmt.LoadModeOverwrite
 			}
 			if setup.IndexManagement || setup.ILMPolicy {
 				loadILM = idxmgmt.LoadModeOverwrite
 			}
+			if setup.IndexManagement {
+				loadDataFrames = idxmgmt.LoadModeOverwrite
+			}
 			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
 				fmt.Println(warn)
 			}
-			if err = m.Setup(loadTemplate, loadILM); err != nil {
+			if err = m.Setup(loadTemplate, loadILM, loadDataFrames); err != nil {
 				return err
 			}
 			fmt.Println("Index setup finished.")
@@ -797,7 +800,7 @@ func (b *Beat) registerESIndexManagement() error {
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
-		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
+		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
 	}
 }
 

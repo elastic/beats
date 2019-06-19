@@ -32,11 +32,11 @@ type FileClientHandler struct {
 }
 
 func (*FileClientHandler) CheckDataFramesEnabled(Mode) (bool, error) {
-	panic("implement me")
+	panic("implement me check")
 }
 
 func (*FileClientHandler) EnsureDataFrames() (bool, error) {
-	panic("implement me")
+	panic("implement me ensure")
 }
 
 type ESClientHandler struct {
@@ -44,11 +44,11 @@ type ESClientHandler struct {
 }
 
 func (*ESClientHandler) CheckDataFramesEnabled(Mode) (bool, error) {
-	panic("implement me")
+	panic("implement me checkes")
 }
 
 func (*ESClientHandler) EnsureDataFrames() (bool, error) {
-	panic("implement me")
+	panic("implement me ensurees")
 }
 
 // NewESClientHandler initializes and returns an ESClientHandler,

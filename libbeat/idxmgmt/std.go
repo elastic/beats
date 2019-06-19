@@ -46,13 +46,14 @@ type indexSupport struct {
 }
 
 type indexState struct {
-	withILM atomic.Bool
+	withILM       atomic.Bool
+	withDataFrame atomic.Bool
 }
 
 type indexManager struct {
-	support *indexSupport
-	ilm     ilm.Manager
-	df      dataframes.Manager
+	support   *indexSupport
+	ilm       ilm.Manager
+	dataFrame dataframes.Manager
 
 	clientHandler ClientHandler
 	assets        Asseter
@@ -70,8 +71,9 @@ type componentType uint8
 
 //go:generate stringer -linecomment -type componentType
 const (
-	componentTemplate componentType = iota //template
-	componentILM                           //ilm
+	componentTemplate  componentType = iota //template
+	componentILM                            //ilm
+	componentDataFrame                      //dataframe
 )
 
 type feature struct {
@@ -154,7 +156,7 @@ func (s *indexSupport) Manager(
 	return &indexManager{
 		support:       s,
 		ilm:           s.ilm.Manager(clientHandler),
-		df:            s.df.Manager(clientHandler),
+		dataFrame:     s.df.Manager(clientHandler),
 		clientHandler: clientHandler,
 		assets:        assets,
 	}
@@ -254,7 +256,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 }
 
 //
-func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
+func (m *indexManager) Setup(loadTemplate, loadILM LoadMode, loadDataFrames LoadMode) error {
 	log := m.support.log
 
 	withILM, err := m.setupWithILM()
@@ -264,6 +266,9 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	if withILM && loadILM.Enabled() {
 		log.Info("Auto ILM enable success.")
 	}
+
+	withDataFrames, err := m.setupWithDataFrames()
+	dfComponent := newFeature(componentDataFrame, withDataFrames, false, loadDataFrames)
 
 	ilmComponent := newFeature(componentILM, withILM, false, loadILM)
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
@@ -302,6 +307,10 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		log.Info("Loaded index template.")
 	}
 
+	if dfComponent.load {
+		m.dataFrame.EnsureDataframes()
+	}
+
 	if ilmComponent.load {
 		// ensure alias is created after the template is created
 		if err := m.ilm.EnsureAlias(); err != nil {
@@ -331,6 +340,21 @@ func (m *indexManager) setupWithILM() (bool, error) {
 		}
 	}
 	return withILM, nil
+}
+
+func (m *indexManager) setupWithDataFrames() (bool, error) {
+	var err error
+	withDataFrame := m.support.st.withDataFrame.Load()
+	if !withDataFrame {
+		withDataFrame, err = m.dataFrame.Enabled()
+		if err != nil {
+			return false, err
+		}
+		if withDataFrame {
+			m.support.st.withDataFrame.CAS(false, true)
+		}
+	}
+	return withDataFrame, nil
 }
 
 func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
