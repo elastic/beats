@@ -41,7 +41,98 @@ setup.template.settings:
 
 setup.data_frame:
   transforms:
-    - pivot:
+    - mappings:
+        dynamic: false
+        properties:
+          monitor_id:
+            type: keyword
+          state:
+            properties:
+              "@timestamp":
+                type: date
+              observer:
+                properties:
+                  geo:
+                    properties:
+                      name:
+                        type: keyword
+                      location:
+                        type: geo_point
+              agent:
+                properties:
+                  id:
+                    type: keyword
+              up:
+                type: integer
+              down:
+                type: integer
+              monitor:
+                properties:
+                  status:
+                    type: keyword
+                  name:
+                    type: keyword
+                  id:
+                    type: keyword
+                  ip:
+                    type: ip
+              url:
+                properties:
+                  domain:
+                    type: keyword
+                    ignore_above: 1024
+                  fragment:
+                    type: keyword
+                    ignore_above: 1024
+                  full:
+                    type: keyword
+                    ignore_above: 1024
+                  original:
+                    type: keyword
+                    ignore_above: 1024
+                  password:
+                    type: keyword
+                    ignore_above: 1024
+                  path:
+                    type: keyword
+                    ignore_above: 1024
+                  port:
+                    type: long
+                  query:
+                    type: keyword
+                    ignore_above: 1024
+                  scheme:
+                    type: keyword
+                    ignore_above: 1024
+                  username:
+                    type: keyword
+                    ignore_above: 1024
+              checks:
+                type: nested
+                properties:
+                  "@timestamp":
+                    type: date
+                  monitor:
+                    type: object
+                    properties:
+                      ip:
+                        type: ip
+                      status:
+                        type: keyword
+                  agent:
+                    properties:
+                      id:
+                        type: keyword
+                  observer:
+                    properties:
+                      geo:
+                        type: object
+                        properties:
+                          name:
+                            type: keyword
+                          location:
+                            type: geo_point
+      pivot:
         group_by:
           monitor_id: {"terms": {"field": "monitor.id"}}
         aggregations:

@@ -38,7 +38,7 @@ func (m *stdManager) Enabled() (bool, error) {
 }
 
 func (m *stdManager) EnsureDataframes() error {
-	return m.client.EnsureDataFrames(m.dft)
+	return m.client.EnsureDataFrameTransforms(m.dft)
 }
 
 func (s *dfSupport) Manager(h ClientHandler) Manager {

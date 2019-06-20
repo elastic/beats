@@ -2,6 +2,7 @@ package dft
 
 import (
 	"fmt"
+	"path"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -17,11 +18,16 @@ type Supporter interface {
 }
 
 type DataFrameTransform struct {
-	Name     string        `config:"string"`
+	Name     string        `config:"name"`
+	Mappings common.MapStr `config:"mappings"`
 	Pivot    common.MapStr `config:"pivot"`
 	Source   string        `config:"source.index"`
 	Dest     string        `config:"dest.index"`
 	Interval string        `config:"timespan"`
+}
+
+func (t *DataFrameTransform) path() string {
+	return path.Join(esDFTPath, t.Name)
 }
 
 // Manager uses a ClientHandler to install a policy.
