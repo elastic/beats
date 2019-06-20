@@ -119,6 +119,7 @@ type ModulesSource interface {
 	DefaultMetricSets(module string) ([]string, error)
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
+	String() string
 }
 
 // NewRegister creates and returns a new Register.
@@ -361,20 +362,13 @@ func (r *Register) String() string {
 		}
 	}
 
+	var secondarySource string
 	if source := r.secondarySource; source != nil {
-		sourceModules, _ := source.Modules()
-		modules = append(modules, sourceModules...)
-
-		for _, module := range sourceModules {
-			sourceMetricSets, _ := source.MetricSets(module)
-			for _, name := range sourceMetricSets {
-				metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
-			}
-		}
+		secondarySource = ", " + source.String()
 	}
 
 	sort.Strings(modules)
 	sort.Strings(metricSets)
-	return fmt.Sprintf("Register [ModuleFactory:[%s], MetricSetFactory:[%s]]",
-		strings.Join(modules, ", "), strings.Join(metricSets, ", "))
+	return fmt.Sprintf("Register [ModuleFactory:[%s], MetricSetFactory:[%s]%s]",
+		strings.Join(modules, ", "), strings.Join(metricSets, ", "), secondarySource)
 }
