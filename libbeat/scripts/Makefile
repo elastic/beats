@@ -321,14 +321,14 @@ coverage-report:
 fields: mage
 	@mage fields
 
+.PONY: config
+config: mage
+	@mage config
+
 ifndef EXCLUDE_COMMON_UPDATE_TARGET
 .PHONY: update
-update: python-env fields collect ## @build Update expects the most recent version of libbeat in the GOPATH
+update: python-env fields collect config ## @build Update expects the most recent version of libbeat in the GOPATH
 	@echo "Updating generated files for ${BEAT_NAME}"
-
-ifneq ($(shell [[ $(BEAT_NAME) == libbeat ]] && echo true ),true)
-	@mage config
-endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include

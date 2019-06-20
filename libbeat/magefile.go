@@ -53,3 +53,7 @@ func GoTestUnit(ctx context.Context) error {
 func GoTestIntegration(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
+
+func Config() error {
+	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
+}
