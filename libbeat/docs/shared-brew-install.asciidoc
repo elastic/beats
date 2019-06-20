@@ -12,16 +12,10 @@ ifeval::["{release-state}"!="unreleased"]
 ["source","sh",subs="attributes"]
 -------------------------
 brew tap elastic/tap
-brew install elastic/tap/{beatname_lc}@{brew-version}
+brew install elastic/tap/{beatname_lc}-full
 -------------------------
 
-//REVIEWERS: I've trimmed the instructions here so that they are parallel to
-//the instructions provided for other install methods. Note that I have not been able
-//to test the commands shown here (with version) specified, so please confirm
-// syntax. I'm concerned that providing the command *without* the version might
-// lead users to download the wrong version of the shipper, especially within
-// the Beats guides where we provide exact version downloads.
-
-To install the OSS distribution, specify +elastic/tap/{beatname_lc}-oss@{brew-version}+.
+This installs the most recently released default distribution of. To install the
+OSS distribution, specify +elastic/tap/{beatname_lc}-oss+.
 
 endif::[]
