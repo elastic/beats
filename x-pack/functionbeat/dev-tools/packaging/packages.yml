@@ -41,9 +41,6 @@ shared:
       source: '{{.BeatName}}.yml'
       mode: 0600
       config: true
-    kibana:
-      source: _meta/kibana.generated
-      mode: 0644
 
   # Binary package spec (tar.gz for linux/darwin)
   - &binary_spec
@@ -61,12 +58,12 @@ shared:
         source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
         mode: 0644
   #
-  # Binaries used to run the function.
+  # Binaries used to run functions.
   #
   - &functionbeat_binaries
     files:
-      pkg/functionbeat:
-        source: 'build/golang-crossbuild/{{.BeatName}}-linux-amd64'
+      pkg/functionbeat-aws:
+        source: 'provider/aws/build/golang-crossbuild/{{.BeatName}}-aws-linux-amd64'
         mode: 0755
 # specs is a list of named packaging "flavors".
 specs:
