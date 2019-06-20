@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/idxmgmt/dataframes"
+	"github.com/elastic/beats/libbeat/idxmgmt/dft"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -36,7 +36,7 @@ import (
 type indexSupport struct {
 	log          *logp.Logger
 	ilm          ilm.Supporter
-	df           dataframes.Supporter
+	df           dft.Supporter
 	info         beat.Info
 	migration    bool
 	templateCfg  template.TemplateConfig
@@ -53,7 +53,7 @@ type indexState struct {
 type indexManager struct {
 	support   *indexSupport
 	ilm       ilm.Manager
-	dataFrame dataframes.Manager
+	dataFrame dft.Manager
 
 	clientHandler ClientHandler
 	assets        Asseter
@@ -99,7 +99,7 @@ func newIndexSupport(
 	log *logp.Logger,
 	info beat.Info,
 	ilmFactory ilm.SupportFactory,
-	dfFactory dataframes.SupportFactory,
+	dfFactory dft.SupportFactory,
 	tmplConfig *common.Config,
 	ilmConfig *common.Config,
 	dfConfig *common.Config,
@@ -308,7 +308,10 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode, loadDataFrames Load
 	}
 
 	if dfComponent.load {
-		m.dataFrame.EnsureDataframes()
+		err := m.support.df.Manager(m.clientHandler).EnsureDataframes()
+		if err != nil {
+			return err
+		}
 	}
 
 	if ilmComponent.load {

@@ -1,4 +1,4 @@
-package dataframes
+package dft
 
 import (
 	"github.com/elastic/beats/libbeat/beat"
@@ -14,6 +14,14 @@ type Supporter interface {
 	Manager(h ClientHandler) Manager
 }
 
+type DataFrameTransform struct {
+	Name     string        `config:"string"`
+	Body     common.MapStr `config:"body"`
+	Source   string        `config:"source"`
+	Dest     string        `config:"dest"`
+	Interval string        `config:"timespan"`
+}
+
 // Manager uses a ClientHandler to install a policy.
 type Manager interface {
 	Enabled() (bool, error)
@@ -23,7 +31,7 @@ type Manager interface {
 
 // DefaultSupport configures a new default ILM support implementation.
 func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
-	cfg := defaultConfig(info)
+	cfg := DefaultConfig(info)
 	if config != nil {
 		if err := config.Unpack(&cfg); err != nil {
 			return nil, err
@@ -45,12 +53,12 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		log = log.Named("dataframe")
 	}
 
-	cfg := defaultConfig(info)
+	cfg := DefaultConfig(info)
 	if config != nil {
 		if err := config.Unpack(&cfg); err != nil {
 			return nil, err
 		}
 	}
 
-	return NewStdSupport(log, cfg.Mode, cfg.Source, cfg.Dest, cfg.Interval, cfg.Transform), nil
+	return NewStdSupport(log, cfg.Mode, cfg.Transform), nil
 }

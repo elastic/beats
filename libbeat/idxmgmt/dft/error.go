@@ -1,4 +1,4 @@
-package dataframes
+package dft
 
 import "errors"
 

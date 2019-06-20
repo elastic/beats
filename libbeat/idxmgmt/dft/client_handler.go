@@ -1,12 +1,20 @@
-package dataframes
+package dft
 
 import (
+	"path"
+
+	"fmt"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
+const esDFTPath = "/_data_frame/transforms"
+
 type ClientHandler interface {
 	CheckDataFramesEnabled(Mode) (bool, error)
-	EnsureDataFrames() (bool, error)
+	EnsureDataFrames(dft DataFrameTransform) error
 }
 
 // ESClient defines the minimal interface required for the Loader to
@@ -35,7 +43,7 @@ func (*FileClientHandler) CheckDataFramesEnabled(Mode) (bool, error) {
 	panic("implement me check")
 }
 
-func (*FileClientHandler) EnsureDataFrames() (bool, error) {
+func (*FileClientHandler) EnsureDataFrames(transform DataFrameTransform) error {
 	panic("implement me ensure")
 }
 
@@ -44,11 +52,36 @@ type ESClientHandler struct {
 }
 
 func (*ESClientHandler) CheckDataFramesEnabled(Mode) (bool, error) {
-	panic("implement me checkes")
+	//TODO make this actually do the thing
+	return true, nil
 }
 
-func (*ESClientHandler) EnsureDataFrames() (bool, error) {
-	panic("implement me ensurees")
+func (h *ESClientHandler) EnsureDataFrames(dft DataFrameTransform) error {
+	p := path.Join(esDFTPath, dft.Name)
+	code, _, err := h.client.Request("GET", p, "", nil, nil)
+	if code == 200 { // Stop existing transform
+		code, _, err = h.client.Request("POST", path.Join(p, "_stop"), "", nil, nil)
+		if err != nil {
+			return err
+		}
+
+		_, _, err := h.client.Request("DELETE", p, "", nil, nil)
+		if err != nil {
+			return err
+		}
+	} else if code != 404 {
+		return errors.Wrapf(err, "unexpected error checking dataframe at path %v", p)
+	}
+
+	code, _, err = h.client.Request("PUT", p, "", nil, dft.Body)
+	if err != nil {
+		return errors.Wrapf(err, "could not PUT dataframe at path %v", p)
+	}
+	fmt.Printf("Created %v with code %v", p, code)
+
+	_, _, err = h.client.Request("POST", path.Join(p, "_start"), "", nil, nil)
+
+	return err
 }
 
 // NewESClientHandler initializes and returns an ESClientHandler,

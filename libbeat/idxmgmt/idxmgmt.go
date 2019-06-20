@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/idxmgmt/dataframes"
+	"github.com/elastic/beats/libbeat/idxmgmt/dft"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -101,12 +101,12 @@ func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *common.Config)
 
 // MakeDefaultSupport creates some default index management support, with a
 // custom ILM support implementation.
-func MakeDefaultSupport(ilmSupport ilm.SupportFactory, dfSupport dataframes.SupportFactory) SupportFactory {
+func MakeDefaultSupport(ilmSupport ilm.SupportFactory, dfSupport dft.SupportFactory) SupportFactory {
 	if ilmSupport == nil {
 		ilmSupport = ilm.DefaultSupport
 	}
 	if dfSupport == nil {
-		dfSupport = dataframes.DefaultSupport
+		dfSupport = dft.DefaultSupport
 	}
 
 	return func(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
