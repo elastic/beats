@@ -30,9 +30,9 @@ func init() {
 			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
 			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
 			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
-			"process_open_fds":  prometheus.Metric("process.fds.open.count"),
-			"process_start_time_seconds": prometheus.Metric("process.started.sec"),
-			
+			"process_open_fds":              prometheus.Metric("process.fds.open.count"),
+			"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
+
 			// HTTP server metrics
 			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
 			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
@@ -67,10 +67,10 @@ func init() {
 			"component":   prometheus.KeyLabel("component"),
 			"group":       prometheus.KeyLabel("group"),
 			"version":     prometheus.KeyLabel("version"),
-			
-			"handler":     prometheus.KeyLabel("handler"),
-			"method":     prometheus.KeyLabel("method"),
-			"host":     prometheus.KeyLabel("host"),
+
+			"handler": prometheus.KeyLabel("handler"),
+			"method":  prometheus.KeyLabel("method"),
+			"host":    prometheus.KeyLabel("host"),
 		},
 	}
 

@@ -38,7 +38,6 @@ func TestEventMappingV1_14(t *testing.T) {
 	)
 }
 
-
 func TestEventMappingV1_previous(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "apiserver",
 		ptest.TestCases{
