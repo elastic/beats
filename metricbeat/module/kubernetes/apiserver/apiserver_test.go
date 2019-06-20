@@ -23,6 +23,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
+
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
 )
 
 const testFile = "_meta/test/metrics"
@@ -36,4 +39,8 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 	)
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", "apiserver")
 }

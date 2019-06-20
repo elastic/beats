@@ -18,15 +18,12 @@
 package statement
 
 import (
-	"database/sql"
+	"context"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
-
-	// Register postgresql database/sql driver
-	_ "github.com/lib/pq"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -44,33 +41,25 @@ func init() {
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
-	mb.BaseMetricSet
+	*postgresql.MetricSet
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := struct{}{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
+	ms, err := postgresql.NewMetricSet(base)
+	if err != nil {
 		return nil, err
 	}
-
-	return &MetricSet{
-		BaseMetricSet: base,
-	}, nil
+	return &MetricSet{MetricSet: ms}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	db, err := sql.Open("postgres", m.HostData().URI)
-	if err != nil {
-		return errors.Wrap(err, "error in Open")
-	}
-	defer db.Close()
-
-	results, err := postgresql.QueryStats(db, "SELECT * FROM pg_stat_statements")
+	ctx := context.Background()
+	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_statements")
 	if err != nil {
 		return errors.Wrap(err, "QueryStats")
 	}

@@ -35,6 +35,8 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/apache"
 )
 
 // response is a raw response copied from an Apache web server.
@@ -268,4 +270,8 @@ func TestStatusOutputs(t *testing.T) {
 		_, err = eventMapping(scanner, "localhost")
 		assert.NoError(t, err, "error mapping "+filename)
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "apache", "status")
 }
