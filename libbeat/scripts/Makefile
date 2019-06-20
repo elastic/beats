@@ -325,21 +325,18 @@ fields: mage
 config: mage
 	@mage config
 
+.PHONY: asset
+asset: mage
+	@mage asset
+
+.PHONY: fields-docs
+fields-docs: mage fields
+	@mage FieldsDocs
+
 ifndef EXCLUDE_COMMON_UPDATE_TARGET
 .PHONY: update
 update: python-env fields collect config ## @build Update expects the most recent version of libbeat in the GOPATH
 	@echo "Updating generated files for ${BEAT_NAME}"
-
-ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
-	mkdir -p include
-	go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license $(LICENSE) -pkg include -in fields.yml -out include/fields.go $(BEAT_NAME)
-endif
-
-ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
-	@# Update docs
-	@mkdir -p docs
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
-endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated
 	@# Generate Kibana index pattern and copy dashboard files

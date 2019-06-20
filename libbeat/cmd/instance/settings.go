@@ -35,6 +35,7 @@ type Settings struct {
 	Monitoring      report.Settings
 	RunFlags        *pflag.FlagSet
 	ConfigOverrides *common.Config
+	ConfigNamespace string
 
 	DisableConfigResolver bool
 

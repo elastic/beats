@@ -52,6 +52,7 @@ var (
 			OSSBeatDir("_meta/beat.docker.yml"),
 			LibbeatDir("_meta/config.docker.yml"),
 		},
+		OutputFile: BeatName,
 	}
 )
 
@@ -86,6 +87,7 @@ type ConfigFileParams struct {
 	DockerParts    []string // List of files or globs.
 	DockerDeps     []interface{}
 	ExtraVars      map[string]interface{}
+	OutputFile     string
 }
 
 // Empty checks if configuration files are set.
@@ -122,7 +124,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 
 	// Short
 	if types.IsShort() {
-		file := filepath.Join(targetDir, BeatName+".yml")
+		file := filepath.Join(targetDir, args.OutputFile+".yml")
 		fmt.Printf(">> Building %v for %v/%v\n", file, params["GOOS"], params["GOARCH"])
 		if err := ExpandFile(shortTemplate, file, params); err != nil {
 			return errors.Wrapf(err, "failed building %v", file)
@@ -131,7 +133,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 
 	// Reference
 	if types.IsReference() {
-		file := filepath.Join(targetDir, BeatName+".reference.yml")
+		file := filepath.Join(targetDir, args.OutputFile+".reference.yml")
 		params["Reference"] = true
 		fmt.Printf(">> Building %v for %v/%v\n", file, params["GOOS"], params["GOARCH"])
 		if err := ExpandFile(referenceTemplate, file, params); err != nil {
@@ -141,7 +143,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 
 	// Docker
 	if types.IsDocker() {
-		file := filepath.Join(targetDir, BeatName+".docker.yml")
+		file := filepath.Join(targetDir, args.OutputFile+".docker.yml")
 		params["Reference"] = false
 		params["Docker"] = true
 		fmt.Printf(">> Building %v for %v/%v\n", file, params["GOOS"], params["GOARCH"])

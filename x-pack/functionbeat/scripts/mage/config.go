@@ -5,19 +5,19 @@
 package mage
 
 import (
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 // XPackConfigFileParams returns the configuration of sample and reference configuration data.
-func XPackConfigFileParams() mage.ConfigFileParams {
-	return mage.ConfigFileParams{
+func XPackConfigFileParams(provider string) devtools.ConfigFileParams {
+	return devtools.ConfigFileParams{
 		ShortParts: []string{
-			mage.OSSBeatDir("_meta/beat.yml"),
-			mage.LibbeatDir("_meta/config.yml.tmpl"),
+			devtools.OSSBeatDir("_meta/beat.yml.tmpl"),
+			devtools.LibbeatDir("_meta/config.yml.tmpl"),
 		},
 		ReferenceParts: []string{
-			mage.OSSBeatDir("_meta/beat.reference.yml"),
-			mage.LibbeatDir("_meta/config.reference.yml.tmpl"),
+			devtools.OSSBeatDir("_meta/beat.reference.yml.tmpl"),
+			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		},
 		ExtraVars: map[string]interface{}{
 			"ExcludeConsole":    true,
@@ -25,6 +25,8 @@ func XPackConfigFileParams() mage.ConfigFileParams {
 			"ExcludeKafka":      true,
 			"ExcludeLogstash":   true,
 			"ExcludeRedis":      true,
+			"Provider":          provider,
 		},
+		OutputFile: devtools.BeatName + "-" + provider,
 	}
 }

@@ -9,23 +9,51 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	functionbeat "github.com/elastic/beats/x-pack/functionbeat/scripts/mage"
 )
 
+var (
+	availableProviders = []string{
+		"aws",
+	}
+	selectedProviders []string
+)
+
 func init() {
 	devtools.BeatDescription = "Functionbeat is a beat implementation for a serverless architecture."
 	devtools.BeatLicense = "Elastic License"
+	selectedProviders = getConfiguredProviders()
 }
 
 // Build builds the Beat binary.
 func Build() error {
-	return devtools.Build(devtools.DefaultBuildArgs())
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	params := devtools.DefaultBuildArgs()
+	for _, provider := range getConfiguredProviders() {
+		params.Name = devtools.BeatName + "-" + provider
+		err = os.Chdir(workingDir + "/" + provider)
+		if err != nil {
+			return err
+		}
+
+		err = devtools.Build(params)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
@@ -74,13 +102,8 @@ func TestPackages() error {
 }
 
 // Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
-}
-
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	return devtools.GenerateFieldsYAML()
+func Update() {
+	mg.SerialDeps(Fields, Config, includeFields, docs)
 }
 
 // GoTestUnit executes the Go unit tests.
@@ -99,5 +122,60 @@ func GoTestIntegration(ctx context.Context) error {
 
 // Config generates both the short and reference configs.
 func Config() error {
-	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, functionbeat.XPackConfigFileParams(), ".")
+	for _, provider := range getConfiguredProviders() {
+		err := devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, functionbeat.XPackConfigFileParams(provider), provider)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Fields generates a fields.yml for the Beat.
+func Fields() error {
+	for _, provider := range getConfiguredProviders() {
+		output := filepath.Join(devtools.CWD(), provider, "fields.yml")
+		err := devtools.GenerateFieldsYAMLTo(output)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func includeFields() error {
+	fnBeatDir := devtools.CWD()
+	for _, provider := range getConfiguredProviders() {
+		err := os.Chdir(filepath.Join(fnBeatDir, provider))
+		if err != nil {
+			return err
+		}
+		output := filepath.Join(fnBeatDir, provider, "include", "fields.go")
+		err = devtools.GenerateFieldsGoWithName(devtools.BeatName+"-"+provider, "fields.yml", output)
+		if err != nil {
+			return err
+		}
+		os.Chdir(fnBeatDir)
+	}
+	return nil
+}
+
+func docs() error {
+	for _, provider := range getConfiguredProviders() {
+		fieldsYml := filepath.Join(devtools.CWD(), provider, "fields.yml")
+		err := devtools.Docs.FieldDocs(fieldsYml)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getConfiguredProviders() []string {
+	providers := os.Getenv("PROVIDERS")
+	if len(providers) == 0 {
+		return availableProviders
+	}
+
+	return strings.Split(providers, ",")
 }

@@ -96,6 +96,11 @@ func GenerateAllInOneFieldsGo() error {
 
 // GenerateFieldsGo generates a .go file containing the fields.yml data.
 func GenerateFieldsGo(fieldsYML, out string) error {
+	return GenerateFieldsGoWithName(BeatName, fieldsYML, out)
+}
+
+// GenerateFieldsGo generates a .go file containing the fields.yml data.
+func GenerateFieldsGoWithName(beatName, fieldsYML, out string) error {
 	const assetCmdPath = "dev-tools/cmd/asset/asset.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -109,7 +114,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 		"-in", fieldsYML,
 		"-out", CreateDir(out),
 		"-license", toLibbeatLicenseName(BeatLicense),
-		BeatName,
+		beatName,
 	)
 
 	return assetCmd()

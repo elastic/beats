@@ -15,23 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beat
+package mage
 
-import "github.com/gofrs/uuid"
+import (
+	"io/ioutil"
 
-// Info stores a beats instance meta data.
-type Info struct {
-	Beat            string    // The actual beat's name
-	IndexPrefix     string    // The beat's index prefix in Elasticsearch.
-	Version         string    // The beat version. Defaults to the libbeat version when an implementation does not set a version
-	Name            string    // configured beat name
-	Hostname        string    // hostname
-	ID              uuid.UUID // ID assigned to beat machine
-	EphemeralID     uuid.UUID // ID assigned to beat process invocation (PID)
-	ConfigNamespace string
+	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/licenses"
+)
 
-	// Monitoring-related fields
-	Monitoring struct {
-		DefaultUsername string // The default username to be used to connect to Elasticsearch Monitoring
+func Asset(license, name, input, output string) error {
+	licenseHeader, err := licenses.Find(license)
+	if err != nil {
+		return err
 	}
+
+	data, err := ioutil.ReadFile(input)
+	if err != nil {
+		return err
+	}
+
+	bs, err := asset.CreateAsset(licenseHeader, name, "fields.yml", "include", data, "asset.BeatFieldsPri", input)
+	if err != nil {
+		panic(err)
+	}
+
+	return ioutil.WriteFile(output, bs, 0640)
 }
