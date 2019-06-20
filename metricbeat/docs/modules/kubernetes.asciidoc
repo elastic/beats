@@ -85,6 +85,13 @@ metricbeat.modules:
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+# Kubernetes controller manager
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - kubecontroller
+  hosts: ["http://kube-controller-manager:10252"]
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

@@ -458,6 +458,13 @@ metricbeat.modules:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
 
+# Kubernetes controller manager
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - kubecontroller
+  hosts: ["http://kube-controller-manager:10252"]
+
 #--------------------------------- kvm Module --------------------------------
 - module: kvm
   metricsets: ["dommemstat"]
