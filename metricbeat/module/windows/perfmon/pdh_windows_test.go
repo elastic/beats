@@ -18,6 +18,7 @@
 package perfmon
 
 import (
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -56,7 +57,9 @@ func TestPdhGetFormattedCounterValueInvalidCounter(t *testing.T) {
 
 // TestPdhExpandWildCardPathInvalidPath will test for invalid query path.
 func TestPdhExpandWildCardPathInvalidPath(t *testing.T) {
-	queryList, err := PdhExpandWildCardPath("sdfhsdhfd")
+	utfPath, err := syscall.UTF16PtrFromString("sdfhsdhfd")
+	assert.Nil(t, err)
+	queryList, err := PdhExpandWildCardPath(utfPath)
 	assert.Nil(t, queryList)
 	assert.EqualValues(t, err, PDH_INVALID_PATH)
 }
@@ -80,7 +83,11 @@ func TestPdhSuccessfulCounterRetrieval(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer PdhCloseQuery(queryHandle)
-	queryList, err := PdhExpandWildCardPath(validQuery)
+	utfPath, err := syscall.UTF16PtrFromString(validQuery)
+	if err != nil {
+		t.Fatal(err)
+	}
+	queryList, err := PdhExpandWildCardPath(utfPath)
 	if err != nil {
 		t.Fatal(err)
 	}
