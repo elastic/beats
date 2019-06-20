@@ -1,4 +1,4 @@
-- module: beats
+- module: beat
   metricsets:
     - stats
     - state
