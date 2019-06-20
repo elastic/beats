@@ -13,7 +13,7 @@ This document describes the fields that are exported by Packetbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-amqp>>
-* <<exported-fields-beat>>
+* <<exported-fields-beat-common>>
 * <<exported-fields-cassandra>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
@@ -442,7 +442,7 @@ Creating application id.
 
 --
 
-[[exported-fields-beat]]
+[[exported-fields-beat-common]]
 == Beat fields
 
 Contains common beat fields available in all event types.

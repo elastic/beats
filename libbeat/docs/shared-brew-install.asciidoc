@@ -15,7 +15,7 @@ brew tap elastic/tap
 brew install elastic/tap/{beatname_lc}-full
 -------------------------
 
-This installs the most recently released default distribution of. To install the
-OSS distribution, specify +elastic/tap/{beatname_lc}-oss+.
+This installs the most recently released default distribution of {beatname_uc}.
+To install the OSS distribution, specify +elastic/tap/{beatname_lc}-oss+.
 
 endif::[]
