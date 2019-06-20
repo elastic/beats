@@ -4,7 +4,7 @@ by calling `GetMetricData` api.
 
 [float]
 === AWS Permissions
-Some specific AWS permissions are required for IAM user to collect AWS SQS metrics.
+Some specific AWS permissions are required for IAM user to collect AWS Cloudwatch metrics.
 ----
 ec2:DescribeRegions
 cloudwatch:GetMetricData
