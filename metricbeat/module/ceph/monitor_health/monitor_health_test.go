@@ -28,6 +28,8 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/ceph"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -87,4 +89,8 @@ func TestFetchEventContents(t *testing.T) {
 
 	total = store_stats["total"].(common.MapStr)
 	assert.EqualValues(t, 8488943, total["bytes"])
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "ceph", "monitor_health")
 }
