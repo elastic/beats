@@ -7,33 +7,28 @@
     },
     "kubernetes": {
         "apiserver": {
-            "api": {
-                "component": "apiserver",
-                "group": "storage.k8s.io",
-                "version": "v1"
-            },
+            "component": "apiserver",
+            "group": "batch",
             "request": {
                 "latency": {
                     "bucket": {
-                        "+Inf": 685,
-                        "1000000": 0,
-                        "125000": 0,
-                        "2000000": 0,
-                        "250000": 0,
-                        "4000000": 0,
-                        "500000": 0,
-                        "8000000": 0
+                        "+Inf": 10206,
+                        "1000000": 10206,
+                        "125000": 10206,
+                        "2000000": 10206,
+                        "250000": 10206,
+                        "4000000": 10206,
+                        "500000": 10206,
+                        "8000000": 10206
                     },
-                    "count": 685,
-                    "sum": 305442339254
-                },
-                "longrunning": {
-                    "count": 3
-                },
-                "resource": "storageclasses",
-                "scope": "cluster",
-                "verb": "WATCH"
-            }
+                    "count": 10206,
+                    "sum": 18978664
+                }
+            },
+            "resource": "jobs",
+            "scope": "cluster",
+            "verb": "LIST",
+            "version": "v1"
         }
     },
     "metricset": {

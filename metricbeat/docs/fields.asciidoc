@@ -12834,7 +12834,7 @@ Kubernetes API server metrics
 
 
 
-*`kubernetes.apiserver.request.client`*::
+*`kubernetes.apiserver.client`*::
 +
 --
 type: keyword
@@ -12844,7 +12844,7 @@ Client doing the requests
 
 --
 
-*`kubernetes.apiserver.request.resource`*::
+*`kubernetes.apiserver.resource`*::
 +
 --
 type: keyword
@@ -12854,7 +12854,7 @@ Requested resource
 
 --
 
-*`kubernetes.apiserver.request.subresource`*::
+*`kubernetes.apiserver.subresource`*::
 +
 --
 type: keyword
@@ -12864,7 +12864,7 @@ Requested subresource
 
 --
 
-*`kubernetes.apiserver.request.scope`*::
+*`kubernetes.apiserver.scope`*::
 +
 --
 type: keyword
@@ -12874,7 +12874,7 @@ Request scope (cluster, namespace, resource)
 
 --
 
-*`kubernetes.apiserver.request.verb`*::
+*`kubernetes.apiserver.verb`*::
 +
 --
 type: keyword
@@ -12884,7 +12884,7 @@ Request HTTP verb
 
 --
 
-*`kubernetes.apiserver.request.code`*::
+*`kubernetes.apiserver.code`*::
 +
 --
 type: keyword
@@ -12894,7 +12894,7 @@ Request HTTP code
 
 --
 
-*`kubernetes.apiserver.request.content_type`*::
+*`kubernetes.apiserver.content_type`*::
 +
 --
 type: keyword
@@ -12904,7 +12904,7 @@ Request HTTP content type
 
 --
 
-*`kubernetes.apiserver.request.dry_run`*::
+*`kubernetes.apiserver.dry_run`*::
 +
 --
 type: keyword
@@ -12914,7 +12914,7 @@ Wether the request used dry run
 
 --
 
-*`kubernetes.apiserver.request.kind`*::
+*`kubernetes.apiserver.kind`*::
 +
 --
 type: keyword
@@ -12924,7 +12924,7 @@ Kind of request
 
 --
 
-*`kubernetes.apiserver.api.component`*::
+*`kubernetes.apiserver.component`*::
 +
 --
 type: keyword
@@ -12934,7 +12934,7 @@ Component handling the task
 
 --
 
-*`kubernetes.apiserver.api.group`*::
+*`kubernetes.apiserver.group`*::
 +
 --
 type: keyword
@@ -12944,12 +12944,199 @@ API group for the resource
 
 --
 
-*`kubernetes.apiserver.api.version`*::
+*`kubernetes.apiserver.version`*::
 +
 --
 type: keyword
 
 version for the group
+
+
+--
+
+*`kubernetes.apiserver.handler`*::
++
+--
+type: keyword
+
+Request handler
+
+
+--
+
+*`kubernetes.apiserver.code`*::
++
+--
+type: keyword
+
+HTTP code
+
+
+--
+
+*`kubernetes.apiserver.method`*::
++
+--
+type: keyword
+
+HTTP method
+
+
+--
+
+*`kubernetes.apiserver.host`*::
++
+--
+type: keyword
+
+Request host
+
+
+--
+
+
+*`kubernetes.apiserver.process.cpu.sec`*::
++
+--
+type: scaled_float
+
+CPU seconds
+
+--
+
+*`kubernetes.apiserver.process.memory.resident.bytes`*::
++
+--
+type: long
+
+Bytes in resident memory
+
+--
+
+*`kubernetes.apiserver.process.memory.virtual.bytes`*::
++
+--
+type: long
+
+Bytes in virtual memory
+
+--
+
+*`kubernetes.apiserver.process.fds.open.count`*::
++
+--
+type: integer
+
+Number of open file descriptors
+
+--
+
+*`kubernetes.apiserver.process.started.sec`*::
++
+--
+type: scaled_float
+
+Seconds since the process started
+
+--
+
+
+*`kubernetes.apiserver.http.request.duration.us.percentile.*`*::
++
+--
+type: scaled_float
+
+Request duration microseconds percentiles
+
+--
+
+*`kubernetes.apiserver.http.request.duration.us.sum`*::
++
+--
+type: scaled_float
+
+Request duration microseconds cumulative sum
+
+--
+
+*`kubernetes.apiserver.http.request.duration.us.count`*::
++
+--
+type: long
+
+Request count for duration
+
+--
+
+*`kubernetes.apiserver.http.request.size.bytes.percentile.*`*::
++
+--
+type: integer
+
+Request size percentiles
+
+--
+
+*`kubernetes.apiserver.http.request.size.bytes.sum`*::
++
+--
+type: long
+
+Request size cumulative sum
+
+--
+
+*`kubernetes.apiserver.http.request.size.bytes.count`*::
++
+--
+type: long
+
+Request count for size
+
+--
+
+*`kubernetes.apiserver.http.response.size.bytes.percentile.*`*::
++
+--
+type: integer
+
+Response size percentiles
+
+--
+
+*`kubernetes.apiserver.http.response.size.bytes.sum`*::
++
+--
+type: long
+
+Response size cumulative sum
+
+--
+
+*`kubernetes.apiserver.http.response.size.bytes.count`*::
++
+--
+type: long
+
+Response count
+
+--
+
+*`kubernetes.apiserver.http.request.count`*::
++
+--
+type: long
+
+Request count for response
+
+--
+
+*`kubernetes.apiserver.client.request.count`*::
++
+--
+type: long
+
+Number of requests as client
 
 
 --

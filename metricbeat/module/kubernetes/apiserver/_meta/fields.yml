@@ -4,54 +4,129 @@
     Kubernetes API server metrics
   release: ga
   fields:
-    - name: request.client
+    - name: client
       type: keyword
       description: >
         Client doing the requests
-    - name: request.resource
+    - name: resource
       type: keyword
       description: >
         Requested resource
-    - name: request.subresource
+    - name: subresource
       type: keyword
       description: >
         Requested subresource
-    - name: request.scope
+    - name: scope
       type: keyword
       description: >
         Request scope (cluster, namespace, resource)
-    - name: request.verb
+    - name: verb
       type: keyword
       description: >
         Request HTTP verb
-    - name: request.code
+    - name: code
       type: keyword
       description: >
         Request HTTP code
-    - name: request.content_type
+    - name: content_type
       type: keyword
       description: >
         Request HTTP content type
-    - name: request.dry_run
+    - name: dry_run
       type: keyword
       description: >
         Wether the request used dry run
-    - name: request.kind
+    - name: kind
       type: keyword
       description: >
         Kind of request
-    - name: api.component
+    - name: component
       type: keyword
       description: >
         Component handling the task
-    - name: api.group
+    - name: group
       type: keyword
       description: >
         API group for the resource
-    - name: api.version
+    - name: version
       type: keyword
       description: >
         version for the group
+    - name: handler
+      type: keyword
+      description: >
+        Request handler
+    - name: code
+      type: keyword
+      description: >
+        HTTP code
+    - name: method
+      type: keyword
+      description: >
+        HTTP method
+    - name: host
+      type: keyword
+      description: >
+        Request host
+
+    - name: process
+      type: group
+      fields:
+        - name: cpu.sec
+          type: scaled_float
+          description: CPU seconds
+        - name: memory.resident.bytes
+          type: long
+          description: Bytes in resident memory
+        - name: memory.virtual.bytes
+          type: long
+          description: Bytes in virtual memory
+        - name: fds.open.count
+          type: integer
+          description: Number of open file descriptors
+        - name: started.sec
+          type: scaled_float
+          description: Seconds since the process started
+
+    - name: http
+      type: group
+      fields:
+        - name: request.duration.us.percentile.*
+          type: scaled_float
+          description: Request duration microseconds percentiles
+        - name: request.duration.us.sum
+          type: scaled_float
+          description: Request duration microseconds cumulative sum
+        - name: request.duration.us.count
+          type: long
+          description: Request count for duration
+        - name: request.size.bytes.percentile.*
+          type: integer
+          description: Request size percentiles
+        - name: request.size.bytes.sum
+          type: long
+          description: Request size cumulative sum
+        - name: request.size.bytes.count
+          type: long
+          description: Request count for size
+        - name: response.size.bytes.percentile.*
+          type: integer
+          description: Response size percentiles
+        - name: response.size.bytes.sum
+          type: long
+          description: Response size cumulative sum
+        - name: response.size.bytes.count
+          type: long
+          description: Response count
+        - name: request.count
+          type: long
+          description: Request count for response
+
+    - name: client.request.count
+      type: long
+      description: >
+       Number of requests as client
+
     - name: request.count
       type: long
       description: >

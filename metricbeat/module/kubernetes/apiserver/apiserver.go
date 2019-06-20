@@ -25,6 +25,23 @@ import (
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
+
+			// Process metrics
+			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
+			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
+			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
+			"process_open_fds":  prometheus.Metric("process.fds.open.count"),
+			"process_start_time_seconds": prometheus.Metric("process.started.sec"),
+			
+			// HTTP server metrics
+			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
+			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
+			"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
+			"http_requests_total":                prometheus.Metric("http.request.count"),
+
+			// REST metrics
+			"rest_client_requests_total": prometheus.Metric("client.request.count"),
+
 			// Deprecated, remove in future releases
 			"apiserver_request_latencies": prometheus.Metric("request.latency"),
 
@@ -37,21 +54,23 @@ func init() {
 		},
 
 		Labels: map[string]prometheus.LabelMap{
-			"client":      prometheus.KeyLabel("request.client"),
-			"code":        prometheus.KeyLabel("request.code"),
-			"contentType": prometheus.KeyLabel("request.content_type"),
-			"dry_run":     prometheus.KeyLabel("request.dry_run"),
-			"requestKind": prometheus.KeyLabel("request.kind"),
+			"client":      prometheus.KeyLabel("client"),
+			"code":        prometheus.KeyLabel("code"),
+			"contentType": prometheus.KeyLabel("content_type"),
+			"dry_run":     prometheus.KeyLabel("dry_run"),
+			"requestKind": prometheus.KeyLabel("kind"),
 
-			// when deprecating current apiserver metrics, these
-			// labels can be swithed from `request.` to `api.`
-			"verb":        prometheus.KeyLabel("request.verb"),
-			"scope":       prometheus.KeyLabel("request.scope"),
-			"resource":    prometheus.KeyLabel("request.resource"),
-			"subresource": prometheus.KeyLabel("request.subresource"),
-			"component":   prometheus.KeyLabel("api.component"),
-			"group":       prometheus.KeyLabel("api.group"),
-			"version":     prometheus.KeyLabel("api.version"),
+			"verb":        prometheus.KeyLabel("verb"),
+			"scope":       prometheus.KeyLabel("scope"),
+			"resource":    prometheus.KeyLabel("resource"),
+			"subresource": prometheus.KeyLabel("subresource"),
+			"component":   prometheus.KeyLabel("component"),
+			"group":       prometheus.KeyLabel("group"),
+			"version":     prometheus.KeyLabel("version"),
+			
+			"handler":     prometheus.KeyLabel("handler"),
+			"method":     prometheus.KeyLabel("method"),
+			"host":     prometheus.KeyLabel("host"),
 		},
 	}
 
