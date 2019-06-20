@@ -75,6 +75,8 @@ tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -243,6 +245,8 @@ in the _Beats Platform Reference_.
 
 If you see a warning about too many open files, you need to increase the
 `ulimit`. See the <<ulimit,FAQ>> for more details.
+
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
 
 *win:*
 
