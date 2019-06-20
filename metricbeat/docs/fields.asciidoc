@@ -17,7 +17,6 @@ grouped in the following categories:
 * <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
-* <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
