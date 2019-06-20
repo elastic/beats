@@ -18,8 +18,9 @@
 package status
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/kibana"
@@ -55,6 +56,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	if ms.XPackEnabled {
+		return nil, fmt.Errorf("The %s metricset cannot be used with xpack.enabled: true", ms.FullyQualifiedName())
+	}
+
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
@@ -69,17 +74,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return err
 	}
 
-	err = eventMapping(r, content)
-
-	if err != nil {
-		m.Log.Error(err)
-		return
-	}
+	return eventMapping(r, content)
 }

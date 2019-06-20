@@ -25,16 +25,16 @@ import (
 type noopSupport struct{}
 type noopManager struct{}
 
-// NoopSupport creates a noop ILM implementation with ILM support being always
+// NewNoopSupport creates a noop ILM implementation with ILM support being always
 // disabled.  Attempts to install a policy or create a write alias will fail.
-func NoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
+func NewNoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 
-func (*noopSupport) Mode() Mode                   { return ModeDisabled }
-func (*noopSupport) Alias() Alias                 { return Alias{} }
-func (*noopSupport) Policy() Policy               { return Policy{} }
-func (*noopSupport) Manager(_ APIHandler) Manager { return (*noopManager)(nil) }
+func (*noopSupport) Mode() Mode                      { return ModeDisabled }
+func (*noopSupport) Alias() Alias                    { return Alias{} }
+func (*noopSupport) Policy() Policy                  { return Policy{} }
+func (*noopSupport) Manager(_ ClientHandler) Manager { return (*noopManager)(nil) }
 
 func (*noopManager) Enabled() (bool, error)            { return false, nil }
 func (*noopManager) EnsureAlias() error                { return errOf(ErrOpNotAvailable) }

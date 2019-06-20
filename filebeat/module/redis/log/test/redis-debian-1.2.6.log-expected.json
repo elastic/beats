@@ -1,0 +1,1002 @@
+[
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 0,
+        "message": "Server started, Redis version 1.2.6",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 54,
+        "message": "WARNING overcommit_memory is set to 0! Background save may fail under low condition memory. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 325,
+        "message": "The server is now ready to accept connections on port 6379",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 402,
+        "message": "Server started, Redis version 1.2.6",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 456,
+        "message": "WARNING overcommit_memory is set to 0! Background save may fail under low condition memory. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 727,
+        "message": "The server is now ready to accept connections on port 6379",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 804,
+        "message": "Server started, Redis version 1.2.6",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 858,
+        "message": "WARNING overcommit_memory is set to 0! Background save may fail under low condition memory. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "verbose",
+        "log.offset": 1129,
+        "message": "The server is now ready to accept connections on port 6379",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1206,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1294,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1382,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1470,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1558,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1646,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1734,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1822,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1910,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 1998,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2086,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2174,
+        "message": "Accepted 127.0.0.1:56742",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2217,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2305,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2393,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2481,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2569,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2657,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2745,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2833,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 2921,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3009,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3097,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3185,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3273,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3361,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3449,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3537,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3625,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3713,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3801,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3889,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 3977,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4065,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4153,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4241,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4329,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4417,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4505,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4593,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4681,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4769,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4857,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 4945,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5033,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5121,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5209,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5297,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5385,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5473,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5561,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5649,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5737,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5825,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 5913,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6001,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6089,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6177,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6265,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6353,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6441,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6529,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6617,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6705,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6793,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6881,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 6969,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7057,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7145,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7233,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7321,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7409,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7497,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7585,
+        "message": "1 clients connected (0 slaves), 619381 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7673,
+        "message": "Closing idle client",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7711,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7799,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7887,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 7975,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8063,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8151,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8239,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8327,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8415,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8503,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8591,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8679,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8767,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8855,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 8943,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 9031,
+        "message": "0 clients connected (0 slaves), 619100 bytes in use, 0 shared objects",
+        "service.type": "redis"
+    }
+]

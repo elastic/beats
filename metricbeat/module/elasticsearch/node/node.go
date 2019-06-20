@@ -20,7 +20,6 @@ package node
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -64,23 +63,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return err
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+nodeStatsPath)
 	if err != nil {
-		err = errors.Wrap(err, "failed to get info from Elasticsearch")
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
+		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
-	err = eventsMapping(r, *info, content)
-	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
-	}
+	return eventsMapping(r, *info, content)
 }

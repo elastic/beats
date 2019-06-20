@@ -46,7 +46,20 @@ NOTE: The special filesystems +/proc+ and +/sys+ are only available if the
 host system is running Linux. Attempts to bind-mount these filesystems will
 fail on Windows and MacOS.
 
+
+If the <<metricbeat-metricset-system-socket,system socket metricset>>
+is being used on Linux, more privileges will need to be granted to Metricbeat.
+This metricset reads files from `/proc` that are an interface to internal
+objects owned by other users. The capabilities needed to read all these files
+(`sys_ptrace` and `dac_read_search`) are disabled by default on Docker. To
+grant these permissions these flags are needed too:
+
+["source","sh",subs="attributes"]
+----
+--user root --cap-add sys_ptrace --cap-add dac_read_search
+----
 [float]
+
 [[monitoring-service]]
 ==== Monitor a service in another container
 

@@ -44,6 +44,7 @@ type client struct {
 	index    string
 	codec    codec.Codec
 	config   sarama.Config
+	mux      sync.Mutex
 
 	producer sarama.AsyncProducer
 
@@ -86,6 +87,9 @@ func newKafkaClient(
 }
 
 func (c *client) Connect() error {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
 	debugf("connect: %v", c.hosts)
 
 	// try to connect
@@ -105,7 +109,14 @@ func (c *client) Connect() error {
 }
 
 func (c *client) Close() error {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	debugf("closed kafka client")
+
+	// producer was not created before the close() was called.
+	if c.producer == nil {
+		return nil
+	}
 
 	c.producer.AsyncClose()
 	c.wg.Wait()

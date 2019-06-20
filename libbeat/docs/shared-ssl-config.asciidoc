@@ -28,6 +28,7 @@ ifndef::only-elasticsearch[]
 Also see <<configuring-ssl-logstash>>.
 endif::[]
 
+ifndef::no_kibana[]
 Example Kibana endpoint config with SSL enabled:
 
 [source,yaml]
@@ -38,7 +39,7 @@ setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
 setup.kibana.ssl.key: "/etc/pki/client/cert.key"
 ----
-
+endif::no_kibana[]
 
 ifeval::["{beatname_lc}"=="heartbeat"]
 Example monitor with SSL enabled:
@@ -224,7 +225,8 @@ ifeval::["{beatname_lc}" == "filebeat"]
 ==== `client_authentication`
 
 This configures what types of client authentication are supported. The valid options
-are `none`, `optional`, and `required`. The default value is required.
+are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+default to `required` otherwise it will be set to `none`.
 
 NOTE: This option is only valid with the TCP or the Syslog input.
 

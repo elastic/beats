@@ -117,12 +117,6 @@ func (f *Factory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrP
 	}, nil
 }
 
-// CheckConfig checks if a config is valid or not
-func (f *Factory) CheckConfig(config *common.Config) error {
-	// TODO: add code here once we know that spinning up a filebeat input to check for errors doesn't cause memory leaks.
-	return nil
-}
-
 func (p *inputsRunner) Start() {
 	// Load pipelines
 	if p.pipelineLoaderFactory != nil {

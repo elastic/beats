@@ -65,7 +65,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		))
 		require.NoError(t, err)
 
-		s := tmp.(*ilmSupport)
+		s := tmp.(*stdSupport)
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
@@ -76,12 +76,10 @@ func TestDefaultSupport_Init(t *testing.T) {
 
 	t.Run("load external policy", func(t *testing.T) {
 		s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
-			map[string]interface{}{
-				"policy_file": "testfiles/custom.json",
-			},
+			common.MapStr{"policy_file": "testfiles/custom.json"},
 		))
 		require.NoError(t, err)
-		assert.Equal(t, map[string]interface{}{"hello": "world"}, s.Policy().Body)
+		assert.Equal(t, common.MapStr{"hello": "world"}, s.Policy().Body)
 	})
 }
 
@@ -98,32 +96,32 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 		},
 		"disabled via handler": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(false, nil),
+				onCheckILMEnabled(ModeAuto).Return(false, nil),
 			},
 		},
 		"enabled via handler": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(true, nil),
+				onCheckILMEnabled(ModeAuto).Return(true, nil),
 			},
 			b: true,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
-				onILMEnabled(ModeEnabled).Return(true, nil),
+				onCheckILMEnabled(ModeEnabled).Return(true, nil),
 			},
 			cfg: map[string]interface{}{"enabled": true},
 			b:   true,
 		},
 		"fail enabled": {
 			calls: []onCall{
-				onILMEnabled(ModeEnabled).Return(false, nil),
+				onCheckILMEnabled(ModeEnabled).Return(false, nil),
 			},
 			cfg:  map[string]interface{}{"enabled": true},
 			fail: ErrESILMDisabled,
 		},
 		"io error": {
 			calls: []onCall{
-				onILMEnabled(ModeAuto).Return(false, errors.New("ups")),
+				onCheckILMEnabled(ModeAuto).Return(false, errors.New("ups")),
 			},
 			cfg: map[string]interface{}{},
 			err: true,
@@ -275,7 +273,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	}
 }
 
-func createManager(t *testing.T, h APIHandler, cfg map[string]interface{}) Manager {
+func createManager(t *testing.T, h ClientHandler, cfg map[string]interface{}) Manager {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 	s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(cfg))
 	require.NoError(t, err)

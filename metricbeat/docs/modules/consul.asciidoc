@@ -23,6 +23,13 @@ The following Metricset is included:
 
 `agent` Metricset fetches information from a Consul Agent in 'Client' mode. It fetches information about the health of the autopilot, runtime metrics and raft data.
 
+[float]
+=== Dashboard
+
+  The Consul module comes with a predefined dashboard:
+
+  image::./images/metricbeat-consul.png[]
+
 
 [float]
 === Example configuration

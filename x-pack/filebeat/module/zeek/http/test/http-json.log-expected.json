@@ -8,7 +8,6 @@
         "destination.geo.location.lon": -97.822,
         "destination.ip": "17.253.5.203",
         "destination.port": 80,
-        "ecs.version": "1.0.0",
         "event.dataset": "zeek.http",
         "event.id": "CCNp8v1SNzY7v9d1Ih",
         "event.module": "zeek",

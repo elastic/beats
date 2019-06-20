@@ -42,7 +42,7 @@ parameter.
 The module comes with a sample dashboard:
 
 [role="screenshot"]
-image:./images/auditbeat-system-overview-dashboard.png[Auditbeat System Overview Dashboard]
+image::./images/auditbeat-system-overview-dashboard.png[Auditbeat System Overview Dashboard]
 
 [float]
 === Configuration options
@@ -66,6 +66,9 @@ sample suggested configuration.
     - user
   period: 10s
   state.period: 12h
+
+  socket.include_localhost: false
+
   user.detect_password_changes: true
 ----
 
@@ -74,6 +77,10 @@ datasets - esp. `process` and `socket` - a shorter period is recommended.
 
 *`state.period`*:: The frequency at which the datasets send full state information.
 This option can be overridden per dataset using `{dataset}.state.period`.
+
+*`socket.include_localhost`*:: If the `socket` dataset is configured and this
+option is set to `true`, Auditbeat will include sockets that have localhost
+as either their source and/or destination IP. Defaults to `false`.
 
 *`user.detect_password_changes`*:: If the `user` dataset is configured and
 this option is set to `true`, Auditbeat will read password information in `/etc/passwd`
@@ -100,6 +107,7 @@ so a longer polling interval can be used.
     - package
     - user
   period: 1m
+
   user.detect_password_changes: true
 
 - module: system

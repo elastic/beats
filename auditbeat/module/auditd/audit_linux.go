@@ -48,6 +48,7 @@ const (
 
 	unicast   = "unicast"
 	multicast = "multicast"
+	uidUnset  = "unset"
 
 	lostEventsUpdateInterval        = time.Second * 15
 	maxDefaultStreamBufferConsumers = 4
@@ -485,9 +486,11 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 			"message_type": strings.ToLower(auditEvent.Type.String()),
 			"sequence":     auditEvent.Sequence,
 			"result":       auditEvent.Result,
-			"session":      auditEvent.Session,
 			"data":         createAuditdData(auditEvent.Data),
 		},
+	}
+	if auditEvent.Session != uidUnset {
+		out.ModuleFields.Put("session", auditEvent.Session)
 	}
 
 	// Add root level fields.
@@ -596,6 +599,9 @@ func addUser(u aucoalesce.User, m common.MapStr) {
 	m.Put("user", user)
 
 	for id, value := range u.IDs {
+		if value == uidUnset {
+			continue
+		}
 		switch id {
 		case "uid":
 			user["id"] = value

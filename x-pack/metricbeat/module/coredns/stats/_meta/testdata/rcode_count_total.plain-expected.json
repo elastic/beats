@@ -1,0 +1,30 @@
+[
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "response": {
+                        "rcode": {
+                            "count": 440
+                        }
+                    }
+                },
+                "rcode": "NOERROR",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    }
+]

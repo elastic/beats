@@ -39,6 +39,11 @@ import (
 const (
 	kafkaDefaultHost = "localhost"
 	kafkaDefaultPort = "9092"
+
+	kafkaSASLProducerUsername = "producer"
+	kafkaSASLProducerPassword = "producer-secret"
+	kafkaSASLUsername         = "stats"
+	kafkaSASLPassword         = "test-secret"
 )
 
 func TestData(t *testing.T) {
@@ -46,8 +51,8 @@ func TestData(t *testing.T) {
 
 	generateKafkaData(t, "metricbeat-generate-data")
 
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(""))
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -65,13 +70,13 @@ func TestTopic(t *testing.T) {
 	// Create initial topic
 	generateKafkaData(t, testTopic)
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig(testTopic))
-	dataBefore, err := mbtest.ReportingFetchV2(f)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(testTopic))
+	dataBefore, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}
 	if len(dataBefore) == 0 {
-		t.Errorf("No offsets fetched from topic (before): %v", testTopic)
+		t.Fatalf("No offsets fetched from topic (before): %v", testTopic)
 	}
 	t.Logf("before: %v", dataBefore)
 
@@ -82,12 +87,12 @@ func TestTopic(t *testing.T) {
 		generateKafkaData(t, testTopic)
 	}
 
-	dataAfter, err := mbtest.ReportingFetchV2(f)
+	dataAfter, err := mbtest.ReportingFetchV2Error(f)
 	if err != nil {
 		t.Fatal("write", err)
 	}
 	if len(dataAfter) == 0 {
-		t.Errorf("No offsets fetched from topic (after): %v", testTopic)
+		t.Fatalf("No offsets fetched from topic (after): %v", testTopic)
 	}
 	t.Logf("after: %v", dataAfter)
 
@@ -128,6 +133,9 @@ func generateKafkaData(t *testing.T, topic string) {
 	config.Producer.Retry.Backoff = 500 * time.Millisecond
 	config.Metadata.Retry.Max = 20
 	config.Metadata.Retry.Backoff = 500 * time.Millisecond
+	config.Net.SASL.Enable = true
+	config.Net.SASL.User = kafkaSASLProducerUsername
+	config.Net.SASL.Password = kafkaSASLProducerPassword
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, config)
 	if err != nil {
 		t.Errorf("%s", err)
@@ -167,6 +175,8 @@ func getConfig(topic string) map[string]interface{} {
 		"metricsets": []string{"partition"},
 		"hosts":      []string{getTestKafkaHost()},
 		"topics":     topics,
+		"username":   kafkaSASLUsername,
+		"password":   kafkaSASLPassword,
 	}
 }
 

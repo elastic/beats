@@ -26,6 +26,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -34,6 +35,8 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/apache"
 )
 
 // response is a raw response copied from an Apache web server.
@@ -85,11 +88,13 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventFetcher(t, config)
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
@@ -162,13 +167,23 @@ func TestFetchTimeout(t *testing.T) {
 		"timeout":    "50ms",
 	}
 
-	f := mbtest.NewEventFetcher(t, config)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
 	start := time.Now()
-	_, err := f.Fetch()
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) == 0 {
+		t.Fatalf("Expected an error, had %d. %v\n", len(errs), errs)
+	}
+	assert.Empty(t, events)
 	elapsed := time.Since(start)
-	if assert.Error(t, err) {
-		assert.Contains(t, err.Error(), "request canceled (Client.Timeout exceeded")
+	var found bool
+	for _, err := range errs {
+		if strings.Contains(err.Error(), "request canceled (Client.Timeout exceeded") {
+			found = true
+		}
+	}
+	if !found {
+		assert.Failf(t, "", "expected an error containing 'request canceled (Client.Timeout exceeded'. Got %v", errs)
 	}
 
 	// Elapsed should be ~50ms, sometimes it can be up to 1s
@@ -201,12 +216,12 @@ func TestMultipleFetches(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventFetcher(t, config)
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
 
 	for i := 0; i < 20; i++ {
-		_, err := f.Fetch()
-		if !assert.NoError(t, err) {
-			t.FailNow()
+		_, errs := mbtest.ReportingFetchV2Error(f)
+		if len(errs) > 0 {
+			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 		}
 	}
 
@@ -255,4 +270,8 @@ func TestStatusOutputs(t *testing.T) {
 		_, err = eventMapping(scanner, "localhost")
 		assert.NoError(t, err, "error mapping "+filename)
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "apache", "status")
 }

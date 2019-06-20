@@ -54,12 +54,12 @@ type Field struct {
 	IgnoreAbove    int         `config:"ignore_above"`
 	AliasPath      string      `config:"path"`
 	MigrationAlias bool        `config:"migration"`
+	Dimension      *bool       `config:"dimension"`
 
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
 	ScalingFactor         int             `config:"scaling_factor"`
 	ObjectTypeParams      []ObjectTypeCfg `config:"object_type_params"`
-
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
 	Count        int    `config:"count"`
@@ -126,7 +126,10 @@ func LoadFieldsYaml(path string) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 
@@ -144,7 +147,10 @@ func LoadFields(f []byte) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 	for _, key := range keys {

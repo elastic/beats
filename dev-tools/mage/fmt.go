@@ -45,7 +45,9 @@ var (
 func Format() {
 	// Don't run AddLicenseHeaders and GoImports concurrently because they
 	// both can modify the same files.
-	mg.Deps(AddLicenseHeaders)
+	if BeatProjectType != CommunityProject {
+		mg.Deps(AddLicenseHeaders)
+	}
 	mg.Deps(GoImports, PythonAutopep8)
 }
 
@@ -110,7 +112,7 @@ func PythonAutopep8() error {
 }
 
 // AddLicenseHeaders adds license headers to .go files. It applies the
-// appropriate license header based on the value of mage.BeatLicense.
+// appropriate license header based on the value of devtools.BeatLicense.
 func AddLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 

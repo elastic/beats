@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2019-01-29T07:35:54.170Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "oqKkg2eoQh2P_KrKliI3DA",
         "elasticsearch.component": "i.i.s.index",
@@ -17,6 +16,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 4000000,
         "event.module": "elasticsearch",
+        "event.timezone": "+00:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
@@ -26,7 +26,6 @@
     },
     {
         "@timestamp": "2019-01-29T07:35:58.359Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.cluster.name": "distribution_run",
         "elasticsearch.cluster.uuid": "oqKkg2eoQh2P_KrKliI3DA",
         "elasticsearch.component": "i.i.s.index",
@@ -42,6 +41,7 @@
         "event.dataset": "elasticsearch.slowlog",
         "event.duration": 0,
         "event.module": "elasticsearch",
+        "event.timezone": "+00:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
