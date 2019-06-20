@@ -63,7 +63,7 @@ var (
 		"queries":                     c.Float("Queries"),
 		"deadlocks":                   c.Float("Deadlocks"),
 		"volume_used.bytes":           c.Float("VolumeBytesUsed"),
-		"free_local_storage":          c.Float("FreeLocalStorage"),
+		"free_local_storage.bytes":    c.Float("FreeLocalStorage"),
 		"transactions": s.Object{
 			"active":  c.Float("ActiveTransactions"),
 			"blocked": c.Float("BlockedTransactions"),

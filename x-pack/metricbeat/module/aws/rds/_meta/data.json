@@ -18,28 +18,28 @@
             "disk_usage": {
                 "bin_log.bytes": 0
             },
-            "free_local_storage": 32977604608,
-            "freeable_memory.bytes": 4954406912,
+            "free_local_storage.bytes": 31211958272,
+            "freeable_memory.bytes": 4681383936,
             "latency": {
                 "commit": 0,
                 "ddl": 0,
-                "dml": 0.15823333333333334,
-                "insert": 0.15823333333333334,
-                "select": 0.1791117021276596,
+                "dml": 0,
+                "insert": 0.16196666666666668,
+                "select": 0.22499999999999998,
                 "update": 0
             },
             "login_failures": 0,
-            "queries": 8.96487369192828,
+            "queries": 7.510281559829625,
             "throughput": {
-                "commit": 0.2499500099980004,
+                "commit": 0.25008753063572253,
                 "ddl": 0,
                 "delete": 0,
-                "dml": 0,
-                "insert": 0.2499500099980004,
-                "network": 1.3998366857199993,
-                "network_receive": 0.6999358396521184,
-                "network_transmit": 0.6999183428599997,
-                "select": 3.1327067919749383,
+                "dml": 0.25008753063572253,
+                "insert": 0.5001750612714451,
+                "network": 1.39989500797161,
+                "network_receive": 0.699947503985805,
+                "network_transmit": 0.699947503985805,
+                "select": 2.4832091728746897,
                 "update": 0
             },
             "transactions": {
