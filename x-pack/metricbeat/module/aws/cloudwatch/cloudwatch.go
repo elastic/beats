@@ -58,7 +58,7 @@ type Config struct {
 	Namespace          string      `config:"namespace" validate:"nonzero,required"`
 	MetricName         string      `config:"metricname"`
 	Dimensions         []Dimension `config:"dimensions"`
-	ResourceTypeFilter string      `config:"resource_type_filter"`
+	ResourceTypeFilter string      `config:"tags.resource_type_filter"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -114,6 +114,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Create events based on namespaces from configuration
 	for namespace, resourceType := range namespaceResourceType {
+		resourceTypeFilter := []string{resourceType}
+		if resourceType == "" {
+			resourceTypeFilter = nil
+		}
+
 		for _, regionName := range m.MetricSet.RegionsList {
 			awsConfig := m.MetricSet.AwsConfig.Copy()
 			awsConfig.Region = regionName
@@ -130,7 +135,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
-			err = m.createEvents(svcCloudwatch, svcResourceAPI, []string{resourceType}, listMetricsOutput, regionName, startTime, endTime, report)
+			err = m.createEvents(svcCloudwatch, svcResourceAPI, resourceTypeFilter, listMetricsOutput, regionName, startTime, endTime, report)
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
@@ -146,21 +151,14 @@ func readCloudwatchConfig(cloudwatchConfigs []Config) ([]cloudwatch.Metric, []st
 	namespaceResourceType := make(map[string]string)
 
 	for _, cloudwatchConfig := range cloudwatchConfigs {
-		namespace := cloudwatchConfig.Namespace
-
-		// Check resourceTypeFilter
-		// If it's not specified, use getResourceTypeUsingNamespace method
-		resourceTypeFilter := cloudwatchConfig.ResourceTypeFilter
-		if resourceTypeFilter == "" {
-			resourceTypeFilter = getResourceTypeUsingNamespace(namespace)
-		}
-
 		if cloudwatchConfig.MetricName != "" {
-			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, namespace)
+			listMetricsOutput := convertConfigToListMetrics(cloudwatchConfig, cloudwatchConfig.Namespace)
 			listMetrics = append(listMetrics, listMetricsOutput)
-			resourceTypes = append(resourceTypes, resourceTypeFilter)
+			if cloudwatchConfig.ResourceTypeFilter != "" {
+				resourceTypes = append(resourceTypes, cloudwatchConfig.ResourceTypeFilter)
+			}
 		} else {
-			namespaceResourceType[namespace] = resourceTypeFilter
+			namespaceResourceType[cloudwatchConfig.Namespace] = cloudwatchConfig.ResourceTypeFilter
 		}
 	}
 
@@ -360,26 +358,4 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.CloudWatchAPI, sv
 	}
 
 	return nil
-}
-
-// getResourceTypeUsingNamespace function is used to get resourceTypeFilter from
-// a given namespace only when resourceTypeFilter is not specified in configuration.
-func getResourceTypeUsingNamespace(namespace string) string {
-	// Some resource name is similar to namespace name.
-	// For example:
-	// ec2 instances: "AWS/EC2" is the namespace name, "ec2" is the resource name.
-
-	// Some resource name is not as easy to get from namespace name.
-	// For example:
-	// load balancer: "AWS/ELB" is the namespace name, "elasticloadbalancing" is the resource name.
-	// https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
-	if namespace == "AWS/ELB" {
-		return "elasticloadbalancing"
-	}
-
-	if namespace == "AWS/EBS" {
-		return "ec2"
-	}
-
-	return strings.ToLower(strings.TrimPrefix(namespace, "AWS/"))
 }

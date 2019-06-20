@@ -150,7 +150,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			[]cloudwatch.Metric{listMetric1},
-			[]string{"ec2"},
+			nil,
 			map[string]string{},
 		},
 		{
@@ -171,8 +171,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			[]cloudwatch.Metric{listMetric1},
-			[]string{"ec2"},
-			map[string]string{"AWS/S3": "s3"},
+			nil,
+			map[string]string{"AWS/S3": ""},
 		},
 		{
 			"test with two specific metrics and a namespace",
@@ -186,6 +186,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: instanceID1,
 						},
 					},
+					ResourceTypeFilter: "ec2:instance",
 				},
 				{
 					Namespace: "AWS/Lambda",
@@ -206,29 +207,32 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			[]cloudwatch.Metric{listMetric1, listMetric6},
-			[]string{"ec2", "rds"},
-			map[string]string{"AWS/Lambda": "lambda"},
+			[]string{"ec2:instance"},
+			map[string]string{"AWS/Lambda": ""},
 		},
 		{
 			"Test a specific metric (only with metric name) and a namespace",
 			[]Config{
 				{
-					Namespace:  "AWS/EC2",
-					MetricName: "CPUUtilization",
+					Namespace:          "AWS/EC2",
+					MetricName:         "CPUUtilization",
+					ResourceTypeFilter: "ec2:instance",
 				},
 				{
-					Namespace: "AWS/S3",
+					Namespace:          "AWS/S3",
+					ResourceTypeFilter: "s3",
 				},
 			},
 			[]cloudwatch.Metric{listMetric7},
-			[]string{"ec2"},
+			[]string{"ec2:instance"},
 			map[string]string{"AWS/S3": "s3"},
 		},
 		{
 			"test EBS namespace",
 			[]Config{
 				{
-					Namespace: "AWS/EBS",
+					Namespace:          "AWS/EBS",
+					ResourceTypeFilter: "ec2",
 				},
 			},
 			nil,
@@ -245,30 +249,5 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			assert.Equal(t, c.expectedResourceTypes, resourceTypes)
 			assert.Equal(t, c.expectedNamespaceResourceType, namespaceResourceType)
 		})
-	}
-}
-
-func TestGetResourceTypeUsingNamespace(t *testing.T) {
-	cases := []struct {
-		namespace            string
-		expectedResourceType string
-	}{
-		{
-			"AWS/EC2",
-			"ec2",
-		},
-		{
-			"AWS/Lambda",
-			"lambda",
-		},
-		{
-			"AWS/ELB",
-			"elasticloadbalancing",
-		},
-	}
-
-	for _, c := range cases {
-		resourceType := getResourceTypeUsingNamespace(c.namespace)
-		assert.Equal(t, c.expectedResourceType, resourceType)
 	}
 }
