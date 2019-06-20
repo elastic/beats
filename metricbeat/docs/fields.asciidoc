@@ -15,7 +15,7 @@ grouped in the following categories:
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
-* <<exported-fields-beat>>
+* <<exported-fields-beat-common>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
@@ -1491,7 +1491,7 @@ SQS queue name
 
 --
 
-[[exported-fields-beat]]
+[[exported-fields-beat-common]]
 == Beat fields
 
 Contains common beat fields available in all event types.
