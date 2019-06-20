@@ -90,8 +90,8 @@ metricbeat.modules:
 - module: kubernetes
   enabled: true
   metricsets:
-    - kubecontroller
-  hosts: ["http://kube-controller-manager:10252"]
+    - controllermanager
+  hosts: ["http://controller-manager:10252"]
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
@@ -106,9 +106,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-container,container>>
 
-* <<metricbeat-metricset-kubernetes-event,event>>
+* <<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>
 
-* <<metricbeat-metricset-kubernetes-kubecontroller,kubecontroller>>
+* <<metricbeat-metricset-kubernetes-event,event>>
 
 * <<metricbeat-metricset-kubernetes-node,node>>
 
@@ -134,9 +134,9 @@ include::kubernetes/apiserver.asciidoc[]
 
 include::kubernetes/container.asciidoc[]
 
-include::kubernetes/event.asciidoc[]
+include::kubernetes/controllermanager.asciidoc[]
 
-include::kubernetes/kubecontroller.asciidoc[]
+include::kubernetes/event.asciidoc[]
 
 include::kubernetes/node.asciidoc[]
 

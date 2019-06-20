@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package kubecontroller
+package controllermanager
 
 import (
 	"testing"
@@ -28,11 +28,11 @@ import (
 const testFile = "_meta/test/metrics"
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "kubecontroller",
+	ptest.TestMetricSet(t, "kubernetes", "controllermanager",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.kubecontroller.1.14",
-				ExpectedFile: "./_meta/test/metrics.kubecontroller.1.14.expected",
+				MetricsFile:  "./_meta/test/metrics.controllermanager.1.14",
+				ExpectedFile: "./_meta/test/metrics.controllermanager.1.14.expected",
 			},
 		},
 	)

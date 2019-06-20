@@ -1,4 +1,4 @@
-# Kubecontroller Stats
+# Controller Manager Stats
 
 ## Version history
 

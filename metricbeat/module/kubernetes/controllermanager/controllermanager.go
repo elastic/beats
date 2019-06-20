@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kubecontroller
+package controllermanager
 
 import (
 	"github.com/elastic/beats/metricbeat/helper/prometheus"
@@ -61,7 +61,7 @@ func init() {
 		},
 	}
 
-	mb.Registry.MustAddMetricSet("kubernetes", "kubecontroller",
+	mb.Registry.MustAddMetricSet("kubernetes", "controllermanager",
 		prometheus.MetricSetBuilder(mapping),
 		mb.WithHostParser(prometheus.HostParser))
 }

@@ -462,8 +462,8 @@ metricbeat.modules:
 - module: kubernetes
   enabled: true
   metricsets:
-    - kubecontroller
-  hosts: ["http://kube-controller-manager:10252"]
+    - controllermanager
+  hosts: ["http://controller-manager:10252"]
 
 #--------------------------------- kvm Module --------------------------------
 - module: kvm

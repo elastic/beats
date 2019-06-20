@@ -1,7 +1,7 @@
-- name: kubecontroller
+- name: controllermanager
   type: group
   description: >
-    Kubernetes controller manager metrics
+    Controller manager metrics
   release: ga
   fields:
     - name: handler

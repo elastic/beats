@@ -1,12 +1,275 @@
 [
     {
         "event": {
-            "dataset": "kubernetes.kubecontroller",
+            "dataset": "kubernetes.controllermanager",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
-            "kubecontroller": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 145
+                    }
+                },
+                "code": "201",
+                "host": "192.168.205.10:6443",
+                "method": "POST"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "ttlcontroller",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "leader": {
+                    "is_master": 1
+                },
+                "name": "kube-controller-manager"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "garbage_collector_graph_changes",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "serviceaccount_tokens_secret",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "node_lifecycle_controller",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "job",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "service",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "node": {
+                    "collector": {
+                        "count": 2,
+                        "eviction": {
+                            "count": 7
+                        },
+                        "health": {
+                            "pct": 100
+                        },
+                        "unhealthy": {
+                            "count": 0
+                        }
+                    }
+                },
+                "process": {
+                    "cpu": {
+                        "sec": 6265
+                    },
+                    "fds": {
+                        "open": {
+                            "count": 14
+                        }
+                    },
+                    "memory": {
+                        "resident": {
+                            "bytes": 100958208
+                        },
+                        "virtual": {
+                            "bytes": 222724096
+                        }
+                    },
+                    "started": {
+                        "sec": 1559227199.05
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
                 "handler": "prometheus",
                 "http": {
                     "request": {
@@ -50,7 +313,7 @@
             }
         },
         "metricset": {
-            "name": "kubecontroller"
+            "name": "controllermanager"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -59,761 +322,12 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.kubecontroller",
+            "dataset": "kubernetes.controllermanager",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
-            "kubecontroller": {
-                "name": "disruption_recheck",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "client": {
-                    "request": {
-                        "count": 12
-                    }
-                },
-                "code": "409",
-                "host": "192.168.205.10:6443",
-                "method": "PUT"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "client": {
-                    "request": {
-                        "count": 172664
-                    }
-                },
-                "code": "200",
-                "host": "192.168.205.10:6443",
-                "method": "PUT"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "node_lifecycle_controller",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "garbage_collector_attempt_to_orphan",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "volumes",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "token_cleaner",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "endpoint",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "pvcs",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "client": {
-                    "request": {
-                        "count": 145
-                    }
-                },
-                "code": "201",
-                "host": "192.168.205.10:6443",
-                "method": "POST"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "serviceaccount",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "resourcequota_priority",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "noexec_taint_pod",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "ttlcontroller",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "daemonset",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "client": {
-                    "request": {
-                        "count": 1113352
-                    }
-                },
-                "code": "200",
-                "host": "192.168.205.10:6443",
-                "method": "GET"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "node": {
-                    "collector": {
-                        "count": 2,
-                        "eviction": {
-                            "count": 7
-                        },
-                        "health": {
-                            "pct": 100
-                        },
-                        "unhealthy": {
-                            "count": 0
-                        }
-                    }
-                },
-                "process": {
-                    "cpu": {
-                        "sec": 6265
-                    },
-                    "fds": {
-                        "open": {
-                            "count": 14
-                        }
-                    },
-                    "memory": {
-                        "resident": {
-                            "bytes": 100958208
-                        },
-                        "virtual": {
-                            "bytes": 222724096
-                        }
-                    },
-                    "started": {
-                        "sec": 1559227199.05
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "garbage_collector_graph_changes",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "serviceaccount_tokens_service",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "resource_quota_controller_resource_changes",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "noexec_taint_node",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "namespace",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "job",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "serviceaccount_tokens_secret",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "code": "200",
-                "handler": "prometheus",
-                "http": {
-                    "request": {
-                        "count": 4
-                    }
-                },
-                "method": "get"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "service",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "client": {
-                    "request": {
-                        "count": 28
-                    }
-                },
-                "code": "404",
-                "host": "192.168.205.10:6443",
-                "method": "GET"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
+            "controllermanager": {
                 "name": "replicaset",
                 "workqueue": {
                     "longestrunning": {
@@ -826,7 +340,7 @@
             }
         },
         "metricset": {
-            "name": "kubecontroller"
+            "name": "controllermanager"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -835,141 +349,12 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.kubecontroller",
+            "dataset": "kubernetes.controllermanager",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
-            "kubecontroller": {
-                "client": {
-                    "request": {
-                        "count": 6
-                    }
-                },
-                "code": "200",
-                "host": "192.168.205.10:6443",
-                "method": "DELETE"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "garbage_collector_attempt_to_delete",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "ClusterRoleAggregator",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "disruption",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "leader": {
-                    "is_master": 1
-                },
-                "name": "kube-controller-manager"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
+            "controllermanager": {
                 "name": "pvprotection",
                 "workqueue": {
                     "longestrunning": {
@@ -982,7 +367,7 @@
             }
         },
         "metricset": {
-            "name": "kubecontroller"
+            "name": "controllermanager"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -991,12 +376,279 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.kubecontroller",
+            "dataset": "kubernetes.controllermanager",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
-            "kubecontroller": {
+            "controllermanager": {
+                "name": "garbage_collector_attempt_to_delete",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "resourcequota_priority",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "disruption",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "code": "200",
+                "handler": "prometheus",
+                "http": {
+                    "request": {
+                        "count": 4
+                    }
+                },
+                "method": "get"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "garbage_collector_attempt_to_orphan",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "serviceaccount",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 28
+                    }
+                },
+                "code": "404",
+                "host": "192.168.205.10:6443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "namespace",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "noexec_taint_pod",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 172664
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "PUT"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
                 "client": {
                     "request": {
                         "count": 1
@@ -1008,7 +660,7 @@
             }
         },
         "metricset": {
-            "name": "kubecontroller"
+            "name": "controllermanager"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -1017,119 +669,12 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.kubecontroller",
+            "dataset": "kubernetes.controllermanager",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
-            "kubecontroller": {
-                "name": "certificate",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "client": {
-                    "request": {
-                        "count": 18
-                    }
-                },
-                "code": "200",
-                "host": "192.168.205.10:6443",
-                "method": "PATCH"
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "replicationmanager",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "bootstrap_signer_queue",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
+            "controllermanager": {
                 "name": "resourcequota_primary",
                 "workqueue": {
                     "longestrunning": {
@@ -1142,7 +687,7 @@
             }
         },
         "metricset": {
-            "name": "kubecontroller"
+            "name": "controllermanager"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -1151,13 +696,13 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.kubecontroller",
+            "dataset": "kubernetes.controllermanager",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
-            "kubecontroller": {
-                "name": "horizontalpodautoscaler",
+            "controllermanager": {
+                "name": "serviceaccount_tokens_service",
                 "workqueue": {
                     "longestrunning": {
                         "sec": 0
@@ -1169,7 +714,7 @@
             }
         },
         "metricset": {
-            "name": "kubecontroller"
+            "name": "controllermanager"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -1178,93 +723,12 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.kubecontroller",
+            "dataset": "kubernetes.controllermanager",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
-            "kubecontroller": {
-                "name": "statefulset",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "claims",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
-                "name": "pvcprotection",
-                "workqueue": {
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "kubecontroller"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.kubecontroller",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "kubecontroller": {
+            "controllermanager": {
                 "name": "deployment",
                 "workqueue": {
                     "longestrunning": {
@@ -1277,7 +741,543 @@
             }
         },
         "metricset": {
-            "name": "kubecontroller"
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "replicationmanager",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "claims",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "pvcs",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "certificate",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "disruption_recheck",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "token_cleaner",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 18
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "PATCH"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "volumes",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 1113352
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "bootstrap_signer_queue",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 6
+                    }
+                },
+                "code": "200",
+                "host": "192.168.205.10:6443",
+                "method": "DELETE"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "ClusterRoleAggregator",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "endpoint",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "noexec_taint_node",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "horizontalpodautoscaler",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "statefulset",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "pvcprotection",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "resource_quota_controller_resource_changes",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "daemonset",
+                "workqueue": {
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 12
+                    }
+                },
+                "code": "409",
+                "host": "192.168.205.10:6443",
+                "method": "PUT"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
         },
         "service": {
             "address": "127.0.0.1:55555",
