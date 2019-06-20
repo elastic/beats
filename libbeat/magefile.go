@@ -54,6 +54,7 @@ func GoTestIntegration(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
 
+// Config generates example and reference configuration for libbeat.
 func Config() error {
 	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
 }
