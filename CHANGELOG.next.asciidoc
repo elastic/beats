@@ -20,6 +20,8 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Metricbeat*
 
+- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
+
 *Packetbeat*
 
 *Winlogbeat*
