@@ -8,13 +8,13 @@ type dfSupport struct {
 	log  *logp.Logger
 	mode Mode
 
-	transform DataFrameTransform
+	transforms []DataFrameTransform
 }
 
 type stdManager struct {
 	mode   Mode
 	client ClientHandler
-	dft    DataFrameTransform
+	dft    []DataFrameTransform
 
 	cached             bool
 	cachedEnabledValue bool
@@ -45,7 +45,7 @@ func (s *dfSupport) Manager(h ClientHandler) Manager {
 	return &stdManager{
 		mode:   s.mode,
 		client: h,
-		dft:    s.transform,
+		dft:    s.transforms,
 	}
 }
 
@@ -53,18 +53,18 @@ func (s *dfSupport) Mode() Mode {
 	return s.mode
 }
 
-func (s *dfSupport) Transform() DataFrameTransform {
-	return s.transform
+func (s *dfSupport) Transforms() []DataFrameTransform {
+	return s.transforms
 }
 
 func NewStdSupport(
 	log *logp.Logger,
 	mode Mode,
-	transform DataFrameTransform,
+	transforms []DataFrameTransform,
 ) Supporter {
 	return &dfSupport{
-		log:       log,
-		mode:      mode,
-		transform: transform,
+		log:        log,
+		mode:       mode,
+		transforms: transforms,
 	}
 }

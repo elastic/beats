@@ -41,8 +41,8 @@ func (ch *clientHandler) CheckDataFramesEnabled(m dft.Mode) (bool, error) {
 	return ch.dfClientHandler.CheckDataFramesEnabled(m)
 }
 
-func (ch *clientHandler) EnsureDataFrames(dft dft.DataFrameTransform) error {
-	return ch.dfClientHandler.EnsureDataFrames(dft)
+func (ch *clientHandler) EnsureDataFrames(transforms []dft.DataFrameTransform) error {
+	return ch.dfClientHandler.EnsureDataFrames(transforms)
 }
 
 // ESClient defines the minimal interface required for the index manager to

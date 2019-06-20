@@ -113,11 +113,11 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory, dfSupport dft.SupportFact
 		const logName = "index-management"
 
 		cfg := struct {
-			ILM        *common.Config         `config:"setup.ilm"`
-			Template   *common.Config         `config:"setup.template"`
-			DataFrames *common.Config         `config:"setup.dataframes"`
-			Output     common.ConfigNamespace `config:"output"`
-			Migration  *common.Config         `config:"migration.6_to_7"`
+			ILM       *common.Config         `config:"setup.ilm"`
+			Template  *common.Config         `config:"setup.template"`
+			DFT       *common.Config         `config:"setup.data_frame"`
+			Output    common.ConfigNamespace `config:"output"`
+			Migration *common.Config         `config:"migration.6_to_7"`
 		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
@@ -135,7 +135,7 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory, dfSupport dft.SupportFact
 			return nil, err
 		}
 
-		return newIndexSupport(log, info, ilmSupport, dfSupport, cfg.Template, cfg.ILM, cfg.DataFrames, cfg.Migration.Enabled())
+		return newIndexSupport(log, info, ilmSupport, dfSupport, cfg.Template, cfg.ILM, cfg.DFT, cfg.Migration.Enabled())
 	}
 }
 

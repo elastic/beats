@@ -1,6 +1,8 @@
 package dft
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -15,11 +17,12 @@ type Supporter interface {
 }
 
 type DataFrameTransform struct {
-	Name     string        `config:"string"`
-	Body     common.MapStr `config:"body"`
-	Source   string        `config:"source"`
-	Dest     string        `config:"dest"`
-	Interval string        `config:"timespan"`
+	Name         string        `config:"string"`
+	Pivot        common.MapStr `config:"body"`
+	Aggregations common.MapStr `config:"body"`
+	Source       string        `config:"source.index"`
+	Dest         string        `config:"dest.index"`
+	Interval     string        `config:"timespan"`
 }
 
 // Manager uses a ClientHandler to install a policy.
@@ -60,5 +63,7 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		}
 	}
 
-	return NewStdSupport(log, cfg.Mode, cfg.Transform), nil
+	fmt.Printf("UNPACKED INTO %v\n", cfg)
+
+	return NewStdSupport(log, cfg.Mode, cfg.Transforms), nil
 }

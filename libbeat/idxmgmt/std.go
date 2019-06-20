@@ -102,7 +102,7 @@ func newIndexSupport(
 	dfFactory dft.SupportFactory,
 	tmplConfig *common.Config,
 	ilmConfig *common.Config,
-	dfConfig *common.Config,
+	dftConfig *common.Config,
 	migration bool,
 ) (*indexSupport, error) {
 	if ilmFactory == nil {
@@ -119,7 +119,7 @@ func newIndexSupport(
 		return nil, err
 	}
 
-	dfSupporter, err := dfFactory(log, info, dfConfig)
+	dfSupporter, err := dfFactory(log, info, dftConfig)
 	if err != nil {
 		return nil, err
 	}
