@@ -12,7 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Heartbeat. They are
 grouped in the following categories:
 
-* <<exported-fields-beat>>
+* <<exported-fields-beat-common>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
@@ -30,7 +30,7 @@ grouped in the following categories:
 * <<exported-fields-tls>>
 
 --
-[[exported-fields-beat]]
+[[exported-fields-beat-common]]
 == Beat fields
 
 Contains common beat fields available in all event types.

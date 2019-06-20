@@ -1,4 +1,5 @@
 - key: beat
+  anchor: beat-common
   title: Beat
   description: >
     Contains common beat fields available in all event types.

@@ -13,7 +13,7 @@ This document describes the fields that are exported by Auditbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-auditd>>
-* <<exported-fields-beat>>
+* <<exported-fields-beat-common>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
@@ -2448,7 +2448,7 @@ The longitude and latitude.
 
 --
 
-[[exported-fields-beat]]
+[[exported-fields-beat-common]]
 == Beat fields
 
 Contains common beat fields available in all event types.
