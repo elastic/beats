@@ -19899,7 +19899,7 @@ The number of requests to read a row based on a key.
 --
 type: long
 
-The number of requests to read the last key in an index.
+The number of requests to read the last key in an index. 
 
 
 --
@@ -19929,7 +19929,7 @@ The number of requests to read the previous row in key order.
 --
 type: long
 
-The number of requests to read a row based on a fixed position.
+The number of requests to read a row based on a fixed position. 
 
 
 --
@@ -19939,7 +19939,7 @@ The number of requests to read a row based on a fixed position.
 --
 type: long
 
-The number of requests to read the next row in the data file.
+The number of requests to read the next row in the data file. 
 
 
 --
@@ -20037,7 +20037,7 @@ The progress of an operation to warm up the InnoDB buffer pool by reading in a s
 --
 type: long
 
-The total number of bytes in the InnoDB buffer pool containing data.
+The total number of bytes in the InnoDB buffer pool containing data. 
 
 
 --
@@ -22924,7 +22924,7 @@ type: long
 
 format: bytes
 
-Used memory by the Lua engine.
+Used memory by the Lua engine.        
 
 
 --
@@ -22936,7 +22936,7 @@ type: long
 
 format: bytes
 
-The size in bytes of the dataset
+The size in bytes of the dataset 
 
 
 --
@@ -23181,7 +23181,7 @@ type: long
 
 format: bytes
 
-The size in bytes of copy-on-write allocations during the last RBD save operation
+The size in bytes of copy-on-write allocations during the last RBD save operation                
 
 
 --
@@ -23310,7 +23310,7 @@ type: long
 
 format: bytes
 
-AOF current file size
+AOF current file size             
 
 
 --
@@ -23414,7 +23414,7 @@ Total size in bytes of the replication backlog buffer
 --
 type: long
 
-The master offset of the replication backlog buffer
+The master offset of the replication backlog buffer          
 
 
 --
@@ -26463,7 +26463,7 @@ The raid level of the device
 --
 type: keyword
 
-Current sync action, if the RAID array is redundant
+Current sync action, if the RAID array is redundant 
 
 
 --
@@ -26748,7 +26748,7 @@ type: integer
 
 format: bytes
 
-Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
 
 
 --
@@ -26834,7 +26834,7 @@ type: integer
 
 format: bytes
 
-Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
 
 
 --
