@@ -73,7 +73,11 @@ func (h *ESClientHandler) EnsureDataFrames(dft DataFrameTransform) error {
 		return errors.Wrapf(err, "unexpected error checking dataframe at path %v", p)
 	}
 
-	code, _, err = h.client.Request("PUT", p, "", nil, dft.Body)
+	body := dft.Body.Clone()
+	body["source"] = map[string]string{"index": dft.Source}
+	body["dest"] = map[string]string{"index": dft.Dest}
+
+	code, _, err = h.client.Request("PUT", p, "", nil, body)
 	if err != nil {
 		return errors.Wrapf(err, "could not PUT dataframe at path %v", p)
 	}
