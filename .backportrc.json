@@ -1,5 +1,0 @@
-{
-  "upstream": "elastic/beats",
-  "branches": ["7.x", { "name": "7.2", "checked": true }, "7.1", "6.8" ],
-  "labels": ["backport"]
-}
