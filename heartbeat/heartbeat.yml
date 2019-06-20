@@ -41,7 +41,10 @@ setup.template.settings:
 
 setup.data_frame:
   transforms:
-    - mappings:
+    - pipeline:
+        name: foo
+        definition:
+      mappings:
         dynamic: false
         properties:
           monitor_id:
