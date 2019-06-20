@@ -17,12 +17,11 @@ type Supporter interface {
 }
 
 type DataFrameTransform struct {
-	Name         string        `config:"string"`
-	Pivot        common.MapStr `config:"body"`
-	Aggregations common.MapStr `config:"body"`
-	Source       string        `config:"source.index"`
-	Dest         string        `config:"dest.index"`
-	Interval     string        `config:"timespan"`
+	Name     string        `config:"string"`
+	Pivot    common.MapStr `config:"pivot"`
+	Source   string        `config:"source.index"`
+	Dest     string        `config:"dest.index"`
+	Interval string        `config:"timespan"`
 }
 
 // Manager uses a ClientHandler to install a policy.
@@ -63,7 +62,8 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		}
 	}
 
-	fmt.Printf("UNPACKED INTO %v\n", cfg)
+	u, _ := config.Child("transforms", 0)
+	fmt.Printf("UNPACKED INTO %v from %v\n", cfg.Transforms[0], u.GetFields())
 
 	return NewStdSupport(log, cfg.Mode, cfg.Transforms), nil
 }

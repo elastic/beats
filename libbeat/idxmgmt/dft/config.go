@@ -8,9 +8,9 @@ import (
 
 // Config is used for unpacking a common.Config.
 type Config struct {
-	Mode        Mode                 `config:enabled`
-	Transforms  []DataFrameTransform `config:transforms`
-	CheckExists bool                 `config:"check_exists"`
+	Mode        Mode                  `config:enabled`
+	Transforms  []*DataFrameTransform `config:transforms`
+	CheckExists bool                  `config:"check_exists"`
 	// Enable always overwrite policy mode. This required manage_ilm privileges.
 	Overwrite bool `config:"overwrite"`
 }
@@ -35,7 +35,7 @@ func DefaultConfig(info beat.Info) Config {
 
 	return Config{
 		Mode: ModeAuto,
-		Transforms: []DataFrameTransform{
+		Transforms: []*DataFrameTransform{
 			{
 				Name:     name,
 				Source:   source,

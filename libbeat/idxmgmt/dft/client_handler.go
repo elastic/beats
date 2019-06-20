@@ -1,6 +1,7 @@
 package dft
 
 import (
+	"encoding/json"
 	"path"
 
 	"fmt"
@@ -14,7 +15,7 @@ const esDFTPath = "/_data_frame/transforms"
 
 type ClientHandler interface {
 	CheckDataFramesEnabled(Mode) (bool, error)
-	EnsureDataFrames(transforms []DataFrameTransform) error
+	EnsureDataFrames(transforms []*DataFrameTransform) error
 }
 
 // ESClient defines the minimal interface required for the Loader to
@@ -43,7 +44,7 @@ func (*FileClientHandler) CheckDataFramesEnabled(Mode) (bool, error) {
 	panic("implement me check")
 }
 
-func (*FileClientHandler) EnsureDataFrames(transforms []DataFrameTransform) error {
+func (*FileClientHandler) EnsureDataFrames(transforms []*DataFrameTransform) error {
 	panic("implement me ensure")
 }
 
@@ -56,7 +57,7 @@ func (*ESClientHandler) CheckDataFramesEnabled(Mode) (bool, error) {
 	return true, nil
 }
 
-func (h *ESClientHandler) EnsureDataFrames(transforms []DataFrameTransform) error {
+func (h *ESClientHandler) EnsureDataFrames(transforms []*DataFrameTransform) error {
 	for _, t := range transforms {
 		p := path.Join(esDFTPath, t.Name)
 		code, _, err := h.client.Request("GET", p, "", nil, nil)
@@ -76,10 +77,10 @@ func (h *ESClientHandler) EnsureDataFrames(transforms []DataFrameTransform) erro
 
 		body := map[string]interface{}{}
 		body["pivot"] = t.Pivot
-		body["aggregations"] = t.Aggregations
 		body["source"] = map[string]string{"index": t.Source}
 		body["dest"] = map[string]string{"index": t.Dest}
-		fmt.Printf("DFT BODY %#v\n", t)
+		j, _ := json.Marshal(body)
+		fmt.Printf("DFT BODY %s\n", string(j))
 
 		code, _, err = h.client.Request("PUT", p, "", nil, body)
 		if err != nil {
