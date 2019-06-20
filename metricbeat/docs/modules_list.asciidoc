@@ -86,7 +86,7 @@ This file is generated! See scripts/docs_collector.py
 .14+| .14+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
-|<<metricbeat-metricset-kubernetes-kubecontroller,kubecontroller>> beta[]  
+|<<metricbeat-metricset-kubernetes-kubecontroller,kubecontroller>>   
 |<<metricbeat-metricset-kubernetes-node,node>>   
 |<<metricbeat-metricset-kubernetes-pod,pod>>   
 |<<metricbeat-metricset-kubernetes-state_container,state_container>>   

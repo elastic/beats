@@ -13419,11 +13419,278 @@ Kubernetes controller manager metrics
 
 
 
-[float]
-== TODO fields
+*`kubernetes.kubecontroller.handler`*::
++
+--
+type: keyword
 
-TODO
+Request handler
 
+
+--
+
+*`kubernetes.kubecontroller.code`*::
++
+--
+type: keyword
+
+HTTP code
+
+
+--
+
+*`kubernetes.kubecontroller.method`*::
++
+--
+type: keyword
+
+HTTP method
+
+
+--
+
+*`kubernetes.kubecontroller.host`*::
++
+--
+type: keyword
+
+Request host
+
+
+--
+
+*`kubernetes.kubecontroller.name`*::
++
+--
+type: keyword
+
+Name for the resource
+
+
+--
+
+*`kubernetes.kubecontroller.zone`*::
++
+--
+type: keyword
+
+Infrastructure zone
+
+
+--
+
+
+*`kubernetes.kubecontroller.process.cpu.sec`*::
++
+--
+type: scaled_float
+
+CPU seconds
+
+--
+
+*`kubernetes.kubecontroller.process.memory.resident.bytes`*::
++
+--
+type: long
+
+Bytes in resident memory
+
+--
+
+*`kubernetes.kubecontroller.process.memory.virtual.bytes`*::
++
+--
+type: long
+
+Bytes in virtual memory
+
+--
+
+*`kubernetes.kubecontroller.process.fds.open.count`*::
++
+--
+type: integer
+
+Number of open file descriptors
+
+--
+
+*`kubernetes.kubecontroller.process.started.sec`*::
++
+--
+type: scaled_float
+
+Seconds since the process started
+
+--
+
+
+*`kubernetes.kubecontroller.http.request.duration.us.percentile.*`*::
++
+--
+type: scaled_float
+
+Request duration microseconds percentiles
+
+--
+
+*`kubernetes.kubecontroller.http.request.duration.us.sum`*::
++
+--
+type: scaled_float
+
+Request duration microseconds cumulative sum
+
+--
+
+*`kubernetes.kubecontroller.http.request.duration.us.count`*::
++
+--
+type: long
+
+Request count for duration
+
+--
+
+*`kubernetes.kubecontroller.http.request.size.bytes.percentile.*`*::
++
+--
+type: integer
+
+Request size percentiles
+
+--
+
+*`kubernetes.kubecontroller.http.request.size.bytes.sum`*::
++
+--
+type: long
+
+Request size cumulative sum
+
+--
+
+*`kubernetes.kubecontroller.http.request.size.bytes.count`*::
++
+--
+type: long
+
+Request count for size
+
+--
+
+*`kubernetes.kubecontroller.http.response.size.bytes.percentile.*`*::
++
+--
+type: integer
+
+Response size percentiles
+
+--
+
+*`kubernetes.kubecontroller.http.response.size.bytes.sum`*::
++
+--
+type: long
+
+Response size cumulative sum
+
+--
+
+*`kubernetes.kubecontroller.http.response.size.bytes.count`*::
++
+--
+type: long
+
+Response count
+
+--
+
+*`kubernetes.kubecontroller.http.request.count`*::
++
+--
+type: long
+
+Request count for response
+
+--
+
+*`kubernetes.kubecontroller.client.request.count`*::
++
+--
+type: long
+
+Number of requests as client
+
+
+--
+
+
+*`kubernetes.kubecontroller.workqueue.longestrunning.sec`*::
++
+--
+type: scaled_float
+
+Longest running processors
+
+--
+
+*`kubernetes.kubecontroller.workqueue.unfinished.sec`*::
++
+--
+type: scaled_float
+
+Unfinished processors
+
+--
+
+
+*`kubernetes.kubecontroller.node.collector.eviction.count`*::
++
+--
+type: long
+
+Number of node evictions
+
+--
+
+*`kubernetes.kubecontroller.node.collector.unhealthy.count`*::
++
+--
+type: long
+
+Number of unhealthy nodes
+
+--
+
+*`kubernetes.kubecontroller.node.collector.count`*::
++
+--
+type: long
+
+Number of nodes
+
+--
+
+*`kubernetes.kubecontroller.node.collector.health.pct`*::
++
+--
+type: integer
+
+Percentage of healthy nodes
+
+--
+
+*`kubernetes.kubecontroller.leader.is_master`*::
++
+--
+type: int
+
+Whether the node is master
+
+
+--
 
 [float]
 == node fields

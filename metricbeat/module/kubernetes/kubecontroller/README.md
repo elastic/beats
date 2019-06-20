@@ -2,7 +2,7 @@
 
 ## Version history
 
-- June 2019, `v1.14.0`
+- June 2019, `v1.14.3`
 
 ## Resources
 
@@ -10,48 +10,30 @@ Each controller emits a set of metrics, there is no source file to reference but
 
 ## Metrics insight
 
-
-http_request_duration_microseconds The HTTP request latencies in microseconds.
+http_request_duration_microseconds The HTTP request latencies in microseconds. Summary
     - handler
-    - quantile
 
-http_request_size_bytes The HTTP request sizes in bytes.
-    - handler
-    - quantile
-
-http_requests_total Total number of HTTP requests made
+http_requests_total Total number of HTTP requests made. Counter
     - code
     - handler
     - method
 
-http_response_size_bytes The HTTP response sizes in bytes.
+http_request_size_bytes The HTTP request sizes in bytes. Summary
     - handler
-    - quantile
 
+http_response_size_bytes The HTTP response sizes in bytes. Summary
+    - handler
 
-rest_client_request_duration_seconds_bucket: Request latency in seconds. Broken down by verb and URL.
-    - url
-    - verb
-    - le
-
-rest_client_requests_total: Number of HTTP requests, partitioned by status code, method, and host.
+rest_client_requests_total Number of HTTP requests, partitioned by status code, method, and host. Counter
     - code
     - host
     - method
 
-workqueue_work_duration_seconds_bucket: How long in seconds processing an item from workqueue takes
-    - name: object name
-    - le
-
-workqueue_queue_duration_seconds_bucket: How long in seconds an item stays in workqueue before being requested
-    - name: 
-    - le:
-
-workqueue_unfinished_work_seconds: How many seconds of work has done that is in progress and hasn't been observed by work_duration. Large values indicate stuck threads. One can deduce the number of stuck threads by observing the rate at which this increases.
+workqueue_longest_running_processor_seconds. Gauge
     - name: 
 
-workqueue_retries_total: Total number of retries handled by workqueue
-    - name:
+workqueue_unfinished_work_seconds: How many seconds of work has done that is in progress and hasn't been observed by work_duration. Large values indicate stuck threads. One can deduce the number of stuck threads by observing the rate at which this increases. Gauge
+    - name: 
 
 process_cpu_seconds_total: Total user and system CPU time spent in seconds.
 process_open_fds Number of open file descriptors.
@@ -71,6 +53,7 @@ node_collector_zone_health measuring percentage of healthy nodes per zone.
 node_collector_zone_size: measuring number of registered Nodes per zones.
     - zone
 
+leader_election_master_status
 
 
 ## Setup environment for manual tests

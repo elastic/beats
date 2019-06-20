@@ -29,7 +29,7 @@ func init() {
 			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
 			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
 			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
-			"process_open_fds":  prometheus.Metric("process.fds.open"),
+			"process_open_fds":  prometheus.Metric("process.fds.open.count"),
 			"process_start_time_seconds": prometheus.Metric("process.started.sec"),
 			
 			// HTTP server metrics
@@ -39,28 +39,21 @@ func init() {
 			"http_requests_total":                prometheus.Metric("http.request.count"),
 
 			// REST metrics
-			"rest_client_request_duration_seconds": prometheus.Metric("client.request.duration.us",
-				prometheus.OpMultiplyBuckets(1000000)),
 			"rest_client_requests_total": prometheus.Metric("client.request.count"),
 
-			// Work Queue metrics
-			"workqueue_work_duration_seconds": prometheus.Metric("workqueue.work.duration.us",
-				prometheus.OpMultiplyBuckets(1000000)),
-			"workqueue_queue_duration_seconds": prometheus.Metric("workqueue.queue.duration.us",
-				prometheus.OpMultiplyBuckets(1000000)),
-			"workqueue_unfinished_work_seconds": prometheus.Metric("workqueue.queue.duration.sec"),
-			"workqueue_retries_total" : prometheus.Metric("workqueue.retries.count"),
-
+			// Controller metrics
+			"workqueue_longest_running_processor_seconds": prometheus.Metric("workqueue.longestrunning.sec"),
+			"workqueue_unfinished_work_seconds": prometheus.Metric("workqueue.unfinished.sec"),
 			"node_collector_evictions_number": prometheus.Metric("node.collector.eviction.count"),
 			"node_collector_unhealthy_nodes_in_zone" : prometheus.Metric("node.collector.unhealthy.count"),
 			"node_collector_zone_size": prometheus.Metric("node.collector.count"),
+			"node_collector_zone_health": prometheus.Metric("node.collector.health.pct"),
+			"leader_election_master_status": prometheus.Metric("leader.is_master"),
 		},
 
 		Labels: map[string]prometheus.LabelMap{
 			"handler": prometheus.KeyLabel("handler"),
 			"code":    prometheus.KeyLabel("code"),
-			"url":     prometheus.KeyLabel("url"),
-			"verb":    prometheus.KeyLabel("verb"),
 			"method":  prometheus.KeyLabel("method"),
 			"host":    prometheus.KeyLabel("host"),
 			"name":    prometheus.KeyLabel("name"),
