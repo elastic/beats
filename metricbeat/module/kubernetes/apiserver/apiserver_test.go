@@ -27,12 +27,24 @@ import (
 
 const testFile = "_meta/test/metrics"
 
-func TestEventMapping(t *testing.T) {
+func TestEventMappingV1_14(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "apiserver",
 		ptest.TestCases{
 			{
 				MetricsFile:  "./_meta/test/metrics.1.14",
-				ExpectedFile: "./_meta/test/metrics.1.14..expected",
+				ExpectedFile: "./_meta/test/metrics.1.14.expected",
+			},
+		},
+	)
+}
+
+
+func TestEventMappingV1_previous(t *testing.T) {
+	ptest.TestMetricSet(t, "kubernetes", "apiserver",
+		ptest.TestCases{
+			{
+				MetricsFile:  "./_meta/test/metrics.1.unknown",
+				ExpectedFile: "./_meta/test/metrics.1.unknown.expected",
 			},
 		},
 	)
