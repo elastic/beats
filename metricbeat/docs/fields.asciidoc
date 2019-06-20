@@ -830,6 +830,16 @@ Total.
 
 
 
+*`aws.tags.*`*::
++
+--
+type: object
+
+Tag key value pairs from aws resources.
+
+
+--
+
 [float]
 == cloudwatch fields
 

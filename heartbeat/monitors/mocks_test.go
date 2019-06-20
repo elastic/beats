@@ -23,15 +23,18 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/heartbeat/hbtest"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/go-lookslike"
+
 	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/hbtest"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -95,26 +98,26 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	return c, nil
 }
 
-func mockEventMonitorValidator(id string) mapval.Validator {
-	var idMatcher mapval.IsDef
+func mockEventMonitorValidator(id string) validator.Validator {
+	var idMatcher isdef.IsDef
 	if id == "" {
-		idMatcher = mapval.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
+		idMatcher = isdef.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
 	} else {
-		idMatcher = mapval.IsEqual(id)
+		idMatcher = isdef.IsEqual(id)
 	}
-	return mapval.Strict(mapval.Compose(
-		mapval.MustCompile(mapval.Map{
-			"monitor": mapval.Map{
+	return lookslike.Strict(lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"monitor": map[string]interface{}{
 				"id":          idMatcher,
 				"name":        "",
 				"type":        "test",
-				"duration.us": mapval.IsDuration,
+				"duration.us": isdef.IsDuration,
 				"status":      "up",
-				"check_group": mapval.IsString,
+				"check_group": isdef.IsString,
 			},
 		}),
 		hbtest.SummaryChecks(1, 0),
-		mapval.MustCompile(mockEventCustomFields()),
+		lookslike.MustCompile(mockEventCustomFields()),
 	))
 }
 

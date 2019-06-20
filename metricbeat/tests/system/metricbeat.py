@@ -27,6 +27,12 @@ class BaseTest(TestCase):
 
         super(BaseTest, self).setUpClass()
 
+    def setUp(self):
+        super(BaseTest, self).setUp()
+
+    def tearDown(self):
+        super(BaseTest, self).tearDown()
+
     def de_dot(self, existing_fields):
         fields = {}
 
