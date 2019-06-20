@@ -29,9 +29,9 @@ func init() {
 			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
 			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
 			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
-			"process_open_fds":  prometheus.Metric("process.fds.open.count"),
-			"process_start_time_seconds": prometheus.Metric("process.started.sec"),
-			
+			"process_open_fds":              prometheus.Metric("process.fds.open.count"),
+			"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
+
 			// HTTP server metrics
 			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
 			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
@@ -43,12 +43,12 @@ func init() {
 
 			// Controller metrics
 			"workqueue_longest_running_processor_seconds": prometheus.Metric("workqueue.longestrunning.sec"),
-			"workqueue_unfinished_work_seconds": prometheus.Metric("workqueue.unfinished.sec"),
-			"node_collector_evictions_number": prometheus.Metric("node.collector.eviction.count"),
-			"node_collector_unhealthy_nodes_in_zone" : prometheus.Metric("node.collector.unhealthy.count"),
-			"node_collector_zone_size": prometheus.Metric("node.collector.count"),
-			"node_collector_zone_health": prometheus.Metric("node.collector.health.pct"),
-			"leader_election_master_status": prometheus.Metric("leader.is_master"),
+			"workqueue_unfinished_work_seconds":           prometheus.Metric("workqueue.unfinished.sec"),
+			"node_collector_evictions_number":             prometheus.Metric("node.collector.eviction.count"),
+			"node_collector_unhealthy_nodes_in_zone":      prometheus.Metric("node.collector.unhealthy.count"),
+			"node_collector_zone_size":                    prometheus.Metric("node.collector.count"),
+			"node_collector_zone_health":                  prometheus.Metric("node.collector.health.pct"),
+			"leader_election_master_status":               prometheus.Metric("leader.is_master"),
 		},
 
 		Labels: map[string]prometheus.LabelMap{
@@ -57,7 +57,7 @@ func init() {
 			"method":  prometheus.KeyLabel("method"),
 			"host":    prometheus.KeyLabel("host"),
 			"name":    prometheus.KeyLabel("name"),
-			"zone": prometheus.KeyLabel("zone"),
+			"zone":    prometheus.KeyLabel("zone"),
 		},
 	}
 
