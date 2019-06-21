@@ -3,6 +3,69 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
+			"name": "certificate",
+			"workqueue": {
+				"adds": {
+					"count": 12
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "node_lifecycle_controller",
+			"workqueue": {
+				"adds": {
+					"count": 17427
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
 			"code": "200",
 			"handler": "prometheus",
 			"http": {
@@ -26,58 +89,115 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "certificate",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "replicaset",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
 			"name": "volumes",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "serviceaccount",
+			"workqueue": {
+				"adds": {
+					"count": 4
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "pvprotection",
+			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "ttlcontroller",
+			"workqueue": {
+				"adds": {
+					"count": 17424
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -106,54 +226,6 @@
 			"code": "200",
 			"host": "192.168.205.10:6443",
 			"method": "PUT"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "ClusterRoleAggregator",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "serviceaccount",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
 		},
 		"Index": "",
 		"ID": "",
@@ -266,58 +338,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "node_lifecycle_controller",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "garbage_collector_attempt_to_delete",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
 			"name": "token_cleaner",
 			"workqueue": {
+				"adds": {
+					"count": 2
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -338,10 +371,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "horizontalpodautoscaler",
+			"name": "resourcequota_priority",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -362,10 +404,52 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "pvprotection",
+			"name": "pvcprotection",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "resourcequota_primary",
+			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -409,10 +493,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "serviceaccount_tokens_secret",
+			"name": "resource_quota_controller_resource_changes",
 			"workqueue": {
+				"adds": {
+					"count": 132
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -433,10 +526,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "disruption",
+			"name": "service",
 			"workqueue": {
+				"adds": {
+					"count": 3
+				},
+				"depth": {
+					"count": 3
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -457,10 +559,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "pvcprotection",
+			"name": "replicaset",
 			"workqueue": {
+				"adds": {
+					"count": 51
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -504,10 +615,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "pvcs",
+			"name": "daemonset",
 			"workqueue": {
+				"adds": {
+					"count": 78
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 3
 				},
 				"unfinished": {
 					"sec": 0
@@ -528,10 +648,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "resource_quota_controller_resource_changes",
+			"name": "namespace",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -552,10 +681,52 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "bootstrap_signer_queue",
+			"name": "horizontalpodautoscaler",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "serviceaccount_tokens_service",
+			"workqueue": {
+				"adds": {
+					"count": 68
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -626,10 +797,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "ttlcontroller",
+			"name": "garbage_collector_attempt_to_orphan",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -650,10 +830,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "endpoint",
+			"name": "pvcs",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -674,106 +863,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "claims",
+			"name": "disruption",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
 				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "deployment",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "resourcequota_priority",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "namespace",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "job",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -817,32 +919,113 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "resourcequota_primary",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
 			"name": "disruption_recheck",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "statefulset",
+			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "endpoint",
+			"workqueue": {
+				"adds": {
+					"count": 26
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "noexec_taint_node",
+			"workqueue": {
+				"adds": {
+					"count": 12
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
 				},
@@ -865,82 +1048,19 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "serviceaccount_tokens_service",
+			"name": "deployment",
 			"workqueue": {
+				"adds": {
+					"count": 46
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
 				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "service",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "garbage_collector_graph_changes",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
-				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "garbage_collector_attempt_to_orphan",
-			"workqueue": {
-				"longestrunning": {
-					"sec": 0
+				"retries": {
+					"count": 11
 				},
 				"unfinished": {
 					"sec": 0
@@ -984,10 +1104,118 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "noexec_taint_node",
+			"name": "garbage_collector_graph_changes",
 			"workqueue": {
+				"adds": {
+					"count": 468043
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "job",
+			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "garbage_collector_attempt_to_delete",
+			"workqueue": {
+				"adds": {
+					"count": 13
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "serviceaccount_tokens_secret",
+			"workqueue": {
+				"adds": {
+					"count": 34
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
 				},
 				"unfinished": {
 					"sec": 0
@@ -1031,8 +1259,14 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "replicationmanager",
+			"name": "claims",
 			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
 				},
@@ -1055,10 +1289,52 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"name": "statefulset",
+			"name": "bootstrap_signer_queue",
 			"workqueue": {
+				"adds": {
+					"count": 2
+				},
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "ClusterRoleAggregator",
+			"workqueue": {
+				"adds": {
+					"count": 68
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 2
 				},
 				"unfinished": {
 					"sec": 0
@@ -1081,30 +1357,12 @@
 		"MetricSetFields": {
 			"name": "noexec_taint_pod",
 			"workqueue": {
-				"longestrunning": {
-					"sec": 0
+				"adds": {
+					"count": 35
 				},
-				"unfinished": {
-					"sec": 0
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"name": "daemonset",
-			"workqueue": {
+				"depth": {
+					"count": 0
+				},
 				"longestrunning": {
 					"sec": 0
 				},
@@ -1135,6 +1393,39 @@
 			"code": "403",
 			"host": "192.168.205.10:6443",
 			"method": "GET"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"name": "replicationmanager",
+			"workqueue": {
+				"adds": {
+					"count": 0
+				},
+				"depth": {
+					"count": 0
+				},
+				"longestrunning": {
+					"sec": 0
+				},
+				"retries": {
+					"count": 0
+				},
+				"unfinished": {
+					"sec": 0
+				}
+			}
 		},
 		"Index": "",
 		"ID": "",
