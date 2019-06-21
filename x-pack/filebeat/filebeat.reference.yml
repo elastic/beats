@@ -789,8 +789,7 @@ filebeat.inputs:
   #ssl.curve_types: []
 
   # Configure what types of client authentication are supported. Valid options
-  # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
-  # default to `required` otherwise it will be set to `none`.
+  # are `none`, `optional`, and `required`. Default is required.
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
@@ -849,8 +848,7 @@ filebeat.inputs:
     #ssl.curve_types: []
 
     # Configure what types of client authentication are supported. Valid options
-    # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
-    # default to `required` otherwise it will be set to `none`.
+    # are `none`, `optional`, and `required`. Default is required.
     #ssl.client_authentication: "required"
 
 #------------------------------ Docker input --------------------------------
