@@ -1605,6 +1605,53 @@ type: keyword
 --
 
 [float]
+=== state
+
+Beat state
+
+
+
+*`beat.state.management.enabled`*::
++
+--
+Is central management enabled?
+
+
+type: bool
+
+--
+
+*`beat.state.module.count`*::
++
+--
+Number of modules enabled
+
+
+type: int
+
+--
+
+*`beat.state.output.name`*::
++
+--
+Name of output used by Beat
+
+
+type: keyword
+
+--
+
+*`beat.state.queue.name`*::
++
+--
+Name of queue being used by Beat
+
+
+type: keyword
+
+--
+
+[float]
 === stats
 
 Beat stats
@@ -1812,7 +1859,6 @@ Beats module
 *`beats.id`*::
 +
 --
-type: keyword
 
 Beat ID.
 
@@ -2051,20 +2097,10 @@ Write stats
 *`beats.stats.libbeat.output.write.bytes`*::
 +
 --
-type: long
-
-Number of bytes written
-
-
---
-
-*`beats.stats.libbeat.output.write.errors`*::
-+
---
-type: long
-
 Number of write errors
 
+
+type: long
 
 --
 
