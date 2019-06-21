@@ -63,7 +63,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		base.name = m.Name
 		baseModule, err := m.baseModule(base.module)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create base module for light module")
+			return nil, errors.Wrapf(err, "failed to create base module for light module '%s', using base module '%s'", m.Module, base.module.Name())
 		}
 		base.module = baseModule
 
