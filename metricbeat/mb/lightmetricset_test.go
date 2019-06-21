@@ -27,34 +27,29 @@ import (
 )
 
 func TestLightMetricSetRegistration(t *testing.T) {
-	cases := []struct {
-		title     string
+	cases := map[string]struct {
 		module    string
 		metricSet string
 		isDefault bool
 		fail      bool
 	}{
-		{
-			title:     "metricset is registered",
+		"metricset is registered": {
 			module:    "foo",
 			metricSet: "bar",
 			fail:      false,
 		},
-		{
-			title:     "metricset is registered and is default",
+		"metricset is registered and is default": {
 			module:    "foo",
 			metricSet: "bar",
 			isDefault: true,
 			fail:      false,
 		},
-		{
-			title:     "module is not registered",
+		"module is not registered": {
 			module:    "notexists",
 			metricSet: "notexists",
 			fail:      true,
 		},
-		{
-			title:     "metricset is not registered",
+		"metricset is not registered": {
 			module:    "foo",
 			metricSet: "notexists",
 			fail:      true,
@@ -71,8 +66,8 @@ func TestLightMetricSetRegistration(t *testing.T) {
 	r := NewRegister()
 	r.MustAddMetricSet(moduleName, metricSetName, fakeMetricSetFactory)
 
-	for _, c := range cases {
-		t.Run(c.title, func(t *testing.T) {
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
 			ms := LightMetricSet{
 				Name:    lightMetricSetName,
 				Module:  lightModuleName,

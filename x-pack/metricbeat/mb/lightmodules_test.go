@@ -29,14 +29,12 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 		hostParser mb.HostParser
 	}
 
-	cases := []struct {
-		title                     string
+	cases := map[string]struct {
 		registered                []testMetricSet
 		expectedMetricSets        map[string][]string
 		expectedDefaultMetricSets map[string][]string
 	}{
-		{
-			title: "no registered modules",
+		"no registered modules": {
 			expectedMetricSets: map[string][]string{
 				"service": []string{"metricset", "nondefault"},
 				"broken":  []string{},
@@ -48,8 +46,7 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 				"empty":   []string{},
 			},
 		},
-		{
-			title: "same module registered (mixed modules case)",
+		"same module registered (mixed modules case)": {
 			registered: []testMetricSet{
 				{name: "other", module: "service"},
 			},
@@ -60,8 +57,7 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 				"service": []string{"metricset"},
 			},
 		},
-		{
-			title: "some metricsets registered",
+		"some metricsets registered": {
 			registered: []testMetricSet{
 				{name: "other", module: "service"},
 				{name: "metricset", module: "something", isDefault: true},
@@ -100,8 +96,8 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 		return r
 	}
 
-	for _, c := range cases {
-		t.Run(c.title, func(t *testing.T) {
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
 			r := newRegistry(c.registered)
 
 			// Check metricsets
@@ -173,44 +169,36 @@ func TestLoadModule(t *testing.T) {
 func TestNewModuleFromConfig(t *testing.T) {
 	logp.TestingSetup()
 
-	cases := []struct {
-		title          string
+	cases := map[string]struct {
 		config         common.MapStr
 		err            bool
 		expectedOption string
 	}{
-		{
-			title:          "normal module",
+		"normal module": {
 			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
 			expectedOption: "default",
 		},
-		{
-			title:          "light module",
+		"light module": {
 			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
 			expectedOption: "test",
 		},
-		{
-			title:          "light module default metricset",
+		"light module default metricset": {
 			config:         common.MapStr{"module": "service"},
 			expectedOption: "test",
 		},
-		{
-			title:          "light module override option",
+		"light module override option": {
 			config:         common.MapStr{"module": "service", "option": "overriden"},
 			expectedOption: "overriden",
 		},
-		{
-			title:  "light module is broken",
+		"light module is broken": {
 			config: common.MapStr{"module": "broken"},
 			err:    true,
 		},
-		{
-			title:  "light metric set doesn't exist",
+		"light metric set doesn't exist": {
 			config: common.MapStr{"module": "service", "metricsets": []string{"notexists"}},
 			err:    true,
 		},
-		{
-			title:  "disabled light module",
+		"disabled light module": {
 			config: common.MapStr{"module": "service", "enabled": false},
 			err:    true,
 		},
@@ -220,8 +208,8 @@ func TestNewModuleFromConfig(t *testing.T) {
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
-	for _, c := range cases {
-		t.Run(c.title, func(t *testing.T) {
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
 			config, err := common.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
