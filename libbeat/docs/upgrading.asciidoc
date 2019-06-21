@@ -67,8 +67,8 @@ index template. This is no longer recommended. Use the `setup` command instead.
 *Metricbeat and Filebeat users:* If you use {beats} central management,
 make sure you migrate the {beats} central management index to 6.7 before you
 upgrade to 7.0. Although central management is not a GA-level feature in 7.0,
-we've provided a migration tool to help you migrate your configurations. For
-more information, see the
+we've provided a migration tool to help you migrate your configurations from
+version 6.6 to 6.7 or later. For more information, see the
 https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
 
 ==== Upgrade {beats} binaries to 7.0

@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-library identifier: 'apm@v1.0.2',
+library identifier: 'apm@current',
 retriever: modernSCM(
   [$class: 'GitSCMSource',
   credentialsId: 'f94e9298-83ae-417e-ba91-85c279771570',
@@ -10,15 +10,18 @@ retriever: modernSCM(
 pipeline {
   agent none
   environment {
-    BASE_DIR="src/github.com/elastic/beats"
+    BASE_DIR = 'src/github.com/elastic/beats'
   }
   options {
-    timeout(time: 1, unit: 'HOURS') 
+    timeout(time: 1, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
     disableResume()
     durabilityHint('PERFORMANCE_OPTIMIZED')
+  }
+  triggers {
+    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
   }
   parameters {
     booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
@@ -49,10 +52,10 @@ pipeline {
     Updating generated files for Beat.
     Checks the GO environment.
     Checks the Python environment.
-    Checks YAML files are generated. 
+    Checks YAML files are generated.
     Validate that all updates were committed.
     */
-    stage('Intake') { 
+    stage('Intake') {
       agent { label 'linux && immutable' }
       options { skipDefaultCheckout() }
       environment {
@@ -61,7 +64,8 @@ pipeline {
         GOPATH = "${env.WORKSPACE}"
       }
       steps {
-        withEnvWrapper() {
+        withGithubNotify(context: 'Intake') {
+          deleteDir()
           unstash 'source'
           dir("${BASE_DIR}"){
             sh './dev-tools/jenkins_intake.sh'
@@ -84,7 +88,8 @@ pipeline {
             GOPATH = "${env.WORKSPACE}"
           }
           steps {
-            withEnvWrapper() {
+            withGithubNotify(context: 'Test', tab: 'tests') {
+              deleteDir()
               unstash 'source'
               dir("${BASE_DIR}"){
                 sh './filebeat/scripts/jenkins/unit-test.sh'
@@ -109,7 +114,7 @@ pipeline {
     aborted {
       echoColor(text: '[ABORTED]', colorfg: 'magenta', colorbg: 'default')
     }
-    failure { 
+    failure {
       echoColor(text: '[FAILURE]', colorfg: 'red', colorbg: 'default')
       //step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: "${NOTIFY_TO}", sendToIndividuals: false])
     }

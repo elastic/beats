@@ -58,11 +58,12 @@ var (
 )
 
 var (
-	files     = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
-	modules   = flag.Bool("modules", false, "check modules folder contents")
-	modulesd  = flag.Bool("modules.d", false, "check modules.d folder contents")
-	monitorsd = flag.Bool("monitors.d", false, "check monitors.d folder contents")
-	rootOwner = flag.Bool("root-owner", false, "expect root to own package files")
+	files             = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	modules           = flag.Bool("modules", false, "check modules folder contents")
+	modulesd          = flag.Bool("modules.d", false, "check modules.d folder contents")
+	monitorsd         = flag.Bool("monitors.d", false, "check monitors.d folder contents")
+	rootOwner         = flag.Bool("root-owner", false, "expect root to own package files")
+	rootUserContainer = flag.Bool("root-user-container", false, "expect root in container user")
 )
 
 func TestRPM(t *testing.T) {
@@ -182,20 +183,26 @@ func checkDocker(t *testing.T, file string) {
 
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
-	checkDockerUser(t, p, info, *rootOwner)
+	checkDockerUser(t, p, info, *rootUserContainer)
+	checkConfigPermissionsWithMode(t, p, os.FileMode(0640))
+	checkManifestPermissionsWithMode(t, p, os.FileMode(0640))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
 func checkConfigPermissions(t *testing.T, p *packageFile) {
+	checkConfigPermissionsWithMode(t, p, expectedConfigMode)
+}
+
+func checkConfigPermissionsWithMode(t *testing.T, p *packageFile, expectedMode os.FileMode) {
 	t.Run(p.Name+" config file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if configFilePattern.MatchString(entry.File) {
 				mode := entry.Mode.Perm()
-				if expectedConfigMode != mode {
+				if expectedMode != mode {
 					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
-						entry.File, expectedConfigMode, mode)
+						entry.File, expectedMode, mode)
 				}
 				return
 			}
@@ -231,13 +238,17 @@ func checkConfigOwner(t *testing.T, p *packageFile, expectRoot bool) {
 
 // Verify that the modules manifest.yml files are installed with a 0644 file mode.
 func checkManifestPermissions(t *testing.T, p *packageFile) {
+	checkManifestPermissionsWithMode(t, p, expectedManifestMode)
+}
+
+func checkManifestPermissionsWithMode(t *testing.T, p *packageFile, expectedMode os.FileMode) {
 	t.Run(p.Name+" manifest file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if manifestFilePattern.MatchString(entry.File) {
 				mode := entry.Mode.Perm()
-				if expectedManifestMode != mode {
+				if expectedMode != mode {
 					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
-						entry.File, expectedManifestMode, mode)
+						entry.File, expectedMode, mode)
 				}
 			}
 		}

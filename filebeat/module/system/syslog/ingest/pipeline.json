@@ -34,10 +34,7 @@
                 "formats": [
                     "MMM  d HH:mm:ss",
                     "MMM dd HH:mm:ss",
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ",
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-                    "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX"
+                    "ISO8601"
                 ],
                 "ignore_failure": true
             }
