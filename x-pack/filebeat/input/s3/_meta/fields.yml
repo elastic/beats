@@ -1,0 +1,19 @@
+- key: s3
+  title: "s3"
+  description: >
+    Fields from s3 input.
+  release: beta
+  fields:
+    - name: log.source
+      type: group
+      description: >
+        Source of the log message.
+      fields:
+        - name: bucketName
+          type: keyword
+          description: >
+            Name of the S3 bucket that this log retrieved from.
+        - name: objectKey
+          type: keyword
+          description: >
+            Name of the S3 object that this log retrieved from.

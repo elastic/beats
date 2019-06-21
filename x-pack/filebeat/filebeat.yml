@@ -13,19 +13,23 @@
 #=========================== Filebeat inputs =============================
 
 filebeat.inputs:
-
+- type: s3
+  queueURLs: ["https://sqs.ap-southeast-1.amazonaws.com/627959692251/test-s3-notification"]
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:"”}'
 # Each - is an input. Most options can be set at the input level, so
 # you can use different inputs for various configurations.
 # Below are the input specific configurations.
 
-- type: log
+#- type: log
 
   # Change to true to enable this input configuration.
-  enabled: false
+  #enabled: false
 
   # Paths that should be crawled and fetched. Glob based paths.
-  paths:
-    - /var/log/*.log
+  #paths:
+  #  - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
