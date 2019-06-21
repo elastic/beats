@@ -126,19 +126,6 @@ example: project-x
 
 --
 
-<<<<<<< HEAD
-=======
-*`cloud.image.id`*::
-+
---
-Image ID for the cloud instance.
-
-
-example: ami-abcd1234
-
---
-
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
 *`meta.cloud.provider`*::
 +
 --
@@ -654,12 +641,6 @@ Port of the client.
 
 type: long
 
-<<<<<<< HEAD
-Port of the client.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
-
 --
 
 *`client.user.email`*::
@@ -1041,12 +1022,6 @@ Port of the destination.
 
 type: long
 
-<<<<<<< HEAD
-Port of the destination.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
-
 --
 
 *`destination.user.email`*::
@@ -1344,12 +1319,6 @@ Severity describes the original severity of the event. What the different severi
 type: long
 
 example: 7
-
-<<<<<<< HEAD
-Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
 
 --
 
@@ -2054,12 +2023,6 @@ type: long
 
 example: 404
 
-<<<<<<< HEAD
-HTTP response status code.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
-
 --
 
 *`http.version`*::
@@ -2625,30 +2588,14 @@ Process id.
 
 type: long
 
-<<<<<<< HEAD
-Process id.
-=======
-example: 4242
-
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
-
 --
 
 *`process.ppid`*::
 +
 --
-Parent process' pid.
+Process parent id.
 
 type: long
-
-<<<<<<< HEAD
-Process parent id.
-=======
-example: 4241
-
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
 
 --
 
@@ -2671,12 +2618,6 @@ Thread ID.
 type: long
 
 example: 4242
-
-<<<<<<< HEAD
-Thread ID.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
 
 --
 
@@ -2884,12 +2825,6 @@ example: 12
 Port of the server.
 
 type: long
-
-<<<<<<< HEAD
-Port of the server.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
 
 --
 
@@ -3207,12 +3142,6 @@ Port of the source.
 
 type: long
 
-<<<<<<< HEAD
-Port of the source.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
-
 --
 
 *`source.user.email`*::
@@ -3361,12 +3290,6 @@ Port of the request, such as 443.
 type: long
 
 example: 443
-
-<<<<<<< HEAD
-Port of the request, such as 443.
-=======
-format: string
->>>>>>> cadbd9d6c... [Docs] Reformat exported fields documentation (#12242)
 
 --
 
