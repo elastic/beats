@@ -11,11 +11,12 @@ import (
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/metricbeat/cmd"
 	"github.com/elastic/beats/metricbeat/cmd/test"
+	"github.com/elastic/beats/metricbeat/mb/module"
 	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
-	"github.com/elastic/beats/x-pack/metricbeat/beater"
-	xpacktest "github.com/elastic/beats/x-pack/metricbeat/cmd/test"
+	xpackbeater "github.com/elastic/beats/x-pack/metricbeat/beater"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/x-pack/metricbeat/include"
@@ -31,11 +32,32 @@ var Name = "metricbeat"
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
+var (
+	rootCreator = beater.Creator(
+		xpackbeater.WithLightModules(),
+		beater.WithModuleOptions(
+			module.WithMetricSetInfo(),
+			module.WithServiceName(),
+		),
+	)
+
+	// Use a customized instance of Metricbeat where startup delay has
+	// been disabled to workaround the fact that Modules() will return
+	// the static modules (not the dynamic ones) with a start delay.
+	testModulesCreator = beater.Creator(
+		xpackbeater.WithLightModules(),
+		beater.WithModuleOptions(
+			module.WithMetricSetInfo(),
+			module.WithMaxStartDelay(0),
+		),
+	)
+)
+
 func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	RootCmd = cmd.GenRootCmdWithSettings(beater.Creator(), instance.Settings{RunFlags: runFlags, Name: Name})
+	RootCmd = cmd.GenRootCmdWithSettings(rootCreator, instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", xpacktest.BeatCreator()))
+	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", testModulesCreator))
 	xpackcmd.AddXPack(RootCmd, Name)
 }
