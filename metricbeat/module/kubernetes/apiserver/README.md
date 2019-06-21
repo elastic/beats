@@ -3,6 +3,7 @@
 ## Version history
 
 - June 2019, `v1.14.3`
+
 ## Resources
 
 `apiserver_request_total`
