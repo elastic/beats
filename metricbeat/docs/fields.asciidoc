@@ -13452,6 +13452,29 @@ Unfinished processors
 
 --
 
+*`kubernetes.controllermanager.workqueue.adds.count`*::
++
+--
+type: scaled_float
+
+--
+
+*`kubernetes.controllermanager.workqueue.depth.count`*::
++
+--
+type: scaled_float
+
+--
+
+*`kubernetes.controllermanager.workqueue.retries.count`*::
++
+--
+type: scaled_float
+
+Unfinished processors
+
+--
+
 
 *`kubernetes.controllermanager.node.collector.eviction.count`*::
 +

@@ -28,7 +28,6 @@
       type: keyword
       description: >
         Infrastructure zone
-
     - name: process
       type: group
       fields:
@@ -47,7 +46,6 @@
         - name: started.sec
           type: scaled_float
           description: Seconds since the process started
-
     - name: http
       type: group
       fields:
@@ -81,12 +79,10 @@
         - name: request.count
           type: long
           description: Request count for response
-
     - name: client.request.count
       type: long
       description: >
         Number of requests as client
-
     - name: workqueue
       type: group
       fields:
@@ -96,6 +92,14 @@
         - name: unfinished.sec
           type: scaled_float
           description: Unfinished processors
+        - name: adds.count
+          type: scaled_float
+        - name: depth.count
+          type: scaled_float
+        - name: retries.count
+          type: scaled_float
+          description: Unfinished processors
+
 
     - name: node.collector
       type: group

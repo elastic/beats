@@ -25,25 +25,21 @@ import (
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
-			// Process metrics
-			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
-			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
-			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
-			"process_open_fds":              prometheus.Metric("process.fds.open.count"),
-			"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
-
-			// HTTP server metrics
-			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
-			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
-			"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
-			"http_requests_total":                prometheus.Metric("http.request.count"),
-
-			// REST metrics
-			"rest_client_requests_total": prometheus.Metric("client.request.count"),
-
-			// Controller metrics
+			"process_cpu_seconds_total":                   prometheus.Metric("process.cpu.sec"),
+			"process_resident_memory_bytes":               prometheus.Metric("process.memory.resident.bytes"),
+			"process_virtual_memory_bytes":                prometheus.Metric("process.memory.virtual.bytes"),
+			"process_open_fds":                            prometheus.Metric("process.fds.open.count"),
+			"process_start_time_seconds":                  prometheus.Metric("process.started.sec"),
+			"http_request_duration_microseconds":          prometheus.Metric("http.request.duration.us"),
+			"http_request_size_bytes":                     prometheus.Metric("http.request.size.bytes"),
+			"http_response_size_bytes":                    prometheus.Metric("http.response.size.bytes"),
+			"http_requests_total":                         prometheus.Metric("http.request.count"),
+			"rest_client_requests_total":                  prometheus.Metric("client.request.count"),
 			"workqueue_longest_running_processor_seconds": prometheus.Metric("workqueue.longestrunning.sec"),
 			"workqueue_unfinished_work_seconds":           prometheus.Metric("workqueue.unfinished.sec"),
+			"workqueue_adds_total":                        prometheus.Metric("workqueue.adds.count"),
+			"workqueue_depth":                             prometheus.Metric("workqueue.depth.count"),
+			"workqueue_retries_total":                     prometheus.Metric("workqueue.retries.count"),
 			"node_collector_evictions_number":             prometheus.Metric("node.collector.eviction.count"),
 			"node_collector_unhealthy_nodes_in_zone":      prometheus.Metric("node.collector.unhealthy.count"),
 			"node_collector_zone_size":                    prometheus.Metric("node.collector.count"),
