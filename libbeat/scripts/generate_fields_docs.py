@@ -13,11 +13,15 @@ def document_fields(output, section, sections, path):
         output.write("{}\n".format(section["prefix"]))
 
     # Intermediate level titles
-    if "description" in section and "prefix" not in section and "anchor" not in section:
+    if ("description" in section and "prefix" not in section and
+            "anchor" not in section):
         output.write("[float]\n")
 
     if "description" in section:
-        output.write("== {} fields\n\n".format(section["name"]))
+        if "anchor" in section:
+            output.write("== {} fields\n\n".format(section["name"]))
+        else:
+            output.write("=== {}\n\n".format(section["name"]))
         output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
@@ -51,6 +55,8 @@ def document_field(output, field, field_path):
     if "deprecated" in field:
         output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
 
+    if "description" in field:
+        output.write("{}\n\n".format(field["description"]))
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
     if "example" in field:
@@ -61,8 +67,6 @@ def document_field(output, field, field_path):
         output.write("required: {}\n\n".format(field["required"]))
     if "path" in field:
         output.write("alias to: {}\n\n".format(field["path"]))
-    if "description" in field:
-        output.write("{}\n\n".format(field["description"]))
 
     if "index" in field:
         if not field["index"]:
@@ -72,10 +76,12 @@ def document_field(output, field, field_path):
         if not field["enabled"]:
             output.write("{}\n\n".format("Object is not enabled."))
 
+    output.write("--\n\n")
+
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
-            document_field(output, subfield, field_path + "." + subfield["name"])
-    output.write("--\n\n")
+            document_field(output, subfield, field_path + "." +
+                           subfield["name"])
 
 
 def fields_to_asciidoc(input, output, beat):
@@ -113,8 +119,9 @@ grouped in the following categories:
         for field in section["fields"]:
             name = field["name"]
             if name in fields:
-                assert field["type"] == fields[name]["type"], 'field "{}" redefined with different type "{}"'.format(
-                    name, field["type"])
+                assert field["type"] == (fields[name]["type"],
+                                         'field "{}" redefined with different type "{}"'.format(
+                    name, field["type"]))
                 fields[name].update(field)
             else:
                 fields[name] = field
@@ -146,8 +153,10 @@ if __name__ == "__main__":
         description="Generates the documentation for a Beat.")
     parser.add_argument("fields", help="Path to fields.yml")
     parser.add_argument("beattitle", help="The beat title")
-    parser.add_argument("es_beats", help="The path to the general beats folder")
-    parser.add_argument("--output_path", default="", dest="output_path", help="Output path, if different from path")
+    parser.add_argument("es_beats",
+                        help="The path to the general beats folder")
+    parser.add_argument("--output_path", default="", dest="output_path",
+                        help="Output path, if different from path")
 
     args = parser.parse_args()
 

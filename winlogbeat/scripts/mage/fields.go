@@ -22,12 +22,12 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 var fb fieldsBuilder
 
-var _ mage.FieldsBuilder = fb
+var _ devtools.FieldsBuilder = fb
 
 type fieldsBuilder struct{}
 
@@ -37,39 +37,39 @@ func (b fieldsBuilder) All() {
 
 func (b fieldsBuilder) FieldsGo() error {
 	switch SelectLogic {
-	case mage.OSSProject:
+	case devtools.OSSProject:
 		return b.commonFieldsGo()
-	case mage.XPackProject:
+	case devtools.XPackProject:
 		return nil
 	default:
-		panic(mage.ErrUnknownProjectType)
+		panic(devtools.ErrUnknownProjectType)
 	}
 }
 
 func (fieldsBuilder) FieldsYML() error {
 	var modules []string
 	switch SelectLogic {
-	case mage.OSSProject, mage.XPackProject:
+	case devtools.OSSProject, devtools.XPackProject:
 		// No modules.
 	default:
-		panic(mage.ErrUnknownProjectType)
+		panic(devtools.ErrUnknownProjectType)
 	}
 
-	if err := mage.GenerateFieldsYAMLTo(mage.FieldsYML, modules...); err != nil {
+	if err := devtools.GenerateFieldsYAMLTo(devtools.FieldsYML, modules...); err != nil {
 		return err
 	}
-	return mage.Copy(mage.FieldsYML, mage.FieldsYMLRoot)
+	return devtools.Copy(devtools.FieldsYML, devtools.FieldsYMLRoot)
 }
 
 func (fieldsBuilder) FieldsAllYML() error {
-	return mage.GenerateFieldsYAMLTo(mage.FieldsAllYML)
+	return devtools.GenerateFieldsYAMLTo(devtools.FieldsAllYML)
 }
 
 func (b fieldsBuilder) commonFieldsGo() error {
 	const file = "build/fields/fields.common.yml"
-	if err := mage.GenerateFieldsYAMLTo(file); err != nil {
+	if err := devtools.GenerateFieldsYAMLTo(file); err != nil {
 		return err
 	}
 	defer os.Remove(file)
-	return mage.GenerateFieldsGo(file, "include/fields.go")
+	return devtools.GenerateFieldsGo(file, "include/fields.go")
 }

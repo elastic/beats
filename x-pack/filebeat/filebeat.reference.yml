@@ -21,9 +21,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
@@ -35,9 +32,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
@@ -119,9 +113,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
   gc:
     enabled: true
     # Set custom paths for the log files. If left empty,
@@ -134,27 +125,17 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
   slowlog:
     enabled: true
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
   deprecation:
     enabled: true
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
 
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
@@ -269,9 +250,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
   # All logs
@@ -381,9 +359,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
-
   # Error logs
   #error:
     #enabled: true
@@ -395,9 +370,6 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
-
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -448,9 +420,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths: ["/var/log/rabbitmq/rabbit@localhost.log*"]
-
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false
 
 #-------------------------------- Redis Module --------------------------------
 #- module: redis
@@ -820,7 +789,8 @@ filebeat.inputs:
   #ssl.curve_types: []
 
   # Configure what types of client authentication are supported. Valid options
-  # are `none`, `optional`, and `required`. Default is required.
+  # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+  # default to `required` otherwise it will be set to `none`.
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
@@ -879,7 +849,8 @@ filebeat.inputs:
     #ssl.curve_types: []
 
     # Configure what types of client authentication are supported. Valid options
-    # are `none`, `optional`, and `required`. Default is required.
+    # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+    # default to `required` otherwise it will be set to `none`.
     #ssl.client_authentication: "required"
 
 #------------------------------ Docker input --------------------------------
@@ -1556,6 +1527,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.

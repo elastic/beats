@@ -144,9 +144,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-redis-key,key>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.14+| .14+|  |<<metricbeat-metricset-system-core,core>>   
+.15+| .15+|  |<<metricbeat-metricset-system-core,core>>   
 |<<metricbeat-metricset-system-cpu,cpu>>   
 |<<metricbeat-metricset-system-diskio,diskio>>   
+|<<metricbeat-metricset-system-entropy,entropy>>   
 |<<metricbeat-metricset-system-filesystem,filesystem>>   
 |<<metricbeat-metricset-system-fsstat,fsstat>>   
 |<<metricbeat-metricset-system-load,load>>   

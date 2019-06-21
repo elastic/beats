@@ -679,6 +679,16 @@ This product includes software developed at
 Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-lookslike
+Version: v0.2.0
+Revision: 807124eb9fc6684949aa99744577175fd6bac4fd
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-lookslike/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-lumber
 Revision: 616041e345fc33c97bc0eb0fa6b388aa07bca3e1
 License type (autodetected): Apache-2.0
@@ -765,8 +775,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.10.2
-Revision: 1227b9d6877d126ad640087e44439d70dba2df4f
+Version: v0.10.3
+Revision: 99ed9cf55303a9d3936cb656b9a86a4a6e67b30a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------

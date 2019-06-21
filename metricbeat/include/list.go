@@ -158,6 +158,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system/core"
 	_ "github.com/elastic/beats/metricbeat/module/system/cpu"
 	_ "github.com/elastic/beats/metricbeat/module/system/diskio"
+	_ "github.com/elastic/beats/metricbeat/module/system/entropy"
 	_ "github.com/elastic/beats/metricbeat/module/system/filesystem"
 	_ "github.com/elastic/beats/metricbeat/module/system/fsstat"
 	_ "github.com/elastic/beats/metricbeat/module/system/load"

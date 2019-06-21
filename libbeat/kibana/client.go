@@ -41,8 +41,8 @@ type Connection struct {
 	Username string
 	Password string
 
-	http    *http.Client
-	version common.Version
+	HTTP    *http.Client
+	Version common.Version
 }
 
 type Client struct {
@@ -134,7 +134,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
-			http: &http.Client{
+			HTTP: &http.Client{
 				Transport: &http.Transport{
 					Dial:    dialer.Dial,
 					DialTLS: tlsDialer.Dial,
@@ -195,7 +195,7 @@ func (conn *Connection) Send(method, extraPath string,
 	req.Header.Add("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 	if method != "GET" {
-		req.Header.Set("kbn-version", conn.version.String())
+		req.Header.Set("kbn-version", conn.Version.String())
 	}
 
 	for header, values := range headers {
@@ -209,7 +209,7 @@ func (conn *Connection) Send(method, extraPath string,
 
 // Implements RoundTrip interface
 func (conn *Connection) RoundTrip(r *http.Request) (*http.Response, error) {
-	return conn.http.Do(r)
+	return conn.HTTP.Do(r)
 }
 
 func (client *Client) readVersion() error {
@@ -253,13 +253,13 @@ func (client *Client) readVersion() error {
 		return fmt.Errorf("fail to parse kibana version (%v): %+v", versionString, err)
 	}
 
-	client.version = *version
+	client.Version = *version
 	return nil
 }
 
 // GetVersion returns the version read from kibana. The version is not set if
 // IgnoreVersion was set when creating the client.
-func (client *Client) GetVersion() common.Version { return client.version }
+func (client *Client) GetVersion() common.Version { return client.Version }
 
 func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[string]interface{}) error {
 

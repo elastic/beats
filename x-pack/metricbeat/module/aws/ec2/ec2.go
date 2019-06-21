@@ -210,8 +210,12 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
 				}
 
+				// Add tags
+				tags := instanceOutput[instanceID].Tags
+				for _, tag := range tags {
+					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+				}
 			}
-
 		}
 	}
 

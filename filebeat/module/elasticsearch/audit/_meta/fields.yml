@@ -61,3 +61,5 @@
       type: alias
       path: user.name
       migration: true
+    - name: message
+      type: text
