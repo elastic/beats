@@ -1,0 +1,6 @@
+- module: beat
+  metricsets:
+    - stats
+  period: 10s
+  hosts: ["http://localhost:5066"]
+
