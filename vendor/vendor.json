@@ -899,6 +899,15 @@
 			"versionExact": "v0.4.0"
 		},
 		{
+			"checksumSHA1": "c54eehjtxPjBUbM4aQuDPgc7G9Q=",
+			"path": "github.com/elastic/go-lookslike",
+			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
+			"revisionTime": "2019-06-17T15:05:19Z",
+			"tree": true,
+			"version": "v0.2.0",
+			"versionExact": "v0.2.0"
+		},
+		{
 			"checksumSHA1": "3jizmlZPCyo6FAZY8Trk9jA8NH4=",
 			"path": "github.com/elastic/go-lumber/client/v2",
 			"revision": "616041e345fc33c97bc0eb0fa6b388aa07bca3e1",

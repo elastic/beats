@@ -16,7 +16,7 @@ Elastic license levels.
 
 ==== Pulling the image
 
-Obtaining Beats for Docker is as simple as issuing a +docker pull+ command
+Obtaining {beatname_uc} for Docker is as simple as issuing a +docker pull+ command
 against the Elastic Docker registry.
 
 ifeval::["{release-state}"=="unreleased"]

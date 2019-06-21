@@ -108,7 +108,7 @@ For example:
 ------
 +
 Similarly, for {beatname_uc} modules, you can define processors under the
-`input` section of the module definition. 
+`input` section of the module definition.
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 [source,yaml]
@@ -119,7 +119,7 @@ ifeval::["{beatname_lc}"=="metricbeat"]
   - <processor_name>:
       when:
         <condition>
-      <parameters> 
+      <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
@@ -133,7 +133,7 @@ auditbeat.modules:
   - <processor_name>:
       when:
         <condition>
-      <parameters> 
+      <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
@@ -142,7 +142,7 @@ For example:
 [source,yaml]
 ----
 packetbeat.protocols:
-- type: <protocol_type>  
+- type: <protocol_type>
   processors:
   - <processor_name>:
       when:
@@ -214,6 +214,7 @@ ifdef::has_decode_csv_fields_processor[]
  * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
+ * <<decode-base64-field,`decode_base64_field`>>
  * <<dissect, `dissect`>>
  * <<extract-array,`extract_array`>>
  * <<processor-dns, `dns`>>
@@ -651,7 +652,7 @@ scalar values, arrays, dictionaries, or any nested combination of these.  By
 default the fields that you specify will be grouped under the `fields`
 sub-dictionary in the event. To group the fields under a different
 sub-dictionary, use the `target` setting. To store the fields as
-top-level fields, set `target: ''`. 
+top-level fields, set `target: ''`.
 
 `target`:: (Optional) Sub-dictionary to put all fields into. Defaults to `fields`.
 `fields`:: Fields to be added.
@@ -863,6 +864,40 @@ is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
+
+[[decode-base64-field]]
+=== Decode Base64 fields
+
+The `decode_base64_field` processor specifies a field to base64 decode.
+The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
+
+To overwrite fields either first rename the target field or use the `drop_fields`
+processor to drop the field and then rename the field.
+
+[source,yaml]
+-------
+processors:
+- decode_base64_field:
+    from: "field1"
+    to: "field2"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+In the example above:
+    - field1 is decoded in field2
+
+The `decode_base64_field` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be base64 decoded is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the base6 4decode
+of fields is stopped and the original event is returned. If set to false, decoding
+continues also if an error happened during decoding. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
 
 [[community-id]]
 === Community ID Network Flow Hash
@@ -1092,7 +1127,7 @@ construct a lookup key with the value of the field `metricset.host`.
 Each Beat can define its own default indexers and matchers which are enabled by
 default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
-the `log.file.path` field, extracts the container ID, and uses it to retrieve 
+the `log.file.path` field, extracts the container ID, and uses it to retrieve
 metadata.
 
 The configuration below enables the processor when {beatname_lc} is run as a pod in
@@ -1175,7 +1210,7 @@ You can do this by mounting the socket inside the container. For example:
 To avoid privilege issues, you may also need to add `--user=root` to the
 `docker run` flags. Because the user must be part of the docker group in order
 to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
-running as non-root inside the container. 
+running as non-root inside the container.
 =====
 
 [source,yaml]
@@ -1257,21 +1292,21 @@ It has the following settings:
 
 `cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
 
-`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+`geo.name`:: (Optional) User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
 
-`geo.location`:: Longitude and latitude in comma separated format.
+`geo.location`:: (Optional) Longitude and latitude in comma separated format.
 
-`geo.continent_name`:: Name of the continent.
+`geo.continent_name`:: (Optional) Name of the continent.
 
-`geo.country_name`:: Name of the country.
+`geo.country_name`:: (Optional) Name of the country.
 
-`geo.region_name`:: Name of the region.
+`geo.region_name`:: (Optional) Name of the region.
 
-`geo.city_name`:: Name of the city.
+`geo.city_name`:: (Optional) Name of the city.
 
-`geo.country_iso_code`:: ISO country code.
+`geo.country_iso_code`:: (Optional) ISO country code.
 
-`geo.region_iso_code`:: ISO region code.
+`geo.region_iso_code`:: (Optional) ISO region code.
 
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
@@ -1334,21 +1369,21 @@ It has the following settings:
 
 `cache.ttl`:: (Optional) The processor uses an internal cache for the observer metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
 
-`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+`geo.name`:: (Optional) User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
 
-`geo.location`:: Longitude and latitude in comma separated format.
+`geo.location`:: (Optional) Longitude and latitude in comma separated format.
 
-`geo.continent_name`:: Name of the continent.
+`geo.continent_name`:: (Optional) Name of the continent.
 
-`geo.country_name`:: Name of the country.
+`geo.country_name`:: (Optional) Name of the country.
 
-`geo.region_name`:: Name of the region.
+`geo.region_name`:: (Optional) Name of the region.
 
-`geo.city_name`:: Name of the city.
+`geo.city_name`:: (Optional) Name of the city.
 
-`geo.country_iso_code`:: ISO country code.
+`geo.country_iso_code`:: (Optional) ISO country code.
 
-`geo.region_iso_code`:: ISO region code.
+`geo.region_iso_code`:: (Optional) ISO region code.
 
 
 The `add_geo_metadata` processor annotates each event with relevant metadata from the observer machine.

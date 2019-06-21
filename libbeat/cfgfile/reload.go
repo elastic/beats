@@ -98,12 +98,11 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	pipeline      beat.Pipeline
-	runnerFactory RunnerFactory
-	config        DynamicConfig
-	path          string
-	done          chan struct{}
-	wg            sync.WaitGroup
+	pipeline beat.Pipeline
+	config   DynamicConfig
+	path     string
+	done     chan struct{}
+	wg       sync.WaitGroup
 }
 
 // NewReloader creates new Reloader instance for the given config

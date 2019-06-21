@@ -30,6 +30,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+
+	_ "github.com/elastic/beats/metricbeat/module/traefik"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -71,4 +73,8 @@ func TestFetchEventContents(t *testing.T) {
 	statusCodes := response["status_codes"].(common.MapStr)
 	assert.EqualValues(t, 17, statusCodes["200"])
 	assert.EqualValues(t, 1, statusCodes["404"])
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "traefik", "health")
 }
