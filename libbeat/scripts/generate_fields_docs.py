@@ -120,7 +120,7 @@ grouped in the following categories:
             name = field["name"]
             if name in fields:
                 assert field["type"] == (fields[name]["type"],
-                    'field "{}" redefined with different type "{}"'.format(
+                                         'field "{}" redefined with different type "{}"'.format(
                     name, field["type"]))
                 fields[name].update(field)
             else:
