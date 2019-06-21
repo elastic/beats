@@ -12964,16 +12964,6 @@ Request handler
 
 --
 
-*`kubernetes.apiserver.request.code`*::
-+
---
-type: keyword
-
-HTTP code
-
-
---
-
 *`kubernetes.apiserver.request.method`*::
 +
 --

@@ -56,10 +56,6 @@
       type: keyword
       description: >
         Request handler
-    - name: request.code
-      type: keyword
-      description: >
-        HTTP code
     - name: request.method
       type: keyword
       description: >
