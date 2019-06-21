@@ -1,3 +1,6 @@
+# Module: cockroachdb
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-cockroachdb.html
+
 - module: cockroachdb
   metricsets: ['status']
   period: 10s
