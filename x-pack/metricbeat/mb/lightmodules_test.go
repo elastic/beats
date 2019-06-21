@@ -8,6 +8,7 @@ package mb
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -174,10 +175,12 @@ func TestNewModuleFromConfig(t *testing.T) {
 		err            bool
 		expectedOption string
 		expectedQuery  mb.QueryParams
+		expectedPeriod time.Duration
 	}{
 		"normal module": {
 			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
 			expectedOption: "default",
+			expectedPeriod: mb.DefaultModuleConfig().Period,
 		},
 		"light module": {
 			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
@@ -195,6 +198,11 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
 			expectedOption: "test",
 			expectedQuery:  mb.QueryParams{"param": "foo"},
+		},
+		"light module with custom period": {
+			config:         common.MapStr{"module": "service", "period": "42s"},
+			expectedOption: "test",
+			expectedPeriod: 42 * time.Second,
 		},
 		"light module is broken": {
 			config: common.MapStr{"module": "broken"},
@@ -239,6 +247,9 @@ func TestNewModuleFromConfig(t *testing.T) {
 					require.True(t, ok)
 					assert.Equal(t, c.expectedOption, ms.Option)
 					assert.Equal(t, c.expectedQuery, ms.Module().Config().Query)
+					if c.expectedPeriod > 0 {
+						assert.Equal(t, c.expectedPeriod, ms.Module().Config().Period)
+					}
 				})
 			}
 		})
