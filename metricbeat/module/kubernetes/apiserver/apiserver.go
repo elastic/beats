@@ -42,9 +42,7 @@ func init() {
 			// REST metrics
 			"rest_client_requests_total": prometheus.Metric("client.request.count"),
 
-			// Deprecated, remove in future releases
-			"apiserver_request_latencies": prometheus.Metric("request.latency"),
-
+			"apiserver_request_latencies":             prometheus.Metric("request.latency"),
 			"apiserver_request_total":                 prometheus.Metric("request.count"),
 			"apiserver_current_inflight_requests":     prometheus.Metric("request.current.count"),
 			"apiserver_longrunning_gauge":             prometheus.Metric("request.longrunning.count"),
@@ -54,23 +52,21 @@ func init() {
 		},
 
 		Labels: map[string]prometheus.LabelMap{
-			"client":      prometheus.KeyLabel("client"),
-			"code":        prometheus.KeyLabel("code"),
-			"contentType": prometheus.KeyLabel("content_type"),
-			"dry_run":     prometheus.KeyLabel("dry_run"),
-			"requestKind": prometheus.KeyLabel("kind"),
-
-			"verb":        prometheus.KeyLabel("verb"),
-			"scope":       prometheus.KeyLabel("scope"),
-			"resource":    prometheus.KeyLabel("resource"),
-			"subresource": prometheus.KeyLabel("subresource"),
-			"component":   prometheus.KeyLabel("component"),
-			"group":       prometheus.KeyLabel("group"),
-			"version":     prometheus.KeyLabel("version"),
-
-			"handler": prometheus.KeyLabel("handler"),
-			"method":  prometheus.KeyLabel("method"),
-			"host":    prometheus.KeyLabel("host"),
+			"client":      prometheus.KeyLabel("request.client"),
+			"resource":    prometheus.KeyLabel("request.resource"),
+			"scope":       prometheus.KeyLabel("request.scope"),
+			"subresource": prometheus.KeyLabel("request.subresource"),
+			"verb":        prometheus.KeyLabel("request.verb"),
+			"code":        prometheus.KeyLabel("request.code"),
+			"contentType": prometheus.KeyLabel("request.content_type"),
+			"dry_run":     prometheus.KeyLabel("request.dry_run"),
+			"requestKind": prometheus.KeyLabel("request.kind"),
+			"component":   prometheus.KeyLabel("request.component"),
+			"group":       prometheus.KeyLabel("request.group"),
+			"version":     prometheus.KeyLabel("request.version"),
+			"handler":     prometheus.KeyLabel("request.handler"),
+			"method":      prometheus.KeyLabel("request.method"),
+			"host":        prometheus.KeyLabel("request.host"),
 		},
 	}
 

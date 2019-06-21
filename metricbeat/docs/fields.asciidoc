@@ -12834,7 +12834,7 @@ Kubernetes API server metrics
 
 
 
-*`kubernetes.apiserver.client`*::
+*`kubernetes.apiserver.request.client`*::
 +
 --
 type: keyword
@@ -12844,7 +12844,7 @@ Client doing the requests
 
 --
 
-*`kubernetes.apiserver.resource`*::
+*`kubernetes.apiserver.request.resource`*::
 +
 --
 type: keyword
@@ -12854,7 +12854,7 @@ Requested resource
 
 --
 
-*`kubernetes.apiserver.subresource`*::
+*`kubernetes.apiserver.request.subresource`*::
 +
 --
 type: keyword
@@ -12864,7 +12864,7 @@ Requested subresource
 
 --
 
-*`kubernetes.apiserver.scope`*::
+*`kubernetes.apiserver.request.scope`*::
 +
 --
 type: keyword
@@ -12874,7 +12874,7 @@ Request scope (cluster, namespace, resource)
 
 --
 
-*`kubernetes.apiserver.verb`*::
+*`kubernetes.apiserver.request.verb`*::
 +
 --
 type: keyword
@@ -12884,7 +12884,7 @@ Request HTTP verb
 
 --
 
-*`kubernetes.apiserver.code`*::
+*`kubernetes.apiserver.request.code`*::
 +
 --
 type: keyword
@@ -12894,7 +12894,7 @@ Request HTTP code
 
 --
 
-*`kubernetes.apiserver.content_type`*::
+*`kubernetes.apiserver.request.content_type`*::
 +
 --
 type: keyword
@@ -12904,7 +12904,7 @@ Request HTTP content type
 
 --
 
-*`kubernetes.apiserver.dry_run`*::
+*`kubernetes.apiserver.request.dry_run`*::
 +
 --
 type: keyword
@@ -12914,7 +12914,7 @@ Wether the request used dry run
 
 --
 
-*`kubernetes.apiserver.kind`*::
+*`kubernetes.apiserver.request.kind`*::
 +
 --
 type: keyword
@@ -12924,7 +12924,7 @@ Kind of request
 
 --
 
-*`kubernetes.apiserver.component`*::
+*`kubernetes.apiserver.request.component`*::
 +
 --
 type: keyword
@@ -12934,7 +12934,7 @@ Component handling the task
 
 --
 
-*`kubernetes.apiserver.group`*::
+*`kubernetes.apiserver.request.group`*::
 +
 --
 type: keyword
@@ -12944,7 +12944,7 @@ API group for the resource
 
 --
 
-*`kubernetes.apiserver.version`*::
+*`kubernetes.apiserver.request.version`*::
 +
 --
 type: keyword
@@ -12954,7 +12954,7 @@ version for the group
 
 --
 
-*`kubernetes.apiserver.handler`*::
+*`kubernetes.apiserver.request.handler`*::
 +
 --
 type: keyword
@@ -12964,7 +12964,7 @@ Request handler
 
 --
 
-*`kubernetes.apiserver.code`*::
+*`kubernetes.apiserver.request.code`*::
 +
 --
 type: keyword
@@ -12974,7 +12974,7 @@ HTTP code
 
 --
 
-*`kubernetes.apiserver.method`*::
+*`kubernetes.apiserver.request.method`*::
 +
 --
 type: keyword
@@ -12984,7 +12984,7 @@ HTTP method
 
 --
 
-*`kubernetes.apiserver.host`*::
+*`kubernetes.apiserver.request.host`*::
 +
 --
 type: keyword

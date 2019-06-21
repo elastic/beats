@@ -7,28 +7,28 @@
     },
     "kubernetes": {
         "apiserver": {
-            "component": "apiserver",
-            "group": "batch",
             "request": {
+                "component": "apiserver",
+                "group": "apiregistration.k8s.io",
                 "latency": {
                     "bucket": {
-                        "+Inf": 10206,
-                        "1000000": 10206,
-                        "125000": 10206,
-                        "2000000": 10206,
-                        "250000": 10206,
-                        "4000000": 10206,
-                        "500000": 10206,
-                        "8000000": 10206
+                        "+Inf": 2,
+                        "1000000": 2,
+                        "125000": 2,
+                        "2000000": 2,
+                        "250000": 2,
+                        "4000000": 2,
+                        "500000": 2,
+                        "8000000": 2
                     },
-                    "count": 10206,
-                    "sum": 18978664
-                }
-            },
-            "resource": "jobs",
-            "scope": "cluster",
-            "verb": "LIST",
-            "version": "v1"
+                    "count": 2,
+                    "sum": 5302
+                },
+                "resource": "apiservices",
+                "scope": "cluster",
+                "verb": "LIST",
+                "version": "v1"
+            }
         }
     },
     "metricset": {

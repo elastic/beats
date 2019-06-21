@@ -2,9 +2,7 @@
 
 ## Version history
 
-- Unknown, unknown
-- June 2019, `v1.14.3`: this version drops `apiserver_request_count` in favor of `apiserver_request_total`. There is a new label for `dry_run`, which is rarely used. Current dashboards should be unaffected. Metric `apiserver_request_latencies` is deprecated and should be removed at next major version.
-
+- June 2019, `v1.14.3`
 ## Resources
 
 `apiserver_request_total`

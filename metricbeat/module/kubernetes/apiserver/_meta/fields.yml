@@ -4,67 +4,67 @@
     Kubernetes API server metrics
   release: ga
   fields:
-    - name: client
+    - name: request.client
       type: keyword
       description: >
         Client doing the requests
-    - name: resource
+    - name: request.resource
       type: keyword
       description: >
         Requested resource
-    - name: subresource
+    - name: request.subresource
       type: keyword
       description: >
         Requested subresource
-    - name: scope
+    - name: request.scope
       type: keyword
       description: >
         Request scope (cluster, namespace, resource)
-    - name: verb
+    - name: request.verb
       type: keyword
       description: >
         Request HTTP verb
-    - name: code
+    - name: request.code
       type: keyword
       description: >
         Request HTTP code
-    - name: content_type
+    - name: request.content_type
       type: keyword
       description: >
         Request HTTP content type
-    - name: dry_run
+    - name: request.dry_run
       type: keyword
       description: >
         Wether the request used dry run
-    - name: kind
+    - name: request.kind
       type: keyword
       description: >
         Kind of request
-    - name: component
+    - name: request.component
       type: keyword
       description: >
         Component handling the task
-    - name: group
+    - name: request.group
       type: keyword
       description: >
         API group for the resource
-    - name: version
+    - name: request.version
       type: keyword
       description: >
         version for the group
-    - name: handler
+    - name: request.handler
       type: keyword
       description: >
         Request handler
-    - name: code
+    - name: request.code
       type: keyword
       description: >
         HTTP code
-    - name: method
+    - name: request.method
       type: keyword
       description: >
         HTTP method
-    - name: host
+    - name: request.host
       type: keyword
       description: >
         Request host
