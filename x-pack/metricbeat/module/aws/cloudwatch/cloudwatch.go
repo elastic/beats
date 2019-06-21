@@ -114,9 +114,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// Create events based on namespaces from configuration
 	for namespace, resourceType := range namespaceResourceType {
-		resourceTypeFilter := []string{resourceType}
-		if resourceType == "" {
-			resourceTypeFilter = nil
+		var resourceTypeFilter []string
+		if resourceType != "" {
+			resourceTypeFilter = []string{resourceType}
 		}
 
 		for _, regionName := range m.MetricSet.RegionsList {
