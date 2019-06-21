@@ -28,6 +28,7 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
 )
 
 func init() {
@@ -141,5 +142,5 @@ func customizePackaging() {
 
 // Config generates both the short/reference/docker configs.
 func Config() error {
-	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
 }
