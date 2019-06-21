@@ -1,4 +1,4 @@
-# Kubescheduler Stats
+# Scheduler Stats
 
 ## Version history
 

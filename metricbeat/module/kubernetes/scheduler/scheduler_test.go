@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package kubescheduler
+package scheduler
 
 import (
 	"testing"
@@ -28,11 +28,11 @@ import (
 const testFile = "_meta/test/metrics"
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "kubescheduler",
+	ptest.TestMetricSet(t, "kubernetes", "scheduler",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.kubescheduler.1.14",
-				ExpectedFile: "./_meta/test/metrics.kubescheduler.1.14.expected",
+				MetricsFile:  "./_meta/test/metrics.scheduler.1.14",
+				ExpectedFile: "./_meta/test/metrics.scheduler.1.14.expected",
 			},
 		},
 	)

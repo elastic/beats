@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kubescheduler
+package scheduler
 
 import (
 	"github.com/elastic/beats/metricbeat/helper/prometheus"
@@ -72,7 +72,7 @@ func init() {
 		},
 	}
 
-	mb.Registry.MustAddMetricSet("kubernetes", "kubescheduler",
+	mb.Registry.MustAddMetricSet("kubernetes", "scheduler",
 		prometheus.MetricSetBuilder(mapping),
 		mb.WithHostParser(prometheus.HostParser))
 }
