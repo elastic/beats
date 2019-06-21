@@ -1890,267 +1890,6 @@ type: long
 
 --
 
-[[exported-fields-beats]]
-== Beats fields
-
-Beats module
-
-
-
-[float]
-== beats fields
-
-
-
-
-*`beats.id`*::
-+
---
-
-Beat ID.
-
-
---
-
-*`beats.type`*::
-+
---
-type: keyword
-
-Beat type.
-
-
---
-
-[float]
-== state fields
-
-Beat state
-
-
-
-*`beat.state.management.enabled`*::
-+
---
-type: bool
-
-Is central management enabled?
-
-
---
-
-*`beat.state.module.count`*::
-+
---
-type: int
-
-Number of modules enabled
-
-
---
-
-*`beat.state.output.name`*::
-+
---
-type: keyword
-
-Name of output used by Beat
-
-
---
-
-*`beat.state.queue.name`*::
-+
---
-type: keyword
-
-Name of queue being used by Beat
-
-
---
-
-[float]
-== stats fields
-
-Beat stats
-
-
-
-*`beats.stats.uptime.ms`*::
-+
---
-type: long
-
-Beat uptime
-
-
---
-
-*`beats.stats.runtime.goroutines`*::
-+
---
-type: long
-
-Number of goroutines running in Beat
-
-
---
-
-[float]
-== libbeat fields
-
-Fields common to all Beats
-
-
-
-[float]
-== output fields
-
-Output stats
-
-
-
-*`beats.stats.libbeat.output.type`*::
-+
---
-type: keyword
-
-Type of output
-
-
---
-
-[float]
-== events fields
-
-Event counters
-
-
-
-*`beats.stats.libbeat.output.events.acked`*::
-+
---
-type: long
-
-Number of events acknowledged
-
-
---
-
-*`beats.stats.libbeat.output.events.active`*::
-+
---
-type: long
-
-Number of active events
-
-
---
-
-*`beats.stats.libbeat.output.events.batches`*::
-+
---
-type: long
-
-Number of event batches
-
-
---
-
-*`beats.stats.libbeat.output.events.dropped`*::
-+
---
-type: long
-
-Number of events dropped
-
-
---
-
-*`beats.stats.libbeat.output.events.duplicates`*::
-+
---
-type: long
-
-Number of events duplicated
-
-
---
-
-*`beats.stats.libbeat.output.events.failed`*::
-+
---
-type: long
-
-Number of events failed
-
-
---
-
-*`beats.stats.libbeat.output.events.toomany`*::
-+
---
-type: long
-
-Number of too many events
-
-
---
-
-*`beats.stats.libbeat.output.events.total`*::
-+
---
-type: long
-
-Total number of events
-
-
---
-
-[float]
-== read fields
-
-Read stats
-
-
-
-*`beats.stats.libbeat.output.read.bytes`*::
-+
---
-type: long
-
-Number of bytes read
-
-
---
-
-*`beats.stats.libbeat.output.read.errors`*::
-+
---
-type: long
-
-Number of read errors
-
-
---
-
-[float]
-== write fields
-
-Write stats
-
-
-
-*`beats.stats.libbeat.output.write.bytes`*::
-+
---
-Number of write errors
-
-
-type: long
-
---
-
 [[exported-fields-ceph]]
 == Ceph fields
 
@@ -20252,7 +19991,7 @@ type: long
 *`mysql.status.handler.read.last`*::
 +
 --
-The number of requests to read the last key in an index.
+The number of requests to read the last key in an index. 
 
 
 type: long
@@ -20282,7 +20021,7 @@ type: long
 *`mysql.status.handler.read.rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position.
+The number of requests to read a row based on a fixed position. 
 
 
 type: long
@@ -20292,7 +20031,7 @@ type: long
 *`mysql.status.handler.read.rnd_next`*::
 +
 --
-The number of requests to read the next row in the data file.
+The number of requests to read the next row in the data file. 
 
 
 type: long
@@ -20390,7 +20129,7 @@ type: long
 *`mysql.status.innodb.buffer_pool.bytes.data`*::
 +
 --
-The total number of bytes in the InnoDB buffer pool containing data.
+The total number of bytes in the InnoDB buffer pool containing data. 
 
 
 type: long
@@ -23275,7 +23014,7 @@ format: bytes
 *`redis.info.memory.used.lua`*::
 +
 --
-Used memory by the Lua engine.
+Used memory by the Lua engine.        
 
 
 type: long
@@ -23287,7 +23026,7 @@ format: bytes
 *`redis.info.memory.used.dataset`*::
 +
 --
-The size in bytes of the dataset
+The size in bytes of the dataset 
 
 
 type: long
@@ -23532,7 +23271,7 @@ format: duration
 *`redis.info.persistence.rdb.copy_on_write.last_size`*::
 +
 --
-The size in bytes of copy-on-write allocations during the last RBD save operation
+The size in bytes of copy-on-write allocations during the last RBD save operation                
 
 
 type: long
@@ -23661,7 +23400,7 @@ format: bytes
 *`redis.info.persistence.aof.size.current`*::
 +
 --
-AOF current file size
+AOF current file size             
 
 
 type: long
@@ -23767,7 +23506,7 @@ format: bytes
 *`redis.info.replication.backlog.first_byte_offset`*::
 +
 --
-The master offset of the replication backlog buffer
+The master offset of the replication backlog buffer          
 
 
 type: long
@@ -26816,7 +26555,7 @@ type: keyword
 *`system.raid.sync_action`*::
 +
 --
-Current sync action, if the RAID array is redundant
+Current sync action, if the RAID array is redundant 
 
 
 type: keyword
@@ -27099,7 +26838,7 @@ All TCP connections
 *`system.socket.summary.tcp.memory`*::
 +
 --
-Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
 
 
 type: integer
@@ -27185,7 +26924,7 @@ All UDP connections
 *`system.socket.summary.udp.memory`*::
 +
 --
-Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
 
 
 type: integer
