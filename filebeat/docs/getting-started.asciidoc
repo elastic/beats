@@ -248,6 +248,8 @@ specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+
 *win:*
 
 [source,shell]
