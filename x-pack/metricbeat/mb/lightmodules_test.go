@@ -173,6 +173,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 		config         common.MapStr
 		err            bool
 		expectedOption string
+		expectedQuery  mb.QueryParams
 	}{
 		"normal module": {
 			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
@@ -189,6 +190,11 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"light module override option": {
 			config:         common.MapStr{"module": "service", "option": "overriden"},
 			expectedOption: "overriden",
+		},
+		"light module with query": {
+			config:         common.MapStr{"module": "service", "query": common.MapStr{"param": "foo"}},
+			expectedOption: "test",
+			expectedQuery:  mb.QueryParams{"param": "foo"},
 		},
 		"light module is broken": {
 			config: common.MapStr{"module": "broken"},
@@ -228,10 +234,12 @@ func TestNewModuleFromConfig(t *testing.T) {
 			assert.NotEmpty(t, metricSets)
 			assert.NoError(t, err)
 			for _, ms := range metricSets {
-				ms, ok := ms.(*metricSetWithOption)
-				if assert.True(t, ok) {
+				t.Run(ms.Name(), func(t *testing.T) {
+					ms, ok := ms.(*metricSetWithOption)
+					require.True(t, ok)
 					assert.Equal(t, c.expectedOption, ms.Option)
-				}
+					assert.Equal(t, c.expectedQuery, ms.Module().Config().Query)
+				})
 			}
 		})
 	}

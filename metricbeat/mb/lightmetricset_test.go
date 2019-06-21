@@ -75,6 +75,11 @@ func TestLightMetricSetRegistration(t *testing.T) {
 			}
 			ms.Input.Module = c.module
 			ms.Input.MetricSet = c.metricSet
+			ms.Input.Defaults = common.MapStr{
+				"query": common.MapStr{
+					"extra": "something",
+				},
+			}
 
 			registration, err := ms.Registration(r)
 			if c.fail {
@@ -87,15 +92,27 @@ func TestLightMetricSetRegistration(t *testing.T) {
 			assert.Equal(t, c.metricSet, registration.Name)
 			assert.Equal(t, c.isDefault, registration.IsDefault)
 
-			// Check that calling the factory with a registered base module
-			// does the proper overrides in the resulting metricset
+			// Check that calling the factory with a registered base module:
+			// - Does not modify original base module
+			// - Does the proper overrides in the resulting metricset
 			bm := baseModule(t, r, moduleName, metricSetName)
+			moduleConfigBefore := bm.Module().Config().String()
 			metricSet, err := registration.Factory(bm)
+
+			assert.Equal(t, moduleConfigBefore, bm.Module().Config().String(),
+				"original base module config should not change")
 			require.NoError(t, err)
 			require.NotNil(t, metricSet)
 
 			assert.Equal(t, lightModuleName, metricSet.Module().Name())
 			assert.Equal(t, lightMetricSetName, metricSet.Name())
+
+			expectedQuery := QueryParams{
+				"default": "foo",
+				"extra":   "something",
+			}
+			query := metricSet.Module().Config().Query
+			assert.Equal(t, expectedQuery, query)
 		})
 	}
 }
@@ -107,6 +124,7 @@ func baseModule(t *testing.T, r *Register, module, metricSet string) BaseMetricS
 	c := DefaultModuleConfig()
 	c.Module = module
 	c.MetricSets = []string{metricSet}
+	c.Query = QueryParams{"default": "foo"}
 	raw, err := common.NewConfigFrom(c)
 	require.NoError(t, err)
 	baseModule, err := newBaseModuleFromConfig(raw)

@@ -98,8 +98,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 // taking into account the light metric set default configurations
 func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 	baseModule := BaseModule{
-		name:   m.Module,
-		config: from.Config(),
+		name: m.Module,
 	}
 	var err error
 	// Set defaults
