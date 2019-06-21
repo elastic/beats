@@ -1579,7 +1579,7 @@ Beat module
 
 
 [float]
-== beat fields
+=== beat
 
 
 
@@ -1587,25 +1587,25 @@ Beat module
 *`beat.id`*::
 +
 --
-type: keyword
-
 Beat ID.
 
+
+type: keyword
 
 --
 
 *`beat.type`*::
 +
 --
-type: keyword
-
 Beat type.
 
+
+type: keyword
 
 --
 
 [float]
-== stats fields
+=== stats
 
 Beat stats
 
@@ -1614,32 +1614,32 @@ Beat stats
 *`beat.stats.uptime.ms`*::
 +
 --
-type: long
-
 Beat uptime
 
+
+type: long
 
 --
 
 *`beat.stats.runtime.goroutines`*::
 +
 --
-type: long
-
 Number of goroutines running in Beat
 
+
+type: long
 
 --
 
 [float]
-== libbeat fields
+=== libbeat
 
 Fields common to all Beats
 
 
 
 [float]
-== output fields
+=== output
 
 Output stats
 
@@ -1648,15 +1648,15 @@ Output stats
 *`beat.stats.libbeat.output.type`*::
 +
 --
-type: keyword
-
 Type of output
 
+
+type: keyword
 
 --
 
 [float]
-== events fields
+=== events
 
 Event counters
 
@@ -1665,85 +1665,85 @@ Event counters
 *`beat.stats.libbeat.output.events.acked`*::
 +
 --
-type: long
-
 Number of events acknowledged
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.events.active`*::
 +
 --
-type: long
-
 Number of active events
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.events.batches`*::
 +
 --
-type: long
-
 Number of event batches
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.events.dropped`*::
 +
 --
-type: long
-
 Number of events dropped
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.events.duplicates`*::
 +
 --
-type: long
-
 Number of events duplicated
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.events.failed`*::
 +
 --
-type: long
-
 Number of events failed
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.events.toomany`*::
 +
 --
-type: long
-
 Number of too many events
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.events.total`*::
 +
 --
-type: long
-
 Total number of events
 
+
+type: long
 
 --
 
 [float]
-== read fields
+=== read
 
 Read stats
 
@@ -1752,25 +1752,25 @@ Read stats
 *`beat.stats.libbeat.output.read.bytes`*::
 +
 --
-type: long
-
 Number of bytes read
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.read.errors`*::
 +
 --
-type: long
-
 Number of read errors
 
+
+type: long
 
 --
 
 [float]
-== write fields
+=== write
 
 Write stats
 
@@ -1779,20 +1779,20 @@ Write stats
 *`beat.stats.libbeat.output.write.bytes`*::
 +
 --
-type: long
-
 Number of bytes written
 
+
+type: long
 
 --
 
 *`beat.stats.libbeat.output.write.errors`*::
 +
 --
-type: long
-
 Number of write errors
 
+
+type: long
 
 --
 
