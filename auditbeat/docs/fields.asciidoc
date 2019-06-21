@@ -13,7 +13,7 @@ This document describes the fields that are exported by Auditbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-auditd>>
-* <<exported-fields-beat>>
+* <<exported-fields-beat-common>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
@@ -115,7 +115,7 @@ alias to: user.filesystem.group.id
 --
 
 [float]
-== name_map fields
+=== name_map
 
 If `resolve_ids` is set to true in the configuration then `name_map` will contain a mapping of uid field names to the resolved name (e.g. auid -> root).
 
@@ -203,7 +203,7 @@ alias to: user.filesystem.group.name
 --
 
 [float]
-== selinux fields
+=== selinux
 
 The SELinux identity of the actor.
 
@@ -211,52 +211,52 @@ The SELinux identity of the actor.
 *`user.selinux.user`*::
 +
 --
-type: keyword
-
 account submitted for authentication
+
+type: keyword
 
 --
 
 *`user.selinux.role`*::
 +
 --
-type: keyword
-
 user's SELinux role
+
+type: keyword
 
 --
 
 *`user.selinux.domain`*::
 +
 --
-type: keyword
-
 The actor's SELinux domain or type.
+
+type: keyword
 
 --
 
 *`user.selinux.level`*::
 +
 --
+The actor's SELinux level.
+
 type: keyword
 
 example: s0
-
-The actor's SELinux level.
 
 --
 
 *`user.selinux.category`*::
 +
 --
-type: keyword
-
 The actor's SELinux category or compartments.
+
+type: keyword
 
 --
 
 [float]
-== process fields
+=== process
 
 Process attributes.
 
@@ -264,16 +264,16 @@ Process attributes.
 *`process.cwd`*::
 +
 --
+The current working directory.
+
 type: alias
 
 alias to: process.working_directory
 
-The current working directory.
-
 --
 
 [float]
-== source fields
+=== source
 
 Source that triggered the event.
 
@@ -281,14 +281,14 @@ Source that triggered the event.
 *`source.path`*::
 +
 --
-type: keyword
-
 This is the path associated with a unix socket.
+
+type: keyword
 
 --
 
 [float]
-== destination fields
+=== destination
 
 Destination address that triggered the event.
 
@@ -296,9 +296,9 @@ Destination address that triggered the event.
 *`destination.path`*::
 +
 --
-type: keyword
-
 This is the path associated with a unix socket.
+
+type: keyword
 
 --
 
@@ -306,49 +306,49 @@ This is the path associated with a unix socket.
 *`auditd.message_type`*::
 +
 --
+The audit message type (e.g. syscall or apparmor_denied).
+
+
 type: keyword
 
 example: syscall
-
-The audit message type (e.g. syscall or apparmor_denied).
-
 
 --
 
 *`auditd.sequence`*::
 +
 --
-type: long
-
 The sequence number of the event as assigned by the kernel. Sequence numbers are stored as a uint32 in the kernel and can rollover.
 
+
+type: long
 
 --
 
 *`auditd.session`*::
 +
 --
-type: keyword
-
 The session ID assigned to a login. All events related to a login session will have the same value.
 
+
+type: keyword
 
 --
 
 *`auditd.result`*::
 +
 --
+The result of the audited operation (success/fail).
+
 type: keyword
 
 example: success or fail
-
-The result of the audited operation (success/fail).
 
 --
 
 
 [float]
-== actor fields
+=== actor
 
 The actor is the user that triggered the audit event.
 
@@ -356,24 +356,24 @@ The actor is the user that triggered the audit event.
 *`auditd.summary.actor.primary`*::
 +
 --
-type: keyword
-
 The primary identity of the actor. This is the actor's original login ID. It will not change even if the user changes to another account.
 
+
+type: keyword
 
 --
 
 *`auditd.summary.actor.secondary`*::
 +
 --
-type: keyword
-
 The secondary identity of the actor. This is typically the same as the primary, except for when the user has used `su`.
+
+type: keyword
 
 --
 
 [float]
-== object fields
+=== object
 
 This is the thing or object being acted upon in the event.
 
@@ -382,43 +382,43 @@ This is the thing or object being acted upon in the event.
 *`auditd.summary.object.type`*::
 +
 --
-type: keyword
-
 A description of the what the "thing" is (e.g. file, socket, user-session).
 
+
+type: keyword
 
 --
 
 *`auditd.summary.object.primary`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.summary.object.secondary`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.summary.how`*::
 +
 --
-type: keyword
-
 This describes how the action was performed. Usually this is the exe or command that was being executed that triggered the event.
 
+
+type: keyword
 
 --
 
 [float]
-== paths fields
+=== paths
 
 List of paths associated with the event.
 
@@ -426,131 +426,131 @@ List of paths associated with the event.
 *`auditd.paths.inode`*::
 +
 --
-type: keyword
-
 inode number
+
+type: keyword
 
 --
 
 *`auditd.paths.dev`*::
 +
 --
-type: keyword
-
 device name as found in /dev
+
+type: keyword
 
 --
 
 *`auditd.paths.obj_user`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.paths.obj_role`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.paths.obj_domain`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.paths.obj_level`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.paths.objtype`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.paths.ouid`*::
 +
 --
-type: keyword
-
 file owner user ID
+
+type: keyword
 
 --
 
 *`auditd.paths.rdev`*::
 +
 --
-type: keyword
-
 the device identifier (special files only)
+
+type: keyword
 
 --
 
 *`auditd.paths.nametype`*::
 +
 --
-type: keyword
-
 kind of file operation being referenced
+
+type: keyword
 
 --
 
 *`auditd.paths.ogid`*::
 +
 --
-type: keyword
-
 file owner group ID
+
+type: keyword
 
 --
 
 *`auditd.paths.item`*::
 +
 --
-type: keyword
-
 which item is being recorded
+
+type: keyword
 
 --
 
 *`auditd.paths.mode`*::
 +
 --
-type: keyword
-
 mode flags on a file
+
+type: keyword
 
 --
 
 *`auditd.paths.name`*::
 +
 --
-type: keyword
-
 file name in avcs
+
+type: keyword
 
 --
 
 [float]
-== data fields
+=== data
 
 The data from the audit messages.
 
@@ -558,1764 +558,1764 @@ The data from the audit messages.
 *`auditd.data.action`*::
 +
 --
-type: keyword
-
 netfilter packet disposition
+
+type: keyword
 
 --
 
 *`auditd.data.minor`*::
 +
 --
-type: keyword
-
 device minor number
+
+type: keyword
 
 --
 
 *`auditd.data.acct`*::
 +
 --
-type: keyword
-
 a user's account name
+
+type: keyword
 
 --
 
 *`auditd.data.addr`*::
 +
 --
-type: keyword
-
 the remote address that the user is connecting from
+
+type: keyword
 
 --
 
 *`auditd.data.cipher`*::
 +
 --
-type: keyword
-
 name of crypto cipher selected
+
+type: keyword
 
 --
 
 *`auditd.data.id`*::
 +
 --
-type: keyword
-
 during account changes
+
+type: keyword
 
 --
 
 *`auditd.data.entries`*::
 +
 --
-type: keyword
-
 number of entries in the netfilter table
+
+type: keyword
 
 --
 
 *`auditd.data.kind`*::
 +
 --
-type: keyword
-
 server or client in crypto operation
+
+type: keyword
 
 --
 
 *`auditd.data.ksize`*::
 +
 --
-type: keyword
-
 key size for crypto operation
+
+type: keyword
 
 --
 
 *`auditd.data.spid`*::
 +
 --
-type: keyword
-
 sent process ID
+
+type: keyword
 
 --
 
 *`auditd.data.arch`*::
 +
 --
-type: keyword
-
 the elf architecture flags
+
+type: keyword
 
 --
 
 *`auditd.data.argc`*::
 +
 --
-type: keyword
-
 the number of arguments to an execve syscall
+
+type: keyword
 
 --
 
 *`auditd.data.major`*::
 +
 --
-type: keyword
-
 device major number
+
+type: keyword
 
 --
 
 *`auditd.data.unit`*::
 +
 --
-type: keyword
-
 systemd unit
+
+type: keyword
 
 --
 
 *`auditd.data.table`*::
 +
 --
-type: keyword
-
 netfilter table name
+
+type: keyword
 
 --
 
 *`auditd.data.terminal`*::
 +
 --
-type: keyword
-
 terminal name the user is running programs on
+
+type: keyword
 
 --
 
 *`auditd.data.grantors`*::
 +
 --
-type: keyword
-
 pam modules approving the action
+
+type: keyword
 
 --
 
 *`auditd.data.direction`*::
 +
 --
-type: keyword
-
 direction of crypto operation
+
+type: keyword
 
 --
 
 *`auditd.data.op`*::
 +
 --
-type: keyword
-
 the operation being performed that is audited
+
+type: keyword
 
 --
 
 *`auditd.data.tty`*::
 +
 --
-type: keyword
-
 tty udevice the user is running programs on
+
+type: keyword
 
 --
 
 *`auditd.data.syscall`*::
 +
 --
-type: keyword
-
 syscall number in effect when the event occurred
+
+type: keyword
 
 --
 
 *`auditd.data.data`*::
 +
 --
-type: keyword
-
 TTY text
+
+type: keyword
 
 --
 
 *`auditd.data.family`*::
 +
 --
-type: keyword
-
 netfilter protocol
+
+type: keyword
 
 --
 
 *`auditd.data.mac`*::
 +
 --
-type: keyword
-
 crypto MAC algorithm selected
+
+type: keyword
 
 --
 
 *`auditd.data.pfs`*::
 +
 --
-type: keyword
-
 perfect forward secrecy method
+
+type: keyword
 
 --
 
 *`auditd.data.items`*::
 +
 --
-type: keyword
-
 the number of path records in the event
+
+type: keyword
 
 --
 
 *`auditd.data.a0`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.data.a1`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.data.a2`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.data.a3`*::
 +
 --
+
+
 type: keyword
-
-
 
 --
 
 *`auditd.data.hostname`*::
 +
 --
-type: keyword
-
 the hostname that the user is connecting from
+
+type: keyword
 
 --
 
 *`auditd.data.lport`*::
 +
 --
-type: keyword
-
 local network port
+
+type: keyword
 
 --
 
 *`auditd.data.rport`*::
 +
 --
-type: keyword
-
 remote port number
+
+type: keyword
 
 --
 
 *`auditd.data.exit`*::
 +
 --
-type: keyword
-
 syscall exit code
+
+type: keyword
 
 --
 
 *`auditd.data.fp`*::
 +
 --
-type: keyword
-
 crypto key finger print
+
+type: keyword
 
 --
 
 *`auditd.data.laddr`*::
 +
 --
-type: keyword
-
 local network address
+
+type: keyword
 
 --
 
 *`auditd.data.sport`*::
 +
 --
-type: keyword
-
 local port number
+
+type: keyword
 
 --
 
 *`auditd.data.capability`*::
 +
 --
-type: keyword
-
 posix capabilities
+
+type: keyword
 
 --
 
 *`auditd.data.nargs`*::
 +
 --
-type: keyword
-
 the number of arguments to a socket call
+
+type: keyword
 
 --
 
 *`auditd.data.new-enabled`*::
 +
 --
-type: keyword
-
 new TTY audit enabled setting
+
+type: keyword
 
 --
 
 *`auditd.data.audit_backlog_limit`*::
 +
 --
-type: keyword
-
 audit system's backlog queue size
+
+type: keyword
 
 --
 
 *`auditd.data.dir`*::
 +
 --
-type: keyword
-
 directory name
+
+type: keyword
 
 --
 
 *`auditd.data.cap_pe`*::
 +
 --
-type: keyword
-
 process effective capability map
+
+type: keyword
 
 --
 
 *`auditd.data.model`*::
 +
 --
-type: keyword
-
 security model being used for virt
+
+type: keyword
 
 --
 
 *`auditd.data.new_pp`*::
 +
 --
-type: keyword
-
 new process permitted capability map
+
+type: keyword
 
 --
 
 *`auditd.data.old-enabled`*::
 +
 --
-type: keyword
-
 present TTY audit enabled setting
+
+type: keyword
 
 --
 
 *`auditd.data.oauid`*::
 +
 --
-type: keyword
-
 object's login user ID
+
+type: keyword
 
 --
 
 *`auditd.data.old`*::
 +
 --
-type: keyword
-
 old value
+
+type: keyword
 
 --
 
 *`auditd.data.banners`*::
 +
 --
-type: keyword
-
 banners used on printed page
+
+type: keyword
 
 --
 
 *`auditd.data.feature`*::
 +
 --
-type: keyword
-
 kernel feature being changed
+
+type: keyword
 
 --
 
 *`auditd.data.vm-ctx`*::
 +
 --
-type: keyword
-
 the vm's context string
+
+type: keyword
 
 --
 
 *`auditd.data.opid`*::
 +
 --
-type: keyword
-
 object's process ID
+
+type: keyword
 
 --
 
 *`auditd.data.seperms`*::
 +
 --
-type: keyword
-
 SELinux permissions being used
+
+type: keyword
 
 --
 
 *`auditd.data.seresult`*::
 +
 --
-type: keyword
-
 SELinux AVC decision granted/denied
+
+type: keyword
 
 --
 
 *`auditd.data.new-rng`*::
 +
 --
-type: keyword
-
 device name of rng being added from a vm
+
+type: keyword
 
 --
 
 *`auditd.data.old-net`*::
 +
 --
-type: keyword
-
 present MAC address assigned to vm
+
+type: keyword
 
 --
 
 *`auditd.data.sigev_signo`*::
 +
 --
-type: keyword
-
 signal number
+
+type: keyword
 
 --
 
 *`auditd.data.ino`*::
 +
 --
-type: keyword
-
 inode number
+
+type: keyword
 
 --
 
 *`auditd.data.old_enforcing`*::
 +
 --
-type: keyword
-
 old MAC enforcement status
+
+type: keyword
 
 --
 
 *`auditd.data.old-vcpu`*::
 +
 --
-type: keyword
-
 present number of CPU cores
+
+type: keyword
 
 --
 
 *`auditd.data.range`*::
 +
 --
-type: keyword
-
 user's SE Linux range
+
+type: keyword
 
 --
 
 *`auditd.data.res`*::
 +
 --
-type: keyword
-
 result of the audited operation(success/fail)
+
+type: keyword
 
 --
 
 *`auditd.data.added`*::
 +
 --
-type: keyword
-
 number of new files detected
+
+type: keyword
 
 --
 
 *`auditd.data.fam`*::
 +
 --
-type: keyword
-
 socket address family
+
+type: keyword
 
 --
 
 *`auditd.data.nlnk-pid`*::
 +
 --
-type: keyword
-
 pid of netlink packet sender
+
+type: keyword
 
 --
 
 *`auditd.data.subj`*::
 +
 --
-type: keyword
-
 lspp subject's context string
+
+type: keyword
 
 --
 
 *`auditd.data.a[0-3]`*::
 +
 --
-type: keyword
-
 the arguments to a syscall
+
+type: keyword
 
 --
 
 *`auditd.data.cgroup`*::
 +
 --
-type: keyword
-
 path to cgroup in sysfs
+
+type: keyword
 
 --
 
 *`auditd.data.kernel`*::
 +
 --
-type: keyword
-
 kernel's version number
+
+type: keyword
 
 --
 
 *`auditd.data.ocomm`*::
 +
 --
-type: keyword
-
 object's command line name
+
+type: keyword
 
 --
 
 *`auditd.data.new-net`*::
 +
 --
-type: keyword
-
 MAC address being assigned to vm
+
+type: keyword
 
 --
 
 *`auditd.data.permissive`*::
 +
 --
-type: keyword
-
 SELinux is in permissive mode
+
+type: keyword
 
 --
 
 *`auditd.data.class`*::
 +
 --
-type: keyword
-
 resource class assigned to vm
+
+type: keyword
 
 --
 
 *`auditd.data.compat`*::
 +
 --
-type: keyword
-
 is_compat_task result
+
+type: keyword
 
 --
 
 *`auditd.data.fi`*::
 +
 --
-type: keyword
-
 file assigned inherited capability map
+
+type: keyword
 
 --
 
 *`auditd.data.changed`*::
 +
 --
-type: keyword
-
 number of changed files
+
+type: keyword
 
 --
 
 *`auditd.data.msg`*::
 +
 --
-type: keyword
-
 the payload of the audit record
+
+type: keyword
 
 --
 
 *`auditd.data.dport`*::
 +
 --
-type: keyword
-
 remote port number
+
+type: keyword
 
 --
 
 *`auditd.data.new-seuser`*::
 +
 --
-type: keyword
-
 new SELinux user
+
+type: keyword
 
 --
 
 *`auditd.data.invalid_context`*::
 +
 --
-type: keyword
-
 SELinux context
+
+type: keyword
 
 --
 
 *`auditd.data.dmac`*::
 +
 --
-type: keyword
-
 remote MAC address
+
+type: keyword
 
 --
 
 *`auditd.data.ipx-net`*::
 +
 --
-type: keyword
-
 IPX network number
+
+type: keyword
 
 --
 
 *`auditd.data.iuid`*::
 +
 --
-type: keyword
-
 ipc object's user ID
+
+type: keyword
 
 --
 
 *`auditd.data.macproto`*::
 +
 --
-type: keyword
-
 ethernet packet type ID field
+
+type: keyword
 
 --
 
 *`auditd.data.obj`*::
 +
 --
-type: keyword
-
 lspp object context string
+
+type: keyword
 
 --
 
 *`auditd.data.ipid`*::
 +
 --
-type: keyword
-
 IP datagram fragment identifier
+
+type: keyword
 
 --
 
 *`auditd.data.new-fs`*::
 +
 --
-type: keyword
-
 file system being added to vm
+
+type: keyword
 
 --
 
 *`auditd.data.vm-pid`*::
 +
 --
-type: keyword
-
 vm's process ID
+
+type: keyword
 
 --
 
 *`auditd.data.cap_pi`*::
 +
 --
-type: keyword
-
 process inherited capability map
+
+type: keyword
 
 --
 
 *`auditd.data.old-auid`*::
 +
 --
-type: keyword
-
 previous auid value
+
+type: keyword
 
 --
 
 *`auditd.data.oses`*::
 +
 --
-type: keyword
-
 object's session ID
+
+type: keyword
 
 --
 
 *`auditd.data.fd`*::
 +
 --
-type: keyword
-
 file descriptor number
+
+type: keyword
 
 --
 
 *`auditd.data.igid`*::
 +
 --
-type: keyword
-
 ipc object's group ID
+
+type: keyword
 
 --
 
 *`auditd.data.new-disk`*::
 +
 --
-type: keyword
-
 disk being added to vm
+
+type: keyword
 
 --
 
 *`auditd.data.parent`*::
 +
 --
-type: keyword
-
 the inode number of the parent file
+
+type: keyword
 
 --
 
 *`auditd.data.len`*::
 +
 --
-type: keyword
-
 length
+
+type: keyword
 
 --
 
 *`auditd.data.oflag`*::
 +
 --
-type: keyword
-
 open syscall flags
+
+type: keyword
 
 --
 
 *`auditd.data.uuid`*::
 +
 --
-type: keyword
-
 a UUID
+
+type: keyword
 
 --
 
 *`auditd.data.code`*::
 +
 --
-type: keyword
-
 seccomp action code
+
+type: keyword
 
 --
 
 *`auditd.data.nlnk-grp`*::
 +
 --
-type: keyword
-
 netlink group number
+
+type: keyword
 
 --
 
 *`auditd.data.cap_fp`*::
 +
 --
-type: keyword
-
 file permitted capability map
+
+type: keyword
 
 --
 
 *`auditd.data.new-mem`*::
 +
 --
-type: keyword
-
 new amount of memory in KB
+
+type: keyword
 
 --
 
 *`auditd.data.seperm`*::
 +
 --
-type: keyword
-
 SELinux permission being decided on
+
+type: keyword
 
 --
 
 *`auditd.data.enforcing`*::
 +
 --
-type: keyword
-
 new MAC enforcement status
+
+type: keyword
 
 --
 
 *`auditd.data.new-chardev`*::
 +
 --
-type: keyword
-
 new character device being assigned to vm
+
+type: keyword
 
 --
 
 *`auditd.data.old-rng`*::
 +
 --
-type: keyword
-
 device name of rng being removed from a vm
+
+type: keyword
 
 --
 
 *`auditd.data.outif`*::
 +
 --
-type: keyword
-
 out interface number
+
+type: keyword
 
 --
 
 *`auditd.data.cmd`*::
 +
 --
-type: keyword
-
 command being executed
+
+type: keyword
 
 --
 
 *`auditd.data.hook`*::
 +
 --
-type: keyword
-
 netfilter hook that packet came from
+
+type: keyword
 
 --
 
 *`auditd.data.new-level`*::
 +
 --
-type: keyword
-
 new run level
+
+type: keyword
 
 --
 
 *`auditd.data.sauid`*::
 +
 --
-type: keyword
-
 sent login user ID
+
+type: keyword
 
 --
 
 *`auditd.data.sig`*::
 +
 --
-type: keyword
-
 signal number
+
+type: keyword
 
 --
 
 *`auditd.data.audit_backlog_wait_time`*::
 +
 --
-type: keyword
-
 audit system's backlog wait time
+
+type: keyword
 
 --
 
 *`auditd.data.printer`*::
 +
 --
-type: keyword
-
 printer name
+
+type: keyword
 
 --
 
 *`auditd.data.old-mem`*::
 +
 --
-type: keyword
-
 present amount of memory in KB
+
+type: keyword
 
 --
 
 *`auditd.data.perm`*::
 +
 --
-type: keyword
-
 the file permission being used
+
+type: keyword
 
 --
 
 *`auditd.data.old_pi`*::
 +
 --
-type: keyword
-
 old process inherited capability map
+
+type: keyword
 
 --
 
 *`auditd.data.state`*::
 +
 --
-type: keyword
-
 audit daemon configuration resulting state
+
+type: keyword
 
 --
 
 *`auditd.data.format`*::
 +
 --
-type: keyword
-
 audit log's format
+
+type: keyword
 
 --
 
 *`auditd.data.new_gid`*::
 +
 --
-type: keyword
-
 new group ID being assigned
+
+type: keyword
 
 --
 
 *`auditd.data.tcontext`*::
 +
 --
-type: keyword
-
 the target's or object's context string
+
+type: keyword
 
 --
 
 *`auditd.data.maj`*::
 +
 --
-type: keyword
-
 device major number
+
+type: keyword
 
 --
 
 *`auditd.data.watch`*::
 +
 --
-type: keyword
-
 file name in a watch record
+
+type: keyword
 
 --
 
 *`auditd.data.device`*::
 +
 --
-type: keyword
-
 device name
+
+type: keyword
 
 --
 
 *`auditd.data.grp`*::
 +
 --
-type: keyword
-
 group name
+
+type: keyword
 
 --
 
 *`auditd.data.bool`*::
 +
 --
-type: keyword
-
 name of SELinux boolean
+
+type: keyword
 
 --
 
 *`auditd.data.icmp_type`*::
 +
 --
-type: keyword
-
 type of icmp message
+
+type: keyword
 
 --
 
 *`auditd.data.new_lock`*::
 +
 --
-type: keyword
-
 new value of feature lock
+
+type: keyword
 
 --
 
 *`auditd.data.old_prom`*::
 +
 --
-type: keyword
-
 network promiscuity flag
+
+type: keyword
 
 --
 
 *`auditd.data.acl`*::
 +
 --
-type: keyword
-
 access mode of resource assigned to vm
+
+type: keyword
 
 --
 
 *`auditd.data.ip`*::
 +
 --
-type: keyword
-
 network address of a printer
+
+type: keyword
 
 --
 
 *`auditd.data.new_pi`*::
 +
 --
-type: keyword
-
 new process inherited capability map
+
+type: keyword
 
 --
 
 *`auditd.data.default-context`*::
 +
 --
-type: keyword
-
 default MAC context
+
+type: keyword
 
 --
 
 *`auditd.data.inode_gid`*::
 +
 --
-type: keyword
-
 group ID of the inode's owner
+
+type: keyword
 
 --
 
 *`auditd.data.new-log_passwd`*::
 +
 --
-type: keyword
-
 new value for TTY password logging
+
+type: keyword
 
 --
 
 *`auditd.data.new_pe`*::
 +
 --
-type: keyword
-
 new process effective capability map
+
+type: keyword
 
 --
 
 *`auditd.data.selected-context`*::
 +
 --
-type: keyword
-
 new MAC context assigned to session
+
+type: keyword
 
 --
 
 *`auditd.data.cap_fver`*::
 +
 --
-type: keyword
-
 file system capabilities version number
+
+type: keyword
 
 --
 
 *`auditd.data.file`*::
 +
 --
-type: keyword
-
 file name
+
+type: keyword
 
 --
 
 *`auditd.data.net`*::
 +
 --
-type: keyword
-
 network MAC address
+
+type: keyword
 
 --
 
 *`auditd.data.virt`*::
 +
 --
-type: keyword
-
 kind of virtualization being referenced
+
+type: keyword
 
 --
 
 *`auditd.data.cap_pp`*::
 +
 --
-type: keyword
-
 process permitted capability map
+
+type: keyword
 
 --
 
 *`auditd.data.old-range`*::
 +
 --
-type: keyword
-
 present SELinux range
+
+type: keyword
 
 --
 
 *`auditd.data.resrc`*::
 +
 --
-type: keyword
-
 resource being assigned
+
+type: keyword
 
 --
 
 *`auditd.data.new-range`*::
 +
 --
-type: keyword
-
 new SELinux range
+
+type: keyword
 
 --
 
 *`auditd.data.obj_gid`*::
 +
 --
-type: keyword
-
 group ID of object
+
+type: keyword
 
 --
 
 *`auditd.data.proto`*::
 +
 --
-type: keyword
-
 network protocol
+
+type: keyword
 
 --
 
 *`auditd.data.old-disk`*::
 +
 --
-type: keyword
-
 disk being removed from vm
+
+type: keyword
 
 --
 
 *`auditd.data.audit_failure`*::
 +
 --
-type: keyword
-
 audit system's failure mode
+
+type: keyword
 
 --
 
 *`auditd.data.inif`*::
 +
 --
-type: keyword
-
 in interface number
+
+type: keyword
 
 --
 
 *`auditd.data.vm`*::
 +
 --
-type: keyword
-
 virtual machine name
+
+type: keyword
 
 --
 
 *`auditd.data.flags`*::
 +
 --
-type: keyword
-
 mmap syscall flags
+
+type: keyword
 
 --
 
 *`auditd.data.nlnk-fam`*::
 +
 --
-type: keyword
-
 netlink protocol number
+
+type: keyword
 
 --
 
 *`auditd.data.old-fs`*::
 +
 --
-type: keyword
-
 file system being removed from vm
+
+type: keyword
 
 --
 
 *`auditd.data.old-ses`*::
 +
 --
-type: keyword
-
 previous ses value
+
+type: keyword
 
 --
 
 *`auditd.data.seqno`*::
 +
 --
-type: keyword
-
 sequence number
+
+type: keyword
 
 --
 
 *`auditd.data.fver`*::
 +
 --
-type: keyword
-
 file system capabilities version number
+
+type: keyword
 
 --
 
 *`auditd.data.qbytes`*::
 +
 --
-type: keyword
-
 ipc objects quantity of bytes
+
+type: keyword
 
 --
 
 *`auditd.data.seuser`*::
 +
 --
-type: keyword
-
 user's SE Linux user acct
+
+type: keyword
 
 --
 
 *`auditd.data.cap_fe`*::
 +
 --
-type: keyword
-
 file assigned effective capability map
+
+type: keyword
 
 --
 
 *`auditd.data.new-vcpu`*::
 +
 --
-type: keyword
-
 new number of CPU cores
+
+type: keyword
 
 --
 
 *`auditd.data.old-level`*::
 +
 --
-type: keyword
-
 old run level
+
+type: keyword
 
 --
 
 *`auditd.data.old_pp`*::
 +
 --
-type: keyword
-
 old process permitted capability map
+
+type: keyword
 
 --
 
 *`auditd.data.daddr`*::
 +
 --
-type: keyword
-
 remote IP address
+
+type: keyword
 
 --
 
 *`auditd.data.old-role`*::
 +
 --
-type: keyword
-
 present SELinux role
+
+type: keyword
 
 --
 
 *`auditd.data.ioctlcmd`*::
 +
 --
-type: keyword
-
 The request argument to the ioctl syscall
+
+type: keyword
 
 --
 
 *`auditd.data.smac`*::
 +
 --
-type: keyword
-
 local MAC address
+
+type: keyword
 
 --
 
 *`auditd.data.apparmor`*::
 +
 --
-type: keyword
-
 apparmor event information
+
+type: keyword
 
 --
 
 *`auditd.data.fe`*::
 +
 --
-type: keyword
-
 file assigned effective capability map
+
+type: keyword
 
 --
 
 *`auditd.data.perm_mask`*::
 +
 --
-type: keyword
-
 file permission mask that triggered a watch event
+
+type: keyword
 
 --
 
 *`auditd.data.ses`*::
 +
 --
-type: keyword
-
 login session ID
+
+type: keyword
 
 --
 
 *`auditd.data.cap_fi`*::
 +
 --
-type: keyword
-
 file inherited capability map
+
+type: keyword
 
 --
 
 *`auditd.data.obj_uid`*::
 +
 --
-type: keyword
-
 user ID of object
+
+type: keyword
 
 --
 
 *`auditd.data.reason`*::
 +
 --
-type: keyword
-
 text string denoting a reason for the action
+
+type: keyword
 
 --
 
 *`auditd.data.list`*::
 +
 --
-type: keyword
-
 the audit system's filter list number
+
+type: keyword
 
 --
 
 *`auditd.data.old_lock`*::
 +
 --
-type: keyword
-
 present value of feature lock
+
+type: keyword
 
 --
 
 *`auditd.data.bus`*::
 +
 --
-type: keyword
-
 name of subsystem bus a vm resource belongs to
+
+type: keyword
 
 --
 
 *`auditd.data.old_pe`*::
 +
 --
-type: keyword
-
 old process effective capability map
+
+type: keyword
 
 --
 
 *`auditd.data.new-role`*::
 +
 --
-type: keyword
-
 new SELinux role
+
+type: keyword
 
 --
 
 *`auditd.data.prom`*::
 +
 --
-type: keyword
-
 network promiscuity flag
+
+type: keyword
 
 --
 
 *`auditd.data.uri`*::
 +
 --
-type: keyword
-
 URI pointing to a printer
+
+type: keyword
 
 --
 
 *`auditd.data.audit_enabled`*::
 +
 --
-type: keyword
-
 audit systems's enable/disable status
+
+type: keyword
 
 --
 
 *`auditd.data.old-log_passwd`*::
 +
 --
-type: keyword
-
 present value for TTY password logging
+
+type: keyword
 
 --
 
 *`auditd.data.old-seuser`*::
 +
 --
-type: keyword
-
 present SELinux user
+
+type: keyword
 
 --
 
 *`auditd.data.per`*::
 +
 --
-type: keyword
-
 linux personality
+
+type: keyword
 
 --
 
 *`auditd.data.scontext`*::
 +
 --
-type: keyword
-
 the subject's context string
+
+type: keyword
 
 --
 
 *`auditd.data.tclass`*::
 +
 --
-type: keyword
-
 target's object classification
+
+type: keyword
 
 --
 
 *`auditd.data.ver`*::
 +
 --
-type: keyword
-
 audit daemon's version number
+
+type: keyword
 
 --
 
 *`auditd.data.new`*::
 +
 --
-type: keyword
-
 value being set in feature
+
+type: keyword
 
 --
 
 *`auditd.data.val`*::
 +
 --
-type: keyword
-
 generic value associated with the operation
+
+type: keyword
 
 --
 
 *`auditd.data.img-ctx`*::
 +
 --
-type: keyword
-
 the vm's disk image context string
+
+type: keyword
 
 --
 
 *`auditd.data.old-chardev`*::
 +
 --
-type: keyword
-
 present character device assigned to vm
+
+type: keyword
 
 --
 
 *`auditd.data.old_val`*::
 +
 --
-type: keyword
-
 current value of SELinux boolean
+
+type: keyword
 
 --
 
 *`auditd.data.success`*::
 +
 --
-type: keyword
-
 whether the syscall was successful or not
+
+type: keyword
 
 --
 
 *`auditd.data.inode_uid`*::
 +
 --
-type: keyword
-
 user ID of the inode's owner
+
+type: keyword
 
 --
 
 *`auditd.data.removed`*::
 +
 --
-type: keyword
-
 number of deleted files
+
+type: keyword
 
 --
 
@@ -2323,76 +2323,76 @@ number of deleted files
 *`auditd.data.socket.port`*::
 +
 --
-type: keyword
-
 The port number.
+
+type: keyword
 
 --
 
 *`auditd.data.socket.saddr`*::
 +
 --
-type: keyword
-
 The raw socket address structure.
+
+type: keyword
 
 --
 
 *`auditd.data.socket.addr`*::
 +
 --
-type: keyword
-
 The remote address.
+
+type: keyword
 
 --
 
 *`auditd.data.socket.family`*::
 +
 --
+The socket family (unix, ipv4, ipv6, netlink).
+
 type: keyword
 
 example: unix
-
-The socket family (unix, ipv4, ipv6, netlink).
 
 --
 
 *`auditd.data.socket.path`*::
 +
 --
-type: keyword
-
 This is the path associated with a unix socket.
+
+type: keyword
 
 --
 
 *`auditd.messages`*::
 +
 --
+An ordered list of the raw messages received from the kernel that were used to construct this document. This field is present if an error occurred processing the data or if `include_raw_message` is set in the config.
+
+
 type: alias
 
 alias to: event.original
-
-An ordered list of the raw messages received from the kernel that were used to construct this document. This field is present if an error occurred processing the data or if `include_raw_message` is set in the config.
-
 
 --
 
 *`auditd.warnings`*::
 +
 --
+The warnings generated by the Beat during the construction of the event. These are disabled by default and are used for development and debug purposes only.
+
+
 type: alias
 
 alias to: error.message
 
-The warnings generated by the Beat during the construction of the event. These are disabled by default and are used for development and debug purposes only.
-
-
 --
 
 [float]
-== geoip fields
+=== geoip
 
 The geoip fields are defined as a convenience in case you decide to enrich the data using a geoip filter in Logstash or Ingest Node.
 
@@ -2401,54 +2401,54 @@ The geoip fields are defined as a convenience in case you decide to enrich the d
 *`geoip.continent_name`*::
 +
 --
-type: keyword
-
 The name of the continent.
 
+
+type: keyword
 
 --
 
 *`geoip.city_name`*::
 +
 --
-type: keyword
-
 The name of the city.
 
+
+type: keyword
 
 --
 
 *`geoip.region_name`*::
 +
 --
-type: keyword
-
 The name of the region.
 
+
+type: keyword
 
 --
 
 *`geoip.country_iso_code`*::
 +
 --
-type: keyword
-
 Country ISO code.
 
+
+type: keyword
 
 --
 
 *`geoip.location`*::
 +
 --
-type: geo_point
-
 The longitude and latitude.
 
 
+type: geo_point
+
 --
 
-[[exported-fields-beat]]
+[[exported-fields-beat-common]]
 == Beat fields
 
 Contains common beat fields available in all event types.
@@ -2458,9 +2458,9 @@ Contains common beat fields available in all event types.
 *`agent.hostname`*::
 +
 --
-type: keyword
-
 Hostname of the agent.
+
+type: keyword
 
 --
 
@@ -2476,15 +2476,15 @@ alias to: event.timezone
 *`fields`*::
 +
 --
-type: object
-
 Contains user configurable fields.
 
+
+type: object
 
 --
 
 [float]
-== error fields
+=== error
 
 Error fields containing additional info in case of errors.
 
@@ -2493,10 +2493,10 @@ Error fields containing additional info in case of errors.
 *`error.type`*::
 +
 --
-type: keyword
-
 Error type.
 
+
+type: keyword
 
 --
 
@@ -2521,9 +2521,9 @@ alias to: agent.hostname
 *`timeseries.instance`*::
 +
 --
-type: keyword
-
 Time series instance id
+
+type: keyword
 
 --
 
@@ -2537,20 +2537,20 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 *`cloud.project.id`*::
 +
 --
-example: project-x
-
 Name of the project in Google Cloud.
 
+
+example: project-x
 
 --
 
 *`cloud.image.id`*::
 +
 --
-example: ami-abcd1234
-
 Image ID for the cloud instance.
 
+
+example: ami-abcd1234
 
 --
 
@@ -2625,7 +2625,7 @@ Contains common fields available in all event types.
 
 
 [float]
-== file fields
+=== file
 
 File attributes.
 
@@ -2633,47 +2633,47 @@ File attributes.
 *`file.setuid`*::
 +
 --
+Set if the file has the `setuid` bit set. Omitted otherwise.
+
 type: boolean
 
 example: True
-
-Set if the file has the `setuid` bit set. Omitted otherwise.
 
 --
 
 *`file.setgid`*::
 +
 --
+Set if the file has the `setgid` bit set. Omitted otherwise.
+
 type: boolean
 
 example: True
-
-Set if the file has the `setgid` bit set. Omitted otherwise.
 
 --
 
 *`file.origin`*::
 +
 --
-type: keyword
-
 An array of strings describing a possible external origin for this file. For example, the URL it was downloaded from. Only supported in macOS, via the kMDItemWhereFroms attribute. Omitted if origin information is not available.
 
+
+type: keyword
+
+--
 
 *`file.origin.raw`*::
 +
 --
-type: keyword
-
 This is a non-analyzed field that is useful for aggregations on the origin data.
 
 
---
+type: keyword
 
 --
 
 [float]
-== selinux fields
+=== selinux
 
 The SELinux identity of the file.
 
@@ -2681,49 +2681,49 @@ The SELinux identity of the file.
 *`file.selinux.user`*::
 +
 --
-type: keyword
-
 The owner of the object.
+
+type: keyword
 
 --
 
 *`file.selinux.role`*::
 +
 --
-type: keyword
-
 The object's SELinux role.
+
+type: keyword
 
 --
 
 *`file.selinux.domain`*::
 +
 --
-type: keyword
-
 The object's SELinux domain or type.
+
+type: keyword
 
 --
 
 *`file.selinux.level`*::
 +
 --
+The object's SELinux level.
+
 type: keyword
 
 example: s0
 
-The object's SELinux level.
-
 --
 
 [float]
-== user fields
+=== user
 
 User information.
 
 
 [float]
-== audit fields
+=== audit
 
 Audit user information.
 
@@ -2731,23 +2731,23 @@ Audit user information.
 *`user.audit.id`*::
 +
 --
-type: keyword
-
 Audit user ID.
+
+type: keyword
 
 --
 
 *`user.audit.name`*::
 +
 --
-type: keyword
-
 Audit user name.
+
+type: keyword
 
 --
 
 [float]
-== effective fields
+=== effective
 
 Effective user information.
 
@@ -2755,23 +2755,23 @@ Effective user information.
 *`user.effective.id`*::
 +
 --
-type: keyword
-
 Effective user ID.
+
+type: keyword
 
 --
 
 *`user.effective.name`*::
 +
 --
-type: keyword
-
 Effective user name.
+
+type: keyword
 
 --
 
 [float]
-== group fields
+=== group
 
 Effective group information.
 
@@ -2779,23 +2779,23 @@ Effective group information.
 *`user.effective.group.id`*::
 +
 --
-type: keyword
-
 Effective group ID.
+
+type: keyword
 
 --
 
 *`user.effective.group.name`*::
 +
 --
-type: keyword
-
 Effective group name.
+
+type: keyword
 
 --
 
 [float]
-== filesystem fields
+=== filesystem
 
 Filesystem user information.
 
@@ -2803,23 +2803,23 @@ Filesystem user information.
 *`user.filesystem.id`*::
 +
 --
-type: keyword
-
 Filesystem user ID.
+
+type: keyword
 
 --
 
 *`user.filesystem.name`*::
 +
 --
-type: keyword
-
 Filesystem user name.
+
+type: keyword
 
 --
 
 [float]
-== group fields
+=== group
 
 Filesystem group information.
 
@@ -2827,23 +2827,23 @@ Filesystem group information.
 *`user.filesystem.group.id`*::
 +
 --
-type: keyword
-
 Filesystem group ID.
+
+type: keyword
 
 --
 
 *`user.filesystem.group.name`*::
 +
 --
-type: keyword
-
 Filesystem group name.
+
+type: keyword
 
 --
 
 [float]
-== saved fields
+=== saved
 
 Saved user information.
 
@@ -2851,23 +2851,23 @@ Saved user information.
 *`user.saved.id`*::
 +
 --
-type: keyword
-
 Saved user ID.
+
+type: keyword
 
 --
 
 *`user.saved.name`*::
 +
 --
-type: keyword
-
 Saved user name.
+
+type: keyword
 
 --
 
 [float]
-== group fields
+=== group
 
 Saved group information.
 
@@ -2875,18 +2875,18 @@ Saved group information.
 *`user.saved.group.id`*::
 +
 --
-type: keyword
-
 Saved group ID.
+
+type: keyword
 
 --
 
 *`user.saved.group.name`*::
 +
 --
-type: keyword
-
 Saved group name.
+
+type: keyword
 
 --
 
@@ -2928,10 +2928,10 @@ alias to: container.name
 *`docker.container.labels`*::
 +
 --
-type: object
-
 Image labels.
 
+
+type: object
 
 --
 
@@ -2944,58 +2944,58 @@ ECS Fields.
 *`@timestamp`*::
 +
 --
+Date/time when the event originated.
+This is the date/time extracted from the event, typically representing when the event was generated by the source.
+If the event source has no original timestamp, this value is typically populated by the first time the event was received by the pipeline.
+Required field for all events.
+
 type: date
 
 example: 2016-05-23T08:05:34.853Z
 
 required: True
 
-Date/time when the event originated.
-This is the date/time extracted from the event, typically representing when the event was generated by the source.
-If the event source has no original timestamp, this value is typically populated by the first time the event was received by the pipeline.
-Required field for all events.
-
 --
 
 *`labels`*::
 +
 --
-type: object
-
-example: {'application': 'foo-bar', 'env': 'production'}
-
 Custom key/value pairs.
 Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
 Example: `docker` and `k8s` labels.
+
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
 
 --
 
 *`message`*::
 +
 --
-type: text
-
-example: Hello World
-
 For log events the message field contains the log message, optimized for viewing in a log viewer.
 For structured logs without an original message field, other fields can be concatenated to form a human-readable summary of the event.
 If multiple messages exist, they can be combined into one message.
+
+type: text
+
+example: Hello World
 
 --
 
 *`tags`*::
 +
 --
+List of keywords used to tag each event.
+
 type: keyword
 
 example: ["production", "env2"]
 
-List of keywords used to tag each event.
-
 --
 
 [float]
-== agent fields
+=== agent
 
 The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host.
 Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
@@ -3004,65 +3004,65 @@ Examples include Beats. Agents may also run on observers. ECS agent.* fields sha
 *`agent.ephemeral_id`*::
 +
 --
+Ephemeral identifier of this agent (if one exists).
+This id normally changes across restarts, but `agent.id` does not.
+
 type: keyword
 
 example: 8a4f500f
-
-Ephemeral identifier of this agent (if one exists).
-This id normally changes across restarts, but `agent.id` does not.
 
 --
 
 *`agent.id`*::
 +
 --
+Unique identifier of this agent (if one exists).
+Example: For Beats this would be beat.id.
+
 type: keyword
 
 example: 8a4f500d
-
-Unique identifier of this agent (if one exists).
-Example: For Beats this would be beat.id.
 
 --
 
 *`agent.name`*::
 +
 --
-type: keyword
-
-example: foo
-
 Custom name of the agent.
 This is a name that can be given to an agent. This can be helpful if for example two Filebeat instances are running on the same host but a human readable separation is needed on which Filebeat instance data is coming from.
 If no name is given, the name is often left empty.
+
+type: keyword
+
+example: foo
 
 --
 
 *`agent.type`*::
 +
 --
+Type of the agent.
+The agent type stays always the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
+
 type: keyword
 
 example: filebeat
-
-Type of the agent.
-The agent type stays always the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
 
 --
 
 *`agent.version`*::
 +
 --
+Version of the agent.
+
 type: keyword
 
 example: 6.0.0-rc2
 
-Version of the agent.
-
 --
 
 [float]
-== client fields
+=== client
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
 For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
@@ -3072,236 +3072,236 @@ Client / server representations can add semantic context to an exchange, which i
 *`client.address`*::
 +
 --
-type: keyword
-
 Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
 
 --
 
 *`client.bytes`*::
 +
 --
+Bytes sent from the client to the server.
+
 type: long
 
 example: 184
 
 format: bytes
 
-Bytes sent from the client to the server.
-
 --
 
 *`client.domain`*::
 +
 --
-type: keyword
-
 Client domain.
+
+type: keyword
 
 --
 
 *`client.geo.city_name`*::
 +
 --
+City name.
+
 type: keyword
 
 example: Montreal
-
-City name.
 
 --
 
 *`client.geo.continent_name`*::
 +
 --
+Name of the continent.
+
 type: keyword
 
 example: North America
-
-Name of the continent.
 
 --
 
 *`client.geo.country_iso_code`*::
 +
 --
+Country ISO code.
+
 type: keyword
 
 example: CA
-
-Country ISO code.
 
 --
 
 *`client.geo.country_name`*::
 +
 --
+Country name.
+
 type: keyword
 
 example: Canada
-
-Country name.
 
 --
 
 *`client.geo.location`*::
 +
 --
+Longitude and latitude.
+
 type: geo_point
 
 example: { "lon": -73.614830, "lat": 45.505918 }
-
-Longitude and latitude.
 
 --
 
 *`client.geo.name`*::
 +
 --
-type: keyword
-
-example: boston-dc
-
 User-defined description of a location, at the level of granularity they care about.
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
 
 --
 
 *`client.geo.region_iso_code`*::
 +
 --
+Region ISO code.
+
 type: keyword
 
 example: CA-QC
-
-Region ISO code.
 
 --
 
 *`client.geo.region_name`*::
 +
 --
+Region name.
+
 type: keyword
 
 example: Quebec
-
-Region name.
 
 --
 
 *`client.ip`*::
 +
 --
-type: ip
-
 IP address of the client.
 Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
 
 --
 
 *`client.mac`*::
 +
 --
-type: keyword
-
 MAC address of the client.
+
+type: keyword
 
 --
 
 *`client.packets`*::
 +
 --
+Packets sent from the client to the server.
+
 type: long
 
 example: 12
-
-Packets sent from the client to the server.
 
 --
 
 *`client.port`*::
 +
 --
+Port of the client.
+
 type: long
 
 format: string
-
-Port of the client.
 
 --
 
 *`client.user.email`*::
 +
 --
-type: keyword
-
 User email address.
+
+type: keyword
 
 --
 
 *`client.user.full_name`*::
 +
 --
+User's full name, if available.
+
 type: keyword
 
 example: Albert Einstein
-
-User's full name, if available.
 
 --
 
 *`client.user.group.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the group on the system/platform.
+
+type: keyword
 
 --
 
 *`client.user.group.name`*::
 +
 --
-type: keyword
-
 Name of the group.
+
+type: keyword
 
 --
 
 *`client.user.hash`*::
 +
 --
-type: keyword
-
 Unique user hash to correlate information for a user in anonymized form.
 Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
 
 --
 
 *`client.user.id`*::
 +
 --
-type: keyword
-
 One or multiple unique identifiers of the user.
+
+type: keyword
 
 --
 
 *`client.user.name`*::
 +
 --
+Short name or login of the user.
+
 type: keyword
 
 example: albert
 
-Short name or login of the user.
-
 --
 
 [float]
-== cloud fields
+=== cloud
 
 Fields related to the cloud or infrastructure the events are coming from.
 
@@ -3309,81 +3309,81 @@ Fields related to the cloud or infrastructure the events are coming from.
 *`cloud.account.id`*::
 +
 --
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
 type: keyword
 
 example: 666777888999
-
-The cloud account or organization id used to identify different entities in a multi-tenant environment.
-Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
 
 --
 
 *`cloud.availability_zone`*::
 +
 --
+Availability zone in which this host is running.
+
 type: keyword
 
 example: us-east-1c
-
-Availability zone in which this host is running.
 
 --
 
 *`cloud.instance.id`*::
 +
 --
+Instance ID of the host machine.
+
 type: keyword
 
 example: i-1234567890abcdef0
-
-Instance ID of the host machine.
 
 --
 
 *`cloud.instance.name`*::
 +
 --
-type: keyword
-
 Instance name of the host machine.
+
+type: keyword
 
 --
 
 *`cloud.machine.type`*::
 +
 --
+Machine type of the host machine.
+
 type: keyword
 
 example: t2.medium
-
-Machine type of the host machine.
 
 --
 
 *`cloud.provider`*::
 +
 --
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
 type: keyword
 
 example: aws
-
-Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
 
 --
 
 *`cloud.region`*::
 +
 --
+Region in which this host is running.
+
 type: keyword
 
 example: us-east-1
 
-Region in which this host is running.
-
 --
 
 [float]
-== container fields
+=== container
 
 Container fields are used for meta information about the specific container that is the source of information.
 These fields help correlate data based containers from any runtime.
@@ -3392,61 +3392,61 @@ These fields help correlate data based containers from any runtime.
 *`container.id`*::
 +
 --
-type: keyword
-
 Unique container id.
+
+type: keyword
 
 --
 
 *`container.image.name`*::
 +
 --
-type: keyword
-
 Name of the image the container was built on.
+
+type: keyword
 
 --
 
 *`container.image.tag`*::
 +
 --
-type: keyword
-
 Container image tag.
+
+type: keyword
 
 --
 
 *`container.labels`*::
 +
 --
-type: object
-
 Image labels.
+
+type: object
 
 --
 
 *`container.name`*::
 +
 --
-type: keyword
-
 Container name.
+
+type: keyword
 
 --
 
 *`container.runtime`*::
 +
 --
+Runtime managing this container.
+
 type: keyword
 
 example: docker
 
-Runtime managing this container.
-
 --
 
 [float]
-== destination fields
+=== destination
 
 Destination fields describe details about the destination of a packet/event.
 Destination fields are usually populated in conjunction with source fields.
@@ -3455,236 +3455,236 @@ Destination fields are usually populated in conjunction with source fields.
 *`destination.address`*::
 +
 --
-type: keyword
-
 Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
 
 --
 
 *`destination.bytes`*::
 +
 --
+Bytes sent from the destination to the source.
+
 type: long
 
 example: 184
 
 format: bytes
 
-Bytes sent from the destination to the source.
-
 --
 
 *`destination.domain`*::
 +
 --
-type: keyword
-
 Destination domain.
+
+type: keyword
 
 --
 
 *`destination.geo.city_name`*::
 +
 --
+City name.
+
 type: keyword
 
 example: Montreal
-
-City name.
 
 --
 
 *`destination.geo.continent_name`*::
 +
 --
+Name of the continent.
+
 type: keyword
 
 example: North America
-
-Name of the continent.
 
 --
 
 *`destination.geo.country_iso_code`*::
 +
 --
+Country ISO code.
+
 type: keyword
 
 example: CA
-
-Country ISO code.
 
 --
 
 *`destination.geo.country_name`*::
 +
 --
+Country name.
+
 type: keyword
 
 example: Canada
-
-Country name.
 
 --
 
 *`destination.geo.location`*::
 +
 --
+Longitude and latitude.
+
 type: geo_point
 
 example: { "lon": -73.614830, "lat": 45.505918 }
-
-Longitude and latitude.
 
 --
 
 *`destination.geo.name`*::
 +
 --
-type: keyword
-
-example: boston-dc
-
 User-defined description of a location, at the level of granularity they care about.
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
 
 --
 
 *`destination.geo.region_iso_code`*::
 +
 --
+Region ISO code.
+
 type: keyword
 
 example: CA-QC
-
-Region ISO code.
 
 --
 
 *`destination.geo.region_name`*::
 +
 --
+Region name.
+
 type: keyword
 
 example: Quebec
-
-Region name.
 
 --
 
 *`destination.ip`*::
 +
 --
-type: ip
-
 IP address of the destination.
 Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
 
 --
 
 *`destination.mac`*::
 +
 --
-type: keyword
-
 MAC address of the destination.
+
+type: keyword
 
 --
 
 *`destination.packets`*::
 +
 --
+Packets sent from the destination to the source.
+
 type: long
 
 example: 12
-
-Packets sent from the destination to the source.
 
 --
 
 *`destination.port`*::
 +
 --
+Port of the destination.
+
 type: long
 
 format: string
-
-Port of the destination.
 
 --
 
 *`destination.user.email`*::
 +
 --
-type: keyword
-
 User email address.
+
+type: keyword
 
 --
 
 *`destination.user.full_name`*::
 +
 --
+User's full name, if available.
+
 type: keyword
 
 example: Albert Einstein
-
-User's full name, if available.
 
 --
 
 *`destination.user.group.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the group on the system/platform.
+
+type: keyword
 
 --
 
 *`destination.user.group.name`*::
 +
 --
-type: keyword
-
 Name of the group.
+
+type: keyword
 
 --
 
 *`destination.user.hash`*::
 +
 --
-type: keyword
-
 Unique user hash to correlate information for a user in anonymized form.
 Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
 
 --
 
 *`destination.user.id`*::
 +
 --
-type: keyword
-
 One or multiple unique identifiers of the user.
+
+type: keyword
 
 --
 
 *`destination.user.name`*::
 +
 --
+Short name or login of the user.
+
 type: keyword
 
 example: albert
 
-Short name or login of the user.
-
 --
 
 [float]
-== ecs fields
+=== ecs
 
 Meta-information specific to ECS.
 
@@ -3692,19 +3692,19 @@ Meta-information specific to ECS.
 *`ecs.version`*::
 +
 --
+ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
+When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
+
 type: keyword
 
 example: 1.0.0
 
 required: True
 
-ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
-When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
-
 --
 
 [float]
-== error fields
+=== error
 
 These fields can represent errors of any kind.
 Use them for errors that happen while fetching events or in cases where the event itself contains an error.
@@ -3713,32 +3713,32 @@ Use them for errors that happen while fetching events or in cases where the even
 *`error.code`*::
 +
 --
-type: keyword
-
 Error code describing the error.
+
+type: keyword
 
 --
 
 *`error.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the error.
+
+type: keyword
 
 --
 
 *`error.message`*::
 +
 --
-type: text
-
 Error message.
+
+type: text
 
 --
 
 [float]
-== event fields
+=== event
 
 The event fields are used for context information about the log or metric event itself.
 A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
@@ -3747,205 +3747,205 @@ A log is defined as an event containing details of something that happened. Log 
 *`event.action`*::
 +
 --
+The action captured by the event.
+This describes the information in the event. It is more specific than `event.category`. Examples are `group-add`, `process-started`, `file-created`. The value is normally defined by the implementer.
+
 type: keyword
 
 example: user-password-change
-
-The action captured by the event.
-This describes the information in the event. It is more specific than `event.category`. Examples are `group-add`, `process-started`, `file-created`. The value is normally defined by the implementer.
 
 --
 
 *`event.category`*::
 +
 --
+Event category.
+This contains high-level information about the contents of the event. It is more generic than `event.action`, in the sense that typically a category contains multiple actions. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
 type: keyword
 
 example: user-management
-
-Event category.
-This contains high-level information about the contents of the event. It is more generic than `event.action`, in the sense that typically a category contains multiple actions. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
 
 --
 
 *`event.created`*::
 +
 --
-type: date
-
 event.created contains the date/time when the event was first read by an agent, or by your pipeline.
 This field is distinct from @timestamp in that @timestamp typically contain the time extracted from the original event.
 In most situations, these two timestamps will be slightly different. The difference can be used to calculate the delay between your source generating an event, and the time when your agent first processed it. This can be used to monitor your agent's or pipeline's ability to keep up with your event source.
 In case the two timestamps are identical, @timestamp should be used.
+
+type: date
 
 --
 
 *`event.dataset`*::
 +
 --
+Name of the dataset.
+The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
+
 type: keyword
 
 example: stats
-
-Name of the dataset.
-The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
 
 --
 
 *`event.duration`*::
 +
 --
+Duration of the event in nanoseconds.
+If event.start and event.end are known this value should be the difference between the end and start time.
+
 type: long
 
 format: duration
-
-Duration of the event in nanoseconds.
-If event.start and event.end are known this value should be the difference between the end and start time.
 
 --
 
 *`event.end`*::
 +
 --
-type: date
-
 event.end contains the date when the event ended or when the activity was last observed.
+
+type: date
 
 --
 
 *`event.hash`*::
 +
 --
+Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
+
 type: keyword
 
 example: 123456789012345678901234567890ABCD
-
-Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
 
 --
 
 *`event.id`*::
 +
 --
+Unique ID to describe the event.
+
 type: keyword
 
 example: 8a4f500d
-
-Unique ID to describe the event.
 
 --
 
 *`event.kind`*::
 +
 --
+The kind of the event.
+This gives information about what type of information the event contains, without being specific to the contents of the event.  Examples are `event`, `state`, `alarm`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
 type: keyword
 
 example: state
-
-The kind of the event.
-This gives information about what type of information the event contains, without being specific to the contents of the event.  Examples are `event`, `state`, `alarm`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
 
 --
 
 *`event.module`*::
 +
 --
+Name of the module this data is coming from.
+This information is coming from the modules used in Beats or Logstash.
+
 type: keyword
 
 example: mysql
-
-Name of the module this data is coming from.
-This information is coming from the modules used in Beats or Logstash.
 
 --
 
 *`event.original`*::
 +
 --
+Raw text message of entire event. Used to demonstrate log integrity.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+
 type: keyword
 
 example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#124;100&#124; worm successfully stopped&#124;10&#124;src=10.0.0.1 dst=2.1.2.2spt=1232
-
-Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
 
 --
 
 *`event.outcome`*::
 +
 --
+The outcome of the event.
+If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
 type: keyword
 
 example: success
-
-The outcome of the event.
-If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
 
 --
 
 *`event.risk_score`*::
 +
 --
-type: float
-
 Risk score or priority of the event (e.g. security solutions). Use your system's original value here.
+
+type: float
 
 --
 
 *`event.risk_score_norm`*::
 +
 --
-type: float
-
 Normalized risk score or priority of the event, on a scale of 0 to 100.
 This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
+
+type: float
 
 --
 
 *`event.severity`*::
 +
 --
+Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+
 type: long
 
 example: 7
 
 format: string
 
-Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
-
 --
 
 *`event.start`*::
 +
 --
-type: date
-
 event.start contains the date when the event started or when the activity was first observed.
+
+type: date
 
 --
 
 *`event.timezone`*::
 +
 --
-type: keyword
-
 This field should be populated when the event's timestamp does not include timezone information already (e.g. default Syslog timestamps). It's optional otherwise.
 Acceptable timezone formats are: a canonical ID (e.g. "Europe/Amsterdam"), abbreviated (e.g. "EST") or an HH:mm differential (e.g. "-05:00").
+
+type: keyword
 
 --
 
 *`event.type`*::
 +
 --
-type: keyword
-
 Reserved for future usage.
 Please avoid using this field for user data.
+
+type: keyword
 
 --
 
 [float]
-== file fields
+=== file
 
 A file is defined as a set of information that has been created on, or has existed on a filesystem.
 File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
@@ -3954,136 +3954,136 @@ File objects can be associated with host events, network events, and/or file eve
 *`file.ctime`*::
 +
 --
-type: date
-
 Last time file metadata changed.
+
+type: date
 
 --
 
 *`file.device`*::
 +
 --
-type: keyword
-
 Device that is the source of the file.
+
+type: keyword
 
 --
 
 *`file.extension`*::
 +
 --
+File extension.
+This should allow easy filtering by file extensions.
+
 type: keyword
 
 example: png
-
-File extension.
-This should allow easy filtering by file extensions.
 
 --
 
 *`file.gid`*::
 +
 --
-type: keyword
-
 Primary group ID (GID) of the file.
+
+type: keyword
 
 --
 
 *`file.group`*::
 +
 --
-type: keyword
-
 Primary group name of the file.
+
+type: keyword
 
 --
 
 *`file.inode`*::
 +
 --
-type: keyword
-
 Inode representing the file in the filesystem.
+
+type: keyword
 
 --
 
 *`file.mode`*::
 +
 --
+Mode of the file in octal representation.
+
 type: keyword
 
 example: 416
-
-Mode of the file in octal representation.
 
 --
 
 *`file.mtime`*::
 +
 --
-type: date
-
 Last time file content was modified.
+
+type: date
 
 --
 
 *`file.owner`*::
 +
 --
-type: keyword
-
 File owner's username.
+
+type: keyword
 
 --
 
 *`file.path`*::
 +
 --
-type: keyword
-
 Path to the file.
+
+type: keyword
 
 --
 
 *`file.size`*::
 +
 --
-type: long
-
 File size in bytes (field is only added when `type` is `file`).
+
+type: long
 
 --
 
 *`file.target_path`*::
 +
 --
-type: keyword
-
 Target path for symlinks.
+
+type: keyword
 
 --
 
 *`file.type`*::
 +
 --
-type: keyword
-
 File type (file, dir, or symlink).
+
+type: keyword
 
 --
 
 *`file.uid`*::
 +
 --
-type: keyword
-
 The user ID (UID) or security identifier (SID) of the file owner.
+
+type: keyword
 
 --
 
 [float]
-== geo fields
+=== geo
 
 Geo fields can carry data about a specific location related to an event.
 This geolocation information can be derived from techniques such as Geo IP, or be user-supplied.
@@ -4092,95 +4092,95 @@ This geolocation information can be derived from techniques such as Geo IP, or b
 *`geo.city_name`*::
 +
 --
+City name.
+
 type: keyword
 
 example: Montreal
-
-City name.
 
 --
 
 *`geo.continent_name`*::
 +
 --
+Name of the continent.
+
 type: keyword
 
 example: North America
-
-Name of the continent.
 
 --
 
 *`geo.country_iso_code`*::
 +
 --
+Country ISO code.
+
 type: keyword
 
 example: CA
-
-Country ISO code.
 
 --
 
 *`geo.country_name`*::
 +
 --
+Country name.
+
 type: keyword
 
 example: Canada
-
-Country name.
 
 --
 
 *`geo.location`*::
 +
 --
+Longitude and latitude.
+
 type: geo_point
 
 example: { "lon": -73.614830, "lat": 45.505918 }
-
-Longitude and latitude.
 
 --
 
 *`geo.name`*::
 +
 --
-type: keyword
-
-example: boston-dc
-
 User-defined description of a location, at the level of granularity they care about.
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
 
 --
 
 *`geo.region_iso_code`*::
 +
 --
+Region ISO code.
+
 type: keyword
 
 example: CA-QC
-
-Region ISO code.
 
 --
 
 *`geo.region_name`*::
 +
 --
+Region name.
+
 type: keyword
 
 example: Quebec
 
-Region name.
-
 --
 
 [float]
-== group fields
+=== group
 
 The group fields are meant to represent groups that are relevant to the event.
 
@@ -4188,23 +4188,23 @@ The group fields are meant to represent groups that are relevant to the event.
 *`group.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the group on the system/platform.
+
+type: keyword
 
 --
 
 *`group.name`*::
 +
 --
-type: keyword
-
 Name of the group.
+
+type: keyword
 
 --
 
 [float]
-== host fields
+=== host
 
 A host is defined as a general computing instance.
 ECS host.* fields should be populated with details about the host on which the event happened, or from which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
@@ -4213,299 +4213,299 @@ ECS host.* fields should be populated with details about the host on which the e
 *`host.architecture`*::
 +
 --
+Operating system architecture.
+
 type: keyword
 
 example: x86_64
-
-Operating system architecture.
 
 --
 
 *`host.geo.city_name`*::
 +
 --
+City name.
+
 type: keyword
 
 example: Montreal
-
-City name.
 
 --
 
 *`host.geo.continent_name`*::
 +
 --
+Name of the continent.
+
 type: keyword
 
 example: North America
-
-Name of the continent.
 
 --
 
 *`host.geo.country_iso_code`*::
 +
 --
+Country ISO code.
+
 type: keyword
 
 example: CA
-
-Country ISO code.
 
 --
 
 *`host.geo.country_name`*::
 +
 --
+Country name.
+
 type: keyword
 
 example: Canada
-
-Country name.
 
 --
 
 *`host.geo.location`*::
 +
 --
+Longitude and latitude.
+
 type: geo_point
 
 example: { "lon": -73.614830, "lat": 45.505918 }
-
-Longitude and latitude.
 
 --
 
 *`host.geo.name`*::
 +
 --
-type: keyword
-
-example: boston-dc
-
 User-defined description of a location, at the level of granularity they care about.
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
 
 --
 
 *`host.geo.region_iso_code`*::
 +
 --
+Region ISO code.
+
 type: keyword
 
 example: CA-QC
-
-Region ISO code.
 
 --
 
 *`host.geo.region_name`*::
 +
 --
+Region name.
+
 type: keyword
 
 example: Quebec
-
-Region name.
 
 --
 
 *`host.hostname`*::
 +
 --
-type: keyword
-
 Hostname of the host.
 It normally contains what the `hostname` command returns on the host machine.
+
+type: keyword
 
 --
 
 *`host.id`*::
 +
 --
-type: keyword
-
 Unique host id.
 As hostname is not always unique, use values that are meaningful in your environment.
 Example: The current usage of `beat.name`.
+
+type: keyword
 
 --
 
 *`host.ip`*::
 +
 --
-type: ip
-
 Host ip address.
+
+type: ip
 
 --
 
 *`host.mac`*::
 +
 --
-type: keyword
-
 Host mac address.
+
+type: keyword
 
 --
 
 *`host.name`*::
 +
 --
-type: keyword
-
 Name of the host.
 It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
+
+type: keyword
 
 --
 
 *`host.os.family`*::
 +
 --
+OS family (such as redhat, debian, freebsd, windows).
+
 type: keyword
 
 example: debian
-
-OS family (such as redhat, debian, freebsd, windows).
 
 --
 
 *`host.os.full`*::
 +
 --
+Operating system name, including the version or code name.
+
 type: keyword
 
 example: Mac OS Mojave
-
-Operating system name, including the version or code name.
 
 --
 
 *`host.os.kernel`*::
 +
 --
+Operating system kernel version as a raw string.
+
 type: keyword
 
 example: 4.4.0-112-generic
-
-Operating system kernel version as a raw string.
 
 --
 
 *`host.os.name`*::
 +
 --
+Operating system name, without the version.
+
 type: keyword
 
 example: Mac OS X
-
-Operating system name, without the version.
 
 --
 
 *`host.os.platform`*::
 +
 --
+Operating system platform (such centos, ubuntu, windows).
+
 type: keyword
 
 example: darwin
-
-Operating system platform (such centos, ubuntu, windows).
 
 --
 
 *`host.os.version`*::
 +
 --
+Operating system version as a raw string.
+
 type: keyword
 
 example: 10.14.1
-
-Operating system version as a raw string.
 
 --
 
 *`host.type`*::
 +
 --
-type: keyword
-
 Type of host.
 For Cloud providers this can be the machine type like `t2.medium`. If vm, this could be the container, for example, or other information meaningful in your environment.
+
+type: keyword
 
 --
 
 *`host.user.email`*::
 +
 --
-type: keyword
-
 User email address.
+
+type: keyword
 
 --
 
 *`host.user.full_name`*::
 +
 --
+User's full name, if available.
+
 type: keyword
 
 example: Albert Einstein
-
-User's full name, if available.
 
 --
 
 *`host.user.group.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the group on the system/platform.
+
+type: keyword
 
 --
 
 *`host.user.group.name`*::
 +
 --
-type: keyword
-
 Name of the group.
+
+type: keyword
 
 --
 
 *`host.user.hash`*::
 +
 --
-type: keyword
-
 Unique user hash to correlate information for a user in anonymized form.
 Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
 
 --
 
 *`host.user.id`*::
 +
 --
-type: keyword
-
 One or multiple unique identifiers of the user.
+
+type: keyword
 
 --
 
 *`host.user.name`*::
 +
 --
+Short name or login of the user.
+
 type: keyword
 
 example: albert
 
-Short name or login of the user.
-
 --
 
 [float]
-== http fields
+=== http
 
 Fields related to HTTP activity. Use the `url` field set to store the url of the request.
 
@@ -4513,126 +4513,126 @@ Fields related to HTTP activity. Use the `url` field set to store the url of the
 *`http.request.body.bytes`*::
 +
 --
+Size in bytes of the request body.
+
 type: long
 
 example: 887
 
 format: bytes
-
-Size in bytes of the request body.
 
 --
 
 *`http.request.body.content`*::
 +
 --
+The full HTTP request body.
+
 type: keyword
 
 example: Hello world
-
-The full HTTP request body.
 
 --
 
 *`http.request.bytes`*::
 +
 --
+Total size in bytes of the request (body and headers).
+
 type: long
 
 example: 1437
 
 format: bytes
-
-Total size in bytes of the request (body and headers).
 
 --
 
 *`http.request.method`*::
 +
 --
+HTTP request method.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
 type: keyword
 
 example: get, post, put
-
-HTTP request method.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
 
 *`http.request.referrer`*::
 +
 --
+Referrer for this HTTP request.
+
 type: keyword
 
 example: https://blog.example.com/
-
-Referrer for this HTTP request.
 
 --
 
 *`http.response.body.bytes`*::
 +
 --
+Size in bytes of the response body.
+
 type: long
 
 example: 887
 
 format: bytes
 
-Size in bytes of the response body.
-
 --
 
 *`http.response.body.content`*::
 +
 --
+The full HTTP response body.
+
 type: keyword
 
 example: Hello world
-
-The full HTTP response body.
 
 --
 
 *`http.response.bytes`*::
 +
 --
+Total size in bytes of the response (body and headers).
+
 type: long
 
 example: 1437
 
 format: bytes
 
-Total size in bytes of the response (body and headers).
-
 --
 
 *`http.response.status_code`*::
 +
 --
+HTTP response status code.
+
 type: long
 
 example: 404
 
 format: string
 
-HTTP response status code.
-
 --
 
 *`http.version`*::
 +
 --
+HTTP version.
+
 type: keyword
 
 example: 1.1
 
-HTTP version.
-
 --
 
 [float]
-== log fields
+=== log
 
 Fields which are specific to log events.
 
@@ -4640,30 +4640,30 @@ Fields which are specific to log events.
 *`log.level`*::
 +
 --
+Original log level of the log event.
+Some examples are `warn`, `error`, `i`.
+
 type: keyword
 
 example: err
-
-Original log level of the log event.
-Some examples are `warn`, `error`, `i`.
 
 --
 
 *`log.original`*::
 +
 --
-type: keyword
-
-example: Sep 19 08:26:10 localhost My log
-
 This is the original log message and contains the full log message before splitting it up in multiple parts.
 In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
 This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
 
+type: keyword
+
+example: Sep 19 08:26:10 localhost My log
+
 --
 
 [float]
-== network fields
+=== network
 
 The network is defined as the communication path over which a host or network event happens.
 The network.* fields should be populated with details about the network activity associated with an event.
@@ -4672,48 +4672,44 @@ The network.* fields should be populated with details about the network activity
 *`network.application`*::
 +
 --
+A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
 type: keyword
 
 example: aim
-
-A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
 
 *`network.bytes`*::
 +
 --
+Total bytes transferred in both directions.
+If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
+
 type: long
 
 example: 368
 
 format: bytes
 
-Total bytes transferred in both directions.
-If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
-
 --
 
 *`network.community_id`*::
 +
 --
+A hash of source and destination IPs and ports, as well as the protocol used in a communication. This is a tool-agnostic standard to identify flows.
+Learn more at https://github.com/corelight/community-id-spec.
+
 type: keyword
 
 example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
-
-A hash of source and destination IPs and ports, as well as the protocol used in a communication. This is a tool-agnostic standard to identify flows.
-Learn more at https://github.com/corelight/community-id-spec.
 
 --
 
 *`network.direction`*::
 +
 --
-type: keyword
-
-example: inbound
-
 Direction of the network traffic.
 Recommended values are:
   * inbound
@@ -4725,91 +4721,95 @@ Recommended values are:
 When mapping events from a host-based monitoring context, populate this field from the host's point of view.
 When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
 
+type: keyword
+
+example: inbound
+
 --
 
 *`network.forwarded_ip`*::
 +
 --
+Host IP address when the source IP address is the proxy.
+
 type: ip
 
 example: 192.1.1.2
-
-Host IP address when the source IP address is the proxy.
 
 --
 
 *`network.iana_number`*::
 +
 --
+IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). Standardized list of protocols. This aligns well with NetFlow and sFlow related logs which use the IANA Protocol Number.
+
 type: keyword
 
 example: 6
-
-IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). Standardized list of protocols. This aligns well with NetFlow and sFlow related logs which use the IANA Protocol Number.
 
 --
 
 *`network.name`*::
 +
 --
+Name given by operators to sections of their network.
+
 type: keyword
 
 example: Guest Wifi
-
-Name given by operators to sections of their network.
 
 --
 
 *`network.packets`*::
 +
 --
+Total packets transferred in both directions.
+If `source.packets` and `destination.packets` are known, `network.packets` is their sum.
+
 type: long
 
 example: 24
-
-Total packets transferred in both directions.
-If `source.packets` and `destination.packets` are known, `network.packets` is their sum.
 
 --
 
 *`network.protocol`*::
 +
 --
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
 type: keyword
 
 example: http
-
-L7 Network protocol name. ex. http, lumberjack, transport protocol.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
 
 *`network.transport`*::
 +
 --
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
 type: keyword
 
 example: tcp
-
-Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
 
 --
 
 *`network.type`*::
 +
 --
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+
 type: keyword
 
 example: ipv4
 
-In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
-
 --
 
 [float]
-== observer fields
+=== observer
 
 An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics.
 This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
@@ -4818,227 +4818,227 @@ This could be a custom hardware appliance or a server that has been configured t
 *`observer.geo.city_name`*::
 +
 --
+City name.
+
 type: keyword
 
 example: Montreal
-
-City name.
 
 --
 
 *`observer.geo.continent_name`*::
 +
 --
+Name of the continent.
+
 type: keyword
 
 example: North America
-
-Name of the continent.
 
 --
 
 *`observer.geo.country_iso_code`*::
 +
 --
+Country ISO code.
+
 type: keyword
 
 example: CA
-
-Country ISO code.
 
 --
 
 *`observer.geo.country_name`*::
 +
 --
+Country name.
+
 type: keyword
 
 example: Canada
-
-Country name.
 
 --
 
 *`observer.geo.location`*::
 +
 --
+Longitude and latitude.
+
 type: geo_point
 
 example: { "lon": -73.614830, "lat": 45.505918 }
-
-Longitude and latitude.
 
 --
 
 *`observer.geo.name`*::
 +
 --
-type: keyword
-
-example: boston-dc
-
 User-defined description of a location, at the level of granularity they care about.
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
 
 --
 
 *`observer.geo.region_iso_code`*::
 +
 --
+Region ISO code.
+
 type: keyword
 
 example: CA-QC
-
-Region ISO code.
 
 --
 
 *`observer.geo.region_name`*::
 +
 --
+Region name.
+
 type: keyword
 
 example: Quebec
-
-Region name.
 
 --
 
 *`observer.hostname`*::
 +
 --
-type: keyword
-
 Hostname of the observer.
+
+type: keyword
 
 --
 
 *`observer.ip`*::
 +
 --
-type: ip
-
 IP address of the observer.
+
+type: ip
 
 --
 
 *`observer.mac`*::
 +
 --
-type: keyword
-
 MAC address of the observer
+
+type: keyword
 
 --
 
 *`observer.os.family`*::
 +
 --
+OS family (such as redhat, debian, freebsd, windows).
+
 type: keyword
 
 example: debian
-
-OS family (such as redhat, debian, freebsd, windows).
 
 --
 
 *`observer.os.full`*::
 +
 --
+Operating system name, including the version or code name.
+
 type: keyword
 
 example: Mac OS Mojave
-
-Operating system name, including the version or code name.
 
 --
 
 *`observer.os.kernel`*::
 +
 --
+Operating system kernel version as a raw string.
+
 type: keyword
 
 example: 4.4.0-112-generic
-
-Operating system kernel version as a raw string.
 
 --
 
 *`observer.os.name`*::
 +
 --
+Operating system name, without the version.
+
 type: keyword
 
 example: Mac OS X
-
-Operating system name, without the version.
 
 --
 
 *`observer.os.platform`*::
 +
 --
+Operating system platform (such centos, ubuntu, windows).
+
 type: keyword
 
 example: darwin
-
-Operating system platform (such centos, ubuntu, windows).
 
 --
 
 *`observer.os.version`*::
 +
 --
+Operating system version as a raw string.
+
 type: keyword
 
 example: 10.14.1
-
-Operating system version as a raw string.
 
 --
 
 *`observer.serial_number`*::
 +
 --
-type: keyword
-
 Observer serial number.
+
+type: keyword
 
 --
 
 *`observer.type`*::
 +
 --
+The type of the observer the data is coming from.
+There is no predefined list of observer types. Some examples are `forwarder`, `firewall`, `ids`, `ips`, `proxy`, `poller`, `sensor`, `APM server`.
+
 type: keyword
 
 example: firewall
-
-The type of the observer the data is coming from.
-There is no predefined list of observer types. Some examples are `forwarder`, `firewall`, `ids`, `ips`, `proxy`, `poller`, `sensor`, `APM server`.
 
 --
 
 *`observer.vendor`*::
 +
 --
-type: keyword
-
 observer vendor information.
+
+type: keyword
 
 --
 
 *`observer.version`*::
 +
 --
-type: keyword
-
 Observer version.
+
+type: keyword
 
 --
 
 [float]
-== organization fields
+=== organization
 
 The organization fields enrich data with information about the company or entity the data is associated with.
 These fields help you arrange or filter data stored in an index by one or multiple organizations.
@@ -5047,23 +5047,23 @@ These fields help you arrange or filter data stored in an index by one or multip
 *`organization.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the organization.
+
+type: keyword
 
 --
 
 *`organization.name`*::
 +
 --
-type: keyword
-
 Organization name.
+
+type: keyword
 
 --
 
 [float]
-== os fields
+=== os
 
 The OS fields contain information about the operating system.
 
@@ -5071,71 +5071,71 @@ The OS fields contain information about the operating system.
 *`os.family`*::
 +
 --
+OS family (such as redhat, debian, freebsd, windows).
+
 type: keyword
 
 example: debian
-
-OS family (such as redhat, debian, freebsd, windows).
 
 --
 
 *`os.full`*::
 +
 --
+Operating system name, including the version or code name.
+
 type: keyword
 
 example: Mac OS Mojave
-
-Operating system name, including the version or code name.
 
 --
 
 *`os.kernel`*::
 +
 --
+Operating system kernel version as a raw string.
+
 type: keyword
 
 example: 4.4.0-112-generic
-
-Operating system kernel version as a raw string.
 
 --
 
 *`os.name`*::
 +
 --
+Operating system name, without the version.
+
 type: keyword
 
 example: Mac OS X
-
-Operating system name, without the version.
 
 --
 
 *`os.platform`*::
 +
 --
+Operating system platform (such centos, ubuntu, windows).
+
 type: keyword
 
 example: darwin
-
-Operating system platform (such centos, ubuntu, windows).
 
 --
 
 *`os.version`*::
 +
 --
+Operating system version as a raw string.
+
 type: keyword
 
 example: 10.14.1
 
-Operating system version as a raw string.
-
 --
 
 [float]
-== process fields
+=== process
 
 These fields contain information about a process.
 These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
@@ -5144,111 +5144,111 @@ These fields can help you correlate metrics information with a process id/name f
 *`process.args`*::
 +
 --
+Array of process arguments.
+May be filtered to protect sensitive information.
+
 type: keyword
 
 example: ['ssh', '-l', 'user', '10.0.0.16']
-
-Array of process arguments.
-May be filtered to protect sensitive information.
 
 --
 
 *`process.executable`*::
 +
 --
+Absolute path to the process executable.
+
 type: keyword
 
 example: /usr/bin/ssh
-
-Absolute path to the process executable.
 
 --
 
 *`process.name`*::
 +
 --
+Process name.
+Sometimes called program name or similar.
+
 type: keyword
 
 example: ssh
-
-Process name.
-Sometimes called program name or similar.
 
 --
 
 *`process.pid`*::
 +
 --
+Process id.
+
 type: long
 
 example: 4242
 
 format: string
-
-Process id.
 
 --
 
 *`process.ppid`*::
 +
 --
+Parent process' pid.
+
 type: long
 
 example: 4241
 
 format: string
 
-Parent process' pid.
-
 --
 
 *`process.start`*::
 +
 --
+The time the process started.
+
 type: date
 
 example: 2016-05-23T08:05:34.853Z
-
-The time the process started.
 
 --
 
 *`process.thread.id`*::
 +
 --
+Thread ID.
+
 type: long
 
 example: 4242
 
 format: string
 
-Thread ID.
-
 --
 
 *`process.title`*::
 +
 --
-type: keyword
-
 Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
+
+type: keyword
 
 --
 
 *`process.working_directory`*::
 +
 --
+The working directory of the process.
+
 type: keyword
 
 example: /home/alice
 
-The working directory of the process.
-
 --
 
 [float]
-== related fields
+=== related
 
 This field set is meant to facilitate pivoting around a piece of data.
 Some pieces of information can be seen in many places in an ECS event. To facilitate searching for them, store an array of all seen values to their corresponding field in `related.`.
@@ -5258,14 +5258,14 @@ A concrete example is IP addresses, which can be under host, observer, source, d
 *`related.ip`*::
 +
 --
-type: ip
-
 All of the IPs seen on your event.
+
+type: ip
 
 --
 
 [float]
-== server fields
+=== server
 
 A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records.
 For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
@@ -5275,236 +5275,236 @@ Client / server representations can add semantic context to an exchange, which i
 *`server.address`*::
 +
 --
-type: keyword
-
 Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
 
 --
 
 *`server.bytes`*::
 +
 --
+Bytes sent from the server to the client.
+
 type: long
 
 example: 184
 
 format: bytes
 
-Bytes sent from the server to the client.
-
 --
 
 *`server.domain`*::
 +
 --
-type: keyword
-
 Server domain.
+
+type: keyword
 
 --
 
 *`server.geo.city_name`*::
 +
 --
+City name.
+
 type: keyword
 
 example: Montreal
-
-City name.
 
 --
 
 *`server.geo.continent_name`*::
 +
 --
+Name of the continent.
+
 type: keyword
 
 example: North America
-
-Name of the continent.
 
 --
 
 *`server.geo.country_iso_code`*::
 +
 --
+Country ISO code.
+
 type: keyword
 
 example: CA
-
-Country ISO code.
 
 --
 
 *`server.geo.country_name`*::
 +
 --
+Country name.
+
 type: keyword
 
 example: Canada
-
-Country name.
 
 --
 
 *`server.geo.location`*::
 +
 --
+Longitude and latitude.
+
 type: geo_point
 
 example: { "lon": -73.614830, "lat": 45.505918 }
-
-Longitude and latitude.
 
 --
 
 *`server.geo.name`*::
 +
 --
-type: keyword
-
-example: boston-dc
-
 User-defined description of a location, at the level of granularity they care about.
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
 
 --
 
 *`server.geo.region_iso_code`*::
 +
 --
+Region ISO code.
+
 type: keyword
 
 example: CA-QC
-
-Region ISO code.
 
 --
 
 *`server.geo.region_name`*::
 +
 --
+Region name.
+
 type: keyword
 
 example: Quebec
-
-Region name.
 
 --
 
 *`server.ip`*::
 +
 --
-type: ip
-
 IP address of the server.
 Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
 
 --
 
 *`server.mac`*::
 +
 --
-type: keyword
-
 MAC address of the server.
+
+type: keyword
 
 --
 
 *`server.packets`*::
 +
 --
+Packets sent from the server to the client.
+
 type: long
 
 example: 12
-
-Packets sent from the server to the client.
 
 --
 
 *`server.port`*::
 +
 --
+Port of the server.
+
 type: long
 
 format: string
-
-Port of the server.
 
 --
 
 *`server.user.email`*::
 +
 --
-type: keyword
-
 User email address.
+
+type: keyword
 
 --
 
 *`server.user.full_name`*::
 +
 --
+User's full name, if available.
+
 type: keyword
 
 example: Albert Einstein
-
-User's full name, if available.
 
 --
 
 *`server.user.group.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the group on the system/platform.
+
+type: keyword
 
 --
 
 *`server.user.group.name`*::
 +
 --
-type: keyword
-
 Name of the group.
+
+type: keyword
 
 --
 
 *`server.user.hash`*::
 +
 --
-type: keyword
-
 Unique user hash to correlate information for a user in anonymized form.
 Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
 
 --
 
 *`server.user.id`*::
 +
 --
-type: keyword
-
 One or multiple unique identifiers of the user.
+
+type: keyword
 
 --
 
 *`server.user.name`*::
 +
 --
+Short name or login of the user.
+
 type: keyword
 
 example: albert
 
-Short name or login of the user.
-
 --
 
 [float]
-== service fields
+=== service
 
 The service fields describe the service for or from which the data was collected.
 These fields help you find and correlate logs for a specific service and version.
@@ -5513,78 +5513,78 @@ These fields help you find and correlate logs for a specific service and version
 *`service.ephemeral_id`*::
 +
 --
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
 type: keyword
 
 example: 8a4f500f
-
-Ephemeral identifier of this service (if one exists).
-This id normally changes across restarts, but `service.id` does not.
 
 --
 
 *`service.id`*::
 +
 --
-type: keyword
-
-example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
-
 Unique identifier of the running service.
 This id should uniquely identify this service. This makes it possible to correlate logs and metrics for one specific service.
 Example: If you are experiencing issues with one redis instance, you can filter on that id to see metrics and logs for that single instance.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
 
 --
 
 *`service.name`*::
 +
 --
-type: keyword
-
-example: elasticsearch-metrics
-
 Name of the service data is collected from.
 The name of the service is normally user given. This allows if two instances of the same service are running on the same machine they can be differentiated by the `service.name`.
 Also it allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
 In the case of Elasticsearch the service.name could contain the cluster name. For Beats the service.name is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
 
 --
 
 *`service.state`*::
 +
 --
-type: keyword
-
 Current state of the service.
+
+type: keyword
 
 --
 
 *`service.type`*::
 +
 --
-type: keyword
-
-example: elasticsearch
-
 The type of the service data is collected from.
 The type can be used to group and correlate logs and metrics from one service type.
 Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
 
 --
 
 *`service.version`*::
 +
 --
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
 type: keyword
 
 example: 3.2.4
 
-Version of the service the data was collected from.
-This allows to look at a data set only for a specific version of a service.
-
 --
 
 [float]
-== source fields
+=== source
 
 Source fields describe details about the source of a packet/event.
 Source fields are usually populated in conjunction with destination fields.
@@ -5593,236 +5593,236 @@ Source fields are usually populated in conjunction with destination fields.
 *`source.address`*::
 +
 --
-type: keyword
-
 Some event source addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
 Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+type: keyword
 
 --
 
 *`source.bytes`*::
 +
 --
+Bytes sent from the source to the destination.
+
 type: long
 
 example: 184
 
 format: bytes
 
-Bytes sent from the source to the destination.
-
 --
 
 *`source.domain`*::
 +
 --
-type: keyword
-
 Source domain.
+
+type: keyword
 
 --
 
 *`source.geo.city_name`*::
 +
 --
+City name.
+
 type: keyword
 
 example: Montreal
-
-City name.
 
 --
 
 *`source.geo.continent_name`*::
 +
 --
+Name of the continent.
+
 type: keyword
 
 example: North America
-
-Name of the continent.
 
 --
 
 *`source.geo.country_iso_code`*::
 +
 --
+Country ISO code.
+
 type: keyword
 
 example: CA
-
-Country ISO code.
 
 --
 
 *`source.geo.country_name`*::
 +
 --
+Country name.
+
 type: keyword
 
 example: Canada
-
-Country name.
 
 --
 
 *`source.geo.location`*::
 +
 --
+Longitude and latitude.
+
 type: geo_point
 
 example: { "lon": -73.614830, "lat": 45.505918 }
-
-Longitude and latitude.
 
 --
 
 *`source.geo.name`*::
 +
 --
-type: keyword
-
-example: boston-dc
-
 User-defined description of a location, at the level of granularity they care about.
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
 
 --
 
 *`source.geo.region_iso_code`*::
 +
 --
+Region ISO code.
+
 type: keyword
 
 example: CA-QC
-
-Region ISO code.
 
 --
 
 *`source.geo.region_name`*::
 +
 --
+Region name.
+
 type: keyword
 
 example: Quebec
-
-Region name.
 
 --
 
 *`source.ip`*::
 +
 --
-type: ip
-
 IP address of the source.
 Can be one or multiple IPv4 or IPv6 addresses.
+
+type: ip
 
 --
 
 *`source.mac`*::
 +
 --
-type: keyword
-
 MAC address of the source.
+
+type: keyword
 
 --
 
 *`source.packets`*::
 +
 --
+Packets sent from the source to the destination.
+
 type: long
 
 example: 12
-
-Packets sent from the source to the destination.
 
 --
 
 *`source.port`*::
 +
 --
+Port of the source.
+
 type: long
 
 format: string
-
-Port of the source.
 
 --
 
 *`source.user.email`*::
 +
 --
-type: keyword
-
 User email address.
+
+type: keyword
 
 --
 
 *`source.user.full_name`*::
 +
 --
+User's full name, if available.
+
 type: keyword
 
 example: Albert Einstein
-
-User's full name, if available.
 
 --
 
 *`source.user.group.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the group on the system/platform.
+
+type: keyword
 
 --
 
 *`source.user.group.name`*::
 +
 --
-type: keyword
-
 Name of the group.
+
+type: keyword
 
 --
 
 *`source.user.hash`*::
 +
 --
-type: keyword
-
 Unique user hash to correlate information for a user in anonymized form.
 Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
 
 --
 
 *`source.user.id`*::
 +
 --
-type: keyword
-
 One or multiple unique identifiers of the user.
+
+type: keyword
 
 --
 
 *`source.user.name`*::
 +
 --
+Short name or login of the user.
+
 type: keyword
 
 example: albert
 
-Short name or login of the user.
-
 --
 
 [float]
-== url fields
+=== url
 
 URL fields provide support for complete or partial URLs, and supports the breaking down into scheme, domain, path, and so on.
 
@@ -5830,113 +5830,113 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 *`url.domain`*::
 +
 --
+Domain of the url, such as "www.elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+
 type: keyword
 
 example: www.elastic.co
-
-Domain of the url, such as "www.elastic.co".
-In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
 
 --
 
 *`url.fragment`*::
 +
 --
-type: keyword
-
 Portion of the url after the `#`, such as "top".
 The `#` is not part of the fragment.
+
+type: keyword
 
 --
 
 *`url.full`*::
 +
 --
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
 type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
-
-If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
 --
 
 *`url.original`*::
 +
 --
-type: keyword
-
-example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
-
 Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
+
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
 --
 
 *`url.password`*::
 +
 --
-type: keyword
-
 Password of the request.
+
+type: keyword
 
 --
 
 *`url.path`*::
 +
 --
-type: keyword
-
 Path of the request, such as "/search".
+
+type: keyword
 
 --
 
 *`url.port`*::
 +
 --
+Port of the request, such as 443.
+
 type: long
 
 example: 443
 
 format: string
 
-Port of the request, such as 443.
-
 --
 
 *`url.query`*::
 +
 --
-type: keyword
-
 The query field describes the query string of the request, such as "q=elasticsearch".
 The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+type: keyword
 
 --
 
 *`url.scheme`*::
 +
 --
+Scheme of the request, such as "https".
+Note: The `:` is not part of the scheme.
+
 type: keyword
 
 example: https
-
-Scheme of the request, such as "https".
-Note: The `:` is not part of the scheme.
 
 --
 
 *`url.username`*::
 +
 --
-type: keyword
-
 Username of the request.
+
+type: keyword
 
 --
 
 [float]
-== user fields
+=== user
 
 The user fields describe information about the user that is relevant to the event.
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
@@ -5945,73 +5945,73 @@ Fields can have one entry or multiple entries. If a user has more than one id, p
 *`user.email`*::
 +
 --
-type: keyword
-
 User email address.
+
+type: keyword
 
 --
 
 *`user.full_name`*::
 +
 --
+User's full name, if available.
+
 type: keyword
 
 example: Albert Einstein
-
-User's full name, if available.
 
 --
 
 *`user.group.id`*::
 +
 --
-type: keyword
-
 Unique identifier for the group on the system/platform.
+
+type: keyword
 
 --
 
 *`user.group.name`*::
 +
 --
-type: keyword
-
 Name of the group.
+
+type: keyword
 
 --
 
 *`user.hash`*::
 +
 --
-type: keyword
-
 Unique user hash to correlate information for a user in anonymized form.
 Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
 
 --
 
 *`user.id`*::
 +
 --
-type: keyword
-
 One or multiple unique identifiers of the user.
+
+type: keyword
 
 --
 
 *`user.name`*::
 +
 --
+Short name or login of the user.
+
 type: keyword
 
 example: albert
 
-Short name or login of the user.
-
 --
 
 [float]
-== user_agent fields
+=== user_agent
 
 The user_agent fields normally come from a browser request.
 They often show up in web service logs coming from the parsed user agent string.
@@ -6020,110 +6020,110 @@ They often show up in web service logs coming from the parsed user agent string.
 *`user_agent.device.name`*::
 +
 --
+Name of the device.
+
 type: keyword
 
 example: iPhone
-
-Name of the device.
 
 --
 
 *`user_agent.name`*::
 +
 --
+Name of the user agent.
+
 type: keyword
 
 example: Safari
-
-Name of the user agent.
 
 --
 
 *`user_agent.original`*::
 +
 --
+Unparsed version of the user_agent.
+
 type: keyword
 
 example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
-
-Unparsed version of the user_agent.
 
 --
 
 *`user_agent.os.family`*::
 +
 --
+OS family (such as redhat, debian, freebsd, windows).
+
 type: keyword
 
 example: debian
-
-OS family (such as redhat, debian, freebsd, windows).
 
 --
 
 *`user_agent.os.full`*::
 +
 --
+Operating system name, including the version or code name.
+
 type: keyword
 
 example: Mac OS Mojave
-
-Operating system name, including the version or code name.
 
 --
 
 *`user_agent.os.kernel`*::
 +
 --
+Operating system kernel version as a raw string.
+
 type: keyword
 
 example: 4.4.0-112-generic
-
-Operating system kernel version as a raw string.
 
 --
 
 *`user_agent.os.name`*::
 +
 --
+Operating system name, without the version.
+
 type: keyword
 
 example: Mac OS X
-
-Operating system name, without the version.
 
 --
 
 *`user_agent.os.platform`*::
 +
 --
+Operating system platform (such centos, ubuntu, windows).
+
 type: keyword
 
 example: darwin
-
-Operating system platform (such centos, ubuntu, windows).
 
 --
 
 *`user_agent.os.version`*::
 +
 --
+Operating system version as a raw string.
+
 type: keyword
 
 example: 10.14.1
-
-Operating system version as a raw string.
 
 --
 
 *`user_agent.version`*::
 +
 --
+Version of the user agent.
+
 type: keyword
 
 example: 12.0
-
-Version of the user agent.
 
 --
 
@@ -6134,7 +6134,7 @@ These are the fields generated by the file_integrity module.
 
 
 [float]
-== hash fields
+=== hash
 
 Hashes of the file. The keys are algorithm names and the values are the hex encoded digest values.
 
@@ -6143,144 +6143,144 @@ Hashes of the file. The keys are algorithm names and the values are the hex enco
 *`hash.blake2b_256`*::
 +
 --
-type: keyword
-
 BLAKE2b-256 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.blake2b_384`*::
 +
 --
-type: keyword
-
 BLAKE2b-384 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.blake2b_512`*::
 +
 --
-type: keyword
-
 BLAKE2b-512 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.md5`*::
 +
 --
-type: keyword
-
 MD5 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha1`*::
 +
 --
-type: keyword
-
 SHA1 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha224`*::
 +
 --
-type: keyword
-
 SHA224 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha256`*::
 +
 --
-type: keyword
-
 SHA256 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha384`*::
 +
 --
-type: keyword
-
 SHA384 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha3_224`*::
 +
 --
-type: keyword
-
 SHA3_224 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha3_256`*::
 +
 --
-type: keyword
-
 SHA3_256 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha3_384`*::
 +
 --
-type: keyword
-
 SHA3_384 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha3_512`*::
 +
 --
-type: keyword
-
 SHA3_512 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha512`*::
 +
 --
-type: keyword
-
 SHA512 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha512_224`*::
 +
 --
-type: keyword
-
 SHA512/224 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.sha512_256`*::
 +
 --
-type: keyword
-
 SHA512/256 hash of the file.
+
+type: keyword
 
 --
 
 *`hash.xxh64`*::
 +
 --
-type: keyword
-
 XX64 hash of the file.
+
+type: keyword
 
 --
 
@@ -6295,34 +6295,34 @@ Info collected for the host machine.
 *`host.containerized`*::
 +
 --
-type: boolean
-
 If the host is a container.
 
+
+type: boolean
 
 --
 
 *`host.os.build`*::
 +
 --
+OS build information.
+
+
 type: keyword
 
 example: 18D109
-
-OS build information.
-
 
 --
 
 *`host.os.codename`*::
 +
 --
+OS codename, if any.
+
+
 type: keyword
 
 example: stretch
-
-OS codename, if any.
-
 
 --
 
@@ -6336,70 +6336,70 @@ Metadata from Jolokia Discovery added by the jolokia provider.
 *`jolokia.agent.version`*::
 +
 --
-type: keyword
-
 Version number of jolokia agent.
 
+
+type: keyword
 
 --
 
 *`jolokia.agent.id`*::
 +
 --
-type: keyword
-
 Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
 
+
+type: keyword
 
 --
 
 *`jolokia.server.product`*::
 +
 --
-type: keyword
-
 The container product if detected.
 
+
+type: keyword
 
 --
 
 *`jolokia.server.version`*::
 +
 --
-type: keyword
-
 The container's version (if detected).
 
+
+type: keyword
 
 --
 
 *`jolokia.server.vendor`*::
 +
 --
-type: keyword
-
 The vendor of the container the agent is running in.
 
+
+type: keyword
 
 --
 
 *`jolokia.url`*::
 +
 --
-type: keyword
-
 The URL how this agent can be contacted.
 
+
+type: keyword
 
 --
 
 *`jolokia.secured`*::
 +
 --
-type: boolean
-
 Whether the agent was configured for authentication or not.
 
+
+type: boolean
 
 --
 
@@ -6414,110 +6414,110 @@ Kubernetes metadata added by the kubernetes processor
 *`kubernetes.pod.name`*::
 +
 --
-type: keyword
-
 Kubernetes pod name
 
+
+type: keyword
 
 --
 
 *`kubernetes.pod.uid`*::
 +
 --
-type: keyword
-
 Kubernetes Pod UID
 
+
+type: keyword
 
 --
 
 *`kubernetes.namespace`*::
 +
 --
-type: keyword
-
 Kubernetes namespace
 
+
+type: keyword
 
 --
 
 *`kubernetes.node.name`*::
 +
 --
-type: keyword
-
 Kubernetes node name
 
+
+type: keyword
 
 --
 
 *`kubernetes.labels`*::
 +
 --
-type: object
-
 Kubernetes labels map
 
+
+type: object
 
 --
 
 *`kubernetes.annotations`*::
 +
 --
-type: object
-
 Kubernetes annotations map
 
+
+type: object
 
 --
 
 *`kubernetes.replicaset.name`*::
 +
 --
-type: keyword
-
 Kubernetes replicaset name
 
+
+type: keyword
 
 --
 
 *`kubernetes.deployment.name`*::
 +
 --
-type: keyword
-
 Kubernetes deployment name
 
+
+type: keyword
 
 --
 
 *`kubernetes.statefulset.name`*::
 +
 --
-type: keyword
-
 Kubernetes statefulset name
 
+
+type: keyword
 
 --
 
 *`kubernetes.container.name`*::
 +
 --
-type: keyword
-
 Kubernetes container name
 
+
+type: keyword
 
 --
 
 *`kubernetes.container.image`*::
 +
 --
-type: keyword
-
 Kubernetes container image
 
+
+type: keyword
 
 --
 
@@ -6549,10 +6549,10 @@ These are the fields generated by the system module.
 *`event.origin`*::
 +
 --
-type: keyword
-
 Origin of the event. This can be a file path (e.g. `/var/log/log.1`), or the name of the system component that supplied the data (e.g. `netlink`).
 
+
+type: keyword
 
 --
 
@@ -6560,20 +6560,20 @@ Origin of the event. This can be a file path (e.g. `/var/log/log.1`), or the nam
 *`user.entity_id`*::
 +
 --
-type: keyword
-
 ID uniquely identifying the user on a host. It is computed as a SHA-256 hash of the host ID, user ID, and user name.
 
+
+type: keyword
 
 --
 
 *`user.terminal`*::
 +
 --
-type: keyword
-
 Terminal of the user.
 
+
+type: keyword
 
 --
 
@@ -6581,15 +6581,15 @@ Terminal of the user.
 *`process.entity_id`*::
 +
 --
-type: keyword
-
 ID uniquely identifying the process. It is computed as a SHA-256 hash of the host ID, PID, and process start time.
 
+
+type: keyword
 
 --
 
 [float]
-== hash fields
+=== hash
 
 Hashes of the executable. The keys are algorithm names and the values are the hex encoded digest values.
 
@@ -6598,144 +6598,144 @@ Hashes of the executable. The keys are algorithm names and the values are the he
 *`process.hash.blake2b_256`*::
 +
 --
-type: keyword
-
 BLAKE2b-256 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.blake2b_384`*::
 +
 --
-type: keyword
-
 BLAKE2b-384 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.blake2b_512`*::
 +
 --
-type: keyword
-
 BLAKE2b-512 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.md5`*::
 +
 --
-type: keyword
-
 MD5 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha1`*::
 +
 --
-type: keyword
-
 SHA1 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha224`*::
 +
 --
-type: keyword
-
 SHA224 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha256`*::
 +
 --
-type: keyword
-
 SHA256 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha384`*::
 +
 --
-type: keyword
-
 SHA384 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha3_224`*::
 +
 --
-type: keyword
-
 SHA3_224 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha3_256`*::
 +
 --
-type: keyword
-
 SHA3_256 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha3_384`*::
 +
 --
-type: keyword
-
 SHA3_384 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha3_512`*::
 +
 --
-type: keyword
-
 SHA3_512 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha512`*::
 +
 --
-type: keyword
-
 SHA512 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha512_224`*::
 +
 --
-type: keyword
-
 SHA512/224 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.sha512_256`*::
 +
 --
-type: keyword
-
 SHA512/256 hash of the executable.
+
+type: keyword
 
 --
 
 *`process.hash.xxh64`*::
 +
 --
-type: keyword
-
 XX64 hash of the executable.
+
+type: keyword
 
 --
 
@@ -6743,21 +6743,21 @@ XX64 hash of the executable.
 *`socket.entity_id`*::
 +
 --
-type: keyword
-
 ID uniquely identifying the socket. It is computed as a SHA-256 hash of the host ID, socket inode, local IP, local port, remote IP, and remote port.
 
+
+type: keyword
 
 --
 
 [float]
-== system.audit fields
+=== system.audit
 
 
 
 
 [float]
-== host fields
+=== host
 
 `host` contains general host information.
 
@@ -6766,107 +6766,107 @@ ID uniquely identifying the socket. It is computed as a SHA-256 hash of the host
 *`system.audit.host.uptime`*::
 +
 --
+Uptime in nanoseconds.
+
+
 type: long
 
 format: duration
-
-Uptime in nanoseconds.
-
 
 --
 
 *`system.audit.host.boottime`*::
 +
 --
-type: date
-
 Boot time.
 
+
+type: date
 
 --
 
 *`system.audit.host.containerized`*::
 +
 --
-type: boolean
-
 Set if host is a container.
 
+
+type: boolean
 
 --
 
 *`system.audit.host.timezone.name`*::
 +
 --
-type: keyword
-
 Name of the timezone of the host, e.g. BST.
 
+
+type: keyword
 
 --
 
 *`system.audit.host.timezone.offset.sec`*::
 +
 --
-type: long
-
 Timezone offset in seconds.
 
+
+type: long
 
 --
 
 *`system.audit.host.hostname`*::
 +
 --
-type: keyword
-
 Hostname.
 
+
+type: keyword
 
 --
 
 *`system.audit.host.id`*::
 +
 --
-type: keyword
-
 Host ID.
 
+
+type: keyword
 
 --
 
 *`system.audit.host.architecture`*::
 +
 --
-type: keyword
-
 Host architecture (e.g. x86_64).
 
+
+type: keyword
 
 --
 
 *`system.audit.host.mac`*::
 +
 --
-type: keyword
-
 MAC addresses.
 
+
+type: keyword
 
 --
 
 *`system.audit.host.ip`*::
 +
 --
-type: ip
-
 IP addresses.
 
+
+type: ip
 
 --
 
 [float]
-== os fields
+=== os
 
 `os` contains information about the operating system.
 
@@ -6875,65 +6875,65 @@ IP addresses.
 *`system.audit.host.os.codename`*::
 +
 --
-type: keyword
-
 OS codename, if any (e.g. stretch).
 
+
+type: keyword
 
 --
 
 *`system.audit.host.os.platform`*::
 +
 --
-type: keyword
-
 OS platform (e.g. centos, ubuntu, windows).
 
+
+type: keyword
 
 --
 
 *`system.audit.host.os.name`*::
 +
 --
-type: keyword
-
 OS name (e.g. Mac OS X).
 
+
+type: keyword
 
 --
 
 *`system.audit.host.os.family`*::
 +
 --
-type: keyword
-
 OS family (e.g. redhat, debian, freebsd, windows).
 
+
+type: keyword
 
 --
 
 *`system.audit.host.os.version`*::
 +
 --
-type: keyword
-
 OS version.
 
+
+type: keyword
 
 --
 
 *`system.audit.host.os.kernel`*::
 +
 --
-type: keyword
-
 The operating system's kernel version.
 
+
+type: keyword
 
 --
 
 [float]
-== package fields
+=== package
 
 `package` contains information about an installed or removed package.
 
@@ -6942,81 +6942,81 @@ The operating system's kernel version.
 *`system.audit.package.entity_id`*::
 +
 --
-type: keyword
-
 ID uniquely identifying the package. It is computed as a SHA-256 hash of the
   host ID, package name, and package version.
 
+
+type: keyword
 
 --
 
 *`system.audit.package.name`*::
 +
 --
-type: keyword
-
 Package name.
 
+
+type: keyword
 
 --
 
 *`system.audit.package.version`*::
 +
 --
-type: keyword
-
 Package version.
 
+
+type: keyword
 
 --
 
 *`system.audit.package.release`*::
 +
 --
-type: keyword
-
 Package release.
 
+
+type: keyword
 
 --
 
 *`system.audit.package.arch`*::
 +
 --
-type: keyword
-
 Package architecture.
 
+
+type: keyword
 
 --
 
 *`system.audit.package.license`*::
 +
 --
-type: keyword
-
 Package license.
 
+
+type: keyword
 
 --
 
 *`system.audit.package.installtime`*::
 +
 --
-type: date
-
 Package install time.
 
+
+type: date
 
 --
 
 *`system.audit.package.size`*::
 +
 --
-type: long
-
 Package size.
 
+
+type: long
 
 --
 
@@ -7031,15 +7031,15 @@ Package summary.
 *`system.audit.package.url`*::
 +
 --
-type: keyword
-
 Package URL.
 
+
+type: keyword
 
 --
 
 [float]
-== user fields
+=== user
 
 `user` contains information about the users on a system.
 
@@ -7048,75 +7048,75 @@ Package URL.
 *`system.audit.user.name`*::
 +
 --
-type: keyword
-
 User name.
 
+
+type: keyword
 
 --
 
 *`system.audit.user.uid`*::
 +
 --
-type: keyword
-
 User ID.
 
+
+type: keyword
 
 --
 
 *`system.audit.user.gid`*::
 +
 --
-type: keyword
-
 Group ID.
 
+
+type: keyword
 
 --
 
 *`system.audit.user.dir`*::
 +
 --
-type: keyword
-
 User's home directory.
 
+
+type: keyword
 
 --
 
 *`system.audit.user.shell`*::
 +
 --
-type: keyword
-
 Program to run at login.
 
+
+type: keyword
 
 --
 
 *`system.audit.user.user_information`*::
 +
 --
-type: keyword
-
 General user information. On Linux, this is the gecos field.
 
+
+type: keyword
 
 --
 
 *`system.audit.user.group`*::
 +
 --
-type: object
-
 `group` contains information about any groups the user is part of (beyond the user's primary group).
 
+
+type: object
 
 --
 
 [float]
-== password fields
+=== password
 
 `password` contains information about a user's password (not the password itself).
 
@@ -7125,20 +7125,20 @@ type: object
 *`system.audit.user.password.type`*::
 +
 --
-type: keyword
-
 A user's password type. Possible values are `shadow_password` (the password hash is in the shadow file), `password_disabled`, `no_password` (this is dangerous as anyone can log in), and `crypt_password` (when the password field in /etc/passwd seems to contain an encrypted password).
 
+
+type: keyword
 
 --
 
 *`system.audit.user.password.last_changed`*::
 +
 --
-type: date
-
 The day the user's password was last changed.
 
+
+type: date
 
 --
 

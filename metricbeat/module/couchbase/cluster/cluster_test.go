@@ -17,32 +17,16 @@
 
 // +build !integration
 
-package state_container
+package cluster
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
-
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
+
+	_ "github.com/elastic/beats/metricbeat/module/couchbase"
 )
 
-func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "state_container",
-		ptest.TestCases{
-			{
-				MetricsFile:  "../_meta/test/kube-state-metrics",
-				ExpectedFile: "./_meta/test/kube-state-metrics.expected",
-			},
-			{
-				MetricsFile:  "../_meta/test/kube-state-metrics.v1.3.0",
-				ExpectedFile: "./_meta/test/kube-state-metrics.v1.3.0.expected",
-			},
-		},
-	)
-}
-
 func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "kubernetes", "state_container")
+	mbtest.TestDataFiles(t, "couchbase", "cluster")
 }

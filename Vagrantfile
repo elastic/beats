@@ -223,6 +223,17 @@ Vagrant.configure(2) do |config|
     end
   end
 
+  config.vm.define "centos7", primary: true do |c|
+    c.vm.box = "bento/centos-7"
+    c.vm.network :forwarded_port, guest: 22, host: 2231,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
 end
 
 # -*- mode: ruby -*-

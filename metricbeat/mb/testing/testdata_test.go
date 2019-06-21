@@ -15,34 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-
-package state_container
+package testing
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
-
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "state_container",
-		ptest.TestCases{
-			{
-				MetricsFile:  "../_meta/test/kube-state-metrics",
-				ExpectedFile: "./_meta/test/kube-state-metrics.expected",
-			},
-			{
-				MetricsFile:  "../_meta/test/kube-state-metrics.v1.3.0",
-				ExpectedFile: "./_meta/test/kube-state-metrics.v1.3.0.expected",
-			},
-		},
-	)
-}
+func TestOmitDocumentedField(t *testing.T) {
+	tts := []struct {
+		a, b   string
+		result bool
+	}{
+		{a: "hello", b: "world", result: false},
+		{a: "hello", b: "hello", result: true},
+		{a: "elasticsearch.stats", b: "elasticsearch.stats", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "elasticsearch.*", result: true},
+		{a: "elasticsearch.stats.hello.world", b: "*", result: true},
+	}
 
-func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "kubernetes", "state_container")
+	for _, tt := range tts {
+		result := omitDocumentedField(tt.a, tt.b)
+		assert.Equal(t, tt.result, result)
+	}
 }
