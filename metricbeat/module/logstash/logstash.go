@@ -38,14 +38,19 @@ type MetricSet struct {
 
 // PipelineState represents the state (shape) of a Logstash pipeline
 type PipelineState struct {
-	ID             string                 `json:"id"`
-	Hash           string                 `json:"hash"`
-	EphemeralID    string                 `json:"ephemeral_id"`
-	Graph          map[string]interface{} `json:"graph,omitempty"`
-	Representation map[string]interface{} `json:"representation"`
-	BatchSize      int                    `json:"batch_size"`
-	Workers        int                    `json:"workers"`
-	ClusterIDs     []string               `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
+	ID             string          `json:"id"`
+	Hash           string          `json:"hash"`
+	EphemeralID    string          `json:"ephemeral_id"`
+	Graph          *graphContainer `json:"graph,omitempty"`
+	Representation *graphContainer `json:"representation"`
+	BatchSize      int             `json:"batch_size"`
+	Workers        int             `json:"workers"`
+}
+
+type graphContainer struct {
+	Graph struct {
+		Vertices []map[string]interface{} `json:"vertices"`
+	} `json:"graph"`
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
