@@ -1,4 +1,4 @@
-ifdef::requires-sudo[]
+ifndef::requires-sudo[]
 TIP: To test your configuration file, change to the directory where the
 {beatname_uc} binary is installed, and run {beatname_uc} in the foreground with
 the following options specified: +./{beatname_lc} test config -e+. Make sure your
@@ -6,7 +6,7 @@ config files are in the path expected by {beatname_uc} (see <<directory-layout>>
 or use the `-c` flag to specify the path to the config file.
 endif::[]
 
-ifndef::requires-sudo[]
+ifdef::requires-sudo[]
 TIP: To test your configuration file, change to the directory where the
 {beatname_uc} binary is installed, and run {beatname_uc} in the foreground with
 the following options specified: +sudo ./{beatname_lc} test config -e+. Make sure
