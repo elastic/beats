@@ -9,7 +9,7 @@
       description: >
         Is central management enabled?
     - name: module.count
-      type: int
+      type: integer
       description: >
         Number of modules enabled
     - name: output.name
