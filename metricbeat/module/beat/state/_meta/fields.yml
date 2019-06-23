@@ -5,7 +5,7 @@
   release: ga
   fields:
     - name: management.enabled
-      type: bool
+      type: boolean
       description: >
         Is central management enabled?
     - name: module.count
