@@ -3,45 +3,47 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "DBClusterIdentifier": "test1-cluster",
-                "Role": "WRITER"
+                "DBInstanceIdentifier": "test1"
             },
             "metrics": {
                 "ActiveTransactions": 0,
                 "AuroraBinlogReplicaLag": 0,
-                "AuroraReplicaLagMaximum": 19.964599990844725,
-                "AuroraReplicaLagMinimum": 19.964599990844725,
+                "AuroraReplicaLagMaximum": 18.62599983215332,
+                "AuroraReplicaLagMinimum": 18.62599983215332,
                 "BinLogDiskUsage": 0,
                 "BlockedTransactions": 0,
                 "BufferCacheHitRatio": 100,
-                "CPUUtilization": 3,
-                "CommitLatency": 7.4758933333333335,
-                "CommitThroughput": 0.4999718865659406,
+                "CPUUtilization": 3.2,
+                "CommitLatency": 7.324593333333333,
+                "CommitThroughput": 0.49995937707131555,
                 "DDLLatency": 0,
                 "DDLThroughput": 0,
-                "DMLLatency": 0.16068,
-                "DMLThroughput": 0.4999718865659406,
+                "DMLLatency": 0.15980666666666668,
+                "DMLThroughput": 0.49995937707131555,
                 "DatabaseConnections": 0,
                 "Deadlocks": 0,
                 "DeleteLatency": 0,
                 "DeleteThroughput": 0,
-                "EngineUptime": 1906152,
-                "FreeLocalStorage": 32210518016,
-                "FreeableMemory": 4688029286.4,
-                "InsertLatency": 0.16068,
-                "InsertThroughput": 0.4999718865659406,
+                "EngineUptime": 5698620,
+                "FreeLocalStorage": 30215283507.2,
+                "FreeableMemory": 4574632345.6,
+                "InsertLatency": 0.15980666666666668,
+                "InsertThroughput": 0.49995937707131555,
                 "LoginFailures": 0,
-                "NetworkReceiveThroughput": 0.7000140072335472,
-                "NetworkThroughput": 1.4000280144670945,
-                "NetworkTransmitThroughput": 0.7000140072335472,
-                "Queries": 8.796634525053722,
+                "NetworkReceiveThroughput": 0.6999953344221976,
+                "NetworkThroughput": 1.3999906688443953,
+                "NetworkTransmitThroughput": 0.6999953344221976,
+                "Queries": 8.796891844051007,
                 "ResultSetCacheHitRatio": 0,
-                "SelectLatency": 0.17715786436043143,
-                "SelectThroughput": 3.086495583173847,
+                "SelectLatency": 0.17348499249549354,
+                "SelectThroughput": 3.0864647634387916,
                 "UpdateLatency": 0,
                 "UpdateThroughput": 0
             },
             "namespace": "AWS/RDS"
+        },
+        "tags": {
+            "workload-type": "other"
         }
     },
     "cloud": {
