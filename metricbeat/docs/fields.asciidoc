@@ -1617,7 +1617,7 @@ Beat state
 Is central management enabled?
 
 
-type: bool
+type: boolean
 
 --
 
