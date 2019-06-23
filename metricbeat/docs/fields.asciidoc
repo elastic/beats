@@ -1627,7 +1627,7 @@ type: boolean
 Number of modules enabled
 
 
-type: int
+type: integer
 
 --
 
