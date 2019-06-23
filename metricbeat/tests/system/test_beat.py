@@ -9,7 +9,7 @@ class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['metricbeat']
     FIELDS = ['beat']
-    METRICSETS = ['stats','state']
+    METRICSETS = ['stats', 'state']
 
     @parameterized.expand(METRICSETS)
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
