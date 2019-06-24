@@ -120,6 +120,6 @@
         type: double
         description: Scheduling duration cumulative sum
       - name: duration.seconds.count
-        type: double
+        type: long
         description: Scheduling count
 

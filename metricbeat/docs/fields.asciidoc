@@ -14422,7 +14422,7 @@ type: double
 --
 Scheduling count
 
-type: double
+type: long
 
 --
 
