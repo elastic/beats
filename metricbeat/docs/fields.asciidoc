@@ -13292,7 +13292,7 @@ type: keyword
 --
 CPU seconds
 
-type: scaled_float
+type: double
 
 --
 
@@ -13319,7 +13319,7 @@ type: long
 --
 Number of open file descriptors
 
-type: integer
+type: long
 
 --
 
@@ -13328,7 +13328,7 @@ type: integer
 --
 Seconds since the process started
 
-type: scaled_float
+type: double
 
 --
 
@@ -13338,7 +13338,7 @@ type: scaled_float
 --
 Request duration microseconds percentiles
 
-type: scaled_float
+type: double
 
 --
 
@@ -13347,7 +13347,7 @@ type: scaled_float
 --
 Request duration microseconds cumulative sum
 
-type: scaled_float
+type: double
 
 --
 
@@ -13365,7 +13365,7 @@ type: long
 --
 Request size percentiles
 
-type: integer
+type: long
 
 --
 
@@ -13392,7 +13392,7 @@ type: long
 --
 Response size percentiles
 
-type: integer
+type: long
 
 --
 
@@ -13439,7 +13439,7 @@ type: long
 --
 Longest running processors
 
-type: scaled_float
+type: double
 
 --
 
@@ -13448,21 +13448,21 @@ type: scaled_float
 --
 Unfinished processors
 
-type: scaled_float
+type: double
 
 --
 
 *`kubernetes.controllermanager.workqueue.adds.count`*::
 +
 --
-type: scaled_float
+type: double
 
 --
 
 *`kubernetes.controllermanager.workqueue.depth.count`*::
 +
 --
-type: scaled_float
+type: double
 
 --
 
@@ -13471,7 +13471,7 @@ type: scaled_float
 --
 Unfinished processors
 
-type: scaled_float
+type: double
 
 --
 
@@ -13508,7 +13508,7 @@ type: long
 --
 Percentage of healthy nodes
 
-type: integer
+type: long
 
 --
 
