@@ -93,14 +93,12 @@
           type: double
           description: Unfinished processors
         - name: adds.count
-          type: double
+          type: long
         - name: depth.count
-          type: double
+          type: long
         - name: retries.count
-          type: double
+          type: long
           description: Unfinished processors
-
-
     - name: node.collector
       type: group
       fields:
@@ -116,7 +114,6 @@
         - name: health.pct
           type: long
           description: Percentage of healthy nodes
-
     - name: leader.is_master
       type: boolean
       description: >

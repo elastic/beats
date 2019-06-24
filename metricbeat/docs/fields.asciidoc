@@ -13455,14 +13455,14 @@ type: double
 *`kubernetes.controllermanager.workqueue.adds.count`*::
 +
 --
-type: double
+type: long
 
 --
 
 *`kubernetes.controllermanager.workqueue.depth.count`*::
 +
 --
-type: double
+type: long
 
 --
 
@@ -13471,7 +13471,7 @@ type: double
 --
 Unfinished processors
 
-type: double
+type: long
 
 --
 
