@@ -1,0 +1,19 @@
+[
+    {
+        "error": {
+            "message": "HTTP error 404 in : 404 Not Found"
+        },
+        "event": {
+            "dataset": "beat.stats",
+            "duration": 115000,
+            "module": "beat"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "beat"
+        }
+    }
+]

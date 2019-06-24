@@ -176,6 +176,14 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "hKCG2tJrxNuV9sHh8TWDQ643i8Y=",
+			"path": "github.com/aws/aws-sdk-go-v2/aws/arn",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
 			"checksumSHA1": "DVN6AdXnfTwEOLJwCOhFqJAEF1E=",
 			"path": "github.com/aws/aws-sdk-go-v2/aws/awserr",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
@@ -426,6 +434,22 @@
 		{
 			"checksumSHA1": "QX85Yp1ihkxh8ye/FktHZUVsT6A=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/lambda",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "Vebj6WNIEJVmgAePYvcknvwkE6w=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "6zjMT1t8nDv2HRJDeUpFLurZdoE=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
 			"revisionTime": "2018-09-27T22:51:20Z",
 			"version": "v2.0.0-preview.5",

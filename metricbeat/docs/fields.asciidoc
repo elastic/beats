@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
+* <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
@@ -1567,6 +1568,231 @@ alias to: agent.hostname
 Time series instance id
 
 type: keyword
+
+--
+
+[[exported-fields-beat]]
+== Beat fields
+
+Beat module
+
+
+
+[float]
+=== beat
+
+
+
+
+*`beat.id`*::
++
+--
+Beat ID.
+
+
+type: keyword
+
+--
+
+*`beat.type`*::
++
+--
+Beat type.
+
+
+type: keyword
+
+--
+
+[float]
+=== stats
+
+Beat stats
+
+
+
+*`beat.stats.uptime.ms`*::
++
+--
+Beat uptime
+
+
+type: long
+
+--
+
+*`beat.stats.runtime.goroutines`*::
++
+--
+Number of goroutines running in Beat
+
+
+type: long
+
+--
+
+[float]
+=== libbeat
+
+Fields common to all Beats
+
+
+
+[float]
+=== output
+
+Output stats
+
+
+
+*`beat.stats.libbeat.output.type`*::
++
+--
+Type of output
+
+
+type: keyword
+
+--
+
+[float]
+=== events
+
+Event counters
+
+
+
+*`beat.stats.libbeat.output.events.acked`*::
++
+--
+Number of events acknowledged
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.active`*::
++
+--
+Number of active events
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.batches`*::
++
+--
+Number of event batches
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.dropped`*::
++
+--
+Number of events dropped
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.duplicates`*::
++
+--
+Number of events duplicated
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.failed`*::
++
+--
+Number of events failed
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.toomany`*::
++
+--
+Number of too many events
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.total`*::
++
+--
+Total number of events
+
+
+type: long
+
+--
+
+[float]
+=== read
+
+Read stats
+
+
+
+*`beat.stats.libbeat.output.read.bytes`*::
++
+--
+Number of bytes read
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.read.errors`*::
++
+--
+Number of read errors
+
+
+type: long
+
+--
+
+[float]
+=== write
+
+Write stats
+
+
+
+*`beat.stats.libbeat.output.write.bytes`*::
++
+--
+Number of bytes written
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.errors`*::
++
+--
+Number of write errors
+
+
+type: long
 
 --
 
