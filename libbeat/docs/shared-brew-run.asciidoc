@@ -5,7 +5,7 @@ run:
 
 ["source","sh",subs="attributes"]
 -----
-brew services start elastic/tap/{beatname_lc}
+brew services start elastic/tap/{beatname_lc}-full
 -----
 
 ifndef::requires-sudo[]
