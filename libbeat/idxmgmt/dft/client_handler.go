@@ -1,7 +1,9 @@
 package dft
 
 import (
+	"fmt"
 	"path"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -65,13 +67,29 @@ func (h *ESClientHandler) EnsureDataFrameTransforms(transforms []*DataFrameTrans
 }
 
 func (h *ESClientHandler) EnsureDataFrameTransform(t *DataFrameTransform) error {
+	err := h.EnsurePipeline(t.Pipeline)
+	if err != nil {
+		return err
+	}
+
+	err = h.EnsureSourceMetaIndex(t)
+	if err != nil {
+		return err
+	}
+
+	err = h.EnsureDestIndex(t)
+	if err != nil {
+		return err
+	}
+
 	code, _, err := h.GetDataFrame(t)
 	p := path.Join(esDFTPath, t.Name)
 	if code == 200 { // Stop existing transform
 		err = h.StopDataFrame(t)
-		if err != nil {
-			return err
-		}
+		// stopping is async, so a delay helps. TODO use a more robust wait method
+		time.Sleep(time.Second)
+		// Ignore these errors for now, in the future we should be more precise
+		// If there is an error it most likely means the dataframe isn't started
 
 		err = h.DeleteDataFrame(t)
 		if err != nil {
@@ -89,6 +107,42 @@ func (h *ESClientHandler) EnsureDataFrameTransform(t *DataFrameTransform) error 
 	return err
 }
 
+func (h *ESClientHandler) EnsureSourceMetaIndex(t *DataFrameTransform) error {
+	return h.EnsureIndex(t.SourceMetaIdx, common.MapStr{})
+}
+
+func (h *ESClientHandler) EnsureDestIndex(t *DataFrameTransform) error {
+	return h.EnsureIndex(t.DestIdx, t.DestMappings)
+}
+
+func (h *ESClientHandler) EnsureIndex(name string, mapping common.MapStr) error {
+	code, _, err := h.client.Request("GET", "/"+name, "", nil, nil)
+	if code == 404 {
+		body := common.MapStr{
+			"mappings": mapping,
+		}
+		_, _, err := h.client.Request("PUT", "/"+name, "", nil, body)
+		return errors.Wrapf(err, "error creating index %s", name)
+	} else if code >= 200 && code <= 299 {
+		// TODO check if mapping is for older or newer version, and only update if we have a newer version
+		_, _, err := h.client.Request("PUT", "/"+name+"/_mapping", "", nil, mapping)
+		return errors.Wrapf(err, "error updating mapping for index %s", name)
+	}
+
+	return errors.Wrapf(err, "error while checking index %s existence", name)
+}
+
+func (h *ESClientHandler) EnsurePipeline(p Pipeline) error {
+	// TODO only overwrite the pipeline if the new pipeline is a newer versio
+	//  n
+	body := common.MapStr{
+		"description": p.Description,
+		"processors":  p.Processors,
+	}
+	_, _, err := h.client.Request("PUT", fmt.Sprintf("/_ingest/pipeline/%s", p.ID), "", nil, body)
+	return err
+}
+
 func (h *ESClientHandler) GetDataFrame(t *DataFrameTransform) (code int, body string, err error) {
 	code, bodyRaw, err := h.client.Request("GET", t.path(), "", nil, nil)
 
@@ -98,8 +152,8 @@ func (h *ESClientHandler) GetDataFrame(t *DataFrameTransform) (code int, body st
 func (h *ESClientHandler) PutDataFrame(t *DataFrameTransform) error {
 	body := map[string]interface{}{}
 	body["pivot"] = t.Pivot
-	body["source"] = map[string]string{"index": t.Source}
-	body["dest"] = map[string]string{"index": t.Dest}
+	body["source"] = map[string]string{"index": t.SourceIdx}
+	body["dest"] = map[string]string{"index": t.DestIdx}
 
 	_, _, err := h.client.Request("PUT", t.path(), "", nil, body)
 
@@ -112,17 +166,17 @@ func (h *ESClientHandler) PutDataFrame(t *DataFrameTransform) error {
 
 func (h *ESClientHandler) DeleteDataFrame(t *DataFrameTransform) error {
 	_, _, err := h.client.Request("DELETE", t.path(), "", nil, nil)
-	return err
+	return errors.Wrapf(err, "could not delete dataframe %s", t.Name)
 }
 
 func (h *ESClientHandler) StartDataFrame(t *DataFrameTransform) error {
 	_, _, err := h.client.Request("POST", path.Join(t.path(), "_start"), "", nil, nil)
-	return err
+	return errors.Wrapf(err, "could not start dataframe %s", t.Name)
 }
 
 func (h *ESClientHandler) StopDataFrame(t *DataFrameTransform) error {
-	_, _, err := h.client.Request("POST", path.Join(t.path(), "_stop"), "", nil, nil)
-	return err
+	_, _, err := h.client.Request("POST", path.Join(t.path(), "_stop"), "", map[string]string{"force": "true"}, nil)
+	return errors.Wrapf(err, "could not stop dataframe %s", t.Name)
 }
 
 // NewESClientHandler initializes and returns an ESClientHandler,

@@ -18,12 +18,20 @@ type Supporter interface {
 }
 
 type DataFrameTransform struct {
-	Name     string        `config:"name"`
-	Mappings common.MapStr `config:"mappings"`
-	Pivot    common.MapStr `config:"pivot"`
-	Source   string        `config:"source.index"`
-	Dest     string        `config:"dest.index"`
-	Interval string        `config:"timespan"`
+	Name               string        `config:"name"`
+	Pivot              common.MapStr `config:"pivot"`
+	DestMappings       common.MapStr `config:"dest.mappings"`
+	SourceMetaIdx      string        `config:"source.meta.index"`
+	SourceMetaMappings common.MapStr `config:"source.meta.mappings"`
+	SourceIdx          string        `config:"source.index"`
+	DestIdx            string        `config:"dest.index"`
+	Interval           string        `config:"timespan"`
+	Pipeline           Pipeline      `config:"pipeline"`
+}
+type Pipeline struct {
+	ID          string          `config:"id"`
+	Description string          `config:"description"`
+	Processors  []common.MapStr `config:"processors"`
 }
 
 func (t *DataFrameTransform) path() string {

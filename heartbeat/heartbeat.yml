@@ -32,6 +32,9 @@ heartbeat.monitors:
   # Total test connection and data exchange timeout
   #timeout: 16s
 
+# heartbeat-8.0.0-*
+# heartbeat-8.0.0-meta
+
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
@@ -42,99 +45,100 @@ setup.template.settings:
 setup.data_frame:
   transforms:
     - pipeline:
-        name: foo
-        definition:
+        id: states-reformat
+        description: reformats the aggregation values into something more ECS friendly
+        processors:
+        - {"rename": {"field": "state.monitor", "target_field": "monitor"}}
+        - {"rename": {"field": "monitor_id", "target_field": "monitor.id"}}
+        - {"rename": {"field": "state.summary", "target_field": "summary"}}
+        - {"rename": {"field": "state.observer", "target_field": "observer"}}
+        - {"rename": {"field": "state.checks", "target_field": "checks"}}
+        - {"rename": {"field": "state.@timestamp", "target_field": "@timestamp"}}
+        - {"rename": {"field": "state.url", "target_field": "url"}}
+        - {"remove": {"field": "state"}}
       mappings:
         dynamic: false
         properties:
-          monitor_id:
-            type: keyword
-          state:
+          "@timestamp":
+            type: date
+          observer:
+            properties:
+              geo:
+                properties:
+                  name:
+                    type: keyword
+                  location:
+                    type: geo_point
+          agent:
+            properties:
+              id:
+                type: keyword
+          monitor:
+            properties:
+              id:
+                type: keyword
+              status:
+                type: keyword
+              name:
+                type: keyword
+              ip:
+                type: ip
+            url:
+              properties:
+                domain:
+                  type: keyword
+                  ignore_above: 1024
+                fragment:
+                  type: keyword
+                  ignore_above: 1024
+                full:
+                  type: keyword
+                  ignore_above: 1024
+                original:
+                  type: keyword
+                  ignore_above: 1024
+                password:
+                  type: keyword
+                  ignore_above: 1024
+                path:
+                  type: keyword
+                  ignore_above: 1024
+                port:
+                  type: long
+                query:
+                  type: keyword
+                  ignore_above: 1024
+                scheme:
+                  type: keyword
+                  ignore_above: 1024
+                username:
+                  type: keyword
+                  ignore_above: 1024
+          checks:
+            type: nested
             properties:
               "@timestamp":
                 type: date
+              monitor:
+                type: object
+                properties:
+                  ip:
+                    type: ip
+                  status:
+                    type: keyword
+              agent:
+                properties:
+                  id:
+                    type: keyword
               observer:
                 properties:
                   geo:
+                    type: object
                     properties:
                       name:
                         type: keyword
                       location:
                         type: geo_point
-              agent:
-                properties:
-                  id:
-                    type: keyword
-              up:
-                type: integer
-              down:
-                type: integer
-              monitor:
-                properties:
-                  status:
-                    type: keyword
-                  name:
-                    type: keyword
-                  id:
-                    type: keyword
-                  ip:
-                    type: ip
-              url:
-                properties:
-                  domain:
-                    type: keyword
-                    ignore_above: 1024
-                  fragment:
-                    type: keyword
-                    ignore_above: 1024
-                  full:
-                    type: keyword
-                    ignore_above: 1024
-                  original:
-                    type: keyword
-                    ignore_above: 1024
-                  password:
-                    type: keyword
-                    ignore_above: 1024
-                  path:
-                    type: keyword
-                    ignore_above: 1024
-                  port:
-                    type: long
-                  query:
-                    type: keyword
-                    ignore_above: 1024
-                  scheme:
-                    type: keyword
-                    ignore_above: 1024
-                  username:
-                    type: keyword
-                    ignore_above: 1024
-              checks:
-                type: nested
-                properties:
-                  "@timestamp":
-                    type: date
-                  monitor:
-                    type: object
-                    properties:
-                      ip:
-                        type: ip
-                      status:
-                        type: keyword
-                  agent:
-                    properties:
-                      id:
-                        type: keyword
-                  observer:
-                    properties:
-                      geo:
-                        type: object
-                        properties:
-                          name:
-                            type: keyword
-                          location:
-                            type: geo_point
       pivot:
         group_by:
           monitor_id: {"terms": {"field": "monitor.id"}}
@@ -157,7 +161,7 @@ setup.data_frame:
                 def ts = doc["@timestamp"][0].toInstant().toEpochMilli();
 
                 def lastCheck = state.checksByAgentIdIP[agentId];
-                Long lastTs = lastCheck != null ? lastCheck["@timestamp"] : null;
+                Instant lastTs = lastCheck != null ? lastCheck["@timestamp"] : null;
                 if (lastTs != null && lastTs > ts) {
                   return;
                 }
@@ -212,7 +216,7 @@ setup.data_frame:
                 Map result = new HashMap();
 
                 Map checks = new HashMap();
-                long maxTs = 0;
+                Instant maxTs = Instant.ofEpochMilli(0);
                 Collection ips = new HashSet();
                 Collection geoNames = new HashSet();
                 for (state in states) {
@@ -221,11 +225,12 @@ setup.data_frame:
                     def agentIdIP = entry.getKey();
                     def check = entry.getValue();
                     def lastBestCheck = checks.get(agentIdIP);
-                    def checkTs = check.get("@timestamp");
+                    def checkTs = Instant.ofEpochMilli(check.get("@timestamp"));
 
-                    if (maxTs < checkTs) { maxTs = checkTs}
+                    if (maxTs.isBefore(checkTs)) { maxTs = checkTs}
 
                     if (lastBestCheck == null || lastBestCheck.get("@timestamp") < checkTs) {
+                      check["@timestamp"] = check["@timestamp"];
                       checks[agentIdIP] = check
                     }
 
@@ -254,9 +259,9 @@ setup.data_frame:
 
                 Map observer = new HashMap();
                 Map geo = new HashMap();
+                observer.geo = geo;
                 geo.name = geoNames;
                 result.observer = observer;
-                result.geo = geo;
 
                 return result;
 

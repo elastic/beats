@@ -2,6 +2,9 @@ package dft
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/libbeat/beat"
 )
@@ -29,18 +32,25 @@ const (
 )
 
 func DefaultConfig(info beat.Info) Config {
+	majorV := strings.Split(info.Version, ".")[0]
+	majorXX := fmt.Sprintf("%s.x.x", majorV)
+	majorXAny := fmt.Sprintf("%s.*", majorV)
+
 	name := fmt.Sprintf("%s-states", info.Beat)
-	source := fmt.Sprintf("%s-%s-*", info.Beat, info.Version)
-	dest := fmt.Sprintf("%s-states", info.Beat)
+	metaIdx := fmt.Sprintf("%s-%s-meta", info.Beat, majorXX)
+	source := fmt.Sprintf("%s-%s", info.Beat, majorXAny)
+	dest := fmt.Sprintf("%s-states-%s", info.Beat, majorXX)
 
 	return Config{
 		Mode: ModeAuto,
 		Transforms: []*DataFrameTransform{
 			{
-				Name:     name,
-				Source:   source,
-				Dest:     dest,
-				Interval: "10s",
+				Name:          name,
+				SourceMetaIdx: metaIdx,
+				SourceIdx:     source,
+				DestIdx:       dest,
+				DestMappings:  common.MapStr{},
+				Interval:      "10s",
 			},
 		},
 	}
