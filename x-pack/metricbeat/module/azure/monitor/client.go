@@ -95,11 +95,11 @@ func (client *AzureMonitorClient) ListMetricDefinitions(resourceURI string) ([]s
 // GetMetricsData returns the specified metric data points for the specified resource ID spanning the last five minutes.
 func (client *AzureMonitorClient) GetMetricsData(metric AzureMonitorMetric) ([]MetricValue, error) {
 	endTime := time.Now().UTC()
-	startTime := endTime.Add(time.Duration(-client.config.Period) * time.Minute)
+	startTime := endTime.Add(client.config.Period * (-1))
 	timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 	metrics := []string{metric.name}
-	interval := "PT1M"
-	resp, err := client.metricsClient.List(context.Background(), metric.resourcePath, timespan, &interval, strings.Join(metrics, ","), "", nil, "", "", insights.Data, metric.namespace)
+	interval := "PT1M" //to do : calculate interval
+	resp, err := client.metricsClient.List(context.Background(), metric.resourcePath, timespan, &interval, strings.Join(metrics, ","), "average,maximum", nil, "", "", insights.Data, metric.namespace)
 	if err != nil {
 		return nil, err
 	}
