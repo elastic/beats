@@ -284,6 +284,9 @@ func readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event, error) {
 		logLines := strings.Split(s, "\n")
 		for _, log := range logLines {
 			// create event
+			if log == "" {
+				continue
+			}
 			event := createEvent(log, s3Info)
 			events = append(events, event)
 		}
@@ -312,8 +315,8 @@ func createEvent(log string, s3Info s3Info) *beat.Event {
 		"message": log,
 		"log": common.MapStr{
 			"source": common.MapStr{
-				"bucketName": s3Info.name,
-				"objectKey":  s3Info.key,
+				"bucket_name": s3Info.name,
+				"object_key":  s3Info.key,
 			},
 		},
 	}
