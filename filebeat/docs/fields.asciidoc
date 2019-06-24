@@ -48,6 +48,7 @@ grouped in the following categories:
 * <<exported-fields-process>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-s3>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
@@ -12839,6 +12840,40 @@ The arguments with which the command was called.
 
 
 type: keyword
+
+--
+
+[[exported-fields-s3]]
+== s3 fields
+
+Fields from s3 input.
+
+
+
+[float]
+== log.source fields
+
+Source of the log message.
+
+
+
+*`log.source.bucket_name`*::
++
+--
+type: keyword
+
+Name of the S3 bucket that this log retrieved from.
+
+
+--
+
+*`log.source.object_key`*::
++
+--
+type: keyword
+
+Name of the S3 object that this log retrieved from.
+
 
 --
 
