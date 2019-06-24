@@ -156,6 +156,18 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#-------------------------------- Beat Module --------------------------------
+- module: beat
+  metricsets:
+    - stats
+  period: 10s
+  hosts: ["http://localhost:5066"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
+
 #-------------------------------- Ceph Module --------------------------------
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]

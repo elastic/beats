@@ -176,6 +176,14 @@
 			"versionExact": "v0.9.0"
 		},
 		{
+			"checksumSHA1": "hKCG2tJrxNuV9sHh8TWDQ643i8Y=",
+			"path": "github.com/aws/aws-sdk-go-v2/aws/arn",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
 			"checksumSHA1": "DVN6AdXnfTwEOLJwCOhFqJAEF1E=",
 			"path": "github.com/aws/aws-sdk-go-v2/aws/awserr",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
@@ -288,6 +296,22 @@
 			"versionExact": "v0.9.0"
 		},
 		{
+			"checksumSHA1": "W20qSroKjq+SVZCQWhdOxTVzMJc=",
+			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/json/jsonutil",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
+			"checksumSHA1": "QBgP8y0RJvyqYn234+0t/TsTV38=",
+			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/jsonrpc",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
 			"checksumSHA1": "aHSao8oK9aBHiVerbVN7Ph5NlMU=",
 			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/query",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
@@ -378,6 +402,22 @@
 		{
 			"checksumSHA1": "obRTk+sa6gOol9WUL2lGUy+KwPs=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
+			"checksumSHA1": "X8PEjygPDSFiWO03ckxEiZRvKhY=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
+			"checksumSHA1": "KH7LAWZzbM7BJZYYghpbFedl84Y=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
 			"revisionTime": "2019-05-28T21:51:27Z",
 			"version": "v0.9.0",
