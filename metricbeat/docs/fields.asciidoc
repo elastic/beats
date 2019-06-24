@@ -13894,6 +13894,313 @@ Total major page faults
 --
 
 [float]
+== scheduler fields
+
+Kubernetes scheduler metrics
+
+
+
+*`kubernetes.scheduler.handler`*::
++
+--
+type: keyword
+
+Request handler
+
+
+--
+
+*`kubernetes.scheduler.code`*::
++
+--
+type: keyword
+
+HTTP code
+
+
+--
+
+*`kubernetes.scheduler.method`*::
++
+--
+type: keyword
+
+HTTP method
+
+
+--
+
+*`kubernetes.scheduler.host`*::
++
+--
+type: keyword
+
+Request host
+
+
+--
+
+*`kubernetes.scheduler.name`*::
++
+--
+type: keyword
+
+Name for the resource
+
+
+--
+
+*`kubernetes.scheduler.result`*::
++
+--
+type: keyword
+
+Schedule attmpt result
+
+
+--
+
+*`kubernetes.scheduler.operation`*::
++
+--
+type: keyword
+
+Scheduling operation
+
+
+--
+
+
+*`kubernetes.scheduler.process.cpu.sec`*::
++
+--
+type: scaled_float
+
+CPU seconds
+
+--
+
+*`kubernetes.scheduler.process.memory.resident.bytes`*::
++
+--
+type: long
+
+Bytes in resident memory
+
+--
+
+*`kubernetes.scheduler.process.memory.virtual.bytes`*::
++
+--
+type: long
+
+Bytes in virtual memory
+
+--
+
+*`kubernetes.scheduler.process.fds.open.count`*::
++
+--
+type: long
+
+Number of open file descriptors
+
+--
+
+*`kubernetes.scheduler.process.started.sec`*::
++
+--
+type: scaled_float
+
+Seconds since the process started
+
+--
+
+
+*`kubernetes.scheduler.http.request.duration.us.percentile.*`*::
++
+--
+type: scaled_float
+
+Request duration microseconds percentiles
+
+--
+
+*`kubernetes.scheduler.http.request.duration.us.sum`*::
++
+--
+type: scaled_float
+
+Request duration microseconds cumulative sum
+
+--
+
+*`kubernetes.scheduler.http.request.duration.us.count`*::
++
+--
+type: long
+
+Request count for duration
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.percentile.*`*::
++
+--
+type: long
+
+Request size percentiles
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.sum`*::
++
+--
+type: long
+
+Request size cumulative sum
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.count`*::
++
+--
+type: long
+
+Request count for size
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.percentile.*`*::
++
+--
+type: object
+
+Response size percentiles
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.sum`*::
++
+--
+type: long
+
+Response size cumulative sum
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.count`*::
++
+--
+type: long
+
+Response count
+
+--
+
+*`kubernetes.scheduler.http.request.count`*::
++
+--
+type: long
+
+Request count
+
+--
+
+*`kubernetes.scheduler.client.request.count`*::
++
+--
+type: long
+
+Number of requests as client
+
+
+--
+
+*`kubernetes.scheduler.leader.is_master`*::
++
+--
+type: boolean
+
+Whether the node is master
+
+
+--
+
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.bucket.*`*::
++
+--
+type: object
+
+E2e scheduling duration microseconds
+
+--
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.sum`*::
++
+--
+type: long
+
+E2e scheduling duration microseconds sum
+
+--
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.count`*::
++
+--
+type: long
+
+E2e scheduling count
+
+--
+
+*`kubernetes.scheduler.scheduler.pod.preemption.victims.count`*::
++
+--
+type: long
+
+Pod preemption victims
+
+--
+
+*`kubernetes.scheduler.scheduler.pod.attempts.count`*::
++
+--
+type: long
+
+Pod attempts count
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.percentile.*`*::
++
+--
+type: object
+
+Scheduling duration percentiles
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.sum`*::
++
+--
+type: double
+
+Scheduling duration cumulative sum
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.count`*::
++
+--
+type: double
+
+Scheduling count
+
+--
+
+[float]
 == container fields
 
 kubernetes container metrics

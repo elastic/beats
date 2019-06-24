@@ -105,6 +105,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-pod,pod>>
 
+* <<metricbeat-metricset-kubernetes-scheduler,scheduler>>
+
 * <<metricbeat-metricset-kubernetes-state_container,state_container>>
 
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
@@ -130,6 +132,8 @@ include::kubernetes/event.asciidoc[]
 include::kubernetes/node.asciidoc[]
 
 include::kubernetes/pod.asciidoc[]
+
+include::kubernetes/scheduler.asciidoc[]
 
 include::kubernetes/state_container.asciidoc[]
 
