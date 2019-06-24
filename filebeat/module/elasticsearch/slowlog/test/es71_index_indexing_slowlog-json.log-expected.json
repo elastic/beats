@@ -1,0 +1,27 @@
+[
+    {
+        "@timestamp": "2019-06-24T19:01:11.415Z",
+        "elasticsearch.cluster.name": "esprod",
+        "elasticsearch.cluster.uuid": "b28RGuVmRDimbAkNTVbacg",
+        "elasticsearch.component": "i.i.s.index",
+        "elasticsearch.index.id": "6cpavWDYRO6pyxezB0LepA",
+        "elasticsearch.index.name": "foo",
+        "elasticsearch.node.id": "erxPlzmKQOGUdrDxGrww_g",
+        "elasticsearch.node.name": "esprod0",
+        "elasticsearch.slowlog.id": "1",
+        "elasticsearch.slowlog.routing": "",
+        "elasticsearch.slowlog.source": "{\"foo\":\"bar\"}",
+        "elasticsearch.slowlog.took": "3ms",
+        "elasticsearch.slowlog.types": "t",
+        "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 3000000,
+        "event.module": "elasticsearch",
+        "event.timezone": "+00:00",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 0,
+        "message": "{\"type\": \"index_indexing_slowlog\", \"timestamp\": \"2019-06-24T15:01:11,415-04:00\", \"level\": \"WARN\", \"component\": \"i.i.s.index\", \"cluster.name\": \"esprod\", \"node.name\": \"esprod0\", \"message\": \"[foo/6cpavWDYRO6pyxezB0LepA]\", \"took\": \"3ms\", \"took_millis\": \"3\", \"doc_type\": \"t\", \"id\": \"1\", \"routing\": \"\", \"source\": \"{\\\"foo\\\":\\\"bar\\\"}\", \"cluster.uuid\": \"b28RGuVmRDimbAkNTVbacg\", \"node.id\": \"erxPlzmKQOGUdrDxGrww_g\"  }",
+        "service.type": "elasticsearch"
+    }
+]
