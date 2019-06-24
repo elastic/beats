@@ -334,9 +334,12 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 	var result []*Container
 	for _, c := range containers {
 		var ipaddresses []string
-		for _, net := range c.NetworkSettings.Networks {
-			if net.IPAddress != "" {
-				ipaddresses = append(ipaddresses, net.IPAddress)
+		if c.NetworkSettings != nil {
+			// Handle alternate platforms like VMWare's VIC that might not have this data.
+			for _, net := range c.NetworkSettings.Networks {
+				if net.IPAddress != "" {
+					ipaddresses = append(ipaddresses, net.IPAddress)
+				}
 			}
 		}
 
