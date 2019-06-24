@@ -50,7 +50,8 @@
       type: group
       fields:
         - name: request.duration.us.percentile.*
-          type: double
+          type: object
+          object_type: double
           description: Request duration microseconds percentiles
         - name: request.duration.us.sum
           type: double
@@ -59,7 +60,8 @@
           type: long
           description: Request count for duration
         - name: request.size.bytes.percentile.*
-          type: long
+          type: object
+          object_type: long
           description: Request size percentiles
         - name: request.size.bytes.sum
           type: long
@@ -68,7 +70,8 @@
           type: long
           description: Request count for size
         - name: response.size.bytes.percentile.*
-          type: long
+          type: object
+          object_type: long
           description: Response size percentiles
         - name: response.size.bytes.sum
           type: long
