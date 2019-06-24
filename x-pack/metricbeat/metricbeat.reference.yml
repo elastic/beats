@@ -226,7 +226,7 @@ metricbeat.modules:
   hosts: ["localhost:5000"]
   enabled: true
 
-#----------------------------- Cockroachdb Module -----------------------------
+#----------------------------- CockroachDB Module -----------------------------
 - module: cockroachdb
   metricsets: ['status']
   period: 10s

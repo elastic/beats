@@ -14,6 +14,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws/s3_daily_storage"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws/s3_request"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws/sqs"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/cockroachdb"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/coredns"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/coredns/stats"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql"
