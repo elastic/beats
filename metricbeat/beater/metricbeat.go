@@ -99,9 +99,6 @@ func DefaultCreator() beat.Creator {
 
 // newMetricbeat creates and returns a new Metricbeat instance.
 func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbeat, error) {
-	// List all registered modules and metricsets.
-	logp.Debug("modules", "%s", mb.Registry.String())
-
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "error reading configuration file")
@@ -119,6 +116,9 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	for _, applyOption := range options {
 		applyOption(metricbeat)
 	}
+
+	// List all registered modules and metricsets.
+	logp.Debug("modules", "Available modules and metricsets: %s", mb.Registry.String())
 
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
