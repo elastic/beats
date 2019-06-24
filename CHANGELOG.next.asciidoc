@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
+- Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
 
 *Auditbeat*
 
