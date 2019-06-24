@@ -48,13 +48,13 @@ func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 }
 
 // OSSConfigFileParams returns the default ConfigFileParams for generating
-// filebeat*.yml files.
+// metricbeat*.yml files.
 func OSSConfigFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 	return configFileParams(devtools.OSSBeatDir("module"))
 }
 
 // XPackConfigFileParams returns the default ConfigFileParams for generating
-// filebeat*.yml files.
+// metricbeat*.yml files.
 func XPackConfigFileParams() devtools.ConfigFileParams {
 	args := configFileParams(devtools.OSSBeatDir("module"), "module")
 	args.ReferenceParts = []string{

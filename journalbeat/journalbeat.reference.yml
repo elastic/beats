@@ -308,7 +308,7 @@ setup.template.settings:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using journalbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Journalbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -577,7 +577,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version journalbeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Journalbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -834,7 +834,7 @@ output.elasticsearch:
   #filename: journalbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every journalbeat restart, the files are rotated. The default value is 10240
+  # every Journalbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -861,26 +861,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the journalbeat installation. This is the default base path
+# The home path for the Journalbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the journalbeat installation. This is the default
+# The configuration path for the Journalbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the journalbeat installation. This is the default base path
-# for all the files in which journalbeat needs to store its data. If not set by a
+# The data path for the Journalbeat installation. This is the default base path
+# for all the files in which Journalbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a journalbeat installation. This is the default location for
+# The logs path for a Journalbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1085,7 +1085,7 @@ setup.kibana:
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, journalbeat periodically logs its internal metrics that have changed
+# If enabled, Journalbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1132,7 +1132,7 @@ logging.files:
 
 
 #============================== Xpack Monitoring ===============================
-# journalbeat can export internal metrics to a central Elasticsearch monitoring
+# Journalbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
