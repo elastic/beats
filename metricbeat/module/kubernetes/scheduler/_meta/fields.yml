@@ -36,7 +36,7 @@
     type: group
     fields:
       - name: cpu.sec
-        type: scaled_float
+        type: double
         description: CPU seconds
       - name: memory.resident.bytes
         type: long
@@ -48,16 +48,16 @@
         type: long
         description: Number of open file descriptors
       - name: started.sec
-        type: scaled_float
+        type: double
         description: Seconds since the process started
   - name: http
     type: group
     fields:
       - name: request.duration.us.percentile.*
-        type: scaled_float
+        type: double
         description: Request duration microseconds percentiles
       - name: request.duration.us.sum
-        type: scaled_float
+        type: double
         description: Request duration microseconds cumulative sum
       - name: request.duration.us.count
         type: long
