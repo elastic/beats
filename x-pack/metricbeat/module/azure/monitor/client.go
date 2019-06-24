@@ -7,34 +7,38 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
+	"github.com/pkg/errors"
 	"strings"
 	"time"
 )
 
 // AzureMonitorClient represents local client which will use the azure sdk go metricsclient
 type AzureMonitorClient struct {
-	metricsClient               *insights.MetricsClient
+	metricsClient          *insights.MetricsClient
 	metricDefinitionClient *insights.MetricDefinitionsClient
-	accessToken          string
-	accessTokenExpiresOn time.Time
-	resources []AzureMonitorResource
-}
-
-type AzureMonitorResource struct {
-	name string
-	uri string
-	metricNamespace string
-	metrics []AzureMonitorMetric
+	resourceClient         *resources.Client
+	config                 azure.Config
+	accessTokenExpiresOn   time.Time
+	metrics                []AzureMonitorMetric
 }
 
 type AzureMonitorMetric struct {
-	name string
-	value int64
+	resourcePath string
+	namespace    string
+	name         string
+	values       []MetricValue
+}
+
+type MetricValue struct {
+	average float64
+	min     float64
+	max     float64
+	total   float64
+	count   int64
 }
 
 // New instantiates the an Azure monitoring client
-func (client *AzureMonitorClient) New(config azure.Config) error{
-
+func (client *AzureMonitorClient) New(config azure.Config) error {
 	clientConfig := auth.NewClientCredentialsConfig(config.ClientId, config.ClientSecret, config.TenantId)
 	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
@@ -42,37 +46,41 @@ func (client *AzureMonitorClient) New(config azure.Config) error{
 	}
 	metricsClient := insights.NewMetricsClient(config.SubscriptionId)
 	metricsDefinitionClient := insights.NewMetricDefinitionsClient(config.SubscriptionId)
+	resourceClient := resources.NewClient(config.SubscriptionId)
 	metricsClient.Authorizer = authorizer
-	metricsDefinitionClient.Authorizer= authorizer
-	client.metricDefinitionClient= &metricsDefinitionClient
+	metricsDefinitionClient.Authorizer = authorizer
+	resourceClient.Authorizer = authorizer
+	client.metricDefinitionClient = &metricsDefinitionClient
 	client.metricsClient = &metricsClient
-
-
-resourceClient := resources.NewClient(config.SubscriptionId)
-resourceClient.Authorizer= authorizer
-	for _, resource := range config.Resources{
-    res:= GetResourceInfo(resourceClient, resource, config)
-_= res
-	}
-
+	client.resourceClient = &resourceClient
+	client.config = config
 	return nil
 }
 
-
-func GetResourceInfo(client resources.Client, name string, config azure.Config) AzureMonitorResource{
-	var monitorResource AzureMonitorResource
-	monitorResource.name= name
-	test, err:= client.Get(context.Background(), "obs-infrastructure", "", "", "", name)
-	if err!= nil{
-		_= test
-		monitorResource.uri= "dsfs"
+// InitResources returns the list of resources and maps them.
+func (client *AzureMonitorClient) InitResources() error {
+	for _, metric := range client.config.Metrics {
+		if metric.ResourceGroup != "" {
+			var top int32 = 20
+			resourceList, err := client.resourceClient.ListByResourceGroup(context.Background(), metric.ResourceGroup, fmt.Sprintf("resourceType eq '%s'", metric.ResourceType), "true", &top)
+			hell := resourceList.Values()
+			_ = hell
+			if err != nil {
+				return errors.Wrapf(err, "error while listing resources by resource group %s  and filter %s", metric.ResourceGroup, metric.ResourceType)
+			}
+			for _, resource := range resourceList.Values() {
+				client.metrics = append(client.metrics, AzureMonitorMetric{resourcePath: *resource.ID, namespace: metric.Namespace, name: metric.MetricName})
+			}
+		}
+		if metric.ResourceId != "" {
+			client.metrics = append(client.metrics, AzureMonitorMetric{resourcePath: metric.ResourceId, namespace: metric.Namespace, name: metric.MetricName})
+		}
 	}
-	return monitorResource
+	return nil
 }
 
 // ListMetricDefinitions returns the list of metrics available for the specified resource in the form "Localized Name (metric name)".
-func (client *AzureMonitorClient)ListMetricDefinitions(resourceURI string) ([]string, error) {
-
+func (client *AzureMonitorClient) ListMetricDefinitions(resourceURI string) ([]string, error) {
 	result, err := client.metricDefinitionClient.List(context.Background(), resourceURI, "")
 	if err != nil {
 		return nil, err
@@ -85,32 +93,39 @@ func (client *AzureMonitorClient)ListMetricDefinitions(resourceURI string) ([]st
 }
 
 // GetMetricsData returns the specified metric data points for the specified resource ID spanning the last five minutes.
-func (client *AzureMonitorClient)GetMetricsData(resourceID string, metrics []string) ([]string, error) {
-
+func (client *AzureMonitorClient) GetMetricsData(metric AzureMonitorMetric) ([]MetricValue, error) {
 	endTime := time.Now().UTC()
-	startTime := endTime.Add(time.Duration(-5) * time.Minute)
+	startTime := endTime.Add(time.Duration(-client.config.Period) * time.Minute)
 	timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
-	resp, err := client.metricsClient.List(context.Background(), resourceID, timespan, nil, strings.Join(metrics, ","), "minimum,maximum", nil, "", "", insights.Data, "")
+	metrics := []string{metric.name}
+	interval := "PT1M"
+	resp, err := client.metricsClient.List(context.Background(), metric.resourcePath, timespan, &interval, strings.Join(metrics, ","), "", nil, "", "", insights.Data, metric.namespace)
 	if err != nil {
 		return nil, err
 	}
-	metricData := []string{}
+	var metricData []MetricValue
 	for _, v := range *resp.Value {
 		for _, t := range *v.Timeseries {
 			for _, mv := range *t.Data {
-				min := float64(0.0)
-				max := float64(0.0)
+				var val MetricValue
 				if mv.Minimum != nil {
-					min = *mv.Minimum
+					val.min = *mv.Minimum
 				}
 				if mv.Maximum != nil {
-					max = *mv.Maximum
+					val.max = *mv.Maximum
 				}
-				metricData = append(metricData, fmt.Sprintf("%s @ %s - min: %f, max: %f", *v.Name.LocalizedValue, *mv.TimeStamp, min, max))
+				if mv.Average != nil {
+					val.average = *mv.Average
+				}
+				if mv.Total != nil {
+					val.total = *mv.Total
+				}
+				if mv.Count != nil {
+					val.count = *mv.Count
+				}
+				metricData = append(metricData, val)
 			}
 		}
 	}
 	return metricData, nil
 }
-

@@ -1,9 +1,19 @@
 - module: azure
-  metricsets: ["monitor"]
+  metricsets:
+  - monitor
   enabled: true
-  period: 30s
-  client_id: '77d77853-217c-439b-923f-e508a73c513b'
-  client_secret: 'immortal'
-  tenant_id: 'aa40685b-417d-4664-b4ec-8f7640719adb'
-  subscription_id: '70bd6e77-4b1e-4835-8896-db77b8eef364'
-  resources: ["obsvm"]
+  period: 60s
+  client_id: ''
+  client_secret: ''
+  tenant_id: ''
+  subscription_id: ''
+  metrics:
+  - resource_id: ""
+    namespace: ""
+    name: ""
+  - resource_group: ""
+    resource_type: ""
+    name: ""
+
+
+

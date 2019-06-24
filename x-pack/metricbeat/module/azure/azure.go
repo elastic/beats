@@ -23,15 +23,27 @@ package azure
 
 import (
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/pkg/errors"
+	"time"
 )
 
 // Config options
 type Config struct {
-	ClientId       string   `config:"client_id"    validate:"required"`
-	ClientSecret   string   `config:"client_secret"`
-	TenantId       string   `config:"tenant_id" validate:"required"`
-	SubscriptionId string   `config:"subscription_id" validate:"required"`
-	Resources      []string `config:"resources"`
+	ClientId       string         `config:"client_id"    validate:"required"`
+	ClientSecret   string         `config:"client_secret" validate:"required"`
+	TenantId       string         `config:"tenant_id" validate:"required"`
+	SubscriptionId string         `config:"subscription_id" validate:"required"`
+	Period         time.Duration  `config:"period"`
+	Metrics        []MetricConfig `config:"metrics"`
+}
+
+// MetricConfig contains metric specific configuration.
+type MetricConfig struct {
+	ResourceId    string `config:"resource_id"`
+	ResourceGroup string `config:"resource_group"`
+	MetricName    string `config:"name"`
+	Namespace     string `config:"namespace"`
+	ResourceType  string `config:"resource_type"`
 }
 
 func init() {
@@ -46,17 +58,7 @@ func init() {
 func newModule(base mb.BaseModule) (mb.Module, error) {
 	var config Config
 	if err := base.UnpackConfig(&config); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
 	return &base, nil
-}
-
-// NewMetricSet creates a base metricset for default configurations optons and auth in the future
-func GetConfig(base mb.BaseMetricSet) (Config, error) {
-	var config Config
-	err := base.Module().UnpackConfig(&config)
-	if err != nil {
-		return config, err
-	}
-	return config, nil
 }
