@@ -18,7 +18,7 @@ import (
 
 // MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
-	ec2iface.EC2API
+	ec2iface.ClientAPI
 }
 
 var regionName = "us-west-1"

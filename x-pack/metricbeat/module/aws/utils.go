@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -26,12 +27,12 @@ func GetStartTimeEndTime(period time.Duration) (time.Time, time.Time) {
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
-func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.CloudWatchAPI) ([]cloudwatch.Metric, error) {
+func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
 	listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
 	reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
 
 	// List metrics of a given namespace for each region
-	listMetricsOutput, err := reqListMetrics.Send()
+	listMetricsOutput, err := reqListMetrics.Send(context.TODO())
 	if err != nil {
 		return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
 	}
@@ -43,7 +44,7 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	return listMetricsOutput.Metrics, nil
 }
 
-func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
+func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
 	getMetricDataInput := &cloudwatch.GetMetricDataInput{
 		NextToken:         nextToken,
 		StartTime:         &startTime,
@@ -52,15 +53,15 @@ func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, next
 	}
 
 	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
-	getMetricDataOutput, err := reqGetMetricData.Send()
+	getMetricDataResponse, err := reqGetMetricData.Send(context.TODO())
 	if err != nil {
 		return nil, errors.Wrap(err, "Error GetMetricDataInput")
 	}
-	return getMetricDataOutput, nil
+	return getMetricDataResponse.GetMetricDataOutput, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
-func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
+func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
 	init := true
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 	for init || getMetricDataOutput.NextToken != nil {

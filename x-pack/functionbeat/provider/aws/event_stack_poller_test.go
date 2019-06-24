@@ -38,7 +38,7 @@ func (m *mockEventHandler) handle(event cloudformation.StackEvent) {
 }
 
 type mockCloudFormationClient struct {
-	cloudformationiface.CloudFormationAPI
+	cloudformationiface.ClientAPI
 	Responses []cloudformation.DescribeStackEventsOutput
 	Index     int
 }

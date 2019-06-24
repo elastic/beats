@@ -265,7 +265,7 @@ func convertConfigToListMetrics(cloudwatchConfig Config, namespace string) cloud
 	return listMetricsOutput
 }
 
-func createEvents(svc cloudwatchiface.CloudWatchAPI, listMetricsTotal []cloudwatch.Metric, regionName string, period time.Duration, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
+func createEvents(svc cloudwatchiface.ClientAPI, listMetricsTotal []cloudwatch.Metric, regionName string, period time.Duration, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
 	identifiers := getIdentifiers(listMetricsTotal)
 	// Initialize events map per region, which stores one event per identifierValue
 	events := map[string]mb.Event{}

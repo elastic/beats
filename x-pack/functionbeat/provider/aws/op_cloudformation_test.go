@@ -17,7 +17,7 @@ import (
 )
 
 type mockCloudformationStack struct {
-	cloudformationiface.CloudFormationAPI
+	cloudformationiface.ClientAPI
 
 	respCreateStackOutput *cloudformation.CreateStackOutput
 	onCreateStackInput    func(*cloudformation.CreateStackInput)
