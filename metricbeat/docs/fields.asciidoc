@@ -14248,7 +14248,7 @@ type: double
 --
 Request duration microseconds percentiles
 
-type: double
+type: object
 
 --
 
@@ -14275,7 +14275,7 @@ type: long
 --
 Request size percentiles
 
-type: long
+type: object
 
 --
 
