@@ -76,7 +76,7 @@ func NewReader(config Config) (*Reader, error) {
 			}
 		}
 		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
-		if childQueries == nil || len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
+		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
 			query.Close()
 			return nil, errors.Errorf(`failed to expand counter (query="%v")`, counter.Query)
 		}
