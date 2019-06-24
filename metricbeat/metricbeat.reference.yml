@@ -156,7 +156,7 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
-#-------------------------------- Beat Module --------------------------------
+#--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:
     - stats
