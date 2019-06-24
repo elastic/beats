@@ -118,7 +118,7 @@
           description: Percentage of healthy nodes
 
     - name: leader.is_master
-      type: int
+      type: boolean
       description: >
         Whether the node is master
 

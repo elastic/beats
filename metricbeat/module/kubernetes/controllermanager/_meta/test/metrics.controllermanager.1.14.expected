@@ -241,25 +241,6 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"leader": {
-				"is_master": 1
-			},
-			"name": "kube-controller-manager"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
 			"client": {
 				"request": {
 					"count": 6
@@ -970,6 +951,25 @@
 					"sec": 0
 				}
 			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"leader": {
+				"is_master": true
+			},
+			"name": "kube-controller-manager"
 		},
 		"Index": "",
 		"ID": "",

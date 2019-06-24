@@ -13518,7 +13518,7 @@ type: integer
 Whether the node is master
 
 
-type: int
+type: boolean
 
 --
 

@@ -69,28 +69,6 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "leader": {
-                    "is_master": 1
-                },
-                "name": "kube-controller-manager"
-            }
-        },
-        "metricset": {
-            "name": "controllermanager"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
                 "name": "disruption_recheck",
                 "workqueue": {
                     "adds": {
@@ -364,6 +342,28 @@
                         }
                     }
                 }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "leader": {
+                    "is_master": true
+                },
+                "name": "kube-controller-manager"
             }
         },
         "metricset": {
