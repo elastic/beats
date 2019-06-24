@@ -49,11 +49,12 @@ var (
 func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 	var event mb.Event
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", beat.ModuleName)
+	event.RootFields.Put("service", common.MapStr{
+		"id":   info.UUID,
+		"name": info.Name,
+	})
 
-	event.ModuleFields = common.MapStr{}
-	event.ModuleFields.Put("id", info.UUID)
-	event.ModuleFields.Put("type", info.Beat)
+	event.Service = info.Beat
 
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)

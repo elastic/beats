@@ -1,7 +1,6 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
-        "id": "1f0c187b-f2ef-4950-b9cc-dd6864b9191a",
         "state": {
             "management": {
                 "enabled": false
@@ -15,8 +14,7 @@
             "queue": {
                 "name": "mem"
             }
-        },
-        "type": "metricbeat"
+        }
     },
     "event": {
         "dataset": "beat.state",
@@ -28,7 +26,8 @@
     },
     "service": {
         "address": "127.0.0.1:5066",
-        "name": "beat",
-        "type": "beat"
+        "id": "1f0c187b-f2ef-4950-b9cc-dd6864b9191a",
+        "name": "Shaunaks-MacBook-Pro-2.local",
+        "type": "metricbeat"
     }
 }
