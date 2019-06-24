@@ -90,7 +90,7 @@ metricbeat.modules:
 - module: kubernetes
   enabled: true
   metricsets:
-    - kubeproxy
+    - proxy
   hosts: ["localhost:10249"]
   period: 10s
 ----
@@ -109,11 +109,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-event,event>>
 
-* <<metricbeat-metricset-kubernetes-kubeproxy,kubeproxy>>
-
 * <<metricbeat-metricset-kubernetes-node,node>>
 
 * <<metricbeat-metricset-kubernetes-pod,pod>>
+
+* <<metricbeat-metricset-kubernetes-proxy,proxy>>
 
 * <<metricbeat-metricset-kubernetes-state_container,state_container>>
 
@@ -137,11 +137,11 @@ include::kubernetes/container.asciidoc[]
 
 include::kubernetes/event.asciidoc[]
 
-include::kubernetes/kubeproxy.asciidoc[]
-
 include::kubernetes/node.asciidoc[]
 
 include::kubernetes/pod.asciidoc[]
+
+include::kubernetes/proxy.asciidoc[]
 
 include::kubernetes/state_container.asciidoc[]
 

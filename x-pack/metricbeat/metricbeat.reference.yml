@@ -517,7 +517,7 @@ metricbeat.modules:
 - module: kubernetes
   enabled: true
   metricsets:
-    - kubeproxy
+    - proxy
   hosts: ["localhost:10249"]
   period: 10s
 

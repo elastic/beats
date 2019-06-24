@@ -6,14 +6,14 @@
       "version": "8.0.0"
     },
     "metricset": {
-      "name": "kubeproxy"
+      "name": "proxy"
     },
     "service": {
       "address": "192.168.205.12:10249",
       "type": "kubernetes"
     },
     "kubernetes": {
-      "kubeproxy": {
+      "proxy": {
         "url": "https://192.168.205.10:6443/%7Bprefix%7D",
         "verb": "POST",
         "client": {
@@ -69,7 +69,7 @@
     "event": {
       "module": "kubernetes",
       "duration": 2421013,
-      "dataset": "kubernetes.kubeproxy"
+      "dataset": "kubernetes.proxy"
     }
   }
   

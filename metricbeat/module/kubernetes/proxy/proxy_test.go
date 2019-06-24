@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package kubeproxy
+package proxy
 
 import (
 	"testing"
@@ -28,11 +28,11 @@ import (
 const testFile = "_meta/test/metrics"
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "kubeproxy",
+	ptest.TestMetricSet(t, "kubernetes", "proxy",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.kubeproxy.1.14",
-				ExpectedFile: "./_meta/test/metrics.kubeproxy.1.14.expected",
+				MetricsFile:  "./_meta/test/metrics.proxy.1.14",
+				ExpectedFile: "./_meta/test/metrics.proxy.1.14.expected",
 			},
 		},
 	)

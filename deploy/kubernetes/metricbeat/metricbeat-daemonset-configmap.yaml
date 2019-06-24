@@ -85,7 +85,7 @@ data:
         #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
     - module: kubernetes
       metricsets:
-        - kubeproxy
+        - proxy
       period: 10s
       host: ${NODE_NAME}
       hosts: ["localhost:10249"]

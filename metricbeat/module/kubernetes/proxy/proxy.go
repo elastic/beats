@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kubeproxy
+package proxy
 
 import (
 	"github.com/elastic/beats/metricbeat/helper/prometheus"
@@ -52,7 +52,7 @@ func init() {
 		},
 	}
 
-	mb.Registry.MustAddMetricSet("kubernetes", "kubeproxy",
+	mb.Registry.MustAddMetricSet("kubernetes", "proxy",
 		prometheus.MetricSetBuilder(mapping),
 		mb.WithHostParser(prometheus.HostParser))
 }

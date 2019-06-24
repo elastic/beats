@@ -13413,241 +13413,6 @@ type: keyword
 --
 
 [float]
-=== kubeproxy
-
-Kubernetes proxy server metrics
-
-
-
-*`kubernetes.kubeproxy.status_code`*::
-+
---
-HTTP Code
-
-
-type: keyword
-
---
-
-*`kubernetes.kubeproxy.host`*::
-+
---
-Host address
-
-
-type: keyword
-
---
-
-*`kubernetes.kubeproxy.method`*::
-+
---
-HTTP method
-
-
-type: keyword
-
---
-
-*`kubernetes.kubeproxy.verb`*::
-+
---
-HTTP method
-
-
-type: keyword
-
---
-
-*`kubernetes.kubeproxy.url`*::
-+
---
-URL requested
-
-
-type: keyword
-
---
-
-*`kubernetes.kubeproxy.handler`*::
-+
---
-HTTP request handler
-
-
-type: keyword
-
---
-
-[float]
-=== process
-
-kubeproxy process metrics
-
-
-
-*`kubernetes.kubeproxy.process.cpu.sec`*::
-+
---
-Total user and system CPU time spent in seconds
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.process.memory.resident.bytes`*::
-+
---
-Resident memory size in bytes
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.process.memory.virtual.bytes`*::
-+
---
-Resident memory size in bytes
-
-
-type: long
-
---
-
-[float]
-=== http
-
-HTTP server metrics
-
-
-
-*`kubernetes.kubeproxy.http.request.duration.us`*::
-+
---
-HTTP request duration
-
-
-type: float
-
---
-
-*`kubernetes.kubeproxy.http.request.size.bytes`*::
-+
---
-HTTP request size
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.http.response.size.bytes`*::
-+
---
-HTTP response size
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.http.request.count`*::
-+
---
-Number of HTTP requests
-
-
-type: long
-
---
-
-[float]
-=== client
-
-kubeproxy REST client metrics
-
-
-
-*`kubernetes.kubeproxy.client.request.duration.us.sum`*::
-+
---
-Requests duration, sum of durations in microseconds
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.client.request.duration.us.count`*::
-+
---
-Request duration, number of requests
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.client.request.duration.us.bucket.*`*::
-+
---
-Request duration, histogram buckets
-
-
-type: object
-
---
-
-*`kubernetes.kubeproxy.client.request.count`*::
-+
---
-Number of Rest requests, broken down by URL and verb
-
-
-type: long
-
---
-
-[float]
-=== sync
-
-kubeproxy proxy rules metrics
-
-
-
-*`kubernetes.kubeproxy.sync.rules.duration.us.sum`*::
-+
---
-SyncProxyRules duration, sum of durations in microseconds
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.sync.rules.duration.us.count`*::
-+
---
-SyncProxyRules duration, number of operations
-
-
-type: long
-
---
-
-*`kubernetes.kubeproxy.sync.rules.duration.us.bucket.*`*::
-+
---
-SyncProxyRules duration, histogram buckets
-
-
-type: object
-
---
-
-[float]
 === node
 
 kubernetes node metrics
@@ -14125,6 +13890,241 @@ Total major page faults
 
 
 type: long
+
+--
+
+[float]
+=== proxy
+
+Kubernetes proxy server metrics
+
+
+
+*`kubernetes.proxy.status_code`*::
++
+--
+HTTP Code
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.host`*::
++
+--
+Host address
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.method`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.verb`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.url`*::
++
+--
+URL requested
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.handler`*::
++
+--
+HTTP request handler
+
+
+type: keyword
+
+--
+
+[float]
+=== process
+
+kubeproxy process metrics
+
+
+
+*`kubernetes.proxy.process.cpu.sec`*::
++
+--
+Total user and system CPU time spent in seconds
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.process.memory.resident.bytes`*::
++
+--
+Resident memory size in bytes
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.process.memory.virtual.bytes`*::
++
+--
+Resident memory size in bytes
+
+
+type: long
+
+--
+
+[float]
+=== http
+
+HTTP server metrics
+
+
+
+*`kubernetes.proxy.http.request.duration.us`*::
++
+--
+HTTP request duration
+
+
+type: float
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes`*::
++
+--
+HTTP request size
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes`*::
++
+--
+HTTP response size
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.request.count`*::
++
+--
+Number of HTTP requests
+
+
+type: long
+
+--
+
+[float]
+=== client
+
+kubeproxy REST client metrics
+
+
+
+*`kubernetes.proxy.client.request.duration.us.sum`*::
++
+--
+Requests duration, sum of durations in microseconds
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.client.request.duration.us.count`*::
++
+--
+Request duration, number of requests
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.client.request.duration.us.bucket.*`*::
++
+--
+Request duration, histogram buckets
+
+
+type: object
+
+--
+
+*`kubernetes.proxy.client.request.count`*::
++
+--
+Number of Rest requests, broken down by URL and verb
+
+
+type: long
+
+--
+
+[float]
+=== sync
+
+kubeproxy proxy rules metrics
+
+
+
+*`kubernetes.proxy.sync.rules.duration.us.sum`*::
++
+--
+SyncProxyRules duration, sum of durations in microseconds
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.rules.duration.us.count`*::
++
+--
+SyncProxyRules duration, number of operations
+
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.rules.duration.us.bucket.*`*::
++
+--
+SyncProxyRules duration, histogram buckets
+
+
+type: object
 
 --
 
