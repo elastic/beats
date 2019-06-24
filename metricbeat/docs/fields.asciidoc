@@ -14202,7 +14202,7 @@ type: keyword
 --
 CPU seconds
 
-type: scaled_float
+type: double
 
 --
 
@@ -14238,7 +14238,7 @@ type: long
 --
 Seconds since the process started
 
-type: scaled_float
+type: double
 
 --
 
@@ -14248,7 +14248,7 @@ type: scaled_float
 --
 Request duration microseconds percentiles
 
-type: scaled_float
+type: double
 
 --
 
@@ -14257,7 +14257,7 @@ type: scaled_float
 --
 Request duration microseconds cumulative sum
 
-type: scaled_float
+type: double
 
 --
 
