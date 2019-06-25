@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-mssql-transaction_log]]
-=== mssql transaction_log metricset
+=== MSSQL transaction_log metricset
 
 experimental[]
 

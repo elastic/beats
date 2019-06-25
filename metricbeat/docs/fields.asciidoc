@@ -18600,7 +18600,7 @@ type: long
 --
 
 [[exported-fields-mssql]]
-== mssql fields
+== MSSQL fields
 
 MS SQL module
 

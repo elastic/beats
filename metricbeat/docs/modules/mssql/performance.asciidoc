@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-metricset-mssql-performance]]
-=== mssql performance metricset
+=== MSSQL performance metricset
 
 experimental[]
 
