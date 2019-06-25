@@ -13303,7 +13303,7 @@ Bytes in resident memory
 
 type: long
 
-format: byte
+format: bytes
 
 --
 
@@ -13314,7 +13314,7 @@ Bytes in virtual memory
 
 type: long
 
-format: byte
+format: bytes
 
 --
 
@@ -13380,7 +13380,7 @@ Request size cumulative sum
 
 type: long
 
-format: byte
+format: bytes
 
 --
 
@@ -13409,7 +13409,7 @@ Response size cumulative sum
 
 type: long
 
-format: byte
+format: bytes
 
 --
 
