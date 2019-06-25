@@ -283,7 +283,7 @@ func convertConfigToListMetrics(cloudwatchConfig Config, namespace string) cloud
 	return listMetricsOutput
 }
 
-func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI, resourceTypes []string, listMetricsTotal []cloudwatch.Metric, regionName string, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ClientAPI, resourceTypes []string, listMetricsTotal []cloudwatch.Metric, regionName string, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
 	// Get tags
 	resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, resourceTypes)
 	if err != nil {

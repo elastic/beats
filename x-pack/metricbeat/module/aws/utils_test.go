@@ -19,12 +19,12 @@ import (
 
 // MockCloudwatchClient struct is used for unit tests.
 type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
+	cloudwatchiface.ClientAPI
 }
 
 // MockResourceGroupsTaggingClient is used for unit tests.
 type MockResourceGroupsTaggingClient struct {
-	resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI
+	resourcegroupstaggingapiiface.ClientAPI
 }
 
 var (
