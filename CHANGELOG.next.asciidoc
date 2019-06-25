@@ -239,6 +239,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add a system/entropy metricset {pull}12450[12450]
 - Allow redis URL format in redis hosts config. {pull}12408[12408]
 - Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
+- Add `beat` module. {pull}12181[12181] {pull}12615[12615]
 - Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
 
 *Packetbeat*
