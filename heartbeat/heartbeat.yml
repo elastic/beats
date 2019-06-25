@@ -248,7 +248,7 @@ setup.data_frame:
 
 
                 Map summary = new HashMap();
-                summary.up = checks.entrySet().stream().filter(c -> c.getValue().status == "up").count();
+                summary.up = checks.entrySet().stream().filter(c -> c.getValue().monitor.status == "up").count();
                 summary.down = checks.size() - summary.up;
                 result.summary = summary;
 
