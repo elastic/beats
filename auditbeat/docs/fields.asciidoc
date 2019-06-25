@@ -2658,11 +2658,8 @@ example: True
 An array of strings describing a possible external origin for this file. For example, the URL it was downloaded from. Only supported in macOS, via the kMDItemWhereFroms attribute. Omitted if origin information is not available.
 
 
-<<<<<<< HEAD
 type: keyword
 
-=======
->>>>>>> [DOCS] More fixes for asciidoctor migration
 --
 
 *`file.origin.raw`*::
@@ -2672,6 +2669,8 @@ This is a non-analyzed field that is useful for aggregations on the origin data.
 
 
 type: keyword
+
+--
 
 [float]
 === selinux
