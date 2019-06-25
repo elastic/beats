@@ -91,9 +91,9 @@ func deleteMessage(qURL string, svc sqsiface.SQSAPI, message sqs.Message) error 
 func sqsSendReceiveDelete() {
 	fmt.Println("Please setup AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and SESSION_TOKEN first. If a temp credentials are needed, please run getTempCreds.go first.")
 	regionsList := []string{"us-west-1", "us-east-1"}
-	accessKeyID := "ASIAZENKQPPN4AXZ3KN2"
-	secretAccessKey := "GcotQB6fb8dPCoCp37BZ4qZWQhwacybhqtbk+xH6"
-	sessionToken := "H6s4gTiZO1kG5150Y9nGkvqkgiyEuT08+CnY0DnmsrPnIpZsqsx9AkltCQF/7iOxF97blS9oCu08hBbmibPU+V/RKLWWr+QF"
+	accessKeyID := "FAKE-ACCESS-KEY-ID"
+	secretAccessKey := "FAKE-SECRET-ACCESS-KEY"
+	sessionToken := "FAKE-SESSION-TOKEN"
 
 	awsConfig := defaults.Config()
 	awsCreds := aws.Credentials{
