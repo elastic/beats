@@ -349,15 +349,19 @@ func NewPushMetricSetV2WithContext(t testing.TB, config interface{}) mb.PushMetr
 // capturingPushReporterV2 stores all the events and errors from a metricset's
 // Run method.
 type capturingPushReporterV2 struct {
-	doneC   chan struct{}
+	context.Context
 	eventsC chan mb.Event
+}
+
+func newCapturingPushReporterV2(ctx context.Context) *capturingPushReporterV2 {
+	return &capturingPushReporterV2{Context: ctx, eventsC: make(chan mb.Event)}
 }
 
 // report writes an event to the output channel and returns true. If the output
 // is closed it returns false.
 func (r *capturingPushReporterV2) report(event mb.Event) bool {
 	select {
-	case <-r.doneC:
+	case <-r.Done():
 		// Publisher is stopped.
 		return false
 	case r.eventsC <- event:
@@ -375,72 +379,11 @@ func (r *capturingPushReporterV2) Error(err error) bool {
 	return r.report(mb.Event{Error: err})
 }
 
-// Done returns the Done channel for this reporter.
-func (r *capturingPushReporterV2) Done() <-chan struct{} {
-	return r.doneC
-}
-
-// RunPushMetricSetV2 run the given push metricset for the specific amount of
-// time and returns all of the events and errors that occur during that period.
-func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
-	var (
-		r      = &capturingPushReporterV2{eventsC: make(chan mb.Event)}
-		wg     sync.WaitGroup
-		events []mb.Event
-	)
-	wg.Add(2)
-
-	// Producer
-	go func() {
-		defer wg.Done()
-		defer close(r.eventsC)
-		if closer, ok := metricSet.(mb.Closer); ok {
-			defer closer.Close()
-		}
-		metricSet.Run(r)
-	}()
-
-	// Consumer
-	go func() {
-		defer wg.Done()
-		defer close(r.doneC)
-
-		timer := time.NewTimer(timeout)
-		defer timer.Stop()
-		for {
-			select {
-			case <-timer.C:
-				return
-			case e, ok := <-r.eventsC:
-				if !ok {
-					return
-				}
-				events = append(events, e)
-				if waitEvents > 0 && waitEvents <= len(events) {
-					return
-				}
-			}
-		}
-	}()
-
-	wg.Wait()
-	return events
-}
-
-// RunPushMetricSetV2WithContext run the given push metricset for the specific amount of
-// time and returns all of the events that occur during that period.
-func RunPushMetricSetV2WithContext(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2WithContext) []mb.Event {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	r := &capturingPushReporterV2{eventsC: make(chan mb.Event)}
-
-	go metricSet.Run(ctx, r)
-
+func (r *capturingPushReporterV2) capture(waitEvents int) []mb.Event {
 	var events []mb.Event
 	for {
 		select {
-		case <-ctx.Done():
+		case <-r.Done():
 			// Timeout
 			return events
 		case e := <-r.eventsC:
@@ -450,4 +393,28 @@ func RunPushMetricSetV2WithContext(timeout time.Duration, waitEvents int, metric
 			}
 		}
 	}
+}
+
+// RunPushMetricSetV2 run the given push metricset for the specific amount of
+// time and returns all of the events and errors that occur during that period.
+func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	r := newCapturingPushReporterV2(ctx)
+
+	go metricSet.Run(r)
+	return r.capture(waitEvents)
+}
+
+// RunPushMetricSetV2WithContext run the given push metricset for the specific amount of
+// time and returns all of the events that occur during that period.
+func RunPushMetricSetV2WithContext(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2WithContext) []mb.Event {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	r := newCapturingPushReporterV2(ctx)
+
+	go metricSet.Run(ctx, r)
+	return r.capture(waitEvents)
 }
