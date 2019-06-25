@@ -159,8 +159,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/aws/aws-sdk-go-v2
-Version: v2.0.0-preview.5
-Revision: d52522b5f4b95591ff6528d7c54923951aadf099
+Version: v0.9.0
+Revision: 098e15df3044cf1b04a222c1c33c3e6135ac89f3
 License type (autodetected): Apache-2.0
 ./vendor/github.com/aws/aws-sdk-go-v2/LICENSE.txt:
 --------------------------------------------------------------------
