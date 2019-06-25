@@ -45,7 +45,7 @@ type PipelineState struct {
 	Representation map[string]interface{} `json:"representation"`
 	BatchSize      int                    `json:"batch_size"`
 	Workers        int                    `json:"workers"`
-	ClusterIDs     []string               `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
+	ClusterIDs     []string               `json:"cluster_uuids,omitempty"`
 }
 
 // PipelineStats represents the stats of a Logstash pipeline
@@ -57,7 +57,7 @@ type PipelineStats struct {
 	Reloads     map[string]interface{}   `json:"reloads"`
 	Queue       map[string]interface{}   `json:"queue"`
 	Vertices    []map[string]interface{} `json:"vertices"`
-	ClusterIDs  []string                 `json:"cluster_uuids,omitempty"` // TODO: see https://github.com/elastic/logstash/issues/10602
+	ClusterIDs  []string                 `json:"cluster_uuids,omitempty"`
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets

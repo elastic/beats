@@ -63,7 +63,7 @@ type nodeInfo struct {
 	Snapshot    bool                   `json:"snapshot"`
 	Status      string                 `json:"status"`
 	HTTPAddress string                 `json:"http_address"`
-	Pipeline    map[string]interface{} `json:"pipeline"` // TODO: https://github.com/elastic/logstash/issues/10121#issuecomment-477960900
+	Pipeline    map[string]interface{} `json:"pipeline"`
 }
 
 // NodeStats represents the stats of a Logstash node
