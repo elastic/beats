@@ -14211,7 +14211,7 @@ type: double
 --
 Bytes in resident memory
 
-type: bytes
+type: byte
 
 --
 
@@ -14220,7 +14220,7 @@ type: bytes
 --
 Bytes in virtual memory
 
-type: bytes
+type: byte
 
 --
 
@@ -14284,7 +14284,7 @@ type: object
 --
 Request size cumulative sum
 
-type: bytes
+type: byte
 
 --
 
@@ -14311,7 +14311,7 @@ type: object
 --
 Response size cumulative sum
 
-type: bytes
+type: byte
 
 --
 
