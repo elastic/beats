@@ -14211,7 +14211,9 @@ type: double
 --
 Bytes in resident memory
 
-type: byte
+type: long
+
+format: bytes
 
 --
 
@@ -14220,7 +14222,9 @@ type: byte
 --
 Bytes in virtual memory
 
-type: byte
+type: long
+
+format: bytes
 
 --
 
@@ -14286,6 +14290,8 @@ Request size cumulative sum
 
 type: long
 
+format: bytes
+
 --
 
 *`kubernetes.scheduler.http.request.size.bytes.count`*::
@@ -14312,6 +14318,8 @@ type: object
 Response size cumulative sum
 
 type: long
+
+format: bytes
 
 --
 
