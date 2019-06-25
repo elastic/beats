@@ -59,7 +59,7 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
-include::../include/var-convert-timezone.asciidoc[]
+include::../include/timezone-support.asciidoc[]
 
 :has-dashboards!:
 

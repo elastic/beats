@@ -135,6 +135,22 @@ auditbeat.modules:
   # socket.state.period: 12h
   # user.state.period: 12h
 
+  # Average file read rate for hashing of the process executable. Default is "50 MiB".
+  process.hash.scan_rate_per_sec: 50 MiB
+
+  # Limit on the size of the process executable that will be hashed. Default is "100 MiB".
+  process.hash.max_file_size: 100 MiB
+
+  # Hash types to compute of the process executable. Supported types are
+  # blake2b_256, blake2b_384, blake2b_512, md5, sha1, sha224, sha256, sha384,
+  # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384, sha3_512, and xxh64.
+  # Default is sha1.
+  process.hash.hash_types: [sha1]
+
+  # Disabled by default. If enabled, the socket dataset will
+  # report sockets to and from localhost.
+  # socket.include_localhost: false
+
   # Enabled by default. Auditbeat will read password fields in
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
@@ -466,6 +482,11 @@ output.elasticsearch:
   # Proxy server URL
   #proxy_url: http://proxy:3128
 
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
+
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
   # dropped. The default is 3.
@@ -708,6 +729,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -1164,6 +1189,9 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
@@ -1207,6 +1235,10 @@ logging.files:
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
   #interval: 0
+
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
 
 # Set to true to log messages in JSON format.
 #logging.json: false

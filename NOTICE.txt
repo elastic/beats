@@ -639,8 +639,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/ecs
-Version: 1.0
-Revision: b9f735dd33b0bbb95dbca4229397c9b7f81f8f53
+Version: v1.0.1
+Revision: ab5e966864a6e2d4bc9fd6e2343e8d7f05f648fb
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/ecs/LICENSE.txt:
 --------------------------------------------------------------------
@@ -679,6 +679,16 @@ This product includes software developed at
 Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
+Dependency: github.com/elastic/go-lookslike
+Version: v0.2.0
+Revision: 807124eb9fc6684949aa99744577175fd6bac4fd
+License type (autodetected): Apache-2.0
+./vendor/github.com/elastic/go-lookslike/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/elastic/go-lumber
 Revision: 616041e345fc33c97bc0eb0fa6b388aa07bca3e1
 License type (autodetected): Apache-2.0
@@ -715,7 +725,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Revision: ab4f04edfc3d6b3864f5f06a068ddab9ad79774f
+Revision: 9a4be54a53be4c48b44d351d52fb425a5e274be5
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
@@ -723,7 +733,7 @@ Apache License 2.0
 
 -------NOTICE.txt-----
 Elastic go-sysinfo
-Copyright 2017-2018 Elasticsearch B.V.
+Copyright 2017-2019 Elasticsearch B.V.
 
 This product includes software developed at
 Elasticsearch, B.V. (https://www.elastic.co/).
@@ -765,8 +775,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.10.1
-Revision: fc57ef8c6efc0b4fdc6d7c623173073a6d3d4736
+Version: v0.10.3
+Revision: 99ed9cf55303a9d3936cb656b9a86a4a6e67b30a
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
@@ -1921,7 +1931,7 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/lib/pq
-Revision: 2704adc878c21e1329f46f6e56a1c387d788ff94
+Revision: 2ff3cb3adc01768e0a552b3a02575a6df38a9bea
 License type (autodetected): MIT
 ./metricbeat/module/postgresql/vendor/github.com/lib/pq/LICENSE.md:
 --------------------------------------------------------------------

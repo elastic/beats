@@ -36,7 +36,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
+	compose.EnsureUpWithTimeout(t, 570, "elasticsearch", "kibana")
 
 	config := mtest.GetConfig("stats")
 	host := config["hosts"].([]string)[0]

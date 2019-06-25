@@ -132,6 +132,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	err := m.fetchStats(r, now)
 	if err != nil {
+		if m.XPackEnabled {
+			m.Logger().Error(err)
+			return nil
+		}
 		return err
 	}
 

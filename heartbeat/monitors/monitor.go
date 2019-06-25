@@ -94,7 +94,25 @@ func (e ErrDuplicateMonitorID) Error() string {
 	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs must be unique values.", e.ID)
 }
 
+// newMonitor Creates a new monitor, without leaking resources in the event of an error.
 func newMonitor(
+	config *common.Config,
+	registrar *pluginsReg,
+	pipelineConnector beat.PipelineConnector,
+	scheduler *scheduler.Scheduler,
+	allowWatches bool,
+	factoryMetadata *common.MapStrPointer,
+) (*Monitor, error) {
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches, factoryMetadata)
+	if m != nil && err != nil {
+		m.Stop()
+	}
+	return m, err
+}
+
+// newMonitorUnsafe is the unsafe way of creating a new monitor because it may return a monitor instance along with an
+// error without freeing monitor resources. m.Stop() must always be called on a non-nil monitor to free resources.
+func newMonitorUnsafe(
 	config *common.Config,
 	registrar *pluginsReg,
 	pipelineConnector beat.PipelineConnector,
@@ -133,13 +151,13 @@ func newMonitor(
 	if m.id != "" {
 		// Ensure we don't have duplicate IDs
 		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.id, m); loaded {
-			return nil, ErrDuplicateMonitorID{m.id}
+			return m, ErrDuplicateMonitorID{m.id}
 		}
 	} else {
 		// If there's no explicit ID generate one
 		hash, err := m.configHash()
 		if err != nil {
-			return nil, err
+			return m, err
 		}
 		m.id = fmt.Sprintf("auto-%s-%#X", m.typ, hash)
 	}
@@ -149,22 +167,22 @@ func newMonitor(
 	m.endpoints = endpoints
 
 	if err != nil {
-		return nil, fmt.Errorf("job err %v", err)
+		return m, fmt.Errorf("job err %v", err)
 	}
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
-		return nil, err
+		return m, err
 	}
 
 	err = m.makeWatchTasks(monitorPlugin)
 	if err != nil {
-		return nil, err
+		return m, err
 	}
 
 	if len(m.watchPollTasks) > 0 {
 		if !allowWatches {
-			return nil, ErrWatchesDisabled
+			return m, ErrWatchesDisabled
 		}
 
 		logp.Info(`Obsolete option 'watch.poll_file' declared. This will be removed in a future release. 

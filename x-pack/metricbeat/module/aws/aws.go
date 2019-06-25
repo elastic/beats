@@ -5,7 +5,7 @@
 package aws
 
 import (
-	"strconv"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 
@@ -20,20 +20,20 @@ import (
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period          string `config:"period"`
-	AccessKeyID     string `config:"access_key_id"`
-	SecretAccessKey string `config:"secret_access_key"`
-	SessionToken    string `config:"session_token"`
-	DefaultRegion   string `config:"default_region"`
+	Period          time.Duration `config:"period" validate:"nonzero,required"`
+	AccessKeyID     string        `config:"access_key_id" validate:"nonzero,required"`
+	SecretAccessKey string        `config:"secret_access_key" validate:"nonzero,required"`
+	SessionToken    string        `config:"session_token"`
+	DefaultRegion   string        `config:"default_region"`
+	Regions         []string      `config:"regions"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
 type MetricSet struct {
 	mb.BaseMetricSet
-	RegionsList    []string
-	DurationString string
-	PeriodInSec    int
-	AwsConfig      *awssdk.Config
+	RegionsList []string
+	Period      time.Duration
+	AwsConfig   *awssdk.Config
 }
 
 // ModuleName is the name of this module.
@@ -62,49 +62,44 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	awsConfig := defaults.Config()
-	awsCreds := awssdk.Credentials{
+	awsCredentials := awssdk.Credentials{
 		AccessKeyID:     config.AccessKeyID,
 		SecretAccessKey: config.SecretAccessKey,
 	}
 	if config.SessionToken != "" {
-		awsCreds.SessionToken = config.SessionToken
+		awsCredentials.SessionToken = config.SessionToken
 	}
 
 	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCreds,
+		Value: awsCredentials,
 	}
 
 	awsConfig.Region = config.DefaultRegion
 
-	svcEC2 := ec2.New(awsConfig)
-	regionsList, err := getRegions(svcEC2)
-	if err != nil {
-		return nil, err
-	}
-
-	// Calculate duration based on period
-	if config.Period == "" {
-		err = errors.New("period is not set in AWS module config")
-		return nil, err
-	}
-
-	durationString, periodSec, err := convertPeriodToDuration(config.Period)
-	if err != nil {
-		return nil, err
-	}
-
-	// Construct MetricSet
 	metricSet := MetricSet{
-		BaseMetricSet:  base,
-		RegionsList:    regionsList,
-		DurationString: durationString,
-		PeriodInSec:    periodSec,
-		AwsConfig:      &awsConfig,
+		BaseMetricSet: base,
+		Period:        config.Period,
+		AwsConfig:     &awsConfig,
 	}
+
+	// Construct MetricSet with a full regions list
+	if config.Regions == nil {
+		svcEC2 := ec2.New(awsConfig)
+		completeRegionsList, err := getRegions(svcEC2)
+		if err != nil {
+			return nil, err
+		}
+
+		metricSet.RegionsList = completeRegionsList
+		return &metricSet, nil
+	}
+
+	// Construct MetricSet with specific regions list from config
+	metricSet.RegionsList = config.Regions
 	return &metricSet, nil
 }
 
-func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
+func getRegions(svc ec2iface.EC2API) (completeRegionsList []string, err error) {
 	input := &ec2.DescribeRegionsInput{}
 	req := svc.DescribeRegionsRequest(input)
 	output, err := req.Send()
@@ -113,33 +108,9 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 		return
 	}
 	for _, region := range output.Regions {
-		regionsList = append(regionsList, *region.RegionName)
+		completeRegionsList = append(completeRegionsList, *region.RegionName)
 	}
 	return
-}
-
-func convertPeriodToDuration(period string) (string, int, error) {
-	// Set starttime double the default frequency earlier than the endtime in order to make sure
-	// GetMetricDataRequest gets the latest data point for each metric.
-	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
-	if err != nil {
-		return "", 0, err
-	}
-
-	unitPeriod := period[len(period)-1:]
-	switch unitPeriod {
-	case "s":
-		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		return duration, numberPeriod, nil
-	case "m":
-		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		periodInSec := numberPeriod * 60
-		return duration, periodInSec, nil
-	default:
-		err = errors.New("invalid period in config. Please reset period in config")
-		duration := "-" + strconv.Itoa(numberPeriod*2) + "s"
-		return duration, numberPeriod, err
-	}
 }
 
 // StringInSlice checks if a string is already exists in list
@@ -156,8 +127,9 @@ func StringInSlice(str string, list []string) bool {
 func InitEvent(metricsetName string, regionName string) mb.Event {
 	event := mb.Event{}
 	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
 	event.MetricSetFields = common.MapStr{}
+	event.ModuleFields = common.MapStr{}
+	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {

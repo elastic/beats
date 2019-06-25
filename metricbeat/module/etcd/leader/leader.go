@@ -18,9 +18,16 @@
 package leader
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -30,6 +37,12 @@ const (
 	defaultScheme = "http"
 	defaultPath   = "/v2/stats/leader"
 	apiVersion    = "2"
+
+	// returned JSON management
+	msgElement        = "message"
+	msgValueNonLeader = "not current leader"
+
+	logSelector = "etcd.leader"
 )
 
 var (
@@ -46,11 +59,15 @@ func init() {
 	)
 }
 
+// MetricSet for etcd.leader
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http         *helper.HTTP
+	logger       *logp.Logger
+	debugEnabled bool
 }
 
+// New etcd.leader metricset object
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -64,6 +81,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
+		logp.NewLogger(logSelector),
+		logp.IsDebug(logSelector),
 	}, nil
 }
 
@@ -71,14 +90,49 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	content, err := m.http.FetchContent()
+	res, err := m.http.FetchResponse()
 	if err != nil {
-		return errors.Wrap(err, "error in http fetch")
+		return errors.Wrap(err, "error fetching response")
+	}
+	defer res.Body.Close()
+
+	content, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return errors.Wrapf(err, "error reading body response")
 	}
 
-	reporter.Event(mb.Event{
-		MetricSetFields: eventMapping(content),
-		ModuleFields:    common.MapStr{"api_version": apiVersion},
-	})
-	return nil
+	if res.StatusCode == http.StatusOK {
+		reporter.Event(mb.Event{
+			MetricSetFields: eventMapping(content),
+			ModuleFields:    common.MapStr{"api_version": apiVersion},
+		})
+		return nil
+	}
+
+	// Errors might be reported as {"message":"<error message>"}
+	// let's look for that structure
+	var jsonResponse map[string]interface{}
+	if err = json.Unmarshal(content, &jsonResponse); err == nil {
+		if retMessage := jsonResponse[msgElement]; retMessage != "" {
+			// there is an error message element, let's use it
+
+			// If a 403 is returned and {"message":"not current leader"}
+			// do not consider this an error
+			// do not report events since this is not a leader
+			if res.StatusCode == http.StatusForbidden &&
+				retMessage == msgValueNonLeader {
+				if m.debugEnabled {
+					m.logger.Debugf("skipping event for non leader member %q", m.Host())
+				}
+				return nil
+			}
+
+			return fmt.Errorf("fetching HTTP response returned status code %d: %s",
+				res.StatusCode, retMessage)
+		}
+	}
+
+	// no message in the JSON payload, return standard error
+	return fmt.Errorf("fetching HTTP response returned status code %d", res.StatusCode)
+
 }

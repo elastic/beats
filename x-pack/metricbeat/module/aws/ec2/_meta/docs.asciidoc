@@ -35,8 +35,9 @@ We fetch the following data:
 Some specific AWS permissions are required for IAM user to collect AWS EC2 metrics.
 ----
 ec2:DescribeInstances
-cloudwatch:GetMetricData
 ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
 ----
 
 [float]

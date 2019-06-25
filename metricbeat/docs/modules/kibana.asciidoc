@@ -5,9 +5,13 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kibana]]
 == Kibana module
 
-The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {stack-ov}/xpack-monitoring.html[monitoring] feature.
+There are two modules that collect metrics about {kib}: 
 
-The default metricset is `status`.
+* The Kibana module tracks only the high-level metrics. The default metricset in
+this module is `status`.
+* The Kibana X-Pack module enables you to monitor more Kibana metrics with our
+{stack-ov}/xpack-monitoring.html[monitoring] feature. The default metricset in
+this module is `stats`.
 
 [float]
 === Compatibility

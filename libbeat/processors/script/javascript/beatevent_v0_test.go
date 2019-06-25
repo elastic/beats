@@ -19,7 +19,6 @@ package javascript
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -29,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/tests/resources"
 )
 
 const (
@@ -206,15 +206,8 @@ func TestBeatEventV0(t *testing.T) {
 }
 
 func BenchmarkBeatEventV0(b *testing.B) {
-	goroutinesAtStart := runtime.NumGoroutine()
-	defer func() {
-		// Sanity check that timers are not leaking goroutines.
-		goroutinesAtEnd := runtime.NumGoroutine()
-		if goroutinesAtEnd != goroutinesAtStart {
-			b.Errorf("Suspected goroutine leak: atStart=%d, atEnd=%d",
-				goroutinesAtStart, goroutinesAtEnd)
-		}
-	}()
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(b)
 
 	benchTest := func(tc testCase, timeout time.Duration) func(b *testing.B) {
 		return func(b *testing.B) {

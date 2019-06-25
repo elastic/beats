@@ -63,7 +63,7 @@ type FileClientHandler struct {
 // prepare a policy and write alias.
 type FileClient interface {
 	GetVersion() common.Version
-	Write(name string, body string) error
+	Write(component string, name string, body string) error
 }
 
 const (
@@ -243,9 +243,8 @@ func (h *FileClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
 
 // CreateILMPolicy writes given policy to the configured file.
 func (h *FileClientHandler) CreateILMPolicy(policy Policy) error {
-	p := common.MapStr{policy.Name: policy.Body}
-	str := fmt.Sprintf("%s\n", p.StringToPrint())
-	if err := h.client.Write(policy.Name, str); err != nil {
+	str := fmt.Sprintf("%s\n", policy.Body.StringToPrint())
+	if err := h.client.Write("policy", policy.Name, str); err != nil {
 		return fmt.Errorf("error printing policy : %v", err)
 	}
 	return nil

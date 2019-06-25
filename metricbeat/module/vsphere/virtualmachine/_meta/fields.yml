@@ -12,6 +12,10 @@
       type: keyword
       description: >
         Virtual Machine name
+    - name: os
+      type: keyword
+      description: >
+        Virtual Machine Operating System name
     - name: cpu.used.mhz
       type: long
       description: >

@@ -16,7 +16,7 @@ XPACK_SUFFIX=x-pack/
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
 # in the x-pack directory (rather than having the OSS build produce both sets
 # of artifacts). This will be removed once we complete the transition.
-PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/filebeat x-pack/metricbeat
+PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/filebeat x-pack/metricbeat x-pack/winlogbeat
 # PROJECTS_XPACK_MAGE is a list of Beats whose primary build logic is based in
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can

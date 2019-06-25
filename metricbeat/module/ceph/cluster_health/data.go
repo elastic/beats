@@ -25,17 +25,20 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Timecheck contains part of the response from a HealthRequest
 type Timecheck struct {
 	RoundStatus string `json:"round_status"`
 	Epoch       int64  `json:"epoch"`
 	Round       int64  `json:"round"`
 }
 
+// Output is the body of the status response
 type Output struct {
 	OverallStatus string    `json:"overall_status"`
 	Timechecks    Timecheck `json:"timechecks"`
 }
 
+// HealthRequest represents the response to a cluster health request
 type HealthRequest struct {
 	Status string `json:"status"`
 	Output Output `json:"output"`

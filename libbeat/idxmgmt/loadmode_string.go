@@ -26,14 +26,15 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[LoadModeUnset-0]
-	_ = x[LoadModeEnabled-1]
-	_ = x[LoadModeForce-2]
-	_ = x[LoadModeDisabled-3]
+	_ = x[LoadModeDisabled-1]
+	_ = x[LoadModeEnabled-2]
+	_ = x[LoadModeOverwrite-3]
+	_ = x[LoadModeForce-4]
 }
 
-const _LoadMode_name = "unsetenabledforcedisabled"
+const _LoadMode_name = "unsetdisabledenabledoverwriteforce"
 
-var _LoadMode_index = [...]uint8{0, 5, 12, 17, 25}
+var _LoadMode_index = [...]uint8{0, 5, 13, 20, 29, 34}
 
 func (i LoadMode) String() string {
 	if i >= LoadMode(len(_LoadMode_index)-1) {

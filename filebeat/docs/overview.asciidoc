@@ -18,7 +18,7 @@ harvester reads a single log for new content and sends the new log data to
 libbeat, which aggregates the events and sends the aggregated data to the output
 that you've configured for {beatname_uc}.
 
-image:./images/filebeat.png[Beats design]
+image::./images/filebeat.png[Beats design]
 
 For more information about inputs and harvesters, see
 <<how-filebeat-works>>.

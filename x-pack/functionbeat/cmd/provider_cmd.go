@@ -5,6 +5,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -18,8 +19,7 @@ import (
 
 var output string
 
-// TODO: Add List() subcommand.
-func handler() (*cliHandler, error) {
+func initProvider() (provider.Provider, error) {
 	b, err := instance.NewInitializedBeat(instance.Settings{Name: Name})
 	if err != nil {
 		return nil, err
@@ -35,7 +35,12 @@ func handler() (*cliHandler, error) {
 		return nil, err
 	}
 
-	provider, err := provider.NewProvider(cfg)
+	return provider.NewProvider(cfg)
+}
+
+// TODO: Add List() subcommand.
+func handler() (*cliHandler, error) {
+	provider, err := initProvider()
 	if err != nil {
 		return nil, err
 	}
@@ -98,4 +103,29 @@ func genPackageCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&output, "output", "o", "", "full path to the package")
 	return cmd
+}
+
+func genExportFunctionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "function",
+		Short: "Export function template",
+		Run: cli.RunWith(func(_ *cobra.Command, args []string) error {
+			p, err := initProvider()
+			if err != nil {
+				return err
+			}
+			builder, err := p.TemplateBuilder()
+			if err != nil {
+				return err
+			}
+			for _, name := range args {
+				template, err := builder.RawTemplate(name)
+				if err != nil {
+					return fmt.Errorf("error generating raw template for %s: %+v", name, err)
+				}
+				fmt.Println(template)
+			}
+			return nil
+		}),
+	}
 }

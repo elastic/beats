@@ -12,6 +12,7 @@ import (
 type Config struct {
 	StatePeriod       time.Duration `config:"state.period"`
 	SocketStatePeriod time.Duration `config:"socket.state.period"`
+	IncludeLocalhost  bool          `config:"socket.include_localhost"`
 }
 
 // Validate validates the host metricset config.
@@ -27,5 +28,6 @@ func (c *Config) effectiveStatePeriod() time.Duration {
 }
 
 var defaultConfig = Config{
-	StatePeriod: 1 * time.Hour,
+	StatePeriod:      1 * time.Hour,
+	IncludeLocalhost: false,
 }

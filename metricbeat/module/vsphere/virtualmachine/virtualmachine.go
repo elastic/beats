@@ -127,17 +127,37 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, vm := range vmt {
-
 		freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
 
-		event := common.MapStr{}
-
-		event["name"] = vm.Summary.Config.Name
-		event.Put("cpu.used.mhz", vm.Summary.QuickStats.OverallCpuUsage)
-		event.Put("memory.used.guest.bytes", int64(vm.Summary.QuickStats.GuestMemoryUsage)*1024*1024)
-		event.Put("memory.used.host.bytes", int64(vm.Summary.QuickStats.HostMemoryUsage)*1024*1024)
-		event.Put("memory.total.guest.bytes", int64(vm.Summary.Config.MemorySizeMB)*1024*1024)
-		event.Put("memory.free.guest.bytes", freeMemory)
+		event := common.MapStr{
+			"name": vm.Summary.Config.Name,
+			"os":   vm.Summary.Config.GuestFullName,
+			"cpu": common.MapStr{
+				"used": common.MapStr{
+					"mhz": vm.Summary.QuickStats.OverallCpuUsage,
+				},
+			},
+			"memory": common.MapStr{
+				"used": common.MapStr{
+					"guest": common.MapStr{
+						"bytes": (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024),
+					},
+					"host": common.MapStr{
+						"bytes": (int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024),
+					},
+				},
+				"total": common.MapStr{
+					"guest": common.MapStr{
+						"bytes": (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024),
+					},
+				},
+				"free": common.MapStr{
+					"guest": common.MapStr{
+						"bytes": freeMemory,
+					},
+				},
+			},
+		}
 
 		if vm.Summary.Runtime.Host != nil {
 			event["host"] = vm.Summary.Runtime.Host.Value

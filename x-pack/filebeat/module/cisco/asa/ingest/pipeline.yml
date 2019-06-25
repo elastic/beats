@@ -22,9 +22,6 @@ processors:
  - date:
      field: "_temp_.raw_date"
      ignore_failure: true
-     {< if .convert_timezone >}
-     timezone: "{{ event.timezone }}"
-     {< end >}
      formats: 
       - "MMM  d HH:mm:ss"
       - "MMM dd HH:mm:ss"
@@ -42,6 +39,12 @@ processors:
       - "MMM dd yyyy HH:mm:ss z"
       - "EEE MMM  d yyyy HH:mm:ss z"
       - "EEE MMM dd yyyy HH:mm:ss z"
+ - date:
+     if: "ctx.event.timezone != null"
+     field: "@timestamp"
+     formats: ["ISO8601"]
+     timezone: "{{ event.timezone }}"
+     on_failure: [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
 
 #
 # Set log.level

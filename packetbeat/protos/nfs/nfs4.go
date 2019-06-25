@@ -17,8 +17,6 @@
 
 package nfs
 
-import "fmt"
-
 const (
 	opAccess             = 3
 	opClose              = 4
@@ -234,7 +232,7 @@ func (nfs *nfs) findV4MainOpcode(xdr *xdr) string {
 		opname, ok := nfsOpnum4[op]
 
 		if !ok {
-			return fmt.Sprintf("ILLEGAL (%d)", op)
+			return "ILLEGAL"
 		}
 		currentOpname = opname
 

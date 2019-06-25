@@ -75,6 +75,8 @@ tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -274,13 +276,15 @@ even if you aren't using Filebeat modules.
 
 To populate the example dashboards with data, you need to either
 <<configuring-ingest-node,define ingest node pipelines>> or use Logstash to
-parse the data into the fields expected by the dashboards. If you are using
-Logstash, see the
-{logstash-ref}/logstash-config-for-filebeat-modules.html[configuration examples]
-in the Logstash documentation for help parsing the log formats supported
-by the dashboards.
+parse the data into the fields expected by the dashboards.
+
+// TODO: Add this section back to the docs when the examples are available.
+// If you are using Logstash, see the
+// {logstash-ref}/logstash-config-for-filebeat-modules.html[configuration examples]
+// in the Logstash documentation for help parsing the log formats supported
+// by the dashboards.
 
 Here is an example of the Filebeat system dashboard:
 
 [role="screenshot"]
-image:./images/kibana-system.png[]
+image::./images/kibana-system.png[]

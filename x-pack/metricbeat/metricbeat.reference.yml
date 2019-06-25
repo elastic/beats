@@ -160,21 +160,64 @@ metricbeat.modules:
 - module: aws
   period: 300s
   metricsets:
-    - "ec2"
-    - "sqs"
+    - ec2
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
 - module: aws
-  period: 86400s
+  period: 300s
   metricsets:
-    - "s3_request"
-    - "s3_daily_storage"
+    - sqs
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
+  #regions:
+  #  - us-west-1
+- module: aws
+  period: 86400s
+  metricsets:
+    - s3_request
+    - s3_daily_storage
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  #regions:
+  #  - us-west-1
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatch
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  cloudwatch_metrics:
+    - namespace: AWS/EC2
+      metricname: CPUUtilization
+      dimensions:
+        - name: InstanceId
+          value: i-0686946e22cf9494a
+    - namespace: AWS/EBS
+    - namespace: AWS/ELB
+      tags.resource_type_filter: elasticloadbalancing
+  #regions:
+  #  - us-east-1
+  #  - us-east-2
+
+#--------------------------------- Beat Module ---------------------------------
+- module: beat
+  metricsets:
+    - stats
+  period: 10s
+  hosts: ["http://localhost:5066"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph
@@ -1083,6 +1126,11 @@ output.elasticsearch:
   # Proxy server URL
   #proxy_url: http://proxy:3128
 
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
+
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
   # dropped. The default is 3.
@@ -1325,6 +1373,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -1781,6 +1833,9 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
@@ -1824,6 +1879,10 @@ logging.files:
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
   #interval: 0
+
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
 
 # Set to true to log messages in JSON format.
 #logging.json: false
