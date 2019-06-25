@@ -21,32 +21,16 @@ import (
 	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
-// config generates short/reference configs.
-func config() error {
-	// NOTE: No Docker config.
-	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, configFileParams(), ".")
-}
-
-func configFileParams() devtools.ConfigFileParams {
-	beatDir := devtools.OSSBeatDir
-	switch SelectLogic {
-	case devtools.OSSProject:
-		beatDir = devtools.OSSBeatDir
-	case devtools.XPackProject:
-		beatDir = devtools.XPackBeatDir
-	default:
-		panic(devtools.ErrUnknownProjectType)
-	}
-
+// ConfigFileParams returns the default ConfigFileParams for generating
+// packetbeat*.yml files.
+func ConfigFileParams() devtools.ConfigFileParams {
 	return devtools.ConfigFileParams{
 		ShortParts: []string{
-			devtools.OSSBeatDir("_meta/common.yml.tmpl"),
-			beatDir("_meta/beat.yml.tmpl"),
+			devtools.OSSBeatDir("_meta/beat.yml"),
 			devtools.LibbeatDir("_meta/config.yml.tmpl"),
 		},
 		ReferenceParts: []string{
-			devtools.OSSBeatDir("_meta/common.yml.tmpl"),
-			beatDir("_meta/beat.yml.tmpl"),
+			devtools.OSSBeatDir("_meta/beat.reference.yml"),
 			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		},
 		DockerParts: []string{
@@ -54,7 +38,7 @@ func configFileParams() devtools.ConfigFileParams {
 			devtools.LibbeatDir("_meta/config.docker.yml"),
 		},
 		ExtraVars: map[string]interface{}{
-			"GOOS": "windows",
+			"UseObserverProcessor": true,
 		},
 	}
 }
