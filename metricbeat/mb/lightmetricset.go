@@ -97,21 +97,23 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 // baseModule does the configuration overrides in the base module configuration
 // taking into account the light metric set default configurations
 func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
-	baseModule := BaseModule{
-		name: m.Module,
-	}
-	var err error
-	// Set defaults
-	if baseModule.rawConfig, err = common.NewConfigFrom(m.Input.Defaults); err != nil {
+	// Initialize config using input defaults as raw config
+	rawConfig, err := common.NewConfigFrom(m.Input.Defaults)
+	if err != nil {
 		return nil, errors.Wrap(err, "invalid input defaults")
 	}
+
 	// Copy values from user configuration
-	if err = from.UnpackConfig(baseModule.rawConfig); err != nil {
+	if err = from.UnpackConfig(rawConfig); err != nil {
 		return nil, errors.Wrap(err, "failed to copy values from user configuration")
 	}
-	// Update module configuration
-	if err = baseModule.UnpackConfig(&baseModule.config); err != nil {
-		return nil, errors.Wrap(err, "failed to set module configuration")
+
+	// Create the base module
+	baseModule, err := newBaseModuleFromConfig(rawConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create base module")
 	}
+	baseModule.name = m.Module
+
 	return &baseModule, nil
 }
