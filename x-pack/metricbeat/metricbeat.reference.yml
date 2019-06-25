@@ -589,7 +589,7 @@ metricbeat.modules:
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
 
-#-------------------------------- Mssql Module --------------------------------
+#-------------------------------- MSSQL Module --------------------------------
 - module: mssql
   metricsets:
     - "transaction_log"

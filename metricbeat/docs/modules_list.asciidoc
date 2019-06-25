@@ -109,9 +109,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-mongodb-metrics,metrics>>   
 |<<metricbeat-metricset-mongodb-replstatus,replstatus>>   
 |<<metricbeat-metricset-mongodb-status,status>>   
-|<<metricbeat-module-mssql,mssql>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>> experimental[]  
-|<<metricbeat-metricset-mssql-transaction_log,transaction_log>> experimental[]  
+|<<metricbeat-module-mssql,MSSQL>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>> beta[]  
+|<<metricbeat-metricset-mssql-transaction_log,transaction_log>> beta[]  
 |<<metricbeat-module-munin,Munin>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
