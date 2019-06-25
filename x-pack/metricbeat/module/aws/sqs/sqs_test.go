@@ -17,7 +17,7 @@ import (
 
 // MockSQSClient struct is used for unit tests.
 type MockSQSClient struct {
-	sqsiface.SQSAPI
+	sqsiface.ClientAPI
 }
 
 func (m *MockSQSClient) ListQueuesRequest(input *sqs.ListQueuesInput) sqs.ListQueuesRequest {
