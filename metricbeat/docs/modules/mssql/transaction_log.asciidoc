@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-mssql-transaction_log]]
 === MSSQL transaction_log metricset
 
-experimental[]
+beta[]
 
 include::../../../../x-pack/metricbeat/module/mssql/transaction_log/_meta/docs.asciidoc[]
 
