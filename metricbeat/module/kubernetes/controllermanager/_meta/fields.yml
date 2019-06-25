@@ -35,10 +35,12 @@
           type: double
           description: CPU seconds
         - name: memory.resident.bytes
-          type: byte
+          type: long
+          format: byte
           description: Bytes in resident memory
         - name: memory.virtual.bytes
-          type: byte
+          type: long
+          format: byte
           description: Bytes in virtual memory
         - name: fds.open.count
           type: long
@@ -61,20 +63,22 @@
           description: Request count for duration
         - name: request.size.bytes.percentile.*
           type: object
-          object_type: byte
+          object_type: long
           description: Request size percentiles
         - name: request.size.bytes.sum
-          type: byte
+          type: long
+          format: byte
           description: Request size cumulative sum
         - name: request.size.bytes.count
           type: long
           description: Request count for size
         - name: response.size.bytes.percentile.*
           type: object
-          object_type: byte
+          object_type: long
           description: Response size percentiles
         - name: response.size.bytes.sum
-          type: byte
+          type: long
+          format: byte
           description: Response size cumulative sum
         - name: response.size.bytes.count
           type: long
