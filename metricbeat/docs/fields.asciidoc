@@ -1652,53 +1652,6 @@ type: keyword
 --
 
 [float]
-=== state
-
-Beat state
-
-
-
-*`beat.state.management.enabled`*::
-+
---
-Is central management enabled?
-
-
-type: boolean
-
---
-
-*`beat.state.module.count`*::
-+
---
-Number of modules enabled
-
-
-type: integer
-
---
-
-*`beat.state.output.name`*::
-+
---
-Name of output used by Beat
-
-
-type: keyword
-
---
-
-*`beat.state.queue.name`*::
-+
---
-Name of queue being used by Beat
-
-
-type: keyword
-
---
-
-[float]
 === stats
 
 Beat stats
