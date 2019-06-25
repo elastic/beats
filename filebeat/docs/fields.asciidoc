@@ -12851,7 +12851,7 @@ Fields from s3 input.
 
 
 [float]
-== log.source fields
+=== log.source
 
 Source of the log message.
 
@@ -12860,20 +12860,20 @@ Source of the log message.
 *`log.source.bucket_name`*::
 +
 --
-type: keyword
-
 Name of the S3 bucket that this log retrieved from.
 
+
+type: keyword
 
 --
 
 *`log.source.object_key`*::
 +
 --
-type: keyword
-
 Name of the S3 object that this log retrieved from.
 
+
+type: keyword
 
 --
 
