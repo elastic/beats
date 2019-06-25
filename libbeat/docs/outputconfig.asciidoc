@@ -903,6 +903,26 @@ All the <<conditions,conditions>> supported by processors are also supported
 here.
 endif::no-processors[]
 
+The following example sets the topic based on whether the message field contains
+the specified string:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.kafka:
+  hosts: ["localhost:9092"]
+  topic: "logs-%{[beat.version]}" 
+  topics:
+    - topic: "critical-%{[beat.version]}"
+      when.contains:
+        message: "CRITICAL"
+    - topic: "error-%{[beat.version]}"
+      when.contains:
+        message: "ERR"
+------------------------------------------------------------------------------
+
+
+This configuration results in topics named +critical-{version}+,
++error-{version}+, and +logs-{version}+.
 
 ===== `key`
 
