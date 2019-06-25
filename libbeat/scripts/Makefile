@@ -321,7 +321,7 @@ coverage-report:
 fields: mage
 	@mage fields
 
-.PONY: config
+.PHONY: config
 config: mage
 	@mage config
 
