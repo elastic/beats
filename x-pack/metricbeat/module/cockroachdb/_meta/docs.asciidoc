@@ -5,3 +5,12 @@ This module periodically fetches metrics from CockroachDB.
 
 The CockroachDB `status` metricset is compatible with any CockroachDB version
 exposing metrics in Prometheus format.
+
+
+[float]
+=== Dashboard
+
+The CockroachDB module includes a predefined dashboard with overview information
+of the monitored servers.
+
+image::./images/metricbeat-cockroachdb-overview.png[]
