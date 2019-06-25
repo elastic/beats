@@ -3,6 +3,7 @@ import metricbeat
 import unittest
 import time
 
+
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['logstash']
@@ -14,7 +15,6 @@ class Test(metricbeat.BaseTest):
         logstash node metricset test
         """
         self.check_metricset("logstash", "node", self.get_hosts(), self.FIELDS + ["process"])
-
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_node_stats(self):
