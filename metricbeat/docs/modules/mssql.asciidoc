@@ -19,10 +19,12 @@ The module is being tested with https://hub.docker.com/r/microsoft/mssql-server-
 
 The following Metricsets are already included:
 
+[float]
 === `transaction_log`
 
 `transaction_log` Metricset fetches information about the operation and transaction log of each MSSQL database in the monitored instance. All data is extracted from the https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/database-related-dynamic-management-views-transact-sql?view=sql-server-2017[Database Dynamic Management Views]
 
+[float]
 === `performance`
 
 `performance` Metricset fetches information from what's commonly known as https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017[Performance Counters] in MSSQL.
