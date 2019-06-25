@@ -686,7 +686,10 @@ The http request timeout in seconds for the Elasticsearch request. The default i
 ===== `ssl`
 
 Configuration options for SSL parameters like the certificate authority to use
-for HTTPS-based connections. If the `ssl` section is missing, the host CAs are used for HTTPS connections to
+for HTTPS-based connections. The Kafka host keystore should be created with the
+`-keyalg RSA` argument to ensure it uses a cipher supported by
+[Filebeat's Kafka library](https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions#why-cant-sarama-connect-to-my-kafka-cluster-using-ssl).
+If the `ssl` section is missing, the host CAs are used for HTTPS connections to
 Elasticsearch.
 
 See <<configuration-ssl>> for more information.
