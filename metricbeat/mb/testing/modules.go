@@ -388,7 +388,7 @@ func (r *capturingPushReporterV2) capture(waitEvents int) []mb.Event {
 			return events
 		case e := <-r.eventsC:
 			events = append(events, e)
-			if len(events) >= waitEvents {
+			if waitEvents > 0 && len(events) >= waitEvents {
 				return events
 			}
 		}
