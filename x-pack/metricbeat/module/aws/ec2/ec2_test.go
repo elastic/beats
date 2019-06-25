@@ -97,7 +97,7 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeInstancesOutput{
-				Reservations: []ec2.RunInstancesOutput{
+				Reservations: []ec2.Reservation{
 					{Instances: []ec2.Instance{instance}},
 				},
 			},
