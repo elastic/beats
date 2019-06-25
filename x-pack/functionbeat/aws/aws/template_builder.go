@@ -76,7 +76,7 @@ func (d *defaultTemplateBuilder) findFunction(name string) (installer, error) {
 // execute generates a template
 func (d *defaultTemplateBuilder) execute(name string) (templateData, error) {
 	d.log.Debug("Compressing all assets into an artifact")
-	content, err := core.MakeZip()
+	content, err := core.MakeZip("aws")
 	if err != nil {
 		return templateData{}, err
 	}

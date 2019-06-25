@@ -8,7 +8,6 @@
 # https://www.elastic.co/guide/en/beats/functionbeat/index.html
 #
 #============================  Provider ===============================
-
 # Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #

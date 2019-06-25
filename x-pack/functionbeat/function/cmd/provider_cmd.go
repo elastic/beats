@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -98,7 +99,11 @@ func genPackageCmd(beatName string) *cobra.Command {
 				output = filepath.Join(dir, "package.zip")
 			}
 
-			return h.BuildPackage(output)
+			elements := strings.Split(beatName, "-")
+			if len(elements) != 2 {
+				return fmt.Errorf("invalid beat name: %s", beatName)
+			}
+			return h.BuildPackage(elements[1], output)
 		}),
 	}
 	cmd.Flags().StringVarP(&output, "output", "o", "", "full path to the package")

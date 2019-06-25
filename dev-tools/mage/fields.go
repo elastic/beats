@@ -99,7 +99,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 	return GenerateFieldsGoWithName(BeatName, fieldsYML, out)
 }
 
-// GenerateFieldsGo generates a .go file containing the fields.yml data.
+// GenerateFieldsGoWithName generates a .go file containing the fields.yml data with configured Beat name.
 func GenerateFieldsGoWithName(beatName, fieldsYML, out string) error {
 	const assetCmdPath = "dev-tools/cmd/asset/asset.go"
 

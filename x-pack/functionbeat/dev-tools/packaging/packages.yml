@@ -4,8 +4,8 @@
 
 shared:
   - &common
-    name: '{{.BeatName}}'
-    service_name: '{{.BeatServiceName}}'
+    name: '{{.BeatName}}-{{.Provider}}'
+    service_name: '{{.BeatServiceName}}-{{.Provider}}'
     os: '{{.GOOS}}'
     arch: '{{.PackageArch}}'
     vendor: '{{.BeatVendor}}'
@@ -13,10 +13,12 @@ shared:
     license: '{{.BeatLicense}}'
     url: '{{.BeatURL}}'
     description: '{{.BeatDescription}}'
+    extra_vars:
+      provider: ''
 
   - &binary_files
-    '{{.BeatName}}{{.BinaryExt}}':
-      source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+    '{{.BeatName}}-{{.Provider}}{{.BinaryExt}}':
+      source: '{{.Provider}}/build/golang-crossbuild/{{.Provider}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}'
       mode: 0755
     fields.yml:
       source: fields.yml
@@ -34,11 +36,11 @@ shared:
       content: >
         {{ commit }}
       mode: 0644
-    '{{.BeatName}}.reference.yml':
-      source: '{{.BeatName}}.reference.yml'
+    '{{.BeatName}}-{{.Provider}}.reference.yml':
+      source: '{{.Provider}}/{{.BeatName}}-{{.Provider}}.reference.yml'
       mode: 0644
-    '{{.BeatName}}.yml':
-      source: '{{.BeatName}}.yml'
+    '{{.BeatName}}-{{.Provider}}.yml':
+      source: '{{.Provider}}/{{.BeatName}}-{{.Provider}}.yml'
       mode: 0600
       config: true
     kibana:
@@ -65,9 +67,10 @@ shared:
   #
   - &functionbeat_binaries
     files:
-      pkg/functionbeat:
-        source: 'build/golang-crossbuild/{{.BeatName}}-linux-amd64'
+      'pkg/functionbeat-{{.Provider}}':
+        source: '{{.Provider}}/build/golang-crossbuild/{{.BeatName}}-{{.Provider}}-linux-amd64'
         mode: 0755
+    output_file: "build/distribution/{{.BeatName}}-{{.Provider}}-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 # specs is a list of named packaging "flavors".
 specs:
   functionbeat:
@@ -81,8 +84,8 @@ specs:
         <<: *functionbeat_binaries
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+          '{{.BeatName}}-{{.Provider}}{{.BinaryExt}}':
+            source: '{{.Provider}}/build/golang-crossbuild/{{.BeatName}}-{{.Provider}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}'
 
     - os: darwin
       types: [tgz]
@@ -90,6 +93,9 @@ specs:
         <<: *binary_spec
         <<: *functionbeat_binaries
         <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}-{{.Provider}}{{.BinaryExt}}':
+            source: '{{.Provider}}/build/golang-crossbuild/{{.BeatName}}-{{.Provider}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}'
 
     - os: linux
       types: [tgz]
@@ -98,5 +104,5 @@ specs:
         <<: *functionbeat_binaries
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+          '{{.BeatName}}-{{.Provider}}{{.BinaryExt}}':
+            source: '{{.Provider}}/build/golang-crossbuild/{{.BeatName}}-{{.Provider}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}'

@@ -28,7 +28,7 @@ type Info struct {
 	Hostname        string    // hostname
 	ID              uuid.UUID // ID assigned to beat machine
 	EphemeralID     uuid.UUID // ID assigned to beat process invocation (PID)
-	ConfigNamespace string
+	ConfigNamespace string    // Namespace in the configuration. By default it's the Beat name.
 
 	// Monitoring-related fields
 	Monitoring struct {

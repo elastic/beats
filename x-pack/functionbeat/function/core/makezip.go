@@ -45,15 +45,15 @@ func rawYaml() ([]byte, error) {
 }
 
 // MakeZip creates a zip from the the current artifacts and the currently available configuration.
-func MakeZip() ([]byte, error) {
+func MakeZip(provider string) ([]byte, error) {
 	rawConfig, err := rawYaml()
 	if err != nil {
 		return nil, err
 	}
 
 	resources := []bundle.Resource{
-		&bundle.MemoryFile{Path: "functionbeat.yml", Raw: rawConfig, FileMode: 0766},
-		&bundle.LocalFile{Path: "pkg/functionbeat", FileMode: 0755},
+		&bundle.MemoryFile{Path: "functionbeat-" + provider + ".yml", Raw: rawConfig, FileMode: 0766},
+		&bundle.LocalFile{Path: "pkg/functionbeat-" + provider, FileMode: 0755},
 	}
 
 	rawKeystore, err := keystoreRaw()

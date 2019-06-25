@@ -65,7 +65,6 @@ func init() {
 // flag so that it reflects the beat name.
 func ChangeDefaultCfgfileFlag(beatName string) error {
 	configfiles.SetDefault(beatName + ".yml")
-	logp.Info("====== %s", beatName)
 	return nil
 }
 

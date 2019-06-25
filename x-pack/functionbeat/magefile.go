@@ -41,7 +41,7 @@ func Build() error {
 	}
 
 	params := devtools.DefaultBuildArgs()
-	for _, provider := range getConfiguredProviders() {
+	for _, provider := range selectedProviders {
 		params.Name = devtools.BeatName + "-" + provider
 		err = os.Chdir(workingDir + "/" + provider)
 		if err != nil {
@@ -59,7 +59,9 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	params := devtools.DefaultGolangCrossBuildArgs()
+	params.Name = "functionbeat-" + params.Name
+	return devtools.GolangCrossBuild(params)
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -69,7 +71,13 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"))
+	for _, provider := range selectedProviders {
+		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", provider))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
@@ -89,11 +97,16 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.MustUsePackaging("functionbeat", "x-pack/functionbeat/dev-tools/packaging/packages.yml")
-
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package, TestPackages)
+	for _, provider := range selectedProviders {
+		devtools.MustUsePackaging("functionbeat", "x-pack/functionbeat/dev-tools/packaging/packages.yml")
+		for _, args := range devtools.Packages {
+			args.Spec.ExtraVar("Provider", provider)
+		}
+
+		mg.SerialDeps(devtools.Package, TestPackages)
+	}
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
@@ -122,7 +135,7 @@ func GoTestIntegration(ctx context.Context) error {
 
 // Config generates both the short and reference configs.
 func Config() error {
-	for _, provider := range getConfiguredProviders() {
+	for _, provider := range selectedProviders {
 		err := devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, functionbeat.XPackConfigFileParams(provider), provider)
 		if err != nil {
 			return err
@@ -133,7 +146,7 @@ func Config() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	for _, provider := range getConfiguredProviders() {
+	for _, provider := range selectedProviders {
 		output := filepath.Join(devtools.CWD(), provider, "fields.yml")
 		err := devtools.GenerateFieldsYAMLTo(output)
 		if err != nil {
@@ -145,7 +158,7 @@ func Fields() error {
 
 func includeFields() error {
 	fnBeatDir := devtools.CWD()
-	for _, provider := range getConfiguredProviders() {
+	for _, provider := range selectedProviders {
 		err := os.Chdir(filepath.Join(fnBeatDir, provider))
 		if err != nil {
 			return err
@@ -161,7 +174,7 @@ func includeFields() error {
 }
 
 func docs() error {
-	for _, provider := range getConfiguredProviders() {
+	for _, provider := range selectedProviders {
 		fieldsYml := filepath.Join(devtools.CWD(), provider, "fields.yml")
 		err := devtools.Docs.FieldDocs(fieldsYml)
 		if err != nil {

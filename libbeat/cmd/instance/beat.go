@@ -237,7 +237,6 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 
 // InitWithSettings does initialization of things common to all actions (read confs, flags)
 func (b *Beat) InitWithSettings(settings Settings) error {
-	fmt.Println("InitWithSettings")
 	err := b.handleFlags()
 	if err != nil {
 		return err
@@ -264,7 +263,6 @@ func (b *Beat) Init() error {
 // BeatConfig returns config section for this beat
 func (b *Beat) BeatConfig() (*common.Config, error) {
 	configName := strings.ToLower(b.Info.ConfigNamespace)
-	fmt.Println("cfgName", configName)
 	if b.RawConfig.HasField(configName) {
 		sub, err := b.RawConfig.Child(configName, -1)
 		if err != nil {

@@ -13,8 +13,10 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/function/config"
 )
 
+// CfgNamespace is the namespace under configuration options are located.
 var CfgNamespace = "functionbeat"
 
+// GenRootCmdWithBeatName generates common command for Functionbeat and sets the name containing the provider.
 func GenRootCmdWithBeatName(name string) *cmd.BeatsRootCmd {
 	rootCmd := cmd.GenRootCmdWithSettings(beater.New, instance.Settings{
 		Name:            name,

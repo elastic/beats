@@ -9,8 +9,7 @@
 #
 
 #============================  Provider ===============================
-{{if eq .Provider "aws"}}
-# Configure functions to run on AWS Lambda, currently we assume that the credentials
+{{if eq .Provider "aws"}}# Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #
 # Configure which S3 endpoint should we use.

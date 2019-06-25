@@ -110,7 +110,5 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.AddCommand(rootCmd.TestCmd)
 	rootCmd.AddCommand(rootCmd.KeystoreCmd)
 
-	fmt.Println("GenRootCmdWithSettings")
-
 	return rootCmd
 }

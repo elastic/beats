@@ -115,8 +115,8 @@ func (c *cliHandler) Remove(names []string) error {
 }
 
 // TODO(ph) check current path and option flag for cobra
-func (c *cliHandler) BuildPackage(output string) error {
-	content, err := core.MakeZip()
+func (c *cliHandler) BuildPackage(provider, output string) error {
+	content, err := core.MakeZip(provider)
 	if err != nil {
 		return err
 	}
