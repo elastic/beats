@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
+- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 
 *Packetbeat*
 
@@ -67,6 +68,7 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
+- Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
 
 *Auditbeat*
 
@@ -77,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 - Fix direction of incoming IPv6 sockets. {pull}12248[12248]
 - Package dataset: Auto-detect package directories. {pull}12289[12289]
 - System module: Start system module without host ID. {pull}12373[12373]
+- Host dataset: Fix reboot detection logic. {pull}12591[12591]
 
 *Filebeat*
 
@@ -91,6 +94,7 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
 - Fix timezone offset parsing in system/syslog. {pull}12529[12529]
+- When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 
 *Heartbeat*
 
@@ -116,6 +120,7 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 - Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
 - Require client_auth by default when ssl is enabled for module http metricset server{pull}12333[12333]
 - The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
+- When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 
 *Packetbeat*
 
@@ -177,6 +182,7 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 - New module `panw` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
 - Add RabbitMQ module. {pull}12032[12032]
 - Add new `container` input. {pull}12162[12162]
+- Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12579[12579]
 
 *Heartbeat*
 
@@ -1052,7 +1058,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 
 * Updates to support changes to licensing of security features.
 +
-Some Elastic Stack security features, such as encrypted communications, file and native authentication, and 
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and
 role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
 
 [[release-notes-6.7.2]]
