@@ -14284,7 +14284,7 @@ type: object
 --
 Request size cumulative sum
 
-type: byte
+type: long
 
 --
 
@@ -14311,7 +14311,7 @@ type: object
 --
 Response size cumulative sum
 
-type: byte
+type: long
 
 --
 
