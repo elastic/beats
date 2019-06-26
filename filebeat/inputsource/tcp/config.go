@@ -35,6 +35,7 @@ type Config struct {
 	Host           string                  `config:"host"`
 	Timeout        time.Duration           `config:"timeout" validate:"nonzero,positive"`
 	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
+	MaxConnections int                     `config:"max_connections" validate:"nonzero,positive"`
 	TLS            *tlscommon.ServerConfig `config:"ssl"`
 }
 

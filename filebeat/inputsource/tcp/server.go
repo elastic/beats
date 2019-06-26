@@ -25,6 +25,8 @@ import (
 	"net"
 	"sync"
 
+	"golang.org/x/net/netutil"
+
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
@@ -175,12 +177,23 @@ func (s *Server) allClients() []*client {
 }
 
 func (s *Server) createServer() (net.Listener, error) {
+	var l net.Listener
+	var err error
 	if s.tlsConfig != nil {
 		t := s.tlsConfig.BuildModuleConfig(s.config.Host)
 		s.log.Info("Listening over TLS")
-		return tls.Listen("tcp", s.config.Host, t)
+		l, err = tls.Listen("tcp", s.config.Host, t)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		l, err = net.Listen("tcp", s.config.Host)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return net.Listen("tcp", s.config.Host)
+
+	return netutil.LimitListener(l, s.config.MaxConnections), nil
 }
 
 func (s *Server) clientsCount() int {
