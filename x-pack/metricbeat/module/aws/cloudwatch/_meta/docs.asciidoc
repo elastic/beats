@@ -13,7 +13,7 @@ tag:getResources
 ----
 
 [float]
-=== Module-specific configuration notes
+=== Metricset-specific configuration notes
 * *namespace*: The namespace to filter against. For example, AWS/EC2, AWS/S3.
 * *metricname*: The name of the metric to filter against. For example, CPUUtilization for EC2 instance.
 * *dimensions*: The dimensions to filter against. For example, InstanceId=i-123.
@@ -22,3 +22,26 @@ The format of each resource type is service[:resourceType].
 For example, specifying a resource type of ec2 returns all Amazon EC2 resources
 (which includes EC2 instances). Specifying a resource type of ec2:instance returns
 only EC2 instances.
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatch
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  cloudwatch_metrics:
+    - namespace: AWS/EC2
+      metricname: CPUUtilization
+      dimensions:
+        - name: InstanceId
+          value: i-0686946e22cf9494a
+    - namespace: AWS/EBS
+    - namespace: AWS/ELB
+      tags.resource_type_filter: elasticloadbalancing
+----
