@@ -5,8 +5,8 @@
       "grok": {
         "field": "message",
         "patterns": [
-          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{LOGLEVEL:log.level}\\]( \\[client %{IPORHOST:source.address}:%{PORT}\\])? %{GREEDYDATA:message}",
-          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{DATA:apache.error.module}:%{LOGLEVEL:log.level}\\] \\[pid %{NUMBER:process.pid:long}(:tid %{NUMBER:process.thread.id:long})?\\]( \\[client %{IPORHOST:source.address}:%{PORT}\\])? %{GREEDYDATA:message}"
+          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{LOGLEVEL:log.level}\\]( \\[client %{IPORHOST:source.address}(:%{PORT})?\\])? %{GREEDYDATA:message}",
+          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{DATA:apache.error.module}:%{LOGLEVEL:log.level}\\] \\[pid %{NUMBER:process.pid:long}(:tid %{NUMBER:process.thread.id:long})?\\]( \\[client %{IPORHOST:source.address}(:%{PORT})?\\])? %{GREEDYDATA:message}"
         ],
         "pattern_definitions": {
           "APACHE_TIME": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}"
