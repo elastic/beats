@@ -77,7 +77,11 @@ certain criteria or time. Closing the harvester means closing the file handler.
 If a file is updated after the harvester is closed, the file will be picked up
 again after `scan_frequency` has elapsed. However, if the file is moved or
 deleted while the harvester is closed, {beatname_uc} will not be able to pick up
-the file again, and any data that the harvester hasn't read will be lost.
+the file again, and any data that the harvester hasn't read will be lost. 
+The `close_*` settings are applied synchronously when {beatname_uc} attempts 
+to read from a file, meaning that if {beatname_uc} is in a blocked state
+due to blocked output, full queue or other issue, a file that would 
+otherwise be closed remains open until {beatname_uc} once again attempts to read from the file.
 
 
 [float]

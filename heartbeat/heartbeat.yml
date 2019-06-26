@@ -86,7 +86,7 @@ setup.kibana:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -127,16 +127,16 @@ output.elasticsearch:
   #ssl.key: "/etc/pki/client/cert.key"
 
 #================================ Processors =====================================
+
 processors:
   - add_observer_metadata: 
-  # Optional, but recommended geo settings for the location heartbeat is running in 
+  # Optional, but recommended geo settings for the location Heartbeat is running in
   #geo: 
     # Token describing this location
     #name: us-east-1a
 
     # Lat, Lon "
     #location: "37.926868, -78.024902"
-
 
 #================================ Logging =====================================
 

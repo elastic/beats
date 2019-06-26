@@ -15,6 +15,7 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	functionbeat "github.com/elastic/beats/x-pack/functionbeat/scripts/mage"
 )
 
 func init() {
@@ -94,4 +95,9 @@ func GoTestUnit(ctx context.Context) error {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoTestIntegration(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+}
+
+// Config generates both the short and reference configs.
+func Config() error {
+	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, functionbeat.XPackConfigFileParams(), ".")
 }

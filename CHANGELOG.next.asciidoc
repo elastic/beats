@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
+- Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
 
 *Auditbeat*
 
@@ -172,6 +173,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
 - Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
 - Add `decode_base64_field` processor for decoding base64 field. {pull}11914[11914]
+- Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 
 *Auditbeat*
 
@@ -205,6 +207,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
 - Add MSSQL module {pull}12079[12079]
 - Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
 
 *Heartbeat*
 
@@ -234,9 +237,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Always report Pod UID in the `pod` metricset. {pull}12345[12345]
 - Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
 - Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
+- Add support for metricbeat modules based on existing modules (a.k.a. light modules) {issue}12270[12270] {pull}12465[12465]
 - Add a system/entropy metricset {pull}12450[12450]
 - Allow redis URL format in redis hosts config. {pull}12408[12408]
 - Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
+- Add `beat` module. {pull}12181[12181] {pull}12615[12615]
+- Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
 
 *Packetbeat*
 

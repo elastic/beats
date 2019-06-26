@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
+* <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
@@ -1567,6 +1568,278 @@ alias to: agent.hostname
 Time series instance id
 
 type: keyword
+
+--
+
+[[exported-fields-beat]]
+== Beat fields
+
+Beat module
+
+
+
+[float]
+=== beat
+
+
+
+
+*`beat.id`*::
++
+--
+Beat ID.
+
+
+type: keyword
+
+--
+
+*`beat.type`*::
++
+--
+Beat type.
+
+
+type: keyword
+
+--
+
+[float]
+=== state
+
+Beat state
+
+
+
+*`beat.state.management.enabled`*::
++
+--
+Is central management enabled?
+
+
+type: boolean
+
+--
+
+*`beat.state.module.count`*::
++
+--
+Number of modules enabled
+
+
+type: integer
+
+--
+
+*`beat.state.output.name`*::
++
+--
+Name of output used by Beat
+
+
+type: keyword
+
+--
+
+*`beat.state.queue.name`*::
++
+--
+Name of queue being used by Beat
+
+
+type: keyword
+
+--
+
+[float]
+=== stats
+
+Beat stats
+
+
+
+*`beat.stats.uptime.ms`*::
++
+--
+Beat uptime
+
+
+type: long
+
+--
+
+*`beat.stats.runtime.goroutines`*::
++
+--
+Number of goroutines running in Beat
+
+
+type: long
+
+--
+
+[float]
+=== libbeat
+
+Fields common to all Beats
+
+
+
+[float]
+=== output
+
+Output stats
+
+
+
+*`beat.stats.libbeat.output.type`*::
++
+--
+Type of output
+
+
+type: keyword
+
+--
+
+[float]
+=== events
+
+Event counters
+
+
+
+*`beat.stats.libbeat.output.events.acked`*::
++
+--
+Number of events acknowledged
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.active`*::
++
+--
+Number of active events
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.batches`*::
++
+--
+Number of event batches
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.dropped`*::
++
+--
+Number of events dropped
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.duplicates`*::
++
+--
+Number of events duplicated
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.failed`*::
++
+--
+Number of events failed
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.toomany`*::
++
+--
+Number of too many events
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.events.total`*::
++
+--
+Total number of events
+
+
+type: long
+
+--
+
+[float]
+=== read
+
+Read stats
+
+
+
+*`beat.stats.libbeat.output.read.bytes`*::
++
+--
+Number of bytes read
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.read.errors`*::
++
+--
+Number of read errors
+
+
+type: long
+
+--
+
+[float]
+=== write
+
+Write stats
+
+
+
+*`beat.stats.libbeat.output.write.bytes`*::
++
+--
+Number of bytes written
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.errors`*::
++
+--
+Number of write errors
+
+
+type: long
 
 --
 
@@ -13900,20 +14173,20 @@ Kubernetes proxy server metrics
 
 
 
-*`kubernetes.proxy.status_code`*::
+*`kubernetes.proxy.handler`*::
 +
 --
-HTTP Code
+Request handler
 
 
 type: keyword
 
 --
 
-*`kubernetes.proxy.host`*::
+*`kubernetes.proxy.code`*::
 +
 --
-Host address
+HTTP code
 
 
 type: keyword
@@ -13930,105 +14203,147 @@ type: keyword
 
 --
 
-*`kubernetes.proxy.verb`*::
+*`kubernetes.proxy.host`*::
 +
 --
-HTTP method
+Request host
 
 
 type: keyword
 
 --
-
-*`kubernetes.proxy.url`*::
-+
---
-URL requested
-
-
-type: keyword
-
---
-
-*`kubernetes.proxy.handler`*::
-+
---
-HTTP request handler
-
-
-type: keyword
-
---
-
-[float]
-=== process
-
-kubeproxy process metrics
-
 
 
 *`kubernetes.proxy.process.cpu.sec`*::
 +
 --
-Total user and system CPU time spent in seconds
+CPU seconds
 
-
-type: long
+type: double
 
 --
 
 *`kubernetes.proxy.process.memory.resident.bytes`*::
 +
 --
-Resident memory size in bytes
-
+Bytes in resident memory
 
 type: long
+
+format: bytes
 
 --
 
 *`kubernetes.proxy.process.memory.virtual.bytes`*::
 +
 --
-Resident memory size in bytes
+Bytes in virtual memory
 
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.process.fds.open.count`*::
++
+--
+Number of open file descriptors
 
 type: long
 
 --
 
-[float]
-=== http
-
-HTTP server metrics
-
-
-
-*`kubernetes.proxy.http.request.duration.us`*::
+*`kubernetes.proxy.process.started.sec`*::
 +
 --
-HTTP request duration
+Seconds since the process started
 
-
-type: float
+type: double
 
 --
 
-*`kubernetes.proxy.http.request.size.bytes`*::
+
+*`kubernetes.proxy.http.request.duration.us.percentile.*`*::
 +
 --
-HTTP request size
+Request duration microseconds percentiles
 
+type: object
+
+--
+
+*`kubernetes.proxy.http.request.duration.us.sum`*::
++
+--
+Request duration microseconds cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.proxy.http.request.duration.us.count`*::
++
+--
+Request count for duration
 
 type: long
 
 --
 
-*`kubernetes.proxy.http.response.size.bytes`*::
+*`kubernetes.proxy.http.request.size.bytes.percentile.*`*::
 +
 --
-HTTP response size
+Request size percentiles
 
+type: object
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.sum`*::
++
+--
+Request size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.percentile.*`*::
++
+--
+Response size percentiles
+
+type: object
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.sum`*::
++
+--
+Response size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.count`*::
++
+--
+Response count
 
 type: long
 
@@ -14037,54 +14352,16 @@ type: long
 *`kubernetes.proxy.http.request.count`*::
 +
 --
-Number of HTTP requests
-
-
-type: long
-
---
-
-[float]
-=== client
-
-kubeproxy REST client metrics
-
-
-
-*`kubernetes.proxy.client.request.duration.us.sum`*::
-+
---
-Requests duration, sum of durations in microseconds
-
+Request count
 
 type: long
-
---
-
-*`kubernetes.proxy.client.request.duration.us.count`*::
-+
---
-Request duration, number of requests
-
-
-type: long
-
---
-
-*`kubernetes.proxy.client.request.duration.us.bucket.*`*::
-+
---
-Request duration, histogram buckets
-
-
-type: object
 
 --
 
 *`kubernetes.proxy.client.request.count`*::
 +
 --
-Number of Rest requests, broken down by URL and verb
+Number of requests as client
 
 
 type: long
@@ -14094,7 +14371,7 @@ type: long
 [float]
 === sync
 
-kubeproxy proxy rules metrics
+kubeproxy proxy sync metrics
 
 
 
@@ -14102,7 +14379,6 @@ kubeproxy proxy rules metrics
 +
 --
 SyncProxyRules duration, sum of durations in microseconds
-
 
 type: long
 
@@ -14113,7 +14389,6 @@ type: long
 --
 SyncProxyRules duration, number of operations
 
-
 type: long
 
 --
@@ -14123,6 +14398,32 @@ type: long
 --
 SyncProxyRules duration, histogram buckets
 
+type: object
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.sum`*::
++
+--
+Network programming duration, sum in microseconds
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.count`*::
++
+--
+Network programming duration, number of operations
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.bucket.*`*::
++
+--
+Network programming duration, histogram buckets
 
 type: object
 
@@ -18609,7 +18910,7 @@ type: long
 --
 
 [[exported-fields-mssql]]
-== mssql fields
+== MSSQL fields
 
 MS SQL module
 
