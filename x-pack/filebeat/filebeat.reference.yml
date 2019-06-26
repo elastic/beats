@@ -972,6 +972,23 @@ filebeat.inputs:
 
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
+
+#------------------------------ S3 input --------------------------------
+# Experimental: Config options for AWS S3 input
+#- type: s3
+  #enabled: false
+
+  # AWS Credentials (required)
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-s3-input
+
+  # QueueURLs (required) to receive queue messages from
+  #queueURLs: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+
+  # S3buckets to collect logs from
+  # bucketNames: ["bucket-test-1", "bucket-test-2"]
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules

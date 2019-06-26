@@ -14,7 +14,8 @@ var defaultConfig = config{
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
-	QueueURLs                 []string `config:"queueURLs"`
+	QueueURLs                 []string `config:"queueURLs" validate:"nonzero,required"`
+	BucketNames               []string `config:"bucketNames"`
 	AccessKeyID               string   `config:"access_key_id" validate:"nonzero,required"`
 	SecretAccessKey           string   `config:"secret_access_key" validate:"nonzero,required"`
 	SessionToken              string   `config:"session_token"`

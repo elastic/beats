@@ -29,18 +29,25 @@ import (
 )
 
 var (
-	// input name
+	// Filebeat input name
 	inputName = "s3"
-	// MaxNumberOfMessage at one poll
-	MaxNumberOfMessage int64 = 10
-	// WaitTimeSecond for each poll
-	WaitTimeSecond int64 = 20
-)
 
-type s3Info struct {
-	name string
-	key  string
-}
+	// The maximum number of messages to return. Amazon SQS never returns more messages
+	// than this value (however, fewer messages might be returned).
+	maxNumberOfMessage int64 = 10
+
+	// The duration (in seconds) for which the call waits for a message to arrive
+	// in the queue before returning. If a message is available, the call returns
+	// sooner than WaitTimeSeconds. If no messages are available and the wait time
+	// expires, the call returns successfully with an empty list of messages.
+	waitTimeSecond int64 = 10
+
+	// The duration (in seconds) that the received messages are hidden from subsequent
+	// retrieve requests after being retrieved by a ReceiveMessage request.
+	// This value needs to be a lot bigger than filebeat collection frequency so
+	// if it took too long to read the s3 log, this sqs message will not be reprocessed.
+	visibilityTimeout int64 = 300
+)
 
 func init() {
 	err := input.Register(inputName, NewInput)
@@ -51,12 +58,17 @@ func init() {
 
 // Input is a input for s3
 type Input struct {
-	started  bool
-	outlet   channel.Outleter
-	config   config
-	cfg      *common.Config
-	registry *harvester.Registry
-	logger   *logp.Logger
+	started bool
+	outlet  channel.Outleter
+	config  config
+	cfg     *common.Config
+	logger  *logp.Logger
+}
+
+type s3Info struct {
+	name   string
+	key    string
+	region string
 }
 
 // NewInput creates a new s3 input
@@ -70,32 +82,21 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
 
-	awsConfig := defaults.Config()
-	awsCredentials := awssdk.Credentials{
-		AccessKeyID:     config.AccessKeyID,
-		SecretAccessKey: config.SecretAccessKey,
-	}
-
-	if config.SessionToken != "" {
-		awsCredentials.SessionToken = config.SessionToken
-	}
-
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCredentials,
-	}
-
 	outlet, err := outletFactory(cfg, context.DynamicFields)
 	if err != nil {
 		return nil, err
 	}
 
+	if len(config.QueueURLs) == 0 {
+		return nil, errors.Wrap(err, "No sqs queueURLs configured")
+	}
+
 	p := &Input{
-		started:  false,
-		outlet:   outlet,
-		cfg:      cfg,
-		config:   config,
-		logger:   logger,
-		registry: harvester.NewRegistry(),
+		started: false,
+		outlet:  outlet,
+		cfg:     cfg,
+		config:  config,
+		logger:  logger,
 	}
 
 	return p, nil
@@ -104,10 +105,6 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 // Run runs the input
 func (p *Input) Run() {
 	p.logger.Debugf("s3", "Run s3 input with queueURLs: %+v", p.config.QueueURLs)
-	if len(p.config.QueueURLs) == 0 {
-		p.logger.Error("No sqs queueURLs configured")
-		return
-	}
 
 	awsConfig := defaults.Config()
 	awsCredentials := awssdk.Credentials{
@@ -135,13 +132,13 @@ func (p *Input) Run() {
 		svcSQS := sqs.New(awsConfig)
 		svcS3 := s3.New(awsConfig)
 
-		// RECEIVE
+		// receive messages
 		receiveMessageInput := &sqs.ReceiveMessageInput{
 			QueueUrl:              &queueURL,
 			MessageAttributeNames: []string{"All"},
-			MaxNumberOfMessages:   &MaxNumberOfMessage,
-			VisibilityTimeout:     awssdk.Int64(20), // 20 seconds
-			WaitTimeSeconds:       &WaitTimeSecond,
+			MaxNumberOfMessages:   &maxNumberOfMessage,
+			VisibilityTimeout:     &visibilityTimeout,
+			WaitTimeSeconds:       &waitTimeSecond,
 		}
 
 		req := svcSQS.ReceiveMessageRequest(receiveMessageInput)
@@ -150,26 +147,44 @@ func (p *Input) Run() {
 			return
 		}
 
+		// process messages
 		if len(output.Messages) > 0 {
-			events, messagesReceiptHandles, err := p.receiveMessages(queueURL, output.Messages, svcS3, svcSQS)
-			if err != nil {
-				p.logger.Error(errors.Wrap(err, "receiveMessages failed"))
-			}
+			var wg sync.WaitGroup
+			numMessages := len(output.Messages)
+			wg.Add(numMessages)
+			for i := range output.Messages {
+				go func(m sqs.Message) {
+					// launch goroutine to handle each message
+					defer wg.Done()
 
-			for _, event := range events {
-				d = &util.Data{Event: *event}
-				err = forwarder.Send(d)
-				if err != nil {
-					p.logger.Error(errors.Wrap(err, "forwarder send failed"))
-				}
-			}
+					s3Infos, err := handleMessage(m, p.config.BucketNames)
+					if err != nil {
+						p.logger.Error(err.Error())
+					}
 
-			// TODO: When log message collection takes longer than 30s(default filebeat freq?),
-			//  sqs messages got read twice or more because it didn't get deleted fast enough.
-			// delete message after events are sent
-			err = deleteMessages(queueURL, messagesReceiptHandles, svcSQS)
-			if err != nil {
-				p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
+					if err != nil {
+						p.logger.Error(err.Error())
+					}
+
+					// read from s3
+					events, err := readS3Object(svcS3, s3Infos)
+					if err != nil {
+						p.logger.Error(err.Error())
+					}
+					for _, event := range events {
+						d = &util.Data{Event: *event}
+						err = forwarder.Send(d)
+						if err != nil {
+							p.logger.Error(errors.Wrap(err, "forwarder send failed"))
+						}
+					}
+
+					// delete message after events are sent
+					err = deleteMessage(queueURL, *m.ReceiptHandle, svcSQS)
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
+					}
+				}(output.Messages[i])
 			}
 		}
 	}
@@ -177,7 +192,6 @@ func (p *Input) Run() {
 
 // Stop stops the input and all its harvesters
 func (p *Input) Stop() {
-	p.registry.Stop()
 	p.outlet.Close()
 }
 
@@ -196,46 +210,8 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 	return "", errors.New("queueURL is not in format: https://sqs.{REGION_ENDPOINT}.amazonaws.com/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 }
 
-// launches goroutine per received message and wait for all message to be processed
-func (p *Input) receiveMessages(queueURL string, messages []sqs.Message, svcS3 s3iface.S3API, svcSQS *sqs.SQS) ([]*beat.Event, []string, error) {
-	var eventsTotal []*beat.Event
-	var messagesReceiptHandles []string
-	var wg sync.WaitGroup
-
-	// TODO: Check goroutine cleanup
-	numMessages := len(messages)
-	wg.Add(numMessages)
-	for i := range messages {
-		go func(m sqs.Message) {
-			// launch goroutine to handle each message
-			defer wg.Done()
-
-			s3Infos, err := handleMessage(m)
-			if err != nil {
-				p.logger.Error(err.Error())
-			}
-
-			if err != nil {
-				p.logger.Error(err.Error())
-			}
-
-			// read from s3
-			events, err := readS3Object(svcS3, s3Infos)
-			if err != nil {
-				p.logger.Error(err.Error())
-			}
-
-			eventsTotal = append(eventsTotal, events...)
-			messagesReceiptHandles = append(messagesReceiptHandles, *m.ReceiptHandle)
-		}(messages[i])
-	}
-
-	wg.Wait()
-	return eventsTotal, messagesReceiptHandles, nil
-}
-
 // handle message
-func handleMessage(m sqs.Message) (s3Infos []s3Info, err error) {
+func handleMessage(m sqs.Message, bucketNames []string) (s3Infos []s3Info, err error) {
 	msg := map[string]interface{}{}
 	err = json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
@@ -244,19 +220,41 @@ func handleMessage(m sqs.Message) (s3Infos []s3Info, err error) {
 	}
 
 	records := msg["Records"].([]interface{})
-	s3Info := s3Info{}
 	for _, record := range records {
 		recordMap := record.(map[string]interface{})
 		if recordMap["eventSource"] == "aws:s3" && recordMap["eventName"] == "ObjectCreated:Put" {
+			s3Info := s3Info{}
+			if !stringInSlice(recordMap["awsRegion"].(string), bucketNames) {
+				continue
+			}
+
+			s3Info.region = recordMap["awsRegion"].(string)
 			s3Record := recordMap["s3"].(map[string]interface{})
+
 			bucketInfo := s3Record["bucket"].(map[string]interface{})
-			objectInfo := s3Record["object"].(map[string]interface{})
 			s3Info.name = bucketInfo["name"].(string)
+
+			objectInfo := s3Record["object"].(map[string]interface{})
 			s3Info.key = objectInfo["key"].(string)
 			s3Infos = append(s3Infos, s3Info)
 		}
 	}
 	return
+}
+
+// stringInSlice checks if a string is already exists in list
+// If there is no bucketNames configured, then collect all.
+func stringInSlice(name string, bucketNames []string) bool {
+	if bucketNames == nil || len(bucketNames) == 0 {
+		return true
+	}
+
+	for _, v := range bucketNames {
+		if v == name {
+			return true
+		}
+	}
+	return false
 }
 
 func readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event, error) {
@@ -270,6 +268,8 @@ func readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event, error) {
 
 		objResp, err := objReq.Send()
 		if err != nil {
+			// What will happen if this object is not a log file or not readable ordoes not exist?
+			// 2019-06-25T17:21:57.406-0600    ERROR   [s3]    s3/input.go:220 s3 get object request failed: NoSuchKey: The specified key does not exist.
 			return nil, errors.Wrap(err, "s3 get object request failed")
 		}
 
@@ -280,48 +280,59 @@ func readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event, error) {
 			return nil, errors.Wrap(err, "buf.ReadFrom failed")
 		}
 
-		s := buf.String() // Does a complete copy of the bytes in the buffer.
+		s := buf.String()
 		logLines := strings.Split(s, "\n")
-		for _, log := range logLines {
-			// create event
+		for i, log := range logLines {
 			if log == "" {
 				continue
 			}
-			event := createEvent(log, s3Info)
+
+			// create event per log line
+			event := createEvent(log, int64(i), s3Info)
 			events = append(events, event)
 		}
 	}
 	return events, nil
 }
 
-func deleteMessages(queueURL string, messagesReceiptHandles []string, svcSQS *sqs.SQS) error {
-	for _, receiptHandle := range messagesReceiptHandles {
-		deleteMessageInput := &sqs.DeleteMessageInput{
-			QueueUrl:      awssdk.String(queueURL),
-			ReceiptHandle: awssdk.String(receiptHandle),
-		}
+func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.SQS) error {
+	deleteMessageInput := &sqs.DeleteMessageInput{
+		QueueUrl:      awssdk.String(queueURL),
+		ReceiptHandle: awssdk.String(messagesReceiptHandle),
+	}
 
-		req := svcSQS.DeleteMessageRequest(deleteMessageInput)
-		_, err := req.Send()
-		if err != nil {
-			return errors.Wrap(err, "DeleteMessageRequest failed")
-		}
+	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
+	_, err := req.Send()
+	if err != nil {
+		return errors.Wrap(err, "DeleteMessageRequest failed")
 	}
 	return nil
 }
 
-func createEvent(log string, s3Info s3Info) *beat.Event {
+func createEvent(log string, offset int64, s3Info s3Info) *beat.Event {
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
-			"source": common.MapStr{
+			"offset":    offset,
+			"file.path": constructObjectURL(s3Info),
+		},
+		"aws": common.MapStr{
+			"s3": common.MapStr{
 				"bucket_name": s3Info.name,
 				"object_key":  s3Info.key,
 			},
+		},
+		"cloud": common.MapStr{
+			"provider": "aws",
+			"region":   s3Info.region,
 		},
 	}
 	return &beat.Event{
 		Timestamp: time.Now(),
 		Fields:    f,
 	}
+}
+
+func constructObjectURL(info s3Info) string {
+	return "https://" + info.name + ".s3-" + info.region + ".amazonaws.com/" + info.key
 }

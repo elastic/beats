@@ -22,7 +22,7 @@ type MockS3Client struct {
 	s3iface.S3API
 }
 
-var s3LogString = "36c1f05b76016b78528454e6e0c60e2b7ff7aa20c0a5e4c748276e5b0a2debd2 test-s3-ks [20/Jun/2019:04:07:48 +0000] 97.118.27.161 arn:aws:iam::627959692251:user/kaiyan.sheng@elastic.co 5141F2225A070122 REST.HEAD.OBJECT Screen%2BShot%2B2019-02-21%2Bat%2B2.15.50%2BPM.png"
+var s3LogString = "36c1f test-s3-ks [20/Jun/2019:04:07:48 +0000] 97.118.27.161 arn:aws:iam::627959692251:user/kaiyan.sheng@elastic.co 5141F2225A070122 REST.HEAD.OBJECT Screen%2BShot%2B2019-02-21%2Bat%2B2.15.50%2BPM.png"
 
 func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
 	logBody := ioutil.NopCloser(bytes.NewReader([]byte(s3LogString)))
@@ -46,6 +46,7 @@ func TestHandleMessage(t *testing.T) {
 	cases := []struct {
 		title           string
 		message         sqs.Message
+		bucketNames     []string
 		expectedS3Infos []s3Info
 	}{
 		{
@@ -53,6 +54,7 @@ func TestHandleMessage(t *testing.T) {
 			sqs.Message{
 				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
 			},
+			[]string{},
 			[]s3Info{
 				{
 					name: "test-s3-ks-2",
@@ -65,6 +67,7 @@ func TestHandleMessage(t *testing.T) {
 			sqs.Message{
 				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Delete\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
 			},
+			[]string{},
 			[]s3Info{},
 		},
 		{
@@ -72,17 +75,42 @@ func TestHandleMessage(t *testing.T) {
 			sqs.Message{
 				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:ec2\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
 			},
+			[]string{},
+			[]s3Info{},
+		},
+		{
+			"sqs message with right bucketNames",
+			sqs.Message{
+				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
+			},
+			[]string{"ap-southeast-1"},
+			[]s3Info{
+				{
+					name: "test-s3-ks-2",
+					key:  "server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA",
+				},
+			},
+		},
+		{
+			"sqs message with wrong bucketNames",
+			sqs.Message{
+				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
+			},
+			[]string{"us-west-1"},
 			[]s3Info{},
 		},
 	}
+
 	for _, c := range cases {
-		s3Info, err := handleMessage(c.message)
-		assert.NoError(t, err)
-		assert.Equal(t, len(c.expectedS3Infos), len(s3Info))
-		if len(s3Info) > 0 {
-			assert.Equal(t, c.expectedS3Infos[0].key, s3Info[0].key)
-			assert.Equal(t, c.expectedS3Infos[0].name, s3Info[0].name)
-		}
+		t.Run(c.title, func(t *testing.T) {
+			s3Info, err := handleMessage(c.message, c.bucketNames)
+			assert.NoError(t, err)
+			assert.Equal(t, len(c.expectedS3Infos), len(s3Info))
+			if len(s3Info) > 0 {
+				assert.Equal(t, c.expectedS3Infos[0].key, s3Info[0].key)
+				assert.Equal(t, c.expectedS3Infos[0].name, s3Info[0].name)
+			}
+		})
 	}
 }
 
@@ -90,18 +118,63 @@ func TestReadS3Object(t *testing.T) {
 	mockSvc := &MockS3Client{}
 	s3Info := []s3Info{
 		{
-			name: "test-s3-ks-2",
-			key:  "log2019-06-21-16-16-54",
+			name:   "test-s3-ks-2",
+			key:    "log2019-06-21-16-16-54",
+			region: "us-west-1",
 		},
 	}
 	events, err := readS3Object(mockSvc, s3Info)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
-	bucketName, err := events[0].Fields.GetValue("log.source.bucket_name")
-	objectKey, err := events[0].Fields.GetValue("log.source.object_key")
-	message, err := events[0].Fields.GetValue("message")
+
+	bucketName, err := events[0].Fields.GetValue("aws.s3.bucket_name")
 	assert.NoError(t, err)
 	assert.Equal(t, "test-s3-ks-2", bucketName.(string))
+
+	objectKey, err := events[0].Fields.GetValue("aws.s3.object_key")
+	assert.NoError(t, err)
 	assert.Equal(t, "log2019-06-21-16-16-54", objectKey.(string))
+
+	cloudProvider, err := events[0].Fields.GetValue("cloud.provider")
+	assert.NoError(t, err)
+	assert.Equal(t, "aws", cloudProvider)
+
+	region, err := events[0].Fields.GetValue("cloud.region")
+	assert.NoError(t, err)
+	assert.Equal(t, "us-west-1", region)
+
+	message, err := events[0].Fields.GetValue("message")
+	assert.NoError(t, err)
 	assert.Equal(t, s3LogString, message.(string))
+}
+
+func TestConstructObjectURL(t *testing.T) {
+	cases := []struct {
+		title             string
+		s3Info            s3Info
+		expectedObjectURL string
+	}{
+		{"construct with object in s3",
+			s3Info{
+				name:   "test-1",
+				key:    "log2019-06-21-16-16-54",
+				region: "us-west-1",
+			},
+			"https://test-1.s3-us-west-1.amazonaws.com/log2019-06-21-16-16-54",
+		},
+		{"construct with object in a folder of s3",
+			s3Info{
+				name:   "test-2",
+				key:    "test-folder-1/test-log-1.txt",
+				region: "us-east-1",
+			},
+			"https://test-2.s3-us-east-1.amazonaws.com/test-folder-1/test-log-1.txt",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			objectURL := constructObjectURL(c.s3Info)
+			assert.Equal(t, c.expectedObjectURL, objectURL)
+		})
+	}
 }
