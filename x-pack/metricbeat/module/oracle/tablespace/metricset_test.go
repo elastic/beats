@@ -19,6 +19,8 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
+
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 
 	events, errs := mbtest.ReportingFetchV2Error(f)
