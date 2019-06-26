@@ -105,6 +105,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/event"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/node"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/pod"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/proxy"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_container"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_deployment"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
