@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 
@@ -115,6 +117,11 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestReadS3Object(t *testing.T) {
+	p := &Input{
+		started: false,
+		logger:  logp.NewLogger(inputName),
+	}
+
 	mockSvc := &MockS3Client{}
 	s3Info := []s3Info{
 		{
@@ -123,7 +130,7 @@ func TestReadS3Object(t *testing.T) {
 			region: "us-west-1",
 		},
 	}
-	events, err := readS3Object(mockSvc, s3Info)
+	events, err := p.readS3Object(mockSvc, s3Info)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 

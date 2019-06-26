@@ -152,6 +152,7 @@ func (p *Input) Run() {
 			var wg sync.WaitGroup
 			numMessages := len(output.Messages)
 			wg.Add(numMessages)
+
 			for i := range output.Messages {
 				go func(m sqs.Message) {
 					// launch goroutine to handle each message
@@ -162,15 +163,12 @@ func (p *Input) Run() {
 						p.logger.Error(err.Error())
 					}
 
+					// read from s3
+					events, err := p.readS3Object(svcS3, s3Infos)
 					if err != nil {
 						p.logger.Error(err.Error())
 					}
 
-					// read from s3
-					events, err := readS3Object(svcS3, s3Infos)
-					if err != nil {
-						p.logger.Error(err.Error())
-					}
 					for _, event := range events {
 						d = &util.Data{Event: *event}
 						err = forwarder.Send(d)
@@ -257,39 +255,68 @@ func stringInSlice(name string, bucketNames []string) bool {
 	return false
 }
 
-func readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event, error) {
+func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event, error) {
 	var events []*beat.Event
-	for _, s3Info := range s3Infos {
-		s3GetObjectInput := &s3.GetObjectInput{
-			Bucket: awssdk.String(s3Info.name),
-			Key:    awssdk.String(s3Info.key),
-		}
-		objReq := svc.GetObjectRequest(s3GetObjectInput)
+	if len(s3Infos) > 0 {
+		var wg sync.WaitGroup
+		numS3Infos := len(s3Infos)
+		wg.Add(numS3Infos)
 
-		objResp, err := objReq.Send()
-		if err != nil {
-			// What will happen if this object is not a log file or not readable ordoes not exist?
-			// 2019-06-25T17:21:57.406-0600    ERROR   [s3]    s3/input.go:220 s3 get object request failed: NoSuchKey: The specified key does not exist.
-			return nil, errors.Wrap(err, "s3 get object request failed")
-		}
+		for i := range s3Infos {
+			go func(s3Info s3Info) {
+				// launch goroutine to handle each message
+				defer wg.Done()
 
-		// TODO: check way to stream
-		buf := new(bytes.Buffer)
-		_, err = buf.ReadFrom(objResp.Body)
-		if err != nil {
-			return nil, errors.Wrap(err, "buf.ReadFrom failed")
-		}
+				s3GetObjectInput := &s3.GetObjectInput{
+					Bucket: awssdk.String(s3Info.name),
+					Key:    awssdk.String(s3Info.key),
+				}
+				req := svc.GetObjectRequest(s3GetObjectInput)
 
-		s := buf.String()
-		logLines := strings.Split(s, "\n")
-		for i, log := range logLines {
-			if log == "" {
-				continue
-			}
+				resp, err := req.Send()
+				if err != nil {
+					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
+				}
 
-			// create event per log line
-			event := createEvent(log, int64(i), s3Info)
-			events = append(events, event)
+				// method1
+				buf := new(bytes.Buffer)
+				_, err = buf.ReadFrom(resp.Body)
+				if err != nil {
+					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
+				}
+
+				logString := buf.String()
+
+				// method2
+				//var logString string
+				//p := make([]byte, 4)
+				//for {
+				//	n, err := resp.Body.Read(p)
+				//	if err == io.EOF {
+				//		break
+				//	}
+				//	logString += string(p[:n])
+				//}
+
+				// method3
+				//outFile, err := os.Create("test")
+				//defer outFile.Close()
+				//_, err = io.Copy(outFile, resp.Body)
+				//fileBytes , err := ioutil.ReadFile("test")
+				//logString := string(fileBytes)
+
+				logLines := strings.Split(logString, "\n")
+				for i, log := range logLines {
+					if log == "" {
+						continue
+					}
+
+					// create event per log line
+					event := createEvent(log, int64(i), s3Info)
+					events = append(events, event)
+				}
+			}(s3Infos[i])
+			wg.Wait()
 		}
 	}
 	return events, nil
