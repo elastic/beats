@@ -65,6 +65,7 @@
 
 - key: summary
   title: "Monitor summary"
+  description:
   fields:
     - name: summary
       type: group

@@ -1,3 +1,6 @@
+# Module: coredns
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-coredns.html
+
 - module: coredns
   metricsets: ["stats"]
   period: 10s

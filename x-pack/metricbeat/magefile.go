@@ -9,16 +9,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 )
 
 func init() {
@@ -66,10 +62,10 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	devtools.UseElasticBeatXPackPackaging()
-	customizePackaging()
+	metricbeat.CustomizePackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
-	mg.Deps(Update, prepareModulePackaging)
+	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
@@ -100,12 +96,13 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(shortConfig, referenceConfig, dockerConfig, createDirModulesD)
+	mg.Deps(metricbeat.ConfigXPack, metricbeat.GenerateDirModulesD)
 }
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, prepareModulePackaging,
+	mg.SerialDeps(Fields, Dashboards, Config,
+		metricbeat.PrepareModulePackagingXPack,
 		devtools.GenerateModuleIncludeListGo)
 }
 
@@ -162,187 +159,4 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	})
-}
-
-// -----------------------------------------------------------------------------
-// Customizations specific to Metricbeat.
-// - Include modules.d directory in packages.
-
-const (
-	dirModulesDGenerated = "build/package/modules.d"
-)
-
-// prepareModulePackaging generates modules and modules.d directories
-// for an x-pack distribution, excluding _meta and test files so that they are
-// not included in packages.
-func prepareModulePackaging() error {
-	mg.Deps(createDirModulesD)
-
-	err := devtools.Clean([]string{
-		dirModulesDGenerated,
-	})
-	if err != nil {
-		return err
-	}
-
-	for _, copyAction := range []struct {
-		src, dst string
-	}{
-		{devtools.OSSBeatDir("modules.d"), dirModulesDGenerated},
-		{"modules.d", dirModulesDGenerated},
-	} {
-		err := (&devtools.CopyTask{
-			Source:  copyAction.src,
-			Dest:    copyAction.dst,
-			Mode:    0644,
-			DirMode: 0755,
-		}).Execute()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func shortConfig() error {
-	var configParts = []string{
-		devtools.OSSBeatDir("_meta/common.yml"),
-		devtools.OSSBeatDir("_meta/setup.yml"),
-		"{{ elastic_beats_dir }}/libbeat/_meta/config.yml",
-	}
-
-	for i, f := range configParts {
-		configParts[i] = devtools.MustExpand(f)
-	}
-
-	configFile := devtools.BeatName + ".yml"
-	devtools.MustFileConcat(configFile, 0640, configParts...)
-	devtools.MustFindReplace(configFile, regexp.MustCompile("beatname"), devtools.BeatName)
-	devtools.MustFindReplace(configFile, regexp.MustCompile("beat-index-prefix"), devtools.BeatIndexPrefix)
-	return nil
-}
-
-func referenceConfig() error {
-	const modulesConfigYml = "build/config.modules.yml"
-	err := devtools.GenerateModuleReferenceConfig(modulesConfigYml, devtools.OSSBeatDir("module"), "module")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(modulesConfigYml)
-
-	var configParts = []string{
-		devtools.OSSBeatDir("_meta/common.reference.yml"),
-		modulesConfigYml,
-		"{{ elastic_beats_dir }}/libbeat/_meta/config.reference.yml",
-	}
-
-	for i, f := range configParts {
-		configParts[i] = devtools.MustExpand(f)
-	}
-
-	configFile := devtools.BeatName + ".reference.yml"
-	devtools.MustFileConcat(configFile, 0640, configParts...)
-	devtools.MustFindReplace(configFile, regexp.MustCompile("beatname"), devtools.BeatName)
-	devtools.MustFindReplace(configFile, regexp.MustCompile("beat-index-prefix"), devtools.BeatIndexPrefix)
-	return nil
-}
-
-func dockerConfig() error {
-	var configParts = []string{
-		devtools.OSSBeatDir("_meta/beat.docker.yml"),
-		devtools.LibbeatDir("_meta/config.docker.yml"),
-	}
-
-	return devtools.FileConcat(devtools.BeatName+".docker.yml", 0600, configParts...)
-}
-
-func createDirModulesD() error {
-	if err := os.RemoveAll("modules.d"); err != nil {
-		return err
-	}
-
-	shortConfigs, err := filepath.Glob("module/*/_meta/config.yml")
-	if err != nil {
-		return err
-	}
-
-	for _, f := range shortConfigs {
-		parts := strings.Split(filepath.ToSlash(f), "/")
-		if len(parts) < 2 {
-			continue
-		}
-		moduleName := parts[1]
-
-		cp := devtools.CopyTask{
-			Source: f,
-			Dest:   filepath.Join("modules.d", moduleName+".yml.disabled"),
-			Mode:   0644,
-		}
-		if err = cp.Execute(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func customizePackaging() {
-	var (
-		archiveModulesDir = "modules.d"
-		unixModulesDir    = "/etc/{{.BeatName}}/modules.d"
-
-		modulesDir = devtools.PackageFile{
-			Mode:    0644,
-			Source:  dirModulesDGenerated,
-			Config:  true,
-			Modules: true,
-		}
-		windowsModulesDir = devtools.PackageFile{
-			Mode:    0644,
-			Source:  "{{.PackageDir}}/modules.d",
-			Config:  true,
-			Modules: true,
-			Dep: func(spec devtools.PackageSpec) error {
-				if err := devtools.Copy(dirModulesDGenerated, spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
-					return errors.Wrap(err, "failed to copy modules.d dir")
-				}
-
-				return devtools.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/modules.d/system.yml"),
-					regexp.MustCompile(`- load`), `#- load`)
-			},
-		}
-		windowsReferenceConfig = devtools.PackageFile{
-			Mode:   0644,
-			Source: "{{.PackageDir}}/metricbeat.reference.yml",
-			Dep: func(spec devtools.PackageSpec) error {
-				err := devtools.Copy("metricbeat.reference.yml",
-					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"))
-				if err != nil {
-					return errors.Wrap(err, "failed to copy reference config")
-				}
-
-				return devtools.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"),
-					regexp.MustCompile(`- load`), `#- load`)
-			},
-		}
-	)
-
-	for _, args := range devtools.Packages {
-		switch args.OS {
-		case "windows":
-			args.Spec.Files[archiveModulesDir] = windowsModulesDir
-			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", windowsReferenceConfig)
-		default:
-			pkgType := args.Types[0]
-			switch pkgType {
-			case devtools.TarGz, devtools.Zip, devtools.Docker:
-				args.Spec.Files[archiveModulesDir] = modulesDir
-			case devtools.Deb, devtools.RPM, devtools.DMG:
-				args.Spec.Files[unixModulesDir] = modulesDir
-			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
-			}
-		}
-	}
 }
