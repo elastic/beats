@@ -32,7 +32,7 @@ func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 		ShortParts: []string{
 			devtools.OSSBeatDir("_meta/common.p1.yml"),
 			devtools.OSSBeatDir("_meta/common.p2.yml"),
-			devtools.LibbeatDir("_meta/config.yml"),
+			devtools.LibbeatDir("_meta/config.yml.tmpl"),
 		},
 		ReferenceDeps: []interface{}{collectModuleConfig},
 		ReferenceParts: []string{
@@ -40,7 +40,7 @@ func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 			modulesConfigYml,
 			devtools.OSSBeatDir("_meta/common.reference.inputs.yml"),
 			devtools.OSSBeatDir("_meta/common.reference.p2.yml"),
-			devtools.LibbeatDir("_meta/config.reference.yml"),
+			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		},
 		DockerParts: []string{
 			devtools.OSSBeatDir("_meta/beat.docker.yml"),
@@ -65,7 +65,7 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 		devtools.OSSBeatDir("_meta/common.reference.inputs.yml"),
 		"_meta/common.reference.inputs.yml", // Added only to X-Pack.
 		devtools.OSSBeatDir("_meta/common.reference.p2.yml"),
-		devtools.LibbeatDir("_meta/config.reference.yml"),
+		devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 	}
 	return args
 }

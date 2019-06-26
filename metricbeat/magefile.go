@@ -96,7 +96,11 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(metricbeat.ConfigOSS, metricbeat.GenerateDirModulesD)
+	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
+}
+
+func configYML() error {
+	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
 }
 
 // Update updates the generated files (aka make update).

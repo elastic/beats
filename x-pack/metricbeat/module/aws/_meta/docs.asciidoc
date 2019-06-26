@@ -39,31 +39,57 @@ IAM policy is an entity that defines permissions to an object within your AWS en
 to be added into the IAM user's policy to authorize Metricbeat to collect AWS monitoring metrics. Please see documentation
 under each metricset for required permissions.
 
-Here is an example of aws metricbeat module configuration:
+The aws module comes with a predefined dashboard. For example:
 
+image::./images/metricbeat-aws-overview.png[]
+
+The aws.yml used for collecting metrics to display on the predefined aws
+dashboard is:
 [source,yaml]
 ----
-metricbeat.modules:
 - module: aws
   period: 300s
   metricsets:
     - ec2
-    - sqs
-  access_key_id: '${AWS_ACCESS_KEY_ID}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
-  session_token: '${AWS_SESSION_TOKEN}'
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
 - module: aws
   period: 300s
   metricsets:
-    - s3_daily_storage
-  access_key_id: '${AWS_ACCESS_KEY_ID}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY}'
-  session_token: '${AWS_SESSION_TOKEN}'
+    - sqs
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  regions:
-    - us-west-1
-    - us-east-1
+
+- module: aws
+  period: 86400s
+  metricsets:
+    - s3_request
+    - s3_daily_storage
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  # regions:
+  #    - us-west-1
+  #    - us-east-1
+- module: aws
+  period: 300s
+  metricsets:
+    - cloudwatch
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  cloudwatch_metrics:
+    - namespace: AWS/EC2
+    - namespace: AWS/EBS
+    - namespace: AWS/Lambda
+    - namespace: AWS/ECS
+    - namespace: AWS/ELB
 ----
 
 [float]

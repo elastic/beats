@@ -96,7 +96,11 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(metricbeat.ConfigXPack, metricbeat.GenerateDirModulesD)
+	mg.Deps(configYML, devtools.GenerateDirModulesD)
+}
+
+func configYML() error {
+	return devtools.Config(devtools.AllConfigTypes, metricbeat.XPackConfigFileParams(), ".")
 }
 
 // Update is an alias for running fields, dashboards, config.
