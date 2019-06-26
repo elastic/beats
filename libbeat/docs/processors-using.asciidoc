@@ -934,7 +934,8 @@ processors:
         source_port: my_source_port
         destination_ip: my_dest_ip
         destination_port: my_dest_port
-        transport: proto
+        iana_number: my_iana_number
+        transport: my_transport
         icmp_type: my_icmp_type
         icmp_code: my_icmp_code
       target: network.community_id
