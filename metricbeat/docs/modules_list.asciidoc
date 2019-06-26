@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [options="header"]
-|===================================
+|===
 |Modules   |Dashboards   |Metricsets   
 |<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
@@ -83,11 +83,12 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.13+| .13+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.14+| .14+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
 |<<metricbeat-metricset-kubernetes-node,node>>   
 |<<metricbeat-metricset-kubernetes-pod,pod>>   
+|<<metricbeat-metricset-kubernetes-proxy,proxy>>   
 |<<metricbeat-metricset-kubernetes-state_container,state_container>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
@@ -109,9 +110,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-mongodb-metrics,metrics>>   
 |<<metricbeat-metricset-mongodb-replstatus,replstatus>>   
 |<<metricbeat-metricset-mongodb-status,status>>   
-|<<metricbeat-module-mssql,mssql>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>> experimental[]  
-|<<metricbeat-metricset-mssql-transaction_log,transaction_log>> experimental[]  
+|<<metricbeat-module-mssql,MSSQL>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>> beta[]  
+|<<metricbeat-metricset-mssql-transaction_log,transaction_log>> beta[]  
 |<<metricbeat-module-munin,Munin>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -174,7 +175,7 @@ This file is generated! See scripts/docs_collector.py
 .3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>> beta[]  
 |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
 |<<metricbeat-metricset-zookeeper-server,server>>   
-|================================
+|===
 
 --
 
