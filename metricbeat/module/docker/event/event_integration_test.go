@@ -20,6 +20,7 @@
 package event
 
 import (
+	"context"
 	"io"
 	"os"
 	"testing"
@@ -28,7 +29,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-	"golang.org/x/net/context"
 
 	"github.com/elastic/beats/auditbeat/core"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -36,11 +36,11 @@ import (
 )
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewPushMetricSetV2(t, getConfig())
+	ms := mbtest.NewPushMetricSetV2WithContext(t, getConfig())
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2(10*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2WithContext(10*time.Second, 1, ms)
 		close(done)
 	}()
 
