@@ -114,10 +114,14 @@ def has_license(folder):
 
     There are two cases accepted:
         * The folder contains a LICENSE
+        * The parent folder contains a LICENSE
         * The folder only contains subdirectories AND all these
           subdirectories contain a LICENSE
     """
+
     if len(get_licenses(folder)) > 0:
+        return True, ""
+    elif len(get_licenses(os.path.join(folder, os.pardir))) > 0: # For go.opencensus.io.
         return True, ""
 
     for subdir in os.listdir(folder):
