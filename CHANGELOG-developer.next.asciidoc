@@ -42,3 +42,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Deprecate setup cmds for `template` and `ilm-policy`. Add new setup cmd for `index-management`. {pull}12132[12132]
 - Use the go-lookslike library for testing in heartbeat. Eventually the mapval package will be replaced with it. {pull}12540[12540]
 - New ReporterV2 interfaces that can receive a context on `Fetch(ctx, reporter)`, or `Run(ctx, reporter)`. {pull}11981[11981]
+- Generate configuration from `mage` for all Beats. {pull}12618[12618]
