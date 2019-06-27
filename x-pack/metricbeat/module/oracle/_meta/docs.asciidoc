@@ -1,4 +1,4 @@
-This is the https://www.oracle.com[Oracle] module for Metricbeat. It is an alpha release and under active development with feedback from the community. A single Metricset for Tablespace monitoring is added so the community can start gathering metrics from their nodes and contributing to the module.
+This is the https://www.oracle.com[Oracle] module for Metricbeat. It is under active development with feedback from the community. A single Metricset for Tablespace monitoring is added so the community can start gathering metrics from their nodes and contributing to the module.
 
 [float]
 == Compatibility

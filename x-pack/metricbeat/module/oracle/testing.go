@@ -45,30 +45,30 @@ func GetOracleEnvPort() string {
 
 // GetOracleEnvServiceName returns the service name to use with Oracle testing server or the value of the environment variable ORACLE_SERVICE_NAME if not empty
 func GetOracleEnvServiceName() string {
-	port := os.Getenv("ORACLE_SERVICE_NAME")
+	serviceName := os.Getenv("ORACLE_SERVICE_NAME")
 
-	if len(port) == 0 {
-		port = "ORCLPDB1.localdomain"
+	if len(serviceName) == 0 {
+		serviceName = "ORCLPDB1.localdomain"
 	}
-	return port
+	return serviceName
 }
 
 // GetOracleEnvUsername returns the username to use with Oracle testing server or the value of the environment variable ORACLE_USERNAME if not empty
 func GetOracleEnvUsername() string {
-	port := os.Getenv("ORACLE_USERNAME")
+	username := os.Getenv("ORACLE_USERNAME")
 
-	if len(port) == 0 {
-		port = "sys"
+	if len(username) == 0 {
+		username = "sys"
 	}
-	return port
+	return username
 }
 
 // GetOracleEnvUsername returns the port of the Oracle server or the value of the environment variable ORACLE_PASSWORD if not empty
 func GetOracleEnvPassword() string {
-	port := os.Getenv("ORACLE_PASSWORD")
+	password := os.Getenv("ORACLE_PASSWORD")
 
-	if len(port) == 0 {
-		port = "Oradoc_db1"
+	if len(password) == 0 {
+		password = "Oradoc_db1"
 	}
-	return port
+	return password
 }

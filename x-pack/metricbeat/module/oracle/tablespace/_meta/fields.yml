@@ -1,6 +1,7 @@
 - name: tablespace
   type: group
   description: tablespace
+  release: beta
   fields:
     - name: name
       type: keyword

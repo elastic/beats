@@ -5,6 +5,7 @@
 package tablespace
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/pkg/errors"
@@ -28,8 +29,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	db        *sql.DB
-	extractor tablespaceExtractMethods
+	db                *sql.DB
+	extractor         tablespaceExtractMethods
+	connectionDetails oracle.ConnectionDetails
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -42,33 +44,34 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error parsing config file")
 	}
 
-	db, err := oracle.NewConnection(&config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating connection to Oracle")
-	}
-
 	return &MetricSet{
-		BaseMetricSet: base,
-		db:            db,
-		extractor:     &tablespaceExtractor{db: db},
+		BaseMetricSet:     base,
+		connectionDetails: config,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	events, err := m.eventMapping()
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
+	if m.db, err = oracle.NewConnection(&m.connectionDetails); err != nil {
+		return errors.Wrap(err, "error creating connection to Oracle")
+	}
+
+	m.extractor = &tablespaceExtractor{db: m.db}
+
+	events, err := m.extractAndTransform(ctx)
 	if err != nil {
 		return err
 	}
+
 	for _, event := range events {
 		if reported := reporter.Event(event); !reported {
-			return nil
+			return
 		}
 	}
 
-	return nil
+	return
 }
 
 // Close the connection to Oracle

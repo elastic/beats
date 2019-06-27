@@ -5,6 +5,7 @@
 package tablespace
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -24,7 +25,7 @@ var notExpectedEvents = []string{`{}`, `{"foo":"bar"}`}
 func TestEventMapping(t *testing.T) {
 	m := MetricSet{extractor: &happyMockExtractor{}}
 
-	events, err := m.eventMapping()
+	events, err := m.extractAndTransform(context.Background())
 	assert.NoError(t, err)
 
 	fmt.Printf("Total %d events\n", len(events))
@@ -61,21 +62,21 @@ func TestEventMapping(t *testing.T) {
 		t.Run("data files", func(t *testing.T) {
 			m := MetricSet{extractor: &errorDataFilesMockExtractor{}}
 
-			_, err := m.eventMapping()
+			_, err := m.extractAndTransform(context.Background())
 			assert.Error(t, err)
 		})
 
 		t.Run("free space data", func(t *testing.T) {
 			m := MetricSet{extractor: &errorFreeSpaceDataMockExtractor{}}
 
-			_, err := m.eventMapping()
+			_, err := m.extractAndTransform(context.Background())
 			assert.Error(t, err)
 		})
 
 		t.Run("temp free space data", func(t *testing.T) {
 			m := MetricSet{extractor: &errorTempFreeSpaceDataMockExtractor{}}
 
-			_, err := m.eventMapping()
+			_, err := m.extractAndTransform(context.Background())
 			assert.Error(t, err)
 		})
 	})

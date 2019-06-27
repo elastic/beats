@@ -5,6 +5,7 @@
 package tablespace
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -30,8 +31,8 @@ func (d *dataFile) eventKey() string {
 	return d.TablespaceName.String
 }
 
-func (e *tablespaceExtractor) dataFilesData() ([]dataFile, error) {
-	rows, err := e.db.Query("SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, MAXBYTES, USER_BYTES, ONLINE_STATUS FROM SYS.DBA_DATA_FILES UNION SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, MAXBYTES, USER_BYTES, STATUS AS ONLINE_STATUS FROM SYS.DBA_TEMP_FILES")
+func (e *tablespaceExtractor) dataFilesData(ctx context.Context) ([]dataFile, error) {
+	rows, err := e.db.QueryContext(ctx, "SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, MAXBYTES, USER_BYTES, ONLINE_STATUS FROM SYS.DBA_DATA_FILES UNION SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, MAXBYTES, USER_BYTES, STATUS AS ONLINE_STATUS FROM SYS.DBA_TEMP_FILES")
 	if err != nil {
 		return nil, errors.Wrap(err, "error executing query")
 	}

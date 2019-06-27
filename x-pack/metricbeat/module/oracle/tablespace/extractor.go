@@ -4,13 +4,16 @@
 
 package tablespace
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
 // tablespaceExtractMethods contains the methods needed to extract the necessary information about a Tablespace
 type tablespaceExtractMethods interface {
-	dataFilesData() ([]dataFile, error)
-	tempFreeSpaceData() ([]tempFreeSpace, error)
-	usedAndFreeSpaceData() ([]usedAndFreeSpace, error)
+	dataFilesData(context.Context) ([]dataFile, error)
+	tempFreeSpaceData(context.Context) ([]tempFreeSpace, error)
+	usedAndFreeSpaceData(context.Context) ([]usedAndFreeSpace, error)
 }
 
 // extractedData contains the necessary tablespace information. Can be updated with more data without affecting methods

@@ -5,6 +5,7 @@
 package tablespace
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/pkg/errors"
@@ -43,25 +44,25 @@ type errorTempFreeSpaceDataMockExtractor struct {
 
 type errorFreeAndUsedSpaceData struct{}
 
-func (errorFreeAndUsedSpaceData) usedAndFreeSpaceData() ([]usedAndFreeSpace, error) {
+func (errorFreeAndUsedSpaceData) usedAndFreeSpaceData(_ context.Context) ([]usedAndFreeSpace, error) {
 	return nil, errors.New("data files error")
 }
 
 type errorTempFreeSpaceData struct{}
 
-func (errorTempFreeSpaceData) tempFreeSpaceData() ([]tempFreeSpace, error) {
+func (errorTempFreeSpaceData) tempFreeSpaceData(_ context.Context) ([]tempFreeSpace, error) {
 	return nil, errors.New("data files error")
 }
 
 type errorDataFiles struct{}
 
-func (errorDataFiles) dataFilesData() ([]dataFile, error) {
+func (errorDataFiles) dataFilesData(_ context.Context) ([]dataFile, error) {
 	return nil, errors.New("data files error")
 }
 
 type happyDataFiles struct{}
 
-func (h happyDataFiles) dataFilesData() ([]dataFile, error) {
+func (h happyDataFiles) dataFilesData(_ context.Context) ([]dataFile, error) {
 	return []dataFile{
 		{FileName: sql.NullString{String: "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/sysaux01.dbf", Valid: true}, FileID: sql.NullInt64{Int64: 18, Valid: true}, TablespaceName: sql.NullString{String: "SYSAUX", Valid: true}, Status: sql.NullString{String: "AVAILABLE", Valid: true}, MaxFileSizeBytes: sql.NullInt64{Valid: true, Int64: 9999994}, AvailableForUserBytes: sql.NullInt64{Int64: 99999994, Valid: true}, OnlineStatus: sql.NullString{String: "ONLINE", Valid: true}, FileSizeBytes: sql.NullInt64{Valid: true, Int64: 9999990}},
 		{FileName: sql.NullString{String: "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/sysaux02.dbf", Valid: true}, FileID: sql.NullInt64{Int64: 181, Valid: true}, TablespaceName: sql.NullString{String: "SYSAUX", Valid: true}, Status: sql.NullString{String: "AVAILABLE", Valid: true}, MaxFileSizeBytes: sql.NullInt64{Valid: true, Int64: 9999995}, AvailableForUserBytes: sql.NullInt64{Int64: 99999995, Valid: true}, OnlineStatus: sql.NullString{String: "ONLINE", Valid: true}, FileSizeBytes: sql.NullInt64{Valid: true, Int64: 9999991}},
@@ -76,13 +77,13 @@ func (h happyDataFiles) dataFilesData() ([]dataFile, error) {
 
 type happyTempFreeSpaceData struct{}
 
-func (happyTempFreeSpaceData) tempFreeSpaceData() ([]tempFreeSpace, error) {
+func (happyTempFreeSpaceData) tempFreeSpaceData(_ context.Context) ([]tempFreeSpace, error) {
 	return []tempFreeSpace{{TablespaceName: "TEMP", TablespaceSize: sql.NullInt64{Valid: true, Int64: 99999}, UsedSpaceBytes: sql.NullInt64{Valid: true, Int64: 99999}, FreeSpace: sql.NullInt64{Int64: 99999, Valid: true}}}, nil
 }
 
 type happyFreeSpaceData struct{}
 
-func (happyFreeSpaceData) usedAndFreeSpaceData() ([]usedAndFreeSpace, error) {
+func (happyFreeSpaceData) usedAndFreeSpaceData(_ context.Context) ([]usedAndFreeSpace, error) {
 	return []usedAndFreeSpace{
 		{TablespaceName: "SYSTEM", TotalFreeBytes: sql.NullInt64{Int64: 9990, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}},
 		{TablespaceName: "SYSAUX", TotalFreeBytes: sql.NullInt64{Int64: 9999, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}},

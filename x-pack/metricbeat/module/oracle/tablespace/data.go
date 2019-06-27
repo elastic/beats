@@ -5,6 +5,7 @@
 package tablespace
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/pkg/errors"
@@ -20,18 +21,18 @@ type tablespaceNameGetter interface {
 
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch
 // by doing queries to Oracle
-func (m *MetricSet) extract(extractor tablespaceExtractMethods) (out *extractedData, err error) {
+func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (out *extractedData, err error) {
 	out = &extractedData{}
 
-	if out.dataFiles, err = extractor.dataFilesData(); err != nil {
+	if out.dataFiles, err = extractor.dataFilesData(ctx); err != nil {
 		return nil, errors.Wrap(err, "error getting data_files")
 	}
 
-	if out.tempFreeSpace, err = extractor.tempFreeSpaceData(); err != nil {
+	if out.tempFreeSpace, err = extractor.tempFreeSpaceData(ctx); err != nil {
 		return nil, errors.Wrap(err, "error getting temp_free_space")
 	}
 
-	if out.freeSpace, err = extractor.usedAndFreeSpaceData(); err != nil {
+	if out.freeSpace, err = extractor.usedAndFreeSpaceData(ctx); err != nil {
 		return nil, errors.Wrap(err, "error getting free space data")
 	}
 
@@ -54,8 +55,8 @@ func (m *MetricSet) transform(in *extractedData) (out map[string]common.MapStr) 
 	return
 }
 
-func (m *MetricSet) eventMapping() ([]mb.Event, error) {
-	extractedMetricsData, err := m.extract(m.extractor)
+func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {
+	extractedMetricsData, err := m.extract(ctx, m.extractor)
 	if err != nil {
 		return nil, errors.Wrap(err, "error extracting data")
 	}

@@ -6,14 +6,10 @@ package oracle
 
 import (
 	"database/sql"
-
 	"gopkg.in/goracle.v2"
 
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
-
-	// Register driver.
-	_ "gopkg.in/goracle.v2"
 
 	"github.com/pkg/errors"
 )
@@ -21,9 +17,9 @@ import (
 // ConnectionDetails contains all possible data that can be used to create a connection with
 // an Oracle db
 type ConnectionDetails struct {
-	Username string   `config:"username"    validate:"nonzero"`
-	Password string   `config:"password"    validate:"nonzero"`
-	Hosts    []string `config:"hosts"    validate:"nonzero"`
+	Username string   `config:"username"`
+	Password string   `config:"password"`
+	Hosts    []string `config:"hosts"    validate:"required"`
 }
 
 // HostParser parsers the host value as a URL

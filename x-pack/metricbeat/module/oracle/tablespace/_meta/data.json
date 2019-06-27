@@ -11,13 +11,13 @@
     "oracle": {
         "tablespace": {
             "data_file": {
-                "id": 19,
-                "name": "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/undotbs01.dbf",
+                "id": 18,
+                "name": "/u02/app/oracle/oradata/ORCLCDB/orclpdb1/sysaux01.dbf",
                 "online_status": "ONLINE",
                 "size": {
-                    "bytes": 188743680,
+                    "bytes": 618659840,
                     "free": {
-                        "bytes": 187695104
+                        "bytes": 617611264
                     },
                     "max": {
                         "bytes": 34359721984
@@ -25,13 +25,13 @@
                 },
                 "status": "AVAILABLE"
             },
-            "name": "UNDOTBS1",
+            "name": "SYSAUX",
             "space": {
                 "free": {
-                    "bytes": 10092544
+                    "bytes": 34799616
                 },
                 "used": {
-                    "bytes": 188743680
+                    "bytes": 618659840
                 }
             }
         }
