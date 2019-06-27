@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-oracle-tablespace]]
 === Oracle tablespace metricset
 
-experimental[]
+beta[]
 
 include::../../../../x-pack/metricbeat/module/oracle/tablespace/_meta/docs.asciidoc[]
 

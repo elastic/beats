@@ -690,7 +690,7 @@ metricbeat.modules:
   metricsets: ["tablespace"]
   enabled: false
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
 
   # username: ""
   # password: ""

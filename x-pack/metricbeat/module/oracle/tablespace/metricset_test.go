@@ -21,7 +21,7 @@ func TestData(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
 
-	if err := mbtest.Write(f, t, ""); err != nil {
+	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
