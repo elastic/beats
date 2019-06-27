@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-kubernetes-proxy]]
 === Kubernetes proxy metricset
 
+beta[]
+
 include::../../../module/kubernetes/proxy/_meta/docs.asciidoc[]
 
 
