@@ -121,7 +121,7 @@ def has_license(folder):
 
     if len(get_licenses(folder)) > 0:
         return True, ""
-    elif len(get_licenses(os.path.join(folder, os.pardir))) > 0: # For go.opencensus.io.
+    elif len(get_licenses(os.path.join(folder, os.pardir))) > 0:  # For go.opencensus.io.
         return True, ""
 
     for subdir in os.listdir(folder):
