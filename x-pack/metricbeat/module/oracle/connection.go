@@ -6,6 +6,7 @@ package oracle
 
 import (
 	"database/sql"
+
 	"gopkg.in/goracle.v2"
 
 	"github.com/elastic/beats/metricbeat/mb"
