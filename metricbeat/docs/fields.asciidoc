@@ -17302,7 +17302,7 @@ The amount of time spent for commits that occurred while a write lock was held.
 --
 
 [[exported-fields-mssql]]
-== mssql fields
+== MSSQL fields
 
 MS SQL module
 
