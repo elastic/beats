@@ -180,7 +180,6 @@ func TestNewModuleFromConfig(t *testing.T) {
 		"normal module": {
 			config:         common.MapStr{"module": "foo", "metricsets": []string{"bar"}},
 			expectedOption: "default",
-			expectedPeriod: mb.DefaultModuleConfig().Period,
 		},
 		"light module": {
 			config:         common.MapStr{"module": "service", "metricsets": []string{"metricset"}},
@@ -247,9 +246,11 @@ func TestNewModuleFromConfig(t *testing.T) {
 					require.True(t, ok)
 					assert.Equal(t, c.expectedOption, ms.Option)
 					assert.Equal(t, c.expectedQuery, ms.Module().Config().Query)
-					if c.expectedPeriod > 0 {
-						assert.Equal(t, c.expectedPeriod, ms.Module().Config().Period)
+					expectedPeriod := c.expectedPeriod
+					if expectedPeriod == 0 {
+						expectedPeriod = mb.DefaultModuleConfig().Period
 					}
+					assert.Equal(t, expectedPeriod, ms.Module().Config().Period)
 				})
 			}
 		})
