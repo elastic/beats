@@ -239,10 +239,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
 - Add support for metricbeat modules based on existing modules (a.k.a. light modules) {issue}12270[12270] {pull}12465[12465]
 - Add a system/entropy metricset {pull}12450[12450]
+- Add kubernetes metricset `controllermanager` {pull}12409[12409]
 - Allow redis URL format in redis hosts config. {pull}12408[12408]
 - Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
 - Add `beat` module. {pull}12181[12181] {pull}12615[12615]
 - Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
+- Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
 
 *Packetbeat*
 

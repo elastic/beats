@@ -10,8 +10,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.5+| .5+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>> beta[]  
+.6+| .6+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>> beta[]  
 |<<metricbeat-metricset-aws-ec2,ec2>>   
+|<<metricbeat-metricset-aws-rds,rds>> beta[]  
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]  
 |<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>> beta[]  
@@ -83,12 +84,13 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.14+| .14+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.15+| .15+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
+|<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>> beta[]  
 |<<metricbeat-metricset-kubernetes-event,event>>   
 |<<metricbeat-metricset-kubernetes-node,node>>   
 |<<metricbeat-metricset-kubernetes-pod,pod>>   
-|<<metricbeat-metricset-kubernetes-proxy,proxy>>   
+|<<metricbeat-metricset-kubernetes-proxy,proxy>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_container,state_container>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   

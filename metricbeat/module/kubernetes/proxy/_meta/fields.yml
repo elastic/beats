@@ -2,7 +2,7 @@
   type: group
   description: >
     Kubernetes proxy server metrics
-  release: ga
+  release: beta
   fields:
   - name: handler
     type: keyword
