@@ -2,7 +2,7 @@
   type: group
   description: >
     Kubernetes scheduler metrics
-  release: ga
+  release: beta
   fields:
   - name: handler
     type: keyword

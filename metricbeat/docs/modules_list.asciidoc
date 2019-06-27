@@ -89,7 +89,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-kubernetes-node,node>>   
 |<<metricbeat-metricset-kubernetes-pod,pod>>   
 |<<metricbeat-metricset-kubernetes-proxy,proxy>>   
-|<<metricbeat-metricset-kubernetes-scheduler,scheduler>>   
+|<<metricbeat-metricset-kubernetes-scheduler,scheduler>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_container,state_container>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   

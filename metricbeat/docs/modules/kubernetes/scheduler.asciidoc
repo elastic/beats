@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-kubernetes-scheduler]]
 === Kubernetes scheduler metricset
 
+beta[]
+
 include::../../../module/kubernetes/scheduler/_meta/docs.asciidoc[]
 
 
