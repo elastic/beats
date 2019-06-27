@@ -321,30 +321,13 @@ coverage-report:
 fields: mage
 	@mage fields
 
+.PHONY: config
+	@mage config
+
 ifndef EXCLUDE_COMMON_UPDATE_TARGET
 .PHONY: update
-update: python-env fields collect ## @build Update expects the most recent version of libbeat in the GOPATH
+update: python-env fields config collect ## @build Update expects the most recent version of libbeat in the GOPATH
 	@echo "Updating generated files for ${BEAT_NAME}"
-
-	@mkdir -p _meta
-	@# Update config files.
-	@cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.yml
-	## The line below allows beats to add a post-processor script that alters the config in arbitrary ways
-	@if test -f scripts/post_process_config.py; then scripts/post_process_config.py ${BEAT_NAME}.yml; fi
-ifneq (,$(wildcard _meta/beat.docker.yml))
-	@cat _meta/beat.docker.yml ${ES_BEATS}/libbeat/_meta/config.docker.yml > ${BEAT_NAME}.docker.yml
-	@chmod 0640 ${BEAT_NAME}.yml ${BEAT_NAME}.docker.yml
-endif
-
-	@# Update reference config files.
-ifeq ($(BEAT_REF_YAML),true)
-	@if [ -e _meta/beat.reference.yml ]; then \
-      cat _meta/beat.reference.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
-  else \
-      cat _meta/beat.yml ${ES_BEATS}/libbeat/_meta/config.reference.yml | sed -e "s/beatname/${BEAT_NAME}/g;s/beat-index-prefix/${BEAT_INDEX_PREFIX}/g" > ${BEAT_NAME}.reference.yml ; \
-  fi;
-	@chmod 0640 ${BEAT_NAME}.reference.yml
-endif
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	mkdir -p include
