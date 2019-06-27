@@ -285,7 +285,7 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event
 					log, err := reader.ReadString('\n')
 					if err != nil {
 						if err == io.EOF {
-							line += 1
+							line++
 							event := createEvent(log, int64(line), s3Info)
 							events = append(events, event)
 							break
@@ -294,7 +294,7 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event
 						}
 					}
 					// create event per log line
-					line += 1
+					line++
 					event := createEvent(log, int64(line), s3Info)
 					events = append(events, event)
 				}
