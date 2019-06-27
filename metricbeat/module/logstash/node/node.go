@@ -66,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if ms.XPack {
-		logstashVersion, err := logstash.GetVersion(http, nodePath)
+		logstashVersion, err := logstash.GetVersion(http, ms.HostData().SanitizedURI+nodePath)
 		if err != nil {
 			return nil, err
 		}
