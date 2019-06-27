@@ -7,7 +7,7 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/x-pack/functionbeat/function/cmd"
+	"github.com/elastic/beats/x-pack/functionbeat/local/cmd"
 	_ "github.com/elastic/beats/x-pack/functionbeat/local/include" // imports features
 )
 

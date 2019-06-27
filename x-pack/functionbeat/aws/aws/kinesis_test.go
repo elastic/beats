@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/functionbeat/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
 )
 
 func TestKinesis(t *testing.T) {

@@ -14,7 +14,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/functionbeat/core"
+	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 )
 
 type simpleFunction struct {

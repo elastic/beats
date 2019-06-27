@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/core"
+	"github.com/elastic/beats/x-pack/functionbeat/function/core"
 )
 
 type mockProvider struct {
