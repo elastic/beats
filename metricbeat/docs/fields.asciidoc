@@ -14167,6 +14167,269 @@ type: long
 --
 
 [float]
+=== proxy
+
+Kubernetes proxy server metrics
+
+
+
+*`kubernetes.proxy.handler`*::
++
+--
+Request handler
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.code`*::
++
+--
+HTTP code
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.method`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.host`*::
++
+--
+Request host
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.proxy.process.cpu.sec`*::
++
+--
+CPU seconds
+
+type: double
+
+--
+
+*`kubernetes.proxy.process.memory.resident.bytes`*::
++
+--
+Bytes in resident memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.process.memory.virtual.bytes`*::
++
+--
+Bytes in virtual memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.process.fds.open.count`*::
++
+--
+Number of open file descriptors
+
+type: long
+
+--
+
+*`kubernetes.proxy.process.started.sec`*::
++
+--
+Seconds since the process started
+
+type: double
+
+--
+
+
+*`kubernetes.proxy.http.request.duration.us.percentile.*`*::
++
+--
+Request duration microseconds percentiles
+
+type: object
+
+--
+
+*`kubernetes.proxy.http.request.duration.us.sum`*::
++
+--
+Request duration microseconds cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.proxy.http.request.duration.us.count`*::
++
+--
+Request count for duration
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.percentile.*`*::
++
+--
+Request size percentiles
+
+type: object
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.sum`*::
++
+--
+Request size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.percentile.*`*::
++
+--
+Response size percentiles
+
+type: object
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.sum`*::
++
+--
+Response size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.count`*::
++
+--
+Response count
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.request.count`*::
++
+--
+Request count
+
+type: long
+
+--
+
+*`kubernetes.proxy.client.request.count`*::
++
+--
+Number of requests as client
+
+
+type: long
+
+--
+
+[float]
+=== sync
+
+kubeproxy proxy sync metrics
+
+
+
+*`kubernetes.proxy.sync.rules.duration.us.sum`*::
++
+--
+SyncProxyRules duration, sum of durations in microseconds
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.rules.duration.us.count`*::
++
+--
+SyncProxyRules duration, number of operations
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.rules.duration.us.bucket.*`*::
++
+--
+SyncProxyRules duration, histogram buckets
+
+type: object
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.sum`*::
++
+--
+Network programming duration, sum in microseconds
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.count`*::
++
+--
+Network programming duration, number of operations
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.bucket.*`*::
++
+--
+Network programming duration, histogram buckets
+
+type: object
+
+--
+
+[float]
 === scheduler
 
 Kubernetes scheduler metrics

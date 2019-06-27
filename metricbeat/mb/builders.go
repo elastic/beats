@@ -241,15 +241,24 @@ func mustImplementFetcher(ms MetricSet) error {
 		ifcs = append(ifcs, "ReportingMetricSetV2Error")
 	}
 
+	if _, ok := ms.(ReportingMetricSetV2WithContext); ok {
+		ifcs = append(ifcs, "ReportingMetricSetV2WithContext")
+	}
+
 	if _, ok := ms.(PushMetricSetV2); ok {
 		ifcs = append(ifcs, "PushMetricSetV2")
 	}
+
+	if _, ok := ms.(PushMetricSetV2WithContext); ok {
+		ifcs = append(ifcs, "PushMetricSetV2WithContext")
+	}
+
 	switch len(ifcs) {
 	case 0:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement an event "+
 			"producing interface (EventFetcher, EventsFetcher, "+
-			"ReportingMetricSet, ReportingMetricSetV2, ReportingMetricSetV2Error, PushMetricSet, or "+
-			"PushMetricSetV2)",
+			"ReportingMetricSet, ReportingMetricSetV2, ReportingMetricSetV2Error, ReportingMetricSetV2WithContext"+
+			"PushMetricSet, PushMetricSetV2, or PushMetricSetV2WithContext)",
 			ms.Module().Name(), ms.Name())
 	case 1:
 		return nil

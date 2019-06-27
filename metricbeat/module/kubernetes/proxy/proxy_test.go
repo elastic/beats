@@ -15,27 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// +build !integration
 
-package container
+package proxy
 
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
-}
+const testFile = "_meta/test/metrics"
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "docker",
-		"metricsets": []string{"container"},
-		"hosts":      []string{"unix:///var/run/docker.sock"},
-	}
+func TestEventMapping(t *testing.T) {
+	ptest.TestMetricSet(t, "kubernetes", "proxy",
+		ptest.TestCases{
+			{
+				MetricsFile:  "./_meta/test/metrics.proxy.1.14",
+				ExpectedFile: "./_meta/test/metrics.proxy.1.14.expected",
+			},
+		},
+	)
 }

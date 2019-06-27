@@ -528,6 +528,14 @@ metricbeat.modules:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
 
+# Kubernetes proxy server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - proxy
+  hosts: ["localhost:10249"]
+  period: 10s
+
 #--------------------------------- Kvm Module ---------------------------------
 - module: kvm
   metricsets: ["dommemstat"]

@@ -48,6 +48,7 @@ func TestGoroutinesChecker(t *testing.T) {
 				<-started
 			},
 		},
+		/* Skipped due to flakyness: https://github.com/elastic/beats/issues/12692
 		{
 			title: "blocked goroutine",
 			test: func() {
@@ -61,6 +62,7 @@ func TestGoroutinesChecker(t *testing.T) {
 			timeout: 500 * time.Millisecond,
 			fail:    true,
 		},
+		*/
 	}
 
 	for _, c := range cases {
