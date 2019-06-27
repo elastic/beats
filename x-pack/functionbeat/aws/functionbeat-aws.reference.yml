@@ -489,10 +489,10 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "functionbeat" plus date
-  # and generates [functionbeat-]YYYY.MM.DD keys.
+  # Optional index name. The default is "functionbeat-aws" plus date
+  # and generates [functionbeat-aws-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "functionbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "functionbeat-aws-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -654,14 +654,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "functionbeat-%{[agent.version]}"
+# Template name. By default the template name is "functionbeat-aws-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.name: "functionbeat-%{[agent.version]}"
+#setup.template.name: "functionbeat-aws-%{[agent.version]}"
 
 # Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "functionbeat-%{[agent.version]}-*"
+#setup.template.pattern: "functionbeat-aws-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -714,7 +714,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Configure the ILM write alias name.
-#setup.ilm.rollover_alias: "functionbeat"
+#setup.ilm.rollover_alias: "functionbeat-aws"
 
 # Configure rollover index pattern.
 #setup.ilm.pattern: "{now/d}-000001"

@@ -136,6 +136,7 @@ func GoTestIntegration(ctx context.Context) error {
 // Config generates both the short and reference configs.
 func Config() error {
 	for _, provider := range selectedProviders {
+		devtools.BeatIndexPrefix += "-" + provider
 		err := devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, functionbeat.XPackConfigFileParams(provider), provider)
 		if err != nil {
 			return err
@@ -168,8 +169,8 @@ func includeFields() error {
 		if err != nil {
 			return err
 		}
-		os.Chdir(fnBeatDir)
 	}
+	os.Chdir(fnBeatDir)
 	return nil
 }
 
