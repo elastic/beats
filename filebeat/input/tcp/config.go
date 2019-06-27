@@ -40,7 +40,7 @@ var defaultConfig = config{
 	Config: tcp.Config{
 		Timeout:        time.Minute * 5,
 		MaxMessageSize: 20 * humanize.MiByte,
-		MaxConnections: 10,
+		MaxConnections: 0,
 	},
 	LineDelimiter: "\n",
 }

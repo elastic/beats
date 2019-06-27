@@ -193,7 +193,10 @@ func (s *Server) createServer() (net.Listener, error) {
 		}
 	}
 
-	return netutil.LimitListener(l, s.config.MaxConnections), nil
+	if s.config.MaxConnections > 0 {
+		return netutil.LimitListener(l, s.config.MaxConnections), nil
+	}
+	return l, nil
 }
 
 func (s *Server) clientsCount() int {
