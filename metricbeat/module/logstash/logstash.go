@@ -85,15 +85,19 @@ type graph struct {
 	Edges    []map[string]interface{} `json:"edges"`
 }
 
+type graphContainer struct {
+	Graph *graph `json:"graph,omitempty"`
+}
+
 // PipelineState represents the state (shape) of a Logstash pipeline
 type PipelineState struct {
-	ID             string `json:"id"`
-	Hash           string `json:"hash"`
-	EphemeralID    string `json:"ephemeral_id"`
-	Graph          *graph `json:"graph,omitempty"`
-	Representation *graph `json:"representation"`
-	BatchSize      int    `json:"batch_size"`
-	Workers        int    `json:"workers"`
+	ID             string          `json:"id"`
+	Hash           string          `json:"hash"`
+	EphemeralID    string          `json:"ephemeral_id"`
+	Graph          *graphContainer `json:"graph,omitempty"`
+	Representation *graphContainer `json:"representation"`
+	BatchSize      int             `json:"batch_size"`
+	Workers        int             `json:"workers"`
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets

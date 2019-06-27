@@ -66,7 +66,7 @@ func makeClusterToPipelinesMap(pipelines []logstash.PipelineState) map[string][]
 
 	for _, pipeline := range pipelines {
 		var clusterUUIDs []string
-		for _, vertex := range pipeline.Graph.Vertices {
+		for _, vertex := range pipeline.Graph.Graph.Vertices {
 			c, ok := vertex["cluster_uuid"]
 			if !ok {
 				continue
