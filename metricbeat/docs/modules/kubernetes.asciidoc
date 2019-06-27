@@ -93,7 +93,16 @@ metricbeat.modules:
     - proxy
   hosts: ["localhost:10249"]
   period: 10s
-----
+
+# Kubernetes scheduler
+# (URL and deployment method will need to be adapted to match scheduler deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - scheduler
+  hosts: ["localhost:10251"]
+  period: 10s
+ ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
 It also supports the options described in <<module-http-config-options>>.

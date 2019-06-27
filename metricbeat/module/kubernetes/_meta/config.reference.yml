@@ -62,3 +62,13 @@
     - proxy
   hosts: ["localhost:10249"]
   period: 10s
+
+# Kubernetes scheduler
+# (URL and deployment method will need to be adapted to match scheduler deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - scheduler
+  hosts: ["localhost:10251"]
+  period: 10s
+ 
