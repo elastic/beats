@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -73,6 +74,10 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 
 // ModuleName is the name of this module.
 const ModuleName = "logstash"
+
+// PipelineGraphAPIsAvailableVersion is the version of Logstash since when its APIs
+// can return pipeline graphs
+var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
 
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
@@ -133,6 +138,32 @@ func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
 	}
 
 	return pipelines, nil
+}
+
+// GetVersion returns the version of the Logstash node
+func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) {
+	const rootPath = "/"
+	content, err := fetchPath(http, currentPath, rootPath, "")
+	if err != nil {
+		return nil, err
+	}
+
+	var response struct {
+		Version *common.Version `json:"version"`
+	}
+
+	err = json.Unmarshal(content, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Version, nil
+}
+
+// ArePipelineGraphAPIsAvailable returns whether Logstash APIs that returns pipeline graphs
+// are available in the given version of Logstash
+func ArePipelineGraphAPIsAvailable(currentLogstashVersion *common.Version) bool {
+	return elastic.IsFeatureAvailable(currentLogstashVersion, PipelineGraphAPIsAvailableVersion)
 }
 
 func fetchPath(http *helper.HTTP, resetURI, path string, query string) ([]byte, error) {
