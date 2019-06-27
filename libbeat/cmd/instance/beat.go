@@ -598,7 +598,6 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.Name = name
 	}
 
-	fmt.Println(settings)
 	b.Info.ConfigNamespace = b.Info.Beat
 	if settings.ConfigNamespace != "" {
 		b.Info.ConfigNamespace = settings.ConfigNamespace

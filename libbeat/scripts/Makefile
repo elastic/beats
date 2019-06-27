@@ -322,11 +322,12 @@ fields: mage
 	@mage fields
 
 .PHONY: config
+config: mage
 	@mage config
 
 ifndef EXCLUDE_COMMON_UPDATE_TARGET
 .PHONY: update
-update: python-env fields config collect ## @build Update expects the most recent version of libbeat in the GOPATH
+update: python-env fields collect config ## @build Update expects the most recent version of libbeat in the GOPATH
 	@echo "Updating generated files for ${BEAT_NAME}"
 
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
