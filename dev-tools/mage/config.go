@@ -122,6 +122,10 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 		params[k] = v
 	}
 
+	if args.OutputFile == "" {
+		args.OutputFile = BeatName
+	}
+
 	// Short
 	if types.IsShort() {
 		file := filepath.Join(targetDir, args.OutputFile+".yml")
