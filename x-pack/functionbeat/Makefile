@@ -17,6 +17,10 @@ include $(ES_BEATS)/libbeat/scripts/Makefile
 .PHONY: collect
 collect:
 
+.PHONY: update
+update: mage
+	mage update
+
 # Generate an artifact to be push on serverless provider.
 .PHONY: linux
 linux:
