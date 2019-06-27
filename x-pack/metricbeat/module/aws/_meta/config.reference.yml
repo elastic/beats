@@ -14,8 +14,8 @@
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
+  regions:
+    - us-west-1
 - module: aws
   period: 86400s
   metricsets:
@@ -25,8 +25,6 @@
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
 - module: aws
   period: 300s
   metricsets:
@@ -44,6 +42,11 @@
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
-  #regions:
-  #  - us-east-1
-  #  - us-east-2
+- module: aws
+  period: 60s
+  metricsets:
+    - rds
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
