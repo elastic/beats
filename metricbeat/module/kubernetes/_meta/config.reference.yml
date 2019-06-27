@@ -71,4 +71,3 @@
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
- 
