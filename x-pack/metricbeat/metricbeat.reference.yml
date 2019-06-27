@@ -522,6 +522,7 @@ metricbeat.modules:
     - event
 
 # Kubernetes API server
+# (when running metricbeat as a pod)
 - module: kubernetes
   enabled: true
   metricsets:
@@ -529,11 +530,21 @@ metricbeat.modules:
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
 
 # Kubernetes proxy server
+# (when running metricbeat locally at hosts or as a daemonset + host network)
 - module: kubernetes
   enabled: true
   metricsets:
     - proxy
   hosts: ["localhost:10249"]
+  period: 10s
+
+# Kubernetes controller manager
+# (URL and deployment will need to be modified to match the controller manager deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - controllermanager
+  hosts: ["http://localhost:10252"]
   period: 10s
 
 # Kubernetes scheduler

@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -74,22 +75,34 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 // ModuleName is the name of this module.
 const ModuleName = "logstash"
 
+// PipelineGraphAPIsAvailableVersion is the version of Logstash since when its APIs
+// can return pipeline graphs
+var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
+
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
 	mb.BaseMetricSet
 	XPack bool
 }
 
+type graph struct {
+	Vertices []map[string]interface{} `json:"vertices"`
+	Edges    []map[string]interface{} `json:"edges"`
+}
+
+type graphContainer struct {
+	Graph *graph `json:"graph,omitempty"`
+}
+
 // PipelineState represents the state (shape) of a Logstash pipeline
 type PipelineState struct {
-	ID             string                 `json:"id"`
-	Hash           string                 `json:"hash"`
-	EphemeralID    string                 `json:"ephemeral_id"`
-	Graph          map[string]interface{} `json:"graph,omitempty"`
-	Representation map[string]interface{} `json:"representation"`
-	BatchSize      int                    `json:"batch_size"`
-	Workers        int                    `json:"workers"`
-	ClusterIDs     []string               `json:"cluster_uuids,omitempty"`
+	ID             string          `json:"id"`
+	Hash           string          `json:"hash"`
+	EphemeralID    string          `json:"ephemeral_id"`
+	Graph          *graphContainer `json:"graph,omitempty"`
+	Representation *graphContainer `json:"representation"`
+	BatchSize      int             `json:"batch_size"`
+	Workers        int             `json:"workers"`
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -133,6 +146,32 @@ func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
 	}
 
 	return pipelines, nil
+}
+
+// GetVersion returns the version of the Logstash node
+func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) {
+	const rootPath = "/"
+	content, err := fetchPath(http, currentPath, rootPath, "")
+	if err != nil {
+		return nil, err
+	}
+
+	var response struct {
+		Version *common.Version `json:"version"`
+	}
+
+	err = json.Unmarshal(content, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Version, nil
+}
+
+// ArePipelineGraphAPIsAvailable returns whether Logstash APIs that returns pipeline graphs
+// are available in the given version of Logstash
+func ArePipelineGraphAPIsAvailable(currentLogstashVersion *common.Version) bool {
+	return elastic.IsFeatureAvailable(currentLogstashVersion, PipelineGraphAPIsAvailableVersion)
 }
 
 func fetchPath(http *helper.HTTP, resetURI, path string, query string) ([]byte, error) {
