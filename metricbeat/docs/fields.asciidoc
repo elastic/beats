@@ -13736,6 +13736,8 @@ type: double
 *`kubernetes.controllermanager.workqueue.adds.count`*::
 +
 --
+Workqueue add count
+
 type: long
 
 --
@@ -13743,6 +13745,8 @@ type: long
 *`kubernetes.controllermanager.workqueue.depth.count`*::
 +
 --
+Workqueue depth count
+
 type: long
 
 --
@@ -13750,7 +13754,7 @@ type: long
 *`kubernetes.controllermanager.workqueue.retries.count`*::
 +
 --
-Unfinished processors
+Workqueue number of retries
 
 type: long
 

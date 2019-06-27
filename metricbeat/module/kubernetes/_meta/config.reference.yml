@@ -71,6 +71,6 @@
   enabled: true
   metricsets:
     - controllermanager
-  hosts: ["http://controller-manager:10252"]
+  hosts: ["http://localhost:10252"]
   period: 10s
 

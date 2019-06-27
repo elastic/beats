@@ -101,11 +101,13 @@
           description: Unfinished processors
         - name: adds.count
           type: long
+          description: Workqueue add count
         - name: depth.count
           type: long
+          description: Workqueue depth count
         - name: retries.count
           type: long
-          description: Unfinished processors
+          description: Workqueue number of retries
     - name: node.collector
       type: group
       fields:
