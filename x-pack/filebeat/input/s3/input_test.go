@@ -24,10 +24,13 @@ type MockS3Client struct {
 	s3iface.S3API
 }
 
-var s3LogString = "36c1f test-s3-ks [20/Jun/2019:04:07:48 +0000] 97.118.27.161 arn:aws:iam::627959692251:user/kaiyan.sheng@elastic.co 5141F2225A070122 REST.HEAD.OBJECT Screen%2BShot%2B2019-02-21%2Bat%2B2.15.50%2BPM.png"
+var (
+	s3LogString1 = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/kaiyan.sheng@elastic.co 5141F REST.HEAD.OBJECT Screen1.png \n"
+	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/kaiyan.sheng@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png"
+)
 
 func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
-	logBody := ioutil.NopCloser(bytes.NewReader([]byte(s3LogString)))
+	logBody := ioutil.NopCloser(bytes.NewReader([]byte(s3LogString1 + s3LogString2)))
 	return s3.GetObjectRequest{
 		Request: &awssdk.Request{
 			Data: &s3.GetObjectOutput{
@@ -125,18 +128,18 @@ func TestReadS3Object(t *testing.T) {
 	mockSvc := &MockS3Client{}
 	s3Info := []s3Info{
 		{
-			name:   "test-s3-ks-2",
+			name:   "test-s3-ks",
 			key:    "log2019-06-21-16-16-54",
 			region: "us-west-1",
 		},
 	}
 	events, err := p.readS3Object(mockSvc, s3Info)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(events))
+	assert.Equal(t, 2, len(events))
 
 	bucketName, err := events[0].Fields.GetValue("aws.s3.bucket_name")
 	assert.NoError(t, err)
-	assert.Equal(t, "test-s3-ks-2", bucketName.(string))
+	assert.Equal(t, "test-s3-ks", bucketName.(string))
 
 	objectKey, err := events[0].Fields.GetValue("aws.s3.object_key")
 	assert.NoError(t, err)
@@ -150,9 +153,13 @@ func TestReadS3Object(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "us-west-1", region)
 
-	message, err := events[0].Fields.GetValue("message")
+	message1, err := events[0].Fields.GetValue("message")
 	assert.NoError(t, err)
-	assert.Equal(t, s3LogString, message.(string))
+	assert.Equal(t, s3LogString1, message1.(string))
+
+	message2, err := events[1].Fields.GetValue("message")
+	assert.NoError(t, err)
+	assert.Equal(t, s3LogString2, message2.(string))
 }
 
 func TestConstructObjectURL(t *testing.T) {

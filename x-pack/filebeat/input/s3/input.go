@@ -5,8 +5,9 @@
 package s3
 
 import (
-	"bytes"
+	"bufio"
 	"encoding/json"
+	"io"
 	"strings"
 	"sync"
 	"time"
@@ -278,41 +279,23 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event
 					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
 				}
 
-				// method1
-				buf := new(bytes.Buffer)
-				_, err = buf.ReadFrom(resp.Body)
-				if err != nil {
-					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
-				}
-
-				logString := buf.String()
-
-				// method2
-				//var logString string
-				//p := make([]byte, 4)
-				//for {
-				//	n, err := resp.Body.Read(p)
-				//	if err == io.EOF {
-				//		break
-				//	}
-				//	logString += string(p[:n])
-				//}
-
-				// method3
-				//outFile, err := os.Create("test")
-				//defer outFile.Close()
-				//_, err = io.Copy(outFile, resp.Body)
-				//fileBytes , err := ioutil.ReadFile("test")
-				//logString := string(fileBytes)
-
-				logLines := strings.Split(logString, "\n")
-				for i, log := range logLines {
-					if log == "" {
-						continue
+				reader := bufio.NewReader(resp.Body)
+				line := 0
+				for {
+					log, err := reader.ReadString('\n')
+					if err != nil {
+						if err == io.EOF {
+							line += 1
+							event := createEvent(log, int64(line), s3Info)
+							events = append(events, event)
+							break
+						} else {
+							p.logger.Error(errors.Wrap(err, "ReadString failed"))
+						}
 					}
-
 					// create event per log line
-					event := createEvent(log, int64(i), s3Info)
+					line += 1
+					event := createEvent(log, int64(line), s3Info)
 					events = append(events, event)
 				}
 			}(s3Infos[i])
