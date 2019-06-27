@@ -57,6 +57,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	if m.db, err = oracle.NewConnection(&m.connectionDetails); err != nil {
 		return errors.Wrap(err, "error creating connection to Oracle")
 	}
+	defer m.db.Close()
 
 	m.extractor = &tablespaceExtractor{db: m.db}
 
@@ -76,5 +77,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 
 // Close the connection to Oracle
 func (m *MetricSet) Close() error {
-	return m.db.Close()
+	if m.db != nil {
+		return m.db.Close()
+	}
+
+	return nil
 }
