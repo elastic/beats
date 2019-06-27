@@ -5,6 +5,8 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-kubernetes-controllermanager]]
 === Kubernetes controllermanager metricset
 
+beta[]
+
 include::../../../module/kubernetes/controllermanager/_meta/docs.asciidoc[]
 
 
