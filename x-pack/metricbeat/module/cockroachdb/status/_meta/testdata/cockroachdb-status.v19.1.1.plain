@@ -1,0 +1,3068 @@
+# HELP queue_merge_processingnanos Nanoseconds spent processing replicas in the merge queue
+# TYPE queue_merge_processingnanos counter
+queue_merge_processingnanos{store="1"} 9.13134608e+09
+# HELP sys_host_disk_read_time Time spent reading from all disks since this process started
+# TYPE sys_host_disk_read_time gauge
+sys_host_disk_read_time 2.595856e+12
+# HELP replicas_leaseholders Number of lease holders
+# TYPE replicas_leaseholders gauge
+replicas_leaseholders{store="1"} 28.0
+# HELP raft_process_commandcommit_latency Latency histogram for committing Raft commands
+# TYPE raft_process_commandcommit_latency histogram
+raft_process_commandcommit_latency_bucket{store="1",le="3583.0"} 1.0
+raft_process_commandcommit_latency_bucket{store="1",le="3967.0"} 2.0
+raft_process_commandcommit_latency_bucket{store="1",le="4607.0"} 4.0
+raft_process_commandcommit_latency_bucket{store="1",le="4863.0"} 7.0
+raft_process_commandcommit_latency_bucket{store="1",le="5375.0"} 10.0
+raft_process_commandcommit_latency_bucket{store="1",le="5631.0"} 11.0
+raft_process_commandcommit_latency_bucket{store="1",le="5887.0"} 13.0
+raft_process_commandcommit_latency_bucket{store="1",le="6399.0"} 15.0
+raft_process_commandcommit_latency_bucket{store="1",le="6655.0"} 16.0
+raft_process_commandcommit_latency_bucket{store="1",le="6911.0"} 18.0
+raft_process_commandcommit_latency_bucket{store="1",le="7423.0"} 25.0
+raft_process_commandcommit_latency_bucket{store="1",le="7679.0"} 34.0
+raft_process_commandcommit_latency_bucket{store="1",le="7935.0"} 52.0
+raft_process_commandcommit_latency_bucket{store="1",le="8191.0"} 89.0
+raft_process_commandcommit_latency_bucket{store="1",le="8703.0"} 275.0
+raft_process_commandcommit_latency_bucket{store="1",le="9215.0"} 640.0
+raft_process_commandcommit_latency_bucket{store="1",le="9727.0"} 1240.0
+raft_process_commandcommit_latency_bucket{store="1",le="10239.0"} 2034.0
+raft_process_commandcommit_latency_bucket{store="1",le="10751.0"} 3032.0
+raft_process_commandcommit_latency_bucket{store="1",le="11263.0"} 4206.0
+raft_process_commandcommit_latency_bucket{store="1",le="11775.0"} 5532.0
+raft_process_commandcommit_latency_bucket{store="1",le="12287.0"} 6970.0
+raft_process_commandcommit_latency_bucket{store="1",le="12799.0"} 8545.0
+raft_process_commandcommit_latency_bucket{store="1",le="13311.0"} 10148.0
+raft_process_commandcommit_latency_bucket{store="1",le="13823.0"} 11768.0
+raft_process_commandcommit_latency_bucket{store="1",le="14335.0"} 13454.0
+raft_process_commandcommit_latency_bucket{store="1",le="14847.0"} 15116.0
+raft_process_commandcommit_latency_bucket{store="1",le="15359.0"} 16689.0
+raft_process_commandcommit_latency_bucket{store="1",le="15871.0"} 18288.0
+raft_process_commandcommit_latency_bucket{store="1",le="16383.0"} 19887.0
+raft_process_commandcommit_latency_bucket{store="1",le="17407.0"} 23033.0
+raft_process_commandcommit_latency_bucket{store="1",le="18431.0"} 26149.0
+raft_process_commandcommit_latency_bucket{store="1",le="19455.0"} 29444.0
+raft_process_commandcommit_latency_bucket{store="1",le="20479.0"} 33096.0
+raft_process_commandcommit_latency_bucket{store="1",le="21503.0"} 37488.0
+raft_process_commandcommit_latency_bucket{store="1",le="22527.0"} 42618.0
+raft_process_commandcommit_latency_bucket{store="1",le="23551.0"} 48454.0
+raft_process_commandcommit_latency_bucket{store="1",le="24575.0"} 55110.0
+raft_process_commandcommit_latency_bucket{store="1",le="25599.0"} 62774.0
+raft_process_commandcommit_latency_bucket{store="1",le="26623.0"} 71043.0
+raft_process_commandcommit_latency_bucket{store="1",le="27647.0"} 80135.0
+raft_process_commandcommit_latency_bucket{store="1",le="28671.0"} 89513.0
+raft_process_commandcommit_latency_bucket{store="1",le="29695.0"} 99081.0
+raft_process_commandcommit_latency_bucket{store="1",le="30719.0"} 108653.0
+raft_process_commandcommit_latency_bucket{store="1",le="31743.0"} 118084.0
+raft_process_commandcommit_latency_bucket{store="1",le="32767.0"} 127282.0
+raft_process_commandcommit_latency_bucket{store="1",le="34815.0"} 144758.0
+raft_process_commandcommit_latency_bucket{store="1",le="36863.0"} 161145.0
+raft_process_commandcommit_latency_bucket{store="1",le="38911.0"} 175932.0
+raft_process_commandcommit_latency_bucket{store="1",le="40959.0"} 188814.0
+raft_process_commandcommit_latency_bucket{store="1",le="43007.0"} 200028.0
+raft_process_commandcommit_latency_bucket{store="1",le="45055.0"} 210048.0
+raft_process_commandcommit_latency_bucket{store="1",le="47103.0"} 218550.0
+raft_process_commandcommit_latency_bucket{store="1",le="49151.0"} 225946.0
+raft_process_commandcommit_latency_bucket{store="1",le="51199.0"} 232584.0
+raft_process_commandcommit_latency_bucket{store="1",le="53247.0"} 238403.0
+raft_process_commandcommit_latency_bucket{store="1",le="55295.0"} 243569.0
+raft_process_commandcommit_latency_bucket{store="1",le="57343.0"} 248153.0
+raft_process_commandcommit_latency_bucket{store="1",le="59391.0"} 252377.0
+raft_process_commandcommit_latency_bucket{store="1",le="61439.0"} 256228.0
+raft_process_commandcommit_latency_bucket{store="1",le="63487.0"} 259838.0
+raft_process_commandcommit_latency_bucket{store="1",le="65535.0"} 263257.0
+raft_process_commandcommit_latency_bucket{store="1",le="69631.0"} 269436.0
+raft_process_commandcommit_latency_bucket{store="1",le="73727.0"} 274921.0
+raft_process_commandcommit_latency_bucket{store="1",le="77823.0"} 279625.0
+raft_process_commandcommit_latency_bucket{store="1",le="81919.0"} 283714.0
+raft_process_commandcommit_latency_bucket{store="1",le="86015.0"} 287064.0
+raft_process_commandcommit_latency_bucket{store="1",le="90111.0"} 289881.0
+raft_process_commandcommit_latency_bucket{store="1",le="94207.0"} 292317.0
+raft_process_commandcommit_latency_bucket{store="1",le="98303.0"} 294451.0
+raft_process_commandcommit_latency_bucket{store="1",le="102399.0"} 296240.0
+raft_process_commandcommit_latency_bucket{store="1",le="106495.0"} 297790.0
+raft_process_commandcommit_latency_bucket{store="1",le="110591.0"} 299094.0
+raft_process_commandcommit_latency_bucket{store="1",le="114687.0"} 300295.0
+raft_process_commandcommit_latency_bucket{store="1",le="118783.0"} 301279.0
+raft_process_commandcommit_latency_bucket{store="1",le="122879.0"} 302183.0
+raft_process_commandcommit_latency_bucket{store="1",le="126975.0"} 303042.0
+raft_process_commandcommit_latency_bucket{store="1",le="131071.0"} 303748.0
+raft_process_commandcommit_latency_bucket{store="1",le="139263.0"} 305002.0
+raft_process_commandcommit_latency_bucket{store="1",le="147455.0"} 306129.0
+raft_process_commandcommit_latency_bucket{store="1",le="155647.0"} 307142.0
+raft_process_commandcommit_latency_bucket{store="1",le="163839.0"} 308119.0
+raft_process_commandcommit_latency_bucket{store="1",le="172031.0"} 309077.0
+raft_process_commandcommit_latency_bucket{store="1",le="180223.0"} 310067.0
+raft_process_commandcommit_latency_bucket{store="1",le="188415.0"} 311000.0
+raft_process_commandcommit_latency_bucket{store="1",le="196607.0"} 311957.0
+raft_process_commandcommit_latency_bucket{store="1",le="204799.0"} 312920.0
+raft_process_commandcommit_latency_bucket{store="1",le="212991.0"} 313937.0
+raft_process_commandcommit_latency_bucket{store="1",le="221183.0"} 314935.0
+raft_process_commandcommit_latency_bucket{store="1",le="229375.0"} 316056.0
+raft_process_commandcommit_latency_bucket{store="1",le="237567.0"} 317161.0
+raft_process_commandcommit_latency_bucket{store="1",le="245759.0"} 318348.0
+raft_process_commandcommit_latency_bucket{store="1",le="253951.0"} 319589.0
+raft_process_commandcommit_latency_bucket{store="1",le="262143.0"} 320768.0
+raft_process_commandcommit_latency_bucket{store="1",le="278527.0"} 323272.0
+raft_process_commandcommit_latency_bucket{store="1",le="294911.0"} 325741.0
+raft_process_commandcommit_latency_bucket{store="1",le="311295.0"} 328198.0
+raft_process_commandcommit_latency_bucket{store="1",le="327679.0"} 330548.0
+raft_process_commandcommit_latency_bucket{store="1",le="344063.0"} 332801.0
+raft_process_commandcommit_latency_bucket{store="1",le="360447.0"} 334903.0
+raft_process_commandcommit_latency_bucket{store="1",le="376831.0"} 336999.0
+raft_process_commandcommit_latency_bucket{store="1",le="393215.0"} 338997.0
+raft_process_commandcommit_latency_bucket{store="1",le="409599.0"} 341024.0
+raft_process_commandcommit_latency_bucket{store="1",le="425983.0"} 343073.0
+raft_process_commandcommit_latency_bucket{store="1",le="442367.0"} 345150.0
+raft_process_commandcommit_latency_bucket{store="1",le="458751.0"} 347254.0
+raft_process_commandcommit_latency_bucket{store="1",le="475135.0"} 349252.0
+raft_process_commandcommit_latency_bucket{store="1",le="491519.0"} 351146.0
+raft_process_commandcommit_latency_bucket{store="1",le="507903.0"} 352939.0
+raft_process_commandcommit_latency_bucket{store="1",le="524287.0"} 354612.0
+raft_process_commandcommit_latency_bucket{store="1",le="557055.0"} 357394.0
+raft_process_commandcommit_latency_bucket{store="1",le="589823.0"} 359524.0
+raft_process_commandcommit_latency_bucket{store="1",le="622591.0"} 361233.0
+raft_process_commandcommit_latency_bucket{store="1",le="655359.0"} 362637.0
+raft_process_commandcommit_latency_bucket{store="1",le="688127.0"} 363781.0
+raft_process_commandcommit_latency_bucket{store="1",le="720895.0"} 364822.0
+raft_process_commandcommit_latency_bucket{store="1",le="753663.0"} 365723.0
+raft_process_commandcommit_latency_bucket{store="1",le="786431.0"} 366584.0
+raft_process_commandcommit_latency_bucket{store="1",le="819199.0"} 367460.0
+raft_process_commandcommit_latency_bucket{store="1",le="851967.0"} 368305.0
+raft_process_commandcommit_latency_bucket{store="1",le="884735.0"} 369129.0
+raft_process_commandcommit_latency_bucket{store="1",le="917503.0"} 369962.0
+raft_process_commandcommit_latency_bucket{store="1",le="950271.0"} 370943.0
+raft_process_commandcommit_latency_bucket{store="1",le="983039.0"} 371928.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.015807e+06"} 373010.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.048575e+06"} 374133.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.114111e+06"} 376715.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.179647e+06"} 379641.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.245183e+06"} 382965.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.310719e+06"} 386355.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.376255e+06"} 389868.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.441791e+06"} 393345.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.507327e+06"} 396745.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.572863e+06"} 400111.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.638399e+06"} 403563.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.703935e+06"} 406964.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.769471e+06"} 410496.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.835007e+06"} 413884.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.900543e+06"} 417261.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.966079e+06"} 420592.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.031615e+06"} 424030.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.097151e+06"} 427438.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.228223e+06"} 434327.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.359295e+06"} 441039.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.490367e+06"} 447005.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.621439e+06"} 451840.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.752511e+06"} 455759.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.883583e+06"} 458845.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.014655e+06"} 461336.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.145727e+06"} 463533.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.276799e+06"} 465344.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.407871e+06"} 466793.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.538943e+06"} 467942.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.670015e+06"} 468838.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.801087e+06"} 469538.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.932159e+06"} 470107.0
+raft_process_commandcommit_latency_bucket{store="1",le="4.063231e+06"} 470528.0
+raft_process_commandcommit_latency_bucket{store="1",le="4.194303e+06"} 470900.0
+raft_process_commandcommit_latency_bucket{store="1",le="4.456447e+06"} 471445.0
+raft_process_commandcommit_latency_bucket{store="1",le="4.718591e+06"} 471770.0
+raft_process_commandcommit_latency_bucket{store="1",le="4.980735e+06"} 471949.0
+raft_process_commandcommit_latency_bucket{store="1",le="5.242879e+06"} 472077.0
+raft_process_commandcommit_latency_bucket{store="1",le="5.505023e+06"} 472202.0
+raft_process_commandcommit_latency_bucket{store="1",le="5.767167e+06"} 472296.0
+raft_process_commandcommit_latency_bucket{store="1",le="6.029311e+06"} 472341.0
+raft_process_commandcommit_latency_bucket{store="1",le="6.291455e+06"} 472391.0
+raft_process_commandcommit_latency_bucket{store="1",le="6.553599e+06"} 472401.0
+raft_process_commandcommit_latency_bucket{store="1",le="6.815743e+06"} 472419.0
+raft_process_commandcommit_latency_bucket{store="1",le="7.077887e+06"} 472422.0
+raft_process_commandcommit_latency_bucket{store="1",le="7.340031e+06"} 472425.0
+raft_process_commandcommit_latency_bucket{store="1",le="7.602175e+06"} 472432.0
+raft_process_commandcommit_latency_bucket{store="1",le="7.864319e+06"} 472439.0
+raft_process_commandcommit_latency_bucket{store="1",le="8.388607e+06"} 472444.0
+raft_process_commandcommit_latency_bucket{store="1",le="8.912895e+06"} 472453.0
+raft_process_commandcommit_latency_bucket{store="1",le="9.437183e+06"} 472456.0
+raft_process_commandcommit_latency_bucket{store="1",le="9.961471e+06"} 472462.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.0485759e+07"} 472467.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.1010047e+07"} 472468.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.2058623e+07"} 472469.0
+raft_process_commandcommit_latency_bucket{store="1",le="1.9922943e+07"} 472470.0
+raft_process_commandcommit_latency_bucket{store="1",le="2.2020095e+07"} 472471.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.0408703e+07"} 472472.0
+raft_process_commandcommit_latency_bucket{store="1",le="3.3554431e+07"} 472474.0
+raft_process_commandcommit_latency_bucket{store="1",le="+Inf"} 472474.0
+raft_process_commandcommit_latency_sum{store="1"} 2.57944308966e+11
+raft_process_commandcommit_latency_count{store="1"} 472474.0
+# HELP queue_gc_pending Number of pending replicas in the GC queue
+# TYPE queue_gc_pending gauge
+queue_gc_pending{store="1"} 0.0
+# HELP queue_gc_info_abortspangcnum Number of AbortSpan entries fit for removal
+# TYPE queue_gc_info_abortspangcnum counter
+queue_gc_info_abortspangcnum{store="1"} 1.0
+# HELP txn_restarts_writetoooldmulti Number of restarts due to multiple concurrent writers committing first
+# TYPE txn_restarts_writetoooldmulti counter
+txn_restarts_writetoooldmulti 0.0
+# HELP liveness_heartbeatsuccesses Number of successful node liveness heartbeats from this node
+# TYPE liveness_heartbeatsuccesses counter
+liveness_heartbeatsuccesses 81701.0
+# HELP sys_gc_pause_percent Current GC pause percentage
+# TYPE sys_gc_pause_percent gauge
+sys_gc_pause_percent 0.0
+# HELP sql_failure_count_internal Number of statements resulting in a planning or runtime error (internal queries)
+# TYPE sql_failure_count_internal counter
+sql_failure_count_internal 0.0
+# HELP txnwaitqueue_query_waiting Number of transaction status queries waiting for an updated transaction record
+# TYPE txnwaitqueue_query_waiting gauge
+txnwaitqueue_query_waiting{store="1"} 0.0
+# HELP txn_restarts Number of restarted KV transactions
+# TYPE txn_restarts histogram
+txn_restarts_bucket{le="+Inf"} 0.0
+txn_restarts_sum 0.0
+txn_restarts_count 0.0
+# HELP txn_restarts_asyncwritefailure Number of restarts due to async consensus writes that failed to leave intents
+# TYPE txn_restarts_asyncwritefailure counter
+txn_restarts_asyncwritefailure 0.0
+# HELP sys_go_totalbytes Total bytes of memory allocated by go, but not released
+# TYPE sys_go_totalbytes gauge
+sys_go_totalbytes 2.72775416e+08
+# HELP leases_success Number of successful lease requests
+# TYPE leases_success counter
+leases_success{store="1"} 116075.0
+# HELP leases_transfers_success Number of successful lease transfers
+# TYPE leases_transfers_success counter
+leases_transfers_success{store="1"} 0.0
+# HELP queue_gc_info_transactionspangcpending Number of GC'able entries corresponding to pending txns
+# TYPE queue_gc_info_transactionspangcpending counter
+queue_gc_info_transactionspangcpending{store="1"} 0.0
+# HELP gossip_bytes_received Number of received gossip bytes
+# TYPE gossip_bytes_received counter
+gossip_bytes_received 0.0
+# HELP sys_fd_softlimit Process open FD soft limit
+# TYPE sys_fd_softlimit gauge
+sys_fd_softlimit 1.048576e+06
+# HELP sys_host_net_send_bytes Bytes sent on all network interfaces since this process started
+# TYPE sys_host_net_send_bytes gauge
+sys_host_net_send_bytes 4.8790559e+07
+# HELP txn_restarts_readwithinuncertainty Number of restarts due to reading a new value within the uncertainty interval
+# TYPE txn_restarts_readwithinuncertainty counter
+txn_restarts_readwithinuncertainty 0.0
+# HELP changefeed_flushes Total flushes across all feeds
+# TYPE changefeed_flushes counter
+changefeed_flushes 0.0
+# HELP raft_entrycache_bytes Aggregate size of all Raft entries in the Raft entry cache
+# TYPE raft_entrycache_bytes gauge
+raft_entrycache_bytes{store="1"} 785584.0
+# HELP gossip_bytes_sent Number of sent gossip bytes
+# TYPE gossip_bytes_sent counter
+gossip_bytes_sent 0.0
+# HELP rebalancing_writespersecond Number of keys written (i.e. applied by raft) per second to the store, averaged over a large time period as used in rebalancing decisions
+# TYPE rebalancing_writespersecond gauge
+rebalancing_writespersecond{store="1"} 62.96870543709626
+# HELP raft_rcvd_app Number of MsgApp messages received by this store
+# TYPE raft_rcvd_app counter
+raft_rcvd_app{store="1"} 0.0
+# HELP capacity_available Available storage capacity
+# TYPE capacity_available gauge
+capacity_available{store="1"} 6.341804032e+09
+# HELP range_splits Number of range splits
+# TYPE range_splits counter
+range_splits{store="1"} 15.0
+# HELP distsender_errors_notleaseholder Number of NotLeaseHolderErrors encountered
+# TYPE distsender_errors_notleaseholder counter
+distsender_errors_notleaseholder 7.0
+# HELP changefeed_emitted_bytes Bytes emitted by all feeds
+# TYPE changefeed_emitted_bytes counter
+changefeed_emitted_bytes 0.0
+# HELP sql_misc_count_internal Number of other SQL statements (internal queries)
+# TYPE sql_misc_count_internal counter
+sql_misc_count_internal 5.0
+# HELP raft_rcvd_vote Number of MsgVote messages received by this store
+# TYPE raft_rcvd_vote counter
+raft_rcvd_vote{store="1"} 0.0
+# HELP queue_replicate_rebalancereplica Number of replica rebalancer-initiated additions attempted by the replicate queue
+# TYPE queue_replicate_rebalancereplica counter
+queue_replicate_rebalancereplica{store="1"} 0.0
+# HELP sys_cgo_totalbytes Total bytes of memory allocated by cgo, but not released
+# TYPE sys_cgo_totalbytes gauge
+sys_cgo_totalbytes 1.48021248e+08
+# HELP exec_error Number of batch KV requests that failed to execute on this node
+# TYPE exec_error counter
+exec_error 39.0
+# HELP range_merges Number of range merges
+# TYPE range_merges counter
+range_merges{store="1"} 7.0
+# HELP capacity_reserved Capacity reserved for snapshots
+# TYPE capacity_reserved gauge
+capacity_reserved{store="1"} 0.0
+# HELP raft_rcvd_prevoteresp Number of MsgPreVoteResp messages received by this store
+# TYPE raft_rcvd_prevoteresp counter
+raft_rcvd_prevoteresp{store="1"} 0.0
+# HELP raft_rcvd_transferleader Number of MsgTransferLeader messages received by this store
+# TYPE raft_rcvd_transferleader counter
+raft_rcvd_transferleader{store="1"} 0.0
+# HELP queue_merge_purgatory Number of replicas in the merge queue's purgatory, waiting to become mergeable
+# TYPE queue_merge_purgatory gauge
+queue_merge_purgatory{store="1"} 0.0
+# HELP txn_restarts_serializable Number of restarts due to a forwarded commit timestamp and isolation=SERIALIZABLE
+# TYPE txn_restarts_serializable counter
+txn_restarts_serializable 0.0
+# HELP exec_success Number of batch KV requests executed successfully on this node
+# TYPE exec_success counter
+exec_success 472311.0
+# HELP changefeed_table_metadata_nanos Time blocked while verifying table metadata histories
+# TYPE changefeed_table_metadata_nanos counter
+changefeed_table_metadata_nanos 0.0
+# HELP raft_rcvd_timeoutnow Number of MsgTimeoutNow messages received by this store
+# TYPE raft_rcvd_timeoutnow counter
+raft_rcvd_timeoutnow{store="1"} 0.0
+# HELP sql_optimizer_fallback_count_internal Number of statements which the cost-based optimizer was unable to plan (internal queries)
+# TYPE sql_optimizer_fallback_count_internal counter
+sql_optimizer_fallback_count_internal 8.0
+# HELP replicas Number of replicas
+# TYPE replicas gauge
+replicas{store="1"} 28.0
+# HELP follower_reads_success_count Number of reads successfully processed by any replica
+# TYPE follower_reads_success_count counter
+follower_reads_success_count{store="1"} 0.0
+# HELP rocksdb_num_sstables Number of rocksdb SSTables
+# TYPE rocksdb_num_sstables gauge
+rocksdb_num_sstables{store="1"} 8.0
+# HELP queue_raftlog_pending Number of pending replicas in the Raft log queue
+# TYPE queue_raftlog_pending gauge
+queue_raftlog_pending{store="1"} 0.0
+# HELP compactor_compactions_failure Number of failed compaction requests sent to the storage engine
+# TYPE compactor_compactions_failure counter
+compactor_compactions_failure{store="1"} 0.0
+# HELP liveness_epochincrements Number of times this node has incremented its liveness epoch
+# TYPE liveness_epochincrements counter
+liveness_epochincrements 0.0
+# HELP sql_mem_internal_max Memory usage per sql statement for internal
+# TYPE sql_mem_internal_max histogram
+sql_mem_internal_max_bucket{le="4011.0"} 17262.0
+sql_mem_internal_max_bucket{le="4311.0"} 18522.0
+sql_mem_internal_max_bucket{le="4487.0"} 18523.0
+sql_mem_internal_max_bucket{le="4791.0"} 18524.0
+sql_mem_internal_max_bucket{le="+Inf"} 18524.0
+sql_mem_internal_max_sum 7.467902e+07
+sql_mem_internal_max_count 18524.0
+# HELP rocksdb_table_readers_mem_estimate Memory used by index and filter blocks
+# TYPE rocksdb_table_readers_mem_estimate gauge
+rocksdb_table_readers_mem_estimate{store="1"} 500736.0
+# HELP replicas_leaders_not_leaseholders Number of replicas that are Raft leaders whose range lease is held by another store
+# TYPE replicas_leaders_not_leaseholders gauge
+replicas_leaders_not_leaseholders{store="1"} 0.0
+# HELP raft_process_tickingnanos Nanoseconds spent in store.processRaft() processing replica.Tick()
+# TYPE raft_process_tickingnanos counter
+raft_process_tickingnanos{store="1"} 5.98486995e+09
+# HELP sql_txn_begin_count Number of SQL transaction BEGIN statements
+# TYPE sql_txn_begin_count counter
+sql_txn_begin_count 0.0
+# HELP sql_txn_rollback_count Number of SQL transaction ROLLBACK statements
+# TYPE sql_txn_rollback_count counter
+sql_txn_rollback_count 0.0
+# HELP sql_delete_count_internal Number of SQL DELETE statements (internal queries)
+# TYPE sql_delete_count_internal counter
+sql_delete_count_internal 2450.0
+# HELP intentage Cumulative age of intents
+# TYPE intentage gauge
+intentage{store="1"} 0.0
+# HELP rocksdb_memtable_total_size Current size of memtable in bytes
+# TYPE rocksdb_memtable_total_size gauge
+rocksdb_memtable_total_size{store="1"} 2.6429136e+07
+# HELP gossip_connections_incoming Number of active incoming gossip connections
+# TYPE gossip_connections_incoming gauge
+gossip_connections_incoming 0.0
+# HELP sys_cgocalls Total number of cgo calls
+# TYPE sys_cgocalls gauge
+sys_cgocalls 1.214794e+07
+# HELP sql_mem_conns_current Current sql statement memory usage for conns
+# TYPE sql_mem_conns_current gauge
+sql_mem_conns_current 0.0
+# HELP sql_insert_count_internal Number of SQL INSERT statements (internal queries)
+# TYPE sql_insert_count_internal counter
+sql_insert_count_internal 2490.0
+# HELP gcbytesage Cumulative age of non-live data
+# TYPE gcbytesage gauge
+gcbytesage{store="1"} 3.1522106e+09
+# HELP requests_backpressure_split Number of backpressured writes waiting on a Range split
+# TYPE requests_backpressure_split gauge
+requests_backpressure_split{store="1"} 0.0
+# HELP compactor_compactions_success Number of successful compaction requests sent to the storage engine
+# TYPE compactor_compactions_success counter
+compactor_compactions_success{store="1"} 0.0
+# HELP queue_replicagc_removereplica Number of replica removals attempted by the replica gc queue
+# TYPE queue_replicagc_removereplica counter
+queue_replicagc_removereplica{store="1"} 0.0
+# HELP distsender_batches Number of batches processed
+# TYPE distsender_batches counter
+distsender_batches 340490.0
+# HELP round_trip_latency Distribution of round-trip latencies with other nodes
+# TYPE round_trip_latency histogram
+round_trip_latency_bucket{le="245759.0"} 1.0
+round_trip_latency_bucket{le="253951.0"} 25.0
+round_trip_latency_bucket{le="262143.0"} 92.0
+round_trip_latency_bucket{le="278527.0"} 911.0
+round_trip_latency_bucket{le="294911.0"} 2649.0
+round_trip_latency_bucket{le="311295.0"} 4865.0
+round_trip_latency_bucket{le="327679.0"} 7628.0
+round_trip_latency_bucket{le="344063.0"} 10558.0
+round_trip_latency_bucket{le="360447.0"} 13536.0
+round_trip_latency_bucket{le="376831.0"} 16139.0
+round_trip_latency_bucket{le="393215.0"} 18236.0
+round_trip_latency_bucket{le="409599.0"} 20031.0
+round_trip_latency_bucket{le="425983.0"} 21488.0
+round_trip_latency_bucket{le="442367.0"} 22718.0
+round_trip_latency_bucket{le="458751.0"} 23716.0
+round_trip_latency_bucket{le="475135.0"} 24576.0
+round_trip_latency_bucket{le="491519.0"} 25464.0
+round_trip_latency_bucket{le="507903.0"} 26542.0
+round_trip_latency_bucket{le="524287.0"} 28175.0
+round_trip_latency_bucket{le="557055.0"} 33758.0
+round_trip_latency_bucket{le="589823.0"} 40605.0
+round_trip_latency_bucket{le="622591.0"} 47657.0
+round_trip_latency_bucket{le="655359.0"} 54350.0
+round_trip_latency_bucket{le="688127.0"} 60828.0
+round_trip_latency_bucket{le="720895.0"} 66901.0
+round_trip_latency_bucket{le="753663.0"} 72581.0
+round_trip_latency_bucket{le="786431.0"} 78060.0
+round_trip_latency_bucket{le="819199.0"} 83831.0
+round_trip_latency_bucket{le="851967.0"} 89348.0
+round_trip_latency_bucket{le="884735.0"} 94717.0
+round_trip_latency_bucket{le="917503.0"} 99397.0
+round_trip_latency_bucket{le="950271.0"} 103438.0
+round_trip_latency_bucket{le="983039.0"} 106780.0
+round_trip_latency_bucket{le="1.015807e+06"} 109538.0
+round_trip_latency_bucket{le="1.048575e+06"} 111823.0
+round_trip_latency_bucket{le="1.114111e+06"} 115252.0
+round_trip_latency_bucket{le="1.179647e+06"} 117529.0
+round_trip_latency_bucket{le="1.245183e+06"} 119141.0
+round_trip_latency_bucket{le="1.310719e+06"} 120236.0
+round_trip_latency_bucket{le="1.376255e+06"} 120994.0
+round_trip_latency_bucket{le="1.441791e+06"} 121500.0
+round_trip_latency_bucket{le="1.507327e+06"} 121834.0
+round_trip_latency_bucket{le="1.572863e+06"} 122026.0
+round_trip_latency_bucket{le="1.638399e+06"} 122145.0
+round_trip_latency_bucket{le="1.703935e+06"} 122214.0
+round_trip_latency_bucket{le="1.769471e+06"} 122256.0
+round_trip_latency_bucket{le="1.835007e+06"} 122289.0
+round_trip_latency_bucket{le="1.900543e+06"} 122316.0
+round_trip_latency_bucket{le="1.966079e+06"} 122332.0
+round_trip_latency_bucket{le="2.031615e+06"} 122345.0
+round_trip_latency_bucket{le="2.097151e+06"} 122355.0
+round_trip_latency_bucket{le="2.228223e+06"} 122374.0
+round_trip_latency_bucket{le="2.359295e+06"} 122390.0
+round_trip_latency_bucket{le="2.490367e+06"} 122403.0
+round_trip_latency_bucket{le="2.621439e+06"} 122409.0
+round_trip_latency_bucket{le="2.752511e+06"} 122418.0
+round_trip_latency_bucket{le="2.883583e+06"} 122422.0
+round_trip_latency_bucket{le="3.014655e+06"} 122429.0
+round_trip_latency_bucket{le="3.145727e+06"} 122433.0
+round_trip_latency_bucket{le="3.276799e+06"} 122435.0
+round_trip_latency_bucket{le="3.407871e+06"} 122436.0
+round_trip_latency_bucket{le="3.538943e+06"} 122440.0
+round_trip_latency_bucket{le="3.801087e+06"} 122443.0
+round_trip_latency_bucket{le="3.932159e+06"} 122446.0
+round_trip_latency_bucket{le="4.063231e+06"} 122449.0
+round_trip_latency_bucket{le="4.194303e+06"} 122451.0
+round_trip_latency_bucket{le="4.456447e+06"} 122453.0
+round_trip_latency_bucket{le="4.980735e+06"} 122455.0
+round_trip_latency_bucket{le="5.242879e+06"} 122458.0
+round_trip_latency_bucket{le="5.505023e+06"} 122462.0
+round_trip_latency_bucket{le="6.029311e+06"} 122465.0
+round_trip_latency_bucket{le="6.291455e+06"} 122468.0
+round_trip_latency_bucket{le="6.553599e+06"} 122469.0
+round_trip_latency_bucket{le="7.340031e+06"} 122472.0
+round_trip_latency_bucket{le="7.602175e+06"} 122474.0
+round_trip_latency_bucket{le="7.864319e+06"} 122477.0
+round_trip_latency_bucket{le="8.126463e+06"} 122480.0
+round_trip_latency_bucket{le="8.388607e+06"} 122481.0
+round_trip_latency_bucket{le="8.912895e+06"} 122483.0
+round_trip_latency_bucket{le="9.437183e+06"} 122484.0
+round_trip_latency_bucket{le="9.961471e+06"} 122485.0
+round_trip_latency_bucket{le="1.0485759e+07"} 122488.0
+round_trip_latency_bucket{le="1.1010047e+07"} 122490.0
+round_trip_latency_bucket{le="1.1534335e+07"} 122491.0
+round_trip_latency_bucket{le="1.2582911e+07"} 122492.0
+round_trip_latency_bucket{le="1.3631487e+07"} 122493.0
+round_trip_latency_bucket{le="1.4155775e+07"} 122494.0
+round_trip_latency_bucket{le="1.7825791e+07"} 122495.0
+round_trip_latency_bucket{le="1.8874367e+07"} 122496.0
+round_trip_latency_bucket{le="2.5165823e+07"} 122497.0
+round_trip_latency_bucket{le="4.8234495e+07"} 122498.0
+round_trip_latency_bucket{le="+Inf"} 122498.0
+round_trip_latency_sum 8.8816066942e+10
+round_trip_latency_count 122498.0
+# HELP sys_rss Current process RSS
+# TYPE sys_rss gauge
+sys_rss 3.14273792e+08
+# HELP queue_replicate_processingnanos Nanoseconds spent processing replicas in the replicate queue
+# TYPE queue_replicate_processingnanos counter
+queue_replicate_processingnanos{store="1"} 4.2535827e+07
+# HELP sql_mem_internal_session_current Current sql session memory usage for internal
+# TYPE sql_mem_internal_session_current gauge
+sql_mem_internal_session_current 0.0
+# HELP sql_mem_conns_session_max Memory usage per sql session for conns
+# TYPE sql_mem_conns_session_max histogram
+sql_mem_conns_session_max_bucket{le="+Inf"} 0.0
+sql_mem_conns_session_max_sum 0.0
+sql_mem_conns_session_max_count 0.0
+# HELP ranges_unavailable Number of ranges with fewer live replicas than needed for quorum
+# TYPE ranges_unavailable gauge
+ranges_unavailable{store="1"} 0.0
+# HELP queue_gc_info_transactionspanscanned Number of entries in transaction spans scanned from the engine
+# TYPE queue_gc_info_transactionspanscanned counter
+queue_gc_info_transactionspanscanned{store="1"} 0.0
+# HELP sys_fd_open Process open file descriptors
+# TYPE sys_fd_open gauge
+sys_fd_open 29.0
+# HELP changefeed_emitted_messages Messages emitted by all feeds
+# TYPE changefeed_emitted_messages counter
+changefeed_emitted_messages 0.0
+# HELP queue_raftlog_process_failure Number of replicas which failed processing in the Raft log queue
+# TYPE queue_raftlog_process_failure counter
+queue_raftlog_process_failure{store="1"} 0.0
+# HELP raft_rcvd_snap Number of MsgSnap messages received by this store
+# TYPE raft_rcvd_snap counter
+raft_rcvd_snap{store="1"} 0.0
+# HELP txnwaitqueue_pusher_slow The total number of cases where a pusher waited more than the excessive wait threshold
+# TYPE txnwaitqueue_pusher_slow gauge
+txnwaitqueue_pusher_slow{store="1"} 0.0
+# HELP queue_replicate_addreplica Number of replica additions attempted by the replicate queue
+# TYPE queue_replicate_addreplica counter
+queue_replicate_addreplica{store="1"} 0.0
+# HELP sql_distsql_flows_queued Number of distributed SQL flows currently queued
+# TYPE sql_distsql_flows_queued gauge
+sql_distsql_flows_queued 0.0
+# HELP sql_optimizer_count Number of statements which ran with the cost-based optimizer
+# TYPE sql_optimizer_count counter
+sql_optimizer_count 0.0
+# HELP sql_optimizer_plan_cache_misses Number of non-prepared statements for which a cached plan was not used
+# TYPE sql_optimizer_plan_cache_misses counter
+sql_optimizer_plan_cache_misses 0.0
+# HELP txnwaitqueue_pushee_waiting Number of pushees on the txn wait queue
+# TYPE txnwaitqueue_pushee_waiting gauge
+txnwaitqueue_pushee_waiting{store="1"} 0.0
+# HELP distsender_errors_inleasetransferbackoffs Number of times backed off due to NotLeaseHolderErrors during lease transfer.
+# TYPE distsender_errors_inleasetransferbackoffs counter
+distsender_errors_inleasetransferbackoffs 0.0
+# HELP sql_distsql_select_count Number of DistSQL SELECT statements
+# TYPE sql_distsql_select_count counter
+sql_distsql_select_count 0.0
+# HELP raft_process_applycommitted_latency Latency histogram for applying all committed Raft commands in a Raft ready
+# TYPE raft_process_applycommitted_latency histogram
+raft_process_applycommitted_latency_bucket{store="1",le="34815.0"} 4.0
+raft_process_applycommitted_latency_bucket{store="1",le="36863.0"} 6.0
+raft_process_applycommitted_latency_bucket{store="1",le="38911.0"} 11.0
+raft_process_applycommitted_latency_bucket{store="1",le="40959.0"} 18.0
+raft_process_applycommitted_latency_bucket{store="1",le="43007.0"} 32.0
+raft_process_applycommitted_latency_bucket{store="1",le="45055.0"} 44.0
+raft_process_applycommitted_latency_bucket{store="1",le="47103.0"} 70.0
+raft_process_applycommitted_latency_bucket{store="1",le="49151.0"} 103.0
+raft_process_applycommitted_latency_bucket{store="1",le="51199.0"} 135.0
+raft_process_applycommitted_latency_bucket{store="1",le="53247.0"} 171.0
+raft_process_applycommitted_latency_bucket{store="1",le="55295.0"} 215.0
+raft_process_applycommitted_latency_bucket{store="1",le="57343.0"} 270.0
+raft_process_applycommitted_latency_bucket{store="1",le="59391.0"} 321.0
+raft_process_applycommitted_latency_bucket{store="1",le="61439.0"} 389.0
+raft_process_applycommitted_latency_bucket{store="1",le="63487.0"} 464.0
+raft_process_applycommitted_latency_bucket{store="1",le="65535.0"} 588.0
+raft_process_applycommitted_latency_bucket{store="1",le="69631.0"} 898.0
+raft_process_applycommitted_latency_bucket{store="1",le="73727.0"} 1609.0
+raft_process_applycommitted_latency_bucket{store="1",le="77823.0"} 2927.0
+raft_process_applycommitted_latency_bucket{store="1",le="81919.0"} 4453.0
+raft_process_applycommitted_latency_bucket{store="1",le="86015.0"} 5944.0
+raft_process_applycommitted_latency_bucket{store="1",le="90111.0"} 7312.0
+raft_process_applycommitted_latency_bucket{store="1",le="94207.0"} 8589.0
+raft_process_applycommitted_latency_bucket{store="1",le="98303.0"} 9828.0
+raft_process_applycommitted_latency_bucket{store="1",le="102399.0"} 11080.0
+raft_process_applycommitted_latency_bucket{store="1",le="106495.0"} 12317.0
+raft_process_applycommitted_latency_bucket{store="1",le="110591.0"} 13657.0
+raft_process_applycommitted_latency_bucket{store="1",le="114687.0"} 15003.0
+raft_process_applycommitted_latency_bucket{store="1",le="118783.0"} 16528.0
+raft_process_applycommitted_latency_bucket{store="1",le="122879.0"} 18133.0
+raft_process_applycommitted_latency_bucket{store="1",le="126975.0"} 19849.0
+raft_process_applycommitted_latency_bucket{store="1",le="131071.0"} 21656.0
+raft_process_applycommitted_latency_bucket{store="1",le="139263.0"} 25759.0
+raft_process_applycommitted_latency_bucket{store="1",le="147455.0"} 30681.0
+raft_process_applycommitted_latency_bucket{store="1",le="155647.0"} 36642.0
+raft_process_applycommitted_latency_bucket{store="1",le="163839.0"} 43694.0
+raft_process_applycommitted_latency_bucket{store="1",le="172031.0"} 51365.0
+raft_process_applycommitted_latency_bucket{store="1",le="180223.0"} 59212.0
+raft_process_applycommitted_latency_bucket{store="1",le="188415.0"} 67133.0
+raft_process_applycommitted_latency_bucket{store="1",le="196607.0"} 74611.0
+raft_process_applycommitted_latency_bucket{store="1",le="204799.0"} 81796.0
+raft_process_applycommitted_latency_bucket{store="1",le="212991.0"} 88794.0
+raft_process_applycommitted_latency_bucket{store="1",le="221183.0"} 95235.0
+raft_process_applycommitted_latency_bucket{store="1",le="229375.0"} 101518.0
+raft_process_applycommitted_latency_bucket{store="1",le="237567.0"} 107528.0
+raft_process_applycommitted_latency_bucket{store="1",le="245759.0"} 113329.0
+raft_process_applycommitted_latency_bucket{store="1",le="253951.0"} 119152.0
+raft_process_applycommitted_latency_bucket{store="1",le="262143.0"} 124805.0
+raft_process_applycommitted_latency_bucket{store="1",le="278527.0"} 136299.0
+raft_process_applycommitted_latency_bucket{store="1",le="294911.0"} 147953.0
+raft_process_applycommitted_latency_bucket{store="1",le="311295.0"} 160014.0
+raft_process_applycommitted_latency_bucket{store="1",le="327679.0"} 172369.0
+raft_process_applycommitted_latency_bucket{store="1",le="344063.0"} 185101.0
+raft_process_applycommitted_latency_bucket{store="1",le="360447.0"} 197900.0
+raft_process_applycommitted_latency_bucket{store="1",le="376831.0"} 211145.0
+raft_process_applycommitted_latency_bucket{store="1",le="393215.0"} 224062.0
+raft_process_applycommitted_latency_bucket{store="1",le="409599.0"} 236720.0
+raft_process_applycommitted_latency_bucket{store="1",le="425983.0"} 247888.0
+raft_process_applycommitted_latency_bucket{store="1",le="442367.0"} 258229.0
+raft_process_applycommitted_latency_bucket{store="1",le="458751.0"} 267321.0
+raft_process_applycommitted_latency_bucket{store="1",le="475135.0"} 275530.0
+raft_process_applycommitted_latency_bucket{store="1",le="491519.0"} 282851.0
+raft_process_applycommitted_latency_bucket{store="1",le="507903.0"} 289574.0
+raft_process_applycommitted_latency_bucket{store="1",le="524287.0"} 295584.0
+raft_process_applycommitted_latency_bucket{store="1",le="557055.0"} 306165.0
+raft_process_applycommitted_latency_bucket{store="1",le="589823.0"} 315252.0
+raft_process_applycommitted_latency_bucket{store="1",le="622591.0"} 323067.0
+raft_process_applycommitted_latency_bucket{store="1",le="655359.0"} 329889.0
+raft_process_applycommitted_latency_bucket{store="1",le="688127.0"} 335861.0
+raft_process_applycommitted_latency_bucket{store="1",le="720895.0"} 340938.0
+raft_process_applycommitted_latency_bucket{store="1",le="753663.0"} 345224.0
+raft_process_applycommitted_latency_bucket{store="1",le="786431.0"} 348731.0
+raft_process_applycommitted_latency_bucket{store="1",le="819199.0"} 351677.0
+raft_process_applycommitted_latency_bucket{store="1",le="851967.0"} 354151.0
+raft_process_applycommitted_latency_bucket{store="1",le="884735.0"} 356204.0
+raft_process_applycommitted_latency_bucket{store="1",le="917503.0"} 357987.0
+raft_process_applycommitted_latency_bucket{store="1",le="950271.0"} 359543.0
+raft_process_applycommitted_latency_bucket{store="1",le="983039.0"} 360920.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.015807e+06"} 362280.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.048575e+06"} 363441.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.114111e+06"} 365816.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.179647e+06"} 368080.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.245183e+06"} 370597.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.310719e+06"} 373424.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.376255e+06"} 376505.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.441791e+06"} 379692.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.507327e+06"} 382959.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.572863e+06"} 386333.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.638399e+06"} 389451.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.703935e+06"} 392607.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.769471e+06"} 395636.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.835007e+06"} 398728.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.900543e+06"} 401914.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.966079e+06"} 405016.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.031615e+06"} 408069.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.097151e+06"} 411113.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.228223e+06"} 417098.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.359295e+06"} 423159.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.490367e+06"} 429273.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.621439e+06"} 435523.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.752511e+06"} 441306.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.883583e+06"} 446308.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.014655e+06"} 450584.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.145727e+06"} 453965.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.276799e+06"} 456712.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.407871e+06"} 459081.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.538943e+06"} 460992.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.670015e+06"} 462590.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.801087e+06"} 464016.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.932159e+06"} 465051.0
+raft_process_applycommitted_latency_bucket{store="1",le="4.063231e+06"} 465970.0
+raft_process_applycommitted_latency_bucket{store="1",le="4.194303e+06"} 466749.0
+raft_process_applycommitted_latency_bucket{store="1",le="4.456447e+06"} 467849.0
+raft_process_applycommitted_latency_bucket{store="1",le="4.718591e+06"} 468610.0
+raft_process_applycommitted_latency_bucket{store="1",le="4.980735e+06"} 469166.0
+raft_process_applycommitted_latency_bucket{store="1",le="5.242879e+06"} 469491.0
+raft_process_applycommitted_latency_bucket{store="1",le="5.505023e+06"} 469691.0
+raft_process_applycommitted_latency_bucket{store="1",le="5.767167e+06"} 469849.0
+raft_process_applycommitted_latency_bucket{store="1",le="6.029311e+06"} 469987.0
+raft_process_applycommitted_latency_bucket{store="1",le="6.291455e+06"} 470107.0
+raft_process_applycommitted_latency_bucket{store="1",le="6.553599e+06"} 470185.0
+raft_process_applycommitted_latency_bucket{store="1",le="6.815743e+06"} 470232.0
+raft_process_applycommitted_latency_bucket{store="1",le="7.077887e+06"} 470258.0
+raft_process_applycommitted_latency_bucket{store="1",le="7.340031e+06"} 470281.0
+raft_process_applycommitted_latency_bucket{store="1",le="7.602175e+06"} 470295.0
+raft_process_applycommitted_latency_bucket{store="1",le="7.864319e+06"} 470313.0
+raft_process_applycommitted_latency_bucket{store="1",le="8.126463e+06"} 470323.0
+raft_process_applycommitted_latency_bucket{store="1",le="8.388607e+06"} 470330.0
+raft_process_applycommitted_latency_bucket{store="1",le="8.912895e+06"} 470342.0
+raft_process_applycommitted_latency_bucket{store="1",le="9.437183e+06"} 470351.0
+raft_process_applycommitted_latency_bucket{store="1",le="9.961471e+06"} 470359.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.0485759e+07"} 470365.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.1010047e+07"} 470368.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.1534335e+07"} 470370.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.2058623e+07"} 470372.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.4155775e+07"} 470373.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.5204351e+07"} 470374.0
+raft_process_applycommitted_latency_bucket{store="1",le="1.9922943e+07"} 470375.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.2020095e+07"} 470376.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.3068671e+07"} 470377.0
+raft_process_applycommitted_latency_bucket{store="1",le="2.5165823e+07"} 470378.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.1457279e+07"} 470379.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.3554431e+07"} 470380.0
+raft_process_applycommitted_latency_bucket{store="1",le="3.5651583e+07"} 470382.0
+raft_process_applycommitted_latency_bucket{store="1",le="4.8234495e+07"} 470383.0
+raft_process_applycommitted_latency_bucket{store="1",le="6.5011711e+07"} 470384.0
+raft_process_applycommitted_latency_bucket{store="1",le="+Inf"} 470384.0
+raft_process_applycommitted_latency_sum{store="1"} 3.926650948e+11
+raft_process_applycommitted_latency_count{store="1"} 470384.0
+# HELP sql_mem_sql_max Memory usage per sql statement for sql
+# TYPE sql_mem_sql_max histogram
+sql_mem_sql_max_bucket{le="+Inf"} 0.0
+sql_mem_sql_max_sum 0.0
+sql_mem_sql_max_count 0.0
+sql_mem_sql_max_bucket{le="+Inf"} 0.0
+sql_mem_sql_max_sum 0.0
+sql_mem_sql_max_count 0.0
+# HELP sql_misc_count Number of other SQL statements
+# TYPE sql_misc_count counter
+sql_misc_count 0.0
+# HELP replicas_leaders Number of raft leaders
+# TYPE replicas_leaders gauge
+replicas_leaders{store="1"} 28.0
+# HELP raftlog_truncated Number of Raft log entries truncated
+# TYPE raftlog_truncated counter
+raftlog_truncated{store="1"} 471777.0
+# HELP queue_replicagc_process_success Number of replicas successfully processed by the replica GC queue
+# TYPE queue_replicagc_process_success counter
+queue_replicagc_process_success{store="1"} 0.0
+# HELP timeseries_write_samples Total number of metric samples written to disk
+# TYPE timeseries_write_samples counter
+timeseries_write_samples 2.2719534e+07
+# HELP sys_gc_pause_ns Total GC pause
+# TYPE sys_gc_pause_ns gauge
+sys_gc_pause_ns 9.92411831e+08
+# HELP sys_cpu_sys_ns Total system cpu time
+# TYPE sys_cpu_sys_ns gauge
+sys_cpu_sys_ns 7.4107e+11
+# HELP intentcount Count of intent keys
+# TYPE intentcount gauge
+intentcount{store="1"} 0.0
+# HELP raft_entrycache_hits Number of successful cache lookups in the Raft entry cache
+# TYPE raft_entrycache_hits counter
+raft_entrycache_hits{store="1"} 61049.0
+# HELP sys_cpu_sys_percent Current system cpu percentage
+# TYPE sys_cpu_sys_percent gauge
+sys_cpu_sys_percent 0.001999642143442117
+# HELP sys_host_net_send_packets Packets sent on all network interfaces since this process started
+# TYPE sys_host_net_send_packets gauge
+sys_host_net_send_packets 376511.0
+# HELP sql_delete_count Number of SQL DELETE statements
+# TYPE sql_delete_count counter
+sql_delete_count 0.0
+# HELP gossip_infos_received Number of received gossip Info objects
+# TYPE gossip_infos_received counter
+gossip_infos_received 0.0
+# HELP sql_mem_conns_max Memory usage per sql statement for conns
+# TYPE sql_mem_conns_max histogram
+sql_mem_conns_max_bucket{le="+Inf"} 0.0
+sql_mem_conns_max_sum 0.0
+sql_mem_conns_max_count 0.0
+# HELP valcount Count of all values
+# TYPE valcount gauge
+valcount{store="1"} 25604.0
+# HELP rocksdb_read_amplification Number of disk reads per query
+# TYPE rocksdb_read_amplification gauge
+rocksdb_read_amplification{store="1"} 1.0
+# HELP raft_rcvd_prop Number of MsgProp messages received by this store
+# TYPE raft_rcvd_prop counter
+raft_rcvd_prop{store="1"} 0.0
+# HELP raft_rcvd_prevote Number of MsgPreVote messages received by this store
+# TYPE raft_rcvd_prevote counter
+raft_rcvd_prevote{store="1"} 0.0
+# HELP txn_aborts Number of aborted KV transactions
+# TYPE txn_aborts counter
+txn_aborts 8.0
+# HELP sys_goroutines Current number of goroutines
+# TYPE sys_goroutines gauge
+sys_goroutines 143.0
+# HELP rocksdb_flushes Number of table flushes
+# TYPE rocksdb_flushes gauge
+rocksdb_flushes{store="1"} 118.0
+# HELP valbytes Number of bytes taken up by values
+# TYPE valbytes gauge
+valbytes{store="1"} 7.43394636e+08
+# HELP rocksdb_block_cache_misses Count of block cache misses
+# TYPE rocksdb_block_cache_misses gauge
+rocksdb_block_cache_misses{store="1"} 206163.0
+# HELP addsstable_proposals Number of SSTable ingestions proposed (i.e. sent to Raft by lease holders)
+# TYPE addsstable_proposals counter
+addsstable_proposals{store="1"} 0.0
+# HELP ranges Number of ranges
+# TYPE ranges gauge
+ranges{store="1"} 28.0
+# HELP capacity Total storage capacity
+# TYPE capacity gauge
+capacity{store="1"} 1.05152176128e+11
+# HELP syscount Count of system KV pairs
+# TYPE syscount gauge
+syscount{store="1"} 165.0
+# HELP rocksdb_block_cache_pinned_usage Bytes pinned by the block cache
+# TYPE rocksdb_block_cache_pinned_usage gauge
+rocksdb_block_cache_pinned_usage{store="1"} 0.0
+# HELP queue_raftlog_process_success Number of replicas successfully processed by the Raft log queue
+# TYPE queue_raftlog_process_success counter
+queue_raftlog_process_success{store="1"} 61082.0
+# HELP sys_cpu_user_percent Current user cpu percentage
+# TYPE sys_cpu_user_percent gauge
+sys_cpu_user_percent 0.007998568573768468
+# HELP sys_host_net_recv_bytes Bytes received on all network interfaces since this process started
+# TYPE sys_host_net_recv_bytes gauge
+sys_host_net_recv_bytes 4.3853078e+07
+# HELP sql_insert_count Number of SQL INSERT statements
+# TYPE sql_insert_count counter
+sql_insert_count 0.0
+# HELP queue_tsmaintenance_processingnanos Nanoseconds spent processing replicas in the time series maintenance queue
+# TYPE queue_tsmaintenance_processingnanos counter
+queue_tsmaintenance_processingnanos{store="1"} 6.00726802e+08
+# HELP tscache_skl_read_pages Number of pages in the read timestamp cache
+# TYPE tscache_skl_read_pages gauge
+tscache_skl_read_pages{store="1"} 1.0
+# HELP intentresolver_async_throttled Number of intent resolution attempts not run asynchronously due to throttling
+# TYPE intentresolver_async_throttled counter
+intentresolver_async_throttled{store="1"} 0.0
+# HELP sys_go_allocbytes Current bytes of memory allocated by go
+# TYPE sys_go_allocbytes gauge
+sys_go_allocbytes 1.85178592e+08
+# HELP queue_split_purgatory Number of replicas in the split queue's purgatory, waiting to become splittable
+# TYPE queue_split_purgatory gauge
+queue_split_purgatory{store="1"} 0.0
+# HELP queue_gc_info_resolvesuccess Number of successful intent resolutions
+# TYPE queue_gc_info_resolvesuccess counter
+queue_gc_info_resolvesuccess{store="1"} 0.0
+# HELP requests_slow_lease Number of requests that have been stuck for a long time acquiring a lease
+# TYPE requests_slow_lease gauge
+requests_slow_lease{store="1"} 0.0
+# HELP requests_slow_raft Number of requests that have been stuck for a long time in raft
+# TYPE requests_slow_raft gauge
+requests_slow_raft{store="1"} 0.0
+# HELP kv_closed_timestamp_max_behind_nanos Largest latency between realtime and replica max closed timestamp
+# TYPE kv_closed_timestamp_max_behind_nanos gauge
+kv_closed_timestamp_max_behind_nanos{store="1"} 3.914004587e+10
+# HELP tscache_skl_read_rotations Number of page rotations in the read timestamp cache
+# TYPE tscache_skl_read_rotations counter
+tscache_skl_read_rotations{store="1"} 0.0
+# HELP txnwaitqueue_pusher_waiting Number of pushers on the txn wait queue
+# TYPE txnwaitqueue_pusher_waiting gauge
+txnwaitqueue_pusher_waiting{store="1"} 0.0
+# HELP sys_cpu_combined_percent_normalized Current user+system cpu percentage, normalized 0-1 by number of cores
+# TYPE sys_cpu_combined_percent_normalized gauge
+sys_cpu_combined_percent_normalized 0.002499552679302646
+# HELP sql_mem_sql_session_current Current sql session memory usage for sql
+# TYPE sql_mem_sql_session_current gauge
+sql_mem_sql_session_current 0.0
+sql_mem_sql_session_current 0.0
+# HELP sql_distsql_service_latency_internal Latency of DistSQL request execution (internal queries)
+# TYPE sql_distsql_service_latency_internal histogram
+sql_distsql_service_latency_internal_bucket{le="344063.0"} 1.0
+sql_distsql_service_latency_internal_bucket{le="360447.0"} 3.0
+sql_distsql_service_latency_internal_bucket{le="376831.0"} 6.0
+sql_distsql_service_latency_internal_bucket{le="409599.0"} 10.0
+sql_distsql_service_latency_internal_bucket{le="425983.0"} 12.0
+sql_distsql_service_latency_internal_bucket{le="442367.0"} 14.0
+sql_distsql_service_latency_internal_bucket{le="458751.0"} 16.0
+sql_distsql_service_latency_internal_bucket{le="475135.0"} 21.0
+sql_distsql_service_latency_internal_bucket{le="491519.0"} 25.0
+sql_distsql_service_latency_internal_bucket{le="507903.0"} 27.0
+sql_distsql_service_latency_internal_bucket{le="524287.0"} 34.0
+sql_distsql_service_latency_internal_bucket{le="557055.0"} 41.0
+sql_distsql_service_latency_internal_bucket{le="589823.0"} 46.0
+sql_distsql_service_latency_internal_bucket{le="622591.0"} 53.0
+sql_distsql_service_latency_internal_bucket{le="655359.0"} 59.0
+sql_distsql_service_latency_internal_bucket{le="688127.0"} 72.0
+sql_distsql_service_latency_internal_bucket{le="720895.0"} 77.0
+sql_distsql_service_latency_internal_bucket{le="753663.0"} 83.0
+sql_distsql_service_latency_internal_bucket{le="786431.0"} 91.0
+sql_distsql_service_latency_internal_bucket{le="819199.0"} 100.0
+sql_distsql_service_latency_internal_bucket{le="851967.0"} 105.0
+sql_distsql_service_latency_internal_bucket{le="884735.0"} 112.0
+sql_distsql_service_latency_internal_bucket{le="917503.0"} 121.0
+sql_distsql_service_latency_internal_bucket{le="950271.0"} 126.0
+sql_distsql_service_latency_internal_bucket{le="983039.0"} 141.0
+sql_distsql_service_latency_internal_bucket{le="1.015807e+06"} 159.0
+sql_distsql_service_latency_internal_bucket{le="1.048575e+06"} 189.0
+sql_distsql_service_latency_internal_bucket{le="1.114111e+06"} 348.0
+sql_distsql_service_latency_internal_bucket{le="1.179647e+06"} 586.0
+sql_distsql_service_latency_internal_bucket{le="1.245183e+06"} 880.0
+sql_distsql_service_latency_internal_bucket{le="1.310719e+06"} 1123.0
+sql_distsql_service_latency_internal_bucket{le="1.376255e+06"} 1361.0
+sql_distsql_service_latency_internal_bucket{le="1.441791e+06"} 1612.0
+sql_distsql_service_latency_internal_bucket{le="1.507327e+06"} 1853.0
+sql_distsql_service_latency_internal_bucket{le="1.572863e+06"} 2093.0
+sql_distsql_service_latency_internal_bucket{le="1.638399e+06"} 2293.0
+sql_distsql_service_latency_internal_bucket{le="1.703935e+06"} 2435.0
+sql_distsql_service_latency_internal_bucket{le="1.769471e+06"} 2580.0
+sql_distsql_service_latency_internal_bucket{le="1.835007e+06"} 2710.0
+sql_distsql_service_latency_internal_bucket{le="1.900543e+06"} 2816.0
+sql_distsql_service_latency_internal_bucket{le="1.966079e+06"} 2902.0
+sql_distsql_service_latency_internal_bucket{le="2.031615e+06"} 3025.0
+sql_distsql_service_latency_internal_bucket{le="2.097151e+06"} 3186.0
+sql_distsql_service_latency_internal_bucket{le="2.228223e+06"} 3684.0
+sql_distsql_service_latency_internal_bucket{le="2.359295e+06"} 4439.0
+sql_distsql_service_latency_internal_bucket{le="2.490367e+06"} 5250.0
+sql_distsql_service_latency_internal_bucket{le="2.621439e+06"} 6083.0
+sql_distsql_service_latency_internal_bucket{le="2.752511e+06"} 7017.0
+sql_distsql_service_latency_internal_bucket{le="2.883583e+06"} 8073.0
+sql_distsql_service_latency_internal_bucket{le="3.014655e+06"} 9107.0
+sql_distsql_service_latency_internal_bucket{le="3.145727e+06"} 9993.0
+sql_distsql_service_latency_internal_bucket{le="3.276799e+06"} 10619.0
+sql_distsql_service_latency_internal_bucket{le="3.407871e+06"} 11073.0
+sql_distsql_service_latency_internal_bucket{le="3.538943e+06"} 11349.0
+sql_distsql_service_latency_internal_bucket{le="3.670015e+06"} 11571.0
+sql_distsql_service_latency_internal_bucket{le="3.801087e+06"} 11722.0
+sql_distsql_service_latency_internal_bucket{le="3.932159e+06"} 11847.0
+sql_distsql_service_latency_internal_bucket{le="4.063231e+06"} 11980.0
+sql_distsql_service_latency_internal_bucket{le="4.194303e+06"} 12093.0
+sql_distsql_service_latency_internal_bucket{le="4.456447e+06"} 12281.0
+sql_distsql_service_latency_internal_bucket{le="4.718591e+06"} 12429.0
+sql_distsql_service_latency_internal_bucket{le="4.980735e+06"} 12524.0
+sql_distsql_service_latency_internal_bucket{le="5.242879e+06"} 12581.0
+sql_distsql_service_latency_internal_bucket{le="5.505023e+06"} 12616.0
+sql_distsql_service_latency_internal_bucket{le="5.767167e+06"} 12646.0
+sql_distsql_service_latency_internal_bucket{le="6.029311e+06"} 12665.0
+sql_distsql_service_latency_internal_bucket{le="6.291455e+06"} 12670.0
+sql_distsql_service_latency_internal_bucket{le="6.553599e+06"} 12677.0
+sql_distsql_service_latency_internal_bucket{le="6.815743e+06"} 12683.0
+sql_distsql_service_latency_internal_bucket{le="7.077887e+06"} 12686.0
+sql_distsql_service_latency_internal_bucket{le="7.340031e+06"} 12691.0
+sql_distsql_service_latency_internal_bucket{le="7.602175e+06"} 12692.0
+sql_distsql_service_latency_internal_bucket{le="8.126463e+06"} 12694.0
+sql_distsql_service_latency_internal_bucket{le="7.5497471e+07"} 12695.0
+sql_distsql_service_latency_internal_bucket{le="+Inf"} 12695.0
+sql_distsql_service_latency_internal_sum 3.3893027433e+10
+sql_distsql_service_latency_internal_count 12695.0
+# HELP distsender_batches_async_sent Number of partial batches sent asynchronously
+# TYPE distsender_batches_async_sent counter
+distsender_batches_async_sent 131796.0
+# HELP changefeed_error_retries Total retryable errors encountered by all changefeeds
+# TYPE changefeed_error_retries counter
+changefeed_error_retries 0.0
+# HELP queue_merge_process_failure Number of replicas which failed processing in the merge queue
+# TYPE queue_merge_process_failure counter
+queue_merge_process_failure{store="1"} 0.0
+# HELP rocksdb_bloom_filter_prefix_checked Number of times the bloom filter was checked
+# TYPE rocksdb_bloom_filter_prefix_checked gauge
+rocksdb_bloom_filter_prefix_checked{store="1"} 1.062627e+06
+# HELP queue_consistency_pending Number of pending replicas in the consistency checker queue
+# TYPE queue_consistency_pending gauge
+queue_consistency_pending{store="1"} 2.0
+# HELP sql_mem_admin_current Current sql statement memory usage for admin
+# TYPE sql_mem_admin_current gauge
+sql_mem_admin_current 0.0
+# HELP sys_host_disk_io_time Time spent reading from or writing to all disks since this process started
+# TYPE sys_host_disk_io_time gauge
+sys_host_disk_io_time 1.6187292e+13
+# HELP leases_epoch Number of replica leaseholders using epoch-based leases
+# TYPE leases_epoch gauge
+leases_epoch{store="1"} 26.0
+# HELP sys_host_disk_write_time Time spent writing to all disks since this process started
+# TYPE sys_host_disk_write_time gauge
+sys_host_disk_write_time 7.5176812e+13
+# HELP changefeed_buffer_entries_out Total entries leaving the buffer between raft and changefeed sinks
+# TYPE changefeed_buffer_entries_out counter
+changefeed_buffer_entries_out 0.0
+# HELP sql_distsql_flows_total Number of distributed SQL flows executed
+# TYPE sql_distsql_flows_total counter
+sql_distsql_flows_total 0.0
+# HELP queue_replicagc_pending Number of pending replicas in the replica GC queue
+# TYPE queue_replicagc_pending gauge
+queue_replicagc_pending{store="1"} 0.0
+# HELP txn_autoretries Number of automatic retries to avoid serializable restarts
+# TYPE txn_autoretries counter
+txn_autoretries 0.0
+# HELP txn_restarts_possiblereplay Number of restarts due to possible replays of command batches at the storage layer
+# TYPE txn_restarts_possiblereplay counter
+txn_restarts_possiblereplay 0.0
+# HELP timeseries_write_errors Total errors encountered while attempting to write metrics to disk
+# TYPE timeseries_write_errors counter
+timeseries_write_errors 0.0
+# HELP sql_query_count Number of SQL queries
+# TYPE sql_query_count counter
+sql_query_count 0.0
+# HELP txnwaitqueue_pusher_wait_time Histogram of durations spent in queue by pushers
+# TYPE txnwaitqueue_pusher_wait_time histogram
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="1.966079e+06"} 1.0
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="2.228223e+06"} 2.0
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="2.490367e+06"} 3.0
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="2.883583e+06"} 4.0
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="3.145727e+06"} 5.0
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="3.407871e+06"} 6.0
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="5.2428799e+07"} 7.0
+txnwaitqueue_pusher_wait_time_bucket{store="1",le="+Inf"} 7.0
+txnwaitqueue_pusher_wait_time_sum{store="1"} 6.8550649e+07
+txnwaitqueue_pusher_wait_time_count{store="1"} 7.0
+# HELP sys_host_disk_weightedio_time Weighted time spent reading from or writing to to all disks since this process started
+# TYPE sys_host_disk_weightedio_time gauge
+sys_host_disk_weightedio_time 7.0077932e+13
+# HELP sql_distsql_queries_active Number of distributed SQL queries currently active
+# TYPE sql_distsql_queries_active gauge
+sql_distsql_queries_active 0.0
+# HELP keycount Count of all keys
+# TYPE keycount gauge
+keycount{store="1"} 24340.0
+# HELP queue_raftlog_processingnanos Nanoseconds spent processing replicas in the Raft log queue
+# TYPE queue_raftlog_processingnanos counter
+queue_raftlog_processingnanos{store="1"} 4.69601786912e+11
+# HELP tscache_skl_write_pages Number of pages in the write timestamp cache
+# TYPE tscache_skl_write_pages gauge
+tscache_skl_write_pages{store="1"} 1.0
+# HELP txn_commits Number of committed KV transactions (including 1PC)
+# TYPE txn_commits counter
+txn_commits 116626.0
+# HELP txn_restarts_unknown Number of restarts due to a unknown reasons
+# TYPE txn_restarts_unknown counter
+txn_restarts_unknown 0.0
+# HELP sys_cgo_allocbytes Current bytes of memory allocated by cgo
+# TYPE sys_cgo_allocbytes gauge
+sys_cgo_allocbytes 1.1346936e+08
+# HELP queue_replicate_removedeadreplica Number of dead replica removals attempted by the replicate queue (typically in response to a node outage)
+# TYPE queue_replicate_removedeadreplica counter
+queue_replicate_removedeadreplica{store="1"} 0.0
+# HELP liveness_heartbeatfailures Number of failed node liveness heartbeats from this node
+# TYPE liveness_heartbeatfailures counter
+liveness_heartbeatfailures 8.0
+# HELP sql_txn_rollback_count_internal Number of SQL transaction ROLLBACK statements (internal queries)
+# TYPE sql_txn_rollback_count_internal counter
+sql_txn_rollback_count_internal 0.0
+# HELP sql_restart_savepoint_count Number of `SAVEPOINT cockroach_restart` statements
+# TYPE sql_restart_savepoint_count counter
+sql_restart_savepoint_count 0.0
+# HELP sql_exec_latency Latency of SQL statement execution
+# TYPE sql_exec_latency histogram
+sql_exec_latency_bucket{le="+Inf"} 0.0
+sql_exec_latency_sum 0.0
+sql_exec_latency_count 0.0
+# HELP sysbytes Number of bytes in system KV pairs
+# TYPE sysbytes gauge
+sysbytes{store="1"} 12998.0
+# HELP queue_replicate_pending Number of pending replicas in the replicate queue
+# TYPE queue_replicate_pending gauge
+queue_replicate_pending{store="1"} 0.0
+# HELP sql_mem_admin_max Memory usage per sql statement for admin
+# TYPE sql_mem_admin_max histogram
+sql_mem_admin_max_bucket{le="+Inf"} 0.0
+sql_mem_admin_max_sum 0.0
+sql_mem_admin_max_count 0.0
+# HELP sql_mem_admin_session_current Current sql session memory usage for admin
+# TYPE sql_mem_admin_session_current gauge
+sql_mem_admin_session_current 0.0
+# HELP sql_distsql_queries_total Number of distributed SQL queries executed
+# TYPE sql_distsql_queries_total counter
+sql_distsql_queries_total 18870.0
+# HELP changefeed_max_behind_nanos Largest commit-to-emit duration of any running feed
+# TYPE changefeed_max_behind_nanos gauge
+changefeed_max_behind_nanos 0.0
+# HELP sql_restart_savepoint_rollback_count_internal Number of `ROLLBACK TO SAVEPOINT cockroach_restart` statements (internal queries)
+# TYPE sql_restart_savepoint_rollback_count_internal counter
+sql_restart_savepoint_rollback_count_internal 0.0
+# HELP requests_slow_latch Number of requests that have been stuck for a long time acquiring latches
+# TYPE requests_slow_latch gauge
+requests_slow_latch{store="1"} 0.0
+# HELP txnwaitqueue_deadlocks_total Number of deadlocks detected by the txn wait queue
+# TYPE txnwaitqueue_deadlocks_total counter
+txnwaitqueue_deadlocks_total{store="1"} 0.0
+# HELP distsender_batches_async_throttled Number of partial batches not sent asynchronously due to throttling
+# TYPE distsender_batches_async_throttled counter
+distsender_batches_async_throttled 0.0
+# HELP sql_mem_internal_txn_current Current sql transaction memory usage for internal
+# TYPE sql_mem_internal_txn_current gauge
+sql_mem_internal_txn_current 0.0
+# HELP changefeed_flush_nanos Total time spent flushing all feeds
+# TYPE changefeed_flush_nanos counter
+changefeed_flush_nanos 0.0
+# HELP range_snapshots_preemptive_applied Number of applied pre-emptive snapshots
+# TYPE range_snapshots_preemptive_applied counter
+range_snapshots_preemptive_applied{store="1"} 0.0
+# HELP queue_replicate_process_failure Number of replicas which failed processing in the replicate queue
+# TYPE queue_replicate_process_failure counter
+queue_replicate_process_failure{store="1"} 361.0
+# HELP changefeed_processing_nanos Time spent processing KV changes into SQL rows
+# TYPE changefeed_processing_nanos counter
+changefeed_processing_nanos 0.0
+# HELP livebytes Number of bytes of live data (keys plus values)
+# TYPE livebytes gauge
+livebytes{store="1"} 7.44512505e+08
+# HELP range_snapshots_generated Number of generated snapshots
+# TYPE range_snapshots_generated counter
+range_snapshots_generated{store="1"} 0.0
+# HELP queue_gc_process_failure Number of replicas which failed processing in the GC queue
+# TYPE queue_gc_process_failure counter
+queue_gc_process_failure{store="1"} 0.0
+# HELP queue_gc_info_intentsconsidered Number of 'old' intents
+# TYPE queue_gc_info_intentsconsidered counter
+queue_gc_info_intentsconsidered{store="1"} 0.0
+# HELP sql_mem_distsql_max Memory usage per sql statement for distsql
+# TYPE sql_mem_distsql_max histogram
+sql_mem_distsql_max_bucket{le="4011.0"} 2452.0
+sql_mem_distsql_max_bucket{le="4791.0"} 2453.0
+sql_mem_distsql_max_bucket{le="+Inf"} 2453.0
+sql_mem_distsql_max_sum 9.839763e+06
+sql_mem_distsql_max_count 2453.0
+# HELP sql_select_count_internal Number of SQL SELECT statements (internal queries)
+# TYPE sql_select_count_internal counter
+sql_select_count_internal 13923.0
+# HELP replicas_reserved Number of replicas reserved for snapshots
+# TYPE replicas_reserved gauge
+replicas_reserved{store="1"} 0.0
+# HELP intents_resolve_attempts Count of (point or range) intent commit evaluation attempts
+# TYPE intents_resolve_attempts counter
+intents_resolve_attempts{store="1"} 211.0
+# HELP raft_heartbeats_pending Number of pending heartbeats and responses waiting to be coalesced
+# TYPE raft_heartbeats_pending gauge
+raft_heartbeats_pending{store="1"} 0.0
+# HELP queue_raftsnapshot_pending Number of pending replicas in the Raft repair queue
+# TYPE queue_raftsnapshot_pending gauge
+queue_raftsnapshot_pending{store="1"} 0.0
+# HELP queue_split_process_failure Number of replicas which failed processing in the split queue
+# TYPE queue_split_process_failure counter
+queue_split_process_failure{store="1"} 0.0
+# HELP compactor_suggestionbytes_queued Number of logical bytes in suggested compactions in the queue
+# TYPE compactor_suggestionbytes_queued gauge
+compactor_suggestionbytes_queued{store="1"} 0.0
+# HELP txn_restarts_txnaborted Number of restarts due to an abort by a concurrent transaction (usually due to deadlock)
+# TYPE txn_restarts_txnaborted counter
+txn_restarts_txnaborted 0.0
+# HELP build_timestamp Build information
+# TYPE build_timestamp gauge
+build_timestamp{tag="v19.1.1",go_version="go1.11.6"} 1.55795202e+09
+# HELP sql_txn_commit_count_internal Number of SQL transaction COMMIT statements (internal queries)
+# TYPE sql_txn_commit_count_internal counter
+sql_txn_commit_count_internal 0.0
+# HELP sql_distsql_exec_latency Latency of DistSQL statement execution
+# TYPE sql_distsql_exec_latency histogram
+sql_distsql_exec_latency_bucket{le="+Inf"} 0.0
+sql_distsql_exec_latency_sum 0.0
+sql_distsql_exec_latency_count 0.0
+# HELP sql_update_count_internal Number of SQL UPDATE statements (internal queries)
+# TYPE sql_update_count_internal counter
+sql_update_count_internal 0.0
+# HELP sql_restart_savepoint_release_count_internal Number of `RELEASE SAVEPOINT cockroach_restart` statements (internal queries)
+# TYPE sql_restart_savepoint_release_count_internal counter
+sql_restart_savepoint_release_count_internal 0.0
+# HELP sql_ddl_count_internal Number of SQL DDL statements (internal queries)
+# TYPE sql_ddl_count_internal counter
+sql_ddl_count_internal 2.0
+# HELP queue_gc_processingnanos Nanoseconds spent processing replicas in the GC queue
+# TYPE queue_gc_processingnanos counter
+queue_gc_processingnanos{store="1"} 3.458062996e+09
+# HELP sys_host_disk_write_bytes Bytes written to all disks since this process started
+# TYPE sys_host_disk_write_bytes gauge
+sys_host_disk_write_bytes 9.32221681664e+11
+# HELP sql_mem_sql_session_max Memory usage per sql session for sql
+# TYPE sql_mem_sql_session_max histogram
+sql_mem_sql_session_max_bucket{le="+Inf"} 0.0
+sql_mem_sql_session_max_sum 0.0
+sql_mem_sql_session_max_count 0.0
+sql_mem_sql_session_max_bucket{le="+Inf"} 0.0
+sql_mem_sql_session_max_sum 0.0
+sql_mem_sql_session_max_count 0.0
+# HELP sql_optimizer_fallback_count Number of statements which the cost-based optimizer was unable to plan
+# TYPE sql_optimizer_fallback_count counter
+sql_optimizer_fallback_count 0.0
+# HELP queue_gc_info_intenttxns Number of associated distinct transactions
+# TYPE queue_gc_info_intenttxns counter
+queue_gc_info_intenttxns{store="1"} 0.0
+# HELP kv_rangefeed_catchup_scan_nanos Time spent in RangeFeed catchup scan
+# TYPE kv_rangefeed_catchup_scan_nanos counter
+kv_rangefeed_catchup_scan_nanos{store="1"} 0.0
+# HELP sql_txn_abort_count Number of SQL transaction abort errors
+# TYPE sql_txn_abort_count counter
+sql_txn_abort_count 0.0
+# HELP queue_raftsnapshot_processingnanos Nanoseconds spent processing replicas in the Raft repair queue
+# TYPE queue_raftsnapshot_processingnanos counter
+queue_raftsnapshot_processingnanos{store="1"} 0.0
+# HELP queue_gc_info_resolvetotal Number of attempted intent resolutions
+# TYPE queue_gc_info_resolvetotal counter
+queue_gc_info_resolvetotal{store="1"} 0.0
+# HELP sys_cpu_user_ns Total user cpu time
+# TYPE sys_cpu_user_ns gauge
+sys_cpu_user_ns 3.05882e+12
+# HELP sys_host_disk_read_bytes Bytes read from all disks since this process started
+# TYPE sys_host_disk_read_bytes gauge
+sys_host_disk_read_bytes 3.06376612864e+11
+# HELP sql_restart_savepoint_rollback_count Number of `ROLLBACK TO SAVEPOINT cockroach_restart` statements
+# TYPE sql_restart_savepoint_rollback_count counter
+sql_restart_savepoint_rollback_count 0.0
+# HELP sql_mem_conns_txn_current Current sql transaction memory usage for conns
+# TYPE sql_mem_conns_txn_current gauge
+sql_mem_conns_txn_current 0.0
+# HELP lastupdatenanos Timestamp at which bytes/keys/intents metrics were last updated
+# TYPE lastupdatenanos gauge
+lastupdatenanos{store="1"} 1.559929588500577e+18
+# HELP rocksdb_block_cache_hits Count of block cache hits
+# TYPE rocksdb_block_cache_hits gauge
+rocksdb_block_cache_hits{store="1"} 3.018768e+06
+# HELP queue_merge_process_success Number of replicas successfully processed by the merge queue
+# TYPE queue_merge_process_success counter
+queue_merge_process_success{store="1"} 29834.0
+# HELP queue_gc_info_transactionspangcaborted Number of GC'able entries corresponding to aborted txns
+# TYPE queue_gc_info_transactionspangcaborted counter
+queue_gc_info_transactionspangcaborted{store="1"} 0.0
+# HELP txn_durations KV transaction durations
+# TYPE txn_durations histogram
+txn_durations_bucket{le="163839.0"} 1.0
+txn_durations_bucket{le="180223.0"} 3.0
+txn_durations_bucket{le="188415.0"} 5.0
+txn_durations_bucket{le="196607.0"} 8.0
+txn_durations_bucket{le="204799.0"} 19.0
+txn_durations_bucket{le="212991.0"} 24.0
+txn_durations_bucket{le="221183.0"} 34.0
+txn_durations_bucket{le="229375.0"} 49.0
+txn_durations_bucket{le="237567.0"} 76.0
+txn_durations_bucket{le="245759.0"} 99.0
+txn_durations_bucket{le="253951.0"} 125.0
+txn_durations_bucket{le="262143.0"} 156.0
+txn_durations_bucket{le="278527.0"} 214.0
+txn_durations_bucket{le="294911.0"} 309.0
+txn_durations_bucket{le="311295.0"} 477.0
+txn_durations_bucket{le="327679.0"} 765.0
+txn_durations_bucket{le="344063.0"} 1045.0
+txn_durations_bucket{le="360447.0"} 1340.0
+txn_durations_bucket{le="376831.0"} 1614.0
+txn_durations_bucket{le="393215.0"} 1880.0
+txn_durations_bucket{le="409599.0"} 2091.0
+txn_durations_bucket{le="425983.0"} 2339.0
+txn_durations_bucket{le="442367.0"} 2614.0
+txn_durations_bucket{le="458751.0"} 2872.0
+txn_durations_bucket{le="475135.0"} 3146.0
+txn_durations_bucket{le="491519.0"} 3377.0
+txn_durations_bucket{le="507903.0"} 3636.0
+txn_durations_bucket{le="524287.0"} 3935.0
+txn_durations_bucket{le="557055.0"} 4741.0
+txn_durations_bucket{le="589823.0"} 5809.0
+txn_durations_bucket{le="622591.0"} 7009.0
+txn_durations_bucket{le="655359.0"} 8353.0
+txn_durations_bucket{le="688127.0"} 9577.0
+txn_durations_bucket{le="720895.0"} 10782.0
+txn_durations_bucket{le="753663.0"} 11990.0
+txn_durations_bucket{le="786431.0"} 13114.0
+txn_durations_bucket{le="819199.0"} 14160.0
+txn_durations_bucket{le="851967.0"} 15130.0
+txn_durations_bucket{le="884735.0"} 15986.0
+txn_durations_bucket{le="917503.0"} 16694.0
+txn_durations_bucket{le="950271.0"} 17310.0
+txn_durations_bucket{le="983039.0"} 17876.0
+txn_durations_bucket{le="1.015807e+06"} 18383.0
+txn_durations_bucket{le="1.048575e+06"} 18928.0
+txn_durations_bucket{le="1.114111e+06"} 20294.0
+txn_durations_bucket{le="1.179647e+06"} 21930.0
+txn_durations_bucket{le="1.245183e+06"} 23681.0
+txn_durations_bucket{le="1.310719e+06"} 25563.0
+txn_durations_bucket{le="1.376255e+06"} 27770.0
+txn_durations_bucket{le="1.441791e+06"} 30082.0
+txn_durations_bucket{le="1.507327e+06"} 32468.0
+txn_durations_bucket{le="1.572863e+06"} 34701.0
+txn_durations_bucket{le="1.638399e+06"} 36778.0
+txn_durations_bucket{le="1.703935e+06"} 38698.0
+txn_durations_bucket{le="1.769471e+06"} 40538.0
+txn_durations_bucket{le="1.835007e+06"} 42173.0
+txn_durations_bucket{le="1.900543e+06"} 43816.0
+txn_durations_bucket{le="1.966079e+06"} 45816.0
+txn_durations_bucket{le="2.031615e+06"} 48034.0
+txn_durations_bucket{le="2.097151e+06"} 50399.0
+txn_durations_bucket{le="2.228223e+06"} 55820.0
+txn_durations_bucket{le="2.359295e+06"} 61388.0
+txn_durations_bucket{le="2.490367e+06"} 66660.0
+txn_durations_bucket{le="2.621439e+06"} 71009.0
+txn_durations_bucket{le="2.752511e+06"} 74469.0
+txn_durations_bucket{le="2.883583e+06"} 77315.0
+txn_durations_bucket{le="3.014655e+06"} 79532.0
+txn_durations_bucket{le="3.145727e+06"} 81600.0
+txn_durations_bucket{le="3.276799e+06"} 83510.0
+txn_durations_bucket{le="3.407871e+06"} 85326.0
+txn_durations_bucket{le="3.538943e+06"} 87181.0
+txn_durations_bucket{le="3.670015e+06"} 89085.0
+txn_durations_bucket{le="3.801087e+06"} 91006.0
+txn_durations_bucket{le="3.932159e+06"} 92840.0
+txn_durations_bucket{le="4.063231e+06"} 94693.0
+txn_durations_bucket{le="4.194303e+06"} 96446.0
+txn_durations_bucket{le="4.456447e+06"} 99500.0
+txn_durations_bucket{le="4.718591e+06"} 101623.0
+txn_durations_bucket{le="4.980735e+06"} 103099.0
+txn_durations_bucket{le="5.242879e+06"} 104099.0
+txn_durations_bucket{le="5.505023e+06"} 104857.0
+txn_durations_bucket{le="5.767167e+06"} 105536.0
+txn_durations_bucket{le="6.029311e+06"} 106060.0
+txn_durations_bucket{le="6.291455e+06"} 106546.0
+txn_durations_bucket{le="6.553599e+06"} 106855.0
+txn_durations_bucket{le="6.815743e+06"} 107059.0
+txn_durations_bucket{le="7.077887e+06"} 107218.0
+txn_durations_bucket{le="7.340031e+06"} 107340.0
+txn_durations_bucket{le="7.602175e+06"} 107420.0
+txn_durations_bucket{le="7.864319e+06"} 107492.0
+txn_durations_bucket{le="8.126463e+06"} 107551.0
+txn_durations_bucket{le="8.388607e+06"} 107601.0
+txn_durations_bucket{le="8.912895e+06"} 107673.0
+txn_durations_bucket{le="9.437183e+06"} 107714.0
+txn_durations_bucket{le="9.961471e+06"} 107742.0
+txn_durations_bucket{le="1.0485759e+07"} 107761.0
+txn_durations_bucket{le="1.1010047e+07"} 107774.0
+txn_durations_bucket{le="1.1534335e+07"} 107785.0
+txn_durations_bucket{le="1.2058623e+07"} 107792.0
+txn_durations_bucket{le="1.2582911e+07"} 107801.0
+txn_durations_bucket{le="1.3107199e+07"} 107807.0
+txn_durations_bucket{le="1.3631487e+07"} 107812.0
+txn_durations_bucket{le="1.4155775e+07"} 107814.0
+txn_durations_bucket{le="1.4680063e+07"} 107818.0
+txn_durations_bucket{le="1.5204351e+07"} 107821.0
+txn_durations_bucket{le="1.5728639e+07"} 107825.0
+txn_durations_bucket{le="1.6252927e+07"} 107827.0
+txn_durations_bucket{le="1.6777215e+07"} 107833.0
+txn_durations_bucket{le="1.7825791e+07"} 107855.0
+txn_durations_bucket{le="1.8874367e+07"} 107878.0
+txn_durations_bucket{le="1.9922943e+07"} 107903.0
+txn_durations_bucket{le="2.0971519e+07"} 107935.0
+txn_durations_bucket{le="2.2020095e+07"} 108002.0
+txn_durations_bucket{le="2.3068671e+07"} 108104.0
+txn_durations_bucket{le="2.4117247e+07"} 108226.0
+txn_durations_bucket{le="2.5165823e+07"} 108425.0
+txn_durations_bucket{le="2.6214399e+07"} 108689.0
+txn_durations_bucket{le="2.7262975e+07"} 108954.0
+txn_durations_bucket{le="2.8311551e+07"} 109249.0
+txn_durations_bucket{le="2.9360127e+07"} 109481.0
+txn_durations_bucket{le="3.0408703e+07"} 109739.0
+txn_durations_bucket{le="3.1457279e+07"} 109971.0
+txn_durations_bucket{le="3.2505855e+07"} 110170.0
+txn_durations_bucket{le="3.3554431e+07"} 110360.0
+txn_durations_bucket{le="3.5651583e+07"} 110608.0
+txn_durations_bucket{le="3.7748735e+07"} 110761.0
+txn_durations_bucket{le="3.9845887e+07"} 110877.0
+txn_durations_bucket{le="4.1943039e+07"} 111018.0
+txn_durations_bucket{le="4.4040191e+07"} 111153.0
+txn_durations_bucket{le="4.6137343e+07"} 111341.0
+txn_durations_bucket{le="4.8234495e+07"} 111581.0
+txn_durations_bucket{le="5.0331647e+07"} 111882.0
+txn_durations_bucket{le="5.2428799e+07"} 112219.0
+txn_durations_bucket{le="5.4525951e+07"} 112547.0
+txn_durations_bucket{le="5.6623103e+07"} 112910.0
+txn_durations_bucket{le="5.8720255e+07"} 113245.0
+txn_durations_bucket{le="6.0817407e+07"} 113560.0
+txn_durations_bucket{le="6.2914559e+07"} 113817.0
+txn_durations_bucket{le="6.5011711e+07"} 114062.0
+txn_durations_bucket{le="6.7108863e+07"} 114247.0
+txn_durations_bucket{le="7.1303167e+07"} 114589.0
+txn_durations_bucket{le="7.5497471e+07"} 114805.0
+txn_durations_bucket{le="7.9691775e+07"} 115019.0
+txn_durations_bucket{le="8.3886079e+07"} 115225.0
+txn_durations_bucket{le="8.8080383e+07"} 115436.0
+txn_durations_bucket{le="9.2274687e+07"} 115601.0
+txn_durations_bucket{le="9.6468991e+07"} 115781.0
+txn_durations_bucket{le="1.00663295e+08"} 115891.0
+txn_durations_bucket{le="1.04857599e+08"} 115978.0
+txn_durations_bucket{le="1.09051903e+08"} 116038.0
+txn_durations_bucket{le="1.13246207e+08"} 116094.0
+txn_durations_bucket{le="1.17440511e+08"} 116127.0
+txn_durations_bucket{le="1.21634815e+08"} 116160.0
+txn_durations_bucket{le="1.25829119e+08"} 116199.0
+txn_durations_bucket{le="1.30023423e+08"} 116225.0
+txn_durations_bucket{le="1.34217727e+08"} 116245.0
+txn_durations_bucket{le="1.42606335e+08"} 116290.0
+txn_durations_bucket{le="1.50994943e+08"} 116325.0
+txn_durations_bucket{le="1.59383551e+08"} 116342.0
+txn_durations_bucket{le="1.67772159e+08"} 116365.0
+txn_durations_bucket{le="1.76160767e+08"} 116378.0
+txn_durations_bucket{le="1.84549375e+08"} 116397.0
+txn_durations_bucket{le="1.92937983e+08"} 116410.0
+txn_durations_bucket{le="2.01326591e+08"} 116426.0
+txn_durations_bucket{le="2.09715199e+08"} 116432.0
+txn_durations_bucket{le="2.18103807e+08"} 116451.0
+txn_durations_bucket{le="2.26492415e+08"} 116457.0
+txn_durations_bucket{le="2.34881023e+08"} 116466.0
+txn_durations_bucket{le="2.43269631e+08"} 116477.0
+txn_durations_bucket{le="2.51658239e+08"} 116484.0
+txn_durations_bucket{le="2.60046847e+08"} 116495.0
+txn_durations_bucket{le="2.68435455e+08"} 116503.0
+txn_durations_bucket{le="2.85212671e+08"} 116520.0
+txn_durations_bucket{le="3.01989887e+08"} 116532.0
+txn_durations_bucket{le="3.18767103e+08"} 116548.0
+txn_durations_bucket{le="3.35544319e+08"} 116554.0
+txn_durations_bucket{le="3.52321535e+08"} 116563.0
+txn_durations_bucket{le="3.69098751e+08"} 116569.0
+txn_durations_bucket{le="3.85875967e+08"} 116574.0
+txn_durations_bucket{le="4.02653183e+08"} 116577.0
+txn_durations_bucket{le="4.19430399e+08"} 116584.0
+txn_durations_bucket{le="4.36207615e+08"} 116585.0
+txn_durations_bucket{le="4.52984831e+08"} 116588.0
+txn_durations_bucket{le="4.69762047e+08"} 116591.0
+txn_durations_bucket{le="5.03316479e+08"} 116595.0
+txn_durations_bucket{le="5.20093695e+08"} 116596.0
+txn_durations_bucket{le="5.36870911e+08"} 116600.0
+txn_durations_bucket{le="5.70425343e+08"} 116601.0
+txn_durations_bucket{le="6.03979775e+08"} 116603.0
+txn_durations_bucket{le="6.37534207e+08"} 116607.0
+txn_durations_bucket{le="6.71088639e+08"} 116608.0
+txn_durations_bucket{le="7.71751935e+08"} 116609.0
+txn_durations_bucket{le="9.39524095e+08"} 116610.0
+txn_durations_bucket{le="1.006632959e+09"} 116612.0
+txn_durations_bucket{le="1.207959551e+09"} 116613.0
+txn_durations_bucket{le="1.342177279e+09"} 116614.0
+txn_durations_bucket{le="1.476395007e+09"} 116615.0
+txn_durations_bucket{le="1.543503871e+09"} 116616.0
+txn_durations_bucket{le="1.677721599e+09"} 116617.0
+txn_durations_bucket{le="2.013265919e+09"} 116618.0
+txn_durations_bucket{le="2.818572287e+09"} 116620.0
+txn_durations_bucket{le="3.355443199e+09"} 116621.0
+txn_durations_bucket{le="4.563402751e+09"} 116625.0
+txn_durations_bucket{le="1.0200547327e+10"} 116626.0
+txn_durations_bucket{le="1.2348030975e+10"} 116627.0
+txn_durations_bucket{le="+Inf"} 116627.0
+txn_durations_sum 8.66699016301e+11
+txn_durations_count 116627.0
+# HELP liveness_heartbeatlatency Node liveness heartbeat latency
+# TYPE liveness_heartbeatlatency histogram
+liveness_heartbeatlatency_bucket{le="851967.0"} 1.0
+liveness_heartbeatlatency_bucket{le="983039.0"} 5.0
+liveness_heartbeatlatency_bucket{le="1.015807e+06"} 43.0
+liveness_heartbeatlatency_bucket{le="1.048575e+06"} 125.0
+liveness_heartbeatlatency_bucket{le="1.114111e+06"} 396.0
+liveness_heartbeatlatency_bucket{le="1.179647e+06"} 852.0
+liveness_heartbeatlatency_bucket{le="1.245183e+06"} 1392.0
+liveness_heartbeatlatency_bucket{le="1.310719e+06"} 2021.0
+liveness_heartbeatlatency_bucket{le="1.376255e+06"} 2657.0
+liveness_heartbeatlatency_bucket{le="1.441791e+06"} 3407.0
+liveness_heartbeatlatency_bucket{le="1.507327e+06"} 4401.0
+liveness_heartbeatlatency_bucket{le="1.572863e+06"} 5488.0
+liveness_heartbeatlatency_bucket{le="1.638399e+06"} 6660.0
+liveness_heartbeatlatency_bucket{le="1.703935e+06"} 7844.0
+liveness_heartbeatlatency_bucket{le="1.769471e+06"} 9126.0
+liveness_heartbeatlatency_bucket{le="1.835007e+06"} 10382.0
+liveness_heartbeatlatency_bucket{le="1.900543e+06"} 11700.0
+liveness_heartbeatlatency_bucket{le="1.966079e+06"} 12859.0
+liveness_heartbeatlatency_bucket{le="2.031615e+06"} 14156.0
+liveness_heartbeatlatency_bucket{le="2.097151e+06"} 15882.0
+liveness_heartbeatlatency_bucket{le="2.228223e+06"} 19658.0
+liveness_heartbeatlatency_bucket{le="2.359295e+06"} 24018.0
+liveness_heartbeatlatency_bucket{le="2.490367e+06"} 28960.0
+liveness_heartbeatlatency_bucket{le="2.621439e+06"} 33719.0
+liveness_heartbeatlatency_bucket{le="2.752511e+06"} 38015.0
+liveness_heartbeatlatency_bucket{le="2.883583e+06"} 41533.0
+liveness_heartbeatlatency_bucket{le="3.014655e+06"} 44406.0
+liveness_heartbeatlatency_bucket{le="3.145727e+06"} 46771.0
+liveness_heartbeatlatency_bucket{le="3.276799e+06"} 48802.0
+liveness_heartbeatlatency_bucket{le="3.407871e+06"} 50683.0
+liveness_heartbeatlatency_bucket{le="3.538943e+06"} 52472.0
+liveness_heartbeatlatency_bucket{le="3.670015e+06"} 54185.0
+liveness_heartbeatlatency_bucket{le="3.801087e+06"} 56019.0
+liveness_heartbeatlatency_bucket{le="3.932159e+06"} 57903.0
+liveness_heartbeatlatency_bucket{le="4.063231e+06"} 59735.0
+liveness_heartbeatlatency_bucket{le="4.194303e+06"} 61459.0
+liveness_heartbeatlatency_bucket{le="4.456447e+06"} 64846.0
+liveness_heartbeatlatency_bucket{le="4.718591e+06"} 67476.0
+liveness_heartbeatlatency_bucket{le="4.980735e+06"} 69209.0
+liveness_heartbeatlatency_bucket{le="5.242879e+06"} 70329.0
+liveness_heartbeatlatency_bucket{le="5.505023e+06"} 71037.0
+liveness_heartbeatlatency_bucket{le="5.767167e+06"} 71541.0
+liveness_heartbeatlatency_bucket{le="6.029311e+06"} 71908.0
+liveness_heartbeatlatency_bucket{le="6.291455e+06"} 72238.0
+liveness_heartbeatlatency_bucket{le="6.553599e+06"} 72547.0
+liveness_heartbeatlatency_bucket{le="6.815743e+06"} 72772.0
+liveness_heartbeatlatency_bucket{le="7.077887e+06"} 72904.0
+liveness_heartbeatlatency_bucket{le="7.340031e+06"} 73029.0
+liveness_heartbeatlatency_bucket{le="7.602175e+06"} 73107.0
+liveness_heartbeatlatency_bucket{le="7.864319e+06"} 73175.0
+liveness_heartbeatlatency_bucket{le="8.126463e+06"} 73220.0
+liveness_heartbeatlatency_bucket{le="8.388607e+06"} 73265.0
+liveness_heartbeatlatency_bucket{le="8.912895e+06"} 73311.0
+liveness_heartbeatlatency_bucket{le="9.437183e+06"} 73342.0
+liveness_heartbeatlatency_bucket{le="9.961471e+06"} 73362.0
+liveness_heartbeatlatency_bucket{le="1.0485759e+07"} 73373.0
+liveness_heartbeatlatency_bucket{le="1.1010047e+07"} 73385.0
+liveness_heartbeatlatency_bucket{le="1.1534335e+07"} 73391.0
+liveness_heartbeatlatency_bucket{le="1.2058623e+07"} 73399.0
+liveness_heartbeatlatency_bucket{le="1.2582911e+07"} 73406.0
+liveness_heartbeatlatency_bucket{le="1.3107199e+07"} 73414.0
+liveness_heartbeatlatency_bucket{le="1.3631487e+07"} 73418.0
+liveness_heartbeatlatency_bucket{le="1.4155775e+07"} 73419.0
+liveness_heartbeatlatency_bucket{le="1.4680063e+07"} 73421.0
+liveness_heartbeatlatency_bucket{le="1.5204351e+07"} 73425.0
+liveness_heartbeatlatency_bucket{le="1.5728639e+07"} 73428.0
+liveness_heartbeatlatency_bucket{le="1.6252927e+07"} 73430.0
+liveness_heartbeatlatency_bucket{le="1.6777215e+07"} 73434.0
+liveness_heartbeatlatency_bucket{le="1.7825791e+07"} 73455.0
+liveness_heartbeatlatency_bucket{le="1.8874367e+07"} 73476.0
+liveness_heartbeatlatency_bucket{le="1.9922943e+07"} 73498.0
+liveness_heartbeatlatency_bucket{le="2.0971519e+07"} 73526.0
+liveness_heartbeatlatency_bucket{le="2.2020095e+07"} 73584.0
+liveness_heartbeatlatency_bucket{le="2.3068671e+07"} 73676.0
+liveness_heartbeatlatency_bucket{le="2.4117247e+07"} 73780.0
+liveness_heartbeatlatency_bucket{le="2.5165823e+07"} 73958.0
+liveness_heartbeatlatency_bucket{le="2.6214399e+07"} 74184.0
+liveness_heartbeatlatency_bucket{le="2.7262975e+07"} 74440.0
+liveness_heartbeatlatency_bucket{le="2.8311551e+07"} 74696.0
+liveness_heartbeatlatency_bucket{le="2.9360127e+07"} 74931.0
+liveness_heartbeatlatency_bucket{le="3.0408703e+07"} 75168.0
+liveness_heartbeatlatency_bucket{le="3.1457279e+07"} 75397.0
+liveness_heartbeatlatency_bucket{le="3.2505855e+07"} 75582.0
+liveness_heartbeatlatency_bucket{le="3.3554431e+07"} 75761.0
+liveness_heartbeatlatency_bucket{le="3.5651583e+07"} 76010.0
+liveness_heartbeatlatency_bucket{le="3.7748735e+07"} 76161.0
+liveness_heartbeatlatency_bucket{le="3.9845887e+07"} 76266.0
+liveness_heartbeatlatency_bucket{le="4.1943039e+07"} 76401.0
+liveness_heartbeatlatency_bucket{le="4.4040191e+07"} 76521.0
+liveness_heartbeatlatency_bucket{le="4.6137343e+07"} 76690.0
+liveness_heartbeatlatency_bucket{le="4.8234495e+07"} 76919.0
+liveness_heartbeatlatency_bucket{le="5.0331647e+07"} 77187.0
+liveness_heartbeatlatency_bucket{le="5.2428799e+07"} 77513.0
+liveness_heartbeatlatency_bucket{le="5.4525951e+07"} 77816.0
+liveness_heartbeatlatency_bucket{le="5.6623103e+07"} 78151.0
+liveness_heartbeatlatency_bucket{le="5.8720255e+07"} 78475.0
+liveness_heartbeatlatency_bucket{le="6.0817407e+07"} 78762.0
+liveness_heartbeatlatency_bucket{le="6.2914559e+07"} 79017.0
+liveness_heartbeatlatency_bucket{le="6.5011711e+07"} 79244.0
+liveness_heartbeatlatency_bucket{le="6.7108863e+07"} 79430.0
+liveness_heartbeatlatency_bucket{le="7.1303167e+07"} 79743.0
+liveness_heartbeatlatency_bucket{le="7.5497471e+07"} 79948.0
+liveness_heartbeatlatency_bucket{le="7.9691775e+07"} 80151.0
+liveness_heartbeatlatency_bucket{le="8.3886079e+07"} 80351.0
+liveness_heartbeatlatency_bucket{le="8.8080383e+07"} 80559.0
+liveness_heartbeatlatency_bucket{le="9.2274687e+07"} 80719.0
+liveness_heartbeatlatency_bucket{le="9.6468991e+07"} 80887.0
+liveness_heartbeatlatency_bucket{le="1.00663295e+08"} 80997.0
+liveness_heartbeatlatency_bucket{le="1.04857599e+08"} 81081.0
+liveness_heartbeatlatency_bucket{le="1.09051903e+08"} 81142.0
+liveness_heartbeatlatency_bucket{le="1.13246207e+08"} 81195.0
+liveness_heartbeatlatency_bucket{le="1.17440511e+08"} 81231.0
+liveness_heartbeatlatency_bucket{le="1.21634815e+08"} 81259.0
+liveness_heartbeatlatency_bucket{le="1.25829119e+08"} 81298.0
+liveness_heartbeatlatency_bucket{le="1.30023423e+08"} 81324.0
+liveness_heartbeatlatency_bucket{le="1.34217727e+08"} 81344.0
+liveness_heartbeatlatency_bucket{le="1.42606335e+08"} 81389.0
+liveness_heartbeatlatency_bucket{le="1.50994943e+08"} 81422.0
+liveness_heartbeatlatency_bucket{le="1.59383551e+08"} 81440.0
+liveness_heartbeatlatency_bucket{le="1.67772159e+08"} 81462.0
+liveness_heartbeatlatency_bucket{le="1.76160767e+08"} 81475.0
+liveness_heartbeatlatency_bucket{le="1.84549375e+08"} 81492.0
+liveness_heartbeatlatency_bucket{le="1.92937983e+08"} 81505.0
+liveness_heartbeatlatency_bucket{le="2.01326591e+08"} 81519.0
+liveness_heartbeatlatency_bucket{le="2.09715199e+08"} 81525.0
+liveness_heartbeatlatency_bucket{le="2.18103807e+08"} 81543.0
+liveness_heartbeatlatency_bucket{le="2.26492415e+08"} 81548.0
+liveness_heartbeatlatency_bucket{le="2.34881023e+08"} 81557.0
+liveness_heartbeatlatency_bucket{le="2.43269631e+08"} 81567.0
+liveness_heartbeatlatency_bucket{le="2.51658239e+08"} 81573.0
+liveness_heartbeatlatency_bucket{le="2.60046847e+08"} 81584.0
+liveness_heartbeatlatency_bucket{le="2.68435455e+08"} 81592.0
+liveness_heartbeatlatency_bucket{le="2.85212671e+08"} 81608.0
+liveness_heartbeatlatency_bucket{le="3.01989887e+08"} 81619.0
+liveness_heartbeatlatency_bucket{le="3.18767103e+08"} 81635.0
+liveness_heartbeatlatency_bucket{le="3.35544319e+08"} 81640.0
+liveness_heartbeatlatency_bucket{le="3.52321535e+08"} 81649.0
+liveness_heartbeatlatency_bucket{le="3.69098751e+08"} 81655.0
+liveness_heartbeatlatency_bucket{le="3.85875967e+08"} 81658.0
+liveness_heartbeatlatency_bucket{le="4.02653183e+08"} 81661.0
+liveness_heartbeatlatency_bucket{le="4.19430399e+08"} 81666.0
+liveness_heartbeatlatency_bucket{le="4.52984831e+08"} 81668.0
+liveness_heartbeatlatency_bucket{le="4.69762047e+08"} 81671.0
+liveness_heartbeatlatency_bucket{le="5.03316479e+08"} 81674.0
+liveness_heartbeatlatency_bucket{le="5.36870911e+08"} 81678.0
+liveness_heartbeatlatency_bucket{le="5.70425343e+08"} 81679.0
+liveness_heartbeatlatency_bucket{le="6.03979775e+08"} 81680.0
+liveness_heartbeatlatency_bucket{le="6.37534207e+08"} 81684.0
+liveness_heartbeatlatency_bucket{le="6.71088639e+08"} 81685.0
+liveness_heartbeatlatency_bucket{le="7.71751935e+08"} 81686.0
+liveness_heartbeatlatency_bucket{le="9.39524095e+08"} 81687.0
+liveness_heartbeatlatency_bucket{le="1.006632959e+09"} 81688.0
+liveness_heartbeatlatency_bucket{le="1.207959551e+09"} 81689.0
+liveness_heartbeatlatency_bucket{le="1.342177279e+09"} 81690.0
+liveness_heartbeatlatency_bucket{le="1.476395007e+09"} 81691.0
+liveness_heartbeatlatency_bucket{le="1.543503871e+09"} 81692.0
+liveness_heartbeatlatency_bucket{le="1.677721599e+09"} 81695.0
+liveness_heartbeatlatency_bucket{le="1.744830463e+09"} 81696.0
+liveness_heartbeatlatency_bucket{le="2.013265919e+09"} 81697.0
+liveness_heartbeatlatency_bucket{le="2.952790015e+09"} 81698.0
+liveness_heartbeatlatency_bucket{le="3.355443199e+09"} 81700.0
+liveness_heartbeatlatency_bucket{le="3.623878655e+09"} 81702.0
+liveness_heartbeatlatency_bucket{le="4.160749567e+09"} 81703.0
+liveness_heartbeatlatency_bucket{le="4.563402751e+09"} 81709.0
+liveness_heartbeatlatency_bucket{le="1.5569256447e+10"} 81711.0
+liveness_heartbeatlatency_bucket{le="+Inf"} 81711.0
+liveness_heartbeatlatency_sum 8.34543599825e+11
+liveness_heartbeatlatency_count 81711.0
+# HELP sys_host_disk_read_count Disk read operations across all disks since this process started
+# TYPE sys_host_disk_read_count gauge
+sys_host_disk_read_count 7.975559e+06
+# HELP raft_rcvd_heartbeatresp Number of (coalesced, if enabled) MsgHeartbeatResp messages received by this store
+# TYPE raft_rcvd_heartbeatresp counter
+raft_rcvd_heartbeatresp{store="1"} 0.0
+# HELP changefeed_poll_request_nanos Time spent fetching changes
+# TYPE changefeed_poll_request_nanos histogram
+changefeed_poll_request_nanos_bucket{le="+Inf"} 0.0
+changefeed_poll_request_nanos_sum 0.0
+changefeed_poll_request_nanos_count 0.0
+# HELP raft_process_handleready_latency Latency histogram for handling a Raft ready
+# TYPE raft_process_handleready_latency histogram
+raft_process_handleready_latency_bucket{store="1",le="1471.0"} 1.0
+raft_process_handleready_latency_bucket{store="1",le="1535.0"} 10.0
+raft_process_handleready_latency_bucket{store="1",le="1599.0"} 26.0
+raft_process_handleready_latency_bucket{store="1",le="1663.0"} 41.0
+raft_process_handleready_latency_bucket{store="1",le="1727.0"} 53.0
+raft_process_handleready_latency_bucket{store="1",le="1791.0"} 63.0
+raft_process_handleready_latency_bucket{store="1",le="1855.0"} 71.0
+raft_process_handleready_latency_bucket{store="1",le="1919.0"} 77.0
+raft_process_handleready_latency_bucket{store="1",le="1983.0"} 83.0
+raft_process_handleready_latency_bucket{store="1",le="2047.0"} 90.0
+raft_process_handleready_latency_bucket{store="1",le="2175.0"} 106.0
+raft_process_handleready_latency_bucket{store="1",le="2303.0"} 132.0
+raft_process_handleready_latency_bucket{store="1",le="2431.0"} 160.0
+raft_process_handleready_latency_bucket{store="1",le="2559.0"} 182.0
+raft_process_handleready_latency_bucket{store="1",le="2687.0"} 200.0
+raft_process_handleready_latency_bucket{store="1",le="2815.0"} 212.0
+raft_process_handleready_latency_bucket{store="1",le="2943.0"} 227.0
+raft_process_handleready_latency_bucket{store="1",le="3071.0"} 237.0
+raft_process_handleready_latency_bucket{store="1",le="3199.0"} 249.0
+raft_process_handleready_latency_bucket{store="1",le="3327.0"} 275.0
+raft_process_handleready_latency_bucket{store="1",le="3455.0"} 300.0
+raft_process_handleready_latency_bucket{store="1",le="3583.0"} 332.0
+raft_process_handleready_latency_bucket{store="1",le="3711.0"} 369.0
+raft_process_handleready_latency_bucket{store="1",le="3839.0"} 405.0
+raft_process_handleready_latency_bucket{store="1",le="3967.0"} 437.0
+raft_process_handleready_latency_bucket{store="1",le="4095.0"} 474.0
+raft_process_handleready_latency_bucket{store="1",le="4351.0"} 553.0
+raft_process_handleready_latency_bucket{store="1",le="4607.0"} 640.0
+raft_process_handleready_latency_bucket{store="1",le="4863.0"} 725.0
+raft_process_handleready_latency_bucket{store="1",le="5119.0"} 810.0
+raft_process_handleready_latency_bucket{store="1",le="5375.0"} 877.0
+raft_process_handleready_latency_bucket{store="1",le="5631.0"} 934.0
+raft_process_handleready_latency_bucket{store="1",le="5887.0"} 984.0
+raft_process_handleready_latency_bucket{store="1",le="6143.0"} 1029.0
+raft_process_handleready_latency_bucket{store="1",le="6399.0"} 1071.0
+raft_process_handleready_latency_bucket{store="1",le="6655.0"} 1097.0
+raft_process_handleready_latency_bucket{store="1",le="6911.0"} 1116.0
+raft_process_handleready_latency_bucket{store="1",le="7167.0"} 1145.0
+raft_process_handleready_latency_bucket{store="1",le="7423.0"} 1160.0
+raft_process_handleready_latency_bucket{store="1",le="7679.0"} 1181.0
+raft_process_handleready_latency_bucket{store="1",le="7935.0"} 1204.0
+raft_process_handleready_latency_bucket{store="1",le="8191.0"} 1227.0
+raft_process_handleready_latency_bucket{store="1",le="8703.0"} 1252.0
+raft_process_handleready_latency_bucket{store="1",le="9215.0"} 1275.0
+raft_process_handleready_latency_bucket{store="1",le="9727.0"} 1291.0
+raft_process_handleready_latency_bucket{store="1",le="10239.0"} 1303.0
+raft_process_handleready_latency_bucket{store="1",le="10751.0"} 1312.0
+raft_process_handleready_latency_bucket{store="1",le="11263.0"} 1319.0
+raft_process_handleready_latency_bucket{store="1",le="11775.0"} 1323.0
+raft_process_handleready_latency_bucket{store="1",le="12287.0"} 1329.0
+raft_process_handleready_latency_bucket{store="1",le="12799.0"} 1332.0
+raft_process_handleready_latency_bucket{store="1",le="13311.0"} 1337.0
+raft_process_handleready_latency_bucket{store="1",le="13823.0"} 1340.0
+raft_process_handleready_latency_bucket{store="1",le="14335.0"} 1342.0
+raft_process_handleready_latency_bucket{store="1",le="14847.0"} 1343.0
+raft_process_handleready_latency_bucket{store="1",le="15871.0"} 1346.0
+raft_process_handleready_latency_bucket{store="1",le="16383.0"} 1349.0
+raft_process_handleready_latency_bucket{store="1",le="17407.0"} 1350.0
+raft_process_handleready_latency_bucket{store="1",le="18431.0"} 1353.0
+raft_process_handleready_latency_bucket{store="1",le="19455.0"} 1356.0
+raft_process_handleready_latency_bucket{store="1",le="20479.0"} 1357.0
+raft_process_handleready_latency_bucket{store="1",le="21503.0"} 1358.0
+raft_process_handleready_latency_bucket{store="1",le="23551.0"} 1359.0
+raft_process_handleready_latency_bucket{store="1",le="25599.0"} 1360.0
+raft_process_handleready_latency_bucket{store="1",le="27647.0"} 1361.0
+raft_process_handleready_latency_bucket{store="1",le="38911.0"} 1362.0
+raft_process_handleready_latency_bucket{store="1",le="86015.0"} 1363.0
+raft_process_handleready_latency_bucket{store="1",le="622591.0"} 1364.0
+raft_process_handleready_latency_bucket{store="1",le="655359.0"} 1376.0
+raft_process_handleready_latency_bucket{store="1",le="688127.0"} 1439.0
+raft_process_handleready_latency_bucket{store="1",le="720895.0"} 1713.0
+raft_process_handleready_latency_bucket{store="1",le="753663.0"} 2374.0
+raft_process_handleready_latency_bucket{store="1",le="786431.0"} 3517.0
+raft_process_handleready_latency_bucket{store="1",le="819199.0"} 5082.0
+raft_process_handleready_latency_bucket{store="1",le="851967.0"} 6911.0
+raft_process_handleready_latency_bucket{store="1",le="884735.0"} 8948.0
+raft_process_handleready_latency_bucket{store="1",le="917503.0"} 11226.0
+raft_process_handleready_latency_bucket{store="1",le="950271.0"} 13745.0
+raft_process_handleready_latency_bucket{store="1",le="983039.0"} 16441.0
+raft_process_handleready_latency_bucket{store="1",le="1.015807e+06"} 19306.0
+raft_process_handleready_latency_bucket{store="1",le="1.048575e+06"} 22523.0
+raft_process_handleready_latency_bucket{store="1",le="1.114111e+06"} 30999.0
+raft_process_handleready_latency_bucket{store="1",le="1.179647e+06"} 43219.0
+raft_process_handleready_latency_bucket{store="1",le="1.245183e+06"} 58452.0
+raft_process_handleready_latency_bucket{store="1",le="1.310719e+06"} 75120.0
+raft_process_handleready_latency_bucket{store="1",le="1.376255e+06"} 91465.0
+raft_process_handleready_latency_bucket{store="1",le="1.441791e+06"} 107287.0
+raft_process_handleready_latency_bucket{store="1",le="1.507327e+06"} 123053.0
+raft_process_handleready_latency_bucket{store="1",le="1.572863e+06"} 139884.0
+raft_process_handleready_latency_bucket{store="1",le="1.638399e+06"} 157100.0
+raft_process_handleready_latency_bucket{store="1",le="1.703935e+06"} 173965.0
+raft_process_handleready_latency_bucket{store="1",le="1.769471e+06"} 190145.0
+raft_process_handleready_latency_bucket{store="1",le="1.835007e+06"} 205457.0
+raft_process_handleready_latency_bucket{store="1",le="1.900543e+06"} 218798.0
+raft_process_handleready_latency_bucket{store="1",le="1.966079e+06"} 230462.0
+raft_process_handleready_latency_bucket{store="1",le="2.031615e+06"} 240333.0
+raft_process_handleready_latency_bucket{store="1",le="2.097151e+06"} 249049.0
+raft_process_handleready_latency_bucket{store="1",le="2.228223e+06"} 263180.0
+raft_process_handleready_latency_bucket{store="1",le="2.359295e+06"} 274571.0
+raft_process_handleready_latency_bucket{store="1",le="2.490367e+06"} 284293.0
+raft_process_handleready_latency_bucket{store="1",le="2.621439e+06"} 292876.0
+raft_process_handleready_latency_bucket{store="1",le="2.752511e+06"} 300613.0
+raft_process_handleready_latency_bucket{store="1",le="2.883583e+06"} 307662.0
+raft_process_handleready_latency_bucket{store="1",le="3.014655e+06"} 314436.0
+raft_process_handleready_latency_bucket{store="1",le="3.145727e+06"} 320782.0
+raft_process_handleready_latency_bucket{store="1",le="3.276799e+06"} 326834.0
+raft_process_handleready_latency_bucket{store="1",le="3.407871e+06"} 332542.0
+raft_process_handleready_latency_bucket{store="1",le="3.538943e+06"} 337942.0
+raft_process_handleready_latency_bucket{store="1",le="3.670015e+06"} 342969.0
+raft_process_handleready_latency_bucket{store="1",le="3.801087e+06"} 347937.0
+raft_process_handleready_latency_bucket{store="1",le="3.932159e+06"} 352824.0
+raft_process_handleready_latency_bucket{store="1",le="4.063231e+06"} 357652.0
+raft_process_handleready_latency_bucket{store="1",le="4.194303e+06"} 362522.0
+raft_process_handleready_latency_bucket{store="1",le="4.456447e+06"} 372147.0
+raft_process_handleready_latency_bucket{store="1",le="4.718591e+06"} 381235.0
+raft_process_handleready_latency_bucket{store="1",le="4.980735e+06"} 389769.0
+raft_process_handleready_latency_bucket{store="1",le="5.242879e+06"} 397349.0
+raft_process_handleready_latency_bucket{store="1",le="5.505023e+06"} 403399.0
+raft_process_handleready_latency_bucket{store="1",le="5.767167e+06"} 408159.0
+raft_process_handleready_latency_bucket{store="1",le="6.029311e+06"} 411887.0
+raft_process_handleready_latency_bucket{store="1",le="6.291455e+06"} 414726.0
+raft_process_handleready_latency_bucket{store="1",le="6.553599e+06"} 416988.0
+raft_process_handleready_latency_bucket{store="1",le="6.815743e+06"} 418605.0
+raft_process_handleready_latency_bucket{store="1",le="7.077887e+06"} 419854.0
+raft_process_handleready_latency_bucket{store="1",le="7.340031e+06"} 420775.0
+raft_process_handleready_latency_bucket{store="1",le="7.602175e+06"} 421477.0
+raft_process_handleready_latency_bucket{store="1",le="7.864319e+06"} 422038.0
+raft_process_handleready_latency_bucket{store="1",le="8.126463e+06"} 422488.0
+raft_process_handleready_latency_bucket{store="1",le="8.388607e+06"} 422898.0
+raft_process_handleready_latency_bucket{store="1",le="8.912895e+06"} 423688.0
+raft_process_handleready_latency_bucket{store="1",le="9.437183e+06"} 424086.0
+raft_process_handleready_latency_bucket{store="1",le="9.961471e+06"} 424330.0
+raft_process_handleready_latency_bucket{store="1",le="1.0485759e+07"} 424501.0
+raft_process_handleready_latency_bucket{store="1",le="1.1010047e+07"} 424618.0
+raft_process_handleready_latency_bucket{store="1",le="1.1534335e+07"} 424707.0
+raft_process_handleready_latency_bucket{store="1",le="1.2058623e+07"} 424764.0
+raft_process_handleready_latency_bucket{store="1",le="1.2582911e+07"} 424819.0
+raft_process_handleready_latency_bucket{store="1",le="1.3107199e+07"} 424856.0
+raft_process_handleready_latency_bucket{store="1",le="1.3631487e+07"} 424890.0
+raft_process_handleready_latency_bucket{store="1",le="1.4155775e+07"} 424925.0
+raft_process_handleready_latency_bucket{store="1",le="1.4680063e+07"} 424946.0
+raft_process_handleready_latency_bucket{store="1",le="1.5204351e+07"} 424971.0
+raft_process_handleready_latency_bucket{store="1",le="1.5728639e+07"} 424989.0
+raft_process_handleready_latency_bucket{store="1",le="1.6252927e+07"} 425016.0
+raft_process_handleready_latency_bucket{store="1",le="1.6777215e+07"} 425068.0
+raft_process_handleready_latency_bucket{store="1",le="1.7825791e+07"} 425172.0
+raft_process_handleready_latency_bucket{store="1",le="1.8874367e+07"} 425289.0
+raft_process_handleready_latency_bucket{store="1",le="1.9922943e+07"} 425442.0
+raft_process_handleready_latency_bucket{store="1",le="2.0971519e+07"} 425809.0
+raft_process_handleready_latency_bucket{store="1",le="2.2020095e+07"} 426361.0
+raft_process_handleready_latency_bucket{store="1",le="2.3068671e+07"} 427150.0
+raft_process_handleready_latency_bucket{store="1",le="2.4117247e+07"} 428347.0
+raft_process_handleready_latency_bucket{store="1",le="2.5165823e+07"} 429952.0
+raft_process_handleready_latency_bucket{store="1",le="2.6214399e+07"} 431706.0
+raft_process_handleready_latency_bucket{store="1",le="2.7262975e+07"} 433726.0
+raft_process_handleready_latency_bucket{store="1",le="2.8311551e+07"} 435706.0
+raft_process_handleready_latency_bucket{store="1",le="2.9360127e+07"} 437654.0
+raft_process_handleready_latency_bucket{store="1",le="3.0408703e+07"} 439470.0
+raft_process_handleready_latency_bucket{store="1",le="3.1457279e+07"} 441064.0
+raft_process_handleready_latency_bucket{store="1",le="3.2505855e+07"} 442548.0
+raft_process_handleready_latency_bucket{store="1",le="3.3554431e+07"} 443818.0
+raft_process_handleready_latency_bucket{store="1",le="3.5651583e+07"} 445891.0
+raft_process_handleready_latency_bucket{store="1",le="3.7748735e+07"} 447628.0
+raft_process_handleready_latency_bucket{store="1",le="3.9845887e+07"} 449246.0
+raft_process_handleready_latency_bucket{store="1",le="4.1943039e+07"} 450935.0
+raft_process_handleready_latency_bucket{store="1",le="4.4040191e+07"} 452842.0
+raft_process_handleready_latency_bucket{store="1",le="4.6137343e+07"} 454638.0
+raft_process_handleready_latency_bucket{store="1",le="4.8234495e+07"} 456484.0
+raft_process_handleready_latency_bucket{store="1",le="5.0331647e+07"} 458280.0
+raft_process_handleready_latency_bucket{store="1",le="5.2428799e+07"} 459987.0
+raft_process_handleready_latency_bucket{store="1",le="5.4525951e+07"} 461500.0
+raft_process_handleready_latency_bucket{store="1",le="5.6623103e+07"} 462749.0
+raft_process_handleready_latency_bucket{store="1",le="5.8720255e+07"} 463780.0
+raft_process_handleready_latency_bucket{store="1",le="6.0817407e+07"} 464641.0
+raft_process_handleready_latency_bucket{store="1",le="6.2914559e+07"} 465304.0
+raft_process_handleready_latency_bucket{store="1",le="6.5011711e+07"} 465874.0
+raft_process_handleready_latency_bucket{store="1",le="6.7108863e+07"} 466315.0
+raft_process_handleready_latency_bucket{store="1",le="7.1303167e+07"} 467092.0
+raft_process_handleready_latency_bucket{store="1",le="7.5497471e+07"} 467642.0
+raft_process_handleready_latency_bucket{store="1",le="7.9691775e+07"} 468087.0
+raft_process_handleready_latency_bucket{store="1",le="8.3886079e+07"} 468490.0
+raft_process_handleready_latency_bucket{store="1",le="8.8080383e+07"} 468858.0
+raft_process_handleready_latency_bucket{store="1",le="9.2274687e+07"} 469199.0
+raft_process_handleready_latency_bucket{store="1",le="9.6468991e+07"} 469481.0
+raft_process_handleready_latency_bucket{store="1",le="1.00663295e+08"} 469695.0
+raft_process_handleready_latency_bucket{store="1",le="1.04857599e+08"} 469859.0
+raft_process_handleready_latency_bucket{store="1",le="1.09051903e+08"} 469988.0
+raft_process_handleready_latency_bucket{store="1",le="1.13246207e+08"} 470084.0
+raft_process_handleready_latency_bucket{store="1",le="1.17440511e+08"} 470171.0
+raft_process_handleready_latency_bucket{store="1",le="1.21634815e+08"} 470257.0
+raft_process_handleready_latency_bucket{store="1",le="1.25829119e+08"} 470326.0
+raft_process_handleready_latency_bucket{store="1",le="1.30023423e+08"} 470380.0
+raft_process_handleready_latency_bucket{store="1",le="1.34217727e+08"} 470418.0
+raft_process_handleready_latency_bucket{store="1",le="1.42606335e+08"} 470498.0
+raft_process_handleready_latency_bucket{store="1",le="1.50994943e+08"} 470542.0
+raft_process_handleready_latency_bucket{store="1",le="1.59383551e+08"} 470600.0
+raft_process_handleready_latency_bucket{store="1",le="1.67772159e+08"} 470645.0
+raft_process_handleready_latency_bucket{store="1",le="1.76160767e+08"} 470698.0
+raft_process_handleready_latency_bucket{store="1",le="1.84549375e+08"} 470764.0
+raft_process_handleready_latency_bucket{store="1",le="1.92937983e+08"} 470801.0
+raft_process_handleready_latency_bucket{store="1",le="2.01326591e+08"} 470860.0
+raft_process_handleready_latency_bucket{store="1",le="2.09715199e+08"} 470909.0
+raft_process_handleready_latency_bucket{store="1",le="2.18103807e+08"} 470967.0
+raft_process_handleready_latency_bucket{store="1",le="2.26492415e+08"} 471025.0
+raft_process_handleready_latency_bucket{store="1",le="2.34881023e+08"} 471078.0
+raft_process_handleready_latency_bucket{store="1",le="2.43269631e+08"} 471121.0
+raft_process_handleready_latency_bucket{store="1",le="2.51658239e+08"} 471166.0
+raft_process_handleready_latency_bucket{store="1",le="2.60046847e+08"} 471221.0
+raft_process_handleready_latency_bucket{store="1",le="2.68435455e+08"} 471266.0
+raft_process_handleready_latency_bucket{store="1",le="2.85212671e+08"} 471373.0
+raft_process_handleready_latency_bucket{store="1",le="3.01989887e+08"} 471420.0
+raft_process_handleready_latency_bucket{store="1",le="3.18767103e+08"} 471466.0
+raft_process_handleready_latency_bucket{store="1",le="3.35544319e+08"} 471499.0
+raft_process_handleready_latency_bucket{store="1",le="3.52321535e+08"} 471537.0
+raft_process_handleready_latency_bucket{store="1",le="3.69098751e+08"} 471567.0
+raft_process_handleready_latency_bucket{store="1",le="3.85875967e+08"} 471582.0
+raft_process_handleready_latency_bucket{store="1",le="4.02653183e+08"} 471601.0
+raft_process_handleready_latency_bucket{store="1",le="4.19430399e+08"} 471620.0
+raft_process_handleready_latency_bucket{store="1",le="4.36207615e+08"} 471625.0
+raft_process_handleready_latency_bucket{store="1",le="4.52984831e+08"} 471632.0
+raft_process_handleready_latency_bucket{store="1",le="4.69762047e+08"} 471640.0
+raft_process_handleready_latency_bucket{store="1",le="4.86539263e+08"} 471644.0
+raft_process_handleready_latency_bucket{store="1",le="5.03316479e+08"} 471652.0
+raft_process_handleready_latency_bucket{store="1",le="5.20093695e+08"} 471654.0
+raft_process_handleready_latency_bucket{store="1",le="5.36870911e+08"} 471660.0
+raft_process_handleready_latency_bucket{store="1",le="5.70425343e+08"} 471663.0
+raft_process_handleready_latency_bucket{store="1",le="6.03979775e+08"} 471672.0
+raft_process_handleready_latency_bucket{store="1",le="6.37534207e+08"} 471677.0
+raft_process_handleready_latency_bucket{store="1",le="6.71088639e+08"} 471685.0
+raft_process_handleready_latency_bucket{store="1",le="7.04643071e+08"} 471688.0
+raft_process_handleready_latency_bucket{store="1",le="7.38197503e+08"} 471692.0
+raft_process_handleready_latency_bucket{store="1",le="7.71751935e+08"} 471695.0
+raft_process_handleready_latency_bucket{store="1",le="8.05306367e+08"} 471698.0
+raft_process_handleready_latency_bucket{store="1",le="8.38860799e+08"} 471699.0
+raft_process_handleready_latency_bucket{store="1",le="8.72415231e+08"} 471701.0
+raft_process_handleready_latency_bucket{store="1",le="9.39524095e+08"} 471703.0
+raft_process_handleready_latency_bucket{store="1",le="9.73078527e+08"} 471704.0
+raft_process_handleready_latency_bucket{store="1",le="1.006632959e+09"} 471713.0
+raft_process_handleready_latency_bucket{store="1",le="1.040187391e+09"} 471715.0
+raft_process_handleready_latency_bucket{store="1",le="1.073741823e+09"} 471719.0
+raft_process_handleready_latency_bucket{store="1",le="1.140850687e+09"} 471722.0
+raft_process_handleready_latency_bucket{store="1",le="1.207959551e+09"} 471724.0
+raft_process_handleready_latency_bucket{store="1",le="1.275068415e+09"} 471726.0
+raft_process_handleready_latency_bucket{store="1",le="1.342177279e+09"} 471732.0
+raft_process_handleready_latency_bucket{store="1",le="1.610612735e+09"} 471733.0
+raft_process_handleready_latency_bucket{store="1",le="1.677721599e+09"} 471734.0
+raft_process_handleready_latency_bucket{store="1",le="2.550136831e+09"} 471735.0
+raft_process_handleready_latency_bucket{store="1",le="2.684354559e+09"} 471737.0
+raft_process_handleready_latency_bucket{store="1",le="3.355443199e+09"} 471738.0
+raft_process_handleready_latency_bucket{store="1",le="6.174015487e+09"} 471740.0
+raft_process_handleready_latency_bucket{store="1",le="6.979321855e+09"} 471742.0
+raft_process_handleready_latency_bucket{store="1",le="7.247757311e+09"} 471743.0
+raft_process_handleready_latency_bucket{store="1",le="7.516192767e+09"} 471744.0
+raft_process_handleready_latency_bucket{store="1",le="1.0200547327e+10"} 471745.0
+raft_process_handleready_latency_bucket{store="1",le="1.3958643711e+10"} 471746.0
+raft_process_handleready_latency_bucket{store="1",le="1.6106127359e+10"} 471747.0
+raft_process_handleready_latency_bucket{store="1",le="+Inf"} 471747.0
+raft_process_handleready_latency_sum{store="1"} 3.511007933053e+12
+raft_process_handleready_latency_count{store="1"} 471747.0
+# HELP raft_rcvd_heartbeat Number of (coalesced, if enabled) MsgHeartbeat messages received by this store
+# TYPE raft_rcvd_heartbeat counter
+raft_rcvd_heartbeat{store="1"} 0.0
+# HELP keybytes Number of bytes taken up by keys
+# TYPE keybytes gauge
+keybytes{store="1"} 1.17353e+06
+# HELP queue_tsmaintenance_process_failure Number of replicas which failed processing in the time series maintenance queue
+# TYPE queue_tsmaintenance_process_failure counter
+queue_tsmaintenance_process_failure{store="1"} 0.0
+# HELP txn_restarts_txnpush Number of restarts due to a transaction push failure
+# TYPE txn_restarts_txnpush counter
+txn_restarts_txnpush 0.0
+# HELP sql_mem_conns_session_current Current sql session memory usage for conns
+# TYPE sql_mem_conns_session_current gauge
+sql_mem_conns_session_current 0.0
+# HELP sql_query_count_internal Number of SQL queries (internal queries)
+# TYPE sql_query_count_internal counter
+sql_query_count_internal 18870.0
+# HELP queue_merge_pending Number of pending replicas in the merge queue
+# TYPE queue_merge_pending gauge
+queue_merge_pending{store="1"} 0.0
+# HELP queue_tsmaintenance_process_success Number of replicas successfully processed by the time series maintenance queue
+# TYPE queue_tsmaintenance_process_success counter
+queue_tsmaintenance_process_success{store="1"} 48.0
+# HELP tscache_skl_write_rotations Number of page rotations in the write timestamp cache
+# TYPE tscache_skl_write_rotations counter
+tscache_skl_write_rotations{store="1"} 0.0
+# HELP sql_bytesin Number of sql bytes received
+# TYPE sql_bytesin counter
+sql_bytesin 0.0
+# HELP range_adds Number of range additions
+# TYPE range_adds counter
+range_adds{store="1"} 0.0
+# HELP raft_rcvd_appresp Number of MsgAppResp messages received by this store
+# TYPE raft_rcvd_appresp counter
+raft_rcvd_appresp{store="1"} 0.0
+# HELP txn_commits1PC Number of committed one-phase KV transactions
+# TYPE txn_commits1PC counter
+txn_commits1PC 84150.0
+# HELP queue_consistency_processingnanos Nanoseconds spent processing replicas in the consistency checker queue
+# TYPE queue_consistency_processingnanos counter
+queue_consistency_processingnanos{store="1"} 7.480947924e+09
+# HELP rebalancing_queriespersecond Number of kv-level requests received per second by the store, averaged over a large time period as used in rebalancing decisions
+# TYPE rebalancing_queriespersecond gauge
+rebalancing_queriespersecond{store="1"} 1.912269045209547
+# HELP raft_commandsapplied Count of Raft commands applied
+# TYPE raft_commandsapplied counter
+raft_commandsapplied{store="1"} 472474.0
+# HELP raft_rcvd_voteresp Number of MsgVoteResp messages received by this store
+# TYPE raft_rcvd_voteresp counter
+raft_rcvd_voteresp{store="1"} 0.0
+# HELP queue_gc_info_pushtxn Number of attempted pushes
+# TYPE queue_gc_info_pushtxn counter
+queue_gc_info_pushtxn{store="1"} 0.0
+# HELP compactor_suggestionbytes_skipped Number of logical bytes in suggested compactions which were not compacted
+# TYPE compactor_suggestionbytes_skipped counter
+compactor_suggestionbytes_skipped{store="1"} 3.3007143e+07
+# HELP distsender_rpc_sent_nextreplicaerror Number of RPCs sent due to per-replica errors
+# TYPE distsender_rpc_sent_nextreplicaerror counter
+distsender_rpc_sent_nextreplicaerror 4.0
+# HELP sql_optimizer_plan_cache_hits_internal Number of non-prepared statements for which a cached plan was used (internal queries)
+# TYPE sql_optimizer_plan_cache_hits_internal counter
+sql_optimizer_plan_cache_hits_internal 16392.0
+# HELP sql_optimizer_plan_cache_misses_internal Number of non-prepared statements for which a cached plan was not used (internal queries)
+# TYPE sql_optimizer_plan_cache_misses_internal counter
+sql_optimizer_plan_cache_misses_internal 2471.0
+# HELP rebalancing_range_rebalances Number of range rebalance operations motivated by store-level load imbalances
+# TYPE rebalancing_range_rebalances counter
+rebalancing_range_rebalances{store="1"} 0.0
+# HELP raft_ticks Number of Raft ticks queued
+# TYPE raft_ticks counter
+raft_ticks{store="1"} 1.837972e+06
+# HELP raft_process_workingnanos Nanoseconds spent in store.processRaft() working
+# TYPE raft_process_workingnanos counter
+raft_process_workingnanos{store="1"} 3.445307227227e+12
+# HELP raft_rcvd_dropped Number of dropped incoming Raft messages
+# TYPE raft_rcvd_dropped counter
+raft_rcvd_dropped{store="1"} 0.0
+# HELP queue_replicate_process_success Number of replicas successfully processed by the replicate queue
+# TYPE queue_replicate_process_success counter
+queue_replicate_process_success{store="1"} 0.0
+# HELP queue_split_process_success Number of replicas successfully processed by the split queue
+# TYPE queue_split_process_success counter
+queue_split_process_success{store="1"} 15.0
+# HELP sql_mem_sql_current Current sql statement memory usage for sql
+# TYPE sql_mem_sql_current gauge
+sql_mem_sql_current 0.0
+sql_mem_sql_current 0.0
+# HELP sql_exec_latency_internal Latency of SQL statement execution (internal queries)
+# TYPE sql_exec_latency_internal histogram
+sql_exec_latency_internal_bucket{le="102399.0"} 2.0
+sql_exec_latency_internal_bucket{le="106495.0"} 3.0
+sql_exec_latency_internal_bucket{le="110591.0"} 4.0
+sql_exec_latency_internal_bucket{le="114687.0"} 6.0
+sql_exec_latency_internal_bucket{le="118783.0"} 9.0
+sql_exec_latency_internal_bucket{le="122879.0"} 10.0
+sql_exec_latency_internal_bucket{le="126975.0"} 13.0
+sql_exec_latency_internal_bucket{le="131071.0"} 17.0
+sql_exec_latency_internal_bucket{le="139263.0"} 23.0
+sql_exec_latency_internal_bucket{le="147455.0"} 29.0
+sql_exec_latency_internal_bucket{le="155647.0"} 41.0
+sql_exec_latency_internal_bucket{le="163839.0"} 51.0
+sql_exec_latency_internal_bucket{le="172031.0"} 69.0
+sql_exec_latency_internal_bucket{le="180223.0"} 83.0
+sql_exec_latency_internal_bucket{le="188415.0"} 97.0
+sql_exec_latency_internal_bucket{le="196607.0"} 111.0
+sql_exec_latency_internal_bucket{le="204799.0"} 134.0
+sql_exec_latency_internal_bucket{le="212991.0"} 160.0
+sql_exec_latency_internal_bucket{le="221183.0"} 187.0
+sql_exec_latency_internal_bucket{le="229375.0"} 228.0
+sql_exec_latency_internal_bucket{le="237567.0"} 283.0
+sql_exec_latency_internal_bucket{le="245759.0"} 385.0
+sql_exec_latency_internal_bucket{le="253951.0"} 530.0
+sql_exec_latency_internal_bucket{le="262143.0"} 718.0
+sql_exec_latency_internal_bucket{le="278527.0"} 1072.0
+sql_exec_latency_internal_bucket{le="294911.0"} 1394.0
+sql_exec_latency_internal_bucket{le="311295.0"} 1744.0
+sql_exec_latency_internal_bucket{le="327679.0"} 2053.0
+sql_exec_latency_internal_bucket{le="344063.0"} 2330.0
+sql_exec_latency_internal_bucket{le="360447.0"} 2622.0
+sql_exec_latency_internal_bucket{le="376831.0"} 2854.0
+sql_exec_latency_internal_bucket{le="393215.0"} 3097.0
+sql_exec_latency_internal_bucket{le="409599.0"} 3311.0
+sql_exec_latency_internal_bucket{le="425983.0"} 3546.0
+sql_exec_latency_internal_bucket{le="442367.0"} 3836.0
+sql_exec_latency_internal_bucket{le="458751.0"} 4107.0
+sql_exec_latency_internal_bucket{le="475135.0"} 4407.0
+sql_exec_latency_internal_bucket{le="491519.0"} 4748.0
+sql_exec_latency_internal_bucket{le="507903.0"} 5172.0
+sql_exec_latency_internal_bucket{le="524287.0"} 5663.0
+sql_exec_latency_internal_bucket{le="557055.0"} 6730.0
+sql_exec_latency_internal_bucket{le="589823.0"} 7857.0
+sql_exec_latency_internal_bucket{le="622591.0"} 9264.0
+sql_exec_latency_internal_bucket{le="655359.0"} 10602.0
+sql_exec_latency_internal_bucket{le="688127.0"} 11755.0
+sql_exec_latency_internal_bucket{le="720895.0"} 12681.0
+sql_exec_latency_internal_bucket{le="753663.0"} 13401.0
+sql_exec_latency_internal_bucket{le="786431.0"} 13952.0
+sql_exec_latency_internal_bucket{le="819199.0"} 14391.0
+sql_exec_latency_internal_bucket{le="851967.0"} 14723.0
+sql_exec_latency_internal_bucket{le="884735.0"} 14981.0
+sql_exec_latency_internal_bucket{le="917503.0"} 15227.0
+sql_exec_latency_internal_bucket{le="950271.0"} 15424.0
+sql_exec_latency_internal_bucket{le="983039.0"} 15632.0
+sql_exec_latency_internal_bucket{le="1.015807e+06"} 15812.0
+sql_exec_latency_internal_bucket{le="1.048575e+06"} 15981.0
+sql_exec_latency_internal_bucket{le="1.114111e+06"} 16238.0
+sql_exec_latency_internal_bucket{le="1.179647e+06"} 16452.0
+sql_exec_latency_internal_bucket{le="1.245183e+06"} 16602.0
+sql_exec_latency_internal_bucket{le="1.310719e+06"} 16691.0
+sql_exec_latency_internal_bucket{le="1.376255e+06"} 16776.0
+sql_exec_latency_internal_bucket{le="1.441791e+06"} 16863.0
+sql_exec_latency_internal_bucket{le="1.507327e+06"} 16976.0
+sql_exec_latency_internal_bucket{le="1.572863e+06"} 17133.0
+sql_exec_latency_internal_bucket{le="1.638399e+06"} 17351.0
+sql_exec_latency_internal_bucket{le="1.703935e+06"} 17624.0
+sql_exec_latency_internal_bucket{le="1.769471e+06"} 17856.0
+sql_exec_latency_internal_bucket{le="1.835007e+06"} 18064.0
+sql_exec_latency_internal_bucket{le="1.900543e+06"} 18200.0
+sql_exec_latency_internal_bucket{le="1.966079e+06"} 18297.0
+sql_exec_latency_internal_bucket{le="2.031615e+06"} 18350.0
+sql_exec_latency_internal_bucket{le="2.097151e+06"} 18392.0
+sql_exec_latency_internal_bucket{le="2.228223e+06"} 18446.0
+sql_exec_latency_internal_bucket{le="2.359295e+06"} 18492.0
+sql_exec_latency_internal_bucket{le="2.490367e+06"} 18532.0
+sql_exec_latency_internal_bucket{le="2.621439e+06"} 18556.0
+sql_exec_latency_internal_bucket{le="2.752511e+06"} 18574.0
+sql_exec_latency_internal_bucket{le="2.883583e+06"} 18586.0
+sql_exec_latency_internal_bucket{le="3.014655e+06"} 18587.0
+sql_exec_latency_internal_bucket{le="3.145727e+06"} 18594.0
+sql_exec_latency_internal_bucket{le="3.276799e+06"} 18598.0
+sql_exec_latency_internal_bucket{le="3.538943e+06"} 18601.0
+sql_exec_latency_internal_bucket{le="3.801087e+06"} 18603.0
+sql_exec_latency_internal_bucket{le="4.456447e+06"} 18605.0
+sql_exec_latency_internal_bucket{le="4.718591e+06"} 18607.0
+sql_exec_latency_internal_bucket{le="5.242879e+06"} 18608.0
+sql_exec_latency_internal_bucket{le="6.291455e+06"} 18609.0
+sql_exec_latency_internal_bucket{le="8.126463e+06"} 18610.0
+sql_exec_latency_internal_bucket{le="8.388607e+06"} 18611.0
+sql_exec_latency_internal_bucket{le="1.0485759e+07"} 18612.0
+sql_exec_latency_internal_bucket{le="1.4680063e+07"} 18613.0
+sql_exec_latency_internal_bucket{le="1.6777215e+07"} 18614.0
+sql_exec_latency_internal_bucket{le="1.8874367e+07"} 18615.0
+sql_exec_latency_internal_bucket{le="1.9922943e+07"} 18616.0
+sql_exec_latency_internal_bucket{le="2.0971519e+07"} 18617.0
+sql_exec_latency_internal_bucket{le="2.2020095e+07"} 18625.0
+sql_exec_latency_internal_bucket{le="2.3068671e+07"} 18634.0
+sql_exec_latency_internal_bucket{le="2.4117247e+07"} 18640.0
+sql_exec_latency_internal_bucket{le="2.5165823e+07"} 18659.0
+sql_exec_latency_internal_bucket{le="2.6214399e+07"} 18679.0
+sql_exec_latency_internal_bucket{le="2.7262975e+07"} 18699.0
+sql_exec_latency_internal_bucket{le="2.8311551e+07"} 18715.0
+sql_exec_latency_internal_bucket{le="2.9360127e+07"} 18733.0
+sql_exec_latency_internal_bucket{le="3.0408703e+07"} 18745.0
+sql_exec_latency_internal_bucket{le="3.1457279e+07"} 18759.0
+sql_exec_latency_internal_bucket{le="3.2505855e+07"} 18773.0
+sql_exec_latency_internal_bucket{le="3.3554431e+07"} 18784.0
+sql_exec_latency_internal_bucket{le="3.5651583e+07"} 18795.0
+sql_exec_latency_internal_bucket{le="3.7748735e+07"} 18807.0
+sql_exec_latency_internal_bucket{le="3.9845887e+07"} 18815.0
+sql_exec_latency_internal_bucket{le="4.1943039e+07"} 18820.0
+sql_exec_latency_internal_bucket{le="4.4040191e+07"} 18827.0
+sql_exec_latency_internal_bucket{le="4.6137343e+07"} 18836.0
+sql_exec_latency_internal_bucket{le="4.8234495e+07"} 18840.0
+sql_exec_latency_internal_bucket{le="5.0331647e+07"} 18845.0
+sql_exec_latency_internal_bucket{le="5.2428799e+07"} 18846.0
+sql_exec_latency_internal_bucket{le="5.4525951e+07"} 18848.0
+sql_exec_latency_internal_bucket{le="5.6623103e+07"} 18853.0
+sql_exec_latency_internal_bucket{le="5.8720255e+07"} 18855.0
+sql_exec_latency_internal_bucket{le="6.2914559e+07"} 18856.0
+sql_exec_latency_internal_bucket{le="6.5011711e+07"} 18857.0
+sql_exec_latency_internal_bucket{le="6.7108863e+07"} 18858.0
+sql_exec_latency_internal_bucket{le="7.1303167e+07"} 18860.0
+sql_exec_latency_internal_bucket{le="7.5497471e+07"} 18862.0
+sql_exec_latency_internal_bucket{le="8.8080383e+07"} 18863.0
+sql_exec_latency_internal_bucket{le="1.42606335e+08"} 18864.0
+sql_exec_latency_internal_bucket{le="1.84549375e+08"} 18865.0
+sql_exec_latency_internal_bucket{le="1.92937983e+08"} 18866.0
+sql_exec_latency_internal_bucket{le="2.43269631e+08"} 18867.0
+sql_exec_latency_internal_bucket{le="2.51658239e+08"} 18868.0
+sql_exec_latency_internal_bucket{le="4.52984831e+08"} 18869.0
+sql_exec_latency_internal_bucket{le="1.006632959e+09"} 18870.0
+sql_exec_latency_internal_bucket{le="+Inf"} 18870.0
+sql_exec_latency_internal_sum 2.4759436874e+10
+sql_exec_latency_internal_count 18870.0
+# HELP leases_expiration Number of replica leaseholders using expiration-based leases
+# TYPE leases_expiration gauge
+leases_expiration{store="1"} 2.0
+# HELP raft_entrycache_accesses Number of cache lookups in the Raft entry cache
+# TYPE raft_entrycache_accesses counter
+raft_entrycache_accesses{store="1"} 61119.0
+# HELP totalbytes Total number of bytes taken up by keys and values including non-live data
+# TYPE totalbytes gauge
+totalbytes{store="1"} 7.44568166e+08
+# HELP rebalancing_lease_transfers Number of lease transfers motivated by store-level load imbalances
+# TYPE rebalancing_lease_transfers counter
+rebalancing_lease_transfers{store="1"} 0.0
+# HELP gossip_connections_outgoing Number of active outgoing gossip connections
+# TYPE gossip_connections_outgoing gauge
+gossip_connections_outgoing 0.0
+# HELP sql_optimizer_plan_cache_hits Number of non-prepared statements for which a cached plan was used
+# TYPE sql_optimizer_plan_cache_hits counter
+sql_optimizer_plan_cache_hits 0.0
+# HELP queue_gc_process_success Number of replicas successfully processed by the GC queue
+# TYPE queue_gc_process_success counter
+queue_gc_process_success{store="1"} 198.0
+# HELP leases_error Number of failed lease requests
+# TYPE leases_error counter
+leases_error{store="1"} 0.0
+# HELP txnwaitqueue_query_wait_time Histogram of durations spent in queue by queries
+# TYPE txnwaitqueue_query_wait_time histogram
+txnwaitqueue_query_wait_time_bucket{store="1",le="+Inf"} 0.0
+txnwaitqueue_query_wait_time_sum{store="1"} 0.0
+txnwaitqueue_query_wait_time_count{store="1"} 0.0
+# HELP sql_mem_sql_txn_current Current sql transaction memory usage for sql
+# TYPE sql_mem_sql_txn_current gauge
+sql_mem_sql_txn_current 0.0
+sql_mem_sql_txn_current 0.0
+# HELP sql_select_count Number of SQL SELECT statements
+# TYPE sql_select_count counter
+sql_select_count 0.0
+# HELP sql_txn_begin_count_internal Number of SQL transaction BEGIN statements (internal queries)
+# TYPE sql_txn_begin_count_internal counter
+sql_txn_begin_count_internal 0.0
+# HELP raftlog_behind Number of Raft log entries followers on other stores are behind
+# TYPE raftlog_behind gauge
+raftlog_behind{store="1"} 0.0
+# HELP queue_raftsnapshot_process_success Number of replicas successfully processed by the Raft repair queue
+# TYPE queue_raftsnapshot_process_success counter
+queue_raftsnapshot_process_success{store="1"} 0.0
+# HELP queue_replicagc_processingnanos Nanoseconds spent processing replicas in the replica GC queue
+# TYPE queue_replicagc_processingnanos counter
+queue_replicagc_processingnanos{store="1"} 0.0
+# HELP sql_mem_conns_txn_max Memory usage per sql transaction for conns
+# TYPE sql_mem_conns_txn_max histogram
+sql_mem_conns_txn_max_bucket{le="+Inf"} 0.0
+sql_mem_conns_txn_max_sum 0.0
+sql_mem_conns_txn_max_count 0.0
+# HELP intentbytes Number of bytes in intent KV pairs
+# TYPE intentbytes gauge
+intentbytes{store="1"} 0.0
+# HELP range_snapshots_normal_applied Number of applied snapshots
+# TYPE range_snapshots_normal_applied counter
+range_snapshots_normal_applied{store="1"} 0.0
+# HELP sql_restart_savepoint_release_count Number of `RELEASE SAVEPOINT cockroach_restart` statements
+# TYPE sql_restart_savepoint_release_count counter
+sql_restart_savepoint_release_count 0.0
+# HELP sql_failure_count Number of statements resulting in a planning or runtime error
+# TYPE sql_failure_count counter
+sql_failure_count 0.0
+# HELP sql_restart_savepoint_count_internal Number of `SAVEPOINT cockroach_restart` statements (internal queries)
+# TYPE sql_restart_savepoint_count_internal counter
+sql_restart_savepoint_count_internal 0.0
+# HELP queue_raftsnapshot_process_failure Number of replicas which failed processing in the Raft repair queue
+# TYPE queue_raftsnapshot_process_failure counter
+queue_raftsnapshot_process_failure{store="1"} 0.0
+# HELP gossip_infos_sent Number of sent gossip Info objects
+# TYPE gossip_infos_sent counter
+gossip_infos_sent 0.0
+# HELP sql_mem_admin_txn_current Current sql transaction memory usage for admin
+# TYPE sql_mem_admin_txn_current gauge
+sql_mem_admin_txn_current 0.0
+# HELP sql_savepoint_count Number of SQL SAVEPOINT statements
+# TYPE sql_savepoint_count counter
+sql_savepoint_count 0.0
+# HELP rocksdb_encryption_algorithm algorithm in use for encryption-at-rest, see ccl/storageccl/engineccl/enginepbccl/key_registry.proto
+# TYPE rocksdb_encryption_algorithm gauge
+rocksdb_encryption_algorithm{store="1"} 0.0
+# HELP raft_entrycache_size Number of Raft entries in the Raft entry cache
+# TYPE raft_entrycache_size gauge
+raft_entrycache_size{store="1"} 697.0
+# HELP distsender_rpc_sent_local Number of local RPCs sent
+# TYPE distsender_rpc_sent_local counter
+distsender_rpc_sent_local 472350.0
+# HELP sys_host_net_recv_packets Packets received on all network interfaces since this process started
+# TYPE sys_host_net_recv_packets gauge
+sys_host_net_recv_packets 376703.0
+# HELP node_id node ID with labels for advertised RPC and HTTP addresses
+# TYPE node_id gauge
+node_id{advertise_addr="roach1:26257",http_addr="roach1:8080"} 1.0
+# HELP queue_gc_info_numkeysaffected Number of keys with GC'able data
+# TYPE queue_gc_info_numkeysaffected counter
+queue_gc_info_numkeysaffected{store="1"} 1771.0
+# HELP distsender_batches_partial Number of partial batches processed after being divided on range boundaries
+# TYPE distsender_batches_partial counter
+distsender_batches_partial 164192.0
+# HELP sql_distsql_flows_queue_wait Duration of time flows spend waiting in the queue
+# TYPE sql_distsql_flows_queue_wait histogram
+sql_distsql_flows_queue_wait_bucket{le="+Inf"} 0.0
+sql_distsql_flows_queue_wait_sum 0.0
+sql_distsql_flows_queue_wait_count 0.0
+# HELP sql_distsql_select_count_internal Number of DistSQL SELECT statements (internal queries)
+# TYPE sql_distsql_select_count_internal counter
+sql_distsql_select_count_internal 12695.0
+# HELP queue_gc_info_abortspanconsidered Number of AbortSpan entries old enough to be considered for removal
+# TYPE queue_gc_info_abortspanconsidered counter
+queue_gc_info_abortspanconsidered{store="1"} 0.0
+# HELP addsstable_applications Number of SSTable ingestions applied (i.e. applied by Replicas)
+# TYPE addsstable_applications counter
+addsstable_applications{store="1"} 0.0
+# HELP sql_mem_admin_txn_max Memory usage per sql transaction for admin
+# TYPE sql_mem_admin_txn_max histogram
+sql_mem_admin_txn_max_bucket{le="+Inf"} 0.0
+sql_mem_admin_txn_max_sum 0.0
+sql_mem_admin_txn_max_count 0.0
+# HELP replicas_quiescent Number of quiesced replicas
+# TYPE replicas_quiescent gauge
+replicas_quiescent{store="1"} 27.0
+# HELP intents_poison_attempts Count of (point or range) poisoning intent abort evaluation attempts
+# TYPE intents_poison_attempts counter
+intents_poison_attempts{store="1"} 0.0
+# HELP rocksdb_compactions Number of table compactions
+# TYPE rocksdb_compactions gauge
+rocksdb_compactions{store="1"} 60.0
+# HELP queue_split_processingnanos Nanoseconds spent processing replicas in the split queue
+# TYPE queue_split_processingnanos counter
+queue_split_processingnanos{store="1"} 5.506998291e+09
+# HELP changefeed_buffer_entries_in Total entries entering the buffer between raft and changefeed sinks
+# TYPE changefeed_buffer_entries_in counter
+changefeed_buffer_entries_in 0.0
+# HELP sql_update_count Number of SQL UPDATE statements
+# TYPE sql_update_count counter
+sql_update_count 0.0
+# HELP ranges_overreplicated Number of ranges with more live replicas than the replication target
+# TYPE ranges_overreplicated gauge
+ranges_overreplicated{store="1"} 0.0
+# HELP rocksdb_bloom_filter_prefix_useful Number of times the bloom filter helped avoid iterator creation
+# TYPE rocksdb_bloom_filter_prefix_useful gauge
+rocksdb_bloom_filter_prefix_useful{store="1"} 659190.0
+# HELP range_removes Number of range removals
+# TYPE range_removes counter
+range_removes{store="1"} 0.0
+# HELP raft_process_logcommit_latency Latency histogram for committing Raft log entries
+# TYPE raft_process_logcommit_latency histogram
+raft_process_logcommit_latency_bucket{store="1",le="557055.0"} 1.0
+raft_process_logcommit_latency_bucket{store="1",le="589823.0"} 135.0
+raft_process_logcommit_latency_bucket{store="1",le="622591.0"} 1448.0
+raft_process_logcommit_latency_bucket{store="1",le="655359.0"} 3624.0
+raft_process_logcommit_latency_bucket{store="1",le="688127.0"} 6521.0
+raft_process_logcommit_latency_bucket{store="1",le="720895.0"} 10052.0
+raft_process_logcommit_latency_bucket{store="1",le="753663.0"} 14115.0
+raft_process_logcommit_latency_bucket{store="1",le="786431.0"} 19327.0
+raft_process_logcommit_latency_bucket{store="1",le="819199.0"} 26156.0
+raft_process_logcommit_latency_bucket{store="1",le="851967.0"} 34719.0
+raft_process_logcommit_latency_bucket{store="1",le="884735.0"} 44345.0
+raft_process_logcommit_latency_bucket{store="1",le="917503.0"} 54776.0
+raft_process_logcommit_latency_bucket{store="1",le="950271.0"} 65910.0
+raft_process_logcommit_latency_bucket{store="1",le="983039.0"} 76932.0
+raft_process_logcommit_latency_bucket{store="1",le="1.015807e+06"} 87091.0
+raft_process_logcommit_latency_bucket{store="1",le="1.048575e+06"} 96484.0
+raft_process_logcommit_latency_bucket{store="1",le="1.114111e+06"} 115130.0
+raft_process_logcommit_latency_bucket{store="1",le="1.179647e+06"} 136343.0
+raft_process_logcommit_latency_bucket{store="1",le="1.245183e+06"} 160203.0
+raft_process_logcommit_latency_bucket{store="1",le="1.310719e+06"} 184907.0
+raft_process_logcommit_latency_bucket{store="1",le="1.376255e+06"} 208097.0
+raft_process_logcommit_latency_bucket{store="1",le="1.441791e+06"} 227664.0
+raft_process_logcommit_latency_bucket{store="1",le="1.507327e+06"} 243194.0
+raft_process_logcommit_latency_bucket{store="1",le="1.572863e+06"} 256469.0
+raft_process_logcommit_latency_bucket{store="1",le="1.638399e+06"} 268350.0
+raft_process_logcommit_latency_bucket{store="1",le="1.703935e+06"} 279460.0
+raft_process_logcommit_latency_bucket{store="1",le="1.769471e+06"} 289448.0
+raft_process_logcommit_latency_bucket{store="1",le="1.835007e+06"} 298683.0
+raft_process_logcommit_latency_bucket{store="1",le="1.900543e+06"} 307583.0
+raft_process_logcommit_latency_bucket{store="1",le="1.966079e+06"} 315841.0
+raft_process_logcommit_latency_bucket{store="1",le="2.031615e+06"} 323722.0
+raft_process_logcommit_latency_bucket{store="1",le="2.097151e+06"} 331357.0
+raft_process_logcommit_latency_bucket{store="1",le="2.228223e+06"} 345442.0
+raft_process_logcommit_latency_bucket{store="1",le="2.359295e+06"} 357862.0
+raft_process_logcommit_latency_bucket{store="1",le="2.490367e+06"} 368808.0
+raft_process_logcommit_latency_bucket{store="1",le="2.621439e+06"} 378072.0
+raft_process_logcommit_latency_bucket{store="1",le="2.752511e+06"} 385739.0
+raft_process_logcommit_latency_bucket{store="1",le="2.883583e+06"} 392031.0
+raft_process_logcommit_latency_bucket{store="1",le="3.014655e+06"} 397196.0
+raft_process_logcommit_latency_bucket{store="1",le="3.145727e+06"} 401260.0
+raft_process_logcommit_latency_bucket{store="1",le="3.276799e+06"} 404595.0
+raft_process_logcommit_latency_bucket{store="1",le="3.407871e+06"} 407424.0
+raft_process_logcommit_latency_bucket{store="1",le="3.538943e+06"} 409771.0
+raft_process_logcommit_latency_bucket{store="1",le="3.670015e+06"} 411771.0
+raft_process_logcommit_latency_bucket{store="1",le="3.801087e+06"} 413347.0
+raft_process_logcommit_latency_bucket{store="1",le="3.932159e+06"} 414696.0
+raft_process_logcommit_latency_bucket{store="1",le="4.063231e+06"} 415818.0
+raft_process_logcommit_latency_bucket{store="1",le="4.194303e+06"} 416658.0
+raft_process_logcommit_latency_bucket{store="1",le="4.456447e+06"} 418075.0
+raft_process_logcommit_latency_bucket{store="1",le="4.718591e+06"} 419094.0
+raft_process_logcommit_latency_bucket{store="1",le="4.980735e+06"} 419872.0
+raft_process_logcommit_latency_bucket{store="1",le="5.242879e+06"} 420486.0
+raft_process_logcommit_latency_bucket{store="1",le="5.505023e+06"} 420951.0
+raft_process_logcommit_latency_bucket{store="1",le="5.767167e+06"} 421314.0
+raft_process_logcommit_latency_bucket{store="1",le="6.029311e+06"} 421569.0
+raft_process_logcommit_latency_bucket{store="1",le="6.291455e+06"} 421798.0
+raft_process_logcommit_latency_bucket{store="1",le="6.553599e+06"} 421976.0
+raft_process_logcommit_latency_bucket{store="1",le="6.815743e+06"} 422123.0
+raft_process_logcommit_latency_bucket{store="1",le="7.077887e+06"} 422243.0
+raft_process_logcommit_latency_bucket{store="1",le="7.340031e+06"} 422350.0
+raft_process_logcommit_latency_bucket{store="1",le="7.602175e+06"} 422462.0
+raft_process_logcommit_latency_bucket{store="1",le="7.864319e+06"} 422573.0
+raft_process_logcommit_latency_bucket{store="1",le="8.126463e+06"} 422705.0
+raft_process_logcommit_latency_bucket{store="1",le="8.388607e+06"} 422914.0
+raft_process_logcommit_latency_bucket{store="1",le="8.912895e+06"} 423254.0
+raft_process_logcommit_latency_bucket{store="1",le="9.437183e+06"} 423340.0
+raft_process_logcommit_latency_bucket{store="1",le="9.961471e+06"} 423404.0
+raft_process_logcommit_latency_bucket{store="1",le="1.0485759e+07"} 423442.0
+raft_process_logcommit_latency_bucket{store="1",le="1.1010047e+07"} 423491.0
+raft_process_logcommit_latency_bucket{store="1",le="1.1534335e+07"} 423517.0
+raft_process_logcommit_latency_bucket{store="1",le="1.2058623e+07"} 423542.0
+raft_process_logcommit_latency_bucket{store="1",le="1.2582911e+07"} 423559.0
+raft_process_logcommit_latency_bucket{store="1",le="1.3107199e+07"} 423578.0
+raft_process_logcommit_latency_bucket{store="1",le="1.3631487e+07"} 423594.0
+raft_process_logcommit_latency_bucket{store="1",le="1.4155775e+07"} 423614.0
+raft_process_logcommit_latency_bucket{store="1",le="1.4680063e+07"} 423630.0
+raft_process_logcommit_latency_bucket{store="1",le="1.5204351e+07"} 423649.0
+raft_process_logcommit_latency_bucket{store="1",le="1.5728639e+07"} 423661.0
+raft_process_logcommit_latency_bucket{store="1",le="1.6252927e+07"} 423710.0
+raft_process_logcommit_latency_bucket{store="1",le="1.6777215e+07"} 423770.0
+raft_process_logcommit_latency_bucket{store="1",le="1.7825791e+07"} 423872.0
+raft_process_logcommit_latency_bucket{store="1",le="1.8874367e+07"} 423989.0
+raft_process_logcommit_latency_bucket{store="1",le="1.9922943e+07"} 424236.0
+raft_process_logcommit_latency_bucket{store="1",le="2.0971519e+07"} 424696.0
+raft_process_logcommit_latency_bucket{store="1",le="2.2020095e+07"} 425332.0
+raft_process_logcommit_latency_bucket{store="1",le="2.3068671e+07"} 426316.0
+raft_process_logcommit_latency_bucket{store="1",le="2.4117247e+07"} 427756.0
+raft_process_logcommit_latency_bucket{store="1",le="2.5165823e+07"} 429521.0
+raft_process_logcommit_latency_bucket{store="1",le="2.6214399e+07"} 431474.0
+raft_process_logcommit_latency_bucket{store="1",le="2.7262975e+07"} 433501.0
+raft_process_logcommit_latency_bucket{store="1",le="2.8311551e+07"} 435547.0
+raft_process_logcommit_latency_bucket{store="1",le="2.9360127e+07"} 437450.0
+raft_process_logcommit_latency_bucket{store="1",le="3.0408703e+07"} 439253.0
+raft_process_logcommit_latency_bucket{store="1",le="3.1457279e+07"} 440886.0
+raft_process_logcommit_latency_bucket{store="1",le="3.2505855e+07"} 442380.0
+raft_process_logcommit_latency_bucket{store="1",le="3.3554431e+07"} 443713.0
+raft_process_logcommit_latency_bucket{store="1",le="3.5651583e+07"} 445826.0
+raft_process_logcommit_latency_bucket{store="1",le="3.7748735e+07"} 447681.0
+raft_process_logcommit_latency_bucket{store="1",le="3.9845887e+07"} 449564.0
+raft_process_logcommit_latency_bucket{store="1",le="4.1943039e+07"} 451321.0
+raft_process_logcommit_latency_bucket{store="1",le="4.4040191e+07"} 453224.0
+raft_process_logcommit_latency_bucket{store="1",le="4.6137343e+07"} 455050.0
+raft_process_logcommit_latency_bucket{store="1",le="4.8234495e+07"} 456677.0
+raft_process_logcommit_latency_bucket{store="1",le="5.0331647e+07"} 458438.0
+raft_process_logcommit_latency_bucket{store="1",le="5.2428799e+07"} 459888.0
+raft_process_logcommit_latency_bucket{store="1",le="5.4525951e+07"} 461122.0
+raft_process_logcommit_latency_bucket{store="1",le="5.6623103e+07"} 462169.0
+raft_process_logcommit_latency_bucket{store="1",le="5.8720255e+07"} 463033.0
+raft_process_logcommit_latency_bucket{store="1",le="6.0817407e+07"} 463763.0
+raft_process_logcommit_latency_bucket{store="1",le="6.2914559e+07"} 464386.0
+raft_process_logcommit_latency_bucket{store="1",le="6.5011711e+07"} 464886.0
+raft_process_logcommit_latency_bucket{store="1",le="6.7108863e+07"} 465289.0
+raft_process_logcommit_latency_bucket{store="1",le="7.1303167e+07"} 465961.0
+raft_process_logcommit_latency_bucket{store="1",le="7.5497471e+07"} 466517.0
+raft_process_logcommit_latency_bucket{store="1",le="7.9691775e+07"} 466919.0
+raft_process_logcommit_latency_bucket{store="1",le="8.3886079e+07"} 467303.0
+raft_process_logcommit_latency_bucket{store="1",le="8.8080383e+07"} 467675.0
+raft_process_logcommit_latency_bucket{store="1",le="9.2274687e+07"} 467982.0
+raft_process_logcommit_latency_bucket{store="1",le="9.6468991e+07"} 468190.0
+raft_process_logcommit_latency_bucket{store="1",le="1.00663295e+08"} 468399.0
+raft_process_logcommit_latency_bucket{store="1",le="1.04857599e+08"} 468551.0
+raft_process_logcommit_latency_bucket{store="1",le="1.09051903e+08"} 468660.0
+raft_process_logcommit_latency_bucket{store="1",le="1.13246207e+08"} 468757.0
+raft_process_logcommit_latency_bucket{store="1",le="1.17440511e+08"} 468843.0
+raft_process_logcommit_latency_bucket{store="1",le="1.21634815e+08"} 468928.0
+raft_process_logcommit_latency_bucket{store="1",le="1.25829119e+08"} 468977.0
+raft_process_logcommit_latency_bucket{store="1",le="1.30023423e+08"} 469030.0
+raft_process_logcommit_latency_bucket{store="1",le="1.34217727e+08"} 469081.0
+raft_process_logcommit_latency_bucket{store="1",le="1.42606335e+08"} 469155.0
+raft_process_logcommit_latency_bucket{store="1",le="1.50994943e+08"} 469185.0
+raft_process_logcommit_latency_bucket{store="1",le="1.59383551e+08"} 469240.0
+raft_process_logcommit_latency_bucket{store="1",le="1.67772159e+08"} 469298.0
+raft_process_logcommit_latency_bucket{store="1",le="1.76160767e+08"} 469341.0
+raft_process_logcommit_latency_bucket{store="1",le="1.84549375e+08"} 469403.0
+raft_process_logcommit_latency_bucket{store="1",le="1.92937983e+08"} 469447.0
+raft_process_logcommit_latency_bucket{store="1",le="2.01326591e+08"} 469506.0
+raft_process_logcommit_latency_bucket{store="1",le="2.09715199e+08"} 469547.0
+raft_process_logcommit_latency_bucket{store="1",le="2.18103807e+08"} 469610.0
+raft_process_logcommit_latency_bucket{store="1",le="2.26492415e+08"} 469669.0
+raft_process_logcommit_latency_bucket{store="1",le="2.34881023e+08"} 469721.0
+raft_process_logcommit_latency_bucket{store="1",le="2.43269631e+08"} 469762.0
+raft_process_logcommit_latency_bucket{store="1",le="2.51658239e+08"} 469810.0
+raft_process_logcommit_latency_bucket{store="1",le="2.60046847e+08"} 469862.0
+raft_process_logcommit_latency_bucket{store="1",le="2.68435455e+08"} 469920.0
+raft_process_logcommit_latency_bucket{store="1",le="2.85212671e+08"} 470015.0
+raft_process_logcommit_latency_bucket{store="1",le="3.01989887e+08"} 470062.0
+raft_process_logcommit_latency_bucket{store="1",le="3.18767103e+08"} 470103.0
+raft_process_logcommit_latency_bucket{store="1",le="3.35544319e+08"} 470137.0
+raft_process_logcommit_latency_bucket{store="1",le="3.52321535e+08"} 470174.0
+raft_process_logcommit_latency_bucket{store="1",le="3.69098751e+08"} 470204.0
+raft_process_logcommit_latency_bucket{store="1",le="3.85875967e+08"} 470227.0
+raft_process_logcommit_latency_bucket{store="1",le="4.02653183e+08"} 470246.0
+raft_process_logcommit_latency_bucket{store="1",le="4.19430399e+08"} 470257.0
+raft_process_logcommit_latency_bucket{store="1",le="4.36207615e+08"} 470262.0
+raft_process_logcommit_latency_bucket{store="1",le="4.52984831e+08"} 470269.0
+raft_process_logcommit_latency_bucket{store="1",le="4.69762047e+08"} 470277.0
+raft_process_logcommit_latency_bucket{store="1",le="4.86539263e+08"} 470281.0
+raft_process_logcommit_latency_bucket{store="1",le="5.03316479e+08"} 470289.0
+raft_process_logcommit_latency_bucket{store="1",le="5.20093695e+08"} 470291.0
+raft_process_logcommit_latency_bucket{store="1",le="5.36870911e+08"} 470297.0
+raft_process_logcommit_latency_bucket{store="1",le="5.70425343e+08"} 470300.0
+raft_process_logcommit_latency_bucket{store="1",le="6.03979775e+08"} 470309.0
+raft_process_logcommit_latency_bucket{store="1",le="6.37534207e+08"} 470314.0
+raft_process_logcommit_latency_bucket{store="1",le="6.71088639e+08"} 470322.0
+raft_process_logcommit_latency_bucket{store="1",le="7.04643071e+08"} 470325.0
+raft_process_logcommit_latency_bucket{store="1",le="7.38197503e+08"} 470329.0
+raft_process_logcommit_latency_bucket{store="1",le="7.71751935e+08"} 470333.0
+raft_process_logcommit_latency_bucket{store="1",le="8.05306367e+08"} 470335.0
+raft_process_logcommit_latency_bucket{store="1",le="8.38860799e+08"} 470336.0
+raft_process_logcommit_latency_bucket{store="1",le="8.72415231e+08"} 470338.0
+raft_process_logcommit_latency_bucket{store="1",le="9.39524095e+08"} 470340.0
+raft_process_logcommit_latency_bucket{store="1",le="9.73078527e+08"} 470342.0
+raft_process_logcommit_latency_bucket{store="1",le="1.006632959e+09"} 470350.0
+raft_process_logcommit_latency_bucket{store="1",le="1.040187391e+09"} 470352.0
+raft_process_logcommit_latency_bucket{store="1",le="1.073741823e+09"} 470356.0
+raft_process_logcommit_latency_bucket{store="1",le="1.140850687e+09"} 470359.0
+raft_process_logcommit_latency_bucket{store="1",le="1.207959551e+09"} 470361.0
+raft_process_logcommit_latency_bucket{store="1",le="1.275068415e+09"} 470363.0
+raft_process_logcommit_latency_bucket{store="1",le="1.342177279e+09"} 470369.0
+raft_process_logcommit_latency_bucket{store="1",le="1.610612735e+09"} 470370.0
+raft_process_logcommit_latency_bucket{store="1",le="1.677721599e+09"} 470371.0
+raft_process_logcommit_latency_bucket{store="1",le="2.550136831e+09"} 470372.0
+raft_process_logcommit_latency_bucket{store="1",le="2.684354559e+09"} 470374.0
+raft_process_logcommit_latency_bucket{store="1",le="3.355443199e+09"} 470375.0
+raft_process_logcommit_latency_bucket{store="1",le="6.174015487e+09"} 470377.0
+raft_process_logcommit_latency_bucket{store="1",le="6.979321855e+09"} 470379.0
+raft_process_logcommit_latency_bucket{store="1",le="7.247757311e+09"} 470380.0
+raft_process_logcommit_latency_bucket{store="1",le="7.516192767e+09"} 470381.0
+raft_process_logcommit_latency_bucket{store="1",le="1.0200547327e+10"} 470382.0
+raft_process_logcommit_latency_bucket{store="1",le="1.3958643711e+10"} 470383.0
+raft_process_logcommit_latency_bucket{store="1",le="1.6106127359e+10"} 470384.0
+raft_process_logcommit_latency_bucket{store="1",le="+Inf"} 470384.0
+raft_process_logcommit_latency_sum{store="1"} 3.092627640976e+12
+raft_process_logcommit_latency_count{store="1"} 470384.0
+# HELP raft_enqueued_pending Number of pending outgoing messages in the Raft Transport queue
+# TYPE raft_enqueued_pending gauge
+raft_enqueued_pending{store="1"} 0.0
+# HELP queue_replicate_purgatory Number of replicas in the replicate queue's purgatory, awaiting allocation options
+# TYPE queue_replicate_purgatory gauge
+queue_replicate_purgatory{store="1"} 28.0
+# HELP sql_mem_internal_session_max Memory usage per sql session for internal
+# TYPE sql_mem_internal_session_max histogram
+sql_mem_internal_session_max_bucket{le="4011.0"} 16068.0
+sql_mem_internal_session_max_bucket{le="+Inf"} 16068.0
+sql_mem_internal_session_max_sum 6.4448748e+07
+sql_mem_internal_session_max_count 16068.0
+# HELP changefeed_emit_nanos Total time spent emitting all feeds
+# TYPE changefeed_emit_nanos counter
+changefeed_emit_nanos 0.0
+# HELP sql_service_latency Latency of SQL request execution
+# TYPE sql_service_latency histogram
+sql_service_latency_bucket{le="+Inf"} 0.0
+sql_service_latency_sum 0.0
+sql_service_latency_count 0.0
+# HELP queue_tsmaintenance_pending Number of pending replicas in the time series maintenance queue
+# TYPE queue_tsmaintenance_pending gauge
+queue_tsmaintenance_pending{store="1"} 0.0
+# HELP queue_gc_info_transactionspangccommitted Number of GC'able entries corresponding to committed txns
+# TYPE queue_gc_info_transactionspangccommitted counter
+queue_gc_info_transactionspangccommitted{store="1"} 0.0
+# HELP distsender_rpc_sent Number of RPCs sent
+# TYPE distsender_rpc_sent counter
+distsender_rpc_sent 472350.0
+# HELP sql_savepoint_count_internal Number of SQL SAVEPOINT statements (internal queries)
+# TYPE sql_savepoint_count_internal counter
+sql_savepoint_count_internal 0.0
+# HELP sql_txn_abort_count_internal Number of SQL transaction abort errors (internal queries)
+# TYPE sql_txn_abort_count_internal counter
+sql_txn_abort_count_internal 0.0
+# HELP intents_abort_attempts Count of (point or range) non-poisoning intent abort evaluation attempts
+# TYPE intents_abort_attempts counter
+intents_abort_attempts{store="1"} 0.0
+# HELP rocksdb_block_cache_usage Bytes used by the block cache
+# TYPE rocksdb_block_cache_usage gauge
+rocksdb_block_cache_usage{store="1"} 6.6875072e+07
+# HELP queue_consistency_process_success Number of replicas successfully processed by the consistency checker queue
+# TYPE queue_consistency_process_success counter
+queue_consistency_process_success{store="1"} 127.0
+# HELP queue_consistency_process_failure Number of replicas which failed processing in the consistency checker queue
+# TYPE queue_consistency_process_failure counter
+queue_consistency_process_failure{store="1"} 0.0
+# HELP timeseries_write_bytes Total size in bytes of metric samples written to disk
+# TYPE timeseries_write_bytes counter
+timeseries_write_bytes 2.220208177e+09
+# HELP sql_mem_distsql_current Current sql statement memory usage for distsql
+# TYPE sql_mem_distsql_current gauge
+sql_mem_distsql_current 0.0
+# HELP sql_mem_sql_txn_max Memory usage per sql transaction for sql
+# TYPE sql_mem_sql_txn_max histogram
+sql_mem_sql_txn_max_bucket{le="+Inf"} 0.0
+sql_mem_sql_txn_max_sum 0.0
+sql_mem_sql_txn_max_count 0.0
+sql_mem_sql_txn_max_bucket{le="+Inf"} 0.0
+sql_mem_sql_txn_max_sum 0.0
+sql_mem_sql_txn_max_count 0.0
+# HELP compactor_suggestionbytes_compacted Number of logical bytes compacted from suggested compactions
+# TYPE compactor_suggestionbytes_compacted counter
+compactor_suggestionbytes_compacted{store="1"} 0.0
+# HELP sys_host_disk_write_count Disk write operations across all disks since this process started
+# TYPE sys_host_disk_write_count gauge
+sys_host_disk_write_count 5.3335189e+07
+# HELP sql_optimizer_count_internal Number of statements which ran with the cost-based optimizer (internal queries)
+# TYPE sql_optimizer_count_internal counter
+sql_optimizer_count_internal 34930.0
+# HELP sql_service_latency_internal Latency of SQL request execution (internal queries)
+# TYPE sql_service_latency_internal histogram
+sql_service_latency_internal_bucket{le="344063.0"} 1.0
+sql_service_latency_internal_bucket{le="360447.0"} 3.0
+sql_service_latency_internal_bucket{le="376831.0"} 6.0
+sql_service_latency_internal_bucket{le="409599.0"} 10.0
+sql_service_latency_internal_bucket{le="425983.0"} 12.0
+sql_service_latency_internal_bucket{le="442367.0"} 14.0
+sql_service_latency_internal_bucket{le="458751.0"} 16.0
+sql_service_latency_internal_bucket{le="475135.0"} 21.0
+sql_service_latency_internal_bucket{le="491519.0"} 25.0
+sql_service_latency_internal_bucket{le="507903.0"} 27.0
+sql_service_latency_internal_bucket{le="524287.0"} 34.0
+sql_service_latency_internal_bucket{le="557055.0"} 41.0
+sql_service_latency_internal_bucket{le="589823.0"} 46.0
+sql_service_latency_internal_bucket{le="622591.0"} 53.0
+sql_service_latency_internal_bucket{le="655359.0"} 59.0
+sql_service_latency_internal_bucket{le="688127.0"} 72.0
+sql_service_latency_internal_bucket{le="720895.0"} 79.0
+sql_service_latency_internal_bucket{le="753663.0"} 96.0
+sql_service_latency_internal_bucket{le="786431.0"} 141.0
+sql_service_latency_internal_bucket{le="819199.0"} 188.0
+sql_service_latency_internal_bucket{le="851967.0"} 236.0
+sql_service_latency_internal_bucket{le="884735.0"} 275.0
+sql_service_latency_internal_bucket{le="917503.0"} 322.0
+sql_service_latency_internal_bucket{le="950271.0"} 362.0
+sql_service_latency_internal_bucket{le="983039.0"} 410.0
+sql_service_latency_internal_bucket{le="1.015807e+06"} 460.0
+sql_service_latency_internal_bucket{le="1.048575e+06"} 531.0
+sql_service_latency_internal_bucket{le="1.114111e+06"} 761.0
+sql_service_latency_internal_bucket{le="1.179647e+06"} 1047.0
+sql_service_latency_internal_bucket{le="1.245183e+06"} 1377.0
+sql_service_latency_internal_bucket{le="1.310719e+06"} 1666.0
+sql_service_latency_internal_bucket{le="1.376255e+06"} 1955.0
+sql_service_latency_internal_bucket{le="1.441791e+06"} 2246.0
+sql_service_latency_internal_bucket{le="1.507327e+06"} 2539.0
+sql_service_latency_internal_bucket{le="1.572863e+06"} 2857.0
+sql_service_latency_internal_bucket{le="1.638399e+06"} 3169.0
+sql_service_latency_internal_bucket{le="1.703935e+06"} 3440.0
+sql_service_latency_internal_bucket{le="1.769471e+06"} 3731.0
+sql_service_latency_internal_bucket{le="1.835007e+06"} 4024.0
+sql_service_latency_internal_bucket{le="1.900543e+06"} 4326.0
+sql_service_latency_internal_bucket{le="1.966079e+06"} 4604.0
+sql_service_latency_internal_bucket{le="2.031615e+06"} 4971.0
+sql_service_latency_internal_bucket{le="2.097151e+06"} 5375.0
+sql_service_latency_internal_bucket{le="2.228223e+06"} 6293.0
+sql_service_latency_internal_bucket{le="2.359295e+06"} 7366.0
+sql_service_latency_internal_bucket{le="2.490367e+06"} 8376.0
+sql_service_latency_internal_bucket{le="2.621439e+06"} 9357.0
+sql_service_latency_internal_bucket{le="2.752511e+06"} 10423.0
+sql_service_latency_internal_bucket{le="2.883583e+06"} 11603.0
+sql_service_latency_internal_bucket{le="3.014655e+06"} 12729.0
+sql_service_latency_internal_bucket{le="3.145727e+06"} 13737.0
+sql_service_latency_internal_bucket{le="3.276799e+06"} 14498.0
+sql_service_latency_internal_bucket{le="3.407871e+06"} 15120.0
+sql_service_latency_internal_bucket{le="3.538943e+06"} 15563.0
+sql_service_latency_internal_bucket{le="3.670015e+06"} 15950.0
+sql_service_latency_internal_bucket{le="3.801087e+06"} 16297.0
+sql_service_latency_internal_bucket{le="3.932159e+06"} 16643.0
+sql_service_latency_internal_bucket{le="4.063231e+06"} 16986.0
+sql_service_latency_internal_bucket{le="4.194303e+06"} 17301.0
+sql_service_latency_internal_bucket{le="4.456447e+06"} 17704.0
+sql_service_latency_internal_bucket{le="4.718591e+06"} 17993.0
+sql_service_latency_internal_bucket{le="4.980735e+06"} 18182.0
+sql_service_latency_internal_bucket{le="5.242879e+06"} 18303.0
+sql_service_latency_internal_bucket{le="5.505023e+06"} 18375.0
+sql_service_latency_internal_bucket{le="5.767167e+06"} 18435.0
+sql_service_latency_internal_bucket{le="6.029311e+06"} 18480.0
+sql_service_latency_internal_bucket{le="6.291455e+06"} 18513.0
+sql_service_latency_internal_bucket{le="6.553599e+06"} 18546.0
+sql_service_latency_internal_bucket{le="6.815743e+06"} 18562.0
+sql_service_latency_internal_bucket{le="7.077887e+06"} 18574.0
+sql_service_latency_internal_bucket{le="7.340031e+06"} 18588.0
+sql_service_latency_internal_bucket{le="7.602175e+06"} 18592.0
+sql_service_latency_internal_bucket{le="7.864319e+06"} 18598.0
+sql_service_latency_internal_bucket{le="8.126463e+06"} 18603.0
+sql_service_latency_internal_bucket{le="8.388607e+06"} 18604.0
+sql_service_latency_internal_bucket{le="8.912895e+06"} 18606.0
+sql_service_latency_internal_bucket{le="9.437183e+06"} 18608.0
+sql_service_latency_internal_bucket{le="9.961471e+06"} 18609.0
+sql_service_latency_internal_bucket{le="1.1010047e+07"} 18610.0
+sql_service_latency_internal_bucket{le="1.4155775e+07"} 18611.0
+sql_service_latency_internal_bucket{le="1.5204351e+07"} 18612.0
+sql_service_latency_internal_bucket{le="1.7825791e+07"} 18613.0
+sql_service_latency_internal_bucket{le="1.9922943e+07"} 18614.0
+sql_service_latency_internal_bucket{le="2.3068671e+07"} 18617.0
+sql_service_latency_internal_bucket{le="2.4117247e+07"} 18624.0
+sql_service_latency_internal_bucket{le="2.5165823e+07"} 18633.0
+sql_service_latency_internal_bucket{le="2.6214399e+07"} 18645.0
+sql_service_latency_internal_bucket{le="2.7262975e+07"} 18656.0
+sql_service_latency_internal_bucket{le="2.8311551e+07"} 18673.0
+sql_service_latency_internal_bucket{le="2.9360127e+07"} 18687.0
+sql_service_latency_internal_bucket{le="3.0408703e+07"} 18711.0
+sql_service_latency_internal_bucket{le="3.1457279e+07"} 18731.0
+sql_service_latency_internal_bucket{le="3.2505855e+07"} 18742.0
+sql_service_latency_internal_bucket{le="3.3554431e+07"} 18756.0
+sql_service_latency_internal_bucket{le="3.5651583e+07"} 18779.0
+sql_service_latency_internal_bucket{le="3.7748735e+07"} 18793.0
+sql_service_latency_internal_bucket{le="3.9845887e+07"} 18804.0
+sql_service_latency_internal_bucket{le="4.1943039e+07"} 18814.0
+sql_service_latency_internal_bucket{le="4.4040191e+07"} 18817.0
+sql_service_latency_internal_bucket{le="4.6137343e+07"} 18826.0
+sql_service_latency_internal_bucket{le="4.8234495e+07"} 18835.0
+sql_service_latency_internal_bucket{le="5.0331647e+07"} 18840.0
+sql_service_latency_internal_bucket{le="5.2428799e+07"} 18844.0
+sql_service_latency_internal_bucket{le="5.4525951e+07"} 18845.0
+sql_service_latency_internal_bucket{le="5.6623103e+07"} 18848.0
+sql_service_latency_internal_bucket{le="5.8720255e+07"} 18852.0
+sql_service_latency_internal_bucket{le="6.0817407e+07"} 18854.0
+sql_service_latency_internal_bucket{le="6.7108863e+07"} 18856.0
+sql_service_latency_internal_bucket{le="7.1303167e+07"} 18858.0
+sql_service_latency_internal_bucket{le="7.5497471e+07"} 18861.0
+sql_service_latency_internal_bucket{le="7.9691775e+07"} 18862.0
+sql_service_latency_internal_bucket{le="8.8080383e+07"} 18863.0
+sql_service_latency_internal_bucket{le="1.50994943e+08"} 18864.0
+sql_service_latency_internal_bucket{le="1.84549375e+08"} 18865.0
+sql_service_latency_internal_bucket{le="1.92937983e+08"} 18866.0
+sql_service_latency_internal_bucket{le="2.43269631e+08"} 18867.0
+sql_service_latency_internal_bucket{le="2.51658239e+08"} 18868.0
+sql_service_latency_internal_bucket{le="4.52984831e+08"} 18869.0
+sql_service_latency_internal_bucket{le="1.006632959e+09"} 18870.0
+sql_service_latency_internal_bucket{le="+Inf"} 18870.0
+sql_service_latency_internal_sum 6.216636577e+10
+sql_service_latency_internal_count 18870.0
+# HELP compactor_compactingnanos Number of nanoseconds spent compacting ranges
+# TYPE compactor_compactingnanos counter
+compactor_compactingnanos{store="1"} 0.0
+# HELP gossip_connections_refused Number of refused incoming gossip connections
+# TYPE gossip_connections_refused counter
+gossip_connections_refused 0.0
+# HELP sql_mem_admin_session_max Memory usage per sql session for admin
+# TYPE sql_mem_admin_session_max histogram
+sql_mem_admin_session_max_bucket{le="+Inf"} 0.0
+sql_mem_admin_session_max_sum 0.0
+sql_mem_admin_session_max_count 0.0
+# HELP sys_gc_count Total number of GC runs
+# TYPE sys_gc_count gauge
+sys_gc_count 3072.0
+# HELP exec_latency Latency of batch KV requests executed on this node
+# TYPE exec_latency histogram
+exec_latency_bucket{le="18431.0"} 1.0
+exec_latency_bucket{le="19455.0"} 3.0
+exec_latency_bucket{le="20479.0"} 4.0
+exec_latency_bucket{le="21503.0"} 7.0
+exec_latency_bucket{le="22527.0"} 10.0
+exec_latency_bucket{le="23551.0"} 35.0
+exec_latency_bucket{le="24575.0"} 171.0
+exec_latency_bucket{le="25599.0"} 381.0
+exec_latency_bucket{le="26623.0"} 674.0
+exec_latency_bucket{le="27647.0"} 962.0
+exec_latency_bucket{le="28671.0"} 1270.0
+exec_latency_bucket{le="29695.0"} 1605.0
+exec_latency_bucket{le="30719.0"} 2005.0
+exec_latency_bucket{le="31743.0"} 2325.0
+exec_latency_bucket{le="32767.0"} 2614.0
+exec_latency_bucket{le="34815.0"} 3169.0
+exec_latency_bucket{le="36863.0"} 3791.0
+exec_latency_bucket{le="38911.0"} 4556.0
+exec_latency_bucket{le="40959.0"} 5308.0
+exec_latency_bucket{le="43007.0"} 6044.0
+exec_latency_bucket{le="45055.0"} 6760.0
+exec_latency_bucket{le="47103.0"} 7431.0
+exec_latency_bucket{le="49151.0"} 8095.0
+exec_latency_bucket{le="51199.0"} 8810.0
+exec_latency_bucket{le="53247.0"} 9583.0
+exec_latency_bucket{le="55295.0"} 10453.0
+exec_latency_bucket{le="57343.0"} 11426.0
+exec_latency_bucket{le="59391.0"} 12449.0
+exec_latency_bucket{le="61439.0"} 13572.0
+exec_latency_bucket{le="63487.0"} 14789.0
+exec_latency_bucket{le="65535.0"} 16026.0
+exec_latency_bucket{le="69631.0"} 18990.0
+exec_latency_bucket{le="73727.0"} 22440.0
+exec_latency_bucket{le="77823.0"} 26188.0
+exec_latency_bucket{le="81919.0"} 30481.0
+exec_latency_bucket{le="86015.0"} 34536.0
+exec_latency_bucket{le="90111.0"} 38640.0
+exec_latency_bucket{le="94207.0"} 42435.0
+exec_latency_bucket{le="98303.0"} 46020.0
+exec_latency_bucket{le="102399.0"} 49403.0
+exec_latency_bucket{le="106495.0"} 52406.0
+exec_latency_bucket{le="110591.0"} 55320.0
+exec_latency_bucket{le="114687.0"} 57999.0
+exec_latency_bucket{le="118783.0"} 60542.0
+exec_latency_bucket{le="122879.0"} 62938.0
+exec_latency_bucket{le="126975.0"} 65281.0
+exec_latency_bucket{le="131071.0"} 67524.0
+exec_latency_bucket{le="139263.0"} 71685.0
+exec_latency_bucket{le="147455.0"} 75546.0
+exec_latency_bucket{le="155647.0"} 79156.0
+exec_latency_bucket{le="163839.0"} 82683.0
+exec_latency_bucket{le="172031.0"} 86111.0
+exec_latency_bucket{le="180223.0"} 89333.0
+exec_latency_bucket{le="188415.0"} 92349.0
+exec_latency_bucket{le="196607.0"} 95233.0
+exec_latency_bucket{le="204799.0"} 97958.0
+exec_latency_bucket{le="212991.0"} 100298.0
+exec_latency_bucket{le="221183.0"} 102432.0
+exec_latency_bucket{le="229375.0"} 104271.0
+exec_latency_bucket{le="237567.0"} 105960.0
+exec_latency_bucket{le="245759.0"} 107519.0
+exec_latency_bucket{le="253951.0"} 108975.0
+exec_latency_bucket{le="262143.0"} 110242.0
+exec_latency_bucket{le="278527.0"} 112495.0
+exec_latency_bucket{le="294911.0"} 114154.0
+exec_latency_bucket{le="311295.0"} 115436.0
+exec_latency_bucket{le="327679.0"} 116347.0
+exec_latency_bucket{le="344063.0"} 116938.0
+exec_latency_bucket{le="360447.0"} 117373.0
+exec_latency_bucket{le="376831.0"} 117735.0
+exec_latency_bucket{le="393215.0"} 117973.0
+exec_latency_bucket{le="409599.0"} 118136.0
+exec_latency_bucket{le="425983.0"} 118289.0
+exec_latency_bucket{le="442367.0"} 118398.0
+exec_latency_bucket{le="458751.0"} 118492.0
+exec_latency_bucket{le="475135.0"} 118561.0
+exec_latency_bucket{le="491519.0"} 118613.0
+exec_latency_bucket{le="507903.0"} 118671.0
+exec_latency_bucket{le="524287.0"} 118701.0
+exec_latency_bucket{le="557055.0"} 118749.0
+exec_latency_bucket{le="589823.0"} 118789.0
+exec_latency_bucket{le="622591.0"} 118808.0
+exec_latency_bucket{le="655359.0"} 118827.0
+exec_latency_bucket{le="688127.0"} 118835.0
+exec_latency_bucket{le="720895.0"} 118842.0
+exec_latency_bucket{le="753663.0"} 118849.0
+exec_latency_bucket{le="786431.0"} 118854.0
+exec_latency_bucket{le="819199.0"} 118872.0
+exec_latency_bucket{le="851967.0"} 118916.0
+exec_latency_bucket{le="884735.0"} 119032.0
+exec_latency_bucket{le="917503.0"} 119248.0
+exec_latency_bucket{le="950271.0"} 119677.0
+exec_latency_bucket{le="983039.0"} 120204.0
+exec_latency_bucket{le="1.015807e+06"} 120881.0
+exec_latency_bucket{le="1.048575e+06"} 121628.0
+exec_latency_bucket{le="1.114111e+06"} 123490.0
+exec_latency_bucket{le="1.179647e+06"} 125813.0
+exec_latency_bucket{le="1.245183e+06"} 128559.0
+exec_latency_bucket{le="1.310719e+06"} 131722.0
+exec_latency_bucket{le="1.376255e+06"} 135639.0
+exec_latency_bucket{le="1.441791e+06"} 140480.0
+exec_latency_bucket{le="1.507327e+06"} 146093.0
+exec_latency_bucket{le="1.572863e+06"} 152133.0
+exec_latency_bucket{le="1.638399e+06"} 158338.0
+exec_latency_bucket{le="1.703935e+06"} 164915.0
+exec_latency_bucket{le="1.769471e+06"} 171923.0
+exec_latency_bucket{le="1.835007e+06"} 179550.0
+exec_latency_bucket{le="1.900543e+06"} 187591.0
+exec_latency_bucket{le="1.966079e+06"} 195856.0
+exec_latency_bucket{le="2.031615e+06"} 204329.0
+exec_latency_bucket{le="2.097151e+06"} 212745.0
+exec_latency_bucket{le="2.228223e+06"} 228186.0
+exec_latency_bucket{le="2.359295e+06"} 241340.0
+exec_latency_bucket{le="2.490367e+06"} 252695.0
+exec_latency_bucket{le="2.621439e+06"} 262466.0
+exec_latency_bucket{le="2.752511e+06"} 271267.0
+exec_latency_bucket{le="2.883583e+06"} 279037.0
+exec_latency_bucket{le="3.014655e+06"} 286310.0
+exec_latency_bucket{le="3.145727e+06"} 293089.0
+exec_latency_bucket{le="3.276799e+06"} 299755.0
+exec_latency_bucket{le="3.407871e+06"} 306613.0
+exec_latency_bucket{le="3.538943e+06"} 313456.0
+exec_latency_bucket{le="3.670015e+06"} 320545.0
+exec_latency_bucket{le="3.801087e+06"} 327474.0
+exec_latency_bucket{le="3.932159e+06"} 334108.0
+exec_latency_bucket{le="4.063231e+06"} 340382.0
+exec_latency_bucket{le="4.194303e+06"} 346337.0
+exec_latency_bucket{le="4.456447e+06"} 356695.0
+exec_latency_bucket{le="4.718591e+06"} 365742.0
+exec_latency_bucket{le="4.980735e+06"} 374158.0
+exec_latency_bucket{le="5.242879e+06"} 381962.0
+exec_latency_bucket{le="5.505023e+06"} 389581.0
+exec_latency_bucket{le="5.767167e+06"} 397363.0
+exec_latency_bucket{le="6.029311e+06"} 404970.0
+exec_latency_bucket{le="6.291455e+06"} 411358.0
+exec_latency_bucket{le="6.553599e+06"} 416508.0
+exec_latency_bucket{le="6.815743e+06"} 420857.0
+exec_latency_bucket{le="7.077887e+06"} 424304.0
+exec_latency_bucket{le="7.340031e+06"} 426863.0
+exec_latency_bucket{le="7.602175e+06"} 428859.0
+exec_latency_bucket{le="7.864319e+06"} 430399.0
+exec_latency_bucket{le="8.126463e+06"} 431543.0
+exec_latency_bucket{le="8.388607e+06"} 432497.0
+exec_latency_bucket{le="8.912895e+06"} 433995.0
+exec_latency_bucket{le="9.437183e+06"} 435121.0
+exec_latency_bucket{le="9.961471e+06"} 435775.0
+exec_latency_bucket{le="1.0485759e+07"} 436259.0
+exec_latency_bucket{le="1.1010047e+07"} 436581.0
+exec_latency_bucket{le="1.1534335e+07"} 436774.0
+exec_latency_bucket{le="1.2058623e+07"} 436905.0
+exec_latency_bucket{le="1.2582911e+07"} 437012.0
+exec_latency_bucket{le="1.3107199e+07"} 437076.0
+exec_latency_bucket{le="1.3631487e+07"} 437150.0
+exec_latency_bucket{le="1.4155775e+07"} 437199.0
+exec_latency_bucket{le="1.4680063e+07"} 437240.0
+exec_latency_bucket{le="1.5204351e+07"} 437266.0
+exec_latency_bucket{le="1.5728639e+07"} 437288.0
+exec_latency_bucket{le="1.6252927e+07"} 437309.0
+exec_latency_bucket{le="1.6777215e+07"} 437343.0
+exec_latency_bucket{le="1.7825791e+07"} 437399.0
+exec_latency_bucket{le="1.8874367e+07"} 437466.0
+exec_latency_bucket{le="1.9922943e+07"} 437534.0
+exec_latency_bucket{le="2.0971519e+07"} 437659.0
+exec_latency_bucket{le="2.2020095e+07"} 437874.0
+exec_latency_bucket{le="2.3068671e+07"} 438191.0
+exec_latency_bucket{le="2.4117247e+07"} 438609.0
+exec_latency_bucket{le="2.5165823e+07"} 439259.0
+exec_latency_bucket{le="2.6214399e+07"} 440017.0
+exec_latency_bucket{le="2.7262975e+07"} 440879.0
+exec_latency_bucket{le="2.8311551e+07"} 441818.0
+exec_latency_bucket{le="2.9360127e+07"} 442682.0
+exec_latency_bucket{le="3.0408703e+07"} 443563.0
+exec_latency_bucket{le="3.1457279e+07"} 444428.0
+exec_latency_bucket{le="3.2505855e+07"} 445192.0
+exec_latency_bucket{le="3.3554431e+07"} 445935.0
+exec_latency_bucket{le="3.5651583e+07"} 447261.0
+exec_latency_bucket{le="3.7748735e+07"} 448463.0
+exec_latency_bucket{le="3.9845887e+07"} 449729.0
+exec_latency_bucket{le="4.1943039e+07"} 451168.0
+exec_latency_bucket{le="4.4040191e+07"} 452749.0
+exec_latency_bucket{le="4.6137343e+07"} 454376.0
+exec_latency_bucket{le="4.8234495e+07"} 456044.0
+exec_latency_bucket{le="5.0331647e+07"} 457706.0
+exec_latency_bucket{le="5.2428799e+07"} 459350.0
+exec_latency_bucket{le="5.4525951e+07"} 460860.0
+exec_latency_bucket{le="5.6623103e+07"} 462143.0
+exec_latency_bucket{le="5.8720255e+07"} 463192.0
+exec_latency_bucket{le="6.0817407e+07"} 464133.0
+exec_latency_bucket{le="6.2914559e+07"} 464866.0
+exec_latency_bucket{le="6.5011711e+07"} 465484.0
+exec_latency_bucket{le="6.7108863e+07"} 465970.0
+exec_latency_bucket{le="7.1303167e+07"} 466848.0
+exec_latency_bucket{le="7.5497471e+07"} 467471.0
+exec_latency_bucket{le="7.9691775e+07"} 468040.0
+exec_latency_bucket{le="8.3886079e+07"} 468578.0
+exec_latency_bucket{le="8.8080383e+07"} 469072.0
+exec_latency_bucket{le="9.2274687e+07"} 469504.0
+exec_latency_bucket{le="9.6468991e+07"} 469896.0
+exec_latency_bucket{le="1.00663295e+08"} 470134.0
+exec_latency_bucket{le="1.04857599e+08"} 470364.0
+exec_latency_bucket{le="1.09051903e+08"} 470525.0
+exec_latency_bucket{le="1.13246207e+08"} 470656.0
+exec_latency_bucket{le="1.17440511e+08"} 470748.0
+exec_latency_bucket{le="1.21634815e+08"} 470850.0
+exec_latency_bucket{le="1.25829119e+08"} 470943.0
+exec_latency_bucket{le="1.30023423e+08"} 471005.0
+exec_latency_bucket{le="1.34217727e+08"} 471045.0
+exec_latency_bucket{le="1.42606335e+08"} 471154.0
+exec_latency_bucket{le="1.50994943e+08"} 471222.0
+exec_latency_bucket{le="1.59383551e+08"} 471283.0
+exec_latency_bucket{le="1.67772159e+08"} 471338.0
+exec_latency_bucket{le="1.76160767e+08"} 471392.0
+exec_latency_bucket{le="1.84549375e+08"} 471458.0
+exec_latency_bucket{le="1.92937983e+08"} 471495.0
+exec_latency_bucket{le="2.01326591e+08"} 471550.0
+exec_latency_bucket{le="2.09715199e+08"} 471585.0
+exec_latency_bucket{le="2.18103807e+08"} 471635.0
+exec_latency_bucket{le="2.26492415e+08"} 471687.0
+exec_latency_bucket{le="2.34881023e+08"} 471733.0
+exec_latency_bucket{le="2.43269631e+08"} 471768.0
+exec_latency_bucket{le="2.51658239e+08"} 471800.0
+exec_latency_bucket{le="2.60046847e+08"} 471850.0
+exec_latency_bucket{le="2.68435455e+08"} 471890.0
+exec_latency_bucket{le="2.85212671e+08"} 471987.0
+exec_latency_bucket{le="3.01989887e+08"} 472032.0
+exec_latency_bucket{le="3.18767103e+08"} 472079.0
+exec_latency_bucket{le="3.35544319e+08"} 472112.0
+exec_latency_bucket{le="3.52321535e+08"} 472149.0
+exec_latency_bucket{le="3.69098751e+08"} 472175.0
+exec_latency_bucket{le="3.85875967e+08"} 472196.0
+exec_latency_bucket{le="4.02653183e+08"} 472210.0
+exec_latency_bucket{le="4.19430399e+08"} 472235.0
+exec_latency_bucket{le="4.36207615e+08"} 472238.0
+exec_latency_bucket{le="4.52984831e+08"} 472243.0
+exec_latency_bucket{le="4.69762047e+08"} 472253.0
+exec_latency_bucket{le="4.86539263e+08"} 472256.0
+exec_latency_bucket{le="5.03316479e+08"} 472262.0
+exec_latency_bucket{le="5.20093695e+08"} 472265.0
+exec_latency_bucket{le="5.36870911e+08"} 472269.0
+exec_latency_bucket{le="5.70425343e+08"} 472271.0
+exec_latency_bucket{le="6.03979775e+08"} 472275.0
+exec_latency_bucket{le="6.37534207e+08"} 472282.0
+exec_latency_bucket{le="6.71088639e+08"} 472287.0
+exec_latency_bucket{le="7.04643071e+08"} 472288.0
+exec_latency_bucket{le="7.38197503e+08"} 472292.0
+exec_latency_bucket{le="7.71751935e+08"} 472293.0
+exec_latency_bucket{le="8.05306367e+08"} 472294.0
+exec_latency_bucket{le="8.38860799e+08"} 472295.0
+exec_latency_bucket{le="8.72415231e+08"} 472296.0
+exec_latency_bucket{le="9.39524095e+08"} 472298.0
+exec_latency_bucket{le="1.006632959e+09"} 472309.0
+exec_latency_bucket{le="1.073741823e+09"} 472310.0
+exec_latency_bucket{le="1.140850687e+09"} 472314.0
+exec_latency_bucket{le="1.207959551e+09"} 472316.0
+exec_latency_bucket{le="1.275068415e+09"} 472317.0
+exec_latency_bucket{le="1.342177279e+09"} 472320.0
+exec_latency_bucket{le="1.409286143e+09"} 472321.0
+exec_latency_bucket{le="1.476395007e+09"} 472322.0
+exec_latency_bucket{le="1.543503871e+09"} 472323.0
+exec_latency_bucket{le="1.610612735e+09"} 472324.0
+exec_latency_bucket{le="1.677721599e+09"} 472325.0
+exec_latency_bucket{le="2.013265919e+09"} 472326.0
+exec_latency_bucket{le="2.080374783e+09"} 472327.0
+exec_latency_bucket{le="2.550136831e+09"} 472329.0
+exec_latency_bucket{le="2.684354559e+09"} 472331.0
+exec_latency_bucket{le="2.818572287e+09"} 472334.0
+exec_latency_bucket{le="3.087007743e+09"} 472337.0
+exec_latency_bucket{le="3.355443199e+09"} 472338.0
+exec_latency_bucket{le="4.563402751e+09"} 472342.0
+exec_latency_bucket{le="5.637144575e+09"} 472343.0
+exec_latency_bucket{le="6.174015487e+09"} 472344.0
+exec_latency_bucket{le="7.247757311e+09"} 472345.0
+exec_latency_bucket{le="1.0200547327e+10"} 472346.0
+exec_latency_bucket{le="1.2348030975e+10"} 472347.0
+exec_latency_bucket{le="1.2884901887e+10"} 472348.0
+exec_latency_bucket{le="1.5569256447e+10"} 472350.0
+exec_latency_bucket{le="+Inf"} 472350.0
+exec_latency_sum 3.301988718306e+12
+exec_latency_count 472350.0
+# HELP sql_distsql_flows_active Number of distributed SQL flows currently active
+# TYPE sql_distsql_flows_active gauge
+sql_distsql_flows_active 0.0
+# HELP sql_conns Number of active sql connections
+# TYPE sql_conns gauge
+sql_conns 0.0
+# HELP ranges_underreplicated Number of ranges with fewer live replicas than the replication target
+# TYPE ranges_underreplicated gauge
+ranges_underreplicated{store="1"} 28.0
+# HELP leases_transfers_error Number of failed lease transfers
+# TYPE leases_transfers_error counter
+leases_transfers_error{store="1"} 0.0
+# HELP txn_restarts_writetooold Number of restarts due to a concurrent writer committing first
+# TYPE txn_restarts_writetooold counter
+txn_restarts_writetooold 0.0
+# HELP sys_host_disk_iopsinprogress IO operations currently in progress on this host
+# TYPE sys_host_disk_iopsinprogress gauge
+sys_host_disk_iopsinprogress 0.0
+# HELP sys_uptime Process uptime
+# TYPE sys_uptime gauge
+sys_uptime 610435.0
+# HELP queue_gc_info_abortspanscanned Number of transactions present in the AbortSpan scanned from the engine
+# TYPE queue_gc_info_abortspanscanned counter
+queue_gc_info_abortspanscanned{store="1"} 1.0
+# HELP addsstable_copies number of SSTable ingestions that required copying files during application
+# TYPE addsstable_copies counter
+addsstable_copies{store="1"} 0.0
+# HELP queue_replicate_removereplica Number of replica removals attempted by the replicate queue (typically in response to a rebalancer-initiated addition)
+# TYPE queue_replicate_removereplica counter
+queue_replicate_removereplica{store="1"} 0.0
+# HELP sql_distsql_service_latency Latency of DistSQL request execution
+# TYPE sql_distsql_service_latency histogram
+sql_distsql_service_latency_bucket{le="+Inf"} 0.0
+sql_distsql_service_latency_sum 0.0
+sql_distsql_service_latency_count 0.0
+# HELP sql_distsql_exec_latency_internal Latency of DistSQL statement execution (internal queries)
+# TYPE sql_distsql_exec_latency_internal histogram
+sql_distsql_exec_latency_internal_bucket{le="102399.0"} 2.0
+sql_distsql_exec_latency_internal_bucket{le="106495.0"} 3.0
+sql_distsql_exec_latency_internal_bucket{le="110591.0"} 4.0
+sql_distsql_exec_latency_internal_bucket{le="114687.0"} 6.0
+sql_distsql_exec_latency_internal_bucket{le="118783.0"} 9.0
+sql_distsql_exec_latency_internal_bucket{le="122879.0"} 10.0
+sql_distsql_exec_latency_internal_bucket{le="126975.0"} 13.0
+sql_distsql_exec_latency_internal_bucket{le="131071.0"} 17.0
+sql_distsql_exec_latency_internal_bucket{le="139263.0"} 23.0
+sql_distsql_exec_latency_internal_bucket{le="147455.0"} 29.0
+sql_distsql_exec_latency_internal_bucket{le="155647.0"} 38.0
+sql_distsql_exec_latency_internal_bucket{le="163839.0"} 45.0
+sql_distsql_exec_latency_internal_bucket{le="172031.0"} 52.0
+sql_distsql_exec_latency_internal_bucket{le="180223.0"} 60.0
+sql_distsql_exec_latency_internal_bucket{le="188415.0"} 67.0
+sql_distsql_exec_latency_internal_bucket{le="196607.0"} 78.0
+sql_distsql_exec_latency_internal_bucket{le="204799.0"} 89.0
+sql_distsql_exec_latency_internal_bucket{le="212991.0"} 96.0
+sql_distsql_exec_latency_internal_bucket{le="221183.0"} 103.0
+sql_distsql_exec_latency_internal_bucket{le="229375.0"} 112.0
+sql_distsql_exec_latency_internal_bucket{le="237567.0"} 137.0
+sql_distsql_exec_latency_internal_bucket{le="245759.0"} 202.0
+sql_distsql_exec_latency_internal_bucket{le="253951.0"} 312.0
+sql_distsql_exec_latency_internal_bucket{le="262143.0"} 447.0
+sql_distsql_exec_latency_internal_bucket{le="278527.0"} 724.0
+sql_distsql_exec_latency_internal_bucket{le="294911.0"} 963.0
+sql_distsql_exec_latency_internal_bucket{le="311295.0"} 1232.0
+sql_distsql_exec_latency_internal_bucket{le="327679.0"} 1487.0
+sql_distsql_exec_latency_internal_bucket{le="344063.0"} 1714.0
+sql_distsql_exec_latency_internal_bucket{le="360447.0"} 1964.0
+sql_distsql_exec_latency_internal_bucket{le="376831.0"} 2159.0
+sql_distsql_exec_latency_internal_bucket{le="393215.0"} 2341.0
+sql_distsql_exec_latency_internal_bucket{le="409599.0"} 2487.0
+sql_distsql_exec_latency_internal_bucket{le="425983.0"} 2637.0
+sql_distsql_exec_latency_internal_bucket{le="442367.0"} 2778.0
+sql_distsql_exec_latency_internal_bucket{le="458751.0"} 2902.0
+sql_distsql_exec_latency_internal_bucket{le="475135.0"} 3031.0
+sql_distsql_exec_latency_internal_bucket{le="491519.0"} 3214.0
+sql_distsql_exec_latency_internal_bucket{le="507903.0"} 3479.0
+sql_distsql_exec_latency_internal_bucket{le="524287.0"} 3786.0
+sql_distsql_exec_latency_internal_bucket{le="557055.0"} 4485.0
+sql_distsql_exec_latency_internal_bucket{le="589823.0"} 5268.0
+sql_distsql_exec_latency_internal_bucket{le="622591.0"} 6400.0
+sql_distsql_exec_latency_internal_bucket{le="655359.0"} 7515.0
+sql_distsql_exec_latency_internal_bucket{le="688127.0"} 8542.0
+sql_distsql_exec_latency_internal_bucket{le="720895.0"} 9360.0
+sql_distsql_exec_latency_internal_bucket{le="753663.0"} 10017.0
+sql_distsql_exec_latency_internal_bucket{le="786431.0"} 10515.0
+sql_distsql_exec_latency_internal_bucket{le="819199.0"} 10905.0
+sql_distsql_exec_latency_internal_bucket{le="851967.0"} 11206.0
+sql_distsql_exec_latency_internal_bucket{le="884735.0"} 11427.0
+sql_distsql_exec_latency_internal_bucket{le="917503.0"} 11626.0
+sql_distsql_exec_latency_internal_bucket{le="950271.0"} 11769.0
+sql_distsql_exec_latency_internal_bucket{le="983039.0"} 11922.0
+sql_distsql_exec_latency_internal_bucket{le="1.015807e+06"} 12055.0
+sql_distsql_exec_latency_internal_bucket{le="1.048575e+06"} 12156.0
+sql_distsql_exec_latency_internal_bucket{le="1.114111e+06"} 12309.0
+sql_distsql_exec_latency_internal_bucket{le="1.179647e+06"} 12444.0
+sql_distsql_exec_latency_internal_bucket{le="1.245183e+06"} 12519.0
+sql_distsql_exec_latency_internal_bucket{le="1.310719e+06"} 12563.0
+sql_distsql_exec_latency_internal_bucket{le="1.376255e+06"} 12601.0
+sql_distsql_exec_latency_internal_bucket{le="1.441791e+06"} 12630.0
+sql_distsql_exec_latency_internal_bucket{le="1.507327e+06"} 12646.0
+sql_distsql_exec_latency_internal_bucket{le="1.572863e+06"} 12660.0
+sql_distsql_exec_latency_internal_bucket{le="1.638399e+06"} 12668.0
+sql_distsql_exec_latency_internal_bucket{le="1.703935e+06"} 12675.0
+sql_distsql_exec_latency_internal_bucket{le="1.769471e+06"} 12679.0
+sql_distsql_exec_latency_internal_bucket{le="1.835007e+06"} 12683.0
+sql_distsql_exec_latency_internal_bucket{le="1.900543e+06"} 12687.0
+sql_distsql_exec_latency_internal_bucket{le="1.966079e+06"} 12690.0
+sql_distsql_exec_latency_internal_bucket{le="2.097151e+06"} 12691.0
+sql_distsql_exec_latency_internal_bucket{le="2.621439e+06"} 12692.0
+sql_distsql_exec_latency_internal_bucket{le="2.752511e+06"} 12694.0
+sql_distsql_exec_latency_internal_bucket{le="3.276799e+06"} 12695.0
+sql_distsql_exec_latency_internal_bucket{le="+Inf"} 12695.0
+sql_distsql_exec_latency_internal_sum 8.061689449e+09
+sql_distsql_exec_latency_internal_count 12695.0
+# HELP sql_mem_internal_current Current sql statement memory usage for internal
+# TYPE sql_mem_internal_current gauge
+sql_mem_internal_current 0.0
+# HELP clock_offset_meannanos Mean clock offset with other nodes
+# TYPE clock_offset_meannanos gauge
+clock_offset_meannanos 0.0
+# HELP clock_offset_stddevnanos Stddev clock offset with other nodes
+# TYPE clock_offset_stddevnanos gauge
+clock_offset_stddevnanos 171607.0
+# HELP queue_replicate_transferlease Number of range lease transfers attempted by the replicate queue
+# TYPE queue_replicate_transferlease counter
+queue_replicate_transferlease{store="1"} 0.0
+# HELP livecount Count of live keys
+# TYPE livecount gauge
+livecount{store="1"} 23454.0
+# HELP capacity_used Used storage capacity
+# TYPE capacity_used gauge
+capacity_used{store="1"} 6.8681999e+07
+# HELP queue_replicagc_process_failure Number of replicas which failed processing in the replica GC queue
+# TYPE queue_replicagc_process_failure counter
+queue_replicagc_process_failure{store="1"} 0.0
+# HELP sql_mem_internal_txn_max Memory usage per sql transaction for internal
+# TYPE sql_mem_internal_txn_max histogram
+sql_mem_internal_txn_max_bucket{le="4011.0"} 7426.0
+sql_mem_internal_txn_max_bucket{le="4311.0"} 7430.0
+sql_mem_internal_txn_max_bucket{le="4791.0"} 7432.0
+sql_mem_internal_txn_max_bucket{le="+Inf"} 7432.0
+sql_mem_internal_txn_max_sum 2.9812512e+07
+sql_mem_internal_txn_max_count 7432.0
+# HELP changefeed_min_high_water Latest high-water timestamp of most behind feed
+# TYPE changefeed_min_high_water gauge
+changefeed_min_high_water 9.223372036854776e+18
+# HELP range_raftleadertransfers Number of raft leader transfers
+# TYPE range_raftleadertransfers counter
+range_raftleadertransfers{store="1"} 0.0
+# HELP sql_ddl_count Number of SQL DDL statements
+# TYPE sql_ddl_count counter
+sql_ddl_count 0.0
+# HELP queue_split_pending Number of pending replicas in the split queue
+# TYPE queue_split_pending gauge
+queue_split_pending{store="1"} 0.0
+# HELP liveness_livenodes Number of live nodes in the cluster (will be 0 if this node is not itself live)
+# TYPE liveness_livenodes gauge
+liveness_livenodes 1.0
+# HELP sql_bytesout Number of sql bytes sent
+# TYPE sql_bytesout counter
+sql_bytesout 0.0
+# HELP sql_txn_commit_count Number of SQL transaction COMMIT statements
+# TYPE sql_txn_commit_count counter
+sql_txn_commit_count 0.0

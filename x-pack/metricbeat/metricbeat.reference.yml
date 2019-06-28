@@ -235,6 +235,16 @@ metricbeat.modules:
   hosts: ["localhost:5000"]
   enabled: true
 
+#----------------------------- CockroachDB Module -----------------------------
+- module: cockroachdb
+  metricsets: ['status']
+  period: 10s
+  hosts: ['localhost:8080']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  #metrics_path: /_status/vars
+
 #-------------------------------- Consul Module --------------------------------
 - module: consul
   metricsets:

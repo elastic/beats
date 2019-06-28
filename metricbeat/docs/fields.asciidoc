@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
+* <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
 * <<exported-fields-coredns>>
@@ -3276,6 +3277,14 @@ type: alias
 alias to: cloud.region
 
 --
+
+[[exported-fields-cockroachdb]]
+== CockroachDB fields
+
+CockroachDB module
+
+
+
 
 [[exported-fields-common]]
 == Common fields

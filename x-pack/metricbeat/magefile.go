@@ -84,7 +84,7 @@ func TestPackages() error {
 		devtools.WithModules(),
 
 		// To be increased or removed when more light modules are added
-		devtools.MinModules(0))
+		devtools.MinModules(1))
 }
 
 // Fields generates a fields.yml and fields.go for each module.
