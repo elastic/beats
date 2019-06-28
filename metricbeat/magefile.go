@@ -37,6 +37,10 @@ func init() {
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
+func CollectDocs() error {
+	return metricbeat.CollectDocs()
+}
+
 // Build builds the Beat binary.
 func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
