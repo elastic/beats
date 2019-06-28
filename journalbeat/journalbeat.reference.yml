@@ -32,6 +32,10 @@ journalbeat.inputs:
   # Matching for nginx entries: "systemd.unit=nginx"
   #include_matches: []
 
+  # Set remote to true to preserve the remote hostname in entries from a remote journal.
+  # It is only needed when used with add_host_metadata.
+  #remote: false
+
   # Optional fields that you can specify to add additional information to the
   # output. Fields can be scalar values, arrays, dictionaries, or any nested
   # combination of these.

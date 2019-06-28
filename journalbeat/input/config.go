@@ -40,6 +40,8 @@ type Config struct {
 	CursorSeekFallback config.SeekMode `config:"cursor_seek_fallback"`
 	// Matches store the key value pairs to match entries.
 	Matches []string `config:"include_matches"`
+	// Remote defines if the journal is form a remote host
+	Remote bool
 
 	// Fields and tags to add to events.
 	common.EventMetadata `config:",inline"`
@@ -54,5 +56,6 @@ var (
 		MaxBackoff:         20 * time.Second,
 		Seek:               config.SeekCursor,
 		CursorSeekFallback: config.SeekHead,
+		Remote:             false,
 	}
 )

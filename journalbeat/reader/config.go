@@ -39,6 +39,8 @@ type Config struct {
 	Backoff time.Duration
 	// Matches store the key value pairs to match entries.
 	Matches []string
+	// Remote defines if the journal is form a remote host
+	Remote bool
 }
 
 const (
