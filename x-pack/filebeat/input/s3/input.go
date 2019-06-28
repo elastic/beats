@@ -143,6 +143,7 @@ func (p *Input) getAWSCredentials() awssdk.Config {
 // Run runs the input
 func (p *Input) Run() {
 	p.logger.Debugf("s3", "Run s3 input with queueURLs: %+v", p.config.QueueURLs)
+	awsConfig := p.getAWSCredentials()
 
 	for _, queueURL := range p.config.QueueURLs {
 		regionName, err := getRegionFromQueueURL(queueURL)
