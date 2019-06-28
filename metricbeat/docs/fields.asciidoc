@@ -14804,7 +14804,7 @@ type: keyword
 *`kubernetes.scheduler.result`*::
 +
 --
-Schedule attmpt result
+Schedule attempt result
 
 
 type: keyword
@@ -14990,7 +14990,7 @@ type: boolean
 *`kubernetes.scheduler.scheduler.e2e.duration.us.bucket.*`*::
 +
 --
-E2e scheduling duration microseconds
+End to end scheduling duration microseconds
 
 type: object
 
@@ -14999,7 +14999,7 @@ type: object
 *`kubernetes.scheduler.scheduler.e2e.duration.us.sum`*::
 +
 --
-E2e scheduling duration microseconds sum
+End to end scheduling duration microseconds sum
 
 type: long
 
@@ -15008,7 +15008,7 @@ type: long
 *`kubernetes.scheduler.scheduler.e2e.duration.us.count`*::
 +
 --
-E2e scheduling count
+End to end scheduling count
 
 type: long
 

@@ -27,7 +27,7 @@
   - name: result
     type: keyword
     description: >
-      Schedule attmpt result
+      Schedule attempt result
   - name: operation
     type: keyword
     description: >
@@ -105,13 +105,13 @@
       - name: e2e.duration.us.bucket.*
         type: object
         object_type: long
-        description: E2e scheduling duration microseconds
+        description: End to end scheduling duration microseconds
       - name: e2e.duration.us.sum
         type: long
-        description: E2e scheduling duration microseconds sum
+        description: End to end scheduling duration microseconds sum
       - name: e2e.duration.us.count
         type: long
-        description: E2e scheduling count
+        description: End to end scheduling count
       - name: pod.preemption.victims.count
         type: long
         description: Pod preemption victims
