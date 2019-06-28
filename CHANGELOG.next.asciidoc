@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
 - Fix timezone offset parsing in system/syslog. {pull}12529[12529]
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
 
 *Heartbeat*
 
