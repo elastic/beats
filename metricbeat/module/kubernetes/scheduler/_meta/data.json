@@ -1,0 +1,33 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.scheduler",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "scheduler": {
+            "operation": "binding",
+            "scheduler": {
+                "duration": {
+                    "seconds": {
+                        "count": 3,
+                        "percentile": {
+                            "50": 0.012318629,
+                            "90": 0.012921477,
+                            "99": 0.012921477
+                        },
+                        "sum": 0.039052979
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "scheduler"
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
+}
