@@ -61,11 +61,10 @@ func init() {
 
 // Input is a input for s3
 type Input struct {
-	started bool
-	outlet  channel.Outleter
-	config  config
-	cfg     *common.Config
-	logger  *logp.Logger
+	outlet    channel.Outleter
+	config    config
+	awsConfig awssdk.Config
+	logger    *logp.Logger
 }
 
 type s3Info struct {
@@ -91,60 +90,57 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	}
 
 	if len(config.QueueURLs) == 0 {
-		return nil, errors.Wrap(err, "No sqs queueURLs configured")
+		return nil, errors.Wrap(err, "no sqs queueURLs configured")
+	}
+
+	awsConfig, err := getAWSCredentials(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "getAWSCredentials failed")
 	}
 
 	p := &Input{
-		started: false,
-		outlet:  outlet,
-		cfg:     cfg,
-		config:  config,
-		logger:  logger,
+		//started: false,
+		outlet: outlet,
+		//cfg:     cfg,
+		config:    config,
+		awsConfig: awsConfig,
+		logger:    logger,
 	}
 
 	return p, nil
 }
 
-func (p *Input) getAWSCredentials() awssdk.Config {
+func getAWSCredentials(config config) (awssdk.Config, error) {
 	// Check if accessKeyID and secretAccessKey is given from configuration
-	if p.config.AccessKeyID != "" && p.config.SecretAccessKey != "" {
+	if config.AccessKeyID != "" && config.SecretAccessKey != "" {
 		awsConfig := defaults.Config()
 		awsCredentials := awssdk.Credentials{
-			AccessKeyID:     p.config.AccessKeyID,
-			SecretAccessKey: p.config.SecretAccessKey,
+			AccessKeyID:     config.AccessKeyID,
+			SecretAccessKey: config.SecretAccessKey,
 		}
-		if p.config.SessionToken != "" {
-			awsCredentials.SessionToken = p.config.SessionToken
+		if config.SessionToken != "" {
+			awsCredentials.SessionToken = config.SessionToken
 		}
 
 		awsConfig.Credentials = awssdk.StaticCredentialsProvider{
 			Value: awsCredentials,
 		}
-		return awsConfig
+		return awsConfig, nil
 	}
 
 	// If accessKeyID and secretAccessKey is not given, then load from default config
-	var awsConfig awssdk.Config
-	var err error
-	if p.config.SharedConfigProfile != "" {
-		awsConfig, err = external.LoadDefaultAWSConfig(
-			external.WithSharedConfigProfile(p.config.SharedConfigProfile),
+	if config.SharedConfigProfile != "" {
+		return external.LoadDefaultAWSConfig(
+			external.WithSharedConfigProfile(config.SharedConfigProfile),
 		)
 	} else {
-		awsConfig, err = external.LoadDefaultAWSConfig()
+		return external.LoadDefaultAWSConfig()
 	}
-
-	if err != nil {
-		p.logger.Error(errors.Wrap(err, "failed to load default config"))
-	}
-	return awsConfig
 }
 
 // Run runs the input
 func (p *Input) Run() {
 	p.logger.Debugf("s3", "Run s3 input with queueURLs: %+v", p.config.QueueURLs)
-	awsConfig := p.getAWSCredentials()
-
 	for _, queueURL := range p.config.QueueURLs {
 		regionName, err := getRegionFromQueueURL(queueURL)
 		if err != nil {
@@ -152,6 +148,7 @@ func (p *Input) Run() {
 			continue
 		}
 
+		awsConfig := p.awsConfig.Copy()
 		awsConfig.Region = regionName
 		svcSQS := sqs.New(awsConfig)
 		svcS3 := s3.New(awsConfig)
@@ -168,7 +165,8 @@ func (p *Input) Run() {
 		req := svcSQS.ReceiveMessageRequest(receiveMessageInput)
 		output, errR := req.Send()
 		if errR != nil {
-			return
+			p.logger.Errorf("failed to receive message from SQS:", err)
+			continue
 		}
 
 		// process messages
@@ -189,9 +187,6 @@ func (p *Input) Run() {
 
 					// read from s3
 					p.readS3Object(svcS3, s3Infos)
-					if err != nil {
-						p.logger.Error(err.Error())
-					}
 
 					// delete message after events are sent
 					err = deleteMessage(queueURL, *m.ReceiptHandle, svcSQS)
@@ -291,8 +286,12 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) {
 				line := 0
 				for {
 					log, err := reader.ReadString('\n')
+					if log == "" {
+						break
+					}
+
 					if err != nil {
-						if err == io.EOF && log != "" {
+						if err == io.EOF {
 							line++
 							p.forwardEvent(createEvent(log, int64(line), s3Info))
 							break

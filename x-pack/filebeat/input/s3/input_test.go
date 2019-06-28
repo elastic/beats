@@ -159,13 +159,16 @@ func TestCreateEvent(t *testing.T) {
 	assert.NoError(t, err)
 	var events []*beat.Event
 	for {
-		line, err := reader.ReadString('\n')
+		log, err := reader.ReadString('\n')
+		if log == "" {
+			break
+		}
 		if err == io.EOF {
-			event := createEvent(line, int64(0), s3Info)
+			event := createEvent(log, int64(0), s3Info)
 			events = append(events, event)
 			break
 		}
-		event := createEvent(line, int64(0), s3Info)
+		event := createEvent(log, int64(0), s3Info)
 		events = append(events, event)
 	}
 
