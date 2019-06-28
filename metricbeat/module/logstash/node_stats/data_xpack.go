@@ -181,6 +181,11 @@ func makeClusterToPipelinesMap(pipelines []PipelineStats) map[string][]PipelineS
 			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
+		// If no cluster UUID was found in this pipeline, assign it a blank one
+		if len(clusterUUIDs) == 0 {
+			clusterUUIDs = []string{""}
+		}
+
 		for _, clusterUUID := range clusterUUIDs {
 			clusterPipelines := clusterToPipelinesMap[clusterUUID]
 			if clusterPipelines == nil {
