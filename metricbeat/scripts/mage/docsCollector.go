@@ -280,26 +280,6 @@ func gatherData(modules []string) (map[string]moduleData, error) {
 	return moduleMap, nil
 }
 
-// Write the module data to docs/
-func writeDocs(modules map[string]moduleData) error {
-
-	err := writeModuleDocs(modules)
-	if err != nil {
-		return errors.Wrap(err, "error writing module docs")
-	}
-	err = writeMetricsetDocs(modules)
-	if err != nil {
-		return errors.Wrap(err, "error writing metricset docs")
-	}
-
-	err = writeModuleList(modules)
-	if err != nil {
-		return errors.Wrap(err, "error writing module list")
-	}
-
-	return nil
-}
-
 // write the module-level docs
 func writeModuleDocs(modules map[string]moduleData) error {
 	for moduleName, mod := range modules {
@@ -397,6 +377,7 @@ func writeMetricsetDocs(modules map[string]moduleData) error {
 	return nil
 }
 
+// Write the module linked list
 func writeModuleList(modules map[string]moduleData) error {
 	noIcon := "image:./images/icon-no.png[No prebuilt dashboards] "
 	yesIcon := "image:./images/icon-yes.png[Prebuilt dashboards are available] "
@@ -456,6 +437,26 @@ func writeModuleList(modules map[string]moduleData) error {
 	return nil
 }
 
+// Write the module data to docs/
+func writeDocs(modules map[string]moduleData) error {
+
+	err := writeModuleDocs(modules)
+	if err != nil {
+		return errors.Wrap(err, "error writing module docs")
+	}
+	err = writeMetricsetDocs(modules)
+	if err != nil {
+		return errors.Wrap(err, "error writing metricset docs")
+	}
+
+	err = writeModuleList(modules)
+	if err != nil {
+		return errors.Wrap(err, "error writing module list")
+	}
+
+	return nil
+}
+
 // CollectDocs does the following:
 // Generate the module-level docs under docs/
 // Generate the module lists
@@ -483,7 +484,5 @@ func CollectDocs() error {
 		return err
 	}
 
-	writeDocs(moduleMap)
-
-	return nil
+	return writeDocs(moduleMap)
 }
