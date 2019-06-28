@@ -18,7 +18,6 @@ grouped in the following categories:
 * <<exported-fields-beat-common>>
 * <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
-* <<exported-fields-cloud>>
 * <<exported-fields-coredns>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
@@ -35,7 +34,6 @@ grouped in the following categories:
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
-* <<exported-fields-log>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
@@ -1401,33 +1399,6 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
-
---
-
-[[exported-fields-cloud]]
-== cloud fields
-
-Cloud fields from s3 input.
-
-
-
-*`provider`*::
-+
---
-Name of the cloud provider for S3.
-
-
-type: keyword
-
---
-
-*`region`*::
-+
---
-Region name of the S3 bucket.
-
-
-type: keyword
 
 --
 
@@ -7875,33 +7846,6 @@ type: long
 +
 --
 Name of organization associated with the autonomous system.
-
-
-type: keyword
-
---
-
-[[exported-fields-log]]
-== log fields
-
-Log fields from s3 input.
-
-
-
-*`offset`*::
-+
---
-The file offset the reported line starts at.
-
-
-type: long
-
---
-
-*`file.path`*::
-+
---
-The objectURL of the file from which the line was read.
 
 
 type: keyword

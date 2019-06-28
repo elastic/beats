@@ -1,18 +1,3 @@
-- key: log
-  title: "log"
-  description: >
-    Log fields from s3 input.
-  release: beta
-  fields:
-    - name: offset
-      type: long
-      description: >
-        The file offset the reported line starts at.
-    - name: file.path
-      type: keyword
-      description: >
-        The objectURL of the file from which the line was read.
-
 - key: aws
   title: "aws"
   description: >
@@ -32,18 +17,3 @@
           type: keyword
           description: >
             Name of the S3 object that this log retrieved from.
-
-- key: cloud
-  title: "cloud"
-  description: >
-    Cloud fields from s3 input.
-  release: beta
-  fields:
-    - name: provider
-      type: keyword
-      description: >
-        Name of the cloud provider for S3.
-    - name: region
-      type: keyword
-      description: >
-        Region name of the S3 bucket.

@@ -12,6 +12,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -103,26 +105,46 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	return p, nil
 }
 
+func (p *Input) getAWSCredentials() awssdk.Config {
+	// Check if accessKeyID and secretAccessKey is given from configuration
+	if p.config.AccessKeyID != "" && p.config.SecretAccessKey != "" {
+		awsConfig := defaults.Config()
+		awsCredentials := awssdk.Credentials{
+			AccessKeyID:     p.config.AccessKeyID,
+			SecretAccessKey: p.config.SecretAccessKey,
+		}
+		if p.config.SessionToken != "" {
+			awsCredentials.SessionToken = p.config.SessionToken
+		}
+
+		awsConfig.Credentials = awssdk.StaticCredentialsProvider{
+			Value: awsCredentials,
+		}
+		return awsConfig
+	}
+
+	// If accessKeyID and secretAccessKey is not given, then load from default config
+	var awsConfig awssdk.Config
+	var err error
+	if p.config.SharedConfigProfile != "" {
+		awsConfig, err = external.LoadDefaultAWSConfig(
+			external.WithSharedConfigProfile(p.config.SharedConfigProfile),
+		)
+	} else {
+		awsConfig, err = external.LoadDefaultAWSConfig()
+	}
+
+	if err != nil {
+		p.logger.Error(errors.Wrap(err, "failed to load default config"))
+	}
+	return awsConfig
+}
+
 // Run runs the input
 func (p *Input) Run() {
 	p.logger.Debugf("s3", "Run s3 input with queueURLs: %+v", p.config.QueueURLs)
 
-	awsConfig := defaults.Config()
-	awsCredentials := awssdk.Credentials{
-		AccessKeyID:     p.config.AccessKeyID,
-		SecretAccessKey: p.config.SecretAccessKey,
-	}
-	if p.config.SessionToken != "" {
-		awsCredentials.SessionToken = p.config.SessionToken
-	}
-
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCredentials,
-	}
-
-	forwarder := harvester.NewForwarder(p.outlet)
 	for _, queueURL := range p.config.QueueURLs {
-		var d *util.Data
 		regionName, err := getRegionFromQueueURL(queueURL)
 		if err != nil {
 			p.logger.Errorf("failed to get region name from queueURL: %s", queueURL)
@@ -165,17 +187,9 @@ func (p *Input) Run() {
 					}
 
 					// read from s3
-					events, err := p.readS3Object(svcS3, s3Infos)
+					p.readS3Object(svcS3, s3Infos)
 					if err != nil {
 						p.logger.Error(err.Error())
-					}
-
-					for _, event := range events {
-						d = &util.Data{Event: *event}
-						err = forwarder.Send(d)
-						if err != nil {
-							p.logger.Error(errors.Wrap(err, "forwarder send failed"))
-						}
 					}
 
 					// delete message after events are sent
@@ -256,8 +270,7 @@ func stringInSlice(name string, bucketNames []string) bool {
 	return false
 }
 
-func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event, error) {
-	var events []*beat.Event
+func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) {
 	if len(s3Infos) > 0 {
 		var wg sync.WaitGroup
 		numS3Infos := len(s3Infos)
@@ -268,26 +281,19 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event
 				// launch goroutine to handle each message
 				defer wg.Done()
 
-				s3GetObjectInput := &s3.GetObjectInput{
-					Bucket: awssdk.String(s3Info.name),
-					Key:    awssdk.String(s3Info.key),
-				}
-				req := svc.GetObjectRequest(s3GetObjectInput)
-
-				resp, err := req.Send()
+				// read from s3 object
+				reader, err := bufferedIORead(svc, s3Info)
 				if err != nil {
 					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
 				}
 
-				reader := bufio.NewReader(resp.Body)
 				line := 0
 				for {
 					log, err := reader.ReadString('\n')
 					if err != nil {
-						if err == io.EOF {
+						if err == io.EOF && log != "" {
 							line++
-							event := createEvent(log, int64(line), s3Info)
-							events = append(events, event)
+							p.forwardEvent(createEvent(log, int64(line), s3Info))
 							break
 						} else {
 							p.logger.Error(errors.Wrap(err, "ReadString failed"))
@@ -295,14 +301,36 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) ([]*beat.Event
 					}
 					// create event per log line
 					line++
-					event := createEvent(log, int64(line), s3Info)
-					events = append(events, event)
+					p.forwardEvent(createEvent(log, int64(line), s3Info))
 				}
 			}(s3Infos[i])
 			wg.Wait()
 		}
 	}
-	return events, nil
+}
+
+func bufferedIORead(svc s3iface.S3API, s3Info s3Info) (*bufio.Reader, error) {
+	s3GetObjectInput := &s3.GetObjectInput{
+		Bucket: awssdk.String(s3Info.name),
+		Key:    awssdk.String(s3Info.key),
+	}
+	req := svc.GetObjectRequest(s3GetObjectInput)
+
+	resp, err := req.Send()
+	if err != nil {
+		return nil, errors.Wrap(err, "s3 get object request failed")
+	}
+
+	return bufio.NewReader(resp.Body), nil
+}
+
+func (p *Input) forwardEvent(event *beat.Event) {
+	forwarder := harvester.NewForwarder(p.outlet)
+	d := &util.Data{Event: *event}
+	err := forwarder.Send(d)
+	if err != nil {
+		p.logger.Error(errors.Wrap(err, "forwarder send failed"))
+	}
 }
 
 func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.SQS) error {

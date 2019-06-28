@@ -6,10 +6,11 @@ package s3
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
@@ -26,7 +27,13 @@ type MockS3Client struct {
 
 var (
 	s3LogString1 = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/kaiyan.sheng@elastic.co 5141F REST.HEAD.OBJECT Screen1.png \n"
-	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/kaiyan.sheng@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png"
+	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/kaiyan.sheng@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png \n"
+	mockSvc      = &MockS3Client{}
+	info         = s3Info{
+		name:   "test-s3-ks",
+		key:    "log2019-06-21-16-16-54",
+		region: "us-west-1",
+	}
 )
 
 func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
@@ -119,22 +126,49 @@ func TestHandleMessage(t *testing.T) {
 	}
 }
 
-func TestReadS3Object(t *testing.T) {
-	p := &Input{
-		started: false,
-		logger:  logp.NewLogger(inputName),
+func TestBufferedIORead(t *testing.T) {
+	reader, err := bufferedIORead(mockSvc, info)
+	assert.NoError(t, err)
+	for i := 0; i < 3; i++ {
+		switch i {
+		case 0:
+			log, err := reader.ReadString('\n')
+			assert.NoError(t, err)
+			assert.Equal(t, s3LogString1, log)
+		case 1:
+			log, err := reader.ReadString('\n')
+			assert.NoError(t, err)
+			assert.Equal(t, s3LogString2, log)
+		case 2:
+			log, err := reader.ReadString('\n')
+			assert.Error(t, io.EOF, err)
+			assert.Equal(t, "", log)
+		}
+	}
+}
+
+func TestCreateEvent(t *testing.T) {
+	mockSvc := &MockS3Client{}
+	s3Info := s3Info{
+		name:   "test-s3-ks",
+		key:    "log2019-06-21-16-16-54",
+		region: "us-west-1",
 	}
 
-	mockSvc := &MockS3Client{}
-	s3Info := []s3Info{
-		{
-			name:   "test-s3-ks",
-			key:    "log2019-06-21-16-16-54",
-			region: "us-west-1",
-		},
-	}
-	events, err := p.readS3Object(mockSvc, s3Info)
+	reader, err := bufferedIORead(mockSvc, s3Info)
 	assert.NoError(t, err)
+	var events []*beat.Event
+	for {
+		line, err := reader.ReadString('\n')
+		if err == io.EOF {
+			event := createEvent(line, int64(0), s3Info)
+			events = append(events, event)
+			break
+		}
+		event := createEvent(line, int64(0), s3Info)
+		events = append(events, event)
+	}
+
 	assert.Equal(t, 2, len(events))
 
 	bucketName, err := events[0].Fields.GetValue("aws.s3.bucket_name")
