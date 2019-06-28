@@ -37,6 +37,7 @@ func init() {
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
+// CollectDocs creates the documentation under docs/
 func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
