@@ -26,8 +26,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
+	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

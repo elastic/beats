@@ -109,3 +109,8 @@ func GoTestUnit(ctx context.Context) error {
 func GoTestIntegration(ctx context.Context) error {
 	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 }
+
+// Config generates both the short/reference/docker configs.
+func Config() error {
+	return devtools.Config(devtools.AllConfigTypes, devtools.ConfigFileParams{}, ".")
+}
