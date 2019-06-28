@@ -809,6 +809,27 @@ required: False
 --
 
 [float]
+=== source
+
+Fields of the source.
+
+
+
+*`source.hostname`*::
++
+--
+Hostname of the remote server the journals are coming from.
+
+
+type: keyword
+
+example: my.host.name
+
+required: False
+
+--
+
+[float]
 === syslog
 
 Fields of the code generating the event.

@@ -283,6 +283,17 @@
           example: "dd8c974asdf01dbe2ef26d7fasdf264c9"
           description: >
             The boot ID for the boot the log was generated in.
+    - name: source
+      type: group
+      description: >
+          Fields of the source.
+      fields:
+        - name: hostname
+          type: keyword
+          required: false
+          example: "my.host.name"
+          description: >
+            Hostname of the remote server the journals are coming from.
     - name: syslog
       type: group
       description: >
