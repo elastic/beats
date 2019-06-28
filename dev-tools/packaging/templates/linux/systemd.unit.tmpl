@@ -9,7 +9,9 @@ After=network-online.target
 User={{ .BeatUser }}
 Group={{ .BeatUser }}
 {{- end }}
+{{ if ne .BeatName "journalbeat" -}}
 Environment="BEAT_LOG_OPTS=-e"
+{{- end }}
 Environment="BEAT_CONFIG_OPTS=-c /etc/{{.BeatName}}/{{.BeatName}}.yml"
 Environment="BEAT_PATH_OPTS=-path.home /usr/share/{{.BeatName}} -path.config /etc/{{.BeatName}} -path.data /var/lib/{{.BeatName}} -path.logs /var/log/{{.BeatName}}"
 ExecStart=/usr/share/{{.BeatName}}/bin/{{.BeatName}} $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
