@@ -183,6 +183,10 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 			meta.Put("container.labels", labels)
 		}
 
+		if len(container.IPAddresses) > 0 {
+			meta.Put("container.ipaddresses", container.IPAddresses)
+		}
+
 		meta.Put("container.id", container.ID)
 		meta.Put("container.image.name", container.Image)
 		meta.Put("container.name", container.Name)

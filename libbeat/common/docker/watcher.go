@@ -20,6 +20,7 @@ package docker
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -340,6 +341,26 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 				if net.IPAddress != "" {
 					ipaddresses = append(ipaddresses, net.IPAddress)
 				}
+			}
+		}
+
+		// If container is using network from other containers, read other containers settings
+		if len(ipaddresses) == 0 && strings.HasPrefix(c.HostConfig.NetworkMode, "container:") {
+			var networkContainerID = strings.TrimLeft(c.HostConfig.NetworkMode, "container:")
+			logp.Debug("docker", "Inspect container %s as network provider for container %s", networkContainerID, c.ID)
+			ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
+			defer cancel()
+			info, err := w.client.ContainerInspect(ctx, networkContainerID)
+			if err == nil {
+				if info.NetworkSettings != nil {
+					for _, net := range info.NetworkSettings.Networks {
+						if net.IPAddress != "" {
+							ipaddresses = append(ipaddresses, net.IPAddress)
+						}
+					}
+				}
+			} else {
+				logp.Warn("unable to inspect container %s due to error %v", c.ID, err)
 			}
 		}
 
