@@ -19,5 +19,5 @@ type config struct {
 	AccessKeyID               string   `config:"access_key_id"`
 	SecretAccessKey           string   `config:"secret_access_key"`
 	SessionToken              string   `config:"session_token"`
-	SharedConfigProfile       string   `config:"shared_config_profile"`
+	ProfileName               string   `config:"credential_profile_name"`
 }

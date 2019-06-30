@@ -978,10 +978,14 @@ filebeat.inputs:
 #- type: s3
   #enabled: false
 
-  # AWS Credentials (required)
+  # AWS Credentials
+  # If access_key_id and secret_access_key are configured, then use them to make api calls.
+  # If not, s3 input will load default AWS config or load with given profile name.
   #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-s3-input
+
   #credential_profile_name: test-s3-input
 
   # QueueURLs (required) to receive queue messages from

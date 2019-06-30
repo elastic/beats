@@ -129,13 +129,14 @@ func getAWSCredentials(config config) (awssdk.Config, error) {
 	}
 
 	// If accessKeyID and secretAccessKey is not given, then load from default config
-	if config.SharedConfigProfile != "" {
+	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
+	// with more details.
+	if config.ProfileName != "" {
 		return external.LoadDefaultAWSConfig(
-			external.WithSharedConfigProfile(config.SharedConfigProfile),
+			external.WithSharedConfigProfile(config.ProfileName),
 		)
-	} else {
-		return external.LoadDefaultAWSConfig()
 	}
+	return external.LoadDefaultAWSConfig()
 }
 
 // Run runs the input
