@@ -35,6 +35,7 @@ https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log e
 https://github.com/eBay/collectbeat[collectbeat]:: Adds discovery on top of Filebeat and Metricbeat in environments like Kubernetes.
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
 https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
+https://github.com/hellmouthengine/discobeat[discobeat]:: Reads messages from Discord and indexes them in Elasticsearch
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
