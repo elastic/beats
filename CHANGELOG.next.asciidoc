@@ -211,6 +211,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
 - Add MSSQL module {pull}12079[12079]
 - Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
 - Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
 - Add support for client addresses with port in Apache error logs {pull}12695[12695]
 
