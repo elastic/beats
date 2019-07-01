@@ -18,80 +18,49 @@
 package mage
 
 import (
-	"os"
-	"regexp"
-
-	"github.com/magefile/mage/mg"
-
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
-// ConfigOSS generates both the short and reference configs for OSS distribution
-func ConfigOSS() {
-	mg.Deps(shortConfig, referenceConfigOSS, dockerConfig, GenerateDirModulesD)
-}
+const modulesConfigYml = "build/config.modules.yml"
 
-// ConfigXPack generates both the short and reference configs for Licensed distribution
-func ConfigXPack() {
-	mg.Deps(shortConfig, referenceConfigXPack, dockerConfig, GenerateDirModulesD)
-}
-
-func shortConfig() error {
-	var configParts = []string{
-		mage.OSSBeatDir("_meta/common.yml"),
-		mage.OSSBeatDir("_meta/setup.yml"),
-		"{{ elastic_beats_dir }}/libbeat/_meta/config.yml",
+func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
+	collectModuleConfig := func() error {
+		return devtools.GenerateModuleReferenceConfig(modulesConfigYml, moduleDirs...)
 	}
 
-	for i, f := range configParts {
-		configParts[i] = mage.MustExpand(f)
+	return devtools.ConfigFileParams{
+		ShortParts: []string{
+			devtools.OSSBeatDir("_meta/common.yml"),
+			devtools.OSSBeatDir("_meta/setup.yml"),
+			devtools.LibbeatDir("_meta/config.yml.tmpl"),
+		},
+		ReferenceDeps: []interface{}{collectModuleConfig},
+		ReferenceParts: []string{
+			devtools.OSSBeatDir("_meta/common.reference.yml"),
+			modulesConfigYml,
+			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
+		},
+		DockerParts: []string{
+			devtools.OSSBeatDir("_meta/beat.docker.yml"),
+			devtools.LibbeatDir("_meta/config.docker.yml"),
+		},
 	}
-
-	configFile := mage.BeatName + ".yml"
-	mage.MustFileConcat(configFile, 0640, configParts...)
-	mage.MustFindReplace(configFile, regexp.MustCompile("beatname"), mage.BeatName)
-	mage.MustFindReplace(configFile, regexp.MustCompile("beat-index-prefix"), mage.BeatIndexPrefix)
-	return nil
 }
 
-func referenceConfigOSS() error {
-	return referenceConfig("module")
+// OSSConfigFileParams returns the default ConfigFileParams for generating
+// metricbeat*.yml files.
+func OSSConfigFileParams(moduleDirs ...string) devtools.ConfigFileParams {
+	return configFileParams(devtools.OSSBeatDir("module"))
 }
 
-func referenceConfigXPack() error {
-	return referenceConfig(mage.OSSBeatDir("module"), "module")
-}
-
-func referenceConfig(dirs ...string) error {
-	const modulesConfigYml = "build/config.modules.yml"
-	err := mage.GenerateModuleReferenceConfig(modulesConfigYml, dirs...)
-	if err != nil {
-		return err
-	}
-	defer os.Remove(modulesConfigYml)
-
-	var configParts = []string{
-		mage.OSSBeatDir("_meta/common.reference.yml"),
+// XPackConfigFileParams returns the default ConfigFileParams for generating
+// metricbeat*.yml files.
+func XPackConfigFileParams() devtools.ConfigFileParams {
+	args := configFileParams(devtools.OSSBeatDir("module"), "module")
+	args.ReferenceParts = []string{
+		devtools.OSSBeatDir("_meta/common.reference.yml"),
 		modulesConfigYml,
-		"{{ elastic_beats_dir }}/libbeat/_meta/config.reference.yml",
+		devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 	}
-
-	for i, f := range configParts {
-		configParts[i] = mage.MustExpand(f)
-	}
-
-	configFile := mage.BeatName + ".reference.yml"
-	mage.MustFileConcat(configFile, 0640, configParts...)
-	mage.MustFindReplace(configFile, regexp.MustCompile("beatname"), mage.BeatName)
-	mage.MustFindReplace(configFile, regexp.MustCompile("beat-index-prefix"), mage.BeatIndexPrefix)
-	return nil
-}
-
-func dockerConfig() error {
-	var configParts = []string{
-		mage.OSSBeatDir("_meta/beat.docker.yml"),
-		mage.LibbeatDir("_meta/config.docker.yml"),
-	}
-
-	return mage.FileConcat(mage.BeatName+".docker.yml", 0600, configParts...)
+	return args
 }

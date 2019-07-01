@@ -4,9 +4,21 @@ by calling `GetMetricData` api.
 
 [float]
 === AWS Permissions
-Some specific AWS permissions are required for IAM user to collect AWS SQS metrics.
+Some specific AWS permissions are required for IAM user to collect AWS Cloudwatch metrics.
 ----
 ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
+tag:getResources
 ----
+
+[float]
+=== Module-specific configuration notes
+* *namespace*: The namespace to filter against. For example, AWS/EC2, AWS/S3.
+* *metricname*: The name of the metric to filter against. For example, CPUUtilization for EC2 instance.
+* *dimensions*: The dimensions to filter against. For example, InstanceId=i-123.
+* *tags.resource_type_filter*: The constraints on the resources that you want returned.
+The format of each resource type is service[:resourceType].
+For example, specifying a resource type of ec2 returns all Amazon EC2 resources
+(which includes EC2 instances). Specifying a resource type of ec2:instance returns
+only EC2 instances.

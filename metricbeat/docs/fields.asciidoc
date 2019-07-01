@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
+* <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
 * <<exported-fields-coredns>>
@@ -51,6 +52,7 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-nginx>>
+* <<exported-fields-oracle>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -1154,26 +1156,118 @@ type: integer
 --
 
 [float]
-=== s3_daily_storage
+=== rds
 
-`s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+`rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
 
 
 
-*`aws.s3_daily_storage.bucket.name`*::
+*`aws.rds.cpu.total.pct`*::
 +
 --
-Name of a S3 bucket.
+The percentage of CPU utilization.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`aws.rds.cpu.credit_usage`*::
++
+--
+The number of CPU credits spent by the instance for CPU utilization.
+
+
+type: long
+
+--
+
+*`aws.rds.cpu.credit_balance`*::
++
+--
+The number of earned CPU credits that an instance has accrued since it was launched or started.
+
+
+type: long
+
+--
+
+*`aws.rds.database_connections`*::
++
+--
+The number of database connections in use.
+
+
+type: long
+
+--
+
+*`aws.rds.db_instance.arn`*::
++
+--
+Amazon Resource Name(ARN) for each rds.
 
 
 type: keyword
 
 --
 
-*`aws.s3_daily_storage.bucket.size.bytes`*::
+*`aws.rds.db_instance.class`*::
 +
 --
-The amount of data in bytes stored in a bucket.
+Contains the name of the compute and memory capacity class of the DB instance.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.identifier`*::
++
+--
+Contains a user-supplied database identifier. This identifier is the unique key that identifies a DB instance.
+
+
+type: keyword
+
+--
+
+*`aws.rds.db_instance.status`*::
++
+--
+Specifies the current state of this database.
+
+
+type: keyword
+
+--
+
+*`aws.rds.disk_queue_depth`*::
++
+--
+The number of outstanding IOs (read/write requests) waiting to access the disk.
+
+
+type: long
+
+--
+
+*`aws.rds.failed_sql_server_agent_jobs`*::
++
+--
+The number of failed SQL Server Agent jobs during the last minute.
+
+
+type: long
+
+--
+
+*`aws.rds.freeable_memory.bytes`*::
++
+--
+The amount of available random access memory.
 
 
 type: long
@@ -1182,11 +1276,453 @@ format: bytes
 
 --
 
+*`aws.rds.free_storage.bytes`*::
++
+--
+The amount of available storage space.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`aws.rds.maximum_used_transaction_ids`*::
++
+--
+The maximum transaction ID that has been used. Applies to PostgreSQL.
+
+
+type: long
+
+--
+
+*`aws.rds.oldest_replication_slot_lag.mb`*::
++
+--
+The lagging size of the replica lagging the most in terms of WAL data received. Applies to PostgreSQL.
+
+
+type: long
+
+--
+
+*`aws.rds.read_io.ops_per_sec`*::
++
+--
+The average number of disk read I/O operations per second.
+
+
+type: float
+
+--
+
+*`aws.rds.replica_lag.sec`*::
++
+--
+The amount of time a Read Replica DB instance lags behind the source DB instance. Applies to MySQL, MariaDB, and PostgreSQL Read Replicas.
+
+
+type: long
+
+format: duration
+
+--
+
+*`aws.rds.swap_usage.bytes`*::
++
+--
+The amount of swap space used on the DB instance. This metric is not available for SQL Server.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`aws.rds.transaction_logs_generation`*::
++
+--
+The disk space used by transaction logs. Applies to PostgreSQL.
+
+
+type: long
+
+--
+
+*`aws.rds.write_io.ops_per_sec`*::
++
+--
+The average number of disk write I/O operations per second.
+
+
+type: float
+
+--
+
+*`aws.rds.queries`*::
++
+--
+The average number of queries executed per second.
+
+
+type: long
+
+--
+
+*`aws.rds.deadlocks`*::
++
+--
+The average number of deadlocks in the database per second.
+
+
+type: long
+
+--
+
+*`aws.rds.volume_used.bytes`*::
++
+--
+The amount of storage used by your Aurora DB instance, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`aws.rds.free_local_storage.bytes`*::
++
+--
+The amount of storage available for temporary tables and logs, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`aws.rds.login_failures`*::
++
+--
+The average number of failed login attempts per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.commit`*::
++
+--
+The average number of commit operations per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.delete`*::
++
+--
+The average number of delete queries per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.ddl`*::
++
+--
+The average number of DDL requests per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.dml`*::
++
+--
+The average number of inserts, updates, and deletes per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.insert`*::
++
+--
+The average number of insert queries per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.network`*::
++
+--
+The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.network_receive`*::
++
+--
+The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.network_transmit`*::
++
+--
+The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.read`*::
++
+--
+The average amount of time taken per disk I/O operation.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.select`*::
++
+--
+The average number of select queries per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.update`*::
++
+--
+The average number of update queries per second.
+
+
+type: long
+
+--
+
+*`aws.rds.throughput.write`*::
++
+--
+The average number of bytes written to disk per second.
+
+
+type: long
+
+--
+
+*`aws.rds.latency.commit`*::
++
+--
+The amount of latency for commit operations, in milliseconds.
+
+
+type: long
+
+format: duration
+
+--
+
+*`aws.rds.latency.ddl`*::
++
+--
+The amount of latency for data definition language (DDL) requests, in milliseconds.
+
+
+type: long
+
+format: duration
+
+--
+
+*`aws.rds.latency.dml`*::
++
+--
+The amount of latency for inserts, updates, and deletes, in milliseconds.
+
+
+type: long
+
+format: duration
+
+--
+
+*`aws.rds.latency.insert`*::
++
+--
+The amount of latency for insert queries, in milliseconds.
+
+
+type: long
+
+format: duration
+
+--
+
+*`aws.rds.latency.read`*::
++
+--
+The average amount of time taken per disk I/O operation.
+
+type: long
+
+format: duration
+
+--
+
+*`aws.rds.latency.select`*::
++
+--
+The amount of latency for select queries, in milliseconds.
+
+type: long
+
+format: duration
+
+type: keyword
+
+--
+
+*`aws.rds.latency.update`*::
++
+--
+The amount of latency for update queries, in milliseconds.
+
+type: long
+
+format: duration
+
+type: keyword
+
+--
+
+=======
+*`aws.rds.latency.write`*::
++
+--
+The average amount of time taken per disk I/O operation.
+
+type: long
+
+format: duration
+
+--
+
+*`aws.rds.disk_usage.bin_log.bytes`*::
++
+--
+The amount of disk space occupied by binary logs on the master. Applies to MySQL read replicas.
+
+type: long
+
+format: bytes
+
+type: long
+
+--
+
+*`aws.rds.disk_usage.replication_slot.mb`*::
++
+--
+=======
+The disk space used by replication slot files. Applies to PostgreSQL.
+
+type: long
+
+type: long
+
+--
+
+*`aws.rds.disk_usage.transaction_logs.mb`*::
++
+--
+The disk space used by transaction logs. Applies to PostgreSQL.
+
+type: long
+
+--
+
+*`aws.rds.transactions.active`*::
++
+--
+The average number of current transactions executing on an Aurora database instance per second.
+
+type: long
+
+--
+
+*`aws.rds.transactions.blocked`*::
++
+--
+The average number of transactions in the database that are blocked per second.
+
+type: long
+
+type: keyword
+
+--
+
+[float]
+=== s3_daily_storage
+
+`s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
+
+*`aws.s3_daily_storage.bucket.name`*::
++
+--
+Name of a S3 bucket.
+
+type: keyword
+
+type: long
+
+--
+
+*`aws.s3_daily_storage.bucket.size.bytes`*::
++
+--
+The amount of data in bytes stored in a bucket.
+
+type: long
+
+format: bytes
+
+type: long
+
+--
+
 *`aws.s3_daily_storage.number_of_objects`*::
 +
 --
 The total number of objects stored in a bucket for all storage classes.
 
+type: long
 
 type: long
 
@@ -1198,14 +1734,14 @@ type: long
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
-
 *`aws.s3_request.bucket.name`*::
 +
 --
 Name of a S3 bucket.
 
-
 type: keyword
+
+type: long
 
 --
 
@@ -1214,6 +1750,7 @@ type: keyword
 --
 The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
 
+type: long
 
 type: long
 
@@ -1224,6 +1761,7 @@ type: long
 --
 The number of HTTP GET requests made for objects in an Amazon S3 bucket.
 
+type: long
 
 type: long
 
@@ -1234,6 +1772,7 @@ type: long
 --
 The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
 
+type: long
 
 type: long
 
@@ -1244,6 +1783,7 @@ type: long
 --
 The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
 
+type: long
 
 type: long
 
@@ -1254,6 +1794,7 @@ type: long
 --
 The number of HTTP HEAD requests made to an Amazon S3 bucket.
 
+type: long
 
 type: long
 
@@ -1264,6 +1805,7 @@ type: long
 --
 The number of HTTP POST requests made to an Amazon S3 bucket.
 
+type: long
 
 type: long
 
@@ -1273,7 +1815,6 @@ type: long
 +
 --
 The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
-
 
 type: long
 
@@ -1598,6 +2139,53 @@ type: keyword
 +
 --
 Beat type.
+
+
+type: keyword
+
+--
+
+[float]
+=== state
+
+Beat state
+
+
+
+*`beat.state.management.enabled`*::
++
+--
+Is central management enabled?
+
+
+type: boolean
+
+--
+
+*`beat.state.module.count`*::
++
+--
+Number of modules enabled
+
+
+type: integer
+
+--
+
+*`beat.state.output.name`*::
++
+--
+Name of output used by Beat
+
+
+type: keyword
+
+--
+
+*`beat.state.queue.name`*::
++
+--
+Name of queue being used by Beat
 
 
 type: keyword
@@ -2700,6 +3288,14 @@ type: alias
 alias to: cloud.region
 
 --
+
+[[exported-fields-cockroachdb]]
+== CockroachDB fields
+
+CockroachDB module
+
+
+
 
 [[exported-fields-common]]
 == Common fields
@@ -13446,6 +14042,321 @@ type: long
 --
 
 [float]
+=== controllermanager
+
+Controller manager metrics
+
+
+
+*`kubernetes.controllermanager.handler`*::
++
+--
+Request handler
+
+
+type: keyword
+
+--
+
+*`kubernetes.controllermanager.code`*::
++
+--
+HTTP code
+
+
+type: keyword
+
+--
+
+*`kubernetes.controllermanager.method`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.controllermanager.host`*::
++
+--
+Request host
+
+
+type: keyword
+
+--
+
+*`kubernetes.controllermanager.name`*::
++
+--
+Name for the resource
+
+
+type: keyword
+
+--
+
+*`kubernetes.controllermanager.zone`*::
++
+--
+Infrastructure zone
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.controllermanager.process.cpu.sec`*::
++
+--
+CPU seconds
+
+type: double
+
+--
+
+*`kubernetes.controllermanager.process.memory.resident.bytes`*::
++
+--
+Bytes in resident memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.controllermanager.process.memory.virtual.bytes`*::
++
+--
+Bytes in virtual memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.controllermanager.process.fds.open.count`*::
++
+--
+Number of open file descriptors
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.process.started.sec`*::
++
+--
+Seconds since the process started
+
+type: double
+
+--
+
+
+*`kubernetes.controllermanager.http.request.duration.us.percentile.*`*::
++
+--
+Request duration microseconds percentiles
+
+type: object
+
+--
+
+*`kubernetes.controllermanager.http.request.duration.us.sum`*::
++
+--
+Request duration microseconds cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.controllermanager.http.request.duration.us.count`*::
++
+--
+Request count for duration
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.http.request.size.bytes.percentile.*`*::
++
+--
+Request size percentiles
+
+type: object
+
+--
+
+*`kubernetes.controllermanager.http.request.size.bytes.sum`*::
++
+--
+Request size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.controllermanager.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.http.response.size.bytes.percentile.*`*::
++
+--
+Response size percentiles
+
+type: object
+
+--
+
+*`kubernetes.controllermanager.http.response.size.bytes.sum`*::
++
+--
+Response size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.controllermanager.http.response.size.bytes.count`*::
++
+--
+Response count
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.http.request.count`*::
++
+--
+Request count for response
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.client.request.count`*::
++
+--
+Number of requests as client
+
+
+type: long
+
+--
+
+
+*`kubernetes.controllermanager.workqueue.longestrunning.sec`*::
++
+--
+Longest running processors
+
+type: double
+
+--
+
+*`kubernetes.controllermanager.workqueue.unfinished.sec`*::
++
+--
+Unfinished processors
+
+type: double
+
+--
+
+*`kubernetes.controllermanager.workqueue.adds.count`*::
++
+--
+Workqueue add count
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.workqueue.depth.count`*::
++
+--
+Workqueue depth count
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.workqueue.retries.count`*::
++
+--
+Workqueue number of retries
+
+type: long
+
+--
+
+
+*`kubernetes.controllermanager.node.collector.eviction.count`*::
++
+--
+Number of node evictions
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.node.collector.unhealthy.count`*::
++
+--
+Number of unhealthy nodes
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.node.collector.count`*::
++
+--
+Number of nodes
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.node.collector.health.pct`*::
++
+--
+Percentage of healthy nodes
+
+type: long
+
+--
+
+*`kubernetes.controllermanager.leader.is_master`*::
++
+--
+Whether the node is master
+
+
+type: boolean
+
+--
+
+[float]
 === event
 
 The Kubernetes events metricset collects events that are generated by objects running inside of Kubernetes
@@ -14114,6 +15025,584 @@ type: long
 --
 Total major page faults
 
+
+type: long
+
+--
+
+[float]
+=== proxy
+
+Kubernetes proxy server metrics
+
+
+
+*`kubernetes.proxy.handler`*::
++
+--
+Request handler
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.code`*::
++
+--
+HTTP code
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.method`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.proxy.host`*::
++
+--
+Request host
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.proxy.process.cpu.sec`*::
++
+--
+CPU seconds
+
+type: double
+
+--
+
+*`kubernetes.proxy.process.memory.resident.bytes`*::
++
+--
+Bytes in resident memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.process.memory.virtual.bytes`*::
++
+--
+Bytes in virtual memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.process.fds.open.count`*::
++
+--
+Number of open file descriptors
+
+type: long
+
+--
+
+*`kubernetes.proxy.process.started.sec`*::
++
+--
+Seconds since the process started
+
+type: double
+
+--
+
+
+*`kubernetes.proxy.http.request.duration.us.percentile.*`*::
++
+--
+Request duration microseconds percentiles
+
+type: object
+
+--
+
+*`kubernetes.proxy.http.request.duration.us.sum`*::
++
+--
+Request duration microseconds cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.proxy.http.request.duration.us.count`*::
++
+--
+Request count for duration
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.percentile.*`*::
++
+--
+Request size percentiles
+
+type: object
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.sum`*::
++
+--
+Request size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.percentile.*`*::
++
+--
+Response size percentiles
+
+type: object
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.sum`*::
++
+--
+Response size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.proxy.http.response.size.bytes.count`*::
++
+--
+Response count
+
+type: long
+
+--
+
+*`kubernetes.proxy.http.request.count`*::
++
+--
+Request count
+
+type: long
+
+--
+
+*`kubernetes.proxy.client.request.count`*::
++
+--
+Number of requests as client
+
+
+type: long
+
+--
+
+[float]
+=== sync
+
+kubeproxy proxy sync metrics
+
+
+
+*`kubernetes.proxy.sync.rules.duration.us.sum`*::
++
+--
+SyncProxyRules duration, sum of durations in microseconds
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.rules.duration.us.count`*::
++
+--
+SyncProxyRules duration, number of operations
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.rules.duration.us.bucket.*`*::
++
+--
+SyncProxyRules duration, histogram buckets
+
+type: object
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.sum`*::
++
+--
+Network programming duration, sum in microseconds
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.count`*::
++
+--
+Network programming duration, number of operations
+
+type: long
+
+--
+
+*`kubernetes.proxy.sync.networkprogramming.duration.us.bucket.*`*::
++
+--
+Network programming duration, histogram buckets
+
+type: object
+
+--
+
+[float]
+=== scheduler
+
+Kubernetes scheduler metrics
+
+
+
+*`kubernetes.scheduler.handler`*::
++
+--
+Request handler
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.code`*::
++
+--
+HTTP code
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.method`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.host`*::
++
+--
+Request host
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.name`*::
++
+--
+Name for the resource
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.result`*::
++
+--
+Schedule attempt result
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.operation`*::
++
+--
+Scheduling operation
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.scheduler.process.cpu.sec`*::
++
+--
+CPU seconds
+
+type: double
+
+--
+
+*`kubernetes.scheduler.process.memory.resident.bytes`*::
++
+--
+Bytes in resident memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.process.memory.virtual.bytes`*::
++
+--
+Bytes in virtual memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.process.fds.open.count`*::
++
+--
+Number of open file descriptors
+
+type: long
+
+--
+
+*`kubernetes.scheduler.process.started.sec`*::
++
+--
+Seconds since the process started
+
+type: double
+
+--
+
+
+*`kubernetes.scheduler.http.request.duration.us.percentile.*`*::
++
+--
+Request duration microseconds percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.http.request.duration.us.sum`*::
++
+--
+Request duration microseconds cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.scheduler.http.request.duration.us.count`*::
++
+--
+Request count for duration
+
+type: long
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.percentile.*`*::
++
+--
+Request size percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.sum`*::
++
+--
+Request size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.percentile.*`*::
++
+--
+Response size percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.sum`*::
++
+--
+Response size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.count`*::
++
+--
+Response count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.http.request.count`*::
++
+--
+Request count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.client.request.count`*::
++
+--
+Number of requests as client
+
+
+type: long
+
+--
+
+*`kubernetes.scheduler.leader.is_master`*::
++
+--
+Whether the node is master
+
+
+type: boolean
+
+--
+
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.bucket.*`*::
++
+--
+End to end scheduling duration microseconds
+
+type: object
+
+--
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.sum`*::
++
+--
+End to end scheduling duration microseconds sum
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.count`*::
++
+--
+End to end scheduling count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.pod.preemption.victims.count`*::
++
+--
+Pod preemption victims
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.pod.attempts.count`*::
++
+--
+Pod attempts count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.percentile.*`*::
++
+--
+Scheduling duration percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.sum`*::
++
+--
+Scheduling duration cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.count`*::
++
+--
+Scheduling count
 
 type: long
 
@@ -18600,7 +20089,7 @@ type: long
 --
 
 [[exported-fields-mssql]]
-== mssql fields
+== MSSQL fields
 
 MS SQL module
 
@@ -20707,6 +22196,143 @@ The current number of idle client connections waiting for a request.
 
 
 type: long
+
+--
+
+[[exported-fields-oracle]]
+== Oracle fields
+
+Oracle database module
+
+
+[float]
+=== oracle
+
+Oracle module
+
+
+[float]
+=== tablespace
+
+tablespace
+
+
+*`oracle.tablespace.name`*::
++
+--
+Tablespace name
+
+type: keyword
+
+--
+
+[float]
+=== data_file
+
+Database files information
+
+
+*`oracle.tablespace.data_file.id`*::
++
+--
+Tablespace unique identifier
+
+type: long
+
+--
+
+*`oracle.tablespace.data_file.name`*::
++
+--
+Filename of the data file
+
+type: keyword
+
+--
+
+[float]
+=== size
+
+Size information about the file
+
+
+*`oracle.tablespace.data_file.size.max.bytes`*::
++
+--
+Maximum file size in bytes
+
+type: bytes
+
+--
+
+*`oracle.tablespace.data_file.size.bytes`*::
++
+--
+Size of the file in bytes
+
+type: bytes
+
+--
+
+*`oracle.tablespace.data_file.size.free.bytes`*::
++
+--
+The size of the file available for user data. The actual size of the file minus this value is used to store file related metadata.
+
+
+type: bytes
+
+--
+
+*`oracle.tablespace.data_file.status`*::
++
+--
+'File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in a tablespace that was dropped)'
+
+
+type: keyword
+
+--
+
+*`oracle.tablespace.data_file.online_status`*::
++
+--
+Last known online status of the data file. One of SYSOFF, SYSTEM, OFFLINE, ONLINE or RECOVER.
+
+type: keyword
+
+--
+
+[float]
+=== space
+
+Tablespace space usage information
+
+
+*`oracle.tablespace.space.free.bytes`*::
++
+--
+Tablespace total free space available, in bytes.
+
+type: bytes
+
+--
+
+*`oracle.tablespace.space.used.bytes`*::
++
+--
+Tablespace used space, in bytes.
+
+type: bytes
+
+--
+
+*`oracle.tablespace.space.total.bytes`*::
++
+--
+Tablespace total size, in bytes.
+
+type: bytes
 
 --
 

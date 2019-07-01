@@ -80,8 +80,8 @@ would override `BEAT_LOG_OPTS` to enable debug for Elasticsearch output.
 Environment="BEAT_LOG_OPTS=-e -d elasticsearch"
 ------------------------------------------------
 
-To use settings from the {beatname_uc} file, empty the environment
-variable. For example:
+To change the logging output from the {beatname_uc} configuration file, empty
+the environment variable. For example:
 
 ["source", "systemd", subs="attributes"]
 ------------------------------------------------

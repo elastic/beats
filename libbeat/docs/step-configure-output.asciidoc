@@ -7,12 +7,10 @@ to {es}, or to {ls} for additional processing.
 To send output directly to {es} (without using {ls}), set the location of the
 {es} installation:
 +
---
 endif::only-elasticsearch[]
 ifdef::only-elasticsearch[]
 . Configure the  {es} output by setting the location of the {es} installation:
 +
---
 endif::only-elasticsearch[]
 endif::has_module_steps[]
 * If you're running our
@@ -33,7 +31,6 @@ output.elasticsearch:
   hosts: ["myEShost:9200"]
 ----------------------------------------------------------------------
 ifndef::has_module_steps[]
---
 +
 ifndef::only-elasticsearch[]
 To send output to {ls}, 

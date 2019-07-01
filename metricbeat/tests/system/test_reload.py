@@ -114,7 +114,7 @@ class Test(metricbeat.BaseTest):
 
         # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("metricset not found"),
+            lambda: self.log_contains("metricset 'system/wrong_metricset' not found"),
             max_timeout=10)
 
         assert exit_code == 1
