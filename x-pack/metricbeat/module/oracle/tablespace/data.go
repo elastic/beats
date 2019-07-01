@@ -14,11 +14,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-type tablespaceNameGetter interface {
-	eventKey() string
-	hash() string
-}
-
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch
 // by doing queries to Oracle
 func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (out *extractedData, err error) {

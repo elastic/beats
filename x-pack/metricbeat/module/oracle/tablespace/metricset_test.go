@@ -31,7 +31,5 @@ func getConfig() map[string]interface{} {
 		"module":     "oracle",
 		"metricsets": []string{"tablespace"},
 		"hosts":      []string{oracle.GetOracleConnectionDetails()},
-		"username":   "sys",
-		"password":   "Oradoc_db1",
 	}
 }

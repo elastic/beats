@@ -6,7 +6,6 @@ package tablespace
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/pkg/errors"
 
@@ -29,7 +28,6 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	db                *sql.DB
 	extractor         tablespaceExtractMethods
 	connectionDetails oracle.ConnectionDetails
 }
@@ -54,32 +52,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
-	if m.db, err = oracle.NewConnection(&m.connectionDetails); err != nil {
+	db, err := oracle.NewConnection(&m.connectionDetails)
+	if err != nil {
 		return errors.Wrap(err, "error creating connection to Oracle")
 	}
-	defer m.db.Close()
+	defer db.Close()
 
-	m.extractor = &tablespaceExtractor{db: m.db}
+	m.extractor = &tablespaceExtractor{db: db}
 
 	events, err := m.extractAndTransform(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error getting or interpreting data from Oracle")
 	}
 
+	m.Load(ctx, events, reporter)
+
+	return
+}
+
+func (m *MetricSet) Load(ctx context.Context, events []mb.Event, reporter mb.ReporterV2) {
 	for _, event := range events {
 		if reported := reporter.Event(event); !reported {
 			return
 		}
 	}
-
-	return
-}
-
-// Close the connection to Oracle
-func (m *MetricSet) Close() error {
-	if m.db != nil {
-		return m.db.Close()
-	}
-
-	return nil
 }
