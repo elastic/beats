@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 )
 
+// ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
 	AccessKeyID               string   `config:"access_key_id"`
 	SecretAccessKey           string   `config:"secret_access_key"`
@@ -17,6 +18,10 @@ type ConfigAWS struct {
 	ProfileName               string   `config:"credential_profile_name"`
 }
 
+// GetAWSCredentials function gets aws credentials from the config.
+// If access_key_id and secret_access_key are given, then use them as credentials.
+// If not, then load from aws config file. If credential_profile_name is not
+// given, then load default profile from the aws config file.
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	// Check if accessKeyID and secretAccessKey is given from configuration
 	if config.AccessKeyID != "" && config.SecretAccessKey != "" {
