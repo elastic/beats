@@ -18,6 +18,8 @@
 package actions
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
 	"io"
 
@@ -28,9 +30,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/checks"
-
-	"bytes"
-	"compress/gzip"
 )
 
 type decompressGzipField struct {
@@ -113,6 +112,7 @@ func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 	var outBuf bytes.Buffer
 	_, err = io.Copy(&outBuf, r)
 	if err != nil {
+		r.Close()
 		return fmt.Errorf("error while decompressing field: %v", err)
 	}
 
