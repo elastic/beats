@@ -231,8 +231,8 @@ filebeat.inputs:
   # Network type to be used for redis connection. Default: tcp
   #network: tcp
 
-  # Max number of concurrent connections. By default it is not limited.
-  #maxconn: 0
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
 
   # Redis AUTH password. Empty by default.
   #password: foobared
@@ -263,8 +263,8 @@ filebeat.inputs:
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
 
-  # Maximum number of connections
-  #max_connections: 10
+  # Max number of concurrent connections, or 0 for no limit. Default: 0
+  #max_connections: 0
 
   # The number of seconds of inactivity before a remote connection is closed.
   #timeout: 300s
