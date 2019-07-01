@@ -132,7 +132,7 @@ func (i *Input) Run() {
 			Processor:     i.processors,
 		},
 		ACKCount: func(n int) {
-			i.logger.Infof("journalbeat successfully published %d events", n)
+			i.logger.Debugf("journalbeat successfully published %d events", n)
 		},
 	})
 	if err != nil {
