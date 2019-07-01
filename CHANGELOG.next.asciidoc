@@ -54,6 +54,33 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Filebeat*
 
+- Add more info to message logged when a duplicated symlink file is found {pull}10845[10845]
+- Add option to configure docker input with paths {pull}10687[10687]
+- Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
+- Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
+- Allow custom default settings with autodiscover (for example, use of CRI paths for logs). {pull}12193[12193]
+- Allow to disable hints based autodiscover default behavior (fetching all logs). {pull}12193[12193]
+- Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
+- Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
+- New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
+- New module for Cisco ASA logs. {issue}9200[9200] {pull}11171[11171]
+- Added support for Cisco ASA fields to the netflow input. {pull}11201[11201]
+- Configurable line terminator. {pull}11015[11015]
+- Add Filebeat envoyproxy module. {pull}11700[11700]
+- Add apache2(httpd) log path (`/var/log/httpd`) to make apache2 module work out of the box on Redhat-family OSes. {issue}11887[11887] {pull}11888[11888]
+- Add support to new MongoDB additional diagnostic information {pull}11952[11952]
+- New module `panw` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
+- Add RabbitMQ module. {pull}12032[12032]
+- Add new `container` input. {pull}12162[12162]
+- Add timeouts on communication with docker daemon. {pull}12310[12310]
+- `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
+- Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
+- Add MSSQL module {pull}12079[12079]
+- Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
+- Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
+
 *Heartbeat*
 
 *Journalbeat*
