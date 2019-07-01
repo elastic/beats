@@ -194,21 +194,22 @@ func (r *Reader) Next() (*beat.Event, error) {
 			return nil, err
 		}
 
+		switch {
 		// error while reading next entry
-		if c < 0 {
+		case c < 0:
 			return nil, fmt.Errorf("error while reading next entry %+v", syscall.Errno(-c))
-		}
-
 		// no new entry, so wait
-		if c == 0 {
+		case c == 0:
 			hasNewEntry, err := r.checkForNewEvents()
 			if err != nil {
 				return nil, err
 			}
 			if !hasNewEntry {
 				r.backoff.Wait()
-				continue
 			}
+			continue
+		// new entries are available
+		default:
 		}
 
 		entry, err := r.journal.GetEntry()

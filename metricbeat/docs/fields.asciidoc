@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
+* <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
 * <<exported-fields-coredns>>
@@ -3276,6 +3277,14 @@ type: alias
 alias to: cloud.region
 
 --
+
+[[exported-fields-cockroachdb]]
+== CockroachDB fields
+
+CockroachDB module
+
+
+
 
 [[exported-fields-common]]
 == Common fields
@@ -15270,6 +15279,321 @@ type: long
 Network programming duration, histogram buckets
 
 type: object
+
+--
+
+[float]
+=== scheduler
+
+Kubernetes scheduler metrics
+
+
+
+*`kubernetes.scheduler.handler`*::
++
+--
+Request handler
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.code`*::
++
+--
+HTTP code
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.method`*::
++
+--
+HTTP method
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.host`*::
++
+--
+Request host
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.name`*::
++
+--
+Name for the resource
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.result`*::
++
+--
+Schedule attempt result
+
+
+type: keyword
+
+--
+
+*`kubernetes.scheduler.operation`*::
++
+--
+Scheduling operation
+
+
+type: keyword
+
+--
+
+
+*`kubernetes.scheduler.process.cpu.sec`*::
++
+--
+CPU seconds
+
+type: double
+
+--
+
+*`kubernetes.scheduler.process.memory.resident.bytes`*::
++
+--
+Bytes in resident memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.process.memory.virtual.bytes`*::
++
+--
+Bytes in virtual memory
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.process.fds.open.count`*::
++
+--
+Number of open file descriptors
+
+type: long
+
+--
+
+*`kubernetes.scheduler.process.started.sec`*::
++
+--
+Seconds since the process started
+
+type: double
+
+--
+
+
+*`kubernetes.scheduler.http.request.duration.us.percentile.*`*::
++
+--
+Request duration microseconds percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.http.request.duration.us.sum`*::
++
+--
+Request duration microseconds cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.scheduler.http.request.duration.us.count`*::
++
+--
+Request count for duration
+
+type: long
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.percentile.*`*::
++
+--
+Request size percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.sum`*::
++
+--
+Request size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.http.request.size.bytes.count`*::
++
+--
+Request count for size
+
+type: long
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.percentile.*`*::
++
+--
+Response size percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.sum`*::
++
+--
+Response size cumulative sum
+
+type: long
+
+format: bytes
+
+--
+
+*`kubernetes.scheduler.http.response.size.bytes.count`*::
++
+--
+Response count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.http.request.count`*::
++
+--
+Request count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.client.request.count`*::
++
+--
+Number of requests as client
+
+
+type: long
+
+--
+
+*`kubernetes.scheduler.leader.is_master`*::
++
+--
+Whether the node is master
+
+
+type: boolean
+
+--
+
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.bucket.*`*::
++
+--
+End to end scheduling duration microseconds
+
+type: object
+
+--
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.sum`*::
++
+--
+End to end scheduling duration microseconds sum
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.e2e.duration.us.count`*::
++
+--
+End to end scheduling count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.pod.preemption.victims.count`*::
++
+--
+Pod preemption victims
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.pod.attempts.count`*::
++
+--
+Pod attempts count
+
+type: long
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.percentile.*`*::
++
+--
+Scheduling duration percentiles
+
+type: object
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.sum`*::
++
+--
+Scheduling duration cumulative sum
+
+type: double
+
+--
+
+*`kubernetes.scheduler.scheduler.duration.seconds.count`*::
++
+--
+Scheduling count
+
+type: long
 
 --
 
