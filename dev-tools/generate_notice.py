@@ -304,6 +304,10 @@ MPL_LICENSE_TITLES = [
     "Mozilla Public License, version 2.0"
 ]
 
+UNIVERSAL_PERMISSIVE_LICENSE_TITLES = [
+    "The Universal Permissive License (UPL), Version 1.0"
+]
+
 
 # return SPDX identifiers from https://spdx.org/licenses/
 def detect_license_summary(content):
@@ -328,6 +332,8 @@ def detect_license_summary(content):
         return "CC-BY-SA-4.0"
     if any(sentence in content[0:3000] for sentence in LGPL_3_LICENSE_TITLE):
         return "LGPL-3.0"
+    if any(sentence in content[0:1500] for sentence in UNIVERSAL_PERMISSIVE_LICENSE_TITLES):
+        return "UPL-1.0"
 
     return "UNKNOWN"
 
@@ -339,6 +345,7 @@ ACCEPTED_LICENSES = [
     "BSD-3-Clause",
     "BSD-2-Clause",
     "MPL-2.0",
+    "UPL-1.0",
 ]
 SKIP_NOTICE = []
 

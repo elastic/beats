@@ -83,3 +83,9 @@ data:
       #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       #ssl.certificate_authorities:
         #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+    - module: kubernetes
+      metricsets:
+        - proxy
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["localhost:10249"]

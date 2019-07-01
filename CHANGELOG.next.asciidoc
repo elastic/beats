@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
+- Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
 
 *Auditbeat*
 
@@ -104,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
 - Fix timezone offset parsing in system/syslog. {pull}12529[12529]
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
 
 *Heartbeat*
 
@@ -113,6 +115,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 - Use backoff when no new events are found. {pull}11861[11861]
+- Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716]
 
 *Metricbeat*
 
@@ -134,6 +137,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
 - When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 - Reuse connections in PostgreSQL metricsets. {issue}12504[12504] {pull}12603[12603]
+- PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.{issue}12590[12590]{pull}12622[12622]
 
 *Packetbeat*
 
@@ -172,6 +176,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
 - Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
 - Add `decode_base64_field` processor for decoding base64 field. {pull}11914[11914]
+- Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 
 *Auditbeat*
 
@@ -205,6 +210,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
 - Add MSSQL module {pull}12079[12079]
 - Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
 
 *Heartbeat*
 
@@ -230,12 +237,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
 - Add overview dashboard to Consul module {pull}10665[10665]
 - New fields were added in the mysql/status metricset. {pull}12227[12227]
+- Added kubernetes metricset `proxy`. {pull}12312[12312]
 - Always report Pod UID in the `pod` metricset. {pull}12345[12345]
 - Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
 - Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
+- Add CockroachDB module. {pull}12467[12467]
+- Add support for metricbeat modules based on existing modules (a.k.a. light modules) {issue}12270[12270] {pull}12465[12465]
 - Add a system/entropy metricset {pull}12450[12450]
+- Add kubernetes metricset `controllermanager` {pull}12409[12409]
 - Allow redis URL format in redis hosts config. {pull}12408[12408]
 - Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
+- Add kubernetes metricset `scheduler` {pull}12521[12521]
+- Add `beat` module. {pull}12181[12181] {pull}12615[12615]
+- Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
+- Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
+- Add Oracle Module {pull}11890[11890]
 
 *Packetbeat*
 

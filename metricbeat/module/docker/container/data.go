@@ -69,6 +69,10 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
 }
 
 func extractIPAddresses(networks *types.SummaryNetworkSettings) []string {
+	// Handle alternate platforms like VMWare's VIC that might not have this data.
+	if networks == nil {
+		return []string{}
+	}
 	ipAddresses := make([]string, 0, len(networks.Networks))
 	for _, network := range networks.Networks {
 		if len(network.IPAddress) > 0 {

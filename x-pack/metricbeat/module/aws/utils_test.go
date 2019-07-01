@@ -12,12 +12,19 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/stretchr/testify/assert"
 )
 
 // MockCloudwatchClient struct is used for unit tests.
 type MockCloudWatchClient struct {
 	cloudwatchiface.CloudWatchAPI
+}
+
+// MockResourceGroupsTaggingClient is used for unit tests.
+type MockResourceGroupsTaggingClient struct {
+	resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI
 }
 
 var (
@@ -92,6 +99,44 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 						Id:     &id4,
 						Label:  &label4,
 						Values: []float64{value4},
+					},
+				},
+			},
+		},
+	}
+}
+
+func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
+	return resourcegroupstaggingapi.GetResourcesRequest{
+		Request: &awssdk.Request{
+			Data: &resourcegroupstaggingapi.GetResourcesOutput{
+				PaginationToken: awssdk.String(""),
+				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
+					{
+						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-1"),
+						Tags: []resourcegroupstaggingapi.Tag{
+							{
+								Key:   awssdk.String("organization"),
+								Value: awssdk.String("engineering"),
+							},
+							{
+								Key:   awssdk.String("owner"),
+								Value: awssdk.String("foo"),
+							},
+						},
+					},
+					{
+						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-2"),
+						Tags: []resourcegroupstaggingapi.Tag{
+							{
+								Key:   awssdk.String("organization"),
+								Value: awssdk.String("finance"),
+							},
+							{
+								Key:   awssdk.String("owner"),
+								Value: awssdk.String("boo"),
+							},
+						},
 					},
 				},
 			},
@@ -283,4 +328,61 @@ func TestFindTimestamp(t *testing.T) {
 		outputTimestamp := FindTimestamp(c.getMetricDataResults)
 		assert.Equal(t, c.expectedTimestamp, outputTimestamp)
 	}
+}
+
+func TestFindIdentifierFromARN(t *testing.T) {
+	cases := []struct {
+		resourceARN        string
+		expectedIdentifier string
+	}{
+		{
+			"arn:aws:rds:eu-west-1:123456789012:db:mysql-db",
+			"mysql-db",
+		},
+		{
+			"arn:aws:ec2:us-east-1:123456789012:instance/i-123",
+			"i-123",
+		},
+		{
+			"arn:aws:sns:us-east-1:627959692251:notification-topic-1",
+			"notification-topic-1",
+		},
+	}
+
+	for _, c := range cases {
+		identifier, err := findIdentifierFromARN(c.resourceARN)
+		assert.NoError(t, err)
+		assert.Equal(t, c.expectedIdentifier, identifier)
+	}
+
+}
+
+func TestGetResourcesTags(t *testing.T) {
+	mockSvc := &MockResourceGroupsTaggingClient{}
+	resourceTagMap, err := GetResourcesTags(mockSvc, []string{"rds"})
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(resourceTagMap))
+
+	expectedResourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
+	expectedResourceTagMap["mysql-db-1"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("engineering"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("foo"),
+		},
+	}
+	expectedResourceTagMap["mysql-db-2"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String("organization"),
+			Value: awssdk.String("finance"),
+		},
+		{
+			Key:   awssdk.String("owner"),
+			Value: awssdk.String("boo"),
+		},
+	}
+	assert.Equal(t, expectedResourceTagMap, resourceTagMap)
 }
