@@ -177,25 +177,26 @@ func (p *Input) Run() {
 			wg.Add(numMessages)
 
 			for i := range output.Messages {
-				go func(m sqs.Message) {
-					// launch goroutine to handle each message
+				go func(message sqs.Message) {
+					// launch goroutine to handle each message from sqs
 					defer wg.Done()
 
-					s3Infos, err := handleMessage(m, p.config.BucketNames)
+					s3Infos, err := handleMessage(message, p.config.BucketNames)
 					if err != nil {
 						p.logger.Error(err.Error())
 					}
 
-					// read from s3
+					// read from s3 object and create event for each log line
 					p.readS3Object(svcS3, s3Infos)
 
 					// delete message after events are sent
-					err = deleteMessage(queueURL, *m.ReceiptHandle, svcSQS)
+					err = deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 					if err != nil {
 						p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
 					}
 				}(output.Messages[i])
 			}
+			wg.Wait()
 		}
 	}
 }
@@ -284,7 +285,7 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) {
 					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
 				}
 
-				line := 0
+				offset := 0
 				for {
 					log, err := reader.ReadString('\n')
 					if log == "" {
@@ -293,20 +294,21 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) {
 
 					if err != nil {
 						if err == io.EOF {
-							line++
-							p.forwardEvent(createEvent(log, int64(line), s3Info))
+							offset += len([]byte(log))
+							p.forwardEvent(createEvent(log, offset, s3Info))
 							break
 						} else {
 							p.logger.Error(errors.Wrap(err, "ReadString failed"))
 						}
 					}
+
 					// create event per log line
-					line++
-					p.forwardEvent(createEvent(log, int64(line), s3Info))
+					offset += len([]byte(log))
+					p.forwardEvent(createEvent(log, offset, s3Info))
 				}
 			}(s3Infos[i])
-			wg.Wait()
 		}
+		wg.Wait()
 	}
 }
 
@@ -348,11 +350,11 @@ func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.SQ
 	return nil
 }
 
-func createEvent(log string, offset int64, s3Info s3Info) *beat.Event {
+func createEvent(log string, offset int, s3Info s3Info) *beat.Event {
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
-			"offset":    offset,
+			"offset":    int64(offset),
 			"file.path": constructObjectURL(s3Info),
 		},
 		"aws": common.MapStr{

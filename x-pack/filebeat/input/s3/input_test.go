@@ -10,14 +10,13 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/beat"
-
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
-
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 // MockS3Client struct is used for unit tests.
@@ -164,11 +163,12 @@ func TestCreateEvent(t *testing.T) {
 			break
 		}
 		if err == io.EOF {
-			event := createEvent(log, int64(0), s3Info)
+			event := createEvent(log, len([]byte(log)), s3Info)
 			events = append(events, event)
 			break
 		}
-		event := createEvent(log, int64(0), s3Info)
+
+		event := createEvent(log, len([]byte(log)), s3Info)
 		events = append(events, event)
 	}
 
