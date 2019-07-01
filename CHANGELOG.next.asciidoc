@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - System module: Start system module without host ID. {pull}12373[12373]
 - Host dataset: Fix reboot detection logic. {pull}12591[12591]
 - Add syscalls used by librpm for the system/package dataset to the default Auditbeat seccomp policy. {issue}12578[12578] {pull}12617[12617]
+- Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
 
 *Filebeat*
 
