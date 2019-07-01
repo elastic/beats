@@ -1589,6 +1589,7 @@ format: duration
 --
 The average amount of time taken per disk I/O operation.
 
+
 type: long
 
 format: duration
@@ -1600,11 +1601,10 @@ format: duration
 --
 The amount of latency for select queries, in milliseconds.
 
+
 type: long
 
 format: duration
-
-type: keyword
 
 --
 
@@ -1613,19 +1613,18 @@ type: keyword
 --
 The amount of latency for update queries, in milliseconds.
 
+
 type: long
 
 format: duration
 
-type: keyword
-
 --
 
-=======
 *`aws.rds.latency.write`*::
 +
 --
 The average amount of time taken per disk I/O operation.
+
 
 type: long
 
@@ -1638,21 +1637,18 @@ format: duration
 --
 The amount of disk space occupied by binary logs on the master. Applies to MySQL read replicas.
 
+
 type: long
 
 format: bytes
-
-type: long
 
 --
 
 *`aws.rds.disk_usage.replication_slot.mb`*::
 +
 --
-=======
 The disk space used by replication slot files. Applies to PostgreSQL.
 
-type: long
 
 type: long
 
@@ -1663,6 +1659,7 @@ type: long
 --
 The disk space used by transaction logs. Applies to PostgreSQL.
 
+
 type: long
 
 --
@@ -1671,6 +1668,7 @@ type: long
 +
 --
 The average number of current transactions executing on an Aurora database instance per second.
+
 
 type: long
 
@@ -1681,9 +1679,8 @@ type: long
 --
 The average number of transactions in the database that are blocked per second.
 
-type: long
 
-type: keyword
+type: long
 
 --
 
@@ -1693,14 +1690,14 @@ type: keyword
 `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
+
 *`aws.s3_daily_storage.bucket.name`*::
 +
 --
 Name of a S3 bucket.
 
-type: keyword
 
-type: long
+type: keyword
 
 --
 
@@ -1709,11 +1706,10 @@ type: long
 --
 The amount of data in bytes stored in a bucket.
 
+
 type: long
 
 format: bytes
-
-type: long
 
 --
 
@@ -1722,7 +1718,6 @@ type: long
 --
 The total number of objects stored in a bucket for all storage classes.
 
-type: long
 
 type: long
 
@@ -1734,14 +1729,14 @@ type: long
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
 
+
 *`aws.s3_request.bucket.name`*::
 +
 --
 Name of a S3 bucket.
 
-type: keyword
 
-type: long
+type: keyword
 
 --
 
@@ -1750,7 +1745,6 @@ type: long
 --
 The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
 
-type: long
 
 type: long
 
@@ -1761,7 +1755,6 @@ type: long
 --
 The number of HTTP GET requests made for objects in an Amazon S3 bucket.
 
-type: long
 
 type: long
 
@@ -1772,7 +1765,6 @@ type: long
 --
 The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
 
-type: long
 
 type: long
 
@@ -1783,7 +1775,6 @@ type: long
 --
 The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
 
-type: long
 
 type: long
 
@@ -1794,7 +1785,6 @@ type: long
 --
 The number of HTTP HEAD requests made to an Amazon S3 bucket.
 
-type: long
 
 type: long
 
@@ -1805,7 +1795,6 @@ type: long
 --
 The number of HTTP POST requests made to an Amazon S3 bucket.
 
-type: long
 
 type: long
 
@@ -1815,6 +1804,7 @@ type: long
 +
 --
 The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
+
 
 type: long
 
