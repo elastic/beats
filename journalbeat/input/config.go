@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/journalbeat/config"
+	"github.com/elastic/beats/journalbeat/reader"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -38,8 +39,15 @@ type Config struct {
 	Seek config.SeekMode `config:"seek"`
 	// CursorSeekFallback sets where to seek if registry file is not available.
 	CursorSeekFallback config.SeekMode `config:"cursor_seek_fallback"`
+
 	// Matches store the key value pairs to match entries.
-	Matches []string `config:"include_matches"`
+	Matches reader.MatcherConfig `config:"include_matches"`
+	// Units stores the units to monitor
+	Units []string `config:"units"`
+	// Kernel stores whether kernel messages should be monitored
+	Kernel bool `config:"kernel"`
+	// Identifiers stores the syslog identifiers to watch
+	Identifiers []string `config:"identifiers"`
 
 	// Fields and tags to add to events.
 	common.EventMetadata `config:",inline"`
