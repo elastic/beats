@@ -52,6 +52,7 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-nginx>>
+* <<exported-fields-oracle>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -22185,6 +22186,143 @@ The current number of idle client connections waiting for a request.
 
 
 type: long
+
+--
+
+[[exported-fields-oracle]]
+== Oracle fields
+
+Oracle database module
+
+
+[float]
+=== oracle
+
+Oracle module
+
+
+[float]
+=== tablespace
+
+tablespace
+
+
+*`oracle.tablespace.name`*::
++
+--
+Tablespace name
+
+type: keyword
+
+--
+
+[float]
+=== data_file
+
+Database files information
+
+
+*`oracle.tablespace.data_file.id`*::
++
+--
+Tablespace unique identifier
+
+type: long
+
+--
+
+*`oracle.tablespace.data_file.name`*::
++
+--
+Filename of the data file
+
+type: keyword
+
+--
+
+[float]
+=== size
+
+Size information about the file
+
+
+*`oracle.tablespace.data_file.size.max.bytes`*::
++
+--
+Maximum file size in bytes
+
+type: bytes
+
+--
+
+*`oracle.tablespace.data_file.size.bytes`*::
++
+--
+Size of the file in bytes
+
+type: bytes
+
+--
+
+*`oracle.tablespace.data_file.size.free.bytes`*::
++
+--
+The size of the file available for user data. The actual size of the file minus this value is used to store file related metadata.
+
+
+type: bytes
+
+--
+
+*`oracle.tablespace.data_file.status`*::
++
+--
+'File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in a tablespace that was dropped)'
+
+
+type: keyword
+
+--
+
+*`oracle.tablespace.data_file.online_status`*::
++
+--
+Last known online status of the data file. One of SYSOFF, SYSTEM, OFFLINE, ONLINE or RECOVER.
+
+type: keyword
+
+--
+
+[float]
+=== space
+
+Tablespace space usage information
+
+
+*`oracle.tablespace.space.free.bytes`*::
++
+--
+Tablespace total free space available, in bytes.
+
+type: bytes
+
+--
+
+*`oracle.tablespace.space.used.bytes`*::
++
+--
+Tablespace used space, in bytes.
+
+type: bytes
+
+--
+
+*`oracle.tablespace.space.total.bytes`*::
++
+--
+Tablespace total size, in bytes.
+
+type: bytes
 
 --
 

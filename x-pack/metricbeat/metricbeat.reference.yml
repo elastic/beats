@@ -703,6 +703,17 @@ metricbeat.modules:
   # Path to server status. Default server-status
   server_status_path: "server-status"
 
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  metricsets: ["tablespace"]
+  enabled: false
+  period: 10s
+  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+
+  # username: ""
+  # password: ""
+
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:
