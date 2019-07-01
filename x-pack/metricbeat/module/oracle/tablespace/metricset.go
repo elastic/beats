@@ -70,6 +70,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return
 }
 
+//Load is the L of an ETL. In this case, takes the events and sends them to Elasticseach
 func (m *MetricSet) Load(ctx context.Context, events []mb.Event, reporter mb.ReporterV2) {
 	for _, event := range events {
 		if reported := reporter.Event(event); !reported {
