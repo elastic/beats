@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0...7.0[Check the HEAD diff]
 - Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Require client_auth by default when ssl is enabled for tcp input {pull}12333[12333]
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
 
 *Heartbeat*
 
