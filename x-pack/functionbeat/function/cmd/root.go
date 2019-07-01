@@ -5,8 +5,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/x-pack/functionbeat/function/beater"
@@ -24,7 +22,6 @@ func GenRootCmdWithBeatName(name string) *cmd.BeatsRootCmd {
 		ConfigOverrides: config.ConfigOverrides,
 	})
 
-	fmt.Println("baba")
 	rootCmd.AddCommand(genDeployCmd(name))
 	rootCmd.AddCommand(genUpdateCmd(name))
 	rootCmd.AddCommand(genRemoveCmd(name))

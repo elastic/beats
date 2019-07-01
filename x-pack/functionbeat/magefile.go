@@ -185,6 +185,73 @@ func docs() error {
 	return nil
 }
 
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	devtools.AddIntegTestUsage()
+	defer devtools.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return devtools.RunIntegTest("goIntegTest", func() error {
+		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+	})
+}
+
+// PythonUnitTest executes the python system tests.
+func PythonUnitTest() error {
+	mg.Deps(devtools.BuildSystemTestBinary)
+	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+}
+
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
+func PythonIntegTest(ctx context.Context) error {
+	if !devtools.IsInIntegTestEnv() {
+		mg.Deps(Fields)
+	}
+	return devtools.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(devtools.BuildSystemTestBinary)
+		args := devtools.DefaultPythonTestIntegrationArgs()
+
+		workingDir := devtools.CWD()
+		for _, provider := range selectedProviders {
+			args.Env = map[string]string{
+				"CURRENT_PROVIDER": "aws",
+			}
+			err := os.Chdir(workingDir + "/" + provider)
+			if err != nil {
+				return err
+			}
+			err = devtools.PythonNoseTest(args)
+			if err != nil {
+				return err
+			}
+		}
+		return os.Chdir(workingDir)
+	})
+}
+
+// BuildSystemTestBinary build a binary for testing that is instrumented for
+// testing and measuring code coverage. The binary is only instrumented for
+// coverage when TEST_COVERAGE=true (default is false).
+func BuildSystemTestBinary() error {
+	workingDir := devtools.CWD()
+	for _, provider := range selectedProviders {
+		err := os.Chdir(workingDir + "/" + provider)
+		if err != nil {
+			return err
+		}
+		err = devtools.BuildSystemTestBinary(devtools.TestBinaryArgs{Name: devtools.BeatName + "-" + provider})
+		if err != nil {
+			return err
+		}
+	}
+	return os.Chdir(workingDir)
+}
+
 func getConfiguredProviders() []string {
 	providers := os.Getenv("PROVIDERS")
 	if len(providers) == 0 {

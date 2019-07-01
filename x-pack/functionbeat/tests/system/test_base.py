@@ -6,6 +6,10 @@ import unittest
 
 
 class Test(BaseTest):
+    def setUp(self):
+        super(BaseTest, self).setUp()
+        provider = os.environ['CURRENT_PROVIDER']
+        self.test_binary = os.path.join(provider, "functionbeat-" + provider + ".test")
 
     @unittest.skip("temporarily disabled")
     def test_base(self):

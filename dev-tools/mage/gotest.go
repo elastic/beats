@@ -53,6 +53,16 @@ type GoTestArgs struct {
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
 }
 
+type TestBinaryArgs struct {
+	Name string // Name of the binary to build
+}
+
+func DefaultTestBinaryArgs() TestBinaryArgs {
+	return TestBinaryArgs{
+		Name: BeatName,
+	}
+}
+
 func makeGoTestArgs(name string) GoTestArgs {
 	fileName := fmt.Sprintf("build/TEST-go-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
 	params := GoTestArgs{
@@ -332,9 +342,10 @@ func (s *GoTestSummary) String() string {
 // BuildSystemTestBinary build a binary for testing that is instrumented for
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
-func BuildSystemTestBinary() error {
+func BuildSystemTestBinary(binArgs TestBinaryArgs) error {
 	args := []string{
 		"test", "-c",
+		"-o", binArgs.Name + ".test",
 	}
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
