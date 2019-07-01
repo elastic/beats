@@ -2616,6 +2616,12 @@
 			"versionExact": "release-branch.go1.10"
 		},
 		{
+			"checksumSHA1": "+/UD9mGRnKxOhZW3+B+VJdIIPn8=",
+			"path": "gopkg.in/goracle.v2",
+			"revision": "3222d7159b45fce95150f06a57e1bcc2868108d3",
+			"revisionTime": "2019-05-30T18:40:54Z"
+		},
+		{
 			"checksumSHA1": "6f8MEU31llHM1sLM/GGH4/Qxu0A=",
 			"path": "gopkg.in/inf.v0",
 			"revision": "3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4",
