@@ -759,6 +759,9 @@ filebeat.inputs:
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
 
+  # Max number of concurrent connections, or 0 for no limit. Default: 0
+  #max_connections: 0
+
   # The number of seconds of inactivity before a remote connection is closed.
   #timeout: 300s
 
