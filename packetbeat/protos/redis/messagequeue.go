@@ -33,7 +33,7 @@ type listEntry struct {
 	next *listEntry
 }
 
-// MessageQueue defines a queue that automatically evict messages based on
+// MessageQueue defines a queue that automatically evicts messages based on
 // the total size or number of elements contained.
 type MessageQueue struct {
 	head, tail *listEntry
