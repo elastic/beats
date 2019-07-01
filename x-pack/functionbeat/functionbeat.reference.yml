@@ -150,6 +150,15 @@ functionbeat.provider.aws.functions:
 
     # Define custom processors for this function.
     #processors:
+    #  This example extracts the raw data from events.
+    #  - decode_base64_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decompress_gzip_field:
+    #      field:
+    #        from: message
+    #        to: message
     #  - decode_json_fields:
     #      fields: ["message"]
     #      process_array: false
@@ -388,6 +397,13 @@ functionbeat.provider.aws.functions:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 #
 # The following example copies the value of message to message_copied
 #
