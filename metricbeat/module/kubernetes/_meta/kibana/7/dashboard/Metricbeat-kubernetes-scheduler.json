@@ -159,14 +159,40 @@
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [],
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "kubernetes.controllermanager"
+                  },
+                  "type": "phrase",
+                  "value": "kubernetes.controllermanager"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "kubernetes.controllermanager",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "title": "Kubernetes - Host selector",
+        "title": "Kubernetes - Host selector controller manager",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -195,7 +221,7 @@
                 "label": "Service address",
                 "options": {
                   "dynamicOptions": true,
-                  "multiselect": true,
+                  "multiselect": false,
                   "order": "desc",
                   "size": 5,
                   "type": "terms"
@@ -204,11 +230,11 @@
                 "type": "list"
               }
             ],
-            "pinFilters": false,
+            "pinFilters": true,
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Kubernetes - Host selector",
+          "title": "Kubernetes - Host selector controller manager",
           "type": "input_control_vis"
         }
       },
@@ -217,6 +243,11 @@
         "visualization": "7.2.0"
       },
       "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
         {
           "id": "metricbeat-*",
           "name": "control_0_index_pattern",
@@ -229,8 +260,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-02T08:03:10.395Z",
-      "version": "WzU4OCwxXQ=="
+      "updated_at": "2019-07-02T09:59:37.431Z",
+      "version": "WzY5NiwxXQ=="
     },
     {
       "attributes": {
