@@ -73,7 +73,7 @@ func New(
 			Seek:               config.Seek,
 			CursorSeekFallback: config.CursorSeekFallback,
 			Matches:            config.Matches,
-			Remote:             config.Remote,
+			SaveRemoteHostname: config.SaveRemoteHostname,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -92,7 +92,7 @@ func New(
 			Seek:               config.Seek,
 			CursorSeekFallback: config.CursorSeekFallback,
 			Matches:            config.Matches,
-			Remote:             config.Remote,
+			SaveRemoteHostname: config.SaveRemoteHostname,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)

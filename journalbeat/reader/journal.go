@@ -259,7 +259,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 
 	// if entry is coming from a remote journal, add_host_metadata overwrites the source hostname, so it
 	// has to be copied to a different field
-	if r.config.Remote {
+	if r.config.SaveRemoteHostname {
 		remoteHostname, err := fields.GetValue("host.hostname")
 		if err == nil {
 			fields.Put("log.source.address", remoteHostname)
