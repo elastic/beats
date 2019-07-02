@@ -703,6 +703,17 @@ metricbeat.modules:
   # Path to server status. Default server-status
   server_status_path: "server-status"
 
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  metricsets: ["tablespace"]
+  enabled: false
+  period: 10s
+  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+
+  # username: ""
+  # password: ""
+
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:
@@ -1071,6 +1082,13 @@ metricbeat.modules:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 #
 # The following example copies the value of message to message_copied
 #

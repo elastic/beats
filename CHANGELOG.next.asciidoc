@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
 - Fix timezone offset parsing in system/syslog. {pull}12529[12529]
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
 
 *Heartbeat*
 
@@ -176,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
 - Add `decode_base64_field` processor for decoding base64 field. {pull}11914[11914]
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
+- Add `decompress_gzip_field` processor. {pull}12733[12733]
 
 *Auditbeat*
 
@@ -209,7 +211,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
 - Add MSSQL module {pull}12079[12079]
 - Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
 - Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
 
 *Heartbeat*
 
@@ -249,6 +253,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `beat` module. {pull}12181[12181] {pull}12615[12615]
 - Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
 - Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
+- Add Oracle Module {pull}11890[11890]
 
 *Packetbeat*
 

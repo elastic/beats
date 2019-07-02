@@ -21,4 +21,6 @@ import (
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/performance"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/transaction_log"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/oracle/tablespace"
 )
