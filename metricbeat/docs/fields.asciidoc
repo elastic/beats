@@ -15526,7 +15526,7 @@ type: boolean
 --
 
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.bucket.*`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.bucket.*`*::
 +
 --
 End to end scheduling duration microseconds
@@ -15535,7 +15535,7 @@ type: object
 
 --
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.sum`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.sum`*::
 +
 --
 End to end scheduling duration microseconds sum
@@ -15544,7 +15544,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.count`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.count`*::
 +
 --
 End to end scheduling count
@@ -15553,7 +15553,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.pod.preemption.victims.count`*::
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.count`*::
 +
 --
 Pod preemption victims
@@ -15562,7 +15562,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.pod.attempts.count`*::
+*`kubernetes.scheduler.scheduling.pod.attempts.count`*::
 +
 --
 Pod attempts count
@@ -15571,7 +15571,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.percentile.*`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.percentile.*`*::
 +
 --
 Scheduling duration percentiles
@@ -15580,7 +15580,7 @@ type: object
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.sum`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.sum`*::
 +
 --
 Scheduling duration cumulative sum
@@ -15589,7 +15589,7 @@ type: double
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.count`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.count`*::
 +
 --
 Scheduling count
