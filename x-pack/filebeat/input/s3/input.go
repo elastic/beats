@@ -12,10 +12,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws/external"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -49,7 +48,9 @@ var (
 	// retrieve requests after being retrieved by a ReceiveMessage request.
 	// This value needs to be a lot bigger than filebeat collection frequency so
 	// if it took too long to read the s3 log, this sqs message will not be reprocessed.
-	visibilityTimeout int64 = 300
+	// The default visibility timeout for a message is 30 seconds. The minimum
+	// is 0 seconds. The maximum is 12 hours.
+	visibilityTimeout int64 = 30
 )
 
 func init() {
@@ -99,9 +100,7 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	}
 
 	p := &Input{
-		//started: false,
-		outlet: outlet,
-		//cfg:     cfg,
+		outlet:    outlet,
 		config:    config,
 		awsConfig: awsConfig,
 		logger:    logger,
@@ -163,6 +162,12 @@ func (p *Input) Run() {
 			WaitTimeSeconds:       &waitTimeSecond,
 		}
 
+		// update message visibility timeout to make sure filebeat can finish reading
+		changeMessageVisibilityInput := &sqs.ChangeMessageVisibilityInput{
+			QueueUrl:          &queueURL,
+			VisibilityTimeout: &visibilityTimeout,
+		}
+
 		req := svcSQS.ReceiveMessageRequest(receiveMessageInput)
 		output, errR := req.Send()
 		if errR != nil {
@@ -177,8 +182,9 @@ func (p *Input) Run() {
 			wg.Add(numMessages)
 
 			for i := range output.Messages {
+				// launch goroutine to handle each message from sqs
+				c := make(chan struct{})
 				go func(message sqs.Message) {
-					// launch goroutine to handle each message from sqs
 					defer wg.Done()
 
 					s3Infos, err := handleMessage(message, p.config.BucketNames)
@@ -195,6 +201,19 @@ func (p *Input) Run() {
 						p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
 					}
 				}(output.Messages[i])
+				select {
+				case <-c:
+					close(c)
+				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
+					// if half of the set visibilityTimeout passed and this is
+					// still ongoing, then change visibility timeout.
+					changeMessageVisibilityInput.ReceiptHandle = output.Messages[i].ReceiptHandle
+					req := svcSQS.ChangeMessageVisibilityRequest(changeMessageVisibilityInput)
+					_, err = req.Send()
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+					}
+				}
 			}
 			wg.Wait()
 		}
@@ -222,14 +241,14 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 }
 
 // handle message
-func handleMessage(m sqs.Message, bucketNames []string) (s3Infos []s3Info, err error) {
+func handleMessage(m sqs.Message, bucketNames []string) ([]s3Info, error) {
 	msg := map[string]interface{}{}
-	err = json.Unmarshal([]byte(*m.Body), &msg)
+	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
-		err = errors.Wrap(err, "json unmarshal sqs message body failed")
-		return
+		return nil, errors.Wrap(err, "json unmarshal sqs message body failed")
 	}
 
+	var s3Infos []s3Info
 	records := msg["Records"].([]interface{})
 	for _, record := range records {
 		recordMap := record.(map[string]interface{})
@@ -250,7 +269,7 @@ func handleMessage(m sqs.Message, bucketNames []string) (s3Infos []s3Info, err e
 			s3Infos = append(s3Infos, s3Info)
 		}
 	}
-	return
+	return s3Infos, nil
 }
 
 // stringInSlice checks if a string is already exists in list
@@ -283,6 +302,7 @@ func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) {
 				reader, err := bufferedIORead(svc, s3Info)
 				if err != nil {
 					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
+					return
 				}
 
 				offset := 0
