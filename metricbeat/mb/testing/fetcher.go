@@ -24,11 +24,12 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+// Fetcher is an interface implemented by all fetchers for testing purpouses
 type Fetcher interface {
 	Module() mb.Module
 	Name() string
 
-	Fetch() ([]mb.Event, []error)
+	FetchEvents() ([]mb.Event, []error)
 	WriteEvents(testing.TB, string)
 	WriteEventsCond(testing.TB, string, func(common.MapStr) bool)
 }
@@ -50,19 +51,15 @@ func NewFetcher(t testing.TB, config interface{}) Fetcher {
 }
 
 type reportingMetricSetV2Fetcher struct {
-	fetcherHelper
-	metricSet mb.ReportingMetricSetV2
+	mb.ReportingMetricSetV2
 }
 
 func newReporterV2Fetcher(metricSet mb.ReportingMetricSetV2) *reportingMetricSetV2Fetcher {
-	return &reportingMetricSetV2Fetcher{
-		fetcherHelper{metricSet},
-		metricSet,
-	}
+	return &reportingMetricSetV2Fetcher{metricSet}
 }
 
-func (f *reportingMetricSetV2Fetcher) Fetch() ([]mb.Event, []error) {
-	return ReportingFetchV2(f.metricSet)
+func (f *reportingMetricSetV2Fetcher) FetchEvents() ([]mb.Event, []error) {
+	return ReportingFetchV2(f)
 }
 
 func (f *reportingMetricSetV2Fetcher) WriteEvents(t testing.TB, path string) {
@@ -70,26 +67,22 @@ func (f *reportingMetricSetV2Fetcher) WriteEvents(t testing.TB, path string) {
 }
 
 func (f *reportingMetricSetV2Fetcher) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
-	err := WriteEventsReporterV2Cond(f.metricSet, t, path, cond)
+	err := WriteEventsReporterV2Cond(f, t, path, cond)
 	if err != nil {
 		t.Fatal("writing events", err)
 	}
 }
 
 type reportingMetricSetV2FetcherError struct {
-	fetcherHelper
-	metricSet mb.ReportingMetricSetV2Error
+	mb.ReportingMetricSetV2Error
 }
 
 func newReporterV2FetcherError(metricSet mb.ReportingMetricSetV2Error) *reportingMetricSetV2FetcherError {
-	return &reportingMetricSetV2FetcherError{
-		fetcherHelper{metricSet},
-		metricSet,
-	}
+	return &reportingMetricSetV2FetcherError{metricSet}
 }
 
-func (f *reportingMetricSetV2FetcherError) Fetch() ([]mb.Event, []error) {
-	return ReportingFetchV2Error(f.metricSet)
+func (f *reportingMetricSetV2FetcherError) FetchEvents() ([]mb.Event, []error) {
+	return ReportingFetchV2Error(f)
 }
 
 func (f *reportingMetricSetV2FetcherError) WriteEvents(t testing.TB, path string) {
@@ -97,26 +90,22 @@ func (f *reportingMetricSetV2FetcherError) WriteEvents(t testing.TB, path string
 }
 
 func (f *reportingMetricSetV2FetcherError) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
-	err := WriteEventsReporterV2ErrorCond(f.metricSet, t, path, cond)
+	err := WriteEventsReporterV2ErrorCond(f, t, path, cond)
 	if err != nil {
 		t.Fatal("writing events", err)
 	}
 }
 
 type reportingMetricSetV2FetcherWithContext struct {
-	fetcherHelper
-	metricSet mb.ReportingMetricSetV2WithContext
+	mb.ReportingMetricSetV2WithContext
 }
 
 func newReporterV2FetcherWithContext(metricSet mb.ReportingMetricSetV2WithContext) *reportingMetricSetV2FetcherWithContext {
-	return &reportingMetricSetV2FetcherWithContext{
-		fetcherHelper{metricSet},
-		metricSet,
-	}
+	return &reportingMetricSetV2FetcherWithContext{metricSet}
 }
 
-func (f *reportingMetricSetV2FetcherWithContext) Fetch() ([]mb.Event, []error) {
-	return ReportingFetchV2WithContext(f.metricSet)
+func (f *reportingMetricSetV2FetcherWithContext) FetchEvents() ([]mb.Event, []error) {
+	return ReportingFetchV2WithContext(f)
 }
 
 func (f *reportingMetricSetV2FetcherWithContext) WriteEvents(t testing.TB, path string) {
@@ -124,20 +113,8 @@ func (f *reportingMetricSetV2FetcherWithContext) WriteEvents(t testing.TB, path 
 }
 
 func (f *reportingMetricSetV2FetcherWithContext) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
-	err := WriteEventsReporterV2WithContextCond(f.metricSet, t, path, cond)
+	err := WriteEventsReporterV2WithContextCond(f, t, path, cond)
 	if err != nil {
 		t.Fatal("writing events", err)
 	}
-}
-
-type fetcherHelper struct {
-	metricSet mb.MetricSet
-}
-
-func (f *fetcherHelper) Module() mb.Module {
-	return f.metricSet.Module()
-}
-
-func (f *fetcherHelper) Name() string {
-	return f.metricSet.Name()
 }

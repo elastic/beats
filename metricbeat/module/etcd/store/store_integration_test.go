@@ -35,7 +35,7 @@ func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "etcd")
 
 	ms := mbtest.NewFetcher(t, getConfig())
-	events, errs := ms.Fetch()
+	events, errs := ms.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
