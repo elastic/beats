@@ -1246,6 +1246,35 @@ type: short
 
 --
 
+[float]
+=== ios
+
+Fields for Cisco IOS logs.
+
+
+
+*`cisco.ios.access_list`*::
++
+--
+Name of the IP access list.
+
+
+type: keyword
+
+--
+
+*`cisco.ios.facility`*::
++
+--
+The facility to which the message refers (for example, SNMP, SYS, and so forth). A facility can be a hardware device, a protocol, or a module of the system software. It denotes the source or the cause of the system message.
+
+
+type: keyword
+
+example: SEC
+
+--
+
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
 
@@ -7419,6 +7448,86 @@ docker.attrs contains labels and environment variables written by docker's JSON 
 
 
 type: object
+
+--
+
+*`event.code`*::
++
+--
+The code for the log message.
+
+
+type: keyword
+
+--
+
+*`icmp.code`*::
++
+--
+ICMP code.
+
+
+type: keyword
+
+--
+
+*`icmp.type`*::
++
+--
+ICMP type.
+
+
+type: keyword
+
+--
+
+*`igmp.type`*::
++
+--
+IGMP type.
+
+
+type: keyword
+
+--
+
+*`source.as.number`*::
++
+--
+Autonomous system number.
+
+
+type: long
+
+--
+
+*`destination.as.number`*::
++
+--
+Autonomous system number.
+
+
+type: long
+
+--
+
+*`source.as.organization.name`*::
++
+--
+Name of organization associated with the autonomous system.
+
+
+type: keyword
+
+--
+
+*`destination.as.organization.name`*::
++
+--
+Name of organization associated with the autonomous system.
+
+
+type: keyword
 
 --
 

@@ -22251,7 +22251,9 @@ Size information about the file
 --
 Maximum file size in bytes
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22260,7 +22262,9 @@ type: bytes
 --
 Size of the file in bytes
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22270,7 +22274,9 @@ type: bytes
 The size of the file available for user data. The actual size of the file minus this value is used to store file related metadata.
 
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22304,7 +22310,9 @@ Tablespace space usage information
 --
 Tablespace total free space available, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22313,7 +22321,9 @@ type: bytes
 --
 Tablespace used space, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22322,7 +22332,9 @@ type: bytes
 --
 Tablespace total size, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
