@@ -49,17 +49,11 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"operation": "preemption_evaluation",
-			"scheduler": {
-				"duration": {
-					"seconds": {
-						"count": 154,
-						"percentile": {
-							"50": 0.008470238,
-							"90": 0.016152651,
-							"99": 0.026165495
-						},
-						"sum": 1.5003563099999988
+			"result": "scheduled",
+			"scheduling": {
+				"pod": {
+					"attempts": {
+						"count": 3
 					}
 				}
 			}
@@ -97,11 +91,17 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"result": "unschedulable",
-			"scheduler": {
-				"pod": {
-					"attempts": {
-						"count": 154
+			"operation": "binding",
+			"scheduling": {
+				"duration": {
+					"seconds": {
+						"count": 3,
+						"percentile": {
+							"50": 0.012318629,
+							"90": 0.012921477,
+							"99": 0.012921477
+						},
+						"sum": 0.039052979
 					}
 				}
 			}
@@ -244,8 +244,54 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
+			"result": "unschedulable",
+			"scheduling": {
+				"pod": {
+					"attempts": {
+						"count": 154
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"result": "error",
+			"scheduling": {
+				"pod": {
+					"attempts": {
+						"count": 0
+					}
+				}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
 			"operation": "predicate_evaluation",
-			"scheduler": {
+			"scheduling": {
 				"duration": {
 					"seconds": {
 						"count": 3,
@@ -273,40 +319,17 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"result": "error",
-			"scheduler": {
-				"pod": {
-					"attempts": {
-						"count": 0
-					}
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"operation": "binding",
-			"scheduler": {
+			"operation": "preemption_evaluation",
+			"scheduling": {
 				"duration": {
 					"seconds": {
-						"count": 3,
+						"count": 154,
 						"percentile": {
-							"50": 0.012318629,
-							"90": 0.012921477,
-							"99": 0.012921477
+							"50": 0.008470238,
+							"90": 0.016152651,
+							"99": 0.026165495
 						},
-						"sum": 0.039052979
+						"sum": 1.5003563099999988
 					}
 				}
 			}
@@ -346,7 +369,7 @@
 					"sec": 1560349587.32
 				}
 			},
-			"scheduler": {
+			"scheduling": {
 				"e2e": {
 					"duration": {
 						"us": {
@@ -378,29 +401,6 @@
 						"victims": {
 							"count": 0
 						}
-					}
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"result": "scheduled",
-			"scheduler": {
-				"pod": {
-					"attempts": {
-						"count": 3
 					}
 				}
 			}
