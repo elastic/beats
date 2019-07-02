@@ -106,7 +106,7 @@ func getRelease(rel string) (string, error) {
 
 // createDocsPath creates the path for the entire docs/ folder
 func createDocsPath(module string) error {
-	return os.MkdirAll(mage.OSSBeatDir(filepath.Join("docs", module)), 0755)
+	return os.MkdirAll(mage.OSSBeatDir(filepath.Join("docs/modules", module)), 0755)
 }
 
 // testIfDocsInDir tests for a `_meta/docs.asciidoc` in a given directory

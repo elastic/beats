@@ -25,7 +25,7 @@ kibana:
 collect-docs: python-env
 	@rm -rf docs/modules
 	@mkdir -p docs/modules
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+	mage CollectDocs
 	mage FieldsDocs
 
 # Collects all module configs
