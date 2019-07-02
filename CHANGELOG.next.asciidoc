@@ -119,6 +119,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Use backoff when no new events are found. {pull}11861[11861]
 - Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716]
+- Preserve host name when reading from remote journal. {pull}12714[12714]
 
 *Metricbeat*
 
