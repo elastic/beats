@@ -13,6 +13,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/filebeat/module/cisco"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/coredns"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/envoyproxy"
+	_ "github.com/elastic/beats/x-pack/filebeat/module/googlecloud"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/iptables"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/mssql"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/netflow"
