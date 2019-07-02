@@ -40,6 +40,8 @@ func NewFetcher(t testing.TB, config interface{}) Fetcher {
 		return NewReporterV2Fetcher(metricSet)
 	case mb.ReportingMetricSetV2Error:
 		return NewReporterV2FetcherError(metricSet)
+	case mb.ReportingMetricSetV2WithContext:
+		return NewReporterV2FetcherWithContext(metricSet)
 	default:
 		t.Fatalf("Failed to create a Fetcher for metricset of type %T", metricSet)
 	}
@@ -56,14 +58,6 @@ func NewReporterV2Fetcher(metricSet mb.ReportingMetricSetV2) *reportingMetricSet
 		fetcherHelper{metricSet},
 		metricSet,
 	}
-}
-
-func (f *reportingMetricSetV2Fetcher) Module() mb.Module {
-	return f.metricSet.Module()
-}
-
-func (f *reportingMetricSetV2Fetcher) Name() string {
-	return f.metricSet.Name()
 }
 
 func (f *reportingMetricSetV2Fetcher) Fetch() ([]mb.Event, []error) {
@@ -93,14 +87,6 @@ func NewReporterV2FetcherError(metricSet mb.ReportingMetricSetV2Error) *reportin
 	}
 }
 
-func (f *reportingMetricSetV2FetcherError) Module() mb.Module {
-	return f.metricSet.Module()
-}
-
-func (f *reportingMetricSetV2FetcherError) Name() string {
-	return f.metricSet.Name()
-}
-
 func (f *reportingMetricSetV2FetcherError) Fetch() ([]mb.Event, []error) {
 	return ReportingFetchV2Error(f.metricSet)
 }
@@ -111,6 +97,33 @@ func (f *reportingMetricSetV2FetcherError) WriteEvents(t testing.TB, path string
 
 func (f *reportingMetricSetV2FetcherError) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
 	err := WriteEventsReporterV2ErrorCond(f.metricSet, t, path, cond)
+	if err != nil {
+		t.Fatal("writing events", err)
+	}
+}
+
+type reportingMetricSetV2FetcherWithContext struct {
+	fetcherHelper
+	metricSet mb.ReportingMetricSetV2WithContext
+}
+
+func NewReporterV2FetcherWithContext(metricSet mb.ReportingMetricSetV2WithContext) *reportingMetricSetV2FetcherWithContext {
+	return &reportingMetricSetV2FetcherWithContext{
+		fetcherHelper{metricSet},
+		metricSet,
+	}
+}
+
+func (f *reportingMetricSetV2FetcherWithContext) Fetch() ([]mb.Event, []error) {
+	return ReportingFetchV2WithContext(f.metricSet)
+}
+
+func (f *reportingMetricSetV2FetcherWithContext) WriteEvents(t testing.TB, path string) {
+	f.WriteEventsCond(t, path, nil)
+}
+
+func (f *reportingMetricSetV2FetcherWithContext) WriteEventsCond(t testing.TB, path string, cond func(common.MapStr) bool) {
+	err := WriteEventsReporterV2WithContextCond(f.metricSet, t, path, cond)
 	if err != nil {
 		t.Fatal("writing events", err)
 	}
