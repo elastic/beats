@@ -46,7 +46,7 @@ type Adapter interface {
 	CreateConfig(bus.Event) ([]*common.Config, error)
 
 	// RunnerFactory provides runner creation by feeding valid configs
-	cfgfile.RunnerFactory
+	cfgfile.CheckableRunnerFactory
 
 	// EventFilter returns the bus filter to retrieve runner start/stop triggering events
 	EventFilter() []string

@@ -30,8 +30,7 @@ type Config struct {
 	Host           string                  `config:"host"`
 	TLS            *docker.TLSConfig       `config:"ssl"`
 	Prefix         string                  `config:"prefix"`
-	HintsEnabled   bool                    `config:"hints.enabled"`
-	DefaultDisable bool                    `config:"default.disable"`
+	Hints          *common.Config          `config:"hints"`
 	Builders       []*common.Config        `config:"builders"`
 	Appenders      []*common.Config        `config:"appenders"`
 	Templates      template.MapperSettings `config:"templates"`

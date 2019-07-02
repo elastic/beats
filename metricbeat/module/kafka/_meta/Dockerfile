@@ -14,6 +14,7 @@ RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && curl -s -o $INSTALL_
     "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
     tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1
 
+ADD kafka_server_jaas.conf /etc/kafka/server_jaas.conf
 ADD run.sh /run.sh
 ADD healthcheck.sh /healthcheck.sh
 

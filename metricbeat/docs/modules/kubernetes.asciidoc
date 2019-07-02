@@ -80,11 +80,39 @@ metricbeat.modules:
     - event
 
 # Kubernetes API server
+# (when running metricbeat as a pod)
 - module: kubernetes
   enabled: true
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+# Kubernetes proxy server
+# (when running metricbeat locally at hosts or as a daemonset + host network)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - proxy
+  hosts: ["localhost:10249"]
+  period: 10s
+
+# Kubernetes controller manager
+# (URL and deployment will need to be modified to match the controller manager deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - controllermanager
+  hosts: ["http://localhost:10252"]
+  period: 10s
+
+# Kubernetes scheduler
+# (URL and deployment method will need to be adapted to match scheduler deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - scheduler
+  hosts: ["localhost:10251"]
+  period: 10s
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
@@ -99,11 +127,17 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-container,container>>
 
+* <<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>
+
 * <<metricbeat-metricset-kubernetes-event,event>>
 
 * <<metricbeat-metricset-kubernetes-node,node>>
 
 * <<metricbeat-metricset-kubernetes-pod,pod>>
+
+* <<metricbeat-metricset-kubernetes-proxy,proxy>>
+
+* <<metricbeat-metricset-kubernetes-scheduler,scheduler>>
 
 * <<metricbeat-metricset-kubernetes-state_container,state_container>>
 
@@ -125,11 +159,17 @@ include::kubernetes/apiserver.asciidoc[]
 
 include::kubernetes/container.asciidoc[]
 
+include::kubernetes/controllermanager.asciidoc[]
+
 include::kubernetes/event.asciidoc[]
 
 include::kubernetes/node.asciidoc[]
 
 include::kubernetes/pod.asciidoc[]
+
+include::kubernetes/proxy.asciidoc[]
+
+include::kubernetes/scheduler.asciidoc[]
 
 include::kubernetes/state_container.asciidoc[]
 

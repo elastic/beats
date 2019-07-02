@@ -155,13 +155,18 @@ func makeAddSummary() jobs.JobWrapper {
 			state.mtx.Lock()
 			defer state.mtx.Unlock()
 
-			// After each job
-			eventStatus, _ := event.GetValue("monitor.status")
-			if eventStatus == "up" {
-				state.up++
-			} else {
-				state.down++
+			// If the event is cancelled we don't record it as being either up or down since
+			// we discard the event anyway.
+			if !eventext.IsEventCancelled(event) {
+				// After each job
+				eventStatus, _ := event.GetValue("monitor.status")
+				if eventStatus == "up" {
+					state.up++
+				} else {
+					state.down++
+				}
 			}
+
 			// No error check needed here
 			event.PutValue("monitor.check_group", state.checkGroup)
 

@@ -51,6 +51,7 @@ func TestEventMapping(t *testing.T) {
 
 	testCases := map[string]interface{}{
 		"name": "nginx-deployment-2303442956-pcqfc",
+		"uid":  "beabc196-2456-11e7-a3ad-42010a840235",
 
 		"network.rx.bytes":  107056,
 		"network.rx.errors": 0,

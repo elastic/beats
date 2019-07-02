@@ -18,6 +18,7 @@
 package readfile
 
 import (
+	"bytes"
 	"io"
 	"time"
 
@@ -53,7 +54,7 @@ func (r EncoderReader) Next() (reader.Message, error) {
 	// Creating message object
 	return reader.Message{
 		Ts:      time.Now(),
-		Content: c,
+		Content: bytes.Trim(c, "\xef\xbb\xbf"),
 		Bytes:   sz,
 	}, err
 }

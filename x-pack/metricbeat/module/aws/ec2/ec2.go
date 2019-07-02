@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -51,8 +52,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
-	remainder300 := metricSet.PeriodInSec % 300
-	remainder60 := metricSet.PeriodInSec % 60
+	remainder300 := int(metricSet.Period.Seconds()) % 300
+	remainder60 := int(metricSet.Period.Seconds()) % 60
 	if remainder300 != 0 || remainder60 != 0 {
 		err := errors.New("period needs to be set to 60s (or a multiple of 60s) if detailed monitoring is " +
 			"enabled for EC2 instances or set to 300s (or a multiple of 300s) if EC2 instances has basic monitoring. " +
@@ -70,10 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
-	if err != nil {
-		return errors.Wrap(err, "Error ParseDuration")
-	}
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
 
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
@@ -102,7 +100,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		var metricDataQueriesTotal []cloudwatch.MetricDataQuery
 		for _, instanceID := range instanceIDs {
-			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)...)
+			metricDataQueriesTotal = append(metricDataQueriesTotal, constructMetricQueries(listMetricsOutput, instanceID, m.Period)...)
 		}
 
 		var metricDataOutput []cloudwatch.MetricDataResult
@@ -139,11 +137,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID string, periodInSec int) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID string, period time.Duration) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, instanceID, i, periodInSec)
+		metricDataQuery := createMetricDataQuery(listMetric, instanceID, i, period)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
@@ -212,8 +210,12 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
 				}
 
+				// Add tags
+				tags := instanceOutput[instanceID].Tags
+				for _, tag := range tags {
+					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+				}
 			}
-
 		}
 	}
 
@@ -260,10 +262,10 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 	return
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index int, periodInSec int) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Average"
-	period := int64(periodInSec)
-	id := "ec2" + strconv.Itoa(index)
+	periodInSeconds := int64(period.Seconds())
+	id := metricsetName + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 
 	for _, dim := range metricDims {
@@ -273,7 +275,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index in
 			metricDataQuery = cloudwatch.MetricDataQuery{
 				Id: &id,
 				MetricStat: &cloudwatch.MetricStat{
-					Period: &period,
+					Period: &periodInSeconds,
 					Stat:   &statistic,
 					Metric: &metric,
 				},

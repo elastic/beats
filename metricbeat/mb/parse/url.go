@@ -168,7 +168,7 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 		pass = defaultPass
 	}
 
-	if userIsSet && passIsSet {
+	if passIsSet {
 		u.User = url.UserPassword(user, pass)
 	} else if userIsSet {
 		u.User = url.User(user)

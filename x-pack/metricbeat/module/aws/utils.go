@@ -5,10 +5,14 @@
 package aws
 
 import (
+	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
+	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -16,14 +20,11 @@ import (
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
-func GetStartTimeEndTime(durationString string) (startTime time.Time, endTime time.Time, err error) {
-	endTime = time.Now()
-	duration, err := time.ParseDuration(durationString)
-	if err != nil {
-		return
-	}
-	startTime = endTime.Add(duration)
-	return startTime, endTime, nil
+func GetStartTimeEndTime(period time.Duration) (time.Time, time.Time) {
+	endTime := time.Now()
+	// Set startTime double the period earlier than the endtime in order to
+	// make sure GetMetricDataRequest gets the latest data point for each metric.
+	return endTime.Add(period * -2), endTime
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
@@ -36,8 +37,7 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	// List metrics of a given namespace for each region
 	listMetricsOutput, err := reqListMetrics.Send()
 	if err != nil {
-		err = errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
-		return nil, err
+		return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
 	}
 
 	if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
@@ -58,8 +58,7 @@ func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, next
 	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
 	getMetricDataOutput, err := reqGetMetricData.Send()
 	if err != nil {
-		err = errors.Wrap(err, "Error GetMetricDataInput")
-		return nil, err
+		return nil, errors.Wrap(err, "Error GetMetricDataInput")
 	}
 	return getMetricDataOutput, nil
 }
@@ -70,12 +69,26 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 	for init || getMetricDataOutput.NextToken != nil {
 		init = false
-		output, err := getMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svc, startTime, endTime)
-		if err != nil {
-			err = errors.Wrap(err, "getMetricDataPerRegion failed")
-			return getMetricDataOutput.MetricDataResults, err
+		// Split metricDataQueries into smaller slices that length no longer than 100.
+		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
+		iter := len(metricDataQueries) / 100
+		for i := 0; i <= iter; i++ {
+			metricDataQueriesPartial := metricDataQueries[iter*100:]
+			if i != iter {
+				metricDataQueriesPartial = metricDataQueries[i*100 : (i+1)*100-1]
+			}
+
+			if len(metricDataQueriesPartial) == 0 {
+				return getMetricDataOutput.MetricDataResults, nil
+			}
+
+			output, err := getMetricDataPerRegion(metricDataQueriesPartial, getMetricDataOutput.NextToken, svc, startTime, endTime)
+			if err != nil {
+				return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "getMetricDataPerRegion failed")
+			}
+
+			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 		}
-		getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 	}
 	return getMetricDataOutput.MetricDataResults, nil
 }
@@ -135,4 +148,61 @@ func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time
 	}
 
 	return timestamp
+}
+
+// GetResourcesTags function queries AWS resource groupings tagging API
+// to get a resource tag mapping with specific resource type filters
+func GetResourcesTags(svc resourcegroupstaggingapiiface.ResourceGroupsTaggingAPIAPI, resourceTypeFilters []string) (map[string][]resourcegroupstaggingapi.Tag, error) {
+	if resourceTypeFilters == nil {
+		return map[string][]resourcegroupstaggingapi.Tag{}, nil
+	}
+
+	resourceTagMap := make(map[string][]resourcegroupstaggingapi.Tag)
+	getResourcesInput := &resourcegroupstaggingapi.GetResourcesInput{
+		PaginationToken:     nil,
+		ResourceTypeFilters: resourceTypeFilters,
+	}
+
+	init := true
+	for init || *getResourcesInput.PaginationToken != "" {
+		init = false
+		getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
+		output, err := getResourcesRequest.Send()
+		if err != nil {
+			err = errors.Wrap(err, "error GetResources")
+			return nil, err
+		}
+
+		getResourcesInput.PaginationToken = output.PaginationToken
+		if resourceTypeFilters == nil || len(output.ResourceTagMappingList) == 0 {
+			return nil, nil
+		}
+
+		for _, resourceTag := range output.ResourceTagMappingList {
+			identifier, err := findIdentifierFromARN(*resourceTag.ResourceARN)
+			if err != nil {
+				err = errors.Wrap(err, "error findIdentifierFromARN")
+				return nil, err
+			}
+			resourceTagMap[identifier] = resourceTag.Tags
+		}
+	}
+	return resourceTagMap, nil
+}
+
+func findIdentifierFromARN(resourceARN string) (string, error) {
+	arnParsed, err := arn.Parse(resourceARN)
+	if err != nil {
+		err = errors.Wrap(err, "error Parse arn")
+		return "", err
+	}
+
+	resourceARNSplit := []string{arnParsed.Resource}
+	if strings.Contains(arnParsed.Resource, ":") {
+		resourceARNSplit = strings.Split(arnParsed.Resource, ":")
+	} else if strings.Contains(arnParsed.Resource, "/") {
+		resourceARNSplit = strings.Split(arnParsed.Resource, "/")
+	}
+	identifier := resourceARNSplit[len(resourceARNSplit)-1]
+	return identifier, nil
 }

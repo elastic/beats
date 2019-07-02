@@ -37,16 +37,19 @@ information, see
 configured the {es} output and want to send {beatname_uc} monitoring events to
 the same {es} cluster, specify the following minimal configuration:
 +
---
-[source, yml]
+["source","yml",subs="attributes"]
 --------------------
-monitoring.enabled: true
+monitoring:
+  enabled: true
+  elasticsearch:
+    username: {beat_monitoring_user}
+    password: somepassword
 --------------------
-
++
 If you configured a different output, such as {ls} or you want to send {beatname_uc}
 monitoring events to a separate {es} cluster (referred to as the _monitoring cluster_),
 you must specify additional configuration options. For example:
-
++
 ["source","yml",subs="attributes"]
 --------------------
 monitoring:
@@ -58,7 +61,6 @@ monitoring:
 --------------------
 <1> This setting identifies the hosts and port numbers of {es} nodes
 that are part of the monitoring cluster.
---
 
 . {kibana-ref}/monitoring-xpack-kibana.html[Configure monitoring in {kib}].
 

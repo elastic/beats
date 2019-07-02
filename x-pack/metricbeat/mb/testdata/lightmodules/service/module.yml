@@ -1,0 +1,4 @@
+name: service
+metricsets:
+- metricset
+- nondefault

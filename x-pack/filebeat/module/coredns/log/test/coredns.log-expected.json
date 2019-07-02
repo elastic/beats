@@ -14,7 +14,6 @@
             "RA"
         ],
         "coredns.response.size": 136,
-        "ecs.version": "1.0.0",
         "event.dataset": "coredns.log",
         "event.duration": 102078,
         "event.module": "coredns",
@@ -47,7 +46,6 @@
             "RA"
         ],
         "coredns.response.size": 188,
-        "ecs.version": "1.0.0",
         "event.dataset": "coredns.log",
         "event.duration": 20948545,
         "event.module": "coredns",

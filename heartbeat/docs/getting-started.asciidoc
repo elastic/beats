@@ -81,6 +81,8 @@ tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -272,4 +274,4 @@ The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
 [role="screenshot"]
-image:./images/heartbeat-statistics.png[Heartbeat statistics]
+image::./images/heartbeat-statistics.png[Heartbeat statistics]

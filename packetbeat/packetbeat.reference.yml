@@ -698,6 +698,13 @@ packetbeat.ignore_outgoing: false
 #    target: ""
 #    overwrite_keys: false
 #
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
 # The following example copies the value of message to message_copied
 #
 #processors:
@@ -736,7 +743,7 @@ packetbeat.ignore_outgoing: false
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using packetbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Packetbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -799,6 +806,11 @@ output.elasticsearch:
   # Proxy server URL
   #proxy_url: http://proxy:3128
 
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
+
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
   # dropped. The default is 3.
@@ -856,7 +868,6 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1001,7 +1012,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version packetbeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Packetbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -1041,6 +1052,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -1254,7 +1269,7 @@ output.elasticsearch:
   #filename: packetbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every packetbeat restart, the files are rotated. The default value is 10240
+  # every Packetbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -1265,7 +1280,6 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
 
 #----------------------------- Console output ---------------------------------
 #output.console:
@@ -1282,26 +1296,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the packetbeat installation. This is the default base path
+# The home path for the Packetbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the packetbeat installation. This is the default
+# The configuration path for the Packetbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the packetbeat installation. This is the default base path
-# for all the files in which packetbeat needs to store its data. If not set by a
+# The data path for the Packetbeat installation. This is the default base path
+# for all the files in which Packetbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a packetbeat installation. This is the default location for
+# The logs path for a Packetbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1497,13 +1511,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, packetbeat periodically logs its internal metrics that have changed
+# If enabled, Packetbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1541,12 +1558,16 @@ logging.files:
   # Unix epoch. Defaults to disabled.
   #interval: 0
 
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
+
 # Set to true to log messages in JSON format.
 #logging.json: false
 
 
 #============================== Xpack Monitoring ===============================
-# packetbeat can export internal metrics to a central Elasticsearch monitoring
+# Packetbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 

@@ -139,4 +139,4 @@ location field, for example `client.geo.location` or `host.geo.location`, as
 the Geohash.
 
 [role="screenshot"]
-image:./images/coordinate-map.png[Coordinate map in {kib}]
+image::./images/coordinate-map.png[Coordinate map in {kib}]

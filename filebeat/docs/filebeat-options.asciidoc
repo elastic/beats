@@ -44,6 +44,7 @@ You can configure {beatname_uc} to use the following inputs:
 
 * <<{beatname_lc}-input-log>>
 * <<{beatname_lc}-input-stdin>>
+* <<{beatname_lc}-input-container>>
 * <<{beatname_lc}-input-redis>>
 * <<{beatname_lc}-input-udp>>
 * <<{beatname_lc}-input-docker>>
@@ -56,6 +57,8 @@ You can configure {beatname_uc} to use the following inputs:
 include::inputs/input-log.asciidoc[]
 
 include::inputs/input-stdin.asciidoc[]
+
+include::inputs/input-container.asciidoc[]
 
 include::inputs/input-redis.asciidoc[]
 

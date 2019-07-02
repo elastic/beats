@@ -18,6 +18,8 @@
 package cluster_health
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -42,11 +44,13 @@ func init() {
 	)
 }
 
+// MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
 	*helper.HTTP
 }
 
+// New creates a new instance of the cluster_health MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {
@@ -63,22 +67,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error in fetch")
 	}
 
 	events, err := eventMapping(content)
 	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error in mapping")
 	}
 
 	reporter.Event(mb.Event{MetricSetFields: events})
 
-	return
+	return nil
 }

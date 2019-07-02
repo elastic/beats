@@ -12,7 +12,9 @@
     },
     "message": "Inbound socket (10.0.2.2:55270 -\u003e 10.0.2.15:22) CLOSED by process sshd (PID: 22799) and user root (UID: 0)",
     "network": {
+        "community_id": "1:IXrg9Y06W7zrkqBlE30jpC/mzjo=",
         "direction": "inbound",
+        "transport": "tcp",
         "type": "ipv4"
     },
     "process": {

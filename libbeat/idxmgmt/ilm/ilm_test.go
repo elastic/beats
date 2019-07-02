@@ -65,7 +65,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		))
 		require.NoError(t, err)
 
-		s := tmp.(*ilmSupport)
+		s := tmp.(*stdSupport)
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
@@ -76,12 +76,10 @@ func TestDefaultSupport_Init(t *testing.T) {
 
 	t.Run("load external policy", func(t *testing.T) {
 		s, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
-			map[string]interface{}{
-				"policy_file": "testfiles/custom.json",
-			},
+			common.MapStr{"policy_file": "testfiles/custom.json"},
 		))
 		require.NoError(t, err)
-		assert.Equal(t, map[string]interface{}{"hello": "world"}, s.Policy().Body)
+		assert.Equal(t, common.MapStr{"hello": "world"}, s.Policy().Body)
 	})
 }
 

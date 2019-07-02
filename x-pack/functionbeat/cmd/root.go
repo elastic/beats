@@ -27,4 +27,11 @@ func init() {
 	RootCmd.AddCommand(genUpdateCmd())
 	RootCmd.AddCommand(genRemoveCmd())
 	RootCmd.AddCommand(genPackageCmd())
+
+	addBeatSpecificSubcommands()
+}
+
+func addBeatSpecificSubcommands() {
+	RootCmd.ExportCmd.Short = "Export current config, index template or function"
+	RootCmd.ExportCmd.AddCommand(genExportFunctionCmd())
 }

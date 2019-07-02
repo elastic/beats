@@ -48,7 +48,7 @@ const (
 )
 
 var (
-	configFilePattern      = regexp.MustCompile(`.*beat\.yml|apm-server\.yml`)
+	configFilePattern      = regexp.MustCompile(`.*beat\.yml$|apm-server\.yml$`)
 	manifestFilePattern    = regexp.MustCompile(`manifest.yml`)
 	modulesDirPattern      = regexp.MustCompile(`module/.+`)
 	modulesDDirPattern     = regexp.MustCompile(`modules.d/$`)
@@ -58,11 +58,13 @@ var (
 )
 
 var (
-	files     = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
-	modules   = flag.Bool("modules", false, "check modules folder contents")
-	modulesd  = flag.Bool("modules.d", false, "check modules.d folder contents")
-	monitorsd = flag.Bool("monitors.d", false, "check monitors.d folder contents")
-	rootOwner = flag.Bool("root-owner", false, "expect root to own package files")
+	files             = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	modules           = flag.Bool("modules", false, "check modules folder contents")
+	minModules        = flag.Int("min-modules", 4, "minimum number of modules to expect in modules folder")
+	modulesd          = flag.Bool("modules.d", false, "check modules.d folder contents")
+	monitorsd         = flag.Bool("monitors.d", false, "check monitors.d folder contents")
+	rootOwner         = flag.Bool("root-owner", false, "expect root to own package files")
+	rootUserContainer = flag.Bool("root-user-container", false, "expect root in container user")
 )
 
 func TestRPM(t *testing.T) {
@@ -181,19 +183,27 @@ func checkDocker(t *testing.T, file string) {
 	}
 
 	checkDockerEntryPoint(t, p, info)
+	checkDockerLabels(t, p, info, file)
+	checkDockerUser(t, p, info, *rootUserContainer)
+	checkConfigPermissionsWithMode(t, p, os.FileMode(0640))
+	checkManifestPermissionsWithMode(t, p, os.FileMode(0640))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
 func checkConfigPermissions(t *testing.T, p *packageFile) {
+	checkConfigPermissionsWithMode(t, p, expectedConfigMode)
+}
+
+func checkConfigPermissionsWithMode(t *testing.T, p *packageFile, expectedMode os.FileMode) {
 	t.Run(p.Name+" config file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if configFilePattern.MatchString(entry.File) {
 				mode := entry.Mode.Perm()
-				if expectedConfigMode != mode {
+				if expectedMode != mode {
 					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
-						entry.File, expectedConfigMode, mode)
+						entry.File, expectedMode, mode)
 				}
 				return
 			}
@@ -229,13 +239,17 @@ func checkConfigOwner(t *testing.T, p *packageFile, expectRoot bool) {
 
 // Verify that the modules manifest.yml files are installed with a 0644 file mode.
 func checkManifestPermissions(t *testing.T, p *packageFile) {
+	checkManifestPermissionsWithMode(t, p, expectedManifestMode)
+}
+
+func checkManifestPermissionsWithMode(t *testing.T, p *packageFile, expectedMode os.FileMode) {
 	t.Run(p.Name+" manifest file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if manifestFilePattern.MatchString(entry.File) {
 				mode := entry.Mode.Perm()
-				if expectedManifestMode != mode {
+				if expectedMode != mode {
 					t.Errorf("file %v has wrong permissions: expected=%v actual=%v",
-						entry.File, expectedManifestMode, mode)
+						entry.File, expectedMode, mode)
 				}
 			}
 		}
@@ -326,7 +340,7 @@ func checkMonitorsDPresent(t *testing.T, prefix string, p *packageFile) {
 
 func checkModules(t *testing.T, name, prefix string, r *regexp.Regexp, p *packageFile) {
 	t.Run(fmt.Sprintf("%s %s contents", p.Name, name), func(t *testing.T) {
-		minExpectedModules := 4
+		minExpectedModules := *minModules
 		total := 0
 		for _, entry := range p.Contents {
 			if strings.HasPrefix(entry.File, prefix) && r.MatchString(entry.File) {
@@ -382,6 +396,35 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 	})
 }
 
+func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file string) {
+	vendor := info.Config.Labels["org.label-schema.vendor"]
+	if vendor != "Elastic" {
+		return
+	}
+	t.Run(fmt.Sprintf("%s labels", p.Name), func(t *testing.T) {
+		expectedLicense := "Elastic License"
+		ossPrefix := strings.Join([]string{
+			info.Config.Labels["org.label-schema.name"],
+			"oss",
+			info.Config.Labels["org.label-schema.version"],
+		}, "-")
+		if strings.HasPrefix(filepath.Base(file), ossPrefix) {
+			expectedLicense = "ASL 2.0"
+		}
+		if license, present := info.Config.Labels["license"]; !present || license != expectedLicense {
+			t.Errorf("unexpected license label: %s", license)
+		}
+	})
+}
+
+func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot bool) {
+	t.Run(fmt.Sprintf("%s user", p.Name), func(t *testing.T) {
+		if expectRoot != (info.Config.User == "root") {
+			t.Errorf("unexpected docker user: %s", info.Config.User)
+		}
+	})
+}
+
 // Helpers
 
 type packageFile struct {
@@ -408,7 +451,6 @@ func getFiles(t *testing.T, pattern *regexp.Regexp) []string {
 			files = append(files, f)
 		}
 	}
-
 	return files
 }
 
@@ -640,8 +682,10 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 
 type dockerInfo struct {
 	Config struct {
-		WorkingDir string
 		Entrypoint []string
+		Labels     map[string]string
+		User       string
+		WorkingDir string
 	} `json:"config"`
 }
 

@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/flowhash"
 	"github.com/elastic/beats/libbeat/logp"
 	sock "github.com/elastic/beats/metricbeat/helper/socket"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -38,6 +39,22 @@ const (
 	eventTypeState = "state"
 	eventTypeEvent = "event"
 )
+
+type ipProtocol uint8
+
+const (
+	// TODO: Unify IP protocol constants in Beats
+	tcp ipProtocol = 6
+)
+
+func (proto ipProtocol) String() string {
+	switch proto {
+	case tcp:
+		return "tcp"
+	default:
+		return ""
+	}
+}
 
 type eventAction uint8
 
@@ -85,6 +102,7 @@ type MetricSet struct {
 // Socket represents information about a socket.
 type Socket struct {
 	Family      linux.AddressFamily
+	Protocol    ipProtocol
 	LocalIP     net.IP
 	LocalPort   int
 	RemoteIP    net.IP
@@ -102,6 +120,7 @@ type Socket struct {
 func newSocket(diag *linux.InetDiagMsg) *Socket {
 	return &Socket{
 		Family:     linux.AddressFamily(diag.Family),
+		Protocol:   tcp,
 		LocalIP:    diag.SrcIP(),
 		LocalPort:  diag.SrcPort(),
 		RemoteIP:   diag.DstIP(),
@@ -126,12 +145,18 @@ func (s Socket) Hash() uint64 {
 func (s Socket) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
 		"network": common.MapStr{
-			"type":      s.Family.String(),
 			"direction": s.Direction.String(),
+			"transport": s.Protocol.String(),
+			"type":      s.Family.String(),
 		},
 		"user": common.MapStr{
 			"id": s.UID,
 		},
+	}
+
+	communityID := s.communityID()
+	if communityID != "" {
+		mapstr.Put("network.community_id", communityID)
 	}
 
 	if s.Username != "" {
@@ -190,6 +215,31 @@ func (s Socket) entityID(hostID string) string {
 	return h.Sum()
 }
 
+// communityID calculates the community ID of this socket.
+func (s Socket) communityID() string {
+	var flow flowhash.Flow
+
+	switch s.Direction {
+	case sock.Inbound:
+		flow.SourceIP = s.RemoteIP
+		flow.SourcePort = uint16(s.RemotePort)
+		flow.DestinationIP = s.LocalIP
+		flow.DestinationPort = uint16(s.LocalPort)
+	case sock.Outbound:
+		flow.SourceIP = s.LocalIP
+		flow.SourcePort = uint16(s.LocalPort)
+		flow.DestinationIP = s.RemoteIP
+		flow.DestinationPort = uint16(s.RemotePort)
+	default:
+		// Listening socket, not a flow
+		return ""
+	}
+
+	flow.Protocol = uint8(s.Protocol)
+
+	return flowhash.CommunityID.Hash(flow)
+}
+
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
@@ -220,8 +270,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch collects the user information. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
-	if needsStateUpdate || ms.cache.IsEmpty() {
-		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+	if needsStateUpdate {
+		ms.log.Debug("Sending state")
 		err := ms.reportState(report)
 		if err != nil {
 			ms.log.Error(err)
@@ -313,7 +363,9 @@ func (ms *MetricSet) socketEvent(socket *Socket, eventType string, action eventA
 	event.RootFields.Put("event.action", action.String())
 	event.RootFields.Put("message", socketMessage(socket, action))
 
-	event.RootFields.Put("socket.entity_id", socket.entityID(ms.HostID()))
+	if ms.HostID() != "" {
+		event.RootFields.Put("socket.entity_id", socket.entityID(ms.HostID()))
+	}
 
 	return event
 }
@@ -364,7 +416,7 @@ func (ms *MetricSet) enrichSocket(socket *Socket) error {
 
 	socket.Username = userAccount.Username
 
-	socket.Direction = ms.listeners.Direction(uint8(syscall.IPPROTO_TCP),
+	socket.Direction = ms.listeners.Direction(uint8(socket.Family), uint8(syscall.IPPROTO_TCP),
 		socket.LocalIP, socket.LocalPort, socket.RemoteIP, socket.RemotePort)
 
 	if ms.ptable != nil {
@@ -391,7 +443,15 @@ func (ms *MetricSet) getSockets() ([]*Socket, error) {
 
 	sockets := make([]*Socket, 0, len(diags))
 	for _, diag := range diags {
-		sockets = append(sockets, newSocket(diag))
+		socket := newSocket(diag)
+
+		if !ms.config.IncludeLocalhost &&
+			(socket.LocalIP.IsLoopback() || socket.RemoteIP.IsLoopback()) {
+
+			continue
+		}
+
+		sockets = append(sockets, socket)
 	}
 
 	return sockets, nil

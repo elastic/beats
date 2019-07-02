@@ -1,12 +1,11 @@
 [
     {
-        "ecs.version": "1.0.0",
+        "event.action": "ssh_login",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.module": "system",
-        "system.auth.ssh.event": "Accepted",
         "event.outcome": "success",
-        "event.category": "authentication",
-        "event.action": "ssh_login",
+        "event.timezone": "+00:00",
         "event.type": "authentication_success",
         "fileset.name": "auth",
         "host.hostname": "localhost",
@@ -17,18 +16,18 @@
         "service.type": "system",
         "source.ip": "10.0.2.2",
         "source.port": 63673,
+        "system.auth.ssh.event": "Accepted",
         "system.auth.ssh.method": "publickey",
         "system.auth.ssh.signature": "RSA 39:33:99:e9:a0:dc:f2:33:a3:e5:72:3b:7c:3a:56:84",
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
+        "event.action": "ssh_login",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.module": "system",
-        "system.auth.ssh.event": "Accepted",
         "event.outcome": "success",
-        "event.category": "authentication",
-        "event.action": "ssh_login",
+        "event.timezone": "+00:00",
         "event.type": "authentication_success",
         "fileset.name": "auth",
         "host.hostname": "localhost",
@@ -39,17 +38,17 @@
         "service.type": "system",
         "source.ip": "192.168.33.1",
         "source.port": 58803,
+        "system.auth.ssh.event": "Accepted",
         "system.auth.ssh.method": "password",
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
+        "event.action": "ssh_login",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.module": "system",
-        "system.auth.ssh.event": "Invalid",
         "event.outcome": "failure",
-        "event.category": "authentication",
-        "event.action": "ssh_login",
+        "event.timezone": "+00:00",
         "event.type": "authentication_failure",
         "fileset.name": "auth",
         "host.hostname": "localhost",
@@ -59,16 +58,16 @@
         "process.pid": 3430,
         "service.type": "system",
         "source.ip": "10.0.2.2",
+        "system.auth.ssh.event": "Invalid",
         "user.name": "test"
     },
     {
-        "ecs.version": "1.0.0",
+        "event.action": "ssh_login",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.module": "system",
-        "system.auth.ssh.event": "Failed",
         "event.outcome": "failure",
-        "event.category": "authentication",
-        "event.action": "ssh_login",
+        "event.timezone": "+00:00",
         "event.type": "authentication_failure",
         "fileset.name": "auth",
         "host.hostname": "slave22",
@@ -85,13 +84,14 @@
         "source.geo.region_name": "Guangdong",
         "source.ip": "116.31.116.24",
         "source.port": 29160,
+        "system.auth.ssh.event": "Failed",
         "system.auth.ssh.method": "password",
         "user.name": "root"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -105,9 +105,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
@@ -123,9 +123,9 @@
         "system.auth.ssh.dropped_ip": "123.57.245.163"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -139,9 +139,9 @@
         "user.name": "vagrant"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "host.hostname": "precise32",
         "input.type": "log",
@@ -156,9 +156,9 @@
         "user.name": "tsg"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "group.id": "48",
         "group.name": "apache",
@@ -170,9 +170,9 @@
         "service.type": "system"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "system.auth",
         "event.module": "system",
+        "event.timezone": "+00:00",
         "fileset.name": "auth",
         "group.id": "48",
         "host.hostname": "localhost",

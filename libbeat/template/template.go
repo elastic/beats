@@ -183,6 +183,25 @@ func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 	return t.load(fields)
 }
 
+// LoadMinimal loads the template only with the given configuration
+func (t *Template) LoadMinimal() (common.MapStr, error) {
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
+	m := common.MapStr{
+		keyPattern: patterns,
+		"order":    t.order,
+		"settings": common.MapStr{
+			"index": t.config.Settings.Index,
+		},
+	}
+	if t.config.Settings.Source != nil {
+		m["mappings"] = buildMappings(
+			t.beatVersion, t.esVersion, t.beatName,
+			nil, nil,
+			common.MapStr(t.config.Settings.Source))
+	}
+	return m, nil
+}
+
 // GetName returns the name of the template
 func (t *Template) GetName() string {
 	return t.name

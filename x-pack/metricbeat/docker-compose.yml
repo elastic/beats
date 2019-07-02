@@ -10,9 +10,21 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
     env_file:
+      - ./module/cockroachdb/_meta/env
+      - ./module/coredns/_meta/env
       - ./module/mssql/_meta/env
 
   # Modules
+  cockroachdb:
+    build: ./module/cockroachdb/_meta
+    ports:
+      - 8080
+
+  coredns:
+    build: ./module/coredns/_meta
+    ports:
+      - 9153
+
   mssql:
     build: ./module/mssql/_meta
     ports:

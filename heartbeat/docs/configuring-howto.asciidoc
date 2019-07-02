@@ -47,6 +47,8 @@ include::./heartbeat-options.asciidoc[]
 
 include::./heartbeat-general-options.asciidoc[]
 
+include::./heartbeat-observer-options.asciidoc[]
+
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
