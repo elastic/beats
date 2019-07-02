@@ -151,6 +151,15 @@ functionbeat.provider.aws.functions:
 
     # Define custom processors for this function.
     #processors:
+    #  This example extracts the raw data from events.
+    #  - decode_base64_field:
+    #      field:
+    #        from: message
+    #        to: message
+    #  - decompress_gzip_field:
+    #      field:
+    #        from: message
+    #        to: message
     #  - decode_json_fields:
     #      fields: ["message"]
     #      process_array: false
