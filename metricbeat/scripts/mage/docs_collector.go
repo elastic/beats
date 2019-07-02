@@ -502,6 +502,11 @@ func writeDocs(modules map[string]moduleData) error {
 // All these are 'collected' from the asciidoc files under _meta/ in each module & metricset
 func CollectDocs() error {
 
+	//create the docs/modules dir
+	err := setupDirectory()
+	if err != nil {
+		return err
+	}
 	// collect modules that have an asciidoc file
 	beatsModuleGlob := filepath.Join(mage.OSSBeatDir("module"), "/*/")
 	modules, err := filepath.Glob(beatsModuleGlob)
