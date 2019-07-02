@@ -8,8 +8,8 @@ import unittest
 class Test(BaseTest):
     def setUp(self):
         super(BaseTest, self).setUp()
-        provider = os.environ['CURRENT_PROVIDER']
-        self.test_binary = os.path.join(provider, "functionbeat-" + provider + ".test")
+        self.provider = os.environ['CURRENT_PROVIDER']
+        self.test_binary = os.path.join(self.provider, "functionbeat-" + self.provider + ".test")
 
     @unittest.skip("temporarily disabled")
     def test_base(self):
@@ -100,16 +100,19 @@ class Test(BaseTest):
         assert exit_code != 0
 
     def _generate_dummy_binary_for_template_checksum(self):
-        if os.path.exists("pkg/functionbeat"):
+        fnbeat_pkg = os.path.join("pkg", "functionbeat-" + self.provider)
+        if os.path.exists(fnbeat_pkg):
             return
 
-        os.mkdir("pkg")
-        with open("pkg/functionbeat", "wb") as f:
+        if not os.path.exists("pkg"):
+            os.mkdir("pkg")
+
+        with open(fnbeat_pkg, "wb") as f:
             f.write("my dummy functionbeat binary")
 
     def _get_generated_function_template(self):
         logs = self.get_log_lines()
-        function_template_lines = logs[:-2]
+        function_template_lines = logs[:-1]
         raw_function_temaplate = "".join(function_template_lines)
         function_template = json.loads(raw_function_temaplate)
         return function_template

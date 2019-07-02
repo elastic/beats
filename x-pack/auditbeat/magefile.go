@@ -165,7 +165,7 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
-	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
+	mg.SerialDeps(Fields, BuildSystemTestBinary)
 	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
 }
 
@@ -175,9 +175,16 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(Fields)
 	}
 	return devtools.RunIntegTest("pythonIntegTest", func() error {
-		mg.Deps(devtools.BuildSystemTestBinary)
+		mg.Deps(BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	})
+}
+
+// BuildSystemTestBinary build a binary for testing that is instrumented for
+// testing and measuring code coverage. The binary is only instrumented for
+// coverage when TEST_COVERAGE=true (default is false).
+func BuildSystemTestBinary() error {
+	return devtools.BuildSystemTestBinary(devtools.DefaultTestBinaryArgs())
 }
 
 // -----------------------------------------------------------------------------

@@ -185,6 +185,18 @@ func docs() error {
 	return nil
 }
 
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest, PythonUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) error {
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+}
+
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	devtools.AddIntegTestUsage()
@@ -203,8 +215,18 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
-	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+	mg.Deps(BuildSystemTestBinary)
+	args := devtools.DefaultPythonTestIntegrationArgs()
+	for _, provider := range selectedProviders {
+		args.Env = map[string]string{
+			"CURRENT_PROVIDER": provider,
+		}
+		err := devtools.PythonNoseTest(args)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
@@ -213,24 +235,19 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(Fields)
 	}
 	return devtools.RunIntegTest("pythonIntegTest", func() error {
-		mg.Deps(devtools.BuildSystemTestBinary)
+		mg.Deps(BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 
-		workingDir := devtools.CWD()
 		for _, provider := range selectedProviders {
 			args.Env = map[string]string{
-				"CURRENT_PROVIDER": "aws",
+				"CURRENT_PROVIDER": provider,
 			}
-			err := os.Chdir(workingDir + "/" + provider)
-			if err != nil {
-				return err
-			}
-			err = devtools.PythonNoseTest(args)
+			err := devtools.PythonNoseTest(args)
 			if err != nil {
 				return err
 			}
 		}
-		return os.Chdir(workingDir)
+		return nil
 	})
 }
 

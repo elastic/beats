@@ -10,8 +10,7 @@ FIELDS_FILE_PATH=module
 XPACK_ONLY?=true
 EXCLUDE_COMMON_UPDATE_TARGET=true
 
-# Path to the libbeat Makefile
-include $(ES_BEATS)/libbeat/scripts/Makefile
+include $(ES_BEATS)/dev-tools/make/xpack.mk
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
