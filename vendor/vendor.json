@@ -3,18 +3,6 @@
 	"ignore": "test",
 	"package": [
 		{
-			"path": "appengine",
-			"revision": ""
-		},
-		{
-			"path": "appengine_internal",
-			"revision": ""
-		},
-		{
-			"path": "appengine_internal/base",
-			"revision": ""
-		},
-		{
 			"checksumSHA1": "NkpNQgmrdzGr9HUDL8Bp5YAxt0k=",
 			"path": "cloud.google.com/go/civil",
 			"revision": "457ea5c15ccf3b87db582c450e80101989da35f7",
