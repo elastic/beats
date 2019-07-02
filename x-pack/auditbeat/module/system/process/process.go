@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -160,7 +161,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms.log.Debug("No state timestamp found")
 	}
 
-	if os.Geteuid() != 0 {
+	if runtime.GOOS != "windows" && os.Geteuid() != 0 {
 		ms.log.Warn("Running as non-root user, will likely not report all processes.")
 	}
 
