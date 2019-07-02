@@ -95,13 +95,16 @@ For a description of each field in the metricset, see the
 // module/metricset missing a release is categorized as "experimental"
 // There are three valid tags: experimental, beta, ga
 func getRelease(rel string) (string, error) {
-	if rel != "" {
-		if rel != "beta" && rel != "ga" {
-			return "", fmt.Errorf("unknown release tag %s", rel)
-		}
-		return rel, nil
+	switch rel {
+	case "ga":
+		return "ga", nil
+	case "beta":
+		return "beta", nil
+	case "":
+		return "experimental", nil
+	default:
+		return "", fmt.Errorf("unknown release tag %s", rel)
 	}
-	return "experimental", nil
 }
 
 // createDocsPath creates the path for the entire docs/ folder
@@ -303,7 +306,8 @@ func writeModuleDocs(modules map[string]moduleData) error {
 	for moduleName, mod := range modules {
 
 		var moduleFile bytes.Buffer
-		moduleFile.WriteString(generatedNote + fmt.Sprintf("[[metricbeat-module-%s]]\n== %s module\n\n", moduleName, mod.Title))
+		moduleFile.WriteString(generatedNote)
+		moduleFile.WriteString(fmt.Sprintf("[[metricbeat-module-%s]]\n== %s module\n\n", moduleName, mod.Title))
 
 		if mod.Release != "ga" {
 			moduleFile.WriteString(fmt.Sprintf("%s[]\n\n", mod.Release))
@@ -358,8 +362,8 @@ func writeMetricsetDocs(modules map[string]moduleData) error {
 
 		for _, metricset := range mod.Metricsets {
 			var metricsetFile bytes.Buffer
-			//metricsetFile.WriteString(generatedNote)
-			metricsetFile.WriteString(generatedNote + fmt.Sprintf("[[metricbeat-metricset-%s-%s]]\n=== %s %s metricset\n\n", moduleName, metricset.Title, mod.Title, metricset.Title))
+			metricsetFile.WriteString(generatedNote)
+			metricsetFile.WriteString(fmt.Sprintf("[[metricbeat-metricset-%s-%s]]\n=== %s %s metricset\n\n", moduleName, metricset.Title, mod.Title, metricset.Title))
 
 			if metricset.Release != "ga" {
 				metricsetFile.WriteString(fmt.Sprintf("%s[]\n\n", metricset.Release))
