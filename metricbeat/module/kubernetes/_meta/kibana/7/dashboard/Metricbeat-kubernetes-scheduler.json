@@ -1,0 +1,36 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Kubernetes Scheduler metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Scheduler",
+        "version": 1
+      },
+      "id": "f5ab5510-9c94-11e9-94fd-c91206cd5249",
+      "migrationVersion": {
+        "dashboard": "7.0.0"
+      },
+      "references": [],
+      "type": "dashboard",
+      "updated_at": "2019-07-02T06:45:20.225Z",
+      "version": "WzIzNCwxXQ=="
+    }
+  ],
+  "version": "7.2.0"
+}
