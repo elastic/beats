@@ -33,6 +33,7 @@ type Fetcher interface {
 	WriteEventsCond(testing.TB, string, func(common.MapStr) bool)
 }
 
+// NewFetcher returns a test fetcher from a Metricset configuration
 func NewFetcher(t testing.TB, config interface{}) Fetcher {
 	metricSet := NewMetricSet(t, config)
 	switch metricSet := metricSet.(type) {
