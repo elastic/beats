@@ -37,11 +37,11 @@ func NewFetcher(t testing.TB, config interface{}) Fetcher {
 	metricSet := NewMetricSet(t, config)
 	switch metricSet := metricSet.(type) {
 	case mb.ReportingMetricSetV2:
-		return NewReporterV2Fetcher(metricSet)
+		return newReporterV2Fetcher(metricSet)
 	case mb.ReportingMetricSetV2Error:
-		return NewReporterV2FetcherError(metricSet)
+		return newReporterV2FetcherError(metricSet)
 	case mb.ReportingMetricSetV2WithContext:
-		return NewReporterV2FetcherWithContext(metricSet)
+		return newReporterV2FetcherWithContext(metricSet)
 	default:
 		t.Fatalf("Failed to create a Fetcher for metricset of type %T", metricSet)
 	}
@@ -53,7 +53,7 @@ type reportingMetricSetV2Fetcher struct {
 	metricSet mb.ReportingMetricSetV2
 }
 
-func NewReporterV2Fetcher(metricSet mb.ReportingMetricSetV2) *reportingMetricSetV2Fetcher {
+func newReporterV2Fetcher(metricSet mb.ReportingMetricSetV2) *reportingMetricSetV2Fetcher {
 	return &reportingMetricSetV2Fetcher{
 		fetcherHelper{metricSet},
 		metricSet,
@@ -80,7 +80,7 @@ type reportingMetricSetV2FetcherError struct {
 	metricSet mb.ReportingMetricSetV2Error
 }
 
-func NewReporterV2FetcherError(metricSet mb.ReportingMetricSetV2Error) *reportingMetricSetV2FetcherError {
+func newReporterV2FetcherError(metricSet mb.ReportingMetricSetV2Error) *reportingMetricSetV2FetcherError {
 	return &reportingMetricSetV2FetcherError{
 		fetcherHelper{metricSet},
 		metricSet,
@@ -107,7 +107,7 @@ type reportingMetricSetV2FetcherWithContext struct {
 	metricSet mb.ReportingMetricSetV2WithContext
 }
 
-func NewReporterV2FetcherWithContext(metricSet mb.ReportingMetricSetV2WithContext) *reportingMetricSetV2FetcherWithContext {
+func newReporterV2FetcherWithContext(metricSet mb.ReportingMetricSetV2WithContext) *reportingMetricSetV2FetcherWithContext {
 	return &reportingMetricSetV2FetcherWithContext{
 		fetcherHelper{metricSet},
 		metricSet,
