@@ -262,7 +262,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 	if r.config.Remote {
 		remoteHostname, err := fields.GetValue("host.hostname")
 		if err == nil {
-			fields.Put("source.hostname", remoteHostname)
+			fields.Put("log.source.address", remoteHostname)
 		}
 	}
 

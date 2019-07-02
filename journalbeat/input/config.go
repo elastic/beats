@@ -41,7 +41,7 @@ type Config struct {
 	// Matches store the key value pairs to match entries.
 	Matches []string `config:"include_matches"`
 	// Remote defines if the journal is from a remote host.
-	Remote bool
+	Remote bool `config:"save_remote_hostname"`
 
 	// Fields and tags to add to events.
 	common.EventMetadata `config:",inline"`
