@@ -91,15 +91,25 @@ For a description of each field in the metricset, see the
 
 `
 
-// getRelease gets the release tag. This kind of logic is needed because any
-// module/metricset missing a release is categorized as "experimental"
-// There are three valid tags: experimental, beta, ga
+// setupDirectory clears and re-creates the docs/modules directory.
+func setupDirectory() error {
+
+	docpath := mage.OSSBeatDir("docs/modules")
+
+	err := os.RemoveAll(docpath)
+	if err != nil {
+		return err
+	}
+
+	return os.Mkdir(docpath, 0744)
+
+}
+
+// getRelease gets the release tag, and errors out if one doesn't exist.
 func getRelease(rel string) (string, error) {
 	switch rel {
-	case "ga":
-		return "ga", nil
-	case "beta":
-		return "beta", nil
+	case "ga", "beta", "experimental":
+		return rel, nil
 	case "":
 		return "", fmt.Errorf("Missing a release string")
 	default:

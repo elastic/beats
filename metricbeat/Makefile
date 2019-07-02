@@ -22,11 +22,8 @@ kibana:
 
 # Collects all module docs
 .PHONY: collect-docs
-collect-docs: python-env
-	@rm -rf docs/modules
-	@mkdir -p docs/modules
-	mage CollectDocs
-	mage FieldsDocs
+collect-docs:
+	mage CollectAll
 
 # Collects all module configs
 .PHONY: configs
