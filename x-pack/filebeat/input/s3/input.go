@@ -50,7 +50,7 @@ var (
 	// if it took too long to read the s3 log, this sqs message will not be reprocessed.
 	// The default visibility timeout for a message is 30 seconds. The minimum
 	// is 0 seconds. The maximum is 12 hours.
-	visibilityTimeout int64 = 30
+	visibilityTimeout int64 = 300
 )
 
 func init() {
@@ -153,39 +153,40 @@ func (p *Input) Run() {
 		svcSQS := sqs.New(awsConfig)
 		svcS3 := s3.New(awsConfig)
 
-		// receive messages
-		receiveMessageInput := &sqs.ReceiveMessageInput{
-			QueueUrl:              &queueURL,
-			MessageAttributeNames: []string{"All"},
-			MaxNumberOfMessages:   &maxNumberOfMessage,
-			VisibilityTimeout:     &visibilityTimeout,
-			WaitTimeSeconds:       &waitTimeSecond,
-		}
-
-		// update message visibility timeout to make sure filebeat can finish reading
+		// update message visibility timeout if it's taking longer than 1/2 of
+		// visibilityTimeout to make sure filebeat can finish reading
 		changeMessageVisibilityInput := &sqs.ChangeMessageVisibilityInput{
 			QueueUrl:          &queueURL,
 			VisibilityTimeout: &visibilityTimeout,
 		}
 
-		req := svcSQS.ReceiveMessageRequest(receiveMessageInput)
-		output, errR := req.Send()
-		if errR != nil {
-			p.logger.Errorf("failed to receive message from SQS:", err)
+		// receive messages
+		req := svcSQS.ReceiveMessageRequest(
+			&sqs.ReceiveMessageInput{
+				QueueUrl:              &queueURL,
+				MessageAttributeNames: []string{"All"},
+				MaxNumberOfMessages:   &maxNumberOfMessage,
+				VisibilityTimeout:     &visibilityTimeout,
+				WaitTimeSeconds:       &waitTimeSecond,
+		})
+		output, err := req.Send()
+		if err != nil {
+			p.logger.Error("failed to receive message from SQS:", err)
 			continue
 		}
 
-		// process messages
+		// process messages received from sqs
 		if len(output.Messages) > 0 {
 			var wg sync.WaitGroup
 			numMessages := len(output.Messages)
 			wg.Add(numMessages)
 
 			for i := range output.Messages {
+				done := make(chan struct{})
 				// launch goroutine to handle each message from sqs
-				c := make(chan struct{})
 				go func(message sqs.Message) {
 					defer wg.Done()
+					defer close(done)
 
 					s3Infos, err := handleMessage(message, p.config.BucketNames)
 					if err != nil {
@@ -201,9 +202,9 @@ func (p *Input) Run() {
 						p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
 					}
 				}(output.Messages[i])
+
 				select {
-				case <-c:
-					close(c)
+				case <-done:
 				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
 					// if half of the set visibilityTimeout passed and this is
 					// still ongoing, then change visibility timeout.
