@@ -168,7 +168,7 @@ func (p *Input) Run() {
 				MaxNumberOfMessages:   &maxNumberOfMessage,
 				VisibilityTimeout:     &visibilityTimeout,
 				WaitTimeSeconds:       &waitTimeSecond,
-		})
+			})
 		output, err := req.Send()
 		if err != nil {
 			p.logger.Error("failed to receive message from SQS:", err)

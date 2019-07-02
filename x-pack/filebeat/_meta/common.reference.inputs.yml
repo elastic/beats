@@ -67,8 +67,6 @@
   #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-s3-input
 
-  #credential_profile_name: test-s3-input
-
   # QueueURLs (required) to receive queue messages from
   #queueURLs: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
 
