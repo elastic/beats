@@ -101,7 +101,7 @@ func getRelease(rel string) (string, error) {
 	case "beta":
 		return "beta", nil
 	case "":
-		return "experimental", nil
+		return "", fmt.Errorf("Missing a release string")
 	default:
 		return "", fmt.Errorf("unknown release tag %s", rel)
 	}
@@ -145,7 +145,7 @@ func loadModuleFields(file string) (moduleData, error) {
 
 	rel, err := getRelease(module.Release)
 	if err != nil {
-		return mod[0], err
+		return mod[0], errors.Wrapf(err, "file %s is missing a release string", file)
 	}
 	module.Release = rel
 
@@ -167,7 +167,11 @@ func getReleaseState(metricsetPath string) (string, error) {
 		return "", err
 	}
 
-	return getRelease(rel[0].Release)
+	relString, err := getRelease(rel[0].Release)
+	if err != nil {
+		return "", errors.Wrapf(err, "metricset %s is missing a release tag", metricsetPath)
+	}
+	return relString, nil
 }
 
 // hasDashboards checks to see if the metricset has dashboards
