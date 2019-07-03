@@ -6,6 +6,7 @@ package aws
 
 import (
 	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -40,14 +41,15 @@ func (m *mockCloudformationStack) CreateStackRequest(
 		m.onCreateStackInput(input)
 	}
 
+	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.CreateStackRequest{
-			Request: &aws.Request{Data: m.respCreateStackOutput, Error: m.err},
+			Request: &aws.Request{Data: m.respCreateStackOutput, Error: m.err, HTTPRequest: httpReq},
 		}
 	}
 
 	return cloudformation.CreateStackRequest{
-		Request: &aws.Request{Data: m.respCreateStackOutput},
+		Request: &aws.Request{Data: m.respCreateStackOutput, HTTPRequest: httpReq},
 	}
 }
 
@@ -58,14 +60,15 @@ func (m *mockCloudformationStack) DeleteStackRequest(
 		m.onDeleteStackInput(input)
 	}
 
+	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.DeleteStackRequest{
-			Request: &aws.Request{Data: m.respDeleteStackOutput, Error: m.err},
+			Request: &aws.Request{Data: m.respDeleteStackOutput, Error: m.err, HTTPRequest: httpReq},
 		}
 	}
 
 	return cloudformation.DeleteStackRequest{
-		Request: &aws.Request{Data: m.respDeleteStackOutput},
+		Request: &aws.Request{Data: m.respDeleteStackOutput, HTTPRequest: httpReq},
 	}
 }
 
@@ -76,14 +79,15 @@ func (m *mockCloudformationStack) DescribeStacksRequest(
 		m.onDescribeStacksInput(input)
 	}
 
+	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.DescribeStacksRequest{
-			Request: &aws.Request{Data: m.respDescribeStacksOutput, Error: m.err},
+			Request: &aws.Request{Data: m.respDescribeStacksOutput, Error: m.err, HTTPRequest: httpReq},
 		}
 	}
 
 	return cloudformation.DescribeStacksRequest{
-		Request: &aws.Request{Data: m.respDescribeStacksOutput},
+		Request: &aws.Request{Data: m.respDescribeStacksOutput, HTTPRequest: httpReq},
 	}
 }
 
@@ -94,14 +98,15 @@ func (m *mockCloudformationStack) UpdateStackRequest(
 		m.onUpdateStackInput(input)
 	}
 
+	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
 		return cloudformation.UpdateStackRequest{
-			Request: &aws.Request{Data: m.respUpdateStackOutput, Error: m.err},
+			Request: &aws.Request{Data: m.respUpdateStackOutput, Error: m.err, HTTPRequest: httpReq},
 		}
 	}
 
 	return cloudformation.UpdateStackRequest{
-		Request: &aws.Request{Data: m.respUpdateStackOutput},
+		Request: &aws.Request{Data: m.respUpdateStackOutput, HTTPRequest: httpReq},
 	}
 }
 

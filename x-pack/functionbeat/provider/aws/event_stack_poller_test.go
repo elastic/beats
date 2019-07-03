@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -52,8 +53,9 @@ func (m *mockCloudFormationClient) DescribeStackEventsRequest(
 			m.Index++
 		}
 	}()
+	httpReq, _ := http.NewRequest("", "", nil)
 	return cloudformation.DescribeStackEventsRequest{
-		Request: &aws.Request{Data: &m.Responses[m.Index]},
+		Request: &aws.Request{Data: &m.Responses[m.Index], HTTPRequest: httpReq},
 	}
 }
 
