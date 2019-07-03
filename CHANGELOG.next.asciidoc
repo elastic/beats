@@ -35,6 +35,8 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Auditbeat*
 
+- Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
+
 *Filebeat*
 
 *Heartbeat*
