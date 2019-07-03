@@ -101,7 +101,7 @@ func setupDirectory() error {
 		return err
 	}
 
-	return os.Mkdir(docpath, 0744)
+	return os.MkdirAll(docpath, 0744)
 
 }
 
