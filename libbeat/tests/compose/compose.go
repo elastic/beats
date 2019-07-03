@@ -54,7 +54,7 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
 	for _, service := range services {
 		err = compose.Start(service)
 		if err != nil {
-			t.Fatal(err)
+			t.Fatal("failed to start service", service, err)
 		}
 	}
 

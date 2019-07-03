@@ -25,8 +25,9 @@ import (
 	// Register fields.
 	_ "github.com/elastic/beats/winlogbeat/include"
 
-	// Import the script processor and supporting modules.
+	// Import processors and supporting modules.
 	_ "github.com/elastic/beats/libbeat/processors/script"
+	_ "github.com/elastic/beats/libbeat/processors/timestamp"
 	_ "github.com/elastic/beats/winlogbeat/processors/script/javascript/module/winlogbeat"
 )
 
