@@ -28,36 +28,45 @@ PROJECTS_XPACK_MAGE=$(PROJECTS_XPACK_PKG)
 #
 include dev-tools/make/mage.mk
 
-# Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
-# Also it builds the docs and the generators
+## help : Show this help.
+help: Makefile
+	@printf "Usage: make [target] [VARIABLE=value]\nTargets:\n"
+	@sed -n 's/^## //p' $< | awk 'BEGIN {FS = ":"}; { if(NF>1 && $$2!="") printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2 ; else printf "%40s\n", $$1};'
+	@printf "Variables:\n"
+	@grep -E "^[A-Za-z0-9_]*\?=" $< | awk 'BEGIN {FS = "\\?="}; { printf "  \033[36m%-25s\033[0m  Default values: %s\n", $$1, $$2}'
 
+
+## testsuite : Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection. Also it builds the docs and the generators.
 .PHONY: testsuite
 testsuite:
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) testsuite || exit 1;)
 
+## setup-commit-hook : Setup the git pre-commit hook
 .PHONY: setup-commit-hook
 setup-commit-hook:
 	@cp script/pre_commit.sh .git/hooks/pre-commit
 	@chmod 751 .git/hooks/pre-commit
 
+## stop-environments : Stop the environment for each project.
 stop-environments:
 	@$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
 
-# Runs unit and system tests without coverage and race detection.
+## test : Runs unit and system tests without coverage and race detection.
 .PHONY: test
 test:
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) test || exit 1;)
 
-# Runs unit tests without coverage and race detection.
+## unit : Runs unit tests without coverage and race detection.
 .PHONY: unit
 unit:
 	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) unit || exit 1;)
 
-# Crosscompile all beats.
+## crosscompile : Crosscompile all beats.
 .PHONY: crosscompile
 crosscompile:
 	@$(foreach var,filebeat winlogbeat metricbeat heartbeat auditbeat,$(MAKE) -C $(var) crosscompile || exit 1;)
 
+## coverage-report : Generates coverage report.
 .PHONY: coverage-report
 coverage-report:
 	@mkdir -p $(COVERAGE_DIR)
@@ -67,11 +76,13 @@ coverage-report:
 	@go tool cover -html=./$(COVERAGE_DIR)/full.cov -o $(COVERAGE_DIR)/full.html
 	@echo "Generated coverage report $(COVERAGE_DIR)/full.html"
 
+## update : TBD.
 .PHONY: update
 update: notice
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) update || exit 1;)
 	@$(MAKE) -C deploy/kubernetes all
 
+## clean : Clean target.
 .PHONY: clean
 clean: mage
 	@rm -rf build
@@ -79,12 +90,12 @@ clean: mage
 	@$(MAKE) -C generator clean
 	@-mage -clean
 
-# Cleans up the vendor directory from unnecessary files
-# This should always be run after updating the dependencies
+## clean-vendor : Cleans up the vendor directory from unnecessary files. This should always be run after updating the dependencies
 .PHONY: clean-vendor
 clean-vendor:
 	@sh script/clean_vendor.sh
 
+## check : TBD.
 .PHONY: check
 check: python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
@@ -97,19 +108,21 @@ check: python-env
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
 
+## check-headers : Check the license headers.
 .PHONY: check-headers
 check-headers:
 	@go get -u github.com/elastic/go-licenser
 	@go-licenser -d -exclude x-pack
 	@go-licenser -d -license Elastic x-pack
 
+## add-headers : Adds the license headers.
 .PHONY: add-headers
 add-headers:
 	@go get github.com/elastic/go-licenser
 	@go-licenser -exclude x-pack
 	@go-licenser -license Elastic x-pack
 
-# Corrects spelling errors
+## misspell : Corrects spelling errors.
 .PHONY: misspell
 misspell:
 	go get -u github.com/client9/misspell/cmd/misspell
@@ -120,29 +133,32 @@ misspell:
 		-name '*' \
 		-exec misspell -w {} \;
 
+## fmt : TBD.
 .PHONY: fmt
 fmt: add-headers python-env
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) fmt || exit 1;)
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
 
+## lint : TBD.
 .PHONY: lint
 lint:
 	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
 	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
 
-# Builds the documents for each beat
+## docs : Builds the documents for each beat
 .PHONY: docs
 docs:
 	@$(foreach var,$(PROJECTS),BUILD_DIR=${BUILD_DIR} $(MAKE) -C $(var) docs || exit 1;)
 	sh ./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ${BUILD_DIR}
 
+## notice : Generates the NOTICE file.
 .PHONY: notice
 notice: python-env
 	@echo "Generating NOTICE"
 	@$(PYTHON_ENV)/bin/python dev-tools/generate_notice.py .
 
-# Sets up the virtual python environment
+## python-env : Sets up the virtual python environment.
 .PHONY: python-env
 python-env:
 	@test -d $(PYTHON_ENV) || virtualenv $(VIRTUALENV_PARAMS) $(PYTHON_ENV)
@@ -150,19 +166,19 @@ python-env:
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 
-# Tests if apm works with the current code
+## test-apm : Tests if apm works with the current code
 .PHONY: test-apm
 test-apm:
 	sh ./script/test_apm.sh
 
 ### Packaging targets ####
 
-# Builds a snapshot release.
+## snapshot : Builds a snapshot release.
 .PHONY: snapshot
 snapshot:
 	@$(MAKE) SNAPSHOT=true release
 
-# Builds a release.
+## release : Builds a release.
 .PHONY: release
 release: beats-dashboards
 	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG),$(MAKE) -C $(var) release || exit 1;)
@@ -170,19 +186,17 @@ release: beats-dashboards
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
       mkdir -p build/distributions/$(subst $(XPACK_SUFFIX),'',$(var)) && mv -f $(var)/build/distributions/* build/distributions/$(subst $(XPACK_SUFFIX),'',$(var))/ || exit 1;)
 
-# Builds a snapshot release. The Go version defined in .go-version will be
-# installed and used for the build.
+## release-manager-snapshot : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
 .PHONY: release-manager-snapshot
 release-manager-snapshot:
 	@$(MAKE) SNAPSHOT=true release-manager-release
 
-# Builds a snapshot release. The Go version defined in .go-version will be
-# installed and used for the build.
+## release-manager-release : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
 .PHONY: release-manager-release
 release-manager-release:
 	./dev-tools/run_with_go_ver $(MAKE) release
 
-# Collects dashboards from all Beats and generates a zip file distribution.
+## beats-dashboardse : Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards
 beats-dashboards: mage update
 	@mage packageBeatDashboards
