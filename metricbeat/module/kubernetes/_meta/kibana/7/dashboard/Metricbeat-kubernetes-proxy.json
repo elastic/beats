@@ -6,7 +6,33 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [],
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "kubernetes.proxy"
+                  },
+                  "type": "phrase",
+                  "value": "kubernetes.proxy"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "kubernetes.proxy",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
             "query": {
               "language": "kuery",
               "query": ""
@@ -120,6 +146,11 @@
       },
       "references": [
         {
+          "id": "metricbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
           "id": "e0ddd3e0-98fe-11e9-ba57-b7ab4e2d4b58",
           "name": "panel_0",
           "type": "visualization"
@@ -156,8 +187,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxNzYsNV0="
+      "updated_at": "2019-07-03T11:28:01.761Z",
+      "version": "WzI2MCwyXQ=="
     },
     {
       "attributes": {
@@ -171,7 +202,7 @@
             }
           }
         },
-        "title": "Kubeproxy - CPU",
+        "title": "Proxy CPU [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -219,18 +250,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubeproxy - CPU",
+          "title": "Proxy CPU [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "e0ddd3e0-98fe-11e9-ba57-b7ab4e2d4b58",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxNzcsNV0="
+      "updated_at": "2019-07-03T11:25:41.944Z",
+      "version": "WzI1MywyXQ=="
     },
     {
       "attributes": {
@@ -244,7 +275,7 @@
             }
           }
         },
-        "title": "Kubeproxy - Memory",
+        "title": "Proxy memory [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -306,18 +337,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubeproxy - Memory",
+          "title": "Proxy memory [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "cac89fb0-9906-11e9-ba57-b7ab4e2d4b58",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxNzgsNV0="
+      "updated_at": "2019-07-03T11:26:56.138Z",
+      "version": "WzI1NiwyXQ=="
     },
     {
       "attributes": {
@@ -331,7 +362,7 @@
             }
           }
         },
-        "title": "Kubeproxy - process summary",
+        "title": "Proxy process [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -341,10 +372,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
-            "markdown": "\n|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ max_of_kubernetes_proxy_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ max_of_kubernetes_proxy_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ max_of_kubernetes_proxy_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n\n",
+            "markdown": "\n|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ average_of_kubernetes_proxy_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ average_of_kubernetes_proxy_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_proxy_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n\n",
             "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
             "markdown_less": "\ntable, tr, td, th {\n    border: none;\n}\n\n",
             "series": [
@@ -397,12 +429,13 @@
                 "fill": 0.5,
                 "formatter": "number",
                 "id": "cc3b1700-99ac-11e9-8beb-c3bf9b9dfc43",
+                "label": "",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "kubernetes.proxy.process.fds.open.count",
                     "id": "cc3b1701-99ac-11e9-8beb-c3bf9b9dfc43",
-                    "type": "max"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -418,12 +451,13 @@
                 "fill": 0.5,
                 "formatter": "bytes",
                 "id": "da1b1270-99ad-11e9-8beb-c3bf9b9dfc43",
+                "label": "",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "kubernetes.proxy.process.memory.resident.bytes",
                     "id": "da1b1271-99ad-11e9-8beb-c3bf9b9dfc43",
-                    "type": "max"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -439,12 +473,13 @@
                 "fill": 0.5,
                 "formatter": "bytes",
                 "id": "50f54000-99ae-11e9-8beb-c3bf9b9dfc43",
+                "label": "",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "kubernetes.proxy.process.memory.virtual.bytes",
                     "id": "50f54001-99ae-11e9-8beb-c3bf9b9dfc43",
-                    "type": "max"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -459,18 +494,18 @@
             "time_field": "@timestamp",
             "type": "markdown"
           },
-          "title": "Kubeproxy - process summary",
+          "title": "Proxy process [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "09b404f0-99af-11e9-ba57-b7ab4e2d4b58",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxNzksNV0="
+      "updated_at": "2019-07-03T11:27:10.384Z",
+      "version": "WzI1NywyXQ=="
     },
     {
       "attributes": {
@@ -484,7 +519,7 @@
             }
           }
         },
-        "title": "Kubeproxy - HTTP request duration",
+        "title": "Proxy HTTP request duration [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -567,18 +602,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubeproxy - HTTP request duration",
+          "title": "Proxy HTTP request duration [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "8c6c2690-9bd8-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxODAsNV0="
+      "updated_at": "2019-07-03T11:25:27.941Z",
+      "version": "WzI1MiwyXQ=="
     },
     {
       "attributes": {
@@ -592,7 +627,7 @@
             }
           }
         },
-        "title": "Kubeproxy - Network programming",
+        "title": "Proxy network programming [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -824,18 +859,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubeproxy - Network programming",
+          "title": "Proxy network programming [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "b8a24790-9bf0-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxODEsNV0="
+      "updated_at": "2019-07-03T11:26:26.595Z",
+      "version": "WzI1NSwyXQ=="
     },
     {
       "attributes": {
@@ -849,7 +884,7 @@
             }
           }
         },
-        "title": "Kubeproxy - Sync rules",
+        "title": "Proxy sync rules [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1064,18 +1099,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubeproxy - Sync rules",
+          "title": "Proxy sync rules [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "ba7bf750-9bf5-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxODIsNV0="
+      "updated_at": "2019-07-03T11:27:49.230Z",
+      "version": "WzI1OSwyXQ=="
     },
     {
       "attributes": {
@@ -1089,7 +1124,7 @@
             }
           }
         },
-        "title": "Kubernetes - Host selector",
+        "title": "Host selector [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1118,7 +1153,7 @@
                 "label": "Service address",
                 "options": {
                   "dynamicOptions": true,
-                  "multiselect": true,
+                  "multiselect": false,
                   "order": "desc",
                   "size": 5,
                   "type": "terms"
@@ -1131,13 +1166,13 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Kubernetes - Host selector",
+          "title": "Host selector [Metricbeat Kubernetes]",
           "type": "input_control_vis"
         }
       },
       "id": "bcb194a0-9bf8-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -1152,9 +1187,9 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxODMsNV0="
+      "updated_at": "2019-07-03T07:20:34.226Z",
+      "version": "WzEzMywxXQ=="
     }
   ],
-  "version": "7.1.1"
+  "version": "7.2.0"
 }
