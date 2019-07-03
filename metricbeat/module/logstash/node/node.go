@@ -20,7 +20,6 @@ package node
 import (
 	"fmt"
 
-	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
@@ -50,7 +49,6 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
-	*helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -60,13 +58,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-
 	if ms.XPack {
-		logstashVersion, err := logstash.GetVersion(http, ms.HostData().SanitizedURI+nodePath)
+		logstashVersion, err := logstash.GetVersion(ms)
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +77,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		ms,
-		http,
 	}, nil
 }
 
@@ -101,7 +93,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return eventMapping(r, content)
 	}
 
-	pipelinesContent, err := logstash.GetPipelines(m.HTTP, m.HostData().SanitizedURI+nodePath)
+	pipelinesContent, err := logstash.GetPipelines(m.MetricSet)
 	if err != nil {
 		m.Logger().Error(err)
 		return nil

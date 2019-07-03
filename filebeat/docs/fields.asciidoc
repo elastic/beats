@@ -22,6 +22,7 @@ grouped in the following categories:
 * <<exported-fields-ecs>>
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-envoyproxy>>
+* <<exported-fields-googlecloud>>
 * <<exported-fields-haproxy>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
@@ -5510,6 +5511,195 @@ type: keyword
 +
 --
 Envoy proxy type, tcp or http
+
+
+type: keyword
+
+--
+
+[[exported-fields-googlecloud]]
+== Google Cloud fields
+
+Module for handling logs from Google Cloud.
+
+
+
+[float]
+=== googlecloud
+
+Fields from Google Cloud logs.
+
+
+
+[float]
+=== vpcflow
+
+Fields for Google Cloud VPC flow logs.
+
+
+
+*`googlecloud.vpcflow.reporter`*::
++
+--
+The side which reported the flow. Can be either 'SRC' or 'DEST'.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.rtt.ms`*::
++
+--
+Latency as measured (for TCP flows only) during the time interval. This is the time elapsed between sending a SEQ and receiving a corresponding ACK and it contains the network RTT as well as the application related delay.
+
+
+type: long
+
+--
+
+[float]
+=== destination.instance
+
+If the destination of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
+
+
+
+*`googlecloud.vpcflow.destination.instance.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.destination.instance.region`*::
++
+--
+Region of the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.destination.instance.zone`*::
++
+--
+Zone of the VM.
+
+
+type: keyword
+
+--
+
+[float]
+=== destination.vpc
+
+If the destination of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
+
+
+
+*`googlecloud.vpcflow.destination.vpc.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.destination.vpc.vpc_name`*::
++
+--
+VPC on which the VM is operating.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.destination.vpc.subnetwork_name`*::
++
+--
+Subnetwork on which the VM is operating.
+
+
+type: keyword
+
+--
+
+[float]
+=== source.instance
+
+If the source of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
+
+
+
+*`googlecloud.vpcflow.source.instance.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.source.instance.region`*::
++
+--
+Region of the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.source.instance.zone`*::
++
+--
+Zone of the VM.
+
+
+type: keyword
+
+--
+
+[float]
+=== source.vpc
+
+If the source of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
+
+
+
+*`googlecloud.vpcflow.source.vpc.project_id`*::
++
+--
+ID of the project containing the VM.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.source.vpc.vpc_name`*::
++
+--
+VPC on which the VM is operating.
+
+
+type: keyword
+
+--
+
+*`googlecloud.vpcflow.source.vpc.subnetwork_name`*::
++
+--
+Subnetwork on which the VM is operating.
 
 
 type: keyword
