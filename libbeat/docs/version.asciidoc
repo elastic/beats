@@ -1,9 +1,9 @@
 :stack-version: 7.3.0
-:doc-branch: 7.x
+:doc-branch: 7.3
 :go-version: 1.12.4
 :release-state: unreleased
 :python: 2.7.9
 :docker: 1.12
 :docker-compose: 1.11
-:branch: 7.x
+:branch: 7.3
 :major-version: 7.x

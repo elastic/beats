@@ -1,5 +1,5 @@
 # Module: googlecloud
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-googlecloud.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.3/filebeat-module-googlecloud.html
 
 - module: googlecloud
   vpcflow:
