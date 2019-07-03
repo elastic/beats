@@ -1,0 +1,75 @@
+[role="xpack"]
+
+:type: s3
+
+[id="{beatname_lc}-input-{type}"]
+=== s3 input
+
+++++
+<titleabbrev>s3</titleabbrev>
+++++
+
+beta[]
+
+Use the `s3` input to retrieve logs from S3 objects that are pointed by messages
+from specific SQS queues.
+
+This input can, for example, be used to receive S3 server access logs to monitor
+detailed records for the requests that are made to a bucket.
+
+Example configuration 1:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: s3
+  queue_urls: ["https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue"]
+  bucket_names: ["test-s3-bucket"]
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:"”}'
+----
+
+Example configuration 2:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: s3
+  queue_urls: ["https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue"]
+  bucket_names: ["test-s3-bucket"]
+  credential_profile_name: test-s3-input
+----
+
+The `s3` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `queue_urls`
+
+URLs of the AWS SQS queues that messages will be received from. Required.
+
+[float]
+==== `bucket_names`
+
+Name of the S3 buckets to read log files from. If it's not specified, then read
+from all S3 buckets that are pointed by SQS messages.
+
+[float]
+==== `aws credentials`
+
+In order to make AWS API calls, `s3` input requires AWS credentials. Users can
+either put the values into the configuration for `access_key_id`,
+`secret_access_key` and/or `session_token`, or use environment variable
+`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and/or `AWS_SESSION_TOKEN` instead.
+Please use `Example configuration 1` as an example.
+
+Or shared AWS credentials file can be used with `credential_profile_name` as an
+optional configuration. Please use `Example configuration 2` as an example. If
+`credential_profile_name` is not specified, then `s3` input will consume
+credentials from shared AWS credentials file with `default` profile name.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

@@ -203,18 +203,22 @@ func (p *Input) Run() {
 					}
 				}(output.Messages[i])
 
-				select {
-				case <-done:
-				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
-					// if half of the set visibilityTimeout passed and this is
-					// still ongoing, then change visibility timeout.
-					changeMessageVisibilityInput.ReceiptHandle = output.Messages[i].ReceiptHandle
-					req := svcSQS.ChangeMessageVisibilityRequest(changeMessageVisibilityInput)
-					_, err = req.Send()
-					if err != nil {
-						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+				go func(message sqs.Message) {
+					for {
+						select {
+						case <-done:
+						case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
+							// if half of the set visibilityTimeout passed and this is
+							// still ongoing, then change visibility timeout.
+							changeMessageVisibilityInput.ReceiptHandle = message.ReceiptHandle
+							req := svcSQS.ChangeMessageVisibilityRequest(changeMessageVisibilityInput)
+							_, err = req.Send()
+							if err != nil {
+								p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+							}
+						}
 					}
-				}
+				}(output.Messages[i])
 			}
 			wg.Wait()
 		}

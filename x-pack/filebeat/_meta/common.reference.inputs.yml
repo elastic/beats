@@ -55,7 +55,7 @@
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 
 #------------------------------ S3 input --------------------------------
-# Experimental: Config options for AWS S3 input
+# Beta: Config options for AWS S3 input
 #- type: s3
   #enabled: false
 
@@ -67,8 +67,8 @@
   #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-s3-input
 
-  # QueueURLs (required) to receive queue messages from
-  #queueURLs: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+  # Queue urls (required) to receive queue messages from
+  #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
 
-  # S3buckets to collect logs from
-  # bucketNames: ["bucket-test-1", "bucket-test-2"]
+  # S3 buckets to collect logs from
+  #bucket_names: ["bucket-test-1", "bucket-test-2"]
