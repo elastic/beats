@@ -472,6 +472,22 @@
 			"versionExact": "v0.9.0"
 		},
 		{
+			"checksumSHA1": "eMHyTG27+3dZ56gst6ofgI4axsQ=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/rds",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
+			"checksumSHA1": "FOeCFbLZpbW9dehoSTok/SIMBGQ=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/rds/rdsiface",
+			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
+			"revisionTime": "2019-05-28T21:51:27Z",
+			"version": "v0.9.0",
+			"versionExact": "v0.9.0"
+		},
+		{
 			"checksumSHA1": "X8PEjygPDSFiWO03ckxEiZRvKhY=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi",
 			"revision": "098e15df3044cf1b04a222c1c33c3e6135ac89f3",
@@ -2892,12 +2908,6 @@
 			"versionExact": "release-branch.go1.10"
 		},
 		{
-			"checksumSHA1": "+/UD9mGRnKxOhZW3+B+VJdIIPn8=",
-			"path": "gopkg.in/goracle.v2",
-			"revision": "3222d7159b45fce95150f06a57e1bcc2868108d3",
-			"revisionTime": "2019-05-30T18:40:54Z"
-        },
-        {
 			"checksumSHA1": "Mr2fXhMRzlQCgANFm91s536pG7E=",
 			"path": "google.golang.org/api/googleapi/transport",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
@@ -3452,6 +3462,12 @@
 			"revisionTime": "2019-06-04T21:21:58Z",
 			"version": "v1.21.1",
 			"versionExact": "v1.21.1"
+		},
+		{
+			"checksumSHA1": "+/UD9mGRnKxOhZW3+B+VJdIIPn8=",
+			"path": "gopkg.in/goracle.v2",
+			"revision": "3222d7159b45fce95150f06a57e1bcc2868108d3",
+			"revisionTime": "2019-05-30T18:40:54Z"
 		},
 		{
 			"checksumSHA1": "6f8MEU31llHM1sLM/GGH4/Qxu0A=",
