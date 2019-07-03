@@ -21,4 +21,4 @@ processors:
   - script:
       lang: javascript
       id: cisco_ios
-      file: module/cisco/ios/config/pipeline.js
+      file: ${path.home}/module/cisco/ios/config/pipeline.js
