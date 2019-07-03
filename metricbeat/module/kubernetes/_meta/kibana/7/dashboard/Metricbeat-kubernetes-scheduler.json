@@ -88,9 +88,9 @@
             "gridData": {
               "h": 11,
               "i": "4",
-              "w": 25,
+              "w": 24,
               "x": 0,
-              "y": 14
+              "y": 29
             },
             "panelIndex": "4",
             "panelRefName": "panel_3",
@@ -101,12 +101,38 @@
             "gridData": {
               "h": 11,
               "i": "5",
-              "w": 23,
-              "x": 25,
-              "y": 14
+              "w": 24,
+              "x": 24,
+              "y": 29
             },
             "panelIndex": "5",
             "panelRefName": "panel_4",
+            "version": "7.2.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "6",
+              "w": 24,
+              "x": 0,
+              "y": 14
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_5",
+            "version": "7.2.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "7",
+              "w": 24,
+              "x": 24,
+              "y": 14
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_6",
             "version": "7.2.0"
           }
         ],
@@ -148,11 +174,21 @@
           "id": "95595810-9ca8-11e9-94fd-c91206cd5249",
           "name": "panel_4",
           "type": "visualization"
+        },
+        {
+          "id": "382ace30-9d98-11e9-b2ae-49acc4cbcea9",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "84d9b200-9d98-11e9-b2ae-49acc4cbcea9",
+          "name": "panel_6",
+          "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-02T09:12:58.678Z",
-      "version": "WzY5MSwxXQ=="
+      "updated_at": "2019-07-03T13:46:42.150Z",
+      "version": "WzI3MywyXQ=="
     },
     {
       "attributes": {
@@ -229,8 +265,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-02T18:25:52.100Z",
-      "version": "WzcwNywyXQ=="
+      "updated_at": "2019-07-03T07:20:34.226Z",
+      "version": "WzEzMywxXQ=="
     },
     {
       "attributes": {
@@ -379,8 +415,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T18:22:42.614Z",
-      "version": "WzcwMiwyXQ=="
+      "updated_at": "2019-07-03T07:20:34.226Z",
+      "version": "WzEzNCwxXQ=="
     },
     {
       "attributes": {
@@ -488,8 +524,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T18:23:14.036Z",
-      "version": "WzcwMywyXQ=="
+      "updated_at": "2019-07-03T07:20:34.226Z",
+      "version": "WzEzNSwxXQ=="
     },
     {
       "attributes": {
@@ -731,8 +767,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T18:24:04.115Z",
-      "version": "WzcwNCwyXQ=="
+      "updated_at": "2019-07-03T07:20:34.226Z",
+      "version": "WzEzNiwxXQ=="
     },
     {
       "attributes": {
@@ -808,8 +844,170 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T18:24:29.251Z",
-      "version": "WzcwNSwyXQ=="
+      "updated_at": "2019-07-03T07:20:34.226Z",
+      "version": "WzEzNywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Scheduler CPU [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "CPU time",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "kubernetes.scheduler.process.cpu.sec",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "11331120-9d98-11e9-9e81-115d18bcfeaa",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}} s"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Scheduler CPU [Metricbeat Kubernetes]",
+          "type": "metrics"
+        }
+      },
+      "id": "382ace30-9d98-11e9-b2ae-49acc4cbcea9",
+      "migrationVersion": {
+        "visualization": "7.2.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-07-03T13:41:11.443Z",
+      "version": "WzI3MCwyXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Scheduler Memory [Metricset Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(251,158,0,1)",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Resident",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "kubernetes.scheduler.process.memory.resident.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "a14defa0-9d98-11e9-9e81-115d18bcfeaa",
+                "label": "Virtual",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "kubernetes.scheduler.process.memory.virtual.bytes",
+                    "id": "a14defa1-9d98-11e9-9e81-115d18bcfeaa",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Scheduler Memory [Metricset Kubernetes]",
+          "type": "metrics"
+        }
+      },
+      "id": "84d9b200-9d98-11e9-b2ae-49acc4cbcea9",
+      "migrationVersion": {
+        "visualization": "7.2.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-07-03T13:45:33.315Z",
+      "version": "WzI3MiwyXQ=="
     }
   ],
   "version": "7.2.0"
