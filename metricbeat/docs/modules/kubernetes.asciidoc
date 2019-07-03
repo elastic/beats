@@ -5,8 +5,12 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kubernetes]]
 == Kubernetes module
 
-This module fetches metrics from Kubernetes https://kubernetes.io/docs/admin/kubelet/[kubelet]
-agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] service.
+This module fetches metrics from Kubernetes several components:
+
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/[kubelet]
+- https://github.com/kubernetes/kube-state-metrics[kube-state-metrics]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/[apiserver]
+- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/[controller-manager]
 
 All metricsets with the `state_` prefix require `hosts` field pointing to kube-state-metrics
 service within the cluster, while the rest should be pointed to kubelet service. Check the
@@ -17,7 +21,17 @@ The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
 [float]
 === Compability
 
-The Kubernetes module is tested with Kubernetes 1.8.0, 1.9.4 and 1.10.0.
+The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
+
+[float]
+=== Dashboard
+
+Kubernetes module is shipped including default dashboards for `apiserver` and `controller manager`. 
+If you are using HA for those components, be aware that when gathering data from all instances the dashboard will usually show and average of the metrics. For those scenarios filtering by hosts or service address is possible.
+
+Kubernetes controller manager example:
+
+image::./images/metricbeat-kubernetes-controllermanager.png[]
 
 
 [float]

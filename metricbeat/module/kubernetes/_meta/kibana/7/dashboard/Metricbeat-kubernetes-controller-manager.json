@@ -223,8 +223,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-03T13:33:44.121Z",
-      "version": "WzI2OSwyXQ=="
+      "updated_at": "2019-07-03T16:33:10.995Z",
+      "version": "WzI5OSwyXQ=="
     },
     {
       "attributes": {
@@ -330,7 +330,7 @@
             "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
-            "interval": "auto",
+            "interval": "30s",
             "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ average_of_kubernetes_controllermanager_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ average_of_kubernetes_controllermanager_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_controllermanager_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
             "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
             "markdown_less": "\ntable, tr, td, th {\n    border: none;\n}\n\n",
@@ -449,8 +449,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:31:40.813Z",
-      "version": "WzI2MiwyXQ=="
+      "updated_at": "2019-07-03T14:46:23.136Z",
+      "version": "WzI5MSwyXQ=="
     },
     {
       "attributes": {
@@ -606,6 +606,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_direction": "desc",
@@ -629,8 +630,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:33:00.848Z",
-      "version": "WzI2NiwyXQ=="
+      "updated_at": "2019-07-03T16:31:08.744Z",
+      "version": "WzI5OCwyXQ=="
     },
     {
       "attributes": {
@@ -655,6 +656,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
@@ -676,6 +678,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_field": "kubernetes.controllermanager.name",
@@ -698,8 +701,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:33:16.325Z",
-      "version": "WzI2NywyXQ=="
+      "updated_at": "2019-07-03T16:30:46.554Z",
+      "version": "WzI5NywyXQ=="
     },
     {
       "attributes": {
@@ -723,6 +726,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
@@ -753,7 +757,7 @@
                 "chart_type": "line",
                 "color": "rgba(164,221,0,1)",
                 "fill": 0.5,
-                "formatter": "number",
+                "formatter": "bytes",
                 "id": "ac896b30-9c29-11e9-92c1-f7d03186c592",
                 "label": "Virtual",
                 "line_width": 1,
@@ -785,8 +789,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:32:19.771Z",
-      "version": "WzI2NCwyXQ=="
+      "updated_at": "2019-07-03T14:04:36.575Z",
+      "version": "WzI3NSwyXQ=="
     },
     {
       "attributes": {
@@ -810,6 +814,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
@@ -837,6 +842,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_field": "kubernetes.controllermanager.name",
@@ -859,8 +865,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:32:40.456Z",
-      "version": "WzI2NSwyXQ=="
+      "updated_at": "2019-07-03T16:30:20.439Z",
+      "version": "WzI5NiwyXQ=="
     },
     {
       "attributes": {
@@ -914,6 +920,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
                 "terms_direction": "desc",
@@ -937,8 +944,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:33:28.675Z",
-      "version": "WzI2OCwyXQ=="
+      "updated_at": "2019-07-03T16:29:29.303Z",
+      "version": "WzI5NSwyXQ=="
     },
     {
       "attributes": {
@@ -959,6 +966,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -1011,8 +1019,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:28:48.776Z",
-      "version": "WzI2MSwyXQ=="
+      "updated_at": "2019-07-03T14:12:01.291Z",
+      "version": "WzI3OCwyXQ=="
     }
   ],
   "version": "7.2.0"
