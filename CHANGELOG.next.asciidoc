@@ -119,6 +119,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Use backoff when no new events are found. {pull}11861[11861]
 - Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716]
+- Preserve host name when reading from remote journal. {pull}12714[12714]
 
 *Metricbeat*
 
@@ -220,7 +221,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
 - Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
 - Add support for client addresses with port in Apache error logs {pull}12695[12695]
+- Add `google-pubsub` input type for consuming messages from a Google Cloud Pub/Sub topic subscription. {pull}12746[12746]
 - Add module for ingesting Cisco IOS logs over syslog. {pull}12748[12748]
+- Add module for ingesting Google Cloud VPC flow logs. {pull}12747[12747]
 
 *Heartbeat*
 

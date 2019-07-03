@@ -167,6 +167,26 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#----------------------------- Google Cloud Module -----------------------------
+- module: googlecloud
+  vpcflow:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
+    # configured to use this topic as a sink for VPC flow logs.
+    var.topic: googlecloud-vpc-flowlogs
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
   # All logs
@@ -919,6 +939,32 @@ filebeat.inputs:
   #custom_definitions:
   #- path/to/ipfix.yaml
   #- path/to/netflow.yaml
+
+#---------------------------- Google Cloud Pub/Sub Input -----------------------
+# Input for reading messages from a Google Cloud Pub/Sub topic subscription.
+- type: google-pubsub
+  enabled: false
+
+  # Google Cloud project ID. Required.
+  project_id: my-gcp-project-id
+
+  # Google Cloud Pub/Sub topic name. Required.
+  topic: my-gcp-pubsub-topic-name
+
+  # Google Cloud Pub/Sub topic subscription name. Required.
+  subscription.name: my-gcp-pubsub-subscription-name
+
+  # Create subscription if it does not exist.
+  #subscription.create: true
+
+  # Number of goroutines to create to read from the subscription.
+  #subscription.num_goroutines: 1
+
+  # Maximum number of unprocessed messages to allow at any time.
+  #subscription.max_outstanding_messages: 1000
+
+  # Path to a JSON file containing the credentials and key used to subscribe.
+  credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules

@@ -20,8 +20,6 @@ package node_stats
 import (
 	"fmt"
 
-	"github.com/elastic/beats/metricbeat/helper"
-
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/logstash"
@@ -38,7 +36,7 @@ func init() {
 }
 
 const (
-	nodeStatsPath = "_node/stats"
+	nodeStatsPath = "/_node/stats"
 )
 
 var (
@@ -52,7 +50,6 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*logstash.MetricSet
-	*helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -62,13 +59,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-
 	if ms.XPack {
-		logstashVersion, err := logstash.GetVersion(http, ms.HostData().SanitizedURI+nodeStatsPath)
+		logstashVersion, err := logstash.GetVersion(ms)
 		if err != nil {
 			return nil, err
 		}
@@ -83,12 +75,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			return nil, fmt.Errorf(errorMsg, ms.FullyQualifiedName(), logstash.PipelineGraphAPIsAvailableVersion, logstashVersion)
 		}
 
-		http.SetURI(http.GetURI() + "?vertices=true")
+		ms.HTTP.SetURI(ms.HTTP.GetURI() + "?vertices=true")
 	}
 
 	return &MetricSet{
 		ms,
-		http,
 	}, nil
 }
 
