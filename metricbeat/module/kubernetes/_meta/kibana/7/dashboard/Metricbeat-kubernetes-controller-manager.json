@@ -86,11 +86,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 13,
+              "h": 12,
               "i": "5",
-              "w": 15,
+              "w": 24,
               "x": 0,
-              "y": 14
+              "y": 39
             },
             "panelIndex": "5",
             "panelRefName": "panel_3",
@@ -99,11 +99,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 13,
+              "h": 12,
               "i": "6",
-              "w": 18,
-              "x": 15,
-              "y": 14
+              "w": 24,
+              "x": 24,
+              "y": 39
             },
             "panelIndex": "6",
             "panelRefName": "panel_4",
@@ -114,8 +114,8 @@
             "gridData": {
               "h": 13,
               "i": "7",
-              "w": 15,
-              "x": 33,
+              "w": 24,
+              "x": 24,
               "y": 14
             },
             "panelIndex": "7",
@@ -147,6 +147,19 @@
             "panelIndex": "9",
             "panelRefName": "panel_7",
             "version": "7.1.1"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 13,
+              "i": "10",
+              "w": 24,
+              "x": 0,
+              "y": 14
+            },
+            "panelIndex": "10",
+            "panelRefName": "panel_8",
+            "version": "7.2.0"
           }
         ],
         "timeRestore": false,
@@ -202,11 +215,16 @@
           "id": "485c8550-9c3a-11e9-9dc8-fd27291d427f",
           "name": "panel_7",
           "type": "visualization"
+        },
+        {
+          "id": "7d80f790-9d96-11e9-b2ae-49acc4cbcea9",
+          "name": "panel_8",
+          "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-03T10:33:28.312Z",
-      "version": "WzI0MywyXQ=="
+      "updated_at": "2019-07-03T13:33:44.121Z",
+      "version": "WzI2OSwyXQ=="
     },
     {
       "attributes": {
@@ -298,7 +316,7 @@
             }
           }
         },
-        "title": "Controller Process - [Metricbeat Kubernetes]",
+        "title": "Controller Process [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -421,7 +439,7 @@
             "time_field": "@timestamp",
             "type": "markdown"
           },
-          "title": "Controller Process - [Metricbeat Kubernetes]",
+          "title": "Controller Process [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -431,8 +449,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T10:12:09.204Z",
-      "version": "WzIzMywyXQ=="
+      "updated_at": "2019-07-03T13:31:40.813Z",
+      "version": "WzI2MiwyXQ=="
     },
     {
       "attributes": {
@@ -446,7 +464,7 @@
             }
           }
         },
-        "title": "Controller HTTP request duration - [Metricbeat Kubernetes]",
+        "title": "Controller HTTP request duration [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -529,7 +547,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Controller HTTP request duration - [Metricbeat Kubernetes]",
+          "title": "Controller HTTP request duration [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -539,8 +557,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T10:14:26.268Z",
-      "version": "WzIzNCwyXQ=="
+      "updated_at": "2019-07-03T13:31:57.207Z",
+      "version": "WzI2MywyXQ=="
     },
     {
       "attributes": {
@@ -554,7 +572,7 @@
             }
           }
         },
-        "title": "Controller Longest running processor - [Metricbeat Kubernetes]",
+        "title": "Controller Longest running processor [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -601,7 +619,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Controller Longest running processor - [Metricbeat Kubernetes]",
+          "title": "Controller Longest running processor [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -611,8 +629,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T10:27:53.984Z",
-      "version": "WzI0MCwyXQ=="
+      "updated_at": "2019-07-03T13:33:00.848Z",
+      "version": "WzI2NiwyXQ=="
     },
     {
       "attributes": {
@@ -626,7 +644,7 @@
             }
           }
         },
-        "title": "Controller Unfinished jobs sec - [Metricbeat Kubernetes]",
+        "title": "Controller Unfinished jobs sec [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -670,7 +688,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Controller Unfinished jobs sec - [Metricbeat Kubernetes]",
+          "title": "Controller Unfinished jobs sec [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -680,8 +698,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T10:26:37.232Z",
-      "version": "WzIzOSwyXQ=="
+      "updated_at": "2019-07-03T13:33:16.325Z",
+      "version": "WzI2NywyXQ=="
     },
     {
       "attributes": {
@@ -695,7 +713,7 @@
             }
           }
         },
-        "title": "Controller Memory - [Metricset Kubernetes]",
+        "title": "Controller Memory [Metricset Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -757,7 +775,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Controller Memory - [Metricset Kubernetes]",
+          "title": "Controller Memory [Metricset Kubernetes]",
           "type": "metrics"
         }
       },
@@ -767,8 +785,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T10:26:13.954Z",
-      "version": "WzIzOCwyXQ=="
+      "updated_at": "2019-07-03T13:32:19.771Z",
+      "version": "WzI2NCwyXQ=="
     },
     {
       "attributes": {
@@ -782,7 +800,7 @@
             }
           }
         },
-        "title": "Controller Workqueue adds - [Metricbeat Kubernetes]",
+        "title": "Controller Workqueue adds [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -831,7 +849,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Controller Workqueue adds - [Metricbeat Kubernetes]",
+          "title": "Controller Workqueue adds [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -841,8 +859,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T10:32:04.216Z",
-      "version": "WzI0MSwyXQ=="
+      "updated_at": "2019-07-03T13:32:40.456Z",
+      "version": "WzI2NSwyXQ=="
     },
     {
       "attributes": {
@@ -856,7 +874,7 @@
             }
           }
         },
-        "title": "Controller Workqueue retries - [Metricbeat Kubernetes]",
+        "title": "Controller Workqueue retries [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -909,7 +927,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Controller Workqueue retries - [Metricbeat Kubernetes]",
+          "title": "Controller Workqueue retries [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -919,8 +937,82 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T10:32:52.313Z",
-      "version": "WzI0MiwyXQ=="
+      "updated_at": "2019-07-03T13:33:28.675Z",
+      "version": "WzI2OCwyXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Controller CPU [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "",
+            "interval": "",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "CPU time",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "kubernetes.controllermanager.process.cpu.sec",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "47731390-9d96-11e9-9e81-115d18bcfeaa",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}} s"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "",
+            "type": "timeseries"
+          },
+          "title": "Controller CPU [Metricbeat Kubernetes]",
+          "type": "metrics"
+        }
+      },
+      "id": "7d80f790-9d96-11e9-b2ae-49acc4cbcea9",
+      "migrationVersion": {
+        "visualization": "7.2.0"
+      },
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2019-07-03T13:28:48.776Z",
+      "version": "WzI2MSwyXQ=="
     }
   ],
   "version": "7.2.0"
