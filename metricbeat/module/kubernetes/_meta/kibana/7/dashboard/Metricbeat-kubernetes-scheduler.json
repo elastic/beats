@@ -166,7 +166,7 @@
             }
           }
         },
-        "title": "Kubernetes - Host selector",
+        "title": "Host selector [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -208,7 +208,7 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Kubernetes - Host selector",
+          "title": "Host selector [Metricbeat Kubernetes]",
           "type": "input_control_vis"
         }
       },
@@ -229,8 +229,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-02T18:16:35.960Z",
-      "version": "WzcwMCwyXQ=="
+      "updated_at": "2019-07-02T18:25:52.100Z",
+      "version": "WzcwNywyXQ=="
     },
     {
       "attributes": {
@@ -244,7 +244,7 @@
             }
           }
         },
-        "title": "Kubescheduler - Process summary",
+        "title": "Process summary [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -369,7 +369,7 @@
             "time_field": "",
             "type": "markdown"
           },
-          "title": "Kubescheduler - Process summary",
+          "title": "Process summary [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -379,8 +379,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T07:28:14.716Z",
-      "version": "WzIzNiwxXQ=="
+      "updated_at": "2019-07-02T18:22:42.614Z",
+      "version": "WzcwMiwyXQ=="
     },
     {
       "attributes": {
@@ -394,7 +394,7 @@
             }
           }
         },
-        "title": "Kubescheduler - HTTP request duration",
+        "title": "Scheduler HTTP request duration [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -478,7 +478,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Kubescheduler - HTTP request duration",
+          "title": "Scheduler HTTP request duration [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -488,8 +488,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T07:34:13.675Z",
-      "version": "WzIzOCwxXQ=="
+      "updated_at": "2019-07-02T18:23:14.036Z",
+      "version": "WzcwMywyXQ=="
     },
     {
       "attributes": {
@@ -503,7 +503,7 @@
             }
           }
         },
-        "title": "Kubescheduler - End to end scheduling duration",
+        "title": "Scheduler end to end scheduling duration [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -721,7 +721,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Kubescheduler - End to end scheduling duration",
+          "title": "Scheduler end to end scheduling duration [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -731,8 +731,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T09:13:36.661Z",
-      "version": "WzY5MiwxXQ=="
+      "updated_at": "2019-07-02T18:24:04.115Z",
+      "version": "WzcwNCwyXQ=="
     },
     {
       "attributes": {
@@ -746,7 +746,7 @@
             }
           }
         },
-        "title": "Kubescheduler - Scheduling attempts",
+        "title": "Scheduler scheduling attempts [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -798,7 +798,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Kubescheduler - Scheduling attempts",
+          "title": "Scheduler scheduling attempts [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
@@ -808,8 +808,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-02T09:11:50.508Z",
-      "version": "WzY5MCwxXQ=="
+      "updated_at": "2019-07-02T18:24:29.251Z",
+      "version": "WzcwNSwyXQ=="
     }
   ],
   "version": "7.2.0"
