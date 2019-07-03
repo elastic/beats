@@ -30,24 +30,19 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix a race condition with the Kafka pipeline client, it is possible that `Close()` get called before `Connect()` . {issue}11945[11945]
-
 *Auditbeat*
-
-- Host dataset: Fix reboot detection logic. {pull}12591[12591]
 
 *Filebeat*
 
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 - Skipping unparsable log entries from docker json reader {pull}12268[12268]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
 
 *Heartbeat*
 
 *Journalbeat*
 
 *Metricbeat*
-
-- When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 
 *Packetbeat*
 
@@ -62,8 +57,6 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
-
-- Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12579[12579]
 
 *Heartbeat*
 

@@ -5,7 +5,6 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 * <<filebeat-installation>>
 * <<filebeat-configuration>>
-* <<config-filebeat-logstash>>
 * <<filebeat-template>>
 * <<load-kibana-dashboards>>
 * <<filebeat-starting>>
@@ -75,6 +74,8 @@ tar xzvf filebeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -141,7 +142,7 @@ endif::[]
 === Step 2: Configure Filebeat
 
 TIP: <<filebeat-modules-overview,Filebeat modules>> provide the fastest getting
-started experience for common log formats. If you want use Filebeat modules,
+started experience for common log formats. If you are using Filebeat modules,
 skip this section, including the remaining getting started steps, and go
 directly to <<filebeat-modules-quickstart>>.
 
@@ -196,23 +197,18 @@ include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 include::../../libbeat/docs/shared-cm-tip.asciidoc[]
 
-[[config-filebeat-logstash]]
-=== Step 3: Configure Filebeat to use Logstash
-
-include::{libbeat-dir}/docs/shared-logstash-config.asciidoc[]
-
 [[filebeat-template]]
-=== Step 4: Load the index template in Elasticsearch
+=== Step 3: Load the index template in Elasticsearch
 
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
-=== Step 5: Set up the Kibana dashboards
+=== Step 4: Set up the Kibana dashboards
 
 include::{libbeat-dir}/docs/dashboards.asciidoc[]
 
 [[filebeat-starting]]
-=== Step 6: Start Filebeat
+=== Step 5: Start Filebeat
 
 Start Filebeat by issuing the appropriate command for your platform. If you
 are accessing a secured Elasticsearch cluster, make sure you've configured
@@ -259,7 +255,7 @@ By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 Filebeat is now ready to send log files to your defined output.
 
 [[view-kibana-dashboards]]
-=== Step 7: View the sample Kibana dashboards
+=== Step 6: View the sample Kibana dashboards
 
 To make it easier for you to explore Filebeat data in Kibana, we've created
 example {beatname_uc} dashboards. You loaded the dashboards earlier when you
