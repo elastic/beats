@@ -82,6 +82,7 @@ var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
 	mb.BaseMetricSet
+	*helper.HTTP
 	XPack bool
 }
 
@@ -117,15 +118,21 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		base,
+		http,
 		config.XPack,
 	}, nil
 }
 
 // GetPipelines returns the list of pipelines running on a Logstash node
-func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
-	content, err := fetchPath(http, resetURI, "_node/pipelines", "graph=true")
+func GetPipelines(m *MetricSet) ([]PipelineState, error) {
+	content, err := fetchPath(m.HTTP, "_node/pipelines", "graph=true")
 	if err != nil {
 		return nil, errors.Wrap(err, "could not fetch node pipelines")
 	}
@@ -149,9 +156,9 @@ func GetPipelines(http *helper.HTTP, resetURI string) ([]PipelineState, error) {
 }
 
 // GetVersion returns the version of the Logstash node
-func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) {
+func GetVersion(m *MetricSet) (*common.Version, error) {
 	const rootPath = "/"
-	content, err := fetchPath(http, currentPath, rootPath, "")
+	content, err := fetchPath(m.HTTP, rootPath, "")
 	if err != nil {
 		return nil, err
 	}
@@ -174,15 +181,16 @@ func ArePipelineGraphAPIsAvailable(currentLogstashVersion *common.Version) bool 
 	return elastic.IsFeatureAvailable(currentLogstashVersion, PipelineGraphAPIsAvailableVersion)
 }
 
-func fetchPath(http *helper.HTTP, resetURI, path string, query string) ([]byte, error) {
-	defer http.SetURI(resetURI)
+func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, error) {
+	currentURI := httpHelper.GetURI()
+	defer httpHelper.SetURI(currentURI)
 
 	// Parses the uri to replace the path
-	u, _ := url.Parse(resetURI)
+	u, _ := url.Parse(currentURI)
 	u.Path = path
 	u.RawQuery = query
 
 	// Http helper includes the HostData with username and password
-	http.SetURI(u.String())
-	return http.FetchContent()
+	httpHelper.SetURI(u.String())
+	return httpHelper.FetchContent()
 }
