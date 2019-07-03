@@ -20,7 +20,7 @@ import (
 
 // MockRDSClient struct is used for unit tests.
 type MockRDSClient struct {
-	rdsiface.RDSAPI
+	rdsiface.ClientAPI
 }
 
 var (
