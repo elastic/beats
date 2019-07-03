@@ -82,16 +82,36 @@ filebeat.modules:
     enabled: true
 
     # Set which input to use between syslog (default) or file.
-    #var.input:
+    #var.input: syslog
 
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    #var.syslog_port: 9001
 
     # Set the log level from 1 (alerts only) to 7 (include all messages).
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
     #var.log_level: 7
+
+  ios:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9002.
+    #var.syslog_port: 9002
+
+    # Set custom paths for the log files when using file input. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
 
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
@@ -146,6 +166,26 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#----------------------------- Google Cloud Module -----------------------------
+- module: googlecloud
+  vpcflow:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
+    # configured to use this topic as a sink for VPC flow logs.
+    var.topic: googlecloud-vpc-flowlogs
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
@@ -759,6 +799,9 @@ filebeat.inputs:
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
 
+  # Max number of concurrent connections, or 0 for no limit. Default: 0
+  #max_connections: 0
+
   # The number of seconds of inactivity before a remote connection is closed.
   #timeout: 300s
 
@@ -896,6 +939,32 @@ filebeat.inputs:
   #custom_definitions:
   #- path/to/ipfix.yaml
   #- path/to/netflow.yaml
+
+#---------------------------- Google Cloud Pub/Sub Input -----------------------
+# Input for reading messages from a Google Cloud Pub/Sub topic subscription.
+- type: google-pubsub
+  enabled: false
+
+  # Google Cloud project ID. Required.
+  project_id: my-gcp-project-id
+
+  # Google Cloud Pub/Sub topic name. Required.
+  topic: my-gcp-pubsub-topic-name
+
+  # Google Cloud Pub/Sub topic subscription name. Required.
+  subscription.name: my-gcp-pubsub-subscription-name
+
+  # Create subscription if it does not exist.
+  #subscription.create: true
+
+  # Number of goroutines to create to read from the subscription.
+  #subscription.num_goroutines: 1
+
+  # Maximum number of unprocessed messages to allow at any time.
+  #subscription.max_outstanding_messages: 1000
+
+  # Path to a JSON file containing the credentials and key used to subscribe.
+  credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -1178,6 +1247,13 @@ filebeat.inputs:
 #    max_depth: 1
 #    target: ""
 #    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
 #
 # The following example copies the value of message to message_copied
 #
@@ -1510,8 +1586,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
