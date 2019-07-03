@@ -1,5 +1,5 @@
 # Module: golang
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-golang.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.3/metricbeat-module-golang.html
 
 - module: golang
   #metricsets:

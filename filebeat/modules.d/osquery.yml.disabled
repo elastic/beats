@@ -1,5 +1,5 @@
 # Module: osquery
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-osquery.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.3/filebeat-module-osquery.html
 
 - module: osquery
   result:
