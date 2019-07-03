@@ -39,6 +39,7 @@ func ConfigFileParams() devtools.ConfigFileParams {
 		},
 		ExtraVars: map[string]interface{}{
 			"UseObserverProcessor": true,
+			"NoDashboards":         true,
 		},
 	}
 }

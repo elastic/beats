@@ -15,6 +15,7 @@
 #  env: staging
 
 
+{{if not .NoDashboards}}
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
@@ -26,6 +27,7 @@
 # versions, this URL points to the dashboard archive on the artifacts.elastic.co
 # website.
 #setup.dashboards.url:
+{{end}}
 
 #============================== Kibana =====================================
 
