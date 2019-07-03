@@ -62,7 +62,7 @@
             "gridData": {
               "h": 14,
               "i": "2",
-              "w": 9,
+              "w": 11,
               "x": 11,
               "y": 0
             },
@@ -75,8 +75,8 @@
             "gridData": {
               "h": 14,
               "i": "3",
-              "w": 28,
-              "x": 20,
+              "w": 26,
+              "x": 22,
               "y": 0
             },
             "panelIndex": "3",
@@ -205,8 +205,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-01T20:09:00.493Z",
-      "version": "WzQzMDgsNV0="
+      "updated_at": "2019-07-03T10:33:28.312Z",
+      "version": "WzI0MywyXQ=="
     },
     {
       "attributes": {
@@ -220,7 +220,7 @@
             }
           }
         },
-        "title": "Kubernetes - Host selector",
+        "title": "Host selector [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -249,7 +249,7 @@
                 "label": "Service address",
                 "options": {
                   "dynamicOptions": true,
-                  "multiselect": true,
+                  "multiselect": false,
                   "order": "desc",
                   "size": 5,
                   "type": "terms"
@@ -262,13 +262,13 @@
             "updateFiltersOnChange": false,
             "useTimeFilter": false
           },
-          "title": "Kubernetes - Host selector",
+          "title": "Host selector [Metricbeat Kubernetes]",
           "type": "input_control_vis"
         }
       },
       "id": "bcb194a0-9bf8-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -283,8 +283,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-01T15:04:48.456Z",
-      "version": "WzQxODMsNV0="
+      "updated_at": "2019-07-03T07:20:34.226Z",
+      "version": "WzEzMywxXQ=="
     },
     {
       "attributes": {
@@ -298,7 +298,7 @@
             }
           }
         },
-        "title": "Kubecontroller - Process summary",
+        "title": "Controller Process - [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -308,11 +308,12 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "drop_last_bucket": 1,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
-            "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ max_of_kubernetes_controllermanager_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ max_of_kubernetes_controllermanager_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_controllermanager_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
+            "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ average_of_kubernetes_controllermanager_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ average_of_kubernetes_controllermanager_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ average_of_kubernetes_controllermanager_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
             "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
             "markdown_less": "\ntable, tr, td, th {\n    border: none;\n}\n\n",
             "series": [
@@ -356,12 +357,13 @@
                 "fill": 0.5,
                 "formatter": "number",
                 "id": "1212ba80-9c1e-11e9-b29f-d55be9348723",
+                "label": "",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "kubernetes.controllermanager.process.fds.open.count",
                     "id": "1212ba81-9c1e-11e9-b29f-d55be9348723",
-                    "type": "max"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -377,12 +379,13 @@
                 "fill": 0.5,
                 "formatter": "bytes",
                 "id": "3f3b17a0-9c1e-11e9-b29f-d55be9348723",
+                "label": "",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "kubernetes.controllermanager.process.memory.resident.bytes",
                     "id": "3f3b17a1-9c1e-11e9-b29f-d55be9348723",
-                    "type": "max"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -418,18 +421,18 @@
             "time_field": "@timestamp",
             "type": "markdown"
           },
-          "title": "Kubecontroller - Process summary",
+          "title": "Controller Process - [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "3dbf6230-9c20-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T17:53:51.599Z",
-      "version": "WzQyOTUsNV0="
+      "updated_at": "2019-07-03T10:12:09.204Z",
+      "version": "WzIzMywyXQ=="
     },
     {
       "attributes": {
@@ -443,7 +446,7 @@
             }
           }
         },
-        "title": "Kubecontroller - HTTP request duration",
+        "title": "Controller HTTP request duration - [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -526,18 +529,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubecontroller - HTTP request duration",
+          "title": "Controller HTTP request duration - [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "d86b2da0-9c20-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T17:07:02.389Z",
-      "version": "WzQyNzgsNV0="
+      "updated_at": "2019-07-03T10:14:26.268Z",
+      "version": "WzIzNCwyXQ=="
     },
     {
       "attributes": {
@@ -551,7 +554,7 @@
             }
           }
         },
-        "title": "Kubecontroller - Longest running processor",
+        "title": "Controller Longest running processor - [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -562,6 +565,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
@@ -573,12 +577,13 @@
                 "fill": 0.5,
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "kubernetes.controllermanager.workqueue.longestrunning.sec",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "max"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -596,18 +601,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubecontroller - Longest running processor",
+          "title": "Controller Longest running processor - [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "0ca95350-9c24-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T17:23:19.235Z",
-      "version": "WzQyODYsNV0="
+      "updated_at": "2019-07-03T10:27:53.984Z",
+      "version": "WzI0MCwyXQ=="
     },
     {
       "attributes": {
@@ -621,7 +626,7 @@
             }
           }
         },
-        "title": "Kubecontroller - Unfinished Jobs sec",
+        "title": "Controller Unfinished jobs sec - [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -665,18 +670,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubecontroller - Unfinished Jobs sec",
+          "title": "Controller Unfinished jobs sec - [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "3e1e1fd0-9c27-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T17:43:02.536Z",
-      "version": "WzQyODgsNV0="
+      "updated_at": "2019-07-03T10:26:37.232Z",
+      "version": "WzIzOSwyXQ=="
     },
     {
       "attributes": {
@@ -690,7 +695,7 @@
             }
           }
         },
-        "title": "Kubecontroller - Memory",
+        "title": "Controller Memory - [Metricset Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -752,18 +757,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubecontroller - Memory",
+          "title": "Controller Memory - [Metricset Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "2ba628e0-9c2a-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T18:00:54.638Z",
-      "version": "WzQyOTYsNV0="
+      "updated_at": "2019-07-03T10:26:13.954Z",
+      "version": "WzIzOCwyXQ=="
     },
     {
       "attributes": {
@@ -777,7 +782,7 @@
             }
           }
         },
-        "title": "Kubecontroller - Workqueue adds",
+        "title": "Controller Workqueue adds - [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -826,18 +831,18 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubecontroller - Workqueue adds",
+          "title": "Controller Workqueue adds - [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "8a95de50-9c38-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T19:47:39.050Z",
-      "version": "WzQzMDQsNV0="
+      "updated_at": "2019-07-03T10:32:04.216Z",
+      "version": "WzI0MSwyXQ=="
     },
     {
       "attributes": {
@@ -851,7 +856,7 @@
             }
           }
         },
-        "title": "Kubecontroller - Workqueue retries",
+        "title": "Controller Workqueue retries - [Metricbeat Kubernetes]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -862,6 +867,7 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
             "interval": "auto",
@@ -873,12 +879,13 @@
                 "fill": 0.5,
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "kubernetes.controllermanager.workqueue.retries.count",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "max"
+                    "type": "avg"
                   },
                   {
                     "field": "61ca57f2-469d-11e7-af02-69e470af7417",
@@ -902,19 +909,19 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Kubecontroller - Workqueue retries",
+          "title": "Controller Workqueue retries - [Metricbeat Kubernetes]",
           "type": "metrics"
         }
       },
       "id": "485c8550-9c3a-11e9-9dc8-fd27291d427f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-01T19:56:46.558Z",
-      "version": "WzQzMDcsNV0="
+      "updated_at": "2019-07-03T10:32:52.313Z",
+      "version": "WzI0MiwyXQ=="
     }
   ],
-  "version": "7.1.1"
+  "version": "7.2.0"
 }
