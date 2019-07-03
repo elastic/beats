@@ -36,6 +36,7 @@ import (
 //sys _PdhGetFormattedCounterValueLong(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLong) (errcode error) [failretval!=0]= pdh.PdhGetFormattedCounterValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
 //sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
+//sys _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) [failretval!=0] = pdh.PdhExpandCounterPathW
 
 type PdhQueryHandle uintptr
 
@@ -140,23 +141,33 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 }
 
 // PdhExpandWildCardPath returns counter paths that match the given counter path.
-func PdhExpandWildCardPath(wildCardPath string) ([]uint16, error) {
-	utfPath, err := syscall.UTF16PtrFromString(wildCardPath)
-	if err != nil {
-		return nil, err
-	}
+func PdhExpandWildCardPath(utfPath *uint16) ([]uint16, error) {
 	var bufferSize uint32
 	if err := _PdhExpandWildCardPath(nil, utfPath, nil, &bufferSize); err != nil {
 		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-
-		expdPaths := make([]uint16, bufferSize)
-		bufferSize = uint32(len(expdPaths))
-		if err := _PdhExpandWildCardPath(nil, utfPath, &expdPaths[0], &bufferSize); err != nil {
+		expandPaths := make([]uint16, bufferSize)
+		if err := _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-		return expdPaths, nil
+		return expandPaths, nil
+	}
+	return nil, nil
+}
+
+// PdhExpandCounterPath returns counter paths that match the given counter path, for 32 bit windows.
+func PdhExpandCounterPath(utfPath *uint16) ([]uint16, error) {
+	var bufferSize uint32
+	if err := _PdhExpandCounterPath(utfPath, nil, &bufferSize); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		expandPaths := make([]uint16, bufferSize)
+		if err := _PdhExpandCounterPath(utfPath, &expandPaths[0], &bufferSize); err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		return expandPaths, nil
 	}
 	return nil, nil
 }

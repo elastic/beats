@@ -47,5 +47,28 @@
         "source.geo.region_iso_code": "US-GA",
         "source.geo.region_name": "Georgia",
         "source.ip": "72.15.99.187"
+    },
+    {
+        "@timestamp": "2019-06-27T06:58:09.169Z",
+        "apache.error.module": "include",
+        "event.dataset": "apache.error",
+        "event.module": "apache",
+        "fileset.name": "error",
+        "input.type": "log",
+        "log.level": "warn",
+        "log.offset": 384,
+        "message": "AH01374: mod_include: Options +Includes (or IncludesNoExec) wasn't set, INCLUDES filter removed: /test.html",
+        "process.pid": 15934,
+        "service.type": "apache",
+        "source.address": "123.123.123.123",
+        "source.geo.city_name": "Beijing",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "CN",
+        "source.geo.location.lat": 39.9288,
+        "source.geo.location.lon": 116.3889,
+        "source.geo.region_iso_code": "CN-BJ",
+        "source.geo.region_name": "Beijing",
+        "source.ip": "123.123.123.123",
+        "source.port": "12345"
     }
 ]

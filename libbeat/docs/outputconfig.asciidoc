@@ -1068,6 +1068,26 @@ All the <<conditions,conditions>> supported by processors are also supported
 here.
 endif::no-processors[]
 
+The following example sets the topic based on whether the message field contains
+the specified string:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.kafka:
+  hosts: ["localhost:9092"]
+  topic: "logs-%{[beat.version]}" 
+  topics:
+    - topic: "critical-%{[beat.version]}"
+      when.contains:
+        message: "CRITICAL"
+    - topic: "error-%{[beat.version]}"
+      when.contains:
+        message: "ERR"
+------------------------------------------------------------------------------
+
+
+This configuration results in topics named +critical-{version}+,
++error-{version}+, and +logs-{version}+.
 
 ===== `key`
 
@@ -1122,7 +1142,7 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 *`full`*:: Strategy to use when fetching metadata, when this option is `true`, the client will maintain
 a full set of metadata for all the available topics, if the this option is set to `false` it will only refresh the
-metadata for the configured topics. The default is true.
+metadata for the configured topics. The default is false.
 
 *`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
 
@@ -1194,8 +1214,11 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 
 ===== `ssl`
 
-Configuration options for SSL parameters like the root CA for Kafka connections. See
-<<configuration-ssl>> for more information.
+Configuration options for SSL parameters like the root CA for Kafka connections.
+ The Kafka host keystore should be created with the
+`-keyalg RSA` argument to ensure it uses a cipher supported by
+https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions#why-cant-sarama-connect-to-my-kafka-cluster-using-ssl[Filebeat's Kafka library].
+See <<configuration-ssl>> for more information.
 
 //begin inner exclude for redis
 ifndef::no-redis-output[]

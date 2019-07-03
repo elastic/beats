@@ -27,6 +27,7 @@ do
   echo "Index path: $index_path"
 
   dest_dir="$html_dir/${name}/${index_path}"
+  echo "Destination directory: $dest_dir"
   mkdir -p "$dest_dir"
   params="--chunk=1"
   if [ "$PREVIEW" = "1" ]; then
@@ -37,5 +38,5 @@ do
     params="$params --resource=${resource_dir}"
   fi
 
-  $docs_dir/build_docs.pl $params --doc "$index" -out "$dest_dir"
+  $docs_dir/build_docs $params --doc "$index" --out "$dest_dir"
 done

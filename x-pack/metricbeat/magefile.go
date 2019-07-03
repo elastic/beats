@@ -9,12 +9,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+)
+
+const (
+	dirModulesGenerated = "build/package/module"
 )
 
 func init() {
@@ -64,6 +70,7 @@ func Package() {
 	devtools.UseElasticBeatXPackPackaging()
 	metricbeat.CustomizePackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
+	packageLightModules()
 
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
@@ -72,7 +79,12 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithModulesD())
+	return devtools.TestPackages(
+		devtools.WithModulesD(),
+		devtools.WithModules(),
+
+		// To be increased or removed when more light modules are added
+		devtools.MinModules(1))
 }
 
 // Fields generates a fields.yml and fields.go for each module.
@@ -96,7 +108,11 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(metricbeat.ConfigXPack, metricbeat.GenerateDirModulesD)
+	mg.Deps(configYML, devtools.GenerateDirModulesD)
+}
+
+func configYML() error {
+	return devtools.Config(devtools.AllConfigTypes, metricbeat.XPackConfigFileParams(), ".")
 }
 
 // Update is an alias for running fields, dashboards, config.
@@ -159,4 +175,76 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	})
+}
+
+// prepareLightModules generates light modules
+func prepareLightModules(path string) error {
+	err := devtools.Clean([]string{dirModulesGenerated})
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dirModulesGenerated, 0755); err != nil {
+		return err
+	}
+
+	filePatterns := []string{
+		"*/module.yml",
+		"*/*/manifest.yml",
+	}
+
+	var files []string
+	for _, pattern := range filePatterns {
+		matches, err := filepath.Glob(filepath.Join(path, pattern))
+		if err != nil {
+			return err
+		}
+		files = append(files, matches...)
+	}
+
+	if len(files) == 0 {
+		return fmt.Errorf("no light modules found")
+	}
+
+	for _, file := range files {
+		rel, _ := filepath.Rel(path, file)
+		dest := filepath.Join(dirModulesGenerated, rel)
+		err := (&devtools.CopyTask{
+			Source:  file,
+			Dest:    dest,
+			Mode:    0644,
+			DirMode: 0755,
+		}).Execute()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// packageLightModules customizes packaging to add light modules
+func packageLightModules() error {
+	prepareLightModules("module")
+
+	var (
+		moduleTarget = "module"
+		module       = devtools.PackageFile{
+			Mode:   0644,
+			Source: dirModulesGenerated,
+		}
+	)
+
+	for _, args := range devtools.Packages {
+		pkgType := args.Types[0]
+		switch pkgType {
+		case devtools.TarGz, devtools.Zip, devtools.Docker:
+			args.Spec.Files[moduleTarget] = module
+		case devtools.Deb, devtools.RPM:
+			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
+		case devtools.DMG:
+			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/"+moduleTarget] = module
+		default:
+			return fmt.Errorf("unhandled package type: %v", pkgType)
+		}
+	}
+	return nil
 }

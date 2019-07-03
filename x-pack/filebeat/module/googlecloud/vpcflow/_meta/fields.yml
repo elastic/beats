@@ -1,0 +1,106 @@
+- name: vpcflow
+  type: group
+  description: >
+    Fields for Google Cloud VPC flow logs.
+  fields:
+  - name: reporter
+    type: keyword
+    description: >
+      The side which reported the flow. Can be either 'SRC' or 'DEST'.
+
+  - name: rtt.ms
+    type: long
+    description: >
+      Latency as measured (for TCP flows only) during the time interval. This is
+      the time elapsed between sending a SEQ and receiving a corresponding ACK
+      and it contains the network RTT as well as the application related delay.
+
+  - name: destination.instance
+    type: group
+    description: >
+      If the destination of the connection was a VM located on the same VPC,
+      this field is populated with VM instance details. In a Shared VPC
+      configuration, project_id corresponds to the project that owns the
+      instance, usually the service project.
+    fields:
+      - name: project_id
+        type: keyword
+        description: >
+          ID of the project containing the VM.
+
+      - name: region
+        type: keyword
+        description: >
+          Region of the VM.
+
+      - name: zone
+        type: keyword
+        description: >
+          Zone of the VM.
+
+  - name: destination.vpc
+    type: group
+    description: >
+      If the destination of the connection was a VM located on the same VPC,
+      this field is populated with VPC network details. In a Shared VPC
+      configuration, project_id corresponds to that of the host project.
+    fields:
+      - name: project_id
+        type: keyword
+        description: >
+          ID of the project containing the VM.
+
+      - name: vpc_name
+        type: keyword
+        description: >
+          VPC on which the VM is operating.
+
+      - name: subnetwork_name
+        type: keyword
+        description: >
+          Subnetwork on which the VM is operating.
+
+  - name: source.instance
+    type: group
+    description: >
+      If the source of the connection was a VM located on the same VPC, this
+      field is populated with VM instance details. In a Shared VPC
+      configuration, project_id corresponds to the project that owns the
+      instance, usually the service project.
+    fields:
+      - name: project_id
+        type: keyword
+        description: >
+          ID of the project containing the VM.
+
+      - name: region
+        type: keyword
+        description: >
+          Region of the VM.
+
+      - name: zone
+        type: keyword
+        description: >
+          Zone of the VM.
+
+  - name: source.vpc
+    type: group
+    description: >
+      If the source of the connection was a VM located on the same VPC, this
+      field is populated with VPC network details. In a Shared VPC
+      configuration, project_id corresponds to that of the host project.
+    fields:
+      - name: project_id
+        type: keyword
+        description: >
+          ID of the project containing the VM.
+
+      - name: vpc_name
+        type: keyword
+        description: >
+          VPC on which the VM is operating.
+
+      - name: subnetwork_name
+        type: keyword
+        description: >
+          Subnetwork on which the VM is operating.
