@@ -333,6 +333,15 @@ packetbeat.protocols:
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
 
+  # Max size for per-session message queue. This places a limit on the memory
+  # that can be used to buffer requests and responses for correlation.
+  #queue_max_bytes: 1048576
+
+  # Max number of messages for per-session message queue. This limits the number
+  # of requests or responses that can be buffered for correlation. Set a value
+  # large enough to allow for pipelining.
+  #queue_max_messages: 20000
+
 - type: thrift
   # Enable thrift monitoring. Default: true
   #enabled: true
@@ -698,6 +707,13 @@ packetbeat.ignore_outgoing: false
 #    target: ""
 #    overwrite_keys: false
 #
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
 # The following example copies the value of message to message_copied
 #
 #processors:
@@ -1029,8 +1045,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1

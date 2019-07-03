@@ -99,7 +99,7 @@
     description: >
       Whether the node is master
 
-  - name: scheduler
+  - name: scheduling
     type: group
     fields:
       - name: e2e.duration.us.bucket.*

@@ -1142,7 +1142,7 @@ brokers, topics, partition, and active leaders to use for publishing.
 
 *`full`*:: Strategy to use when fetching metadata, when this option is `true`, the client will maintain
 a full set of metadata for all the available topics, if the this option is set to `false` it will only refresh the
-metadata for the configured topics. The default is true.
+metadata for the configured topics. The default is false.
 
 *`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
 

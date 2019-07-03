@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "vBY5JVo2RftJoZExAKoCCTOr5fU=",
+			"path": "4d63.com/tz",
+			"revision": "bd6cee76f7319745d44ff235e42124b3891e293d",
+			"revisionTime": "2019-03-11T03:41:57Z"
+		},
+		{
 			"checksumSHA1": "NkpNQgmrdzGr9HUDL8Bp5YAxt0k=",
 			"path": "cloud.google.com/go/civil",
 			"revision": "632e11ec7c242a85e1931e4a8fdda2002316569f",
@@ -2360,6 +2366,12 @@
 			"revisionTime": "2017-10-22T17:59:00Z",
 			"version": "release-branch.go1.9",
 			"versionExact": "release-branch.go1.9"
+		},
+		{
+			"checksumSHA1": "CkkyCjLPBm0OGzfMuTfaDsd45X4=",
+			"path": "golang.org/x/net/netutil",
+			"revision": "3b0461eec859c4b73bb64fdc8285971fd33e3938",
+			"revisionTime": "2019-06-20T19:42:36Z"
 		},
 		{
 			"checksumSHA1": "QEm/dePZ0lOnyOs+m22KjXfJ/IU=",

@@ -93,7 +93,7 @@ func defaultConfig() kafkaConfig {
 				Backoff: 250 * time.Millisecond,
 			},
 			RefreshFreq: 10 * time.Minute,
-			Full:        true,
+			Full:        false,
 		},
 		KeepAlive:        0,
 		MaxMessageBytes:  nil, // use library default

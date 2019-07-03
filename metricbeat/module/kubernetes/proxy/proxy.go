@@ -38,7 +38,7 @@ func init() {
 			"rest_client_requests_total":         prometheus.Metric("client.request.count"),
 			"kubeproxy_sync_proxy_rules_duration_seconds": prometheus.Metric("sync.rules.duration.us",
 				prometheus.OpMultiplyBuckets(1000000)),
-			"kubeproxy_network_programming_duration_seconds_bucket": prometheus.Metric("sync.networkprogramming.duration.us",
+			"kubeproxy_network_programming_duration_seconds": prometheus.Metric("sync.networkprogramming.duration.us",
 				prometheus.OpMultiplyBuckets(1000000)),
 		},
 
