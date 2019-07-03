@@ -187,8 +187,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-03T13:46:42.150Z",
-      "version": "WzI3MywyXQ=="
+      "updated_at": "2019-07-03T14:42:40.028Z",
+      "version": "WzI4OSwyXQ=="
     },
     {
       "attributes": {
@@ -291,10 +291,11 @@
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
+            "drop_last_bucket": 1,
             "filter": "_exists_:\"kubernetes.scheduler.process.started.sec\"",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "",
-            "interval": "",
+            "interval": "30s",
             "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ max_of_kubernetes_scheduler_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ max_of_kubernetes_scheduler_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ max_of_kubernetes_scheduler_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
             "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
             "markdown_less": "\ntable, tr, td, th {\n    border: none;\n}\n\n",
@@ -415,8 +416,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T07:20:34.226Z",
-      "version": "WzEzNCwxXQ=="
+      "updated_at": "2019-07-03T14:45:05.521Z",
+      "version": "WzI5MCwyXQ=="
     },
     {
       "attributes": {
@@ -866,6 +867,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -918,8 +920,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-03T13:41:11.443Z",
-      "version": "WzI3MCwyXQ=="
+      "updated_at": "2019-07-03T14:10:38.608Z",
+      "version": "WzI3NywyXQ=="
     },
     {
       "attributes": {
