@@ -867,7 +867,8 @@ exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
 `add_error_key`:: (Optional) If it set to true, in case of error while decoding json keys
 `error` field is going to be part of event with error message. If it set to false, there
-will not be any error in event's field. Even error occurs while decoding json keys
+will not be any error in event's field. Even error occurs while decoding json keys. The
+default value is false
 
 
 [[decode-base64-field]]

@@ -55,7 +55,6 @@ var (
 	defaultConfig = config{
 		MaxDepth:     1,
 		ProcessArray: false,
-		AddErrorKey:  true,
 	}
 	errProcessingSkipped = errors.New("processing skipped")
 )
