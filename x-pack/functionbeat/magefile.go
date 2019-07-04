@@ -35,20 +35,13 @@ func init() {
 
 // Build builds the Beat binary.
 func Build() error {
-	workingDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
 	params := devtools.DefaultBuildArgs()
-	for _, provider := range selectedProviders {
+	for _, provider := range functionbeat.SelectedProviders {
+		inputFiles := filepath.Join(provider, "main.go")
+		params.InputFiles = []string{inputFiles}
 		params.Name = devtools.BeatName + "-" + provider
-		err = os.Chdir(workingDir + "/" + provider)
-		if err != nil {
-			return err
-		}
-
-		err = devtools.Build(params)
+		params.OutputDir = provider
+		err := devtools.Build(params)
 		if err != nil {
 			return err
 		}
