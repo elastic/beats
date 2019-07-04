@@ -15,9 +15,3 @@ var:
 
 ingest_pipeline: ingest/pipeline.json
 input: config/ntlm.yml
-
-requires.processors:
-- name: geoip
-  plugin: ingest-geoip
-- name: user_agent
-  plugin: ingest-user_agent

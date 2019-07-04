@@ -1,0 +1,92 @@
+{
+  "description": "Pipeline for normalizing Zeek smb_files.log",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['smb_files']['ts'] * 1000; ctx.zeek.smb_files.remove('ts');"
+      }
+    },
+    {
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{source.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.ip",
+        "value": "{{destination.address}}"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "times.accessed",
+        "path": "zeek.smb_files"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "times.changed",
+        "path": "zeek.smb_files"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "times.created",
+        "path": "zeek.smb_files"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "times.modified",
+        "path": "zeek.smb_files"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.smb_files.times.accessed",
+        "target_field": "zeek.smb_files.times.accessed",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.smb_files.times?.accessed != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.smb_files.times.changed",
+        "target_field": "zeek.smb_files.times.changed",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.smb_files.times?.accessed != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.smb_files.times.created",
+        "target_field": "zeek.smb_files.times.created",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.smb_files.times?.accessed != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.smb_files.times.modified",
+        "target_field": "zeek.smb_files.times.modified",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.smb_files.times?.accessed != null"
+      }
+    }
+  ],
+  "on_failure": [{ 
+    "set": { 
+      "field": "error.message", 
+      "value": "{{ _ingest.on_failure_message }}" 
+    } 
+  }]
+}

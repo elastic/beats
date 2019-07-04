@@ -27,17 +27,18 @@
       }
     },
     {
-      "date" : {
-        "field" : "zeek.kerberos.valid_until",
-        "target_field" : "zeek.kerberos.valid_until",
-        "formats" : ["UNIX"]
+      "date": {
+        "field": "zeek.kerberos.valid_until",
+        "target_field": "zeek.kerberos.valid_until",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.kerberos.valid_until != null"
       }
     }
   ],
-  "on_failure" : [{ 
-    "set" : { 
-      "field" : "error.message", 
-      "value" : "{{ _ingest.on_failure_message }}" 
+  "on_failure": [{ 
+    "set": { 
+      "field": "error.message", 
+      "value": "{{ _ingest.on_failure_message }}" 
     } 
   }]
 }
