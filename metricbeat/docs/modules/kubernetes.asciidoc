@@ -209,4 +209,3 @@ include::kubernetes/state_statefulset.asciidoc[]
 include::kubernetes/system.asciidoc[]
 
 include::kubernetes/volume.asciidoc[]
-
