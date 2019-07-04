@@ -18,6 +18,8 @@ The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
 
 The Kubernetes module is tested with Kubernetes 1.13.x and 1.14.x
 
+Dashboards for `scheduler` and `proxy` are not compatible with kibana versions below `7.2.0`
+
 [float]
 === Dashboard
 
