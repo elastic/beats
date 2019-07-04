@@ -341,6 +341,27 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	return stackUsage, err
 }
 
+// IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
+func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
+	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
+	if err != nil {
+		return false, err
+	}
+
+	var response map[string]map[string]map[string]map[string]bool
+	err = json.Unmarshal(content, &response)
+	if err != nil {
+		return false, err
+	}
+
+	for _, nodeInfo := range response["nodes"] {
+		mlockall := nodeInfo["process"]["mlockall"]
+		return mlockall, nil
+	}
+
+	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
+}
+
 // PassThruField copies the field at the given path from the given source data object into
 // the same path in the given target data object.
 func PassThruField(fieldPath string, sourceData, targetData common.MapStr) error {
