@@ -1,0 +1,87 @@
+{
+  "_index": "filebeat-7.2.0-2019.07.04-000001",
+  "_type": "_doc",
+  "_id": "zU7vvmsBxi2B1GAoVmvm",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "agent": {
+      "hostname": "7fcc397807ee",
+      "id": "1c768e8d-10df-44e5-a0e8-07dd14bbfc58",
+      "ephemeral_id": "9dc57b56-3ba3-4f79-a452-f9ae0be339b8",
+      "type": "filebeat",
+      "version": "7.2.0"
+    },
+    "log": {
+      "file": {
+        "path": "/var/log/bro/current/smb_files.log"
+      },
+      "offset": 965
+    },
+    "destination": {
+      "address": "192.168.10.30",
+      "port": 445,
+      "ip": "192.168.10.30"
+    },
+    "zeek": {
+      "session_id": "C9YAaEzWLL62yWMn5",
+      "smb_files": {
+        "path": "\\\\admin-pc\\ADMIN$",
+        "times": {
+          "created": "2017-10-09T16:13:19.607Z",
+          "modified": "2017-10-09T16:13:19.607Z",
+          "accessed": "2017-10-09T16:13:19.607Z",
+          "changed": "2017-10-09T16:13:19.607Z"
+        },
+        "size": 145568,
+        "name": "PSEXESVC.exe",
+        "action": "SMB::FILE_OPEN"
+      }
+    },
+    "source": {
+      "address": "192.168.10.31",
+      "port": 49239,
+      "ip": "192.168.10.31"
+    },
+    "fileset": {
+      "name": "smb_files"
+    },
+    "network": {
+      "community_id": "1:k308wDxRMx/FIEzeh+YwD86zgoA=",
+      "transport": "tcp"
+    },
+    "tags": [
+      "zeek.smb_files"
+    ],
+    "input": {
+      "type": "log"
+    },
+    "@timestamp": 1507565601000,
+    "ecs": {
+      "version": "1.0.0"
+    },
+    "service": {
+      "type": "zeek"
+    },
+    "host": {
+      "name": "7fcc397807ee"
+    },
+    "event": {
+      "created": "2019-07-04T21:41:23.266Z",
+      "module": "zeek",
+      "id": "C9YAaEzWLL62yWMn5",
+      "dataset": "zeek.smb_files"
+    }
+  },
+  "fields": {
+    "@timestamp": [
+      "2017-10-09T16:13:21.000Z"
+    ],
+    "event.created": [
+      "2019-07-04T21:41:23.266Z"
+    ],
+    "suricata.eve.timestamp": [
+      "2017-10-09T16:13:21.000Z"
+    ]
+  }
+}

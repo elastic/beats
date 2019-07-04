@@ -1,0 +1,85 @@
+{
+  "_index": "filebeat-7.2.0-2019.07.04-000001",
+  "_type": "_doc",
+  "_id": "w07vvmsBxi2B1GAoVmvm",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "agent": {
+      "hostname": "7fcc397807ee",
+      "id": "1c768e8d-10df-44e5-a0e8-07dd14bbfc58",
+      "type": "filebeat",
+      "ephemeral_id": "9dc57b56-3ba3-4f79-a452-f9ae0be339b8",
+      "version": "7.2.0"
+    },
+    "log": {
+      "file": {
+        "path": "/var/log/bro/current/kerberos.log"
+      },
+      "offset": 0
+    },
+    "destination": {
+      "address": "192.168.10.10",
+      "port": 88,
+      "ip": "192.168.10.10"
+    },
+    "zeek": {
+      "session_id": "C56Flhb4WQBNkfMOl",
+      "kerberos": {
+        "cipher": "aes256-cts-hmac-sha1-96",
+        "valid_until": "2037-09-13T02:48:05.000Z",
+        "request_type": "TGS",
+        "renewable": true,
+        "success": true,
+        "service": "HOST/admin-pc",
+        "client": "RonHD/CONTOSO.LOCAL",
+        "forwardable": true
+      }
+    },
+    "source": {
+      "address": "192.168.10.31",
+      "port": 49242,
+      "ip": "192.168.10.31"
+    },
+    "fileset": {
+      "name": "kerberos"
+    },
+    "network": {
+      "community_id": "1:DW/lSsosl8gZ8pqO9kKMm7cZheQ=",
+      "transport": "tcp"
+    },
+    "tags": [
+      "zeek.kerberos"
+    ],
+    "input": {
+      "type": "log"
+    },
+    "@timestamp": 1507565599000,
+    "ecs": {
+      "version": "1.0.0"
+    },
+    "service": {
+      "type": "zeek"
+    },
+    "host": {
+      "name": "7fcc397807ee"
+    },
+    "event": {
+      "created": "2019-07-04T21:41:23.265Z",
+      "module": "zeek",
+      "id": "C56Flhb4WQBNkfMOl",
+      "dataset": "zeek.kerberos"
+    }
+  },
+  "fields": {
+    "@timestamp": [
+      "2017-10-09T16:13:19.000Z"
+    ],
+    "event.created": [
+      "2019-07-04T21:41:23.265Z"
+    ],
+    "suricata.eve.timestamp": [
+      "2017-10-09T16:13:19.000Z"
+    ]
+  }
+}
