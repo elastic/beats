@@ -91,16 +91,11 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 
 // GenerateAllInOneFieldsGo generates an all-in-one fields.go file.
 func GenerateAllInOneFieldsGo() error {
-	return GenerateFieldsGo("fields.yml", "include/fields.go")
+	return GenerateFieldsGo(BeatName, "fields.yml", "include/fields.go")
 }
 
 // GenerateFieldsGo generates a .go file containing the fields.yml data.
-func GenerateFieldsGo(fieldsYML, out string) error {
-	return GenerateFieldsGoWithName(BeatName, fieldsYML, out)
-}
-
-// GenerateFieldsGoWithName generates a .go file containing the fields.yml data with configured Beat name.
-func GenerateFieldsGoWithName(beatName, fieldsYML, out string) error {
+func GenerateFieldsGo(beatName, fieldsYML, out string) error {
 	const assetCmdPath = "dev-tools/cmd/asset/asset.go"
 
 	beatsDir, err := ElasticBeatsDir()

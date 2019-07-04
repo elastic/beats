@@ -71,5 +71,5 @@ func (b fieldsBuilder) commonFieldsGo() error {
 		return err
 	}
 	defer os.Remove(file)
-	return devtools.GenerateFieldsGo(file, "include/fields.go")
+	return devtools.GenerateFieldsGo(devtools.BeatName, file, "include/fields.go")
 }
