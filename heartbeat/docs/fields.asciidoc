@@ -313,6 +313,16 @@ type: keyword
 
 --
 
+*`monitor.continuous_status_segment`*::
++
+--
+A UUID representing a continuous state from the perspective of the beat.
+
+
+type: keyword
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 

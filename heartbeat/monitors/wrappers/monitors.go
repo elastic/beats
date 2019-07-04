@@ -121,6 +121,115 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 	}
 }
 
+const FlappingThreshold time.Duration = time.Minute
+
+const (
+	StatusUp stateStatus = iota
+	StatusDown
+	StatusMixed
+)
+
+type stateStatus int8
+
+type historicalStatus struct {
+	ts     time.Time
+	status stateStatus
+}
+
+type monitorState struct {
+	startedAt   time.Time
+	status      stateStatus
+	flapHistory []historicalStatus
+}
+
+func (state *monitorState) isFlapping() bool {
+	return len(state.flapHistory) > 0
+}
+
+func (state *monitorState) isStateStillStable(currentStatus stateStatus) bool {
+	return state.status == currentStatus && state.isFlapping()
+}
+
+func (state *monitorState) flapCompute(currentStatus stateStatus) bool {
+	state.flapHistory = append(state.flapHistory, historicalStatus{time.Now(), state.status})
+	state.status = currentStatus
+
+	// Figure out which values are old enough that we can discard them for our calculation
+	cutOff := time.Now().Add(-FlappingThreshold)
+	discardIndex := -1
+	for idx, hs := range state.flapHistory {
+		if hs.ts.Before(cutOff) {
+			discardIndex = idx
+		} else {
+			break
+		}
+	}
+	// Do the discarding
+	if discardIndex != -1 {
+		state.flapHistory = state.flapHistory[discardIndex+1:]
+	}
+
+	// Check to see if we are no longer flapping, and if so clear flap history
+	for _, hs := range state.flapHistory {
+		if hs.status != currentStatus {
+			return false
+		}
+	}
+	return true
+}
+
+func NewMonitorState(currentStatus stateStatus) *monitorState {
+	return &monitorState{
+		startedAt: time.Now(),
+		status:    currentStatus,
+	}
+}
+
+type monitorStateTracker struct {
+	states map[string]*monitorState
+}
+
+func (mst *monitorStateTracker) get(monitorId string, currentStatus stateStatus) (state *monitorState) {
+	if state, ok := mst.states[monitorId]; ok {
+		if state.isFlapping() {
+			// Check to see if there's still an ongoing flap after recording
+			// the new status
+			if state.flapCompute(currentStatus) {
+				fmt.Printf("STABLE FLAP\n")
+				return state
+			} else {
+				fmt.Printf("EXIT FLAP\n")
+				state = NewMonitorState(currentStatus)
+				mst.states[monitorId] = state
+				return state
+			}
+		} else if state.status == currentStatus {
+			// The state is stable, no changes needed
+			fmt.Printf("STABLE STATE\n")
+			return state
+		} else if state.startedAt.After(time.Now().Add(-FlappingThreshold)) {
+			state.flapCompute(currentStatus) // record the new state to the flap history
+			fmt.Printf("ENTER FLAP\n")
+			return state
+		}
+	}
+
+	fmt.Printf("NEW STATE\n")
+	// No previous state, so make a new one
+	state = NewMonitorState(currentStatus)
+	mst.states[monitorId] = state
+	return state
+}
+
+func (mst *monitorStateTracker) getID(monitorId string, currentStatus stateStatus) time.Time {
+	return mst.get(monitorId, currentStatus).startedAt
+}
+
+// TODO this is obviously a memory leak and for the POC only
+var stateTracker = &monitorStateTracker{
+	states: map[string]*monitorState{},
+}
+
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
 func makeAddSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
@@ -177,7 +286,20 @@ func makeAddSummary() jobs.JobWrapper {
 
 			// After last job
 			if state.remaining == 0 {
+				monitorId, _ := event.GetValue("monitor.id")
+				var trackerStatus stateStatus
+				if state.down == 0 {
+					trackerStatus = StatusUp
+				} else if state.up > 0 {
+					trackerStatus = StatusMixed
+				} else {
+					trackerStatus = StatusDown
+				}
+				monitorIdString, _ := monitorId.(string)
 				eventext.MergeEventFields(event, common.MapStr{
+					"monitor": common.MapStr{
+						"continuous_status_segment": stateTracker.getID(monitorIdString, trackerStatus),
+					},
 					"summary": common.MapStr{
 						"up":   state.up,
 						"down": state.down,
