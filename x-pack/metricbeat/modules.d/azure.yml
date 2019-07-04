@@ -7,13 +7,32 @@
   client_secret: ''
   tenant_id: ''
   subscription_id: ''
-  metrics:
-  - resource_id: ""
-    namespace: ""
-    name: ""
-  - resource_group: ""
-    resource_type: ""
-    name: ""
-
+  refresh_list_interval: 120s
+  resources:
+  - resource_id: "/subscriptions/xxxxx/resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/obsapimanagement"
+    namespaces:
+    - name: "Microsoft.ApiManagement/service"
+      metrics:
+      - name: "Requests"
+        aggregations: ["Maximum"]
+        dimensions:
+        - name: "Hostname"
+          value: "obsapimanagement.azure-api.net"
+      - name: ["Capacity", "Requests"]
+        aggregations: ["Average"]
+        dimensions:
+        - name: "Location"
+          value: "West Europe"
+  - resource_group: "obs-infrastructure"
+    resource_type: "Microsoft.Compute/virtualMachines"
+    namespaces:
+    - name: "Microsoft.Compute/virtualMachines"
+      metrics:
+      - name: "Percentage CPU"
+        aggregations: ["Average", "Minimum", "Maximum"]
+    - name: "Microsoft.Compute/virtualMachines"
+      metrics:
+      - name: ["Disk Read Bytes", "Data Disk Write Operations/Sec", "Network Out"]
+        aggregations: ["Average", "Maximum"]
 
 

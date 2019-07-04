@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/azure"
@@ -22,7 +21,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	client *AzureMonitorClient
+	client *Client
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -34,10 +33,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
 	}
-	if len(config.Metrics) == 0 {
+	if len(config.Resources) == 0 {
 		return nil, errors.New("no metrics defined")
 	}
-	var monitorClient AzureMonitorClient
+	var monitorClient Client
 	monitorClient.New(config)
 	monitorClient.InitResources()
 
@@ -51,22 +50,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	for _, metric := range m.client.metrics {
-		values, err := m.client.GetMetricsData(metric)
-		if err != nil {
-			return nil
-		}
-		report.Event(mb.Event{
-			MetricSetFields: common.MapStr{
-				"resource": common.MapStr{
-					"id": metric.resourcePath,
-					"metric": common.MapStr{
-						"name":  metric.name,
-						"value": values[0].total,
-					},
-				},
-			},
-		})
+	err := m.client.InitResources()
+	if err != nil {
+		return nil
 	}
+	err = m.client.GetMetricValues()
+	if err != nil {
+		return nil
+	}
+	eventsMapping(report, m.client.resources.metrics)
+
 	return nil
 }

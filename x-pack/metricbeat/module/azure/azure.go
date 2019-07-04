@@ -29,21 +29,38 @@ import (
 
 // Config options
 type Config struct {
-	ClientId       string         `config:"client_id"    validate:"required"`
-	ClientSecret   string         `config:"client_secret" validate:"required"`
-	TenantId       string         `config:"tenant_id" validate:"required"`
-	SubscriptionId string         `config:"subscription_id" validate:"required"`
-	Period         time.Duration  `config:"period"`
-	Metrics        []MetricConfig `config:"metrics"`
+	ClientId            string           `config:"client_id"    validate:"required"`
+	ClientSecret        string           `config:"client_secret" validate:"required"`
+	TenantId            string           `config:"tenant_id" validate:"required"`
+	SubscriptionId      string           `config:"subscription_id" validate:"required"`
+	Period              time.Duration    `config:"period"`
+	Resources           []ResourceConfig `config:"resources"`
+	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
 }
 
 // MetricConfig contains metric specific configuration.
+type ResourceConfig struct {
+	Id        string            `config:"resource_id"`
+	Group     string            `config:"resource_group"`
+	Namespace []NamespaceConfig `config:"namespaces"`
+	Type      string            `config:"resource_type"`
+	Query     string            `config:"resource_query"`
+}
+
+type NamespaceConfig struct {
+	Name    string         `config:"name"`
+	Metrics []MetricConfig `config:"metrics"`
+}
+
 type MetricConfig struct {
-	ResourceId    string `config:"resource_id"`
-	ResourceGroup string `config:"resource_group"`
-	MetricName    string `config:"name"`
-	Namespace     string `config:"namespace"`
-	ResourceType  string `config:"resource_type"`
+	Name         []string          `config:"name"`
+	Aggregations []string          `config:"aggregations"`
+	Dimensions   []DimensionConfig `config:"dimensions"`
+}
+
+type DimensionConfig struct {
+	Name  string `config:"name"`
+	Value string `config:"value"`
 }
 
 func init() {
