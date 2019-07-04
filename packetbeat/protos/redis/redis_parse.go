@@ -44,15 +44,11 @@ type redisMessage struct {
 	message   common.NetString
 	method    common.NetString
 	path      common.NetString
-
-	next *redisMessage
 }
 
-const (
-	start = iota
-	bulkArray
-	simpleMessage
-)
+func (msg *redisMessage) Size() int {
+	return len(msg.message)
+}
 
 var (
 	empty    = common.NetString("")

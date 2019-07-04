@@ -40,22 +40,18 @@ type stream struct {
 
 type redisConnectionData struct {
 	streams   [2]*stream
-	requests  messageList
-	responses messageList
-}
-
-type messageList struct {
-	head, tail *redisMessage
+	requests  MessageQueue
+	responses MessageQueue
 }
 
 // Redis protocol plugin
 type redisPlugin struct {
 	// config
-	ports        []int
-	sendRequest  bool
-	sendResponse bool
-
+	ports              []int
+	sendRequest        bool
+	sendResponse       bool
 	transactionTimeout time.Duration
+	queueConfig        MessageQueueConfig
 
 	results protos.Reporter
 }
@@ -67,6 +63,7 @@ var (
 
 var (
 	unmatchedResponses = monitoring.NewInt(nil, "redis.unmatched_responses")
+	unmatchedRequests  = monitoring.NewInt(nil, "redis.unmatched_requests")
 )
 
 func init() {
@@ -106,6 +103,7 @@ func (redis *redisPlugin) setFromConfig(config *redisConfig) {
 	redis.sendRequest = config.SendRequest
 	redis.sendResponse = config.SendResponse
 	redis.transactionTimeout = config.TransactionTimeout
+	redis.queueConfig = config.QueueLimits
 }
 
 func (redis *redisPlugin) GetPorts() []int {
@@ -130,27 +128,33 @@ func (redis *redisPlugin) Parse(
 ) protos.ProtocolData {
 	defer logp.Recover("ParseRedis exception")
 
-	conn := ensureRedisConnection(private)
+	conn := redis.ensureRedisConnection(private)
 	conn = redis.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
 	}
 	return conn
 }
+func (redis *redisPlugin) newConnectionData() *redisConnectionData {
+	return &redisConnectionData{
+		requests:  NewMessageQueue(redis.queueConfig),
+		responses: NewMessageQueue(redis.queueConfig),
+	}
+}
 
-func ensureRedisConnection(private protos.ProtocolData) *redisConnectionData {
+func (redis *redisPlugin) ensureRedisConnection(private protos.ProtocolData) *redisConnectionData {
 	if private == nil {
-		return &redisConnectionData{}
+		return redis.newConnectionData()
 	}
 
 	priv, ok := private.(*redisConnectionData)
 	if !ok {
 		logp.Warn("redis connection data type error, create new one")
-		return &redisConnectionData{}
+		return redis.newConnectionData()
 	}
 	if priv == nil {
 		logp.Warn("Unexpected: redis connection data not set, create new one")
-		return &redisConnectionData{}
+		return redis.newConnectionData()
 	}
 
 	return priv
@@ -244,29 +248,37 @@ func (redis *redisPlugin) handleRedis(
 	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isRequest {
-		conn.requests.append(m) // wait for response
+		// wait for response
+		if evicted := conn.requests.Append(m); evicted > 0 {
+			unmatchedRequests.Add(int64(evicted))
+		}
 	} else {
-		conn.responses.append(m)
+		if evicted := conn.responses.Append(m); evicted > 0 {
+			unmatchedResponses.Add(int64(evicted))
+		}
 		redis.correlate(conn)
 	}
 }
 
 func (redis *redisPlugin) correlate(conn *redisConnectionData) {
 	// drop responses with missing requests
-	if conn.requests.empty() {
-		for !conn.responses.empty() {
+	if conn.requests.IsEmpty() {
+		for !conn.responses.IsEmpty() {
 			debugf("Response from unknown transaction. Ignoring")
 			unmatchedResponses.Add(1)
-			conn.responses.pop()
+			conn.responses.Pop()
 		}
 		return
 	}
 
 	// merge requests with responses into transactions
-	for !conn.responses.empty() && !conn.requests.empty() {
-		requ := conn.requests.pop()
-		resp := conn.responses.pop()
-
+	for !conn.responses.IsEmpty() && !conn.requests.IsEmpty() {
+		requ, okReq := conn.requests.Pop().(*redisMessage)
+		resp, okResp := conn.responses.Pop().(*redisMessage)
+		if !okReq || !okResp {
+			logp.Err("invalid type found in message queue")
+			continue
+		}
 		if redis.results != nil {
 			event := redis.newTransaction(requ, resp)
 			redis.results(event)
@@ -341,35 +353,4 @@ func (redis *redisPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	// TODO: check if we have pending data that we can send up the stack
 
 	return private
-}
-
-func (ml *messageList) append(msg *redisMessage) {
-	if ml.tail == nil {
-		ml.head = msg
-	} else {
-		ml.tail.next = msg
-	}
-	msg.next = nil
-	ml.tail = msg
-}
-
-func (ml *messageList) empty() bool {
-	return ml.head == nil
-}
-
-func (ml *messageList) pop() *redisMessage {
-	if ml.head == nil {
-		return nil
-	}
-
-	msg := ml.head
-	ml.head = ml.head.next
-	if ml.head == nil {
-		ml.tail = nil
-	}
-	return msg
-}
-
-func (ml *messageList) last() *redisMessage {
-	return ml.tail
 }
