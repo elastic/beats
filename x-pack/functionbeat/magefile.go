@@ -9,28 +9,26 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
+
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/target/integtest"
 	functionbeat "github.com/elastic/beats/x-pack/functionbeat/scripts/mage"
 )
 
-var (
-	availableProviders = []string{
-		"aws",
-	}
-	selectedProviders []string
-)
+var ()
 
 func init() {
 	devtools.BeatDescription = "Functionbeat is a beat implementation for a serverless architecture."
 	devtools.BeatLicense = "Elastic License"
-	selectedProviders = getConfiguredProviders()
 }
 
 // Build builds the Beat binary.
@@ -64,7 +62,7 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	for _, provider := range selectedProviders {
+	for _, provider := range functionbeat.SelectedProviders {
 		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", provider))
 		if err != nil {
 			return err
@@ -78,10 +76,20 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
+// Update is an alias for update:all. This is a workaround for
+// https://github.com/magefile/mage/issues/217.
+func Update() {
+	fmt.Printf("baba %+v\n", functionbeat.Update.All)
+	mg.Deps(functionbeat.Update.All)
 }
+
+// Update is an alias for update:fields. This is a workaround for
+// https://github.com/magefile/mage/issues/217.
+func Fields() { mg.Deps(functionbeat.Update.Fields) }
+
+// Update is an alias for update:config. This is a workaround for
+// https://github.com/magefile/mage/issues/217.
+func Config() { mg.Deps(functionbeat.Update.Config) }
 
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
@@ -92,125 +100,29 @@ func Package() {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	for _, provider := range selectedProviders {
+	for _, provider := range functionbeat.SelectedProviders {
 		devtools.MustUsePackaging("functionbeat", "x-pack/functionbeat/dev-tools/packaging/packages.yml")
 		for _, args := range devtools.Packages {
 			args.Spec.ExtraVar("Provider", provider)
 		}
 
-		mg.SerialDeps(devtools.Package, TestPackages)
+		mg.Deps(devtools.Package)
+		mg.Deps(devtools.TestPackages)
 	}
-}
-
-// TestPackages tests the generated packages (i.e. file modes, owners, groups).
-func TestPackages() error {
-	return devtools.TestPackages()
-}
-
-// Update updates the generated files (aka make update).
-func Update() {
-	mg.SerialDeps(Fields, Config, includeFields, docs)
-}
-
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-}
-
-// Config generates both the short and reference configs.
-func Config() error {
-	for _, provider := range selectedProviders {
-		devtools.BeatIndexPrefix += "-" + provider
-		err := devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, functionbeat.XPackConfigFileParams(provider), provider)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	for _, provider := range selectedProviders {
-		output := filepath.Join(devtools.CWD(), provider, "fields.yml")
-		err := devtools.GenerateFieldsYAMLTo(output)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func includeFields() error {
-	fnBeatDir := devtools.CWD()
-	for _, provider := range selectedProviders {
-		err := os.Chdir(filepath.Join(fnBeatDir, provider))
-		if err != nil {
-			return err
-		}
-		output := filepath.Join(fnBeatDir, provider, "include", "fields.go")
-		err = devtools.GenerateFieldsGoWithName(devtools.BeatName+"-"+provider, "fields.yml", output)
-		if err != nil {
-			return err
-		}
-	}
-	os.Chdir(fnBeatDir)
-	return nil
-}
-
-func docs() error {
-	for _, provider := range selectedProviders {
-		fieldsYml := filepath.Join(devtools.CWD(), provider, "fields.yml")
-		err := devtools.Docs.FieldDocs(fieldsYml)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	devtools.AddIntegTestUsage()
 	defer devtools.StopIntegTestEnv()
-	mg.SerialDeps(GoIntegTest, PythonIntegTest)
-}
-
-// GoIntegTest executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoIntegTest(ctx context.Context) error {
-	return devtools.RunIntegTest("goIntegTest", func() error {
-		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-	})
+	mg.SerialDeps(integtest.GoIntegTest, PythonIntegTest)
 }
 
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.Deps(BuildSystemTestBinary)
 	args := devtools.DefaultPythonTestIntegrationArgs()
-	for _, provider := range selectedProviders {
+	for _, provider := range functionbeat.SelectedProviders {
 		args.Env = map[string]string{
 			"CURRENT_PROVIDER": provider,
 		}
@@ -225,22 +137,10 @@ func PythonUnitTest() error {
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
+		mg.Deps(functionbeat.Update.Fields)
 	}
 	return devtools.RunIntegTest("pythonIntegTest", func() error {
-		mg.Deps(BuildSystemTestBinary)
-		args := devtools.DefaultPythonTestIntegrationArgs()
-
-		for _, provider := range selectedProviders {
-			args.Env = map[string]string{
-				"CURRENT_PROVIDER": provider,
-			}
-			err := devtools.PythonNoseTest(args)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
+		return PythonUnitTest()
 	})
 }
 
@@ -248,25 +148,18 @@ func PythonIntegTest(ctx context.Context) error {
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
 func BuildSystemTestBinary() error {
-	workingDir := devtools.CWD()
-	for _, provider := range selectedProviders {
-		err := os.Chdir(workingDir + "/" + provider)
-		if err != nil {
-			return err
+	params := devtools.DefaultTestBinaryArgs()
+	for _, provider := range functionbeat.SelectedProviders {
+		params.Name = devtools.BeatName + "-" + provider
+		inputFiles := make([]string, 0)
+		for _, inputFileName := range []string{"main.go", "main_test.go"} {
+			inputFiles = append(inputFiles, filepath.Join(provider, inputFileName))
 		}
-		err = devtools.BuildSystemTestBinary(devtools.TestBinaryArgs{Name: devtools.BeatName + "-" + provider})
+		params.InputFiles = inputFiles
+		err := devtools.BuildSystemTestBinary(params)
 		if err != nil {
 			return err
 		}
 	}
-	return os.Chdir(workingDir)
-}
-
-func getConfiguredProviders() []string {
-	providers := os.Getenv("PROVIDERS")
-	if len(providers) == 0 {
-		return availableProviders
-	}
-
-	return strings.Split(providers, ",")
+	return nil
 }

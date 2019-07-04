@@ -53,14 +53,10 @@ type GoTestArgs struct {
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
 }
 
+// TestBinaryArgs are the arguments used when building binary for testing.
 type TestBinaryArgs struct {
-	Name string // Name of the binary to build
-}
-
-func DefaultTestBinaryArgs() TestBinaryArgs {
-	return TestBinaryArgs{
-		Name: BeatName,
-	}
+	Name       string // Name of the binary to build
+	InputFiles []string
 }
 
 func makeGoTestArgs(name string) GoTestArgs {
@@ -88,6 +84,14 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
 	return args
+}
+
+// DefaultGoTestIntegrationArgs returns the default arguments for building
+// a binary for testing.
+func DefaultTestBinaryArgs() TestBinaryArgs {
+	return TestBinaryArgs{
+		Name: BeatName,
+	}
 }
 
 // GoTest invokes "go test" and reports the results to stdout. It returns an
@@ -349,6 +353,9 @@ func BuildSystemTestBinary(binArgs TestBinaryArgs) error {
 	}
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
+	}
+	if len(binArgs.InputFiles) > 0 {
+		args = append(args, binArgs.InputFiles...)
 	}
 	return sh.RunV("go", args...)
 }
