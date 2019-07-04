@@ -15,6 +15,7 @@ import (
 // Update target namespace.
 type Update mg.Namespace
 
+// Aliases stores aliases for the targets.
 var Aliases = map[string]interface{}{
 	"update": Update.All,
 }

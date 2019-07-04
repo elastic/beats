@@ -86,7 +86,7 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	return args
 }
 
-// DefaultGoTestIntegrationArgs returns the default arguments for building
+// DefaultTestBinaryArgs returns the default arguments for building
 // a binary for testing.
 func DefaultTestBinaryArgs() TestBinaryArgs {
 	return TestBinaryArgs{
