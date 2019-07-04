@@ -155,6 +155,15 @@ var (
 				"free_in_bytes":      c.Int("free_in_bytes"),
 				"available_in_bytes": c.Int("available_in_bytes"),
 			}),
+			"io_stats": c.Dict("io_stats", s.Schema{
+				"total": c.Dict("total", s.Schema{
+					"operations":       c.Int("operations"),
+					"read_kilobytes":   c.Int("read_kilobytes"),
+					"read_operations":  c.Int("read_operations"),
+					"write_kilobytes":  c.Int("write_kilobytes"),
+					"write_operations": c.Int("write_operations"),
+				}, c.DictOptional),
+			}, c.DictOptional),
 		}),
 	}
 
