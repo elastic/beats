@@ -4,25 +4,19 @@
 package mage
 
 import (
-	"log"
 	"os"
 	"strings"
 )
 
 var (
+	// SelectedProviders is the list of selected providers
+	// Can be configured by setting PROVIDERS enviroment variable.
+	SelectedProviders = getConfiguredProviders()
+
 	availableProviders = []string{
 		"aws",
 	}
-
-	// SelectedProviders is the list of selected providers
-	// Can be configured by setting PROVIDERS enviroment variable.
-	SelectedProviders []string
 )
-
-func init() {
-	SelectedProviders := getConfiguredProviders()
-	log.Println("Selected providers:", SelectedProviders)
-}
 
 func getConfiguredProviders() []string {
 	providers := os.Getenv("PROVIDERS")

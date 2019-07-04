@@ -78,16 +78,13 @@ func CrossBuildGoDaemon() error {
 
 // Update is an alias for update:all. This is a workaround for
 // https://github.com/magefile/mage/issues/217.
-func Update() {
-	fmt.Printf("baba %+v\n", functionbeat.Update.All)
-	mg.Deps(functionbeat.Update.All)
-}
+func Update() { mg.Deps(functionbeat.Update.All) }
 
-// Update is an alias for update:fields. This is a workaround for
+// Fields is an alias for update:fields. This is a workaround for
 // https://github.com/magefile/mage/issues/217.
 func Fields() { mg.Deps(functionbeat.Update.Fields) }
 
-// Update is an alias for update:config. This is a workaround for
+// Config is an alias for update:config. This is a workaround for
 // https://github.com/magefile/mage/issues/217.
 func Config() { mg.Deps(functionbeat.Update.Config) }
 

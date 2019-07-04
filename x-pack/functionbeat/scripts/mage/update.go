@@ -10,15 +10,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/target/common"
-	"github.com/elastic/beats/dev-tools/mage/target/docs"
 )
-
-func init() {
-	common.RegisterCheckDeps(Update.All)
-
-	docs.RegisterDeps(Update.FieldDocs)
-}
 
 // Update target namespace.
 type Update mg.Namespace
@@ -29,7 +21,7 @@ var Aliases = map[string]interface{}{
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.Config, Update.FieldDocs)
+	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs)
 }
 
 // Config generates both the short and reference configs.
@@ -47,7 +39,7 @@ func (Update) Config() error {
 
 // Fields generates a fields.yml for the Beat.
 func (Update) Fields() error {
-	for _, provider := range SelectedProviders {
+	for _, provider := range getConfiguredProviders() {
 		output := filepath.Join(devtools.CWD(), provider, "fields.yml")
 		err := devtools.GenerateFieldsYAMLTo(output)
 		if err != nil {
@@ -57,19 +49,21 @@ func (Update) Fields() error {
 	return nil
 }
 
+// FieldDocs collects all fields by provider and generates documentation for them.
 func (Update) FieldDocs() error {
-	mg.Deps(includeFields)
+	var inputs []string
 	for _, provider := range SelectedProviders {
-		fieldsYml := filepath.Join(devtools.CWD(), provider, "fields.yml")
-		err := devtools.Docs.FieldDocs(fieldsYml)
-		if err != nil {
-			return err
-		}
+		inputs = append(inputs, provider)
 	}
-	return nil
+	output := devtools.CreateDir("build/fields/fields.all.yml")
+	if err := devtools.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+		return err
+	}
+	return devtools.Docs.FieldDocs(output)
 }
 
-func includeFields() error {
+// IncludeFields generates include/fields.go by provider.
+func (Update) IncludeFields() error {
 	mg.Deps(Update.Fields)
 	for _, provider := range SelectedProviders {
 		input := filepath.Join(provider, "fields.yml")
