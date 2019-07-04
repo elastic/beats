@@ -199,6 +199,13 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
+		mlockall, err := elasticsearch.IsMLockAllEnabled(m.HTTP, m.HTTP.GetURI(), nodeID)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		nodeData["mlockall"] = mlockall
+
 		// Build source_node object
 		sourceNode := common.MapStr{
 			"uuid":              nodeID,
