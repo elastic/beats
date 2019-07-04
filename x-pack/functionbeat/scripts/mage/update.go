@@ -34,8 +34,9 @@ func (Update) All() {
 
 // Config generates both the short and reference configs.
 func (Update) Config() error {
+	idxPrefix := devtools.BeatIndexPrefix
 	for _, provider := range SelectedProviders {
-		devtools.BeatIndexPrefix += "-" + provider
+		devtools.BeatIndexPrefix = idxPrefix + "-" + provider
 		err := devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, XPackConfigFileParams(provider), provider)
 		if err != nil {
 			return err
