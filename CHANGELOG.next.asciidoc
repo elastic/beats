@@ -208,6 +208,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add MSSQL module {pull}12079[12079]
 - Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
 - Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
+- Add support for virtual host in Apache access logs {pull}xxxx[xxxxx]
 
 *Heartbeat*
 

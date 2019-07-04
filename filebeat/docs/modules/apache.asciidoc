@@ -84,3 +84,14 @@ include::../include/var-paths.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-apache,exported fields>> section.
 
+=== Virtual Host
+
+See customlog documentation  https://httpd.apache.org/docs/2.4/en/mod/mod_log_config.html
+Add %v config in httpd.conf in log section
+["source","sh",subs="attributes"]
+-----
+    # Replace
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    # By
+    LogFormat "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+-----
