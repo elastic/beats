@@ -1214,8 +1214,11 @@ Note: If set to 0, no ACKs are returned by Kafka. Messages might be lost silentl
 
 ===== `ssl`
 
-Configuration options for SSL parameters like the root CA for Kafka connections. See
-<<configuration-ssl>> for more information.
+Configuration options for SSL parameters like the root CA for Kafka connections.
+ The Kafka host keystore should be created with the
+`-keyalg RSA` argument to ensure it uses a cipher supported by
+https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions#why-cant-sarama-connect-to-my-kafka-cluster-using-ssl[Filebeat's Kafka library].
+See <<configuration-ssl>> for more information.
 
 //begin inner exclude for redis
 ifndef::no-redis-output[]
