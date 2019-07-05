@@ -2,9 +2,21 @@
   "description": "Pipeline for normalizing Zeek smb_files.log",
   "processors": [
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['smb_files']['ts'] * 1000; ctx.zeek.smb_files.remove('ts');"
+      "date": {
+        "field": "@timestamp",
+        "target_field": "event.created",
+        "formats": ["ISO8601"]
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.smb_files.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.smb_files.ts"
       }
     },
     {

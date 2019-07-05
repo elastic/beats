@@ -32,6 +32,9 @@ processors:
 
         - from: "zeek.ntlm.uid"
           to: "zeek.session_id"
+
+        - from: "zeek.ntlm.domainname"
+          to: "zeek.ntlm.domain"
         
         - from: "zeek.ntlm.server_dns_computer_name"
           to: "zeek.ntlm.server.dns_name"

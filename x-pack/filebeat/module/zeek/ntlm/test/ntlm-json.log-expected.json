@@ -30,7 +30,7 @@
           "dns_name": "Victim-PC.contoso.local"
         },
         "hostname": "ybaARon55QykXrgu",
-        "domainname": "contoso.local",
+        "domain": "contoso.local",
         "username": "JeffV"
       },
       "session_id": "CHphiNUKDC20fsy09"

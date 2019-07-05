@@ -37,7 +37,7 @@
           "mac": "00:0c:29:03:df:ad"
         },
         "lease_time": 1800,
-        "domainname": "localdomain",
+        "domain": "localdomain",
         "msg_types": [
           "REQUEST",
           "ACK"

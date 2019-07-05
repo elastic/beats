@@ -2,9 +2,21 @@
   "description": "Pipeline for normalizing Zeek dhcp.log",
   "processors": [
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['dhcp']['ts'] * 1000; ctx.zeek.dhcp.remove('ts');"
+      "date": {
+        "field": "@timestamp",
+        "target_field": "event.created",
+        "formats": ["ISO8601"]
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.dhcp.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.dhcp.ts"
       }
     },
     {

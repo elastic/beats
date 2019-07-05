@@ -39,8 +39,5 @@ processors:
         - from: "zeek.dhcp.host_name"
           to: "zeek.dhcp.hostname"
 
-        - from: "zeek.dhcp.domain"
-          to: "zeek.dhcp.domainname"
-
       ignore_missing: true
       fail_on_error: false
