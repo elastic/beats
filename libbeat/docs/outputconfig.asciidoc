@@ -755,15 +755,14 @@ input {
 output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
-    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" <1>
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}" <1>
   }
 }
 ------------------------------------------------------------------------------
 <1> `%{[@metadata][beat]}` sets the first part of the index name to the value
-of the `beat` metadata field, `%{[@metadata][version]}` sets the second part to
-the Beat's version, and `%{+YYYY.MM.dd}` sets the third part of the
-name to a date based on the Logstash `@timestamp` field. For example:
-+{beat_default_index_prefix}-{version}-2017.03.29+.
+of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to
+the Beat's version. For example:
++{beat_default_index_prefix}-{version}+.
 
 Events indexed into Elasticsearch with the Logstash configuration shown here
 will be similar to events directly indexed by Beats into Elasticsearch.
