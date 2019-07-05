@@ -1,9 +1,5 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
         "dataset": "rabbitmq.queue",
         "duration": 115000,
@@ -69,7 +65,7 @@
         "vhost": "/"
     },
     "service": {
-        "address": "127.0.0.1:53995",
+        "address": "127.0.0.1:55555",
         "type": "rabbitmq"
     }
 }
