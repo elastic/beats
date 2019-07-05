@@ -10,13 +10,15 @@
     {
       "set": {
         "field": "source.ip",
-        "value": "{{zeek.dhcp.address.client}}"
+        "value": "{{zeek.dhcp.address.client}}",
+        "if": "ctx.zeek.dhcp.address.client != null"
       }
     },
     {
       "set": {
         "field": "destination.ip",
-        "value": "{{zeek.dhcp.address.server}}"
+        "value": "{{zeek.dhcp.address.server}}",
+        "if": "ctx.zeek.dhcp.address.server != null"
       }
     },
     {
