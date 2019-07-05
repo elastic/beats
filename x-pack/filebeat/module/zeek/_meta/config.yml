@@ -19,6 +19,8 @@
     enabled: true
   smb_mapping:
     enabled: true
+  ssh:
+    enabled: true
   ssl:
     enabled: true
 

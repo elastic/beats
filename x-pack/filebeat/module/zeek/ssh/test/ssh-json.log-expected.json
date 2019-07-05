@@ -1,0 +1,78 @@
+{
+  "_index": "filebeat-7.2.0-2019.07.05-000001",
+  "_type": "_doc",
+  "_id": "Yy5Cw2sBiYxzj5FMGqQ2",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "agent": {
+      "hostname": "37f1470a76b2",
+      "id": "d9b369a2-c037-4ea0-b09a-28e3e8307114",
+      "ephemeral_id": "76ad460c-436f-4e3d-a1a1-9a59bb1f5846",
+      "type": "filebeat",
+      "version": "7.2.0"
+    },
+    "log": {
+      "file": {
+        "path": "/var/log/bro/current/ssh.log"
+      },
+      "offset": 0
+    },
+    "destination": {
+      "port": 22,
+      "ip": "10.0.0.2"
+    },
+    "zeek": {
+      "ssh": {
+        "server": "SSH-2.0-Cisco-1.25",
+        "auth_attempts": 0,
+        "client": "SSH-1.99-Cisco-1.25",
+        "version": 1
+      },
+      "session_id": "CrxUm64kkKlNbznWpc"
+    },
+    "source": {
+      "port": 59139,
+      "ip": "10.0.0.1"
+    },
+    "fileset": {
+      "name": "ssh"
+    },
+    "network": {
+      "community_id": "1:8EKL/U5PZ9j4soa5DKyDdATcf+0=",
+      "transport": "tcp"
+    },
+    "tags": [
+      "zeek.ssh"
+    ],
+    "input": {
+      "type": "log"
+    },
+    "@timestamp": "2008-06-20T12:22:20.292Z",
+    "ecs": {
+      "version": "1.0.0"
+    },
+    "service": {
+      "type": "zeek"
+    },
+    "host": {
+      "name": "37f1470a76b2"
+    },
+    "event": {
+      "created": "2019-07-05T17:50:15.947Z",
+      "module": "zeek",
+      "dataset": "zeek.ssh"
+    }
+  },
+  "fields": {
+    "@timestamp": [
+      "2008-06-20T12:22:20.292Z"
+    ],
+    "event.created": [
+      "2019-07-05T17:50:15.947Z"
+    ],
+    "suricata.eve.timestamp": [
+      "2008-06-20T12:22:20.292Z"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "description": "Pipeline for normalizing Zeek ssh.log",
+  "processors": [
+    {
+      "date": {
+        "field": "@timestamp",
+        "target_field": "event.created",
+        "formats": ["ISO8601"]
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.ssh.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.ssh.ts"
+      }
+    }
+  ],
+  "on_failure" : [{ 
+    "set" : { 
+      "field" : "error.message", 
+      "value" : "{{ _ingest.on_failure_message }}" 
+    } 
+  }]
+}
