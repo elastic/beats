@@ -8,25 +8,6 @@
       }
     },
     {
-      "set": {
-        "field": "event.id",
-        "value": "{{zeek.session_id}}",
-        "if": "ctx.zeek.session_id != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}"
-      }
-    },
-    {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}"
-      }
-    },
-    {
       "dot_expander": {
         "field": "times.accessed",
         "path": "zeek.smb_files"

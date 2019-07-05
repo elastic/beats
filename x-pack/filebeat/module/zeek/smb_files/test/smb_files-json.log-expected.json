@@ -19,7 +19,6 @@
       "offset": 965
     },
     "destination": {
-      "address": "192.168.10.30",
       "port": 445,
       "ip": "192.168.10.30"
     },
@@ -39,7 +38,6 @@
       }
     },
     "source": {
-      "address": "192.168.10.31",
       "port": 49239,
       "ip": "192.168.10.31"
     },
@@ -69,7 +67,6 @@
     "event": {
       "created": "2019-07-04T21:41:23.266Z",
       "module": "zeek",
-      "id": "C9YAaEzWLL62yWMn5",
       "dataset": "zeek.smb_files"
     }
   },

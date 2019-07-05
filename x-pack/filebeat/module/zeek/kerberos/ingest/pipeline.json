@@ -8,25 +8,6 @@
       }
     },
     {
-      "set": {
-        "field": "event.id",
-        "value": "{{zeek.session_id}}",
-        "if": "ctx.zeek.session_id != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}"
-      }
-    },
-    {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}"
-      }
-    },
-    {
       "date": {
         "field": "zeek.kerberos.valid_until",
         "target_field": "zeek.kerberos.valid_until",

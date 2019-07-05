@@ -1,0 +1,89 @@
+{
+  "_index": "filebeat-7.2.0-2019.07.05-000001",
+  "_type": "_doc",
+  "_id": "Tk4rwGsBxi2B1GAo-m1S",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "agent": {
+      "hostname": "64b07fdb108a",
+      "id": "0ab013ce-d69d-44d4-b61e-0d2d689e3b4b",
+      "ephemeral_id": "8d251159-78b4-4deb-ae87-9aa8bd8fdda9",
+      "type": "filebeat",
+      "version": "7.2.0"
+    },
+    "log": {
+      "file": {
+        "path": "/var/log/bro/current/dhcp.log"
+      },
+      "offset": 797
+    },
+    "destination": {
+      "ip": "192.168.199.254"
+    },
+    "zeek": {
+      "session_id": [
+        "CmWOt6VWaNGqXYcH6",
+        "CLObLo4YHn0u23Tp8a"
+      ],
+      "dhcp": {
+        "duration": 0.000161,
+        "hostname": "DESKTOP-2AEFM7G",
+        "address": {
+          "server": "192.168.199.254",
+          "requested": "192.168.199.132",
+          "client": "192.168.199.132",
+          "assigned": "192.168.199.132",
+          "mac": "00:0c:29:03:df:ad"
+        },
+        "lease_time": 1800,
+        "domainname": "localdomain",
+        "msg_types": [
+          "REQUEST",
+          "ACK"
+        ]
+      }
+    },
+    "source": {
+      "ip": "192.168.199.132"
+    },
+    "fileset": {
+      "name": "dhcp"
+    },
+    "tags": [
+      "zeek.dhcp"
+    ],
+    "network": {
+      "transport": "udp"
+    },
+    "input": {
+      "type": "log"
+    },
+    "@timestamp": 1476605498000,
+    "ecs": {
+      "version": "1.0.0"
+    },
+    "service": {
+      "type": "zeek"
+    },
+    "host": {
+      "name": "64b07fdb108a"
+    },
+    "event": {
+      "created": "2019-07-05T03:27:14.479Z",
+      "module": "zeek",
+      "dataset": "zeek.dhcp"
+    }
+  },
+  "fields": {
+    "@timestamp": [
+      "2016-10-16T08:11:38.000Z"
+    ],
+    "event.created": [
+      "2019-07-05T03:27:14.479Z"
+    ],
+    "suricata.eve.timestamp": [
+      "2016-10-16T08:11:38.000Z"
+    ]
+  }
+}

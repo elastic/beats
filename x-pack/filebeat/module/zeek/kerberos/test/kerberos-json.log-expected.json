@@ -19,7 +19,6 @@
       "offset": 0
     },
     "destination": {
-      "address": "192.168.10.10",
       "port": 88,
       "ip": "192.168.10.10"
     },
@@ -37,7 +36,6 @@
       }
     },
     "source": {
-      "address": "192.168.10.31",
       "port": 49242,
       "ip": "192.168.10.31"
     },
@@ -67,7 +65,6 @@
     "event": {
       "created": "2019-07-04T21:41:23.265Z",
       "module": "zeek",
-      "id": "C56Flhb4WQBNkfMOl",
       "dataset": "zeek.kerberos"
     }
   },

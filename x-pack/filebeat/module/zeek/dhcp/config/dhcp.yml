@@ -1,0 +1,46 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: udp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.dhcp"
+
+        - from: "zeek.dhcp.uids"
+          to: "zeek.session_id"
+
+        - from: "zeek.dhcp.client_addr"
+          to: "zeek.dhcp.address.client"
+
+        - from: "zeek.dhcp.server_addr"
+          to: "zeek.dhcp.address.server"
+
+        - from: "zeek.dhcp.requested_addr"
+          to: "zeek.dhcp.address.requested"
+
+        - from: "zeek.dhcp.assigned_addr"
+          to: "zeek.dhcp.address.assigned"
+
+        - from: "zeek.dhcp.mac"
+          to: "zeek.dhcp.address.mac"
+
+        - from: "zeek.dhcp.host_name"
+          to: "zeek.dhcp.hostname"
+
+        - from: "zeek.dhcp.domain"
+          to: "zeek.dhcp.domainname"
+
+      ignore_missing: true
+      fail_on_error: false

@@ -1,0 +1,17 @@
+{
+  "description": "Pipeline for normalizing Zeek smb_mapping.log",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['smb_mapping']['ts'] * 1000; ctx.zeek.smb_mapping.remove('ts');"
+      }
+    }
+  ],
+  "on_failure": [{
+    "set": {
+      "field": "error.message",
+      "value": "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

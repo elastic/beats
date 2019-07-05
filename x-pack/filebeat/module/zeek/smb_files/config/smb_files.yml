@@ -19,13 +19,13 @@ processors:
           to: "zeek.smb_files"
 
         - from: "zeek.smb_files.id.orig_h"
-          to: "source.address"
+          to: "source.ip"
 
         - from: "zeek.smb_files.id.orig_p"
           to: "source.port"
 
         - from: "zeek.smb_files.id.resp_h"
-          to: "destination.address"
+          to: "destination.ip"
 
         - from: "zeek.smb_files.id.resp_p"
           to: "destination.port"
@@ -35,9 +35,7 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
+
 {{ if .community_id }}
   - community_id:
-      fields:
-        source_ip: source.address
-        destination_ip: destination.address
 {{ end }}

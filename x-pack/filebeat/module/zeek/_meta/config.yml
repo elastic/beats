@@ -2,6 +2,8 @@
   # All logs
   connection:
     enabled: true
+  dhcp:
+    enabled: true
   dns: 
     enabled: true
   http:
@@ -11,6 +13,8 @@
   kerberos:
     enabled: true
   smb_files:
+    enabled: true
+  smb_mapping:
     enabled: true
   ssl:
     enabled: true

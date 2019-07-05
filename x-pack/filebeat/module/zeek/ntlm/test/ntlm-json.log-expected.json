@@ -19,7 +19,6 @@
       "offset": 6819
     },
     "destination": {
-      "address": "192.168.10.31",
       "port": 445,
       "ip": "192.168.10.31"
     },
@@ -37,7 +36,6 @@
       "session_id": "CHphiNUKDC20fsy09"
     },
     "source": {
-      "address": "192.168.10.50",
       "port": 46785,
       "ip": "192.168.10.50"
     },
@@ -67,7 +65,6 @@
     "event": {
       "created": "2019-07-04T21:41:23.272Z",
       "module": "zeek",
-      "id": "CHphiNUKDC20fsy09",
       "dataset": "zeek.ntlm"
     }
   },

@@ -1,0 +1,35 @@
+{
+  "description": "Pipeline for normalizing Zeek dhcp.log",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['dhcp']['ts'] * 1000; ctx.zeek.dhcp.remove('ts');"
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{zeek.dhcp.address.client}}"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.ip",
+        "value": "{{zeek.dhcp.address.server}}"
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.dhcp.client_fqdn",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure": [{
+    "set": {
+      "field": "error.message",
+      "value": "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}
