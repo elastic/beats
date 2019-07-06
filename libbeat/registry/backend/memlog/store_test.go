@@ -36,7 +36,7 @@ func TestLoadVersion1(t *testing.T) {
 
 	list, err := ioutil.ReadDir(dataHome)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 	cases := list[:0]

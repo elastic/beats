@@ -59,7 +59,7 @@ func (tx *transaction) close() {
 
 func (tx *transaction) Close() error {
 	if tx.active {
-		tx.Rollback()
+		tx.execRollback()
 	}
 	return nil
 }
@@ -69,10 +69,14 @@ func (tx *transaction) Rollback() error {
 		return errTxInactive
 	}
 
+	tx.execRollback()
+	return nil
+}
+
+func (tx *transaction) execRollback() {
 	defer tx.close()
 	tx.mem.Rollback()
 
-	return nil
 }
 
 func (tx *transaction) needsCheckpoint() bool {
@@ -192,9 +196,9 @@ func (tx *transaction) Remove(k backend.Key) (err error) {
 
 func (tx *transaction) Update(k backend.Key, fields interface{}) (err error) {
 	if err = tx.checkWrite(); err == nil {
-		tx.mem.Update(k, fields)
+		err = tx.mem.Update(k, fields)
 	}
-	return
+	return err
 }
 
 func (tx *transaction) EachKey(

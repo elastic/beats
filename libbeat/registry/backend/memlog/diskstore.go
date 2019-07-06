@@ -27,6 +27,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cleanup"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -276,11 +277,9 @@ func (s *diskStore) checkpointTmpFile(baseName string, tbl *hashtable) (string, 
 	}
 
 	ok := false
-	defer func() {
-		if !ok {
-			f.Close()
-		}
-	}()
+	defer cleanup.IfNot(&ok, func() {
+		f.Close()
+	})
 
 	writer := bufio.NewWriterSize(&ensureWriter{f}, s.bufferSize)
 	enc := newJSONEncoder(writer)
@@ -606,11 +605,9 @@ func writeMetaFile(home string, mode os.FileMode) error {
 	}
 
 	ok := false
-	defer func() {
-		if !ok {
-			f.Close()
-		}
-	}()
+	defer cleanup.IfNot(&ok, func() {
+		f.Close()
+	})
 
 	enc := newJSONEncoder(&ensureWriter{f})
 	err = enc.Encode(storeMeta{
@@ -670,7 +667,6 @@ func listDataFiles(home string) ([]dataFileInfo, error) {
 
 	var infos []dataFileInfo
 	for i := range files {
-
 		info, err := os.Lstat(files[i])
 		if err != nil {
 			return nil, err

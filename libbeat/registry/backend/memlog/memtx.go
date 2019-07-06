@@ -205,7 +205,7 @@ func (tx *memTx) insertKV(txRef cacheEntryRef, k []byte, value common.MapStr) {
 	tx.state.setEntry(txRef, entry)
 }
 
-func (tx *memTx) Remove(k []byte) error {
+func (tx *memTx) Remove(k []byte) {
 	key := tx.makeKeyPair(k)
 	txRef := tx.state.find(key)
 
@@ -213,7 +213,7 @@ func (tx *memTx) Remove(k []byte) error {
 	if txRef.IsNil() {
 		ref := tx.store.find(key)
 		if ref.IsNil() {
-			return nil // key does not exist -> done
+			return // key does not exist -> done
 		}
 
 		rawKey = ref.Access().key
@@ -224,7 +224,6 @@ func (tx *memTx) Remove(k []byte) error {
 	entry := txCacheEntry{tx: tx.parent, key: rawKey}
 	entry.recordRemove()
 	tx.state.setEntry(txRef, entry)
-	return nil
 }
 
 func (tx *memTx) cacheEntry(at cacheEntryRef, ref valueRef) cacheEntryRef {

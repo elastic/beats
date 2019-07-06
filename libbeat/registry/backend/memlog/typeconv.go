@@ -24,6 +24,13 @@ import (
 	"github.com/elastic/go-structform/gotype"
 )
 
+// typeConv can convert structured data between arbitrary typed (serializable)
+// go structures and maps/slices/arrays. It uses go-structform/gotype for input
+// and output values each, such that any arbitrary structures can be used.
+//
+// Internally typeConv is used by the ValueDecoder for (de-)serializing an
+// users value into common.MapStr, which is used to store objects in the memory
+// store.
 type typeConv struct {
 	fold   *gotype.Iterator
 	unfold *gotype.Unfolder
@@ -44,12 +51,13 @@ var typeConvPool = sync.Pool{
 
 func newTypeConv() *typeConv {
 	tc := typeConvPool.Get().(*typeConv)
-	tc.init()
 	return tc
 }
 
 func (t *typeConv) release() {
-	typeConvPool.Put(t)
+	if t != nil {
+		typeConvPool.Put(t)
+	}
 }
 
 func (t *typeConv) init() {
