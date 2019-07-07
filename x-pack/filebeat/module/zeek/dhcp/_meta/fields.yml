@@ -1,0 +1,60 @@
+- name: dhcp
+  type: group
+  description: >
+    Fields exported by the Zeek DHCP log
+  fields:
+    - name: domain
+      type: keyword
+      description: >
+        Domain name offered by the DHCP Server
+
+    - name: duration
+      type: float
+      description: >
+        Time taken for the DHCP exchange to complete
+
+    - name: hostname
+      type: keyword
+      description: >
+        Name of the requesting host
+
+    - name: lease_time
+      type: integer
+      description: >
+        Duration of the lease in seconds
+
+    - name: msg_types
+      type: keyword
+      description: >
+        List of DHCP message types seen in this exchange
+
+    - name: address
+      type: group
+      description: >
+        Addresses seen in this DHCP exchange
+      fields:
+        - name: assigned
+          type: ip
+          description: >
+            IP address the client was assigned
+
+        - name: client
+          type: ip
+          description: >
+            IP address of the requesting host
+
+        - name: mac
+          type: keyword
+          description: >
+            MAC address of the requesting host
+
+        - name: requested
+          type: ip
+          description: >
+            IP address the client requested
+
+        - name: server
+          type: ip
+          description: >
+            IP address of the DHCP server
+

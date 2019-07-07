@@ -1,0 +1,108 @@
+- name: dns
+  type: group
+  description: >
+    Fields exported by the Zeek DNS log
+  fields:
+    - name: trans_id
+      type: keyword
+      description: >
+        DNS transaction identifier
+  
+    - name: rtt
+      type: double
+      description: >
+        Round trip time for the query and response
+  
+    - name: query
+      type: keyword
+      description: >
+        The domain name that is the subject of the DNS query
+  
+    - name: qclass
+      type: long
+      description: >
+        The QCLASS value specifying the class of the query
+  
+    - name: qclass_name
+      type: keyword
+      description: >
+        A descriptive name for the class of the query
+  
+    - name: qtype
+      type: long
+      description: >
+        A QTYPE value specifying the type of the query
+  
+    - name: qtype_name
+      type: keyword
+      description: >
+        A descriptive name for the type of the query
+  
+    - name: rcode
+      type: long
+      description: >
+        The response code value in DNS response messages
+  
+    - name: rcode_name
+      type: keyword
+      description: >
+        A descriptive name for the response code value
+  
+    - name: AA
+      type: boolean
+      description: |
+        The Authoritative Answer bit for response messages specifies that the responding 
+        name server is an authority for the domain name in the question section
+  
+    - name: TC
+      type: boolean
+      description: >
+        The Truncation bit specifies that the message was truncated
+  
+    - name: RD
+      type: boolean
+      description: |
+        The Recursion Desired bit in a request message indicates that the client 
+        wants recursive service for this query
+  
+    - name: RA
+      type: boolean
+      description: |
+        The Recursion Available bit in a response message indicates that the name 
+        server supports recursive queries.
+  
+    - name: answers
+      type: keyword
+      description: >
+        The set of resource descriptions in the query answer
+  
+    - name: TTLs
+      type: double
+      description: >
+        The caching intervals of the associated RRs described by the answers field
+  
+    - name: rejected
+      type: boolean
+      description: >
+        Indicates whether the DNS query was rejected by the server
+    
+    - name: total_answers
+      type: integer
+      description: >
+        The total number of resource records in the reply 
+  
+    - name: total_replies
+      type: integer
+      description: >
+        The total number of resource records in the reply message
+  
+    - name: saw_query
+      type: boolean
+      description: >
+        Whether the full DNS query has been seen
+  
+    - name: saw_reply
+      type: boolean
+      description: >
+        Whether the full DNS reply has been seen
+  

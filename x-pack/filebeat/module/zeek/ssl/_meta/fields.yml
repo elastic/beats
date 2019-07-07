@@ -1,0 +1,97 @@
+- name: ssl
+  type: group
+  description: >
+    Fields exported by the Zeek SSL log
+  fields:
+    - name: version
+      type: keyword
+      description: >
+        SSL/TLS version that was logged
+  
+    - name: cipher
+      type: keyword
+      description: >
+        SSL/TLS cipher suite that was logged
+  
+    - name: curve
+      type: keyword
+      description: >
+        Elliptic curve that was logged when using ECDH/ECDHE
+  
+    - name: server_name
+      type: keyword
+      description: |
+        Value of the Server Name Indicator SSL/TLS extension. It indicates the server name 
+        that the client was requesting
+  
+    - name: resumed
+      type: boolean
+      description: |
+        Flag to indicate if the session was resumed reusing the key material exchanged in an 
+        earlier connection
+  
+    - name: next_protocol
+      type: keyword
+      description: >
+        Next protocol the server chose using the application layer next protocol extension
+  
+    - name: established
+      type: boolean
+      description: >
+        Flag to indicate if this ssl session has been established successfully
+  
+    - name: cert_chain
+      type: keyword
+      description: >
+        Chain of certificates offered by the server to validate its complete signing chain
+  
+    - name: cert_chain_fuids
+      type: keyword
+      description: >
+        An ordered vector of certificate file identifiers for the certificates offered by the server
+  
+    - name: client_cert_chain
+      type: keyword
+      description: >
+        Chain of certificates offered by the client to validate its complete signing chain
+  
+    - name: client_cert_chain_fuids
+      type: keyword
+      description: >
+        An ordered vector of certificate file identifiers for the certificates offered by the client
+  
+    - name: issuer
+      type: keyword
+      description: >
+        Subject of the signer of the X.509 certificate offered by the server
+  
+    - name: client_issuer
+      type: keyword
+      description: >
+        Subject of the X.509 certificate offered by the client
+  
+    - name: validation_status
+      type: keyword
+      description: >
+        Result of certificate validation for this connection
+  
+    - name: validation_code
+      type: keyword
+      description: >
+        Result of certificate validation for this connection, given as OpenSSL validation code
+  
+    - name: subject
+      type: keyword
+      description: >
+        Subject of the X.509 certificate offered by the server
+  
+    - name: client_subject
+      type: keyword
+      description: >
+        Subject of the X.509 certificate offered by the client
+  
+    - name: last_alert
+      type: keyword
+      description: >
+        Last alert that was seen during the connection
+  
