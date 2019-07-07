@@ -1,0 +1,41 @@
+- name: smb_files
+  type: group
+  description: >
+    Fields exported by the Zeek SMB Files log
+  fields:
+    - name: action
+      type: keyword
+      description: >
+        SMB request type
+
+    - name: name
+      type: keyword
+      description: >
+        Name of the accessed file
+
+    - name: path
+      type: keyword
+      description: >
+        Path of the network share
+
+    - name: size
+      type: long
+      description: >
+        Byte size of the file
+
+    - name: times
+      type: group
+      description: >
+        Timestamps of the file
+      fields:
+        - name: accessed
+          type: keyword
+
+        - name: changed
+          type: keyword
+
+        - name: created
+          type: keyword
+
+        - name: modified
+          type: keyword

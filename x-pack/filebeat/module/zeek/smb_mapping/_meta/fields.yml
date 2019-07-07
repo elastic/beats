@@ -1,0 +1,17 @@
+- name: smb_mapping
+  type: group
+  description: >
+    Fields exported by the Zeek SMB_Mapping log
+  fields:
+    - name: path
+      type: keyword
+      description: >
+        Path of the share
+
+    - name: service
+      type: keyword
+      description: >
+        Service offered by this share
+
+    - name: share_type
+      type: keyword

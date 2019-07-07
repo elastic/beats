@@ -1,0 +1,59 @@
+- name: ssh
+  type: group
+  description: >
+    Fields exported by the Zeek SSH log
+  fields:
+    - name: client
+      type: keyword
+      description: >
+        SSH client version
+
+    - name: host_key
+      type: keyword
+      description: >
+        SSH Server's key thumbprint
+
+    - name: server
+      type: keyword
+      description: >
+        SSH server version
+
+    - name: version
+      type: keyword
+      description: >
+        SSH protocol version
+
+    - name: algorithm
+      type: group
+      description: >
+        Cipher algorithms used in this session
+      fields:
+        - name: cipher
+          type: keyword
+
+        - name: compression
+          type: keyword
+
+        - name: host_key
+          type: keyword
+
+        - name: key_exchange
+          type: keyword
+
+        - name: mac
+          type: keyword
+
+    - name: auth
+      type: group
+      description: >
+        Authentication fields
+      fields:
+        - name: attempts
+          type: integer
+          description: >
+            Number of authentication attempts in this session
+
+        - name: success
+          type: boolean
+          description: >
+            True if the login succeeded

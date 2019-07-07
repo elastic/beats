@@ -33,6 +33,27 @@ processors:
         - from: "zeek.ssh.uid"
           to: "zeek.session_id"
 
+        - from: "zeek.ssh.auth_attempts"
+          to: "zeek.ssh.auth.attempts"
+
+        - from: "zeek.ssh.auth_success"
+          to: "zeek.ssh.auth.success"
+
+        - from: "zeek.ssh.cipher_alg"
+          to: "zeek.ssh.algorithm.cipher"
+
+        - from: "zeek.ssh.mac_alg"
+          to: "zeek.ssh.algorithm.mac"
+
+        - from: "zeek.ssh.compression_alg"
+          to: "zeek.ssh.algorithm.compression"
+
+        - from: "zeek.ssh.kex_alg"
+          to: "zeek.ssh.algorithm.key_exchange"
+
+        - from: "zeek.ssh.host_key_alg"
+          to: "zeek.ssh.algorithm.host_key"
+
       ignore_missing: true
       fail_on_error: false
 

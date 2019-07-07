@@ -21,23 +21,26 @@ processors:
         - from: "zeek.dhcp.uids"
           to: "zeek.session_id"
 
+        - from: "zeek.dhcp.assigned_addr"
+          to: "zeek.dhcp.address.assigned"
+
         - from: "zeek.dhcp.client_addr"
           to: "zeek.dhcp.address.client"
 
-        - from: "zeek.dhcp.server_addr"
-          to: "zeek.dhcp.address.server"
+        - from: "zeek.dhcp.mac"
+          to: "zeek.dhcp.address.mac"
 
         - from: "zeek.dhcp.requested_addr"
           to: "zeek.dhcp.address.requested"
 
-        - from: "zeek.dhcp.assigned_addr"
-          to: "zeek.dhcp.address.assigned"
-
-        - from: "zeek.dhcp.mac"
-          to: "zeek.dhcp.address.mac"
+        - from: "zeek.dhcp.server_addr"
+          to: "zeek.dhcp.address.server"
 
         - from: "zeek.dhcp.host_name"
           to: "zeek.dhcp.hostname"
 
       ignore_missing: true
       fail_on_error: false
+
+  - drop_fields:
+     fields: ["zeek.dhcp.client_fqdn"]

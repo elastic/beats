@@ -35,15 +35,15 @@ processors:
 
         - from: "zeek.ntlm.domainname"
           to: "zeek.ntlm.domain"
-        
+
         - from: "zeek.ntlm.server_dns_computer_name"
-          to: "zeek.ntlm.server.dns_name"
-        
+          to: "zeek.ntlm.server.name.dns"
+
         - from: "zeek.ntlm.server_nb_computer_name"
-          to: "zeek.ntlm.server.nb_name"
-        
+          to: "zeek.ntlm.server.name.netbios"
+
         - from: "zeek.ntlm.server_tree_name"
-          to: "zeek.ntlm.server.tree_name"
+          to: "zeek.ntlm.server.name.tree"
 
       ignore_missing: true
       fail_on_error: false

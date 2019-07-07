@@ -32,12 +32,6 @@
         "value": "{{zeek.dhcp.address.server}}",
         "if": "ctx.zeek.dhcp.address.server != null"
       }
-    },
-    {
-      "remove": {
-        "field": "zeek.dhcp.client_fqdn",
-        "ignore_missing": true
-      }
     }
   ],
   "on_failure": [{
