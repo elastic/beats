@@ -988,9 +988,6 @@ filebeat.inputs:
 
   # Queue urls (required) to receive queue messages from
   #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
-
-  # S3 buckets to collect logs from
-  #bucket_names: ["bucket-test-1", "bucket-test-2"]
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules

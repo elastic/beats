@@ -188,7 +188,7 @@ func (p *Input) Run() {
 					defer wg.Done()
 					defer close(done)
 
-					s3Infos, err := handleMessage(message, p.config.BucketNames)
+					s3Infos, err := handleMessage(message)
 					if err != nil {
 						p.logger.Error(err.Error())
 					}
@@ -207,6 +207,7 @@ func (p *Input) Run() {
 					for {
 						select {
 						case <-done:
+							return
 						case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
 							// if half of the set visibilityTimeout passed and this is
 							// still ongoing, then change visibility timeout.
@@ -246,7 +247,7 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 }
 
 // handle message
-func handleMessage(m sqs.Message, bucketNames []string) ([]s3Info, error) {
+func handleMessage(m sqs.Message) ([]s3Info, error) {
 	msg := map[string]interface{}{}
 	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
@@ -259,10 +260,6 @@ func handleMessage(m sqs.Message, bucketNames []string) ([]s3Info, error) {
 		recordMap := record.(map[string]interface{})
 		if recordMap["eventSource"] == "aws:s3" && recordMap["eventName"] == "ObjectCreated:Put" {
 			s3Info := s3Info{}
-			if !stringInSlice(recordMap["awsRegion"].(string), bucketNames) {
-				continue
-			}
-
 			s3Info.region = recordMap["awsRegion"].(string)
 			s3Record := recordMap["s3"].(map[string]interface{})
 

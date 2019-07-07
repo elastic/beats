@@ -24,7 +24,6 @@ Example configuration 1:
 {beatname_lc}.inputs:
 - type: s3
   queue_urls: ["https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue"]
-  bucket_names: ["test-s3-bucket"]
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:"”}'
@@ -37,7 +36,6 @@ Example configuration 2:
 {beatname_lc}.inputs:
 - type: s3
   queue_urls: ["https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue"]
-  bucket_names: ["test-s3-bucket"]
   credential_profile_name: test-s3-input
 ----
 
@@ -48,12 +46,6 @@ The `s3` input supports the following configuration options plus the
 ==== `queue_urls`
 
 URLs of the AWS SQS queues that messages will be received from. Required.
-
-[float]
-==== `bucket_names`
-
-Name of the S3 buckets to read log files from. If it's not specified, then read
-from all S3 buckets that are pointed by SQS messages.
 
 [float]
 ==== `aws credentials`
