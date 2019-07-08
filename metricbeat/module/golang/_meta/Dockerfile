@@ -1,4 +1,5 @@
-FROM docker.elastic.co/beats/metricbeat:6.5.4
+ARG TAG=6.5.4
+FROM docker.elastic.co/beats/metricbeat:${TAG}
 
 HEALTHCHECK --interval=1s --retries=90 CMD curl -f http://localhost:6060/debug/vars
 

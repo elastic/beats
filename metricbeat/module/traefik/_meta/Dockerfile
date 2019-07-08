@@ -1,4 +1,5 @@
-FROM traefik:1.6-alpine
+ARG TAG=1.6-alpine
+FROM traefik:${TAG}
 
 COPY ./traefik.toml /etc/traefik/traefik.toml
 

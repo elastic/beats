@@ -1,4 +1,5 @@
-FROM memcached:1.4.35-alpine
+ARG TAG=1.4.35-alpine
+FROM memcached:${TAG}
 
 USER root
 RUN apk update

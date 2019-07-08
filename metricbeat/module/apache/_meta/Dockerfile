@@ -1,4 +1,5 @@
-FROM httpd:2.4.20
+ARG TAG=2.4.20
+FROM httpd:${TAG}
 RUN sed -i "/jessie-updates/d" /etc/apt/sources.list
 RUN apt-get update && apt-get install -y curl
 HEALTHCHECK --interval=1s --retries=90 CMD curl -f http://localhost

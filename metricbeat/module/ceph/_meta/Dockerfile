@@ -1,4 +1,5 @@
-FROM ceph/daemon:master-6373c6a-jewel-centos-7-x86_64
+ARG TAG=master-6373c6a-jewel-centos-7-x86_64
+FROM ceph/daemon:${TAG}
 
 RUN yum -q install -y jq && yum clean all && rm -fr /var/cache/yum
 

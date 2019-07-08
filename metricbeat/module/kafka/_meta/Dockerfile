@@ -1,6 +1,6 @@
 FROM debian:stretch
 
-ARG KAFKA_VERSION=2.1.1
+ARG TAG=2.1.1
 
 ENV KAFKA_HOME /kafka
 
@@ -11,7 +11,7 @@ ENV TERM=linux
 RUN apt-get update && apt-get install -y curl openjdk-8-jre-headless netcat dnsutils
 
 RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && curl -s -o $INSTALL_DIR/kafka.tgz \
-    "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
+    "https://archive.apache.org/dist/kafka/${TAG}/kafka_2.11-${TAG}.tgz" && \
     tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1
 
 ADD kafka_server_jaas.conf /etc/kafka/server_jaas.conf

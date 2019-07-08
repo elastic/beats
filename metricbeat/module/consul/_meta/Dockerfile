@@ -1,4 +1,5 @@
-FROM consul:1.4.2
+ARG TAG=1.4.2
+FROM consul:${TAG}
 
 ENV CONSUL_BIND_INTERFACE='eth0'
 

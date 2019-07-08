@@ -1,4 +1,5 @@
-FROM ubuntu:16.04
+ARG TAG=16.04
+FROM ubuntu:${TAG}
 
 RUN apt-get update && \
     apt-get install -y munin-node netcat && \

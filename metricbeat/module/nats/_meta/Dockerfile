@@ -1,5 +1,5 @@
-ARG NATS_VERSION=1.3.0
-FROM nats:$NATS_VERSION
+ARG TAG=1.3.0
+FROM nats:${TAG}
 
 # create an enhanced container with nc command available since nats is based
 # on scratch image making healthcheck impossible
