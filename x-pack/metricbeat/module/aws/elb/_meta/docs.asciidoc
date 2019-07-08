@@ -1,0 +1,9 @@
+Elastic Load Balancing publishes data points to Amazon CloudWatch for your load
+balancers and your back-end instances. This aws `elb` metricset collects these
+Cloudwatch metrics for monitoring purposes.
+
+[source,yaml]
+------------------------------------------------------------------------------
+- module: aws
+  metricsets: ['elb']
+------------------------------------------------------------------------------
