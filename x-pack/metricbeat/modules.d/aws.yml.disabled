@@ -38,18 +38,14 @@
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  cloudwatch_metrics:
-    - namespace: AWS/EC2
-      metricname: CPUUtilization
+  namespace: AWS/EC2
+  tags.resource_type_filter: ec2:instance
+  metrics:
+    - names: ["CPUUtilization", "DiskReadOps", "DiskWriteOps"]
+      statistics: ["Average", "Maximum"]
       dimensions:
         - name: InstanceId
           value: i-0686946e22cf9494a
-    - namespace: AWS/EBS
-    - namespace: AWS/ELB
-      tags.resource_type_filter: elasticloadbalancing
-  #regions:
-  #  - us-east-1
-  #  - us-east-2
 - module: aws
   period: 60s
   metricsets:
