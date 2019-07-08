@@ -121,7 +121,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in CreateContainerView")
 	}
 
-	defer func(){
+	defer func() {
 		if err := v.Destroy(ctx); err != nil {
 			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
 		}
