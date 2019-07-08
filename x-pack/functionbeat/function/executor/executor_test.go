@@ -161,7 +161,7 @@ func testCannotRunTwice(t *testing.T) {
 	m1.AssertExpectations(t)
 
 	assert.True(t, executor.IsCompleted())
-	assert.Error(t, errAlreadyExecuted, executor.Execute(ctx))
+	assert.Error(t, ErrAlreadyExecuted, executor.Execute(ctx))
 }
 
 func testCannotAddCompleted(t *testing.T) {

@@ -16,6 +16,7 @@ import (
 
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/pkg"
 
@@ -106,6 +107,11 @@ func Package() {
 		mg.Deps(devtools.Package)
 		mg.Deps(devtools.TestPackages)
 	}
+}
+
+// UnitTest executes the unit tests (Go and Python).
+func UnitTest() {
+	mg.SerialDeps(unittest.GoUnitTest, PythonUnitTest)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
