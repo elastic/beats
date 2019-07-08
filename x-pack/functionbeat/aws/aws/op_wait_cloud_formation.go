@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/executor"
 )
 
 var periodicCheck = 2 * time.Second
@@ -47,7 +48,7 @@ func newWaitDeleteCloudFormation(
 	}
 }
 
-func (o *opWaitCloudFormation) Execute(ctx executionContext) error {
+func (o *opWaitCloudFormation) Execute(ctx executor.Context) error {
 	c, ok := ctx.(*stackContext)
 	if !ok {
 		return errWrongContext

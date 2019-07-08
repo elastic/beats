@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/executor"
 )
 
 // This error is not provided by the S3 error package.
@@ -27,7 +28,7 @@ func newOpEnsureBucket(log *logp.Logger, cfg aws.Config, bucketName string) *opE
 	return &opEnsureBucket{log: log, svc: s3.New(cfg), bucketName: bucketName}
 }
 
-func (o *opEnsureBucket) Execute(_ executionContext) error {
+func (o *opEnsureBucket) Execute(_ executor.Context) error {
 	o.log.Debugf("Verifying presence of S3 bucket: %s", o.bucketName)
 
 	check := &s3.HeadBucketInput{Bucket: aws.String(o.bucketName)}

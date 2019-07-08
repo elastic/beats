@@ -16,6 +16,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/executor"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
 )
 
@@ -65,7 +66,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	c.log.Debugf("Using cloudformation template:\n%s", templateData.json)
 	svcCF := cf.New(c.awsCfg)
 
-	executer := newExecutor(c.log)
+	executer := executor.NewExecutor(c.log)
 	executer.Add(newOpEnsureBucket(c.log, c.awsCfg, c.bucket()))
 	executer.Add(newOpUploadToBucket(
 		c.log,
@@ -141,7 +142,7 @@ func (c *CLIManager) Remove(name string) error {
 	defer c.log.Debugf("Removal of function '%s' complete", name)
 
 	svc := cf.New(c.awsCfg)
-	executer := newExecutor(c.log)
+	executer := executor.NewExecutor(c.log)
 	executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
 	executer.Add(newWaitDeleteCloudFormation(c.log, c.awsCfg))
 

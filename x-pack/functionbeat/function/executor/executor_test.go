@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package aws
+package executor
 
 import (
 	"errors"
@@ -16,12 +16,12 @@ type MockUndoer struct {
 	mock.Mock
 }
 
-func (m *MockUndoer) Execute(_ executionContext) error {
+func (m *MockUndoer) Execute(_ Context) error {
 	args := m.Called()
 	return args.Error(0)
 }
 
-func (m *MockUndoer) Rollback(_ executionContext) error {
+func (m *MockUndoer) Rollback(_ Context) error {
 	args := m.Called()
 	return args.Error(0)
 }
@@ -30,7 +30,7 @@ type MockDoer struct {
 	mock.Mock
 }
 
-func (m *MockDoer) Execute(_ executionContext) error {
+func (m *MockDoer) Execute(_ Context) error {
 	args := m.Called()
 	return args.Error(0)
 }
@@ -46,7 +46,7 @@ func TestExecutor(t *testing.T) {
 
 func testAll(t *testing.T) {
 	ctx := struct{}{}
-	executor := newExecutor(nil)
+	executor := NewExecutor(nil)
 	m1 := &MockDoer{}
 	m1.On("Execute").Return(nil)
 
@@ -65,7 +65,7 @@ func testAll(t *testing.T) {
 
 func testError(t *testing.T) {
 	ctx := struct{}{}
-	executor := newExecutor(nil)
+	executor := NewExecutor(nil)
 	m1 := &MockDoer{}
 	m1.On("Execute").Return(nil)
 
@@ -87,7 +87,7 @@ func testError(t *testing.T) {
 
 func testUndoer(t *testing.T) {
 	ctx := struct{}{}
-	executor := newExecutor(nil)
+	executor := NewExecutor(nil)
 	m1 := &MockUndoer{}
 	m1.On("Execute").Return(nil)
 	m1.On("Rollback").Return(nil)
@@ -118,7 +118,7 @@ func testFailRollback(t *testing.T) {
 	e := errors.New("error on execution")
 	e2 := errors.New("error on rollback")
 
-	executor := newExecutor(nil)
+	executor := NewExecutor(nil)
 	m1 := &MockUndoer{}
 	m1.On("Execute").Return(nil)
 
@@ -148,7 +148,7 @@ func testFailRollback(t *testing.T) {
 
 func testCannotRunTwice(t *testing.T) {
 	ctx := struct{}{}
-	executor := newExecutor(nil)
+	executor := NewExecutor(nil)
 	m1 := &MockDoer{}
 	m1.On("Execute").Return(nil)
 
@@ -165,7 +165,7 @@ func testCannotRunTwice(t *testing.T) {
 }
 
 func testCannotAddCompleted(t *testing.T) {
-	executor := newExecutor(nil)
+	executor := NewExecutor(nil)
 	m1 := &MockDoer{}
 	m1.On("Execute").Return(nil)
 

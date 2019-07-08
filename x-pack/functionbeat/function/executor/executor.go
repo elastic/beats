@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package aws
+package executor
 
 import (
 	"errors"
@@ -11,14 +11,14 @@ import (
 )
 
 var (
-	errNeverRun        = errors.New("executor was never executed")
-	errCannotAdd       = errors.New("cannot add to an already executed executor")
-	errAlreadyExecuted = errors.New("executor already executed")
+	ErrNeverRun        = errors.New("executor was never executed")
+	ErrCannotAdd       = errors.New("cannot add to an already executed executor")
+	ErrAlreadyExecuted = errors.New("executor already executed")
 )
 
-type executionContext interface{}
+type Context interface{}
 
-type executor struct {
+type Executor struct {
 	operations []doer
 	undos      []undoer
 	completed  bool
@@ -26,26 +26,26 @@ type executor struct {
 }
 
 type doer interface {
-	Execute(executionContext) error
+	Execute(Context) error
 }
 
 type undoer interface {
-	Rollback(executionContext) error
+	Rollback(Context) error
 }
 
-func newExecutor(log *logp.Logger) *executor {
+func NewExecutor(log *logp.Logger) *Executor {
 	if log == nil {
 		log = logp.NewLogger("")
 	}
 
 	log = log.Named("executor")
-	return &executor{log: log}
+	return &Executor{log: log}
 }
 
-func (e *executor) Execute(ctx executionContext) (err error) {
+func (e *Executor) Execute(ctx Context) (err error) {
 	e.log.Debugf("The executor is executing '%d' operations for converging state", len(e.operations))
 	if e.IsCompleted() {
-		return errAlreadyExecuted
+		return ErrAlreadyExecuted
 	}
 	for _, operation := range e.operations {
 		err = operation.Execute(ctx)
@@ -64,10 +64,10 @@ func (e *executor) Execute(ctx executionContext) (err error) {
 	return err
 }
 
-func (e *executor) Rollback(ctx executionContext) (err error) {
+func (e *Executor) Rollback(ctx Context) (err error) {
 	e.log.Debugf("The executor is rolling back previous execution, '%d' operations to rollback", len(e.undos))
 	if !e.IsCompleted() {
-		return errNeverRun
+		return ErrNeverRun
 	}
 	for i := len(e.undos) - 1; i >= 0; i-- {
 		operation := e.undos[i]
@@ -85,18 +85,18 @@ func (e *executor) Rollback(ctx executionContext) (err error) {
 	return err
 }
 
-func (e *executor) Add(operation ...doer) error {
+func (e *Executor) Add(operation ...doer) error {
 	if e.IsCompleted() {
-		return errCannotAdd
+		return ErrCannotAdd
 	}
 	e.operations = append(e.operations, operation...)
 	return nil
 }
 
-func (e *executor) markCompleted() {
+func (e *Executor) markCompleted() {
 	e.completed = true
 }
 
-func (e *executor) IsCompleted() bool {
+func (e *Executor) IsCompleted() bool {
 	return e.completed
 }

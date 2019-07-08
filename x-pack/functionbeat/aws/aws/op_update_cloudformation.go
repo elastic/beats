@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/executor"
 )
 
 type opUpdateCloudFormation struct {
@@ -20,7 +21,7 @@ type opUpdateCloudFormation struct {
 	stackName   string
 }
 
-func (o *opUpdateCloudFormation) Execute(ctx executionContext) error {
+func (o *opUpdateCloudFormation) Execute(ctx executor.Context) error {
 	c, ok := ctx.(*stackContext)
 	if !ok {
 		return errWrongContext

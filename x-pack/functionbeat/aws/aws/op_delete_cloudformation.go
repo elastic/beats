@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/executor"
 )
 
 type opDeleteCloudFormation struct {
@@ -19,7 +20,7 @@ type opDeleteCloudFormation struct {
 	stackName string
 }
 
-func (o *opDeleteCloudFormation) Execute(ctx executionContext) error {
+func (o *opDeleteCloudFormation) Execute(ctx executor.Context) error {
 	c, ok := ctx.(*stackContext)
 	if !ok {
 		return errWrongContext

@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/executor"
 )
 
 type opUploadToBucket struct {
@@ -38,7 +39,7 @@ func newOpUploadToBucket(
 	}
 }
 
-func (o *opUploadToBucket) Execute(_ executionContext) error {
+func (o *opUploadToBucket) Execute(_ executor.Context) error {
 	o.log.Debugf("Uploading file '%s' to bucket '%s' with size %d bytes", o.path, o.bucketName, len(o.raw))
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(o.bucketName),
@@ -56,7 +57,7 @@ func (o *opUploadToBucket) Execute(_ executionContext) error {
 	return nil
 }
 
-func (o *opUploadToBucket) Rollback(ctx executionContext) error {
+func (o *opUploadToBucket) Rollback(ctx executor.Context) error {
 	// The error will be logged but we do not enforce a hard failure because the file could have
 	// been removed before.
 	err := newOpDeleteFileBucket(o.log, o.config, o.bucketName, o.path).Execute(ctx)

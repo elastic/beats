@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/x-pack/functionbeat/function/executor"
 )
 
 type opDeleteFileBucket struct {
@@ -31,7 +32,7 @@ func newOpDeleteFileBucket(
 	}
 }
 
-func (o *opDeleteFileBucket) Execute(_ executionContext) error {
+func (o *opDeleteFileBucket) Execute(_ executor.Context) error {
 	o.log.Debugf("Removing file '%s' on bucket '%s'", o.path, o.bucketName)
 	input := &s3.DeleteObjectInput{
 		Bucket: aws.String(o.bucketName),
