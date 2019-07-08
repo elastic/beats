@@ -10,6 +10,8 @@ var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: "s3",
 	},
+	ProfileName:       "default",
+	VisibilityTimeout: 300,
 }
 
 type config struct {
@@ -19,4 +21,5 @@ type config struct {
 	SecretAccessKey           string   `config:"secret_access_key"`
 	SessionToken              string   `config:"session_token"`
 	ProfileName               string   `config:"credential_profile_name"`
+	VisibilityTimeout         int      `config:"visibility_timeout"`
 }

@@ -988,6 +988,10 @@ filebeat.inputs:
 
   # Queue urls (required) to receive queue messages from
   #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+
+  # The duration (in seconds) that the received messages are hidden from subsequent
+  # retrieve requests after being retrieved by a ReceiveMessage request.
+  #visibility_timeout: 300
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules

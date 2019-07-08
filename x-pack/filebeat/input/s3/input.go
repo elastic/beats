@@ -43,14 +43,6 @@ var (
 	// sooner than WaitTimeSeconds. If no messages are available and the wait time
 	// expires, the call returns successfully with an empty list of messages.
 	waitTimeSecond int64 = 10
-
-	// The duration (in seconds) that the received messages are hidden from subsequent
-	// retrieve requests after being retrieved by a ReceiveMessage request.
-	// This value needs to be a lot bigger than filebeat collection frequency so
-	// if it took too long to read the s3 log, this sqs message will not be reprocessed.
-	// The default visibility timeout for a message is 30 seconds. The minimum
-	// is 0 seconds. The maximum is 12 hours.
-	visibilityTimeout int64 = 300
 )
 
 func init() {
@@ -130,17 +122,15 @@ func getAWSCredentials(config config) (awssdk.Config, error) {
 	// If accessKeyID and secretAccessKey is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
-	if config.ProfileName != "" {
-		return external.LoadDefaultAWSConfig(
-			external.WithSharedConfigProfile(config.ProfileName),
-		)
-	}
-	return external.LoadDefaultAWSConfig()
+	return external.LoadDefaultAWSConfig(
+		external.WithSharedConfigProfile(config.ProfileName),
+	)
 }
 
 // Run runs the input
 func (p *Input) Run() {
 	p.logger.Debugf("s3", "Run s3 input with queueURLs: %+v", p.config.QueueURLs)
+	visibilityTimeout := int64(p.config.VisibilityTimeout)
 	for _, queueURL := range p.config.QueueURLs {
 		regionName, err := getRegionFromQueueURL(queueURL)
 		if err != nil {
