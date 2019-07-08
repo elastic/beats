@@ -1,2 +1,8 @@
 TAGS:
-  - 8
+  - mysql:5.7.24
+  - mysql:8.0.13
+  - percona:5.7.24
+  - percona:8.0.13-4
+  - mariadb:10.2.23
+  - mariadb:10.3.14
+  - mariadb:10.4.4

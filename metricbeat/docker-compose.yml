@@ -57,13 +57,6 @@ services:
     ports:
       - 80
 
-  apache_2_4_12:
-    build:
-      context: ./module/apache/_meta
-      dockerfile: Dockerfile.2.4.12
-    ports:
-      - 80
-
   metricbeat:
     build: ./module/beat/_meta
     ports:
@@ -124,14 +117,6 @@ services:
     ports:
       - 2379
 
-  etcd_3_2:
-    build:
-      context: ./module/etcd/_meta
-      args:
-        ETCD_VERSION: v3.2.25
-    ports:
-      - 2379
-
   golang:
     build: ./module/golang/_meta
     ports:
@@ -139,24 +124,6 @@ services:
 
   haproxy:
     build: ./module/haproxy/_meta
-    ports:
-      - 14567
-      - 14568
-      - 14569
-
-  haproxy_1_6:
-    build:
-      context: ./module/haproxy/_meta
-      dockerfile: Dockerfile.1.6
-    ports:
-      - 14567
-      - 14568
-      - 14569
-
-  haproxy_1_7:
-    build:
-      context: ./module/haproxy/_meta
-      dockerfile: Dockerfile.1.7
     ports:
       - 14567
       - 14568
@@ -173,26 +140,7 @@ services:
       - 8778
 
   kafka:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 2.1.1
-    ports:
-      - 9092
-
-  kafka_1_1_0:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 1.1.0
-    ports:
-      - 9092
-
-  kafka_0_10_2:
-    build:
-      context: ./module/kafka/_meta
-      args:
-        KAFKA_VERSION: 0.10.2.2
+    build: ./module/kafka/_meta
     ports:
       - 9092
 
@@ -250,7 +198,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mysql:5.7.24
+        TAG: mysql:5.7.24
     ports:
       - 3306
 
@@ -258,7 +206,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mysql:8.0.13
+        TAG: mysql:8.0.13
     ports:
       - 3306
 
@@ -266,7 +214,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: percona:5.7.24
+        TAG: percona:5.7.24
     ports:
       - 3306
 
@@ -274,7 +222,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: percona:8.0.13-4
+        TAG: percona:8.0.13-4
     ports:
       - 3306
 
@@ -282,7 +230,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.2.23
+        TAG: mariadb:10.2.23
     ports:
       - 3306
 
@@ -290,7 +238,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.3.14
+        TAG: mariadb:10.3.14
     ports:
       - 3306
 
@@ -298,7 +246,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.4.4
+        TAG: mariadb:10.4.4
     ports:
       - 3306
 
@@ -334,22 +282,6 @@ services:
 
   redis:
     build: ./module/redis/_meta
-    ports:
-      - 6379
-
-  redis_4:
-    build:
-      context: ./module/redis/_meta
-      args:
-        REDIS_VERSION: 4.0.11
-    ports:
-      - 6379
-
-  redis_5:
-    build:
-      context: ./module/redis/_meta
-      args:
-        REDIS_VERSION: 5.0-rc4
     ports:
       - 6379
 

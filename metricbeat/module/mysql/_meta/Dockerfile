@@ -1,5 +1,5 @@
-ARG TAG=5.7.12
-FROM mysql:${TAG}
+ARG TAG=mysql:5.7.12
+FROM ${TAG}
 
 ENV MYSQL_ROOT_PASSWORD test
 
