@@ -1,5 +1,5 @@
-ARG TAG=7.1
-FROM bitnami/php-fpm:${TAG}
+ARG TAG=php-7.1
+FROM tsouza/nginx-php-fpm:${TAG}
 
 RUN echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/www.conf
 ADD ./php-fpm.conf /etc/nginx/sites-enabled
