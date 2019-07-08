@@ -1,0 +1,4 @@
+- key: googlepubsub
+  title: "googlepubsub"
+  description: >
+    Fields from Google Cloud Pub/Sub input.
