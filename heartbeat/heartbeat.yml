@@ -135,7 +135,7 @@ output.elasticsearch:
 processors:
   - add_observer_metadata: 
       geo: 
-        name: "${GEO_NAME:mpls-mn-us}"
+        name: "${GEO_NAME}"
         location: "37.926868, -78.024902"
 
 

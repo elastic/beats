@@ -65,13 +65,25 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWr
 				thisID = fmt.Sprintf("%s-%x", id, urlHash)
 			}
 
+			status, _ := event.Fields.GetValue("monitor.status")
+			var trackerStatus stateStatus
+			if status == "down" {
+				trackerStatus = StatusDown
+			} else {
+				trackerStatus = StatusUp
+			}
+			ip, _ := event.Fields.GetValue("monitor.ip")
+			trackerId := fmt.Sprintf("%s-%s", id, ip)
+			cssId := stateTracker.getID(trackerId, trackerStatus)
+
 			eventext.MergeEventFields(
 				event,
 				common.MapStr{
 					"monitor": common.MapStr{
-						"id":   thisID,
-						"name": name,
-						"type": typ,
+						"id":                        thisID,
+						"name":                      name,
+						"type":                      typ,
+						"continuous_status_segment": cssId,
 					},
 				},
 			)
@@ -88,6 +100,7 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWr
 func addMonitorStatus(origJob jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		cont, err := origJob(event)
+
 		fields := common.MapStr{
 			"monitor": common.MapStr{
 				"status": look.Status(err),
@@ -297,12 +310,10 @@ func makeAddSummary() jobs.JobWrapper {
 				}
 				monitorIdString, _ := monitorId.(string)
 				eventext.MergeEventFields(event, common.MapStr{
-					"monitor": common.MapStr{
-						"continuous_status_segment": stateTracker.getID(monitorIdString, trackerStatus),
-					},
 					"summary": common.MapStr{
-						"up":   state.up,
-						"down": state.down,
+						"continuous_status_segment": stateTracker.getID(monitorIdString, trackerStatus),
+						"up":                        state.up,
+						"down":                      state.down,
 					},
 				})
 				resetState()
