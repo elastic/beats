@@ -1,0 +1,54 @@
+- name: performance
+  type: group
+  description: TODO
+  fields:
+    - name: name
+      type: keyword
+      description: Tablespace name
+
+    - name: data_file
+      type: group
+      description: Database files information
+      fields:
+        - name: id
+          type: long
+          description: Tablespace unique identifier
+        - name: name
+          type: keyword
+          description: Filename of the data file
+        - name: size
+          type: group
+          description: Size information about the file
+          fields:
+            - name: max.bytes
+              type: bytes
+              description: Maximum file size in bytes
+            - name: bytes
+              type: bytes
+              description: Size of the file in bytes
+            - name: free.bytes
+              type: bytes
+              description: >
+                The size of the file available for user data. The actual size of the file minus this value is used to store file related metadata.
+        - name: status
+          type: keyword
+          description: >
+            'File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in
+            a tablespace that was dropped)'
+        - name: online_status
+          type: keyword
+          description: Last known online status of the data file. One of SYSOFF, SYSTEM, OFFLINE, ONLINE or RECOVER.
+
+    - name: space
+      type: group
+      description: Tablespace space usage information
+      fields:
+        - name: free.bytes
+          type: bytes
+          description: Tablespace total free space available, in bytes.
+        - name: used.bytes
+          type: bytes
+          description: Tablespace used space, in bytes.
+        - name: total.bytes
+          type: bytes
+          description: Tablespace total size, in bytes.
