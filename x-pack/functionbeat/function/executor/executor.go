@@ -11,13 +11,18 @@ import (
 )
 
 var (
-	ErrNeverRun        = errors.New("executor was never executed")
-	ErrCannotAdd       = errors.New("cannot add to an already executed executor")
+	// ErrNeverRun is returned if the step was never run.
+	ErrNeverRun = errors.New("executor was never executed")
+	// ErrCannotAdd is returned if the executor had already ran and a new operation is added.
+	ErrCannotAdd = errors.New("cannot add to an already executed executor")
+	// ErrAlreadyExecuted is returned if it has already run.
 	ErrAlreadyExecuted = errors.New("executor already executed")
 )
 
+// Context holds the information of each execution step.
 type Context interface{}
 
+// Executor tries to execute operations. If an operation fails, everything is rolled back.
 type Executor struct {
 	operations []doer
 	undos      []undoer
@@ -33,6 +38,7 @@ type undoer interface {
 	Rollback(Context) error
 }
 
+// NewExecutor return a new executor.
 func NewExecutor(log *logp.Logger) *Executor {
 	if log == nil {
 		log = logp.NewLogger("")
@@ -42,6 +48,7 @@ func NewExecutor(log *logp.Logger) *Executor {
 	return &Executor{log: log}
 }
 
+// Execute executes all operations. If something fail it rolls back.
 func (e *Executor) Execute(ctx Context) (err error) {
 	e.log.Debugf("The executor is executing '%d' operations for converging state", len(e.operations))
 	if e.IsCompleted() {
@@ -64,6 +71,7 @@ func (e *Executor) Execute(ctx Context) (err error) {
 	return err
 }
 
+// Rollback rolls back executed operations.
 func (e *Executor) Rollback(ctx Context) (err error) {
 	e.log.Debugf("The executor is rolling back previous execution, '%d' operations to rollback", len(e.undos))
 	if !e.IsCompleted() {
@@ -85,6 +93,7 @@ func (e *Executor) Rollback(ctx Context) (err error) {
 	return err
 }
 
+// Add adds new operation to execute.
 func (e *Executor) Add(operation ...doer) error {
 	if e.IsCompleted() {
 		return ErrCannotAdd
@@ -97,6 +106,7 @@ func (e *Executor) markCompleted() {
 	e.completed = true
 }
 
+// IsCompleted returns if all operations are completed.
 func (e *Executor) IsCompleted() bool {
 	return e.completed
 }
