@@ -39,17 +39,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Filebeat*
 
-- Add support for Cisco syslog format used by their switch. {pull}10760[10760]
-- Cover empty request data, url and version in Apache2 module{pull}10730[10730]
-- Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
-- Improve detection of file deletion on Windows. {pull}10747[10747]
-- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
-- Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
-- Add missing Kubernetes metadata fields to Filebeat CoreDNS module, and fix a documentation error. {pull}11591[11591]
-- Reduce memory usage if long lines are truncated to fit `max_bytes` limit. The line buffer is copied into a smaller buffer now. This allows the runtime to release unused memory earlier. {pull}11524[11524]
-- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
-- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
-- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
 - Skipping unparsable log entries from docker json reader {pull}12268[12268]
 
 *Heartbeat*
