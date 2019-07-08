@@ -19,5 +19,5 @@ func init() {
 // AssetGooglepubsub returns asset data.
 // This is the base64 encoded gzipped contents of input/googlepubsub.
 func AssetGooglepubsub() string {
-	return "eJxMyjEKAjEQQNE+p/hsr/YpbARtBW8QMy6DcSckM4W3F6y2fbwDb/lmVrO1SY8yoyRw9SaZZc9LgirzObS72pY5J4CrSquT17APt3/n0iwq9yinRxR06+HH9AsAAP//T4AjDg=="
+	return "eJxUyjEKAjEQQNE+p/hsv9qnsBG0FbxBzLgMxp2QzBTeXrCzfbyVl3wym9nWZO1RZpQErt4ks/z5kqDKfAztrrZnTgngotLq5DnszfX3OTeLyi3K8R4F3Xv4IX0DAAD//30mI2g="
 }
