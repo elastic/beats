@@ -57,7 +57,6 @@ func TestHandleMessage(t *testing.T) {
 	cases := []struct {
 		title           string
 		message         sqs.Message
-		bucketNames     []string
 		expectedS3Infos []s3Info
 	}{
 		{
@@ -65,7 +64,6 @@ func TestHandleMessage(t *testing.T) {
 			sqs.Message{
 				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
 			},
-			[]string{},
 			[]s3Info{
 				{
 					name: "test-s3-ks-2",
@@ -78,7 +76,6 @@ func TestHandleMessage(t *testing.T) {
 			sqs.Message{
 				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Delete\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
 			},
-			[]string{},
 			[]s3Info{},
 		},
 		{
@@ -86,35 +83,13 @@ func TestHandleMessage(t *testing.T) {
 			sqs.Message{
 				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:ec2\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
 			},
-			[]string{},
-			[]s3Info{},
-		},
-		{
-			"sqs message with right bucketNames",
-			sqs.Message{
-				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
-			},
-			[]string{"ap-southeast-1"},
-			[]s3Info{
-				{
-					name: "test-s3-ks-2",
-					key:  "server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA",
-				},
-			},
-		},
-		{
-			"sqs message with wrong bucketNames",
-			sqs.Message{
-				Body: awssdk.String("{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\",\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\",\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54-E68E4316CEB285AA\"}}}]}"),
-			},
-			[]string{"us-west-1"},
 			[]s3Info{},
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			s3Info, err := handleMessage(c.message, c.bucketNames)
+			s3Info, err := handleMessage(c.message)
 			assert.NoError(t, err)
 			assert.Equal(t, len(c.expectedS3Infos), len(s3Info))
 			if len(s3Info) > 0 {
