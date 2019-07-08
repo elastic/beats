@@ -19,8 +19,10 @@ package memlog
 
 import (
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	structform "github.com/elastic/go-structform"
 	"github.com/elastic/go-structform/gotype"
 )
 
@@ -62,13 +64,56 @@ func (t *typeConv) release() {
 
 func (t *typeConv) init() {
 	unfold, _ := gotype.NewUnfolder(nil)
-	fold, err := gotype.NewIterator(unfold)
+	fold, err := gotype.NewIterator(unfold, gotype.Folders(
+		foldTimestamp,
+	))
 	if err != nil {
 		panic(err)
 	}
 
 	t.unfold = unfold
 	t.fold = fold
+}
+
+func foldTimestamp(in *time.Time, v structform.ExtVisitor) error {
+	var (
+		ts  = *in
+		off int16
+		loc = ts.Location()
+	)
+
+	const encodingVersion = 0
+
+	if loc == time.UTC {
+		off = -1
+	} else {
+		_, offset := ts.Zone()
+		offset /= 60 // Note: best effort. If the zone offset has a factional minute, then we will ignore it here
+		if offset < -32768 || offset == -1 || offset > 32767 {
+			offset = 0 // Note: best effort. Ignore offset if it becomes an unexpected value
+		}
+		off = int16(offset)
+	}
+
+	sec := uint64(ts.Unix())
+	extra := (uint64(encodingVersion) << 56) |
+		(uint64(off) << 32) |
+		uint64(ts.Nanosecond())
+
+	if err := v.OnArrayStart(2, structform.Uint64Type); err != nil {
+		return err
+	}
+	if err := v.OnUint64(extra); err != nil {
+		return err
+	}
+	if err := v.OnUint64(sec); err != nil {
+		return err
+	}
+	if err := v.OnArrayFinished(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (t *typeConv) Convert(to, from interface{}) error {

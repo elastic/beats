@@ -19,6 +19,7 @@ package memlog
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -45,6 +46,17 @@ func TestTypeConv(t *testing.T) {
 		var m common.MapStr
 		tc.Convert(&m, struct{ A string }{"test"})
 		assert.Equal(t, common.MapStr{"a": "test"}, m)
+	}))
+
+	t.Run("timestamp to MapStr", withTypeConv(func(t *testing.T, tc *typeConv) {
+		var m common.MapStr
+		ts := time.Unix(1234, 5678).UTC()
+
+		off := int16(-1)
+		expected := []uint64{uint64(5678) | uint64(off)<<32, 1234}
+
+		tc.Convert(&m, struct{ Timestamp time.Time }{ts})
+		assert.Equal(t, common.MapStr{"timestamp": expected}, m)
 	}))
 }
 
