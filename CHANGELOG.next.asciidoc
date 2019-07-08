@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Filebeat*
 
+- Skipping unparsable log entries from docker json reader {pull}12268[12268]
 - Add support for client addresses with port in Apache error logs {pull}12695[12695]
 
 *Heartbeat*
