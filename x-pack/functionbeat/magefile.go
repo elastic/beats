@@ -118,7 +118,14 @@ func UnitTest() {
 func IntegTest() {
 	devtools.AddIntegTestUsage()
 	defer devtools.StopIntegTestEnv()
-	mg.SerialDeps(integtest.GoIntegTest, PythonIntegTest)
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest() {
+	mg.Deps(integtest.GoIntegTest)
 }
 
 // PythonUnitTest executes the python system tests.
