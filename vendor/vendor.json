@@ -1359,44 +1359,44 @@
 			"revisionTime": "2018-08-31T13:10:45Z"
 		},
 		{
-			"checksumSHA1": "tuhGcluN3UtoiFBovqsep6aPx3s=",
+			"checksumSHA1": "0Wy9N78P/Gh12DUbixilznW67ak=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "TX9y4oPL5YmT4Gb/OU4GIPTdQB4=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "hPqGM3DENaGfipEODoyZ4mKogTQ=",
 			"path": "github.com/elastic/gosigar/sys",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "mLq5lOyD0ZU39ysXuf1ETOLJ+f0=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
-			"checksumSHA1": "R70u1XUHH/t1pquvHEFDeUFtkFk=",
+			"checksumSHA1": "ZoHlhk6iiV8eMn0ozjy6mvC5+Dc=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "Klc34HULvwvY4cGA/D8HmqtXLqw=",
