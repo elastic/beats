@@ -55,8 +55,14 @@ func Enroll(
 
 	ts := time.Now()
 
+	// This timestamp format is a variation of RFC3339 replacing colons with
+	// slashes so that it can be used as part of a filename in all OSes.
+	// (Colon is not a valid character for filenames in Windows).
+	// Also removed the TZ-offset as that can cause a plus sign to be output.
+	const fsSafeTimestamp = "2006-01-02T15-04-05"
+
 	// backup current settings:
-	backConfigFile := configFile + "." + ts.Format(time.RFC3339) + ".bak"
+	backConfigFile := configFile + "." + ts.Format(fsSafeTimestamp) + ".bak"
 	fmt.Println("Saving a copy of current settings to " + backConfigFile)
 	err = file.SafeFileRotate(backConfigFile, configFile)
 	if err != nil {
