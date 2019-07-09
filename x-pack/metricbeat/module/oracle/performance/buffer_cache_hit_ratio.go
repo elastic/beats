@@ -2,9 +2,10 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package tablespace
+package performance
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/pkg/errors"
@@ -15,11 +16,11 @@ type bufferCacheHitRatio struct {
 	physicalReads  sql.NullInt64
 	dbBlockGets    sql.NullInt64
 	consistentGets sql.NullInt64
-	hitRatio       float64
+	hitRatio       sql.NullFloat64
 }
 
-func (e *performanceExtractor) bufferCacheHitRatio() ([]bufferCacheHitRatio, error) {
-	rows, err := e.db.Query(`SELECT name, physical_reads, db_block_gets, consistent_gets,
+func (e *performanceExtractor) bufferCacheHitRatio(ctx context.Context) ([]bufferCacheHitRatio, error) {
+	rows, err := e.db.QueryContext(ctx, `SELECT name, physical_reads, db_block_gets, consistent_gets,
        1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit Ratio"
 FROM V$BUFFER_POOL_STATISTICS;`)
 	if err != nil {

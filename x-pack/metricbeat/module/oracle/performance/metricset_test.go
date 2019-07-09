@@ -4,7 +4,7 @@
 
 // +build integration
 
-package tablespace
+package performance
 
 import (
 	"testing"
@@ -19,9 +19,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
 
-	events, errs := mbtest.ReportingFetchV2Error(f)
+	events, errs := mbtest.ReportingFetchV2WithContext(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}

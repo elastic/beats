@@ -6,7 +6,7 @@ package tablespace
 
 import (
 	"context"
-	"database/sql"
+	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
 
 	"github.com/pkg/errors"
 
@@ -78,9 +78,9 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
-				m.checkNullInt64(out, key, "space.total.bytes", tempFreeSpaceTable.TablespaceSize)
-				m.checkNullInt64(out, key, "space.used.bytes", tempFreeSpaceTable.UsedSpaceBytes)
-				m.checkNullInt64(out, key, "space.free.bytes", tempFreeSpaceTable.FreeSpace)
+				oracle.CheckNullSqlValue(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{tempFreeSpaceTable.TablespaceSize})
+				oracle.CheckNullSqlValue(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{tempFreeSpaceTable.UsedSpaceBytes})
+				oracle.CheckNullSqlValue(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{tempFreeSpaceTable.FreeSpace})
 			}
 		}
 	}
@@ -99,8 +99,8 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 		if name != "" {
 			for _, freeSpaceTable := range freeSpaces {
 				if name == freeSpaceTable.TablespaceName {
-					m.checkNullInt64(out, key, "space.free.bytes", freeSpaceTable.TotalFreeBytes)
-					m.checkNullInt64(out, key, "space.used.bytes", freeSpaceTable.TotalUsedBytes)
+					oracle.CheckNullSqlValue(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{freeSpaceTable.TotalFreeBytes})
+					oracle.CheckNullSqlValue(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{freeSpaceTable.TotalUsedBytes})
 				}
 			}
 		}
@@ -115,34 +115,13 @@ func (m *MetricSet) addDataFileData(d *dataFile, output map[string]common.MapStr
 
 	_, _ = output[d.hash()].Put("name", d.eventKey())
 
-	m.checkNullString(output, d.hash(), "data_file.name", d.FileName)
-	m.checkNullInt64(output, d.hash(), "data_file.id", d.FileID)
-	m.checkNullInt64(output, d.hash(), "data_file.size.bytes", d.FileSizeBytes)
-	m.checkNullInt64(output, d.hash(), "data_file.size.max.bytes", d.MaxFileSizeBytes)
-	m.checkNullInt64(output, d.hash(), "data_file.size.free.bytes", d.AvailableForUserBytes)
-	m.checkNullString(output, d.hash(), "data_file.status", d.Status)
-	m.checkNullString(output, d.hash(), "data_file.online_status", d.OnlineStatus)
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{d.FileName})
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.name", &oracle.StringValue{d.FileName})
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.status", &oracle.StringValue{d.Status})
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.online_status", &oracle.StringValue{d.OnlineStatus})
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.id", &oracle.Int64Value{d.FileID})
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.size.bytes", &oracle.Int64Value{d.FileSizeBytes})
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.size.max.bytes", &oracle.Int64Value{d.MaxFileSizeBytes})
+	oracle.CheckNullSqlValue(m.Logger(), output, d.hash(), "data_file.size.free.bytes", &oracle.Int64Value{d.AvailableForUserBytes})
 
-}
-
-// checkNullInt64 avoid setting an invalid 0 long value on Metricbeat event
-func (m *MetricSet) checkNullInt64(output map[string]common.MapStr, parentKey, field string, nullInt64 sql.NullInt64) {
-	if nullInt64.Valid {
-		if _, ok := output[parentKey]; ok {
-			if _, err := output[parentKey].Put(field, nullInt64.Int64); err != nil {
-				m.Logger().Debug(err)
-			}
-		}
-	}
-}
-
-// checkNullString avoid setting an invalid empty string value on Metricbeat event
-func (m *MetricSet) checkNullString(output map[string]common.MapStr, parentKey, field string, nullString sql.NullString) {
-	if nullString.Valid {
-		if _, ok := output[parentKey]; ok {
-			if _, err := output[parentKey].Put(field, nullString.String); err != nil {
-				m.Logger().Debug(err)
-			}
-		}
-	}
 }
