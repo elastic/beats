@@ -22,18 +22,18 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: http
-  id: localhost
-  urls: ["http://localhost:9200"]
-  schedule: '@every 10s'
+  id: occasional-issues
+  urls: ["http://localhost:5678/pattern?r=200x220,500x4"]
+  schedule: '@every 1s'
 - type: http
-  id: elastic-co
-  urls: ["https://www.elastic.co"]
-  schedule: '@every 10s'
+  id: always-green
+  urls: ["http://localhost:5678/"]
+  schedule: '@every 1s'
   mode: all
 - type: http
-  id: andrewvc-com
-  urls: ["http://blog.andrewvc.com"]
-  schedule: '@every 10s'
+  id: always-down
+  urls: ["http://localhost:5678/pattern?r=500x4,404x4"]
+  schedule: '@every 1s'
   mode: all
 
 
