@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
 - Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
 - Limit memory usage of Redis replication sessions. {issue}12657[12657]
+- Fix parsing the extended RCODE in the DNS parser. {pull}12805[12805]
 
 *Winlogbeat*
 
@@ -185,6 +186,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 - Add `decompress_gzip_field` processor. {pull}12733[12733]
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
+- Add Oracle Tablespaces Dashboard {pull}12736[12736]
 
 *Auditbeat*
 
@@ -249,7 +251,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
 - Add overview dashboard to Consul module {pull}10665[10665]
 - New fields were added in the mysql/status metricset. {pull}12227[12227]
-- Added kubernetes metricset `proxy`. {pull}12312[12312]
+- Add Kubernetes metricset `proxy`. {pull}12312[12312]
+- Add Kubernetes proxy dashboard to Kubernetes module {pull}12734[12734]
 - Always report Pod UID in the `pod` metricset. {pull}12345[12345]
 - Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
 - Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
@@ -257,13 +260,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for metricbeat modules based on existing modules (a.k.a. light modules) {issue}12270[12270] {pull}12465[12465]
 - Add a system/entropy metricset {pull}12450[12450]
 - Add kubernetes metricset `controllermanager` {pull}12409[12409]
+- Add Kubernetes controller manager dashboard to Kubernetes module {pull}12744[12744]
 - Allow redis URL format in redis hosts config. {pull}12408[12408]
 - Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
 - Add kubernetes metricset `scheduler` {pull}12521[12521]
+- Add Kubernetes scheduler dashboard to Kubernetes module {pull}12749[12749]
 - Add `beat` module. {pull}12181[12181] {pull}12615[12615]
 - Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
 - Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
 - Add Oracle Module {pull}11890[11890]
+
 
 *Packetbeat*
 
