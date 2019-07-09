@@ -20,6 +20,8 @@
 package diskio
 
 import (
+	windows2 "golang.org/x/sys/windows"
+	"strings"
 	"syscall"
 	"unsafe"
 
@@ -86,7 +88,8 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 		var counter diskPerformance
 		err = ioCounter(drive.UNCPath, &counter)
 		if err != nil {
-			return nil, err
+			logp.Err("Could not return any performance counter values for %s .Error: %v", drive.UNCPath, err)
+			continue
 		}
 		ret[drive.Name] = disk.IOCountersStat{
 			Name:       drive.Name,
@@ -224,5 +227,36 @@ func isValidLogicalDrive(path string) bool {
 	if ret == 1 || ret == 5 || err != errorSuccess {
 		return false
 	}
+
+	//check for ramdisk label as the drive type is fixed in this case
+	volumeLabel, err := GetVolumeLabel(utfPath)
+	if err != nil {
+		return false
+	}
+	if strings.ToLower(volumeLabel) == "ramdisk" {
+		return false
+	}
 	return true
+}
+
+// GetVolumeLabel function will retrieve the volume label
+func GetVolumeLabel(path *uint16) (string, error) {
+	lpVolumeNameBuffer := make([]uint16, 256)
+	lpVolumeSerialNumber := uint32(0)
+	lpMaximumComponentLength := uint32(0)
+	lpFileSystemFlags := uint32(0)
+	lpFileSystemNameBuffer := make([]uint16, 256)
+	err := windows2.GetVolumeInformation(
+		path,
+		&lpVolumeNameBuffer[0],
+		uint32(len(lpVolumeNameBuffer)),
+		&lpVolumeSerialNumber,
+		&lpMaximumComponentLength,
+		&lpFileSystemFlags,
+		&lpFileSystemNameBuffer[0],
+		uint32(len(lpFileSystemNameBuffer)))
+	if err != nil {
+		return "", err
+	}
+	return syscall.UTF16ToString(lpVolumeNameBuffer), nil
 }
