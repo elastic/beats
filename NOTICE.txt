@@ -786,7 +786,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Revision: 9a4be54a53be4c48b44d351d52fb425a5e274be5
+Version: v1.0.2
+Revision: 06c1f463545498d8f4b378d4dcf3171794c28537
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
@@ -836,8 +837,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.10.3
-Revision: 99ed9cf55303a9d3936cb656b9a86a4a6e67b30a
+Version: v0.10.4
+Revision: f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
