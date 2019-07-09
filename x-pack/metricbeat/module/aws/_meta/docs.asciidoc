@@ -81,4 +81,4 @@ for a list of AWS services that publish metrics to CloudWatch.
 dimensions to Amazon CloudWatch every minute.
 
 [id="aws-credentials-config"]
-include::../../../../libbeat/docs/aws-credentials-config.asciidoc[]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]

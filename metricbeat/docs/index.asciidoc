@@ -1,8 +1,11 @@
 = Metricbeat Reference
 
 :libbeat-dir: ../../libbeat
+:libbeat-xpack-dir: ../../../x-pack/libbeat
 
 include::{libbeat-dir}/docs/version.asciidoc[]
+
+include::{libbeat-xpack-dir}/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
