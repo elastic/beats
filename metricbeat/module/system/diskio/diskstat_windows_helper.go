@@ -20,10 +20,11 @@
 package diskio
 
 import (
-	windows2 "golang.org/x/sys/windows"
 	"strings"
 	"syscall"
 	"unsafe"
+
+	windows2 "golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/libbeat/logp"
 
