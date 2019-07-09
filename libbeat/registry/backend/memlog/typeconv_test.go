@@ -44,7 +44,8 @@ func TestTypeConv(t *testing.T) {
 
 	t.Run("to MapStr", withTypeConv(func(t *testing.T, tc *typeConv) {
 		var m common.MapStr
-		tc.Convert(&m, struct{ A string }{"test"})
+		err := tc.Convert(&m, struct{ A string }{"test"})
+		require.NoError(t, err)
 		assert.Equal(t, common.MapStr{"a": "test"}, m)
 	}))
 
@@ -53,10 +54,40 @@ func TestTypeConv(t *testing.T) {
 		ts := time.Unix(1234, 5678).UTC()
 
 		off := int16(-1)
-		expected := []uint64{uint64(5678) | uint64(off)<<32, 1234}
+		expected := []uint64{uint64(5678) | uint64(uint16(off))<<32, 1234}
 
-		tc.Convert(&m, struct{ Timestamp time.Time }{ts})
+		err := tc.Convert(&m, struct{ Timestamp time.Time }{ts})
+		require.NoError(t, err)
 		assert.Equal(t, common.MapStr{"timestamp": expected}, m)
+	}))
+
+	t.Run("timestamp from encoded MapStr", withTypeConv(func(t *testing.T, tc *typeConv) {
+		type testStruct struct {
+			Timestamp time.Time
+		}
+
+		var v testStruct
+		off := int16(-1)
+		err := tc.Convert(&v, common.MapStr{
+			"timestamp": []uint64{5678 | (uint64(uint16(off)))<<32, 1234},
+		})
+		require.NoError(t, err)
+		expected := time.Unix(1234, 5678).UTC()
+		assert.Equal(t, testStruct{expected}, v)
+	}))
+
+	t.Run("timestamp from string", withTypeConv(func(t *testing.T, tc *typeConv) {
+		type testStruct struct {
+			Timestamp time.Time
+		}
+
+		var v testStruct
+		ts := time.Now()
+		err := tc.Convert(&v, common.MapStr{
+			"timestamp": ts.Format(time.RFC3339),
+		})
+		require.NoError(t, err)
+		assert.Equal(t, v.Timestamp.Format(time.RFC3339), ts.Format(time.RFC3339))
 	}))
 }
 
