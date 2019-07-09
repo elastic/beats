@@ -776,8 +776,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-structform
-Version: v0.0.5
-Revision: 1425975cf4eb470099fcf02cbe9389cf3a7028a3
+Version: v0.0.6
+Revision: a50e916a1b628ad1abc6f58b47668a2f60075ef1
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-structform/LICENSE:
 --------------------------------------------------------------------

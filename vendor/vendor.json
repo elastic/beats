@@ -1087,60 +1087,72 @@
 			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "W459MQNQ8qF6qmzLO/QLevTKZlU=",
+			"checksumSHA1": "emdbYfb0g8SZbGdA5SjG5KqtSeg=",
 			"path": "github.com/elastic/go-structform",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "BnoVvQlbw1jk1oveTVQtG+dhGRs=",
 			"path": "github.com/elastic/go-structform/cborl",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "xjEIhANt0tAq4FjndVCLQhCXkQo=",
+			"checksumSHA1": "bM07XJFGHFoV9uXA2eyQ7jLNP04=",
 			"path": "github.com/elastic/go-structform/gotype",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
+		},
+		{
+			"path": "github.com/elastic/go-structform/internal/cborl",
+			"revision": "v0.0.6",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
+		},
+		{
+			"path": "github.com/elastic/go-structform/internal/gotype",
+			"revision": "v0.0.6",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "BIRSw/+jqs6VTgRx4MXJy453oGQ=",
 			"path": "github.com/elastic/go-structform/internal/unsafe",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "VPkz0hvtlbDDObJJZoTrjF2CN68=",
+			"checksumSHA1": "FhQJI0wITqamJEpedRmyvzTvyy0=",
 			"path": "github.com/elastic/go-structform/json",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "zRLY43OHR3VYw3fu3XznhxziC4E=",
+			"checksumSHA1": "/D2bDi80hOOAC4Ftf/QpHdi2UFU=",
 			"path": "github.com/elastic/go-structform/ubjson",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "QC8/6yQsm4f+zZo14ExnFtyiaXk=",
 			"path": "github.com/elastic/go-structform/visitors",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "pdGPPNf1TeT3fTl8Uwl55hE9/G8=",
