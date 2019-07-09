@@ -64,7 +64,6 @@ func writeTemplate(filename string, t *template.Template, args interface{}) erro
 	if err != nil {
 		return errors.Wrap(err, "error executing template")
 	}
-
 	return nil
 }
 
@@ -82,16 +81,12 @@ var funcMap = template.FuncMap{
 
 // setupDirectory clears and re-creates the docs/modules directory.
 func setupDirectory() error {
-
 	docpath := mage.OSSBeatDir("docs/modules")
-
 	err := os.RemoveAll(docpath)
 	if err != nil {
 		return err
 	}
-
 	return os.MkdirAll(docpath, 0744)
-
 }
 
 // getRelease gets the release tag, and errors out if one doesn't exist.
@@ -354,7 +349,6 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 
 // writeDocs writes the module data to docs/
 func writeDocs(modules []moduleData) error {
-
 	tmplList := template.New("moduleList").Option("missingkey=error").Funcs(funcMap)
 	tmplList, err := tmplList.ParseGlob(mage.OSSBeatDir("scripts/mage/template/*.tmpl"))
 	if err != nil {
