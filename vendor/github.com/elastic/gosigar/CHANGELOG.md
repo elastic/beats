@@ -12,6 +12,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Deprecated
 
+## [0.10.4]
+
+### Fixed
+
+- Fixed a crash when splitting command-line arguments under Windows. #124
+
+## [0.10.3]
+
+### Fixed
+- ProcState.Get() doesn't fail under Windows when it cannot obtain process ownership information. #121
+
 ## [0.10.2]
 
 ### Fixed
