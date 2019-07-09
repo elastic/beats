@@ -131,10 +131,14 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 		return nil
 	}
 
-	// protocol
-	v, err = event.GetValue(p.Fields.TransportProtocol)
+	// protocol (try IANA number first)
+	v, err = event.GetValue(p.Fields.IANANumber)
 	if err != nil {
-		return nil
+		// Try transport protocol name next.
+		v, err = event.GetValue(p.Fields.TransportProtocol)
+		if err != nil {
+			return nil
+		}
 	}
 	flow.Protocol, ok = tryToIANATransportProtocol(v)
 	if !ok {
@@ -250,7 +254,11 @@ const (
 	igmpProtocol     uint8 = 2
 	tcpProtocol      uint8 = 6
 	udpProtocol      uint8 = 17
+	greProtocol      uint8 = 47
 	icmpIPv6Protocol uint8 = 58
+	eigrpProtocol    uint8 = 88
+	ospfProtocol     uint8 = 89
+	pimProtocol      uint8 = 103
 	sctpProtocol     uint8 = 132
 )
 
@@ -259,8 +267,12 @@ var transports = map[string]uint8{
 	"igmp":      igmpProtocol,
 	"tcp":       tcpProtocol,
 	"udp":       udpProtocol,
+	"gre":       greProtocol,
 	"ipv6-icmp": icmpIPv6Protocol,
 	"icmpv6":    icmpIPv6Protocol,
+	"eigrp":     eigrpProtocol,
+	"ospf":      ospfProtocol,
+	"pim":       pimProtocol,
 	"sctp":      sctpProtocol,
 }
 

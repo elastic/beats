@@ -218,6 +218,13 @@
 #    target: ""
 #    overwrite_keys: false
 #
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
 # The following example copies the value of message to message_copied
 #
 #processors:
@@ -549,8 +556,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
