@@ -503,9 +503,17 @@ func GetUserProcessParams(handle syscall.Handle, pbi ProcessBasicInformation) (p
 	return params, nil
 }
 
+// ReadProcessUnicodeString returns a zero-terminated UTF-16 string from another
+// process's memory.
 func ReadProcessUnicodeString(handle syscall.Handle, s *UnicodeString) ([]byte, error) {
-	buf := make([]byte, s.Size)
-	nRead, err := ReadProcessMemory(handle, s.Buffer, buf)
+	// Allocate an extra UTF-16 null character at the end in case the read string
+	// is not terminated.
+	extra := 2
+	if s.Size&1 != 0 {
+		extra = 3 // If size is odd, need 3 nulls to terminate.
+	}
+	buf := make([]byte, int(s.Size)+extra)
+	nRead, err := ReadProcessMemory(handle, s.Buffer, buf[:s.Size])
 	if err != nil {
 		return nil, err
 	}
@@ -515,11 +523,25 @@ func ReadProcessUnicodeString(handle syscall.Handle, s *UnicodeString) ([]byte, 
 	return buf, nil
 }
 
-// Use Windows' CommandLineToArgv API to split an UTF-16 command line string
-// into a list of parameters.
+// ByteSliceToStringSlice uses CommandLineToArgv API to split an UTF-16 command
+// line string into a list of parameters.
 func ByteSliceToStringSlice(utf16 []byte) ([]string, error) {
-	if len(utf16) == 0 {
+	n := len(utf16)
+	// Discard odd byte
+	if n&1 != 0 {
+		n--
+		utf16 = utf16[:n]
+	}
+	if n == 0 {
 		return nil, nil
+	}
+	terminated := false
+	for i := 0; i < n && !terminated; i += 2 {
+		terminated = utf16[i] == 0 && utf16[i+1] == 0
+	}
+	if !terminated {
+		// Append a null uint16 at the end if terminator is missing
+		utf16 = append(utf16, 0, 0)
 	}
 	var numArgs int32
 	argsWide, err := syscall.CommandLineToArgv((*uint16)(unsafe.Pointer(&utf16[0])), &numArgs)
