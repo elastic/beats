@@ -359,7 +359,7 @@ func TestFindIdentifierFromARN(t *testing.T) {
 
 func TestGetResourcesTags(t *testing.T) {
 	mockSvc := &MockResourceGroupsTaggingClient{}
-	resourceTagMap, err := GetResourcesTags(mockSvc, []string{"rds"})
+	resourceTagMap, err := GetResourcesTags(mockSvc, "rds")
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(resourceTagMap))
 
