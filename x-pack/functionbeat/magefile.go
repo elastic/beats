@@ -153,7 +153,7 @@ func PythonIntegTest(ctx context.Context) error {
 func BuildSystemTestBinary() error {
 	params := devtools.DefaultTestBinaryArgs()
 	for _, provider := range functionbeat.SelectedProviders {
-		params.Name = devtools.BeatName + "-" + provider
+		params.Name = filepath.Join(provider, devtools.BeatName+"-"+provider)
 		inputFiles := make([]string, 0)
 		for _, inputFileName := range []string{"main.go", "main_test.go"} {
 			inputFiles = append(inputFiles, filepath.Join(provider, inputFileName))
