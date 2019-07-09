@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -28,6 +27,8 @@ import (
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
+
+	"text/template"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
@@ -45,16 +46,6 @@ type moduleData struct {
 	Metricsets []metricsetData
 }
 
-// checkConfig checks to see if the config list has a particular item
-func (m moduleData) checkConfig(key string) bool {
-	for _, item := range m.Settings {
-		if item == key {
-			return true
-		}
-	}
-	return false
-}
-
 type metricsetData struct {
 	Path       string
 	Title      string
@@ -63,33 +54,31 @@ type metricsetData struct {
 	DataExists bool
 }
 
-var generatedNote = `////
-This file is generated! See scripts/docs_collector.py
-////
+func writeTemplate(filename string, t *template.Template, args interface{}) error {
+	fd, err := os.Create(filename)
+	if err != nil {
+		return errors.Wrapf(err, "error opening file at %s", filename)
+	}
+	defer fd.Close()
+	err = t.Execute(fd, args)
+	if err != nil {
+		return errors.Wrap(err, "error executing template")
+	}
 
-`
+	return nil
+}
 
-var moduleExampleConfig = `
-
-[float]
-=== Example configuration
-
-The %s module supports the standard configuration options that are described
-in <<configuration-metricbeat>>. Here is an example configuration:
-
-[source,yaml]
-----
-metricbeat.modules:
-`
-
-var metricsetFields = `
-
-==== Fields
-
-For a description of each field in the metricset, see the
-<<exported-fields-%s,exported fields>> section.
-
-`
+//a helper function used by the tempate engine to generate the base paths
+// We're doing this because the mage.*Dir() functions will return an absolute path, which we can't just throw into the docs.
+var funcMap = template.FuncMap{
+	"basePath": func(path string) string {
+		base := "module"
+		if strings.Contains(path, mage.XPackBeatDir()) {
+			base = "../x-pack/metricbeat/module"
+		}
+		return base
+	},
+}
 
 // setupDirectory clears and re-creates the docs/modules directory.
 func setupDirectory() error {
@@ -262,14 +251,14 @@ func gatherMetricsets(modulePath string, moduleName string) ([]metricsetData, er
 }
 
 // gatherData gathers all the data we need to construct the docs that end up in metricbeat/docs
-func gatherData(modules []string) (map[string]moduleData, error) {
-	moduleMap := make(map[string]moduleData)
+func gatherData(modules []string) ([]moduleData, error) {
+	moduleList := make([]moduleData, 0)
 	//iterate over all the modules, checking to make sure we have an asciidoc file
 	for _, module := range modules {
 
 		isModule, err := testIfDocsInDir(module)
 		if err != nil {
-			return moduleMap, err
+			return moduleList, err
 		}
 		if !isModule {
 			continue
@@ -278,28 +267,28 @@ func gatherData(modules []string) (map[string]moduleData, error) {
 
 		err = createDocsPath(moduleName)
 		if err != nil {
-			return moduleMap, err
+			return moduleList, err
 		}
 
 		fieldsm, err := loadModuleFields(filepath.Join(module, "_meta/fields.yml"))
 		if err != nil {
-			return moduleMap, err
+			return moduleList, err
 		}
 
 		cfgPath, err := getConfigfile(module)
 		if err != nil {
-			return moduleMap, err
+			return moduleList, err
 		}
 
 		metricsets, err := gatherMetricsets(module, moduleName)
 		if err != nil {
-			return moduleMap, err
+			return moduleList, err
 		}
 
 		//dump the contents of the module asciidoc
 		moduleDoc, err := ioutil.ReadFile(filepath.Join(module, "_meta/docs.asciidoc"))
 		if err != nil {
-			return moduleMap, err
+			return moduleList, err
 		}
 
 		fieldsm.Path = module
@@ -307,187 +296,81 @@ func gatherData(modules []string) (map[string]moduleData, error) {
 		fieldsm.Metricsets = metricsets
 		fieldsm.Asciidoc = string(moduleDoc)
 		fieldsm.Dashboards = hasDashboards(module)
+		fieldsm.Base = moduleName
 
-		moduleMap[moduleName] = fieldsm
+		moduleList = append(moduleList, fieldsm)
 
 	} // end of modules loop
 
-	return moduleMap, nil
+	return moduleList, nil
 }
 
 // writeModuleDocs writes the module-level docs
-func writeModuleDocs(modules map[string]moduleData) error {
-	for moduleName, mod := range modules {
-
-		var moduleFile bytes.Buffer
-		moduleFile.WriteString(generatedNote)
-		moduleFile.WriteString(fmt.Sprintf("[[metricbeat-module-%s]]\n== %s module\n\n", moduleName, mod.Title))
-
-		if mod.Release != "ga" {
-			moduleFile.WriteString(fmt.Sprintf("%s[]\n\n", mod.Release))
-
-		}
-		// Add the asciidoc lines, config header, config example
-		moduleFile.WriteString(mod.Asciidoc + fmt.Sprintf(moduleExampleConfig, mod.Title) + mod.CfgFile + "----\n\n")
-
-		// we're doing this in a somewhat klunky way to insure the order of the original python script is preserved
-		additonalHelpers := false
-		if mod.checkConfig("ssl") {
-			moduleFile.WriteString("This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.\n")
-			additonalHelpers = true
-		}
-		if mod.checkConfig("http") {
-			moduleFile.WriteString("It also supports the options described in <<module-http-config-options>>.\n")
-			additonalHelpers = true
-		}
-
-		if additonalHelpers {
-			moduleFile.WriteString("\n")
-		}
-
-		// Add the metricset links
-
-		moduleFile.WriteString("[float]\n=== Metricsets\n\nThe following metricsets are available:\n\n")
-		// iterate over the metricsets, adding links and includes.
-		// Again, this particular way is done to preserve the output of the original python script
-		for _, ms := range mod.Metricsets {
-			moduleFile.WriteString(fmt.Sprintf("* %s\n\n", ms.Link))
-
-		}
-		for _, ms := range mod.Metricsets {
-			moduleFile.WriteString(fmt.Sprintf("include::%s/%s.asciidoc[]\n\n", moduleName, ms.Title))
-
-		}
-
-		// write to doc file
-		filename := mage.OSSBeatDir(filepath.Join("docs", "modules", fmt.Sprintf("%s.asciidoc", moduleName)))
-		err := ioutil.WriteFile(filename, moduleFile.Bytes(), 0644)
+func writeModuleDocs(modules []moduleData, t *template.Template) error {
+	for _, mod := range modules {
+		filename := mage.OSSBeatDir(filepath.Join("docs", "modules", fmt.Sprintf("%s.asciidoc", mod.Base)))
+		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
 		if err != nil {
-			return errors.Wrapf(err, "error writing file %s", filename)
+			return err
 		}
 	}
-
 	return nil
 }
 
 // writeMetricsetDocs writes the metricset-level docs
-func writeMetricsetDocs(modules map[string]moduleData) error {
-	for moduleName, mod := range modules {
-
+func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
+	for _, mod := range modules {
 		for _, metricset := range mod.Metricsets {
-			var metricsetFile bytes.Buffer
-			metricsetFile.WriteString(generatedNote)
-			metricsetFile.WriteString(fmt.Sprintf("[[metricbeat-metricset-%s-%s]]\n=== %s %s metricset\n\n", moduleName, metricset.Title, mod.Title, metricset.Title))
-
-			if metricset.Release != "ga" {
-				metricsetFile.WriteString(fmt.Sprintf("%s[]\n\n", metricset.Release))
+			modData := struct {
+				Mod       moduleData
+				Metricset metricsetData
+			}{
+				mod,
+				metricset,
 			}
-
-			// We're doing this because the maage.*Dir() functions will return an absolute path, which we can't just throw into the docs.
-			// So emulate the behavior of the python scripts and have relative paths
-			base := "module"
-			if strings.Contains(mod.Path, mage.XPackBeatDir()) {
-				base = "../x-pack/metricbeat/module"
-			}
-			metricsetFile.WriteString(fmt.Sprintf("include::../../../%s/%s/%s/_meta/docs.asciidoc[]\n", base, moduleName, metricset.Title))
-			metricsetFile.WriteString(fmt.Sprintf(metricsetFields, moduleName))
-
-			if metricset.DataExists {
-				metricsetFile.WriteString("Here is an example document generated by this metricset:\n\n[source,json]\n----\n")
-				metricsetFile.WriteString(fmt.Sprintf("include::../../../%s/%s/%s/_meta/data.json[]\n----\n", base, moduleName, metricset.Title))
-
-			}
-
-			// write to the metricset doc file
-			filename := mage.OSSBeatDir(filepath.Join("docs", "modules", moduleName, fmt.Sprintf("%s.asciidoc", metricset.Title)))
-			err := ioutil.WriteFile(filename, metricsetFile.Bytes(), 0644)
+			filename := mage.OSSBeatDir(filepath.Join("docs", "modules", mod.Base, fmt.Sprintf("%s.asciidoc", metricset.Title)))
+			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
-				return errors.Wrapf(err, "error writing file %s", filename)
+				return errors.Wrapf(err, "error opening file at %s", filename)
 			}
-
 		} // end metricset loop
-
 	} // end module loop
-
 	return nil
 }
 
 // writeModuleList writes the module linked list
-func writeModuleList(modules map[string]moduleData) error {
-	noIcon := "image:./images/icon-no.png[No prebuilt dashboards] "
-	yesIcon := "image:./images/icon-yes.png[Prebuilt dashboards are available] "
-	var moduleList bytes.Buffer
-	moduleList.WriteString(generatedNote + "[options=\"header\"]\n|===\n|Modules   |Dashboards   |Metricsets   \n")
-
-	// sort the map by sorting the keys, then arrange links in alphabetical order
-	keys := make([]string, 0)
-	for key := range modules {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-
-	for _, key := range keys {
-		mod := modules[key]
-
-		releaseString := ""
-		if mod.Release != "ga" {
-			releaseString = fmt.Sprintf("%s[]", mod.Release)
-		}
-
-		hasDash := noIcon
-		if mod.Dashboards {
-			hasDash = yesIcon
-		}
-
-		moduleList.WriteString(fmt.Sprintf("|<<metricbeat-module-%s,%s>>  %s   |%s   |  \n", key, mod.Title, releaseString, hasDash))
-		// Make sure empty entry row spans over all metricset rows for this module
-		moduleList.WriteString(fmt.Sprintf(".%d+| .%d+|  ", len(mod.Metricsets), len(mod.Metricsets)))
-
-		// gotta sort these again
-		sort.Slice(mod.Metricsets, func(i, j int) bool {
-			return mod.Metricsets[i].Title < mod.Metricsets[j].Title
-		})
-		for _, ms := range mod.Metricsets {
-			msReleaseString := ""
-			if ms.Release != "ga" {
-				msReleaseString = fmt.Sprintf("%s[]", ms.Release)
-			}
-			moduleList.WriteString(fmt.Sprintf("|%s %s  \n", ms.Link, msReleaseString))
-
-		}
-
-	}
-	moduleList.WriteString("|===\n\n--\n\n")
-
-	// iterate again to add the includes
-	for _, key := range keys {
-		moduleList.WriteString(fmt.Sprintf("include::modules/%s.asciidoc[]\n", key))
-
-	}
-
-	// write the module list
+func writeModuleList(modules []moduleData, t *template.Template) error {
+	// Turn the map into a sorted list
+	//Normally the glob functions would do this sorting for us,
+	//but because we mix the regular and x-pack dirs we have to sort them again.
+	sort.Slice(modules, func(i, j int) bool {
+		return modules[i].Base < modules[j].Base
+	})
+	//write and execute the template
 	filepath := mage.OSSBeatDir(filepath.Join("docs", "modules_list.asciidoc"))
-	err := ioutil.WriteFile(filepath, moduleList.Bytes(), 0644)
-	if err != nil {
-		return errors.Wrapf(err, "error writing file %s", filepath)
-	}
+	return writeTemplate(filepath, t.Lookup("moduleList.tmpl"), modules)
 
-	return nil
 }
 
 // writeDocs writes the module data to docs/
-func writeDocs(modules map[string]moduleData) error {
+func writeDocs(modules []moduleData) error {
 
-	err := writeModuleDocs(modules)
+	tmplList := template.New("moduleList").Option("missingkey=error").Funcs(funcMap)
+	tmplList, err := tmplList.ParseGlob(mage.OSSBeatDir("scripts/mage/template/*.tmpl"))
+	if err != nil {
+		return errors.Wrap(err, "error parsing template files")
+	}
+
+	err = writeModuleDocs(modules, tmplList)
 	if err != nil {
 		return errors.Wrap(err, "error writing module docs")
 	}
-	err = writeMetricsetDocs(modules)
+	err = writeMetricsetDocs(modules, tmplList)
 	if err != nil {
 		return errors.Wrap(err, "error writing metricset docs")
 	}
 
-	err = writeModuleList(modules)
+	err = writeModuleList(modules, tmplList)
 	if err != nil {
 		return errors.Wrap(err, "error writing module list")
 	}
