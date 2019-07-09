@@ -141,7 +141,7 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk":       c.Dict("bulk", threadPoolStatsSchema),
+			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
 			"write":      c.Dict("write", threadPoolStatsSchema),
 			"generic":    c.Dict("generic", threadPoolStatsSchema),
 			"get":        c.Dict("get", threadPoolStatsSchema),
