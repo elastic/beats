@@ -1989,12 +1989,12 @@
 			"revisionTime": "2017-03-22T23:44:13Z"
 		},
 		{
-			"checksumSHA1": "VsImZoqjaqgwK+u/4eIEzQhuRNM=",
+			"checksumSHA1": "HIr4QObwKUZBt54QIh1+aTzc4hU=",
 			"path": "github.com/miekg/dns",
-			"revision": "5a2b9fab83ff0f8bfc99684bd5f43a37abe560f1",
-			"revisionTime": "2018-06-04T21:06:13Z",
-			"version": "v1.0.8",
-			"versionExact": "v1.0.8"
+			"revision": "b13675009d59c97f3721247d9efa8914e1866a5b",
+			"revisionTime": "2019-06-28T15:40:26Z",
+			"version": "v1.1.15",
+			"versionExact": "v1.1.15"
 		},
 		{
 			"checksumSHA1": "sWdAYPKyaT4SW8hNQNpRS0sU4lU=",
@@ -2940,12 +2940,6 @@
 			"versionExact": "release-branch.go1.10"
 		},
 		{
-			"checksumSHA1": "+/UD9mGRnKxOhZW3+B+VJdIIPn8=",
-			"path": "gopkg.in/goracle.v2",
-			"revision": "3222d7159b45fce95150f06a57e1bcc2868108d3",
-			"revisionTime": "2019-05-30T18:40:54Z"
-        },
-        {
 			"checksumSHA1": "Mr2fXhMRzlQCgANFm91s536pG7E=",
 			"path": "google.golang.org/api/googleapi/transport",
 			"revision": "02490b97dff7cfde1995bd77de808fd27053bc87",
@@ -3500,6 +3494,12 @@
 			"revisionTime": "2019-06-04T21:21:58Z",
 			"version": "v1.21.1",
 			"versionExact": "v1.21.1"
+		},
+		{
+			"checksumSHA1": "+/UD9mGRnKxOhZW3+B+VJdIIPn8=",
+			"path": "gopkg.in/goracle.v2",
+			"revision": "3222d7159b45fce95150f06a57e1bcc2868108d3",
+			"revisionTime": "2019-05-30T18:40:54Z"
 		},
 		{
 			"checksumSHA1": "6f8MEU31llHM1sLM/GGH4/Qxu0A=",
