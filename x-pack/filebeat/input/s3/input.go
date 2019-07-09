@@ -58,6 +58,7 @@ type Input struct {
 	config    config
 	awsConfig awssdk.Config
 	logger    *logp.Logger
+	close     chan struct{}
 }
 
 type s3Info struct {
@@ -96,6 +97,7 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		config:    config,
 		awsConfig: awsConfig,
 		logger:    logger,
+		close:     make(chan struct{}),
 	}
 
 	return p, nil
@@ -143,14 +145,7 @@ func (p *Input) Run() {
 		svcSQS := sqs.New(awsConfig)
 		svcS3 := s3.New(awsConfig)
 
-		// update message visibility timeout if it's taking longer than 1/2 of
-		// visibilityTimeout to make sure filebeat can finish reading
-		changeMessageVisibilityInput := &sqs.ChangeMessageVisibilityInput{
-			QueueUrl:          &queueURL,
-			VisibilityTimeout: &visibilityTimeout,
-		}
-
-		// receive messages
+		// receive messages from sqs
 		req := svcSQS.ReceiveMessageRequest(
 			&sqs.ReceiveMessageInput{
 				QueueUrl:              &queueURL,
@@ -165,65 +160,84 @@ func (p *Input) Run() {
 			continue
 		}
 
-		// process messages received from sqs
-		if len(output.Messages) > 0 {
-			var wg sync.WaitGroup
-			numMessages := len(output.Messages)
-			wg.Add(numMessages)
-
-			for i := range output.Messages {
-				done := make(chan struct{})
-				// launch goroutine to handle each message from sqs
-				go func(message sqs.Message) {
-					defer wg.Done()
-					defer close(done)
-
-					s3Infos, err := handleMessage(message)
-					if err != nil {
-						p.logger.Error(err.Error())
-					}
-
-					// read from s3 object and create event for each log line
-					p.readS3Object(svcS3, s3Infos)
-
-					// delete message after events are sent
-					err = deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
-					if err != nil {
-						p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
-					}
-				}(output.Messages[i])
-
-				go func(message sqs.Message) {
-					for {
-						select {
-						case <-done:
-							return
-						case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
-							// if half of the set visibilityTimeout passed and this is
-							// still ongoing, then change visibility timeout.
-							changeMessageVisibilityInput.ReceiptHandle = message.ReceiptHandle
-							req := svcSQS.ChangeMessageVisibilityRequest(changeMessageVisibilityInput)
-							_, err = req.Send()
-							if err != nil {
-								p.logger.Error(errors.Wrap(err, "change message visibility failed"))
-							}
-						}
-					}
-				}(output.Messages[i])
-			}
-			wg.Wait()
+		if len(output.Messages) == 0 {
+			p.logger.Debug("no message received from SQS:", queueURL)
+			continue
 		}
+
+		// process messages received from sqs, get logs from s3 and create events
+		p.processor(queueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
 	}
 }
 
-// Stop stops the input and all its harvesters
+// Stop stops the s3 input
 func (p *Input) Stop() {
-	p.outlet.Close()
+	close(p.close)
+	defer p.outlet.Close()
+	p.logger.Info("Stopping s3 input")
 }
 
 // Wait stops the s3 input.
 func (p *Input) Wait() {
 	p.Stop()
+}
+
+func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 *s3.S3, svcSQS *sqs.SQS) {
+	var wg sync.WaitGroup
+	numMessages := len(messages)
+	wg.Add(numMessages)
+
+	// update message visibility timeout if it's taking longer than 1/2 of
+	// visibilityTimeout to make sure filebeat can finish reading
+	changeMessageVisibilityInput := &sqs.ChangeMessageVisibilityInput{
+		QueueUrl:          &queueURL,
+		VisibilityTimeout: &visibilityTimeout,
+	}
+
+	// process messages received from sqs
+	for i := range messages {
+		done := make(chan struct{})
+		// launch goroutine to handle each message from sqs
+		go func(message sqs.Message) {
+			defer wg.Done()
+			defer close(done)
+
+			s3Infos, err := handleMessage(message)
+			if err != nil {
+				p.logger.Error(err.Error())
+			}
+
+			// read from s3 object and create event for each log line
+			p.readS3CreateEvents(svcS3, s3Infos)
+
+			// delete message after events are sent
+			err = deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
+			if err != nil {
+				p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
+			}
+		}(messages[i])
+
+		go func(message sqs.Message) {
+			for {
+				select {
+				case <-p.close:
+					return
+				case <-done:
+					return
+				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
+					// if half of the set visibilityTimeout passed and this is
+					// still ongoing, then change visibility timeout.
+					changeMessageVisibilityInput.ReceiptHandle = message.ReceiptHandle
+					req := svcSQS.ChangeMessageVisibilityRequest(changeMessageVisibilityInput)
+					_, err := req.Send()
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+					}
+				}
+			}
+		}(messages[i])
+	}
+	wg.Wait()
 }
 
 func getRegionFromQueueURL(queueURL string) (string, error) {
@@ -279,7 +293,7 @@ func stringInSlice(name string, bucketNames []string) bool {
 	return false
 }
 
-func (p *Input) readS3Object(svc s3iface.S3API, s3Infos []s3Info) {
+func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 	if len(s3Infos) > 0 {
 		var wg sync.WaitGroup
 		numS3Infos := len(s3Infos)
