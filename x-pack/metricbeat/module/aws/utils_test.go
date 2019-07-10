@@ -6,6 +6,7 @@ package aws
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -55,6 +56,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 		Name:  &dimName,
 		Value: &instanceID,
 	}
+	httpReq, _ := http.NewRequest("", "", nil)
 	return cloudwatch.ListMetricsRequest{
 		Request: &awssdk.Request{
 			Data: &cloudwatch.ListMetricsOutput{
@@ -66,6 +68,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
