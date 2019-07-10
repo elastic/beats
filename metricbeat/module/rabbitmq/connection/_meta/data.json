@@ -12,6 +12,7 @@
         "connection": {
             "channel_max": 65535,
             "channels": 2,
+            "client_provided_name": "Connection2",
             "frame_max": 131072,
             "host": "::1",
             "name": "[::1]:60940 -\u003e [::1]:5672",

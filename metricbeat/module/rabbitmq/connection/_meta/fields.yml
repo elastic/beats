@@ -79,3 +79,7 @@
       type: long
       description: >
         Number of octets received on the connection.
+    - name: client_provided_name
+      type: keyword
+      description: >
+        User specified connection name.
