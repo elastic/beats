@@ -47,7 +47,8 @@ type Input struct {
 	started       bool
 	outlet        channel.Outleter
 	consumerGroup sarama.ConsumerGroup
-	goContext     context.Context
+	kafkaContext  context.Context
+	kafkaCancel   context.CancelFunc // The CancelFunc for kafkaContext
 }
 
 // NewInput creates a new kafka input
@@ -81,12 +82,12 @@ func NewInput(
 
 	// Sarama uses standard go contexts to control cancellation, so we need to
 	// wrap our input context channel in that interface.
-	goContext, cancel := context.WithCancel(context.Background())
+	kafkaContext, kafkaCancel := context.WithCancel(context.Background())
 	go func() {
 		select {
 		case <-inputContext.Done:
 			logp.Info("Closing kafka context because input stopped.")
-			cancel()
+			kafkaCancel()
 			return
 		}
 	}()
@@ -97,7 +98,8 @@ func NewInput(
 		started:       false,
 		outlet:        out,
 		consumerGroup: consumerGroup,
-		goContext:     goContext,
+		kafkaContext:  kafkaContext,
+		kafkaCancel:   kafkaCancel,
 	}
 
 	return input, nil
@@ -124,7 +126,7 @@ func (p *Input) Run() {
 			for {
 				handler := groupHandler{input: p}
 
-				err := p.consumerGroup.Consume(p.goContext, p.config.Topics, handler)
+				err := p.consumerGroup.Consume(p.kafkaContext, p.config.Topics, handler)
 				if err != nil {
 					fmt.Printf("Consume error: %v\n", err)
 					//panic(err)
@@ -136,10 +138,14 @@ func (p *Input) Run() {
 	}
 }
 
+// Wait shuts down the Input by cancelling the internal context.
 func (p *Input) Wait() {
+	p.Stop()
 }
 
+// Stop shuts down the Input by cancelling the internal context.
 func (p *Input) Stop() {
+	p.kafkaCancel()
 }
 
 type groupHandler struct {
@@ -171,9 +177,11 @@ func createEvent(
 func (groupHandler) Setup(session sarama.ConsumerGroupSession) error {
 	return nil
 }
+
 func (groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 	return nil
 }
+
 func (h groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		event := createEvent(sess, claim, msg)
