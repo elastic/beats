@@ -159,6 +159,8 @@ func createEvent(
 			"kafka": common.MapStr{
 				"topic":     claim.Topic(),
 				"partition": claim.Partition(),
+				"offset":    message.Offset,
+				//message.Timestamp
 			},
 			// TODO: add more metadata
 		},

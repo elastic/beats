@@ -118,7 +118,6 @@ func TestInput(t *testing.T) {
 	input.Run()
 
 	timeout := time.After(30 * time.Second)
-	done := make(chan struct{})
 	for _, m := range messageStrs {
 		select {
 		case event := <-events:
@@ -127,17 +126,8 @@ func TestInput(t *testing.T) {
 				t.Fatal(err)
 			}
 			assert.Equal(t, result, m)
-			if state := event.GetState(); state.Finished {
-				//assert.Equal(t, len(logs), int(state.Offset), "file has not been fully read")
-				go func() {
-					//closer(context, input.(*Input))
-					close(done)
-				}()
-			}
-		case <-done:
-			return
 		case <-timeout:
-			t.Fatal("timeout waiting for closed state")
+			t.Fatal("timeout waiting for incoming events")
 		}
 	}
 }
@@ -209,140 +199,5 @@ func writeToKafkaTopic(
 	_, _, err = producer.SendMessage(msg)
 	if err != nil {
 		t.Fatal(err)
-	}
-}
-
-func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return cfg
-}
-
-func newTestConsumer(t *testing.T) sarama.Consumer {
-	hosts := []string{getTestKafkaHost()}
-	consumer, err := sarama.NewConsumer(hosts, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return consumer
-}
-
-var testTopicOffsets = map[string]int64{}
-
-func testReadFromKafkaTopic(
-	t *testing.T, topic string, nMessages int,
-	timeout time.Duration,
-) []*sarama.ConsumerMessage {
-	consumer := newTestConsumer(t)
-	defer func() {
-		consumer.Close()
-	}()
-
-	offset, found := testTopicOffsets[topic]
-	if !found {
-		offset = sarama.OffsetOldest
-	}
-
-	partitionConsumer, err := consumer.ConsumePartition(topic, 0, offset)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		partitionConsumer.Close()
-	}()
-
-	timer := time.After(timeout)
-	var messages []*sarama.ConsumerMessage
-	for i := 0; i < nMessages; i++ {
-		select {
-		case msg := <-partitionConsumer.Messages():
-			messages = append(messages, msg)
-			testTopicOffsets[topic] = msg.Offset + 1
-		case <-timer:
-			break
-		}
-	}
-
-	return messages
-}
-
-func flatten(infos []eventInfo) []beat.Event {
-	var out []beat.Event
-	for _, info := range infos {
-		out = append(out, info.events...)
-	}
-	return out
-}
-
-func single(fields common.MapStr) []eventInfo {
-	return []eventInfo{
-		{
-			events: []beat.Event{
-				{Timestamp: time.Now(), Fields: fields},
-			},
-		},
-	}
-}
-
-func randMulti(batches, n int, event common.MapStr) []eventInfo {
-	var out []eventInfo
-	for i := 0; i < batches; i++ {
-		var data []beat.Event
-		for j := 0; j < n; j++ {
-			tmp := common.MapStr{}
-			for k, v := range event {
-				tmp[k] = v
-			}
-			//tmp["message"] = randString(100)
-			data = append(data, beat.Event{Timestamp: time.Now(), Fields: tmp})
-		}
-
-		out = append(out, eventInfo{data})
-	}
-	return out
-}
-
-func setupInput(t *testing.T, context input.Context, closer func(input.Context, *Input)) {
-	// Setup the input
-	config, _ := common.NewConfigFrom(common.MapStr{
-		"host": "localhost:9092",
-	})
-
-	events := make(chan *util.Data, 100)
-	defer close(events)
-	capturer := NewEventCapturer(events)
-	defer capturer.Close()
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
-		return channel.SubOutlet(capturer), nil
-	}
-
-	input, err := NewInput(config, connector, context)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	// Run the input and wait for finalization
-	input.Run()
-
-	timeout := time.After(30 * time.Second)
-	done := make(chan struct{})
-	for {
-		select {
-		case event := <-events:
-			if state := event.GetState(); state.Finished {
-				//assert.Equal(t, len(logs), int(state.Offset), "file has not been fully read")
-				go func() {
-					closer(context, input.(*Input))
-					close(done)
-				}()
-			}
-		case <-done:
-			return
-		case <-timeout:
-			t.Fatal("timeout waiting for closed state")
-		}
 	}
 }
