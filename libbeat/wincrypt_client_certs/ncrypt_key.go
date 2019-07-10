@@ -79,7 +79,7 @@ func (k *NcyptKey) decryptPKCS1(msg []byte) (plaintext []byte, err error) {
 		nil,
 		uint32(0),
 		&plaintextLen,
-		ncrypt.NCRYPT_PAD_PKCS1_FLAG | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.NCRYPT_PAD_PKCS1_FLAG,
 	)
 
 	if valid != 1 {
@@ -101,7 +101,7 @@ func (k *NcyptKey) decryptPKCS1(msg []byte) (plaintext []byte, err error) {
 		&buffer[0],
 		uint32(len(buffer)),
 		&plaintextLen,
-		ncrypt.NCRYPT_PAD_PKCS1_FLAG | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.NCRYPT_PAD_PKCS1_FLAG,
 	)
 
 	if valid != 1 {
@@ -143,7 +143,7 @@ func (k *NcyptKey) decryptOAEP(msg []byte, hash crypto.Hash, label []byte) (plai
 		nil,
 		0,
 		&plaintextLen,
-		ncrypt.NCRYPT_PAD_OAEP_FLAG | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.NCRYPT_PAD_OAEP_FLAG,
 	)
 
 	if valid != 1 {
@@ -165,7 +165,7 @@ func (k *NcyptKey) decryptOAEP(msg []byte, hash crypto.Hash, label []byte) (plai
 		&buffer[0],
 		uint32(len(buffer)),
 		&plaintextLen,
-		ncrypt.NCRYPT_PAD_OAEP_FLAG | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.NCRYPT_PAD_OAEP_FLAG,
 	)
 
 	if valid != 1 {
@@ -191,7 +191,7 @@ func (k *NcyptKey)decryptSessionKey(msg []byte, key []byte) error {
 		&em[0],
 		uint32(len(em)),
 		&plaintextLen,
-		ncrypt.NCRYPT_PAD_PKCS1_FLAG | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.NCRYPT_PAD_PKCS1_FLAG,
 	)
 
 	valid &= subtle.ConstantTimeEq(int32(plaintextLen), int32(len(key)))
@@ -280,7 +280,7 @@ func (k *NcyptKey) signPSS(digest []byte, pssOpts *rsa.PSSOptions)(signature []b
 		nil,
 		uint32(0),
 		&bytesWritten,
-		ncrypt.BCRYPT_PAD_PSS | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.BCRYPT_PAD_PSS,
 	)
 
 	if err != nil {
@@ -300,7 +300,7 @@ func (k *NcyptKey) signPSS(digest []byte, pssOpts *rsa.PSSOptions)(signature []b
 		&buffer[0],
 		uint32(len(buffer)),
 		&bytesWritten,
-		ncrypt.BCRYPT_PAD_PSS | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.BCRYPT_PAD_PSS,
 	)
 
 	if err != nil {
@@ -331,7 +331,7 @@ func (k *NcyptKey) signPKCS1(digest []byte, hash crypto.Hash)(signature []byte, 
 		nil,
 		uint32(0),
 		&bytesWritten,
-		ncrypt.BCRYPT_PAD_PKCS1 | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.BCRYPT_PAD_PKCS1,
 	)
 
 	if err != nil {
@@ -351,7 +351,7 @@ func (k *NcyptKey) signPKCS1(digest []byte, hash crypto.Hash)(signature []byte, 
 		&buffer[0],
 		uint32(len(buffer)),
 		&bytesWritten,
-		ncrypt.BCRYPT_PAD_PKCS1 | ncrypt.NCRYPT_SILENT_FLAG,
+		ncrypt.BCRYPT_PAD_PKCS1,
 	)
 
 	if err != nil {
