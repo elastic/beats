@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -350,7 +351,11 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 // writeDocs writes the module data to docs/
 func writeDocs(modules []moduleData) error {
 	tmplList := template.New("moduleList").Option("missingkey=error").Funcs(funcMap)
-	tmplList, err := tmplList.ParseGlob(mage.OSSBeatDir("scripts/mage/template/*.tmpl"))
+	beatPath, err := mage.ElasticBeatsDir()
+	if err != nil {
+		return errors.Wrap(err, "error finding beats dir")
+	}
+	tmplList, err = tmplList.ParseGlob(path.Join(beatPath, "metricbeat/scripts/mage/template/*.tmpl"))
 	if err != nil {
 		return errors.Wrap(err, "error parsing template files")
 	}
