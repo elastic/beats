@@ -196,18 +196,6 @@ endif::serverless[]
 
 When true, logs messages in JSON format. The default is false.
 
-ifndef::serverless[]
-[float]
-==== `logging.files.redirect_stderr` experimental[]
-
-When true, diagnostic messages printed to {beatname_uc}'s standard error output
-will also be logged to the log file. This can be helpful in situations were
-{beatname_uc} terminates unexpectedly because an error has been detected by
-Go's runtime but diagnostic information is not present in the log file.
-This feature is only available when logging to files (`logging.to_files` is true).
-Disabled by default.
-endif::serverless[]
-
 [float]
 === Logging format
 
