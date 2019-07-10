@@ -7,6 +7,7 @@
 package ec2
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
@@ -94,6 +95,8 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 		PrivateDnsName:   &privateDNSName,
 		PrivateIpAddress: &privateIP,
 	}
+
+	httpReq, _ := http.NewRequest("", "", nil)
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeInstancesOutput{
@@ -101,6 +104,7 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 					{Instances: []ec2.Instance{instance}},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }

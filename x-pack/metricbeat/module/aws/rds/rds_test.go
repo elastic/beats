@@ -7,6 +7,7 @@
 package rds
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
@@ -53,6 +54,7 @@ func TestCreateMetricDataQuery(t *testing.T) {
 }
 
 func (m *MockRDSClient) DescribeDBInstancesRequest(input *rds.DescribeDBInstancesInput) rds.DescribeDBInstancesRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
 	return rds.DescribeDBInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &rds.DescribeDBInstancesOutput{
@@ -66,6 +68,7 @@ func (m *MockRDSClient) DescribeDBInstancesRequest(input *rds.DescribeDBInstance
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
