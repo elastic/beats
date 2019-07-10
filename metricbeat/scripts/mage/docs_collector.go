@@ -24,7 +24,6 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
-	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
@@ -71,11 +70,11 @@ var funcMap = template.FuncMap{
 	//a helper function used by the tempate engine to generate the base paths
 	// We're doing this because the mage.*Dir() functions will return an absolute path, which we can't just throw into the docs.
 	"basePath": func(path string) string {
-		base := "module"
-		if strings.Contains(path, mage.XPackBeatDir()) {
-			base = "../x-pack/metricbeat/module"
+		rel, err := filepath.Rel(mage.OSSBeatDir(), path)
+		if err != nil {
+			panic(err)
 		}
-		return base
+		return filepath.Dir(rel)
 	},
 }
 
