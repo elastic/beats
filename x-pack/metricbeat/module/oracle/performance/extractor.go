@@ -13,13 +13,17 @@ import (
 type performanceExtractMethods interface {
 	bufferCacheHitRatio(context.Context) ([]bufferCacheHitRatio, error)
 	library(context.Context) ([]library, error)
+	cursorsByUsernameAndMachine(ctx context.Context) ([]cursorsByUsernameAndMachine, error)
+	totalCursors(ctx context.Context) (*totalCursors, error)
 }
 
 // extractedData contains the necessary performance information. Can be updated with more data without affecting methods
 // signatures.
 type extractedData struct {
-	bufferCacheHitRatios []bufferCacheHitRatio
-	libraryData          []library
+	bufferCacheHitRatios        []bufferCacheHitRatio
+	libraryData                 []library
+	cursorsByUsernameAndMachine []cursorsByUsernameAndMachine
+	totalCursors                *totalCursors
 }
 
 // performanceExtractor is the implementor of performanceExtractMethods. It's implementation are on different Go files

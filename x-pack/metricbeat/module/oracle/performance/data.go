@@ -27,6 +27,14 @@ func (m *MetricSet) extract(ctx context.Context, extractor performanceExtractMet
 		return nil, errors.Wrap(err, "error getting temp_free_space")
 	}
 
+	if out.cursorsByUsernameAndMachine, err = extractor.cursorsByUsernameAndMachine(ctx); err != nil {
+		return nil, errors.Wrap(err, "error getting temp_free_space")
+	}
+
+	if out.totalCursors, err = extractor.totalCursors(ctx); err != nil {
+		return nil, errors.Wrap(err, "error getting temp_free_space")
+	}
+
 	return
 }
 
