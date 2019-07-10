@@ -25,22 +25,43 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var defaultConfig = kafkaInputConfig{
-	Version: kafka.Version("1.0.0"),
-	GroupID: "FilebeatGroup",
-}
+type initialOffset int
+
+const (
+	initialOffsetOldest initialOffset = iota
+	initialOffsetNewest
+)
+
+var (
+	defaultConfig = kafkaInputConfig{
+		Version:       kafka.Version("1.0.0"),
+		InitialOffset: initialOffsetOldest,
+	}
+
+	initialOffsets = map[string]initialOffset{
+		"oldest": initialOffsetOldest,
+		"newest": initialOffsetNewest,
+	}
+)
 
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
-	Hosts   []string      `config:"hosts" validate:"required"`
-	Topics  []string      `config:"topics" validate:"required"`
-	Version kafka.Version `config:"version"`
-	GroupID string        `config:"group_id"`
+	Hosts         []string      `config:"hosts" validate:"required"`
+	Topics        []string      `config:"topics" validate:"required"`
+	GroupID       string        `config:"group_id" validate:"required"`
+	Version       kafka.Version `config:"version"`
+	InitialOffset initialOffset `config:"initial_offset"`
+}
+
+func (off initialOffset) asSaramaOffset() int64 {
+	return map[initialOffset]int64{
+		initialOffsetOldest: sarama.OffsetOldest,
+		initialOffsetNewest: sarama.OffsetNewest,
+	}[off]
 }
 
 // Validate validates the config.
 func (c *kafkaInputConfig) Validate() error {
-
 	return nil
 }
 
@@ -63,11 +84,23 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Version = version
 
 	k.Consumer.Return.Errors = true
-	k.Consumer.Offsets.Initial = sarama.OffsetOldest
+	k.Consumer.Offsets.Initial = config.InitialOffset.asSaramaOffset()
 
 	if err := k.Validate(); err != nil {
 		logp.Err("Invalid kafka configuration: %v", err)
 		return nil, err
 	}
 	return k, nil
+}
+
+// Unpack validates and unpack the "initial_offset" config option
+func (off *initialOffset) Unpack(value string) error {
+	initialOffset, ok := initialOffsets[value]
+	if !ok {
+		return fmt.Errorf("invalid initialOffset '%s'", value)
+	}
+
+	*off = initialOffset
+
+	return nil
 }

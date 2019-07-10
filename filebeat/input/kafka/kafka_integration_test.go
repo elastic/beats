@@ -96,8 +96,9 @@ func TestInput(t *testing.T) {
 
 	// Setup the input config
 	config, _ := common.NewConfigFrom(common.MapStr{
-		"hosts":  "kafka:9092",
-		"topics": []string{testTopic},
+		"hosts":    "kafka:9092",
+		"topics":   []string{testTopic},
+		"group_id": "filebeat",
 	})
 
 	// Route input events through our capturer instead of sending through ES.
