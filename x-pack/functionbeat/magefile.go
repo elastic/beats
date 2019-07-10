@@ -114,6 +114,11 @@ func UnitTest() {
 	mg.SerialDeps(unittest.GoUnitTest, PythonUnitTest)
 }
 
+// GoTestUnit is an alias for goUnitTest.
+func GoTestUnit() {
+	mg.Deps(unittest.GoUnitTest)
+}
+
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	devtools.AddIntegTestUsage()
