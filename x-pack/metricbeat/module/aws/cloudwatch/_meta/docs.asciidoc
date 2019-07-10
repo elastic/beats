@@ -106,6 +106,7 @@ from EBS, ELB and EC2 with tags from these services.
 With the configuration below, users will be able to collect specific cloudwatch
 metrics. For example CPUUtilization metric from EC2 instance i-123 and NetworkIn
 metric from EC2 instance i-456.
+[source,yaml]
 ----
 - module: aws
   period: 300s
