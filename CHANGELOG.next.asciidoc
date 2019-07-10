@@ -13,6 +13,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.1. {pull}11330[11330]
 - Update to Golang 1.12.4. {pull}11782[11782]
 - Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
+- Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
+- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
 
 *Auditbeat*
 
@@ -74,6 +76,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
 - Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
+- Fixed `json.add_error_key` property setting for delivering error messages from beat events  {pull}11298[11298]
+- Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 
 *Auditbeat*
 
@@ -88,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - System module: Start system module without host ID. {pull}12373[12373]
 - Host dataset: Fix reboot detection logic. {pull}12591[12591]
 - Add syscalls used by librpm for the system/package dataset to the default Auditbeat seccomp policy. {issue}12578[12578] {pull}12617[12617]
+- Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
 
 *Filebeat*
 
@@ -105,6 +110,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
 - Fix timezone offset parsing in system/syslog. {pull}12529[12529]
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
+- Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
 
 *Heartbeat*
 
@@ -115,6 +122,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Use backoff when no new events are found. {pull}11861[11861]
 - Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716]
+- Preserve host name when reading from remote journal. {pull}12714[12714]
 
 *Metricbeat*
 
@@ -143,6 +151,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
 - Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
 - Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
+- Limit memory usage of Redis replication sessions. {issue}12657[12657]
+- Fix parsing the extended RCODE in the DNS parser. {pull}12805[12805]
 
 *Winlogbeat*
 
@@ -175,7 +185,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
 - Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
 - Add `decode_base64_field` processor for decoding base64 field. {pull}11914[11914]
+- Add support for reading the `network.iana_number` field by default to the community_id processor. {pull}12701[12701]
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
+- Add `decompress_gzip_field` processor. {pull}12733[12733]
+- Add `timestamp` processor for parsing time fields. {pull}12699[12699]
+- Add Oracle Tablespaces Dashboard {pull}12736[12736]
 
 *Auditbeat*
 
@@ -209,7 +223,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
 - Add MSSQL module {pull}12079[12079]
 - Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
 - Use correct OS path separator in `add_kubernetes_metadata` to support Windows nodes. {pull}9205[9205]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
+- Add `google-pubsub` input type for consuming messages from a Google Cloud Pub/Sub topic subscription. {pull}12746[12746]
+- Add module for ingesting Cisco IOS logs over syslog. {pull}12748[12748]
+- Add module for ingesting Google Cloud VPC flow logs. {pull}12747[12747]
 
 *Heartbeat*
 
@@ -235,7 +254,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
 - Add overview dashboard to Consul module {pull}10665[10665]
 - New fields were added in the mysql/status metricset. {pull}12227[12227]
-- Added kubernetes metricset `proxy`. {pull}12312[12312]
+- Add Kubernetes metricset `proxy`. {pull}12312[12312]
+- Add Kubernetes proxy dashboard to Kubernetes module {pull}12734[12734]
 - Always report Pod UID in the `pod` metricset. {pull}12345[12345]
 - Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
 - Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
@@ -243,12 +263,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for metricbeat modules based on existing modules (a.k.a. light modules) {issue}12270[12270] {pull}12465[12465]
 - Add a system/entropy metricset {pull}12450[12450]
 - Add kubernetes metricset `controllermanager` {pull}12409[12409]
+- Add Kubernetes controller manager dashboard to Kubernetes module {pull}12744[12744]
 - Allow redis URL format in redis hosts config. {pull}12408[12408]
 - Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
 - Add kubernetes metricset `scheduler` {pull}12521[12521]
+- Add Kubernetes scheduler dashboard to Kubernetes module {pull}12749[12749]
 - Add `beat` module. {pull}12181[12181] {pull}12615[12615]
 - Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
 - Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
+- Add Oracle Module {pull}11890[11890]
+
 
 *Packetbeat*
 

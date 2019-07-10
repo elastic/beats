@@ -46,3 +46,17 @@ cloudwatch:ListMetrics
 The aws ec2 metricset comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-ec2-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - ec2
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+----
