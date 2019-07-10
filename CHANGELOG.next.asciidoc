@@ -14,6 +14,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.4. {pull}11782[11782]
 - Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
 - Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
+- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
 
 *Auditbeat*
 
@@ -75,6 +76,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
 - Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
+- Fixed `json.add_error_key` property setting for delivering error messages from beat events  {pull}11298[11298]
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 
 *Auditbeat*

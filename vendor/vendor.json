@@ -1087,102 +1087,128 @@
 			"versionExact": "v1.1.0"
 		},
 		{
-			"checksumSHA1": "W459MQNQ8qF6qmzLO/QLevTKZlU=",
+			"checksumSHA1": "emdbYfb0g8SZbGdA5SjG5KqtSeg=",
 			"path": "github.com/elastic/go-structform",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "BnoVvQlbw1jk1oveTVQtG+dhGRs=",
 			"path": "github.com/elastic/go-structform/cborl",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "xjEIhANt0tAq4FjndVCLQhCXkQo=",
+			"checksumSHA1": "bM07XJFGHFoV9uXA2eyQ7jLNP04=",
 			"path": "github.com/elastic/go-structform/gotype",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
+		},
+		{
+			"path": "github.com/elastic/go-structform/internal/cborl",
+			"revision": "v0.0.6",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
+		},
+		{
+			"path": "github.com/elastic/go-structform/internal/gotype",
+			"revision": "v0.0.6",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "BIRSw/+jqs6VTgRx4MXJy453oGQ=",
 			"path": "github.com/elastic/go-structform/internal/unsafe",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "VPkz0hvtlbDDObJJZoTrjF2CN68=",
+			"checksumSHA1": "FhQJI0wITqamJEpedRmyvzTvyy0=",
 			"path": "github.com/elastic/go-structform/json",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "zRLY43OHR3VYw3fu3XznhxziC4E=",
+			"checksumSHA1": "/D2bDi80hOOAC4Ftf/QpHdi2UFU=",
 			"path": "github.com/elastic/go-structform/ubjson",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
 			"checksumSHA1": "QC8/6yQsm4f+zZo14ExnFtyiaXk=",
 			"path": "github.com/elastic/go-structform/visitors",
-			"revision": "1425975cf4eb470099fcf02cbe9389cf3a7028a3",
-			"revisionTime": "2018-08-16T18:22:27Z",
-			"version": "v0.0.5",
-			"versionExact": "v0.0.5"
+			"revision": "a50e916a1b628ad1abc6f58b47668a2f60075ef1",
+			"revisionTime": "2019-07-09T13:44:56Z",
+			"version": "v0.0.6",
+			"versionExact": "v0.0.6"
 		},
 		{
-			"checksumSHA1": "pdGPPNf1TeT3fTl8Uwl55hE9/G8=",
+			"checksumSHA1": "u5pjOSlI10k6Q9LaRcF7OgBa2tU=",
 			"path": "github.com/elastic/go-sysinfo",
-			"revision": "9a4be54a53be4c48b44d351d52fb425a5e274be5",
-			"revisionTime": "2019-05-08T09:33:45Z"
+			"revision": "06c1f463545498d8f4b378d4dcf3171794c28537",
+			"revisionTime": "2019-07-09T16:49:53Z",
+			"version": "v1.0.2",
+			"versionExact": "v1.0.2"
 		},
 		{
 			"checksumSHA1": "GiZCjX17K265TtamGZZw4R2Jwbk=",
 			"path": "github.com/elastic/go-sysinfo/internal/registry",
-			"revision": "9a4be54a53be4c48b44d351d52fb425a5e274be5",
-			"revisionTime": "2019-05-08T09:33:45Z"
+			"revision": "06c1f463545498d8f4b378d4dcf3171794c28537",
+			"revisionTime": "2019-07-09T16:49:53Z",
+			"version": "v1.0.2",
+			"versionExact": "v1.0.2"
 		},
 		{
 			"checksumSHA1": "dVSTUnZHCLNd0tYIENqdj05RyI8=",
 			"path": "github.com/elastic/go-sysinfo/providers/darwin",
-			"revision": "9a4be54a53be4c48b44d351d52fb425a5e274be5",
-			"revisionTime": "2019-05-08T09:33:45Z"
+			"revision": "06c1f463545498d8f4b378d4dcf3171794c28537",
+			"revisionTime": "2019-07-09T16:49:53Z",
+			"version": "v1.0.2",
+			"versionExact": "v1.0.2"
 		},
 		{
 			"checksumSHA1": "LWMXshdY44+JM7g09dA4tXMZ1rY=",
 			"path": "github.com/elastic/go-sysinfo/providers/linux",
-			"revision": "9a4be54a53be4c48b44d351d52fb425a5e274be5",
-			"revisionTime": "2019-05-08T09:33:45Z"
+			"revision": "06c1f463545498d8f4b378d4dcf3171794c28537",
+			"revisionTime": "2019-07-09T16:49:53Z",
+			"version": "v1.0.2",
+			"versionExact": "v1.0.2"
 		},
 		{
 			"checksumSHA1": "RWLvcP1w9ynKbuCqiW6prwd+EDU=",
 			"path": "github.com/elastic/go-sysinfo/providers/shared",
-			"revision": "9a4be54a53be4c48b44d351d52fb425a5e274be5",
-			"revisionTime": "2019-05-08T09:33:45Z"
+			"revision": "06c1f463545498d8f4b378d4dcf3171794c28537",
+			"revisionTime": "2019-07-09T16:49:53Z",
+			"version": "v1.0.2",
+			"versionExact": "v1.0.2"
 		},
 		{
-			"checksumSHA1": "13qV0fFj6P5m1/n1HsdByRW0Hk4=",
+			"checksumSHA1": "E+yrwS/aZemnWUvwTvEhiczYuD8=",
 			"path": "github.com/elastic/go-sysinfo/providers/windows",
-			"revision": "9a4be54a53be4c48b44d351d52fb425a5e274be5",
-			"revisionTime": "2019-05-08T09:33:45Z"
+			"revision": "06c1f463545498d8f4b378d4dcf3171794c28537",
+			"revisionTime": "2019-07-09T16:49:53Z",
+			"version": "v1.0.2",
+			"versionExact": "v1.0.2"
 		},
 		{
 			"checksumSHA1": "OHierbaoOHx79d73DuLrao43rIg=",
 			"path": "github.com/elastic/go-sysinfo/types",
-			"revision": "9a4be54a53be4c48b44d351d52fb425a5e274be5",
-			"revisionTime": "2019-05-08T09:33:45Z"
+			"revision": "06c1f463545498d8f4b378d4dcf3171794c28537",
+			"revisionTime": "2019-07-09T16:49:53Z",
+			"version": "v1.0.2",
+			"versionExact": "v1.0.2"
 		},
 		{
 			"checksumSHA1": "bNf3GDGhZh86bfCIMM5c5AYfo3g=",
@@ -1359,44 +1385,44 @@
 			"revisionTime": "2018-08-31T13:10:45Z"
 		},
 		{
-			"checksumSHA1": "tuhGcluN3UtoiFBovqsep6aPx3s=",
+			"checksumSHA1": "0Wy9N78P/Gh12DUbixilznW67ak=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "TX9y4oPL5YmT4Gb/OU4GIPTdQB4=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "hPqGM3DENaGfipEODoyZ4mKogTQ=",
 			"path": "github.com/elastic/gosigar/sys",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "mLq5lOyD0ZU39ysXuf1ETOLJ+f0=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
-			"checksumSHA1": "R70u1XUHH/t1pquvHEFDeUFtkFk=",
+			"checksumSHA1": "ZoHlhk6iiV8eMn0ozjy6mvC5+Dc=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "99ed9cf55303a9d3936cb656b9a86a4a6e67b30a",
-			"revisionTime": "2019-05-27T11:32:19Z",
-			"version": "v0.10.3",
-			"versionExact": "v0.10.3"
+			"revision": "f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d",
+			"revisionTime": "2019-07-09T16:38:49Z",
+			"version": "v0.10.4",
+			"versionExact": "v0.10.4"
 		},
 		{
 			"checksumSHA1": "Klc34HULvwvY4cGA/D8HmqtXLqw=",
