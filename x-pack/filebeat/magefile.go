@@ -13,6 +13,9 @@ import (
 
 	"github.com/magefile/mage/mg"
 
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/dashboards"
+
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
 )
@@ -20,6 +23,8 @@ import (
 func init() {
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
+
+	dashboards.RegisterImportDeps(Build, collectDashboards)
 }
 
 // Aliases provides compatibility with CI while we transition all Beats
@@ -100,8 +105,8 @@ func fieldsYML() error {
 	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module", "input")
 }
 
-// Dashboards collects all the dashboards and generates index patterns.
-func Dashboards() error {
+// collectDashboards collects all the dashboards and generates index patterns.
+func collectDashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module", "input")
 }
 
@@ -125,7 +130,7 @@ func configYML() error {
 
 // Update is an alias for executing fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, includeList,
+	mg.SerialDeps(Fields, collectDashboards, Config, includeList,
 		filebeat.PrepareModulePackagingXPack)
 }
 
