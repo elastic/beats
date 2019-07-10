@@ -776,8 +776,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-structform
-Version: v0.0.5
-Revision: 1425975cf4eb470099fcf02cbe9389cf3a7028a3
+Version: v0.0.6
+Revision: a50e916a1b628ad1abc6f58b47668a2f60075ef1
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-structform/LICENSE:
 --------------------------------------------------------------------
@@ -786,7 +786,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-sysinfo
-Revision: 9a4be54a53be4c48b44d351d52fb425a5e274be5
+Version: v1.0.2
+Revision: 06c1f463545498d8f4b378d4dcf3171794c28537
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-sysinfo/LICENSE.txt:
 --------------------------------------------------------------------
@@ -836,8 +837,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.10.3
-Revision: 99ed9cf55303a9d3936cb656b9a86a4a6e67b30a
+Version: v0.10.4
+Revision: f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
@@ -2503,8 +2504,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/miekg/dns
-Version: v1.0.8
-Revision: 5a2b9fab83ff0f8bfc99684bd5f43a37abe560f1
+Version: v1.1.15
+Revision: b13675009d59c97f3721247d9efa8914e1866a5b
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/miekg/dns/LICENSE:
 --------------------------------------------------------------------

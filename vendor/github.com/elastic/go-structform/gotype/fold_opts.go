@@ -19,33 +19,32 @@ package gotype
 
 import "reflect"
 
-type initOptions struct {
+type initFoldOptions struct {
 	foldFns map[reflect.Type]reFoldFn
 }
 
-type Option func(*initOptions) error
+type FoldOption func(*initFoldOptions) error
 
-func applyOpts(opts []Option) (initOptions, error) {
-	i := initOptions{}
+func applyFoldOpts(opts []FoldOption) (i initFoldOptions, err error) {
 	for _, o := range opts {
-		if err := o(&i); err != nil {
-			return initOptions{}, err
+		if err = o(&i); err != nil {
+			break
 		}
 	}
-	return i, nil
+	return i, err
 }
 
-func Folders(in ...interface{}) Option {
+func Folders(in ...interface{}) FoldOption {
 	folders, err := makeUserFoldFns(in)
 	if err != nil {
-		return func(_ *initOptions) error { return err }
+		return func(_ *initFoldOptions) error { return err }
 	}
 
 	if len(folders) == 0 {
-		return func(*initOptions) error { return nil }
+		return func(*initFoldOptions) error { return nil }
 	}
 
-	return func(o *initOptions) error {
+	return func(o *initFoldOptions) error {
 		if o.foldFns == nil {
 			o.foldFns = map[reflect.Type]reFoldFn{}
 		}
