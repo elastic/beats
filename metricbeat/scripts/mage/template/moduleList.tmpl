@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 |===
 |Modules   |Dashboards   |Metricsets   
 {{range $k := . -}}
-|<<metricbeat-module-{{$k.Base}},{{$k.Title}}>>  {{if not (eq $k.Release "ga")}}{{$k.Release}}[]{{end}}   |{{if $k.Dashboards}}image:./images/icon-yes.png[Prebuilt dashboards are available] {{else}}image:./images/icon-no.png[No prebuilt dashboards] {{end}}   |  
+|<<{{getBeatName}}-module-{{$k.Base}},{{$k.Title}}>>  {{if not (eq $k.Release "ga")}}{{$k.Release}}[]{{end}}   |{{if $k.Dashboards}}image:./images/icon-yes.png[Prebuilt dashboards are available] {{else}}image:./images/icon-no.png[No prebuilt dashboards] {{end}}   |  
 .{{$k.Metricsets | len}}+| .{{$k.Metricsets | len}}+|  {{range $m := $k.Metricsets}}|{{$m.Link}} {{if not (eq $m.Release "ga")}}{{$m.Release}}[]{{end}}  
 {{end -}}
 {{end -}}

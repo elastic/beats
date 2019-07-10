@@ -24,6 +24,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
@@ -76,6 +77,10 @@ var funcMap = template.FuncMap{
 		}
 		return filepath.Dir(rel)
 	},
+	"getBeatName": func() string {
+		return mage.BeatName
+	},
+	"title": strings.Title,
 }
 
 // setupDirectory clears and re-creates the docs/modules directory.
@@ -211,7 +216,7 @@ func gatherMetricsets(modulePath string, moduleName string) ([]metricsetData, er
 		}
 
 		// generate the asciidoc link used in the module docs, since we need this in a few places
-		link := fmt.Sprintf("<<metricbeat-metricset-%s-%s,%s>>", moduleName, metricsetName, metricsetName)
+		link := fmt.Sprintf("<<%s-metricset-%s-%s,%s>>", mage.BeatName, moduleName, metricsetName, metricsetName)
 
 		// test to see if the metricset has a data.json
 		hasData := false
