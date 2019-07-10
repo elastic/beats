@@ -1,0 +1,21 @@
+- key: kafka-input
+  title: Kafka Input
+  description: >
+    Kafka metadata added by the kafka input
+  short_config: false
+  anchor: kafka-input
+  fields:
+    - name: kafka.topic
+      type: keyword
+      description: >
+        Kafka topic
+
+    - name: kafka.partition
+      type: long
+      description: >
+        Kafka partition number
+
+    - name: kafka.offset
+      type: long
+      description: >
+        Kafka offset of this message

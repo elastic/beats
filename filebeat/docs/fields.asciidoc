@@ -29,6 +29,7 @@ grouped in the following categories:
 * <<exported-fields-iptables>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
+* <<exported-fields-kafka-input>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
@@ -6982,6 +6983,43 @@ Java class the trace is coming from.
 type: text
 
 Message part of the trace.
+
+
+--
+
+[[exported-fields-kafka-input]]
+== Kafka Input fields
+
+Kafka metadata added by the kafka input
+
+
+
+*`kafka.topic`*::
++
+--
+type: keyword
+
+Kafka topic
+
+
+--
+
+*`kafka.partition`*::
++
+--
+type: long
+
+Kafka partition number
+
+
+--
+
+*`kafka.offset`*::
++
+--
+type: long
+
+Kafka offset of this message
 
 
 --
