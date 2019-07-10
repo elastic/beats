@@ -25,11 +25,10 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
-
-	"text/template"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
@@ -68,9 +67,9 @@ func writeTemplate(filename string, t *template.Template, args interface{}) erro
 	return nil
 }
 
-//a helper function used by the tempate engine to generate the base paths
-// We're doing this because the mage.*Dir() functions will return an absolute path, which we can't just throw into the docs.
 var funcMap = template.FuncMap{
+	//a helper function used by the tempate engine to generate the base paths
+	// We're doing this because the mage.*Dir() functions will return an absolute path, which we can't just throw into the docs.
 	"basePath": func(path string) string {
 		base := "module"
 		if strings.Contains(path, mage.XPackBeatDir()) {
@@ -87,7 +86,7 @@ func setupDirectory() error {
 	if err != nil {
 		return err
 	}
-	return os.MkdirAll(docpath, 0744)
+	return os.MkdirAll(docpath, 0755)
 }
 
 // getRelease gets the release tag, and errors out if one doesn't exist.
@@ -104,25 +103,17 @@ func getRelease(rel string) (string, error) {
 
 // createDocsPath creates the path for the entire docs/ folder
 func createDocsPath(module string) error {
-	return os.MkdirAll(mage.OSSBeatDir(filepath.Join("docs/modules", module)), 0755)
+	return os.MkdirAll(mage.OSSBeatDir("docs/modules", module), 0755)
 }
 
 // testIfDocsInDir tests for a `_meta/docs.asciidoc` in a given directory
-func testIfDocsInDir(moduleDir string) (bool, error) {
-	moduledir, err := os.Stat(moduleDir)
+func testIfDocsInDir(moduleDir string) bool {
+
+	_, err := os.Stat(filepath.Join(moduleDir, "_meta/docs.asciidoc"))
 	if err != nil {
-		return false, err
+		return false
 	}
-	if moduledir.Mode().IsRegular() {
-		return false, nil
-	}
-	_, err = os.Stat(filepath.Join(moduleDir, "_meta/docs.asciidoc"))
-	if os.IsNotExist(err) {
-		return false, nil
-	} else if err != nil {
-		return false, errors.Wrap(err, "error looking for asciidoc")
-	}
-	return true, nil
+	return true
 }
 
 // loadModuleFields loads the module-specific fields.yml file
@@ -171,12 +162,11 @@ func getReleaseState(metricsetPath string) (string, error) {
 
 // hasDashboards checks to see if the metricset has dashboards
 func hasDashboards(modulePath string) bool {
-	_, err := os.Stat(filepath.Join(modulePath, "_meta/kibana"))
-	if err != nil {
-		return false
+	info, err := os.Stat(filepath.Join(modulePath, "_meta/kibana"))
+	if err == nil && info.IsDir() {
+		return true
 	}
-
-	return true
+	return false
 }
 
 // getConfigfile uses the config.reference.yml file if it exists. if not, the normal one.
@@ -192,7 +182,7 @@ func getConfigfile(modulePath string) (string, error) {
 		}
 	}
 	if goodPath == "" {
-		return "", fmt.Errorf("Could not find a config file in %s", modulePath)
+		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
 	raw, err := ioutil.ReadFile(goodPath)
@@ -208,7 +198,7 @@ func gatherMetricsets(modulePath string, moduleName string) ([]metricsetData, er
 	}
 	var metricsets []metricsetData
 	for _, metricset := range metricsetList {
-		isMetricset, err := testIfDocsInDir(metricset)
+		isMetricset := testIfDocsInDir(metricset)
 		if err != nil {
 			return nil, err
 		}
@@ -252,16 +242,13 @@ func gatherData(modules []string) ([]moduleData, error) {
 	//iterate over all the modules, checking to make sure we have an asciidoc file
 	for _, module := range modules {
 
-		isModule, err := testIfDocsInDir(module)
-		if err != nil {
-			return moduleList, err
-		}
+		isModule := testIfDocsInDir(module)
 		if !isModule {
 			continue
 		}
 		moduleName := filepath.Base(module)
 
-		err = createDocsPath(moduleName)
+		err := createDocsPath(moduleName)
 		if err != nil {
 			return moduleList, err
 		}
@@ -304,7 +291,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 // writeModuleDocs writes the module-level docs
 func writeModuleDocs(modules []moduleData, t *template.Template) error {
 	for _, mod := range modules {
-		filename := mage.OSSBeatDir(filepath.Join("docs", "modules", fmt.Sprintf("%s.asciidoc", mod.Base)))
+		filename := mage.OSSBeatDir("docs", "modules", fmt.Sprintf("%s.asciidoc", mod.Base))
 		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
 		if err != nil {
 			return err
@@ -324,7 +311,7 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 				mod,
 				metricset,
 			}
-			filename := mage.OSSBeatDir(filepath.Join("docs", "modules", mod.Base, fmt.Sprintf("%s.asciidoc", metricset.Title)))
+			filename := mage.OSSBeatDir("docs", "modules", mod.Base, fmt.Sprintf("%s.asciidoc", metricset.Title))
 			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
 				return errors.Wrapf(err, "error opening file at %s", filename)
@@ -343,7 +330,7 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 		return modules[i].Base < modules[j].Base
 	})
 	//write and execute the template
-	filepath := mage.OSSBeatDir(filepath.Join("docs", "modules_list.asciidoc"))
+	filepath := mage.OSSBeatDir("docs", "modules_list.asciidoc")
 	return writeTemplate(filepath, t.Lookup("moduleList.tmpl"), modules)
 
 }
@@ -390,14 +377,14 @@ func CollectDocs() error {
 		return err
 	}
 	// collect modules that have an asciidoc file
-	beatsModuleGlob := filepath.Join(mage.OSSBeatDir("module"), "/*/")
+	beatsModuleGlob := mage.OSSBeatDir("module", "/*/")
 	modules, err := filepath.Glob(beatsModuleGlob)
 	if err != nil {
 		return err
 	}
 
 	// collect additional x-pack modules
-	xpackModuleGlob := filepath.Join(mage.XPackBeatDir("module"), "/*/")
+	xpackModuleGlob := mage.XPackBeatDir("module", "/*/")
 	xpackModules, err := filepath.Glob(xpackModuleGlob)
 	if err != nil {
 		return err
