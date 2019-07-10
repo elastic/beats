@@ -323,7 +323,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 func TestGenerateFieldName(t *testing.T) {
 	cases := []struct {
 		title             string
-		label []string
+		label             []string
 		expectedFieldName string
 	}{
 		{
