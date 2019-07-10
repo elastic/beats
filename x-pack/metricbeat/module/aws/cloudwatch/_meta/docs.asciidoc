@@ -25,16 +25,17 @@ only EC2 instances.
 
 [float]
 === Configuration example
+To be more focused on `cloudwatch` metricset use cases, the examples below do
+not include configurations on AWS credentials.
+Please see <<aws-credentials-config>> for more details on setting AWS credentials
+in configurations in order for this metricset to make proper AWS API calls.
+
 [source,yaml]
 ----
 - module: aws
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   cloudwatch_metrics:
     - namespace: AWS/EBS <1>
     - namespace: AWS/ELB <2>
@@ -71,10 +72,6 @@ from EBS, ELB and EC2 without tag information.
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   cloudwatch_metrics:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
@@ -90,10 +87,6 @@ from EBS, ELB and EC2 with tags from these services.
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   cloudwatch_metrics:
     - namespace: AWS/EBS
       tags.resource_type_filter: ebs
@@ -112,10 +105,6 @@ metric from EC2 instance i-456.
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   cloudwatch_metrics:
     - namespace: AWS/EC2
       metricname: CPUUtilization
