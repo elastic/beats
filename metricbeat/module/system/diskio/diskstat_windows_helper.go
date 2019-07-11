@@ -224,8 +224,8 @@ func isValidLogicalDrive(path string) bool {
 	}
 	ret, _, err := syscall.Syscall(procGetDriveTypeW.Addr(), 1, uintptr(unsafe.Pointer(utfPath)), 0, 0)
 
-	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5
-	if ret == 1 || ret == 5 || err != errorSuccess {
+	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5 DRIVE_UNKNOWN = 0 DRIVE_RAMDISK = 6
+	if ret == 1 || ret == 5 || ret == 0 || ret == 6 || err != errorSuccess {
 		return false
 	}
 
