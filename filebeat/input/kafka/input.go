@@ -49,6 +49,7 @@ type Input struct {
 	consumerGroup sarama.ConsumerGroup
 	kafkaContext  context.Context
 	kafkaCancel   context.CancelFunc // The CancelFunc for kafkaContext
+	log           *logp.Logger
 }
 
 // NewInput creates a new kafka input
@@ -100,6 +101,7 @@ func NewInput(
 		consumerGroup: consumerGroup,
 		kafkaContext:  kafkaContext,
 		kafkaCancel:   kafkaCancel,
+		log:           logp.NewLogger("kafka input").With("hosts", config.Hosts),
 	}
 
 	return input, nil
@@ -117,8 +119,7 @@ func (p *Input) Run() {
 		// Track errors
 		go func() {
 			for err := range p.consumerGroup.Errors() {
-				// TODO: handle
-				fmt.Println("ERROR", err)
+				p.log.Errorw("Error reading from kafka", "error", err)
 			}
 		}()
 
@@ -128,9 +129,7 @@ func (p *Input) Run() {
 
 				err := p.consumerGroup.Consume(p.kafkaContext, p.config.Topics, handler)
 				if err != nil {
-					fmt.Printf("Consume error: %v\n", err)
-					//panic(err)
-					// TODO: report error
+					p.log.Errorw("Kafka consume error", "error", err)
 				}
 			}
 		}()
