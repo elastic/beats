@@ -39,6 +39,7 @@ var (
 	defaultConfig = kafkaInputConfig{
 		Version:       kafka.Version("1.0.0"),
 		InitialOffset: initialOffsetOldest,
+		ClientID:      "filebeat",
 	}
 
 	initialOffsets = map[string]initialOffset{
@@ -52,18 +53,12 @@ type kafkaInputConfig struct {
 	Hosts         []string          `config:"hosts" validate:"required"`
 	Topics        []string          `config:"topics" validate:"required"`
 	GroupID       string            `config:"group_id" validate:"required"`
+	ClientID      string            `config:"client_id"`
 	Version       kafka.Version     `config:"version"`
 	InitialOffset initialOffset     `config:"initial_offset"`
 	TLS           *tlscommon.Config `config:"ssl"`
 	Username      string            `config:"username"`
 	Password      string            `config:"password"`
-}
-
-func (off initialOffset) asSaramaOffset() int64 {
-	return map[initialOffset]int64{
-		initialOffsetOldest: sarama.OffsetOldest,
-		initialOffsetNewest: sarama.OffsetNewest,
-	}[off]
 }
 
 // Validate validates the config.
@@ -80,15 +75,6 @@ func (c *kafkaInputConfig) Validate() error {
 		return fmt.Errorf("password must be set when username is configured")
 	}
 	return nil
-}
-
-func stringInSlice(str string, list []string) bool {
-	for _, v := range list {
-		if v == str {
-			return true
-		}
-	}
-	return false
 }
 
 func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
@@ -118,11 +104,23 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 		k.Net.SASL.Password = config.Password
 	}
 
+	// configure client ID
+	k.ClientID = config.ClientID
+
 	if err := k.Validate(); err != nil {
 		logp.Err("Invalid kafka configuration: %v", err)
 		return nil, err
 	}
 	return k, nil
+}
+
+// asSaramaOffset converts an initialOffset enum to the corresponding
+// sarama offset value.
+func (off initialOffset) asSaramaOffset() int64 {
+	return map[initialOffset]int64{
+		initialOffsetOldest: sarama.OffsetOldest,
+		initialOffsetNewest: sarama.OffsetNewest,
+	}[off]
 }
 
 // Unpack validates and unpack the "initial_offset" config option
