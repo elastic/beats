@@ -23631,7 +23631,7 @@ type: long
 
 --
 
-*`rabbitmq.connection.client_provided_name`*::
+*`rabbitmq.connection.client_provided.name`*::
 +
 --
 User specified connection name.
