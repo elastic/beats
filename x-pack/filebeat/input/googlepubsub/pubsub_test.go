@@ -37,7 +37,7 @@ const (
 
 var once sync.Once
 
-func testSetup(t *testing.T) *pubsub.Client {
+func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	t.Helper()
 
 	host := os.Getenv("PUBSUB_EMULATOR_HOST")
@@ -55,46 +55,52 @@ func testSetup(t *testing.T) *pubsub.Client {
 
 	once.Do(func() {
 		logp.TestingSetup()
+
+		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
+		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
+
+		// Sanity check the emulator.
+		resp, err := httpClient.Get("http://" + host)
+		if err != nil {
+			t.Fatalf("pubsub emulator at %s is not healthy: %v", host, err)
+		}
+		defer resp.Body.Close()
+
+		_, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatal("failed to read response", err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("pubsub emulator is not healthy, got status code %d", resp.StatusCode)
+		}
 	})
 
-	// Sanity check the emulator.
-	resp, err := http.Get("http://" + host)
-	if err != nil {
-		t.Fatalf("pubsub emulator at %s is not healthy: %v", host, err)
-	}
-	_, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal("failed to read response", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("pubsub emulator is not healthy, got status code %d", resp.StatusCode)
-	}
-
-	client, err := pubsub.NewClient(context.Background(), emulatorProjectID)
+	ctx, cancel := context.WithCancel(context.Background())
+	client, err := pubsub.NewClient(ctx, emulatorProjectID)
 	if err != nil {
 		t.Fatalf("failed to create client: %v", err)
 	}
 
 	resetPubSub(t, client)
-	return client
+	return client, cancel
 }
 
 func resetPubSub(t *testing.T, client *pubsub.Client) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// Clear topics.
 	topics := client.Topics(ctx)
 	for {
-		sub, err := topics.Next()
+		topic, err := topics.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
 			t.Fatal(err)
 		}
-
-		if err = sub.Delete(ctx); err != nil {
-			t.Fatalf("failed to delete topic %v: %v", sub.ID(), err)
+		if err = topic.Delete(ctx); err != nil {
+			t.Fatalf("failed to delete topic %v: %v", topic.ID(), err)
 		}
 	}
 
@@ -116,9 +122,10 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 }
 
 func createTopic(t *testing.T, client *pubsub.Client) {
-	ctx := context.Background()
-	topic := client.Topic(emulatorTopic)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
+	topic := client.Topic(emulatorTopic)
 	exists, err := topic.Exists(ctx)
 	if err != nil {
 		t.Fatalf("failed to check if topic exists: %v", err)
@@ -132,8 +139,11 @@ func createTopic(t *testing.T, client *pubsub.Client) {
 }
 
 func publishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	topic := client.Topic(emulatorTopic)
+	defer topic.Stop()
 
 	messageIDs := make([]string, numMsgs)
 	for i := 0; i < numMsgs; i++ {
@@ -153,7 +163,8 @@ func publishMessages(t *testing.T, client *pubsub.Client, numMsgs int) []string 
 }
 
 func createSubscription(t *testing.T, client *pubsub.Client) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	sub := client.Subscription(emulatorSubscription)
 	exists, err := sub.Exists(ctx)
@@ -207,7 +218,8 @@ func runTest(t *testing.T, cfg *common.Config, run func(client *pubsub.Client, i
 	}
 
 	// Create pubsub client for setting up and communicating to emulator.
-	client := testSetup(t)
+	client, clientCancel := testSetup(t)
+	defer clientCancel()
 	defer client.Close()
 
 	// Simulate input.Context from Filebeat input runner.
@@ -358,5 +370,16 @@ func TestSubscriptionCreate(t *testing.T) {
 		if err := group.Wait(); err != nil {
 			t.Fatal(err)
 		}
+	})
+}
+
+func TestRunStop(t *testing.T) {
+	cfg := defaultTestConfig()
+
+	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
+		input.Run()
+		input.Stop()
+		input.Run()
+		input.Stop()
 	})
 }
