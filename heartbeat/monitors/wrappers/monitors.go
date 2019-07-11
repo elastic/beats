@@ -203,6 +203,7 @@ func NewMonitorState(currentStatus stateStatus) *monitorState {
 
 type monitorStateTracker struct {
 	states map[string]*monitorState
+	mtx    sync.Mutex
 }
 
 func (mst *monitorStateTracker) get(monitorId string, currentStatus stateStatus) (state *monitorState) {
@@ -238,12 +239,15 @@ func (mst *monitorStateTracker) get(monitorId string, currentStatus stateStatus)
 }
 
 func (mst *monitorStateTracker) getID(monitorId string, currentStatus stateStatus) time.Time {
+	mst.mtx.Lock()
+	defer mst.mtx.Unlock()
 	return mst.get(monitorId, currentStatus).startedAt
 }
 
 // TODO this is obviously a memory leak and for the POC only
 var stateTracker = &monitorStateTracker{
 	states: map[string]*monitorState{},
+	mtx:    sync.Mutex{},
 }
 var stateTrackerMtx = sync.Mutex{}
 
