@@ -48,6 +48,7 @@ type pubsubInput struct {
 
 	controlMutex sync.Mutex     // Mutex that guards against concurrent Run/Wait/Stop calls.
 	wg           sync.WaitGroup // Waits on main pubsub runner goroutine.
+	running      bool           // Indicates if Run() is active.
 
 	ackedCount *atomic.Uint32 // Total number of successfully ACKed pubsub messages.
 }
@@ -97,14 +98,21 @@ func NewInput(
 	return in, nil
 }
 
-// Run starts the pubsub input worker then returns. This is meant to be called
-// once.
+// Run starts the pubsub input worker then returns.
 func (in *pubsubInput) Run() {
 	in.controlMutex.Lock()
 	defer in.controlMutex.Unlock()
 
+	// Don't start more than once. The input runner calls Run() periodically
+	// based on scan_frequency.
+	if in.running {
+		return
+	}
+
+	in.running = true
 	in.wg.Add(1)
 	go func() {
+		in.log.Info("Pub/Sub input worker has started.")
 		defer in.log.Info("Pub/Sub input worker has stopped.")
 		defer in.wg.Done()
 		if err := in.run(); err != nil {
@@ -161,6 +169,7 @@ func (in *pubsubInput) Stop() {
 	defer in.controlMutex.Unlock()
 	in.inputCtxCancel()
 	in.wg.Wait()
+	in.running = false
 	in.log.Debugw("Pub/Sub input is stopped.", "pubsub_acked", in.ackedCount.Load())
 }
 
