@@ -6,8 +6,11 @@ package s3
 
 import (
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"io"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -30,10 +33,9 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var (
-	// Filebeat input name
-	inputName = "s3"
+const inputName = "s3"
 
+var (
 	// The maximum number of messages to return. Amazon SQS never returns more messages
 	// than this value (however, fewer messages might be returned).
 	maxNumberOfMessage int64 = 10
@@ -83,8 +85,9 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, err
 	}
 
-	if len(config.QueueURLs) == 0 {
-		return nil, errors.Wrap(err, "no sqs queueURLs configured")
+	err = config.validate()
+	if err != nil {
+		return nil, errors.Wrapf(err, "validation for s3 input config failed: config = %s", config)
 	}
 
 	awsConfig, err := getAWSCredentials(config)
@@ -101,6 +104,18 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	}
 
 	return p, nil
+}
+
+func (c *config) validate() error {
+	if c.VisibilityTimeout < 0 || c.VisibilityTimeout.Hours() > 12 {
+		return errors.New("visibilityTimeout is not defined within the " +
+			"expected bounds")
+	}
+
+	if len(c.QueueURLs) == 0 {
+		return errors.New("no SQS queueURLs are configured")
+	}
+	return nil
 }
 
 func getAWSCredentials(config config) (awssdk.Config, error) {
@@ -132,7 +147,8 @@ func getAWSCredentials(config config) (awssdk.Config, error) {
 // Run runs the input
 func (p *Input) Run() {
 	p.logger.Debugf("s3", "Run s3 input with queueURLs: %+v", p.config.QueueURLs)
-	visibilityTimeout := int64(p.config.VisibilityTimeout)
+	visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
+
 	for _, queueURL := range p.config.QueueURLs {
 		regionName, err := getRegionFromQueueURL(queueURL)
 		if err != nil {
@@ -187,13 +203,6 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 	numMessages := len(messages)
 	wg.Add(numMessages)
 
-	// update message visibility timeout if it's taking longer than 1/2 of
-	// visibilityTimeout to make sure filebeat can finish reading
-	changeMessageVisibilityInput := &sqs.ChangeMessageVisibilityInput{
-		QueueUrl:          &queueURL,
-		VisibilityTimeout: &visibilityTimeout,
-	}
-
 	// process messages received from sqs
 	for i := range messages {
 		done := make(chan struct{})
@@ -204,7 +213,8 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 
 			s3Infos, err := handleMessage(message)
 			if err != nil {
-				p.logger.Error(err.Error())
+				p.logger.Error(errors.Wrap(err, "handelMessage failed"))
+				return
 			}
 
 			// read from s3 object and create event for each log line
@@ -225,11 +235,9 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 				case <-done:
 					return
 				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
-					// if half of the set visibilityTimeout passed and this is
+					// If half of the set visibilityTimeout passed and this is
 					// still ongoing, then change visibility timeout.
-					changeMessageVisibilityInput.ReceiptHandle = message.ReceiptHandle
-					req := svcSQS.ChangeMessageVisibilityRequest(changeMessageVisibilityInput)
-					_, err := req.Send()
+					err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 					if err != nil {
 						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 					}
@@ -238,6 +246,16 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 		}(messages[i])
 	}
 	wg.Wait()
+}
+
+func changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svc *sqs.SQS, receiptHandle *string) error {
+	req := svc.ChangeMessageVisibilityRequest(&sqs.ChangeMessageVisibilityInput{
+		QueueUrl:          &queueURL,
+		VisibilityTimeout: &visibilityTimeout,
+		ReceiptHandle:     receiptHandle,
+	})
+	_, err := req.Send()
+	return err
 }
 
 func getRegionFromQueueURL(queueURL string) (string, error) {
@@ -278,21 +296,6 @@ func handleMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-// stringInSlice checks if a string is already exists in list
-// If there is no bucketNames configured, then collect all.
-func stringInSlice(name string, bucketNames []string) bool {
-	if bucketNames == nil || len(bucketNames) == 0 {
-		return true
-	}
-
-	for _, v := range bucketNames {
-		if v == name {
-			return true
-		}
-	}
-	return false
-}
-
 func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 	if len(s3Infos) > 0 {
 		var wg sync.WaitGroup
@@ -307,7 +310,7 @@ func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 				// read from s3 object
 				reader, err := bufferedIORead(svc, s3Info)
 				if err != nil {
-					p.logger.Error(errors.Wrap(err, "s3 get object request failed"))
+					p.logger.Error(errors.Wrap(err, "bufferedIORead failed"))
 					return
 				}
 
@@ -320,17 +323,25 @@ func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 
 					if err != nil {
 						if err == io.EOF {
+							// create event for last line
 							offset += len([]byte(log))
-							p.forwardEvent(createEvent(log, offset, s3Info))
+							err = p.forwardEvent(createEvent(log, offset, s3Info))
+							if err != nil {
+								p.logger.Error(errors.Wrap(err, "forwardEvent failed"))
+							}
 							break
-						} else {
-							p.logger.Error(errors.Wrap(err, "ReadString failed"))
 						}
+
+						p.logger.Error(errors.Wrap(err, "ReadString failed"))
+						break
 					}
 
 					// create event per log line
 					offset += len([]byte(log))
-					p.forwardEvent(createEvent(log, offset, s3Info))
+					err = p.forwardEvent(createEvent(log, offset, s3Info))
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "forwardEvent failed"))
+					}
 				}
 			}(s3Infos[i])
 		}
@@ -353,13 +364,14 @@ func bufferedIORead(svc s3iface.S3API, s3Info s3Info) (*bufio.Reader, error) {
 	return bufio.NewReader(resp.Body), nil
 }
 
-func (p *Input) forwardEvent(event *beat.Event) {
+func (p *Input) forwardEvent(event *beat.Event) error {
 	forwarder := harvester.NewForwarder(p.outlet)
 	d := &util.Data{Event: *event}
 	err := forwarder.Send(d)
 	if err != nil {
-		p.logger.Error(errors.Wrap(err, "forwarder send failed"))
+		return errors.Wrap(err, "forwarder send failed")
 	}
+	return nil
 }
 
 func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.SQS) error {
@@ -395,6 +407,7 @@ func createEvent(log string, offset int, s3Info s3Info) *beat.Event {
 		},
 	}
 	return &beat.Event{
+		Meta:      common.MapStr{"id": makeEventID(s3Info, offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
 	}
@@ -402,4 +415,12 @@ func createEvent(log string, offset int, s3Info s3Info) *beat.Event {
 
 func constructObjectURL(info s3Info) string {
 	return "https://" + info.name + ".s3-" + info.region + ".amazonaws.com/" + info.key
+}
+
+// makeTopicID returns a short sha256 hash of the bucket name + object key name + offset.
+func makeEventID(s3Info s3Info, offset int) string {
+	h := sha256.New()
+	h.Write([]byte(s3Info.name + s3Info.key + "-" + strconv.Itoa(offset)))
+	prefix := hex.EncodeToString(h.Sum(nil))
+	return prefix[:10]
 }

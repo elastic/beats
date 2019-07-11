@@ -4,22 +4,26 @@
 
 package s3
 
-import "github.com/elastic/beats/filebeat/harvester"
+import (
+	"time"
+
+	"github.com/elastic/beats/filebeat/harvester"
+)
 
 var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: "s3",
 	},
 	ProfileName:       "default",
-	VisibilityTimeout: 300,
+	VisibilityTimeout: 300 * time.Second,
 }
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
-	QueueURLs                 []string `config:"queue_urls" validate:"nonzero,required"`
-	AccessKeyID               string   `config:"access_key_id"`
-	SecretAccessKey           string   `config:"secret_access_key"`
-	SessionToken              string   `config:"session_token"`
-	ProfileName               string   `config:"credential_profile_name"`
-	VisibilityTimeout         int      `config:"visibility_timeout"`
+	QueueURLs                 []string      `config:"queue_urls" validate:"nonzero,required"`
+	AccessKeyID               string        `config:"access_key_id"`
+	SecretAccessKey           string        `config:"secret_access_key"`
+	SessionToken              string        `config:"session_token"`
+	ProfileName               string        `config:"credential_profile_name"`
+	VisibilityTimeout         time.Duration `config:"visibility_timeout"`
 }
