@@ -38,8 +38,8 @@ type commonStats struct {
 }
 
 type cpu struct {
-	Percent     int                    `json:"percent"`
-	LoadAverage map[string]interface{} `json:"load_average"`
+	Percent     int                    `json:"percent,omitempty"`
+	LoadAverage map[string]interface{} `json:"load_average,omitempty"`
 }
 
 type process struct {
