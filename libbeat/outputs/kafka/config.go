@@ -226,8 +226,6 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	}
 	k.Version = version
 
-	k.MetricRegistry = kafkaMetricsRegistry()
-
 	k.Producer.Partitioner = partitioner
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
