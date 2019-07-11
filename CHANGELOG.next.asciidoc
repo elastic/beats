@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Filebeat*
 
+- Skipping unparsable log entries from docker json reader {pull}12268[12268]
+
 *Heartbeat*
 
 *Journalbeat*
