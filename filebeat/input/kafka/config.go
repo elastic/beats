@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/kafka"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
@@ -106,6 +108,14 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 
 	// configure client ID
 	k.ClientID = config.ClientID
+
+	k.MetricRegistry = adapter.GetGoMetrics(
+		monitoring.Default,
+		"filebeat.inputs.kafka",
+		adapter.Rename("incoming-byte-rate", "bytes_read"),
+		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		adapter.GoMetricsNilify,
+	)
 
 	if err := k.Validate(); err != nil {
 		logp.Err("Invalid kafka configuration: %v", err)
