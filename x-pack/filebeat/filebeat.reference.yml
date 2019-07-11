@@ -896,19 +896,16 @@ filebeat.inputs:
     # default to `required` otherwise it will be set to `none`.
     #ssl.client_authentication: "required"
 
-#------------------------------ Docker input --------------------------------
-# Experimental: Docker input reads and parses `json-file` logs from Docker
-#- type: docker
+#------------------------------ Container input --------------------------------
+#- type: container
   #enabled: false
 
-  # Combine partial lines flagged by `json-file` format
-  #combine_partials: true
+  # Paths for container logs that should be crawled and fetched.
+  #paths:
+  #  -/var/lib/docker/containers/*/*.log
 
-  # Use this to read from all containers, replace * with a container id to read from one:
-  #containers:
-  #  stream: all # can be all, stdout or stderr
-  #  ids:
-  #    - '*'
+  # Configure stream to filter to a specific stream: stdout, stderr or all (default)
+  #stream: all
 
 #------------------------------ NetFlow input --------------------------------
 # Experimental: Config options for the Netflow/IPFIX collector over UDP input
@@ -978,7 +975,7 @@ filebeat.inputs:
 #        - condition:
 #            equals.docker.container.image: busybox
 #          config:
-#            - type: log
+#            - type: container
 #              paths:
 #                - /var/lib/docker/containers/${data.docker.container.id}/*.log
 
