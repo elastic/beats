@@ -18,11 +18,14 @@
 package kafka
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Shopify/sarama"
 	"github.com/elastic/beats/libbeat/common/kafka"
+	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type initialOffset int
@@ -46,11 +49,14 @@ var (
 
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
-	Hosts         []string      `config:"hosts" validate:"required"`
-	Topics        []string      `config:"topics" validate:"required"`
-	GroupID       string        `config:"group_id" validate:"required"`
-	Version       kafka.Version `config:"version"`
-	InitialOffset initialOffset `config:"initial_offset"`
+	Hosts         []string          `config:"hosts" validate:"required"`
+	Topics        []string          `config:"topics" validate:"required"`
+	GroupID       string            `config:"group_id" validate:"required"`
+	Version       kafka.Version     `config:"version"`
+	InitialOffset initialOffset     `config:"initial_offset"`
+	TLS           *tlscommon.Config `config:"ssl"`
+	Username      string            `config:"username"`
+	Password      string            `config:"password"`
 }
 
 func (off initialOffset) asSaramaOffset() int64 {
@@ -62,6 +68,17 @@ func (off initialOffset) asSaramaOffset() int64 {
 
 // Validate validates the config.
 func (c *kafkaInputConfig) Validate() error {
+	if len(c.Hosts) == 0 {
+		return errors.New("no hosts configured")
+	}
+
+	if err := c.Version.Validate(); err != nil {
+		return err
+	}
+
+	if c.Username != "" && c.Password == "" {
+		return fmt.Errorf("password must be set when username is configured")
+	}
 	return nil
 }
 
@@ -85,6 +102,21 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 
 	k.Consumer.Return.Errors = true
 	k.Consumer.Offsets.Initial = config.InitialOffset.asSaramaOffset()
+
+	tls, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, err
+	}
+	if tls != nil {
+		k.Net.TLS.Enable = true
+		k.Net.TLS.Config = tls.BuildModuleConfig("")
+	}
+
+	if config.Username != "" {
+		k.Net.SASL.Enable = true
+		k.Net.SASL.User = config.Username
+		k.Net.SASL.Password = config.Password
+	}
 
 	if err := k.Validate(); err != nil {
 		logp.Err("Invalid kafka configuration: %v", err)
