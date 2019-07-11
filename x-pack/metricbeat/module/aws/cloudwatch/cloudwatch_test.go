@@ -150,22 +150,22 @@ func TestConstructLabel(t *testing.T) {
 		{
 			listMetricWithDetail1,
 			"Average",
-			"CPUUtilization AWS/EC2 InstanceId i-1 Average",
+			"CPUUtilization AWS/EC2 Average InstanceId i-1",
 		},
 		{
 			listMetricWithDetail2,
 			"Maximum",
-			"StatusCheckFailed AWS/EC2 InstanceId i-1 Maximum",
+			"StatusCheckFailed AWS/EC2 Maximum InstanceId i-1",
 		},
 		{
 			listMetricWithDetail3,
 			"Minimum",
-			"StatusCheckFailed_System AWS/EC2 InstanceId i-2 Minimum",
+			"StatusCheckFailed_System AWS/EC2 Minimum InstanceId i-2",
 		},
 		{
 			listMetricWithDetail4,
 			"Sum",
-			"StatusCheckFailed_Instance AWS/EC2 InstanceId i-2 Sum",
+			"StatusCheckFailed_Instance AWS/EC2 Sum InstanceId i-2",
 		},
 		{
 			listMetricWithDetail5,
@@ -328,32 +328,32 @@ func TestGenerateFieldName(t *testing.T) {
 	}{
 		{
 			"test Average",
-			[]string{"CPUUtilization", "AWS/EC2", "InstanceId", "i-1", "Average"},
+			[]string{"CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
 			"metrics.CPUUtilization.avg",
 		},
 		{
 			"test Maximum",
-			[]string{"CPUUtilization", "AWS/EC2", "InstanceId", "i-1", "Maximum"},
+			[]string{"CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
 			"metrics.CPUUtilization.max",
 		},
 		{
 			"test Minimum",
-			[]string{"CPUUtilization", "AWS/EC2", "InstanceId", "i-1", "Minimum"},
+			[]string{"CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
 			"metrics.CPUUtilization.min",
 		},
 		{
 			"test Sum",
-			[]string{"CPUUtilization", "AWS/EC2", "InstanceId", "i-1", "Sum"},
+			[]string{"CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
 			"metrics.CPUUtilization.sum",
 		},
 		{
 			"test SampleCount",
-			[]string{"CPUUtilization", "AWS/EC2", "InstanceId", "i-1", "SampleCount"},
+			[]string{"CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
 			"metrics.CPUUtilization.count",
 		},
 		{
 			"test extended statistic",
-			[]string{"CPUUtilization", "AWS/EC2", "InstanceId", "i-1", "p10"},
+			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
 			"metrics.CPUUtilization.p10",
 		},
 	}

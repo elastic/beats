@@ -24,9 +24,9 @@ var (
 	metricsetName        = "cloudwatch"
 	metricNameIdx        = 0
 	namespaceIdx         = 1
-	identifierNameIdx    = 2
-	identifierValueIdx   = 3
-	statisticIdx         = 4
+	statisticIdx         = 2
+	identifierNameIdx    = 3
+	identifierValueIdx   = 4
 	defaultStatistics    = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
 	statisticLookupTable = map[string]string{
 		"Average":     "avg",
@@ -204,7 +204,7 @@ func readCloudwatchConfig(cloudwatchConfigsTotal []Config) ([]listMetricWithDeta
 
 func constructLabel(metric listMetricWithDetail, statistic string) string {
 	// label = metricName + namespace + dimensionKeyTotal + dimensionValueTotal + statistic
-	label := *metric.cloudwatchMetric.MetricName + " " + *metric.cloudwatchMetric.Namespace
+	label := *metric.cloudwatchMetric.MetricName + " " + *metric.cloudwatchMetric.Namespace + " " + statistic
 	dimNames := ""
 	dimValues := ""
 	for i, dim := range metric.cloudwatchMetric.Dimensions {
@@ -220,14 +220,14 @@ func constructLabel(metric listMetricWithDetail, statistic string) string {
 		label += " " + dimNames
 		label += " " + dimValues
 	}
-
-	label += " " + statistic
 	return label
 }
 
 func createMetricDataQueries(listMetricDetailTotal []listMetricWithDetail, period time.Duration) (metricDataQueries []cloudwatch.MetricDataQuery) {
 	for i, listMetricTypeStats := range listMetricDetailTotal {
 		for j, statistic := range listMetricTypeStats.statistic {
+			stat := new(string)
+			*stat = statistic
 			label := constructLabel(listMetricTypeStats, statistic)
 			periodInSec := int64(period.Seconds())
 
@@ -236,7 +236,7 @@ func createMetricDataQueries(listMetricDetailTotal []listMetricWithDetail, perio
 				Id: &id,
 				MetricStat: &cloudwatch.MetricStat{
 					Period: &periodInSec,
-					Stat:   &statistic,
+					Stat:   stat,
 					Metric: &listMetricTypeStats.cloudwatchMetric,
 				},
 				Label: &label,
@@ -332,7 +332,9 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	// Get tags
 	var resourceTypes []string
 	for _, listMetrics := range listMetricDetailTotal {
-		resourceTypes = append(resourceTypes, listMetrics.resourceTypeFilter)
+		if !aws.StringInSlice(listMetrics.resourceTypeFilter, resourceTypes) {
+			resourceTypes = append(resourceTypes, listMetrics.resourceTypeFilter)
+		}
 	}
 
 	resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, resourceTypes)
