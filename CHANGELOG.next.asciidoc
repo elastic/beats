@@ -14,6 +14,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.12.4. {pull}11782[11782]
 - Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
 - Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
+- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
 
 *Auditbeat*
 
@@ -75,6 +76,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
 - Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
 - Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
+- Fixed `json.add_error_key` property setting for delivering error messages from beat events  {pull}11298[11298]
+- Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 
 *Auditbeat*
 
@@ -142,6 +145,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 - Reuse connections in PostgreSQL metricsets. {issue}12504[12504] {pull}12603[12603]
 - PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.{issue}12590[12590]{pull}12622[12622]
+- In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
 - Ramdisk is not filtered out when collecting disk performance counters in diskio metricset {issue}12814[12814] {pull}12829[12829]
 
 *Packetbeat*
@@ -187,7 +191,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 - Add `decompress_gzip_field` processor. {pull}12733[12733]
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
-- Add Oracle Tablespaces Dashboard {pull}12736[12736]
 
 *Auditbeat*
 
@@ -270,7 +273,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
 - Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
 - Add Oracle Module {pull}11890[11890]
-
+- Add Oracle Tablespaces Dashboard {pull}12736[12736]
 
 *Packetbeat*
 

@@ -17,3 +17,19 @@ cloudwatch:ListMetrics
 The aws s3_daily_storage metricset and s3_request metricset shares one predefined dashboard. For example:
 
 image::./images/metricbeat-aws-s3-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 86400s
+  metricsets:
+    - s3_daily_storage
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  #regions:
+  #  - us-west-1
+----
