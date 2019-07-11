@@ -208,6 +208,8 @@ func (u *timeUnfolder) OnInt(ctx gotype.UnfoldCtx, in int64) error {
 }
 
 func (u *timeUnfolder) OnArrayFinished(ctx gotype.UnfoldCtx) error {
+	defer ctx.Done()
+
 	if u.st != timeUnfoldWaitDone {
 		return errors.New("unexpected timestamp array closed")
 	}
@@ -237,6 +239,5 @@ func (u *timeUnfolder) OnArrayFinished(ctx gotype.UnfoldCtx) error {
 		}
 	}
 
-	ctx.Done()
 	return nil
 }

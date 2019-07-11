@@ -84,10 +84,10 @@ func TestTypeConv(t *testing.T) {
 		var v testStruct
 		ts := time.Now()
 		err := tc.Convert(&v, common.MapStr{
-			"timestamp": ts.Format(time.RFC3339),
+			"timestamp": ts.Format(time.RFC3339Nano),
 		})
 		require.NoError(t, err)
-		assert.Equal(t, v.Timestamp.Format(time.RFC3339), ts.Format(time.RFC3339))
+		assert.Equal(t, v.Timestamp.Format(time.RFC3339Nano), ts.Format(time.RFC3339Nano))
 	}))
 }
 
