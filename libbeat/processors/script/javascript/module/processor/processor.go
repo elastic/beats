@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors/dns"
 	"github.com/elastic/beats/libbeat/processors/extract_array"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/libbeat/processors/timestamp"
 )
 
 // Create constructors for most of the Beat processors.
@@ -54,12 +55,14 @@ var constructors = map[string]processors.Constructor{
 	"CommunityID":           communityid.New,
 	"Convert":               convert.New,
 	"CopyFields":            actions.NewCopyFields,
+	"DecodeBase64Field":     actions.NewDecodeBase64Field,
 	"DecodeCSVField":        decode_csv_fields.NewDecodeCSVField,
 	"DecodeJSONFields":      actions.NewDecodeJSONFields,
 	"Dissect":               dissect.NewProcessor,
 	"DNS":                   dns.New,
 	"ExtractArray":          extract_array.New,
 	"Rename":                actions.NewRenameFields,
+	"Timestamp":             timestamp.New,
 	"TruncateFields":        actions.NewTruncateFields,
 }
 

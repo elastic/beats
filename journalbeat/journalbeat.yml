@@ -98,7 +98,7 @@ setup.kibana:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using journalbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Journalbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.

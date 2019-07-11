@@ -1,0 +1,51 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "id": "1f0c187b-f2ef-4950-b9cc-dd6864b9191a",
+        "stats": {
+            "libbeat": {
+                "output": {
+                    "events": {
+                        "acked": 0,
+                        "active": 0,
+                        "batches": 0,
+                        "dropped": 0,
+                        "duplicates": 0,
+                        "failed": 0,
+                        "toomany": 0,
+                        "total": 0
+                    },
+                    "read": {
+                        "bytes": 0,
+                        "errors": 0
+                    },
+                    "type": "elasticsearch",
+                    "write": {
+                        "bytes": 0,
+                        "errors": 0
+                    }
+                }
+            },
+            "runtime": {
+                "goroutines": 39
+            },
+            "uptime": {
+                "ms": 12019
+            }
+        },
+        "type": "metricbeat"
+    },
+    "event": {
+        "dataset": "beat.stats",
+        "duration": 115000,
+        "module": "beat"
+    },
+    "metricset": {
+        "name": "stats"
+    },
+    "service": {
+        "address": "127.0.0.1:5066",
+        "name": "beat",
+        "type": "beat"
+    }
+}

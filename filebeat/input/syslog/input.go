@@ -249,7 +249,9 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 
 	f["syslog"] = syslog
 	f["event"] = event
-	f["process"] = process
+	if len(process) > 0 {
+		f["process"] = process
+	}
 
 	if ev.Sequence() != -1 {
 		f["event.sequence"] = ev.Sequence()

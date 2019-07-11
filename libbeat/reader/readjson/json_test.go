@@ -172,6 +172,13 @@ func TestDecodeJSON(t *testing.T) {
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": int64(1)},
 		},
+		{
+			// If AddErrorKey set to false, error event should not be set.
+			Text:         `{"message": "test", "value": "`,
+			Config:       Config{MessageKey: "value", AddErrorKey: false},
+			ExpectedText: `{"message": "test", "value": "`,
+			ExpectedMap:  nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -265,7 +272,7 @@ func TestAddJSONFields(t *testing.T) {
 			Name:       "fail to parse @timestamp",
 			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"}},
 			Text:       &text,
-			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true},
+			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
 			ExpectedItems: common.MapStr{
 				"type":  "test",
 				"error": common.MapStr{"type": "json", "message": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)"},
@@ -278,7 +285,7 @@ func TestAddJSONFields(t *testing.T) {
 			Name:       "wrong @timestamp format",
 			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "test", "@timestamp": 42}},
 			Text:       &text,
-			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true},
+			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
 			ExpectedItems: common.MapStr{
 				"type":  "test",
 				"error": common.MapStr{"type": "json", "message": "@timestamp not overwritten (not string)"},
@@ -290,7 +297,7 @@ func TestAddJSONFields(t *testing.T) {
 			Name:       "ignore non-string type field",
 			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": 42}},
 			Text:       &text,
-			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true},
+			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
 			ExpectedItems: common.MapStr{
 				"type":  "test_type",
 				"error": common.MapStr{"type": "json", "message": "type not overwritten (not string)"},
@@ -302,7 +309,7 @@ func TestAddJSONFields(t *testing.T) {
 			Name:       "ignore empty type field",
 			Data:       common.MapStr{"type": "test_type", "json": common.MapStr{"type": ""}},
 			Text:       &text,
-			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true},
+			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
 			ExpectedItems: common.MapStr{
 				"type":  "test_type",
 				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [])"},
@@ -314,10 +321,22 @@ func TestAddJSONFields(t *testing.T) {
 			Name:       "ignore type names starting with underscore",
 			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "_type"}},
 			Text:       &text,
-			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true},
+			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: true},
 			ExpectedItems: common.MapStr{
 				"type":  "test_type",
 				"error": common.MapStr{"type": "json", "message": "type not overwritten (invalid value [_type])"},
+			},
+			ExpectedTimestamp: time.Time{},
+		},
+		{
+			// if AddErrorKey is false, err should not be set.
+			Name:       "ignore type names starting with underscore",
+			Data:       common.MapStr{"@timestamp": common.Time(now), "type": "test_type", "json": common.MapStr{"type": "_type"}},
+			Text:       &text,
+			JSONConfig: Config{KeysUnderRoot: true, OverwriteKeys: true, AddErrorKey: false},
+			ExpectedItems: common.MapStr{
+				"type":  "test_type",
+				"error": nil,
 			},
 			ExpectedTimestamp: time.Time{},
 		},
