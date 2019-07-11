@@ -20,5 +20,5 @@ package memlog
 import "os"
 
 func syncFile(f *os.File) error {
-	return f.File.Sync() // stdlib already uses FlushFileBuffes, yay
+	return f.Sync() // stdlib already uses FlushFileBuffes, yay
 }
