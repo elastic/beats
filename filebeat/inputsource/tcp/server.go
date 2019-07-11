@@ -27,7 +27,6 @@ import (
 
 	"golang.org/x/net/netutil"
 
-	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -38,7 +37,7 @@ type Server struct {
 	sync.RWMutex
 	config    *Config
 	Listener  net.Listener
-	clients   map[string]*client
+	clients   map[Client]struct{}
 	wg        sync.WaitGroup
 	done      chan struct{}
 	factory   ClientFactory
@@ -62,7 +61,7 @@ func New(
 
 	return &Server{
 		config:    config,
-		clients:   make(map[string]*client, 0),
+		clients:   make(map[Client]struct{}, 0),
 		done:      make(chan struct{}),
 		factory:   factory,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
@@ -102,17 +101,7 @@ func (s *Server) run() {
 			}
 		}
 
-		networkFunc, splitFunc, onConnect, onDisconnect := s.factory()
-		client := newClient(
-			conn,
-			s.log,
-			networkFunc,
-			splitFunc,
-			uint64(s.config.MaxMessageSize),
-			s.config.Timeout,
-			onConnect,
-			onDisconnect,
-		)
+		client := s.factory(s.config)
 
 		s.wg.Add(1)
 		go func() {
@@ -124,13 +113,13 @@ func (s *Server) run() {
 			defer s.unregisterClient(client)
 			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
 
-			err := client.handle()
+			err := client.Handle(conn)
 			if err != nil {
-				s.log.Debugw("ClientInfo error", "error", err)
+				s.log.Debugw("client error", "error", err)
 			}
 
 			defer s.log.Debugw(
-				"ClientInfo disconnected",
+				"client disconnected",
 				"remote_address",
 				conn.RemoteAddr(),
 				"total",
@@ -146,30 +135,30 @@ func (s *Server) Stop() {
 	close(s.done)
 	s.Listener.Close()
 	for _, client := range s.allClients() {
-		client.close()
+		client.Close()
 	}
 	s.wg.Wait()
 	s.log.Info("TCP server stopped")
 }
 
-func (s *Server) registerClient(client *client) {
+func (s *Server) registerClient(client Client) {
 	s.Lock()
 	defer s.Unlock()
-	s.clients[client.ID()] = client
+	s.clients[client] = struct{}{}
 }
 
-func (s *Server) unregisterClient(client *client) {
+func (s *Server) unregisterClient(client Client) {
 	s.Lock()
 	defer s.Unlock()
-	delete(s.clients, client.ID())
+	delete(s.clients, client)
 }
 
-func (s *Server) allClients() []*client {
+func (s *Server) allClients() []Client {
 	s.RLock()
 	defer s.RUnlock()
-	currentClients := make([]*client, len(s.clients))
+	currentClients := make([]Client, len(s.clients))
 	idx := 0
-	for _, client := range s.clients {
+	for client := range s.clients {
 		currentClients[idx] = client
 		idx++
 	}

@@ -231,6 +231,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...v7.0.0-rc1[Check the HEA
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945] {pull}11223[11223]
 - Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
+- Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
 
 *Metricbeat*
 
@@ -1432,8 +1433,6 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Added default and TCP parsing formats to HAproxy module {issue}8311[8311] {pull}8637[8637]
 - Add Suricata IDS/IDP/NSM module. {issue}8153[8153] {pull}8693[8693]
 - Support for Kafka 2.0.0 {pull}8853[8853]
-- Allow to force CRI format parsing for better performance {pull}8424[8424]
-- Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
 
 *Heartbeat*
 

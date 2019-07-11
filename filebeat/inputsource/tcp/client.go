@@ -25,76 +25,67 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/satori/go.uuid"
 
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// ClientInfo is a remote client.
-type client struct {
+// splitClient is a TCP client that has splitting capabilities.
+type splitClient struct {
 	conn           net.Conn
-	log            *logp.Logger
 	callback       inputsource.NetworkFunc
 	done           chan struct{}
 	metadata       inputsource.NetworkMetadata
 	splitFunc      bufio.SplitFunc
 	maxMessageSize uint64
 	timeout        time.Duration
-	onConnect      ClientCallback
-	OnDisconnect   ClientCallback
-	id             string
 }
 
-// ClientFactory passes a connection ID as an input and gets back a NetworkFunc and a SplitFunc
-type ClientFactory func() (inputsource.NetworkFunc, bufio.SplitFunc, ClientCallback, ClientCallback)
+// ClientFactory returns a Client func
+type ClientFactory func(config *Config) Client
 
-// ClientInfo allows creator of clients to get information about a client
-type ClientInfo interface {
-	// ID() returns a connection id for the given client connection
-	ID() string
+// Client interface provides mechanisms for handling of incoming TCP connections
+type Client interface {
+	Handle(conn net.Conn) error
+	Close()
 }
 
-// ClientCallback allows a callback to occur when a new client connects or disconnects to the server
-type ClientCallback func(info ClientInfo)
+// SplitClientFactory allows creation of a Client that can do splitting of messages received on a TCP connection.
+func SplitClientFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) ClientFactory {
+	return func(config *Config) Client {
+		return NewSplitClient(callback, splitFunc, uint64(config.MaxMessageSize), config.Timeout)
+	}
+}
 
-func newClient(
-	conn net.Conn,
-	log *logp.Logger,
+// NewSplitClient allows creation of a TCP client that has splitting capabilities.
+func NewSplitClient(
 	callback inputsource.NetworkFunc,
 	splitFunc bufio.SplitFunc,
 	maxReadMessage uint64,
 	timeout time.Duration,
-	onConnect ClientCallback,
-	onDisconnect ClientCallback,
-) *client {
-	client := &client{
-		conn:           conn,
-		log:            log.With("remote_address", conn.RemoteAddr()),
+) Client {
+	client := &splitClient{
 		callback:       callback,
 		done:           make(chan struct{}),
 		splitFunc:      splitFunc,
 		maxMessageSize: maxReadMessage,
 		timeout:        timeout,
-		metadata: inputsource.NetworkMetadata{
-			RemoteAddr: conn.RemoteAddr(),
-			TLS:        extractSSLInformation(conn),
-		},
-		onConnect:    onConnect,
-		OnDisconnect: onDisconnect,
-		id:           uuid.NewV4().String(),
 	}
-	extractSSLInformation(conn)
 	return client
 }
 
-func (c *client) handle() error {
-	if c.onConnect != nil {
-		c.onConnect(c)
+// Handle takes a connection as input and processes data received on it.
+func (c *splitClient) Handle(conn net.Conn) error {
+	c.conn = conn
+	c.metadata = inputsource.NetworkMetadata{
+		RemoteAddr: conn.RemoteAddr(),
+		TLS:        extractSSLInformation(conn),
 	}
 
-	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxMessageSize)
+	log := logp.NewLogger("split_client").With("remote_addr", conn.RemoteAddr().String())
+
+	r := NewResetableLimitedReader(NewDeadlineReader(conn, c.timeout), c.maxMessageSize)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
 	scanner.Split(c.splitFunc)
@@ -112,20 +103,16 @@ func (c *client) handle() error {
 			}
 			// This is a user defined limit and we should notify the user.
 			if IsMaxReadBufferErr(err) {
-				c.log.Errorw("client error", "error", err)
+				log.Errorw("split_client error", "error", err)
 			}
-			return errors.Wrap(err, "tcp client error")
+			return errors.Wrap(err, "tcp split_client error")
 		}
 		r.Reset()
 		c.callback(scanner.Bytes(), c.metadata)
 	}
 
-	if c.OnDisconnect != nil {
-		c.OnDisconnect(c)
-	}
-
 	// We are out of the scanner, either we reached EOF or another fatal error occurred.
-	// like we failed to complete the TLS handshake or we are missing the client certificate when
+	// like we failed to complete the TLS handshake or we are missing the splitClient certificate when
 	// mutual auth is on, which is the default.
 	if err := scanner.Err(); err != nil {
 		return err
@@ -134,13 +121,10 @@ func (c *client) handle() error {
 	return nil
 }
 
-func (c *client) close() {
-	close(c.done)
+// Close is used to perform clean up before the client is released.
+func (c *splitClient) Close() {
 	c.conn.Close()
-}
-
-func (c *client) ID() string {
-	return c.id
+	close(c.done)
 }
 
 func extractSSLInformation(c net.Conn) *inputsource.TLSMetadata {

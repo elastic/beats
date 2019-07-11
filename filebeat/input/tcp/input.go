@@ -18,7 +18,6 @@
 package tcp
 
 import (
-	"bufio"
 	"fmt"
 	"sync"
 	"time"
@@ -81,9 +80,7 @@ func NewInput(
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	factory := func() (inputsource.NetworkFunc, bufio.SplitFunc, tcp.ClientCallback, tcp.ClientCallback) {
-		return cb, splitFunc, nil, nil
-	}
+	factory := tcp.SplitClientFactory(cb, splitFunc)
 
 	server, err := tcp.New(&config.Config, factory)
 	if err != nil {

@@ -168,9 +168,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			factory := func() (inputsource.NetworkFunc, bufio.SplitFunc, ClientCallback, ClientCallback) {
-				return to, test.splitFunc, nil, nil
-			}
+			factory := SplitClientFactory(to, test.splitFunc)
 			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
@@ -222,9 +220,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		return
 	}
 
-	factory := func() (inputsource.NetworkFunc, bufio.SplitFunc, ClientCallback, ClientCallback) {
-		return to, bufio.ScanLines, nil, nil
-	}
+	factory := SplitClientFactory(to, bufio.ScanLines)
 
 	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {
