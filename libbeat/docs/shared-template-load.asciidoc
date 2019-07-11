@@ -141,7 +141,7 @@ ifdef::deb_os,rpm_os[]
 *deb and rpm:*
 ["source","sh",subs="attributes"]
 ----
-{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 endif::deb_os,rpm_os[]
 
@@ -150,14 +150,14 @@ ifdef::mac_os[]
 
 ["source","sh",subs="attributes"]
 ----
-./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+./{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 
 *brew:*
 
 ["source","sh",subs="attributes"]
 ----
-{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 endif::mac_os[]
 
@@ -166,7 +166,7 @@ ifdef::linux_os[]
 
 ["source","sh",subs="attributes"]
 ----
-./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+./{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 endif::linux_os[]
 
@@ -176,7 +176,7 @@ ifdef::docker_platform[]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run {dockerimage} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 endif::docker_platform[]
 
@@ -193,7 +193,7 @@ and run:
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-PS > .{backslash}{beatname_lc}.exe setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+PS > .{backslash}{beatname_lc}.exe setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 endif::win_os[]
 

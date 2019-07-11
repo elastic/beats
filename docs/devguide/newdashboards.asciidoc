@@ -72,7 +72,7 @@ Flags:
   -h, --help               help for setup
       --machine-learning   Setup machine learning job configurations only
       --modules string     List of enabled modules (comma separated)
-      --template           Setup index template only
+      --index-management           Setup index template only
 ----
 
 The flags are useful when you don't want to load everything. For example, to
