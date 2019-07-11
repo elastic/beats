@@ -107,7 +107,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat] Netflow: Flow Exporters",
+        "title": "[Filebeat Netflow] Flow Exporters",
         "uiStateJSON": {},
         "version": 1
       },
@@ -180,7 +180,7 @@
             }
           }
         },
-        "title": "Netflow: Dashboard Navigation [Filebeat]",
+        "title": "Dashboard Navigation [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -189,7 +189,7 @@
           "params": {
             "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
           },
-          "title": "Netflow: Dashboard Navigation [Filebeat]",
+          "title": "Dashboard Navigation [Filebeat Netflow]",
           "type": "markdown"
         }
       },
@@ -217,7 +217,7 @@
             }
           }
         },
-        "title": "Netflow: Flow Exporters (flow records) [Filebeat]",
+        "title": "Flow Exporters (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -250,7 +250,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Flow Exporters (flow records) [Filebeat]",
+          "title": "Flow Exporters (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -284,7 +284,7 @@
             }
           }
         },
-        "title": "Netflow: Ingress Interfaces (flow records) [Filebeat]",
+        "title": "Ingress Interfaces (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -317,7 +317,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Ingress Interfaces (flow records) [Filebeat]",
+          "title": "Ingress Interfaces (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -351,7 +351,7 @@
             }
           }
         },
-        "title": "Netflow: Egress Interfaces (flow records) [Filebeat]",
+        "title": "Egress Interfaces (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -386,7 +386,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Egress Interfaces (flow records) [Filebeat]",
+          "title": "Egress Interfaces (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -418,7 +418,7 @@
             }
           }
         },
-        "title": "Netflow: Egress Interfaces (bytes) [Filebeat]",
+        "title": "Egress Interfaces (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -428,7 +428,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.egress_interface:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.egress_interface:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Egress Interfaces (bytes) [Filebeat]",
+          "title": "Egress Interfaces (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -454,7 +454,7 @@
             }
           }
         },
-        "title": "Netflow: Egress Interfaces (packets) [Filebeat]",
+        "title": "Egress Interfaces (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -464,7 +464,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.egress_interface:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.egress_interface:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Egress Interfaces (packets) [Filebeat]",
+          "title": "Egress Interfaces (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -490,7 +490,7 @@
             }
           }
         },
-        "title": "Netflow: Ingress Interfaces (packets) [Filebeat]",
+        "title": "Ingress Interfaces (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -500,7 +500,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.ingress_interface:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.ingress_interface:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Ingress Interfaces (packets) [Filebeat]",
+          "title": "Ingress Interfaces (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -526,7 +526,7 @@
             }
           }
         },
-        "title": "Netflow: Ingress Interfaces (bytes) [Filebeat]",
+        "title": "Ingress Interfaces (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -536,7 +536,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.ingress_interface:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.ingress_interface:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Ingress Interfaces (bytes) [Filebeat]",
+          "title": "Ingress Interfaces (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },

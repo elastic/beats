@@ -83,7 +83,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat] Netflow: Conversation Partners",
+        "title": "[Filebeat Netflow] Conversation Partners",
         "uiStateJSON": {
           "P-1": {
             "vis": {
@@ -153,7 +153,7 @@
             }
           }
         },
-        "title": "[Filebeat] Netflow: Conversation Partners",
+        "title": "[Filebeat Netflow] Conversation Partners",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -235,7 +235,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "[Filebeat] Netflow: Conversation Partners",
+          "title": "[Filebeat Netflow] Conversation Partners",
           "type": "table"
         }
       },
@@ -272,7 +272,7 @@
             }
           }
         },
-        "title": "Netflow: IP Version and Protocols (bytes) [Filebeat]",
+        "title": "IP Version and Protocols (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -373,7 +373,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Netflow: IP Version and Protocols (bytes) [Filebeat]",
+          "title": "IP Version and Protocols (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -407,7 +407,7 @@
             }
           }
         },
-        "title": "Netflow: Destinations and Sources (bytes) [Filebeat]",
+        "title": "Destinations and Sources (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -456,7 +456,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destinations and Sources (bytes) [Filebeat]",
+          "title": "Destinations and Sources (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -490,7 +490,7 @@
             }
           }
         },
-        "title": "Netflow: Destination and Source Ports (bytes) [Filebeat]",
+        "title": "Destination and Source Ports (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -539,7 +539,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destination and Source Ports (bytes) [Filebeat]",
+          "title": "Destination and Source Ports (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -572,7 +572,7 @@
             }
           }
         },
-        "title": "Netflow: Dashboard Navigation [Filebeat]",
+        "title": "Dashboard Navigation [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -581,7 +581,7 @@
           "params": {
             "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
           },
-          "title": "Netflow: Dashboard Navigation [Filebeat]",
+          "title": "Dashboard Navigation [Filebeat Netflow]",
           "type": "markdown"
         }
       },

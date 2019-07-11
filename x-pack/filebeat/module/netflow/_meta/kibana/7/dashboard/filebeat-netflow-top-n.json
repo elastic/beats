@@ -115,7 +115,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat] Netflow: Top-N",
+        "title": "[Filebeat Netflow] Top-N",
         "uiStateJSON": {
           "P-2": {
             "vis": {
@@ -274,7 +274,7 @@
             }
           }
         },
-        "title": "Netflow: Dashboard Navigation [Filebeat]",
+        "title": "Dashboard Navigation [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -283,7 +283,7 @@
           "params": {
             "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
           },
-          "title": "Netflow: Dashboard Navigation [Filebeat]",
+          "title": "Dashboard Navigation [Filebeat Netflow]",
           "type": "markdown"
         }
       },
@@ -311,7 +311,7 @@
             }
           }
         },
-        "title": "Netflow: Top Sources [Filebeat]",
+        "title": "Top Sources [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -380,7 +380,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Sources [Filebeat]",
+          "title": "Top Sources [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -414,7 +414,7 @@
             }
           }
         },
-        "title": "Netflow: Top Destinations [Filebeat]",
+        "title": "Top Destinations [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -483,7 +483,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Destinations [Filebeat]",
+          "title": "Top Destinations [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -517,7 +517,7 @@
             }
           }
         },
-        "title": "Netflow: Top Source Ports [Filebeat]",
+        "title": "Top Source Ports [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -586,7 +586,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Source Ports [Filebeat]",
+          "title": "Top Source Ports [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -620,7 +620,7 @@
             }
           }
         },
-        "title": "Netflow: Top Destination Ports [Filebeat]",
+        "title": "Top Destination Ports [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -689,7 +689,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Destination Ports [Filebeat]",
+          "title": "Top Destination Ports [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -723,7 +723,7 @@
             }
           }
         },
-        "title": "Netflow: Top Protocols [Filebeat]",
+        "title": "Top Protocols [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -792,7 +792,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Protocols [Filebeat]",
+          "title": "Top Protocols [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -826,7 +826,7 @@
             }
           }
         },
-        "title": "Netflow: Top Autonomous Systems [Filebeat]",
+        "title": "Top Autonomous Systems [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -895,7 +895,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Autonomous Systems [Filebeat]",
+          "title": "Top Autonomous Systems [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -929,7 +929,7 @@
             }
           }
         },
-        "title": "Netflow: Top Cities [Filebeat]",
+        "title": "Top Cities [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -1011,7 +1011,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Cities [Filebeat]",
+          "title": "Top Cities [Filebeat Netflow]",
           "type": "table"
         }
       },
@@ -1045,7 +1045,7 @@
             }
           }
         },
-        "title": "Netflow: Top Flow Exporters [Filebeat]",
+        "title": "Top Flow Exporters [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -1114,7 +1114,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Netflow: Top Flow Exporters [Filebeat]",
+          "title": "Top Flow Exporters [Filebeat Netflow]",
           "type": "table"
         }
       },

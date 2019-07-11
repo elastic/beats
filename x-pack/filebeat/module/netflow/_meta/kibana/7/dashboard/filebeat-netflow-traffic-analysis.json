@@ -371,7 +371,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat] Netflow: Traffic Analysis",
+        "title": "[Filebeat Netflow] Traffic Analysis",
         "uiStateJSON": {
           "P-15": {
             "vis": {
@@ -684,7 +684,7 @@
             }
           }
         },
-        "title": "Netflow: Autonomous Systems (bytes) [Filebeat]",
+        "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -694,7 +694,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Autonomous Systems (bytes) [Filebeat]",
+          "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -721,7 +721,7 @@
             }
           }
         },
-        "title": "Netflow: Dashboard Navigation [Filebeat]",
+        "title": "Dashboard Navigation [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -730,7 +730,7 @@
           "params": {
             "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
           },
-          "title": "Netflow: Dashboard Navigation [Filebeat]",
+          "title": "Dashboard Navigation [Filebeat Netflow]",
           "type": "markdown"
         }
       },
@@ -756,7 +756,7 @@
             }
           }
         },
-        "title": "Netflow: Cities (bytes) [Filebeat]",
+        "title": "Cities (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -766,7 +766,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.geo.city_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.city_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Cities (bytes) [Filebeat]",
+          "title": "Cities (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -792,7 +792,7 @@
             }
           }
         },
-        "title": "Netflow: Countries (bytes) [Filebeat]",
+        "title": "Countries (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -802,7 +802,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.geo.country_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.country_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Countries (bytes) [Filebeat]",
+          "title": "Countries (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -828,7 +828,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Ports (bytes) [Filebeat]",
+        "title": "Destination Ports (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -838,7 +838,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Destination Ports (bytes) [Filebeat]",
+          "title": "Destination Ports (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -864,7 +864,7 @@
             }
           }
         },
-        "title": "Netflow: TCP Flags (bytes) [Filebeat]",
+        "title": "TCP Flags (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -874,7 +874,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.tcp_control_bits:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.tcp_control_bits:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: TCP Flags (bytes) [Filebeat]",
+          "title": "TCP Flags (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -900,7 +900,7 @@
             }
           }
         },
-        "title": "Netflow: VLANs (bytes) [Filebeat]",
+        "title": "VLANs (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -910,7 +910,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.vlan_id:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.vlan_id:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: VLANs (bytes) [Filebeat]",
+          "title": "VLANs (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -936,7 +936,7 @@
             }
           }
         },
-        "title": "Netflow: Types of Service (bytes) [Filebeat]",
+        "title": "Types of Service (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -946,7 +946,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"netflow.ip_class_of_service:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.ip_class_of_service:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Types of Service (bytes) [Filebeat]",
+          "title": "Types of Service (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -972,7 +972,7 @@
             }
           }
         },
-        "title": "Netflow: Source Ports (bytes) [Filebeat]",
+        "title": "Source Ports (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -982,7 +982,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"source.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Source Ports (bytes) [Filebeat]",
+          "title": "Source Ports (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -1008,7 +1008,7 @@
             }
           }
         },
-        "title": "Netflow: Sources (bytes) [Filebeat]",
+        "title": "Sources (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1018,7 +1018,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"source.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Sources (bytes) [Filebeat]",
+          "title": "Sources (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -1044,7 +1044,7 @@
             }
           }
         },
-        "title": "Netflow: Destinations (bytes) [Filebeat]",
+        "title": "Destinations (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1054,7 +1054,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Destinations (bytes) [Filebeat]",
+          "title": "Destinations (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -1082,7 +1082,7 @@
             }
           }
         },
-        "title": "Netflow: Sources (bytes) [Filebeat]",
+        "title": "Sources (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1118,7 +1118,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Sources (bytes) [Filebeat]",
+          "title": "Sources (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1152,7 +1152,7 @@
             }
           }
         },
-        "title": "Netflow: Source Ports (bytes) [Filebeat]",
+        "title": "Source Ports (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1188,7 +1188,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Source Ports (bytes) [Filebeat]",
+          "title": "Source Ports (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1222,7 +1222,7 @@
             }
           }
         },
-        "title": "Netflow: Destinations (bytes) [Filebeat]",
+        "title": "Destinations (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1258,7 +1258,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destinations (bytes) [Filebeat]",
+          "title": "Destinations (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1292,7 +1292,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Ports (bytes) [Filebeat]",
+        "title": "Destination Ports (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1328,7 +1328,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destination Ports (bytes) [Filebeat]",
+          "title": "Destination Ports (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1362,7 +1362,7 @@
             }
           }
         },
-        "title": "Netflow: Types of Service (bytes) [Filebeat]",
+        "title": "Types of Service (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1398,7 +1398,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Types of Service (bytes) [Filebeat]",
+          "title": "Types of Service (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1432,7 +1432,7 @@
             }
           }
         },
-        "title": "Netflow: VLANs (bytes) [Filebeat]",
+        "title": "VLANs (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1468,7 +1468,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: VLANs (bytes) [Filebeat]",
+          "title": "VLANs (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1502,7 +1502,7 @@
             }
           }
         },
-        "title": "Netflow: TCP Flags (bytes) [Filebeat]",
+        "title": "TCP Flags (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1538,7 +1538,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: TCP Flags (bytes) [Filebeat]",
+          "title": "TCP Flags (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1572,7 +1572,7 @@
             }
           }
         },
-        "title": "Netflow: Autonomous Systems (bytes) [Filebeat]",
+        "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1608,7 +1608,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Autonomous Systems (bytes) [Filebeat]",
+          "title": "Autonomous Systems (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1642,7 +1642,7 @@
             }
           }
         },
-        "title": "Netflow: Countries (bytes) [Filebeat]",
+        "title": "Countries (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1678,7 +1678,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Countries (bytes) [Filebeat]",
+          "title": "Countries (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1712,7 +1712,7 @@
             }
           }
         },
-        "title": "Netflow: Cities (bytes) [Filebeat]",
+        "title": "Cities (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1748,7 +1748,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Cities (bytes) [Filebeat]",
+          "title": "Cities (bytes) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -1780,7 +1780,7 @@
             }
           }
         },
-        "title": "Netflow: Sources (packets) [Filebeat]",
+        "title": "Sources (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1790,7 +1790,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"source.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Sources (packets) [Filebeat]",
+          "title": "Sources (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -1818,7 +1818,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Count [Filebeat]",
+        "title": "Destination Count [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1839,7 +1839,7 @@
             "fontSize": "32",
             "handleNoResults": true
           },
-          "title": "Netflow: Destination Count [Filebeat]",
+          "title": "Destination Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -1873,7 +1873,7 @@
             }
           }
         },
-        "title": "Netflow: Source Count [Filebeat]",
+        "title": "Source Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -1940,7 +1940,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: Source Count [Filebeat]",
+          "title": "Source Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -1972,7 +1972,7 @@
             }
           }
         },
-        "title": "Netflow: Destinations (packets) [Filebeat]",
+        "title": "Destinations (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1982,7 +1982,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.ip:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.ip:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Destinations (packets) [Filebeat]",
+          "title": "Destinations (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2010,7 +2010,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Port Count [Filebeat]",
+        "title": "Destination Port Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -2077,7 +2077,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: Destination Port Count [Filebeat]",
+          "title": "Destination Port Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -2111,7 +2111,7 @@
             }
           }
         },
-        "title": "Netflow: Source Port Count [Filebeat]",
+        "title": "Source Port Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -2178,7 +2178,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: Source Port Count [Filebeat]",
+          "title": "Source Port Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -2210,7 +2210,7 @@
             }
           }
         },
-        "title": "Netflow: Autonomous Systems (packets) [Filebeat]",
+        "title": "Autonomous Systems (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2220,7 +2220,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Autonomous Systems (packets) [Filebeat]",
+          "title": "Autonomous Systems (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2246,7 +2246,7 @@
             }
           }
         },
-        "title": "Netflow: Cities (packets) [Filebeat]",
+        "title": "Cities (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2256,7 +2256,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.geo.city_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.city_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Cities (packets) [Filebeat]",
+          "title": "Cities (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2282,7 +2282,7 @@
             }
           }
         },
-        "title": "Netflow: Countries (packets) [Filebeat]",
+        "title": "Countries (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2292,7 +2292,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.geo.country_name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.geo.country_name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Countries (packets) [Filebeat]",
+          "title": "Countries (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2318,7 +2318,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Ports (packets) [Filebeat]",
+        "title": "Destination Ports (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2328,7 +2328,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Destination Ports (packets) [Filebeat]",
+          "title": "Destination Ports (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2354,7 +2354,7 @@
             }
           }
         },
-        "title": "Netflow: Source Ports (packets) [Filebeat]",
+        "title": "Source Ports (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2364,7 +2364,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"source.port:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.port:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Source Ports (packets) [Filebeat]",
+          "title": "Source Ports (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2390,7 +2390,7 @@
             }
           }
         },
-        "title": "Netflow: TCP Flags (packets) [Filebeat]",
+        "title": "TCP Flags (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2400,7 +2400,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.tcp_control_bits:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.tcp_control_bits:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: TCP Flags (packets) [Filebeat]",
+          "title": "TCP Flags (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2426,7 +2426,7 @@
             }
           }
         },
-        "title": "Netflow: Types of Service (packets) [Filebeat]",
+        "title": "Types of Service (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2436,7 +2436,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.ip_class_of_service:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.ip_class_of_service:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Types of Service (packets) [Filebeat]",
+          "title": "Types of Service (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2462,7 +2462,7 @@
             }
           }
         },
-        "title": "Netflow: VLANs (packets) [Filebeat]",
+        "title": "VLANs (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -2472,7 +2472,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"netflow.vlan_id:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* netflow.vlan_id:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: VLANs (packets) [Filebeat]",
+          "title": "VLANs (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -2500,7 +2500,7 @@
             }
           }
         },
-        "title": "Netflow: ToS Count [Filebeat]",
+        "title": "ToS Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -2567,7 +2567,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: ToS Count [Filebeat]",
+          "title": "ToS Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -2601,7 +2601,7 @@
             }
           }
         },
-        "title": "Netflow: VLAN Count [Filebeat]",
+        "title": "VLAN Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -2668,7 +2668,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: VLAN Count [Filebeat]",
+          "title": "VLAN Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -2702,7 +2702,7 @@
             }
           }
         },
-        "title": "Netflow: Autonomous System Count [Filebeat]",
+        "title": "Autonomous System Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -2769,7 +2769,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: Autonomous System Count [Filebeat]",
+          "title": "Autonomous System Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -2803,7 +2803,7 @@
             }
           }
         },
-        "title": "Netflow: City Count [Filebeat]",
+        "title": "City Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -2870,7 +2870,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: City Count [Filebeat]",
+          "title": "City Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -2904,7 +2904,7 @@
             }
           }
         },
-        "title": "Netflow: Country Count [Filebeat]",
+        "title": "Country Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -2971,7 +2971,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: Country Count [Filebeat]",
+          "title": "Country Count [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -3005,7 +3005,7 @@
             }
           }
         },
-        "title": "Netflow: TCP Flags Count [Filebeat]",
+        "title": "TCP Flags Count [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -3072,7 +3072,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "Netflow: TCP Flags Count [Filebeat]",
+          "title": "TCP Flags Count [Filebeat Netflow]",
           "type": "metric"
         }
       },

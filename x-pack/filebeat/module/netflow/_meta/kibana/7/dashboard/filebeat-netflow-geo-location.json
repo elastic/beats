@@ -81,7 +81,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat] Netflow: Geo Location",
+        "title": "[Filebeat Netflow] Geo Location",
         "uiStateJSON": {
           "P-16": {
             "mapCenter": [
@@ -148,7 +148,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Geo Location Heatmap [Filebeat]",
+        "title": "Destination Geo Location Heatmap [Filebeat Netflow]",
         "uiStateJSON": {
           "mapCenter": [
             8.407168163601076,
@@ -209,7 +209,7 @@
               "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
-          "title": "Netflow: Destination Geo Location Heatmap [Filebeat]",
+          "title": "Destination Geo Location Heatmap [Filebeat Netflow]",
           "type": "tile_map"
         }
       },
@@ -243,7 +243,7 @@
             }
           }
         },
-        "title": "Netflow: Countries and Cities (flow records) [Filebeat]",
+        "title": "Countries and Cities (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -291,7 +291,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Countries and Cities (flow records) [Filebeat]",
+          "title": "Countries and Cities (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -325,7 +325,7 @@
             }
           }
         },
-        "title": "Netflow: Destinations and Sources (flow records) [Filebeat]",
+        "title": "Destinations and Sources (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -373,7 +373,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destinations and Sources (flow records) [Filebeat]",
+          "title": "Destinations and Sources (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -407,7 +407,7 @@
             }
           }
         },
-        "title": "Netflow: Destination and Source Ports (flow records) [Filebeat]",
+        "title": "Destination and Source Ports (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -455,7 +455,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destination and Source Ports (flow records) [Filebeat]",
+          "title": "Destination and Source Ports (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -488,7 +488,7 @@
             }
           }
         },
-        "title": "Netflow: Dashboard Navigation [Filebeat]",
+        "title": "Dashboard Navigation [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -497,7 +497,7 @@
           "params": {
             "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
           },
-          "title": "Netflow: Dashboard Navigation [Filebeat]",
+          "title": "Dashboard Navigation [Filebeat Netflow]",
           "type": "markdown"
         }
       },

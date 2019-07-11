@@ -107,7 +107,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat] Netflow: Autonomous Systems",
+        "title": "[Filebeat Netflow] Autonomous Systems",
         "uiStateJSON": {},
         "version": 1
       },
@@ -180,7 +180,7 @@
             }
           }
         },
-        "title": "Netflow: Dashboard Navigation [Filebeat]",
+        "title": "Dashboard Navigation [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -189,7 +189,7 @@
           "params": {
             "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
           },
-          "title": "Netflow: Dashboard Navigation [Filebeat]",
+          "title": "Dashboard Navigation [Filebeat Netflow]",
           "type": "markdown"
         }
       },
@@ -215,7 +215,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Autonomous Systems (bytes) [Filebeat]",
+        "title": "Destination Autonomous Systems (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -225,7 +225,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"destination.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Destination Autonomous Systems (bytes) [Filebeat]",
+          "title": "Destination Autonomous Systems (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -251,7 +251,7 @@
             }
           }
         },
-        "title": "Netflow: Destination Autonomous Systems (packets) [Filebeat]",
+        "title": "Destination Autonomous Systems (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -261,7 +261,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"destination.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* destination.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Destination Autonomous Systems (packets) [Filebeat]",
+          "title": "Destination Autonomous Systems (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -287,7 +287,7 @@
             }
           }
         },
-        "title": "Netflow: Source Autonomous Systems (bytes) [Filebeat]",
+        "title": "Source Autonomous Systems (bytes) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -297,7 +297,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.bytes\", split=\"source.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"bytes / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Source Autonomous Systems (bytes) [Filebeat]",
+          "title": "Source Autonomous Systems (bytes) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -323,7 +323,7 @@
             }
           }
         },
-        "title": "Netflow: Source Autonomous Systems (packets) [Filebeat]",
+        "title": "Source Autonomous Systems (packets) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -333,7 +333,7 @@
             "expression": ".es(index=\"filebeat-*\", metric=\"sum:network.packets\", split=\"source.as.organization.name:10\", kibana=true).scale_interval(1s).fit(mode=scale).if(operator=\"lt\", if=0, then=0).trim(start=2,end=1).label(regex=\"^.* source.as.organization.name:(.+) \u003e .*$\", label=\"$1\").lines(width=1, stack=true, fill=1).yaxis(label=\"packets / sec\", min=0)",
             "interval": "auto"
           },
-          "title": "Netflow: Source Autonomous Systems (packets) [Filebeat]",
+          "title": "Source Autonomous Systems (packets) [Filebeat Netflow]",
           "type": "timelion"
         }
       },
@@ -361,7 +361,7 @@
             }
           }
         },
-        "title": "Netflow: Destination and Source ASs (flow records) [Filebeat]",
+        "title": "Destination and Source ASs (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -409,7 +409,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destination and Source ASs (flow records) [Filebeat]",
+          "title": "Destination and Source ASs (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -443,7 +443,7 @@
             }
           }
         },
-        "title": "Netflow: Destinations and Sources (flow records) [Filebeat]",
+        "title": "Destinations and Sources (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -491,7 +491,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destinations and Sources (flow records) [Filebeat]",
+          "title": "Destinations and Sources (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
@@ -525,7 +525,7 @@
             }
           }
         },
-        "title": "Netflow: Destination and Source Ports (flow records) [Filebeat]",
+        "title": "Destination and Source Ports (flow records) [Filebeat Netflow]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -573,7 +573,7 @@
             "isDonut": true,
             "legendPosition": "right"
           },
-          "title": "Netflow: Destination and Source Ports (flow records) [Filebeat]",
+          "title": "Destination and Source Ports (flow records) [Filebeat Netflow]",
           "type": "pie"
         }
       },
