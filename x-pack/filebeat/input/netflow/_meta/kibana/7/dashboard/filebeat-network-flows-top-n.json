@@ -12,7 +12,7 @@
             }
           }
         },
-        "savedSearchId": "2e9de603-5372-4a9c-a787-5c28f4cfcb7d",
+        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
         "title": "Source Port and Transport [Filebeat Flows]",
         "uiStateJSON": {},
         "version": 1,
@@ -77,7 +77,7 @@
           "type": "pie"
         }
       },
-      "id": "3b0d8bf6-450e-4f5f-abf4-74b8204fa5e7",
+      "id": "3bc31900-1ae7-11e9-9eb0-d1ab52900288",
       "type": "visualization",
       "updated_at": "2019-01-18T16:16:16.527Z",
       "version": 2
@@ -204,7 +204,7 @@
           "type": "input_control_vis"
         }
       },
-      "id": "e3ba8d3e-b63a-49b0-977a-167b0886b4f3",
+      "id": "b957b010-1ae7-11e9-9eb0-d1ab52900288",
       "type": "visualization",
       "updated_at": "2019-01-18T16:16:16.527Z",
       "version": 2
@@ -221,7 +221,7 @@
             }
           }
         },
-        "savedSearchId": "2e9de603-5372-4a9c-a787-5c28f4cfcb7d",
+        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
         "title": "Destination Port and Transport [Filebeat Flows]",
         "uiStateJSON": {},
         "version": 1,
@@ -286,7 +286,7 @@
           "type": "pie"
         }
       },
-      "id": "ca65f3b7-8a3d-45bb-9e44-8b6511665c84",
+      "id": "44042280-1ae7-11e9-9eb0-d1ab52900288",
       "type": "visualization",
       "updated_at": "2019-01-18T16:16:16.527Z",
       "version": 2
@@ -303,7 +303,7 @@
             }
           }
         },
-        "savedSearchId": "2e9de603-5372-4a9c-a787-5c28f4cfcb7d",
+        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
         "title": "Top Sources Table [Filebeat Flows]",
         "uiStateJSON": {
           "vis": {
@@ -398,7 +398,7 @@
           "type": "table"
         }
       },
-      "id": "1439876d-0ae4-439c-a65d-e92faa0715f9",
+      "id": "846bac40-1ae6-11e9-9eb0-d1ab52900288",
       "type": "visualization",
       "updated_at": "2019-01-18T16:39:24.499Z",
       "version": 3
@@ -415,7 +415,7 @@
             }
           }
         },
-        "savedSearchId": "2e9de603-5372-4a9c-a787-5c28f4cfcb7d",
+        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
         "title": "Top Destinations Table [Filebeat Flows]",
         "uiStateJSON": {
           "vis": {
@@ -510,7 +510,7 @@
           "type": "table"
         }
       },
-      "id": "db9408ac-e6f5-41da-b677-530c31cda2ec",
+      "id": "8d0c61f0-1ae6-11e9-9eb0-d1ab52900288",
       "type": "visualization",
       "updated_at": "2019-01-18T16:39:44.417Z",
       "version": 3
@@ -527,7 +527,7 @@
             }
           }
         },
-        "savedSearchId": "2e9de603-5372-4a9c-a787-5c28f4cfcb7d",
+        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
         "title": "Flows Over Time [Filebeat Flows]",
         "uiStateJSON": {
           "vis": {
@@ -684,7 +684,7 @@
           "type": "area"
         }
       },
-      "id": "7b3caa8b-91d9-4a6a-b768-e4e3a8c36c3e",
+      "id": "e7c6efa0-1ae8-11e9-9eb0-d1ab52900288",
       "type": "visualization",
       "updated_at": "2019-01-18T16:16:16.527Z",
       "version": 2
@@ -746,7 +746,7 @@
         "title": "Network Flow Search [Filebeat]",
         "version": 1
       },
-      "id": "2e9de603-5372-4a9c-a787-5c28f4cfcb7d",
+      "id": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
       "type": "search",
       "updated_at": "2019-01-18T16:16:16.527Z",
       "version": 2
@@ -779,7 +779,7 @@
               "x": 0,
               "y": 8
             },
-            "id": "3b0d8bf6-450e-4f5f-abf4-74b8204fa5e7",
+            "id": "3bc31900-1ae7-11e9-9eb0-d1ab52900288",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0"
@@ -793,7 +793,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "e3ba8d3e-b63a-49b0-977a-167b0886b4f3",
+            "id": "b957b010-1ae7-11e9-9eb0-d1ab52900288",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0"
@@ -807,7 +807,7 @@
               "x": 24,
               "y": 8
             },
-            "id": "ca65f3b7-8a3d-45bb-9e44-8b6511665c84",
+            "id": "44042280-1ae7-11e9-9eb0-d1ab52900288",
             "panelIndex": "3",
             "type": "visualization",
             "version": "7.0.0"
@@ -821,7 +821,7 @@
               "x": 0,
               "y": 23
             },
-            "id": "1439876d-0ae4-439c-a65d-e92faa0715f9",
+            "id": "846bac40-1ae6-11e9-9eb0-d1ab52900288",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0"
@@ -835,7 +835,7 @@
               "x": 24,
               "y": 23
             },
-            "id": "db9408ac-e6f5-41da-b677-530c31cda2ec",
+            "id": "8d0c61f0-1ae6-11e9-9eb0-d1ab52900288",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0"
@@ -849,7 +849,7 @@
               "x": 24,
               "y": 0
             },
-            "id": "7b3caa8b-91d9-4a6a-b768-e4e3a8c36c3e",
+            "id": "e7c6efa0-1ae8-11e9-9eb0-d1ab52900288",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0"
@@ -859,7 +859,7 @@
         "title": "Top-N Flows [Filebeat Flows]",
         "version": 1
       },
-      "id": "951e423f-80f4-4d01-aaae-141139f053ee",
+      "id": "1374fe40-1ae8-11e9-9eb0-d1ab52900288",
       "type": "dashboard",
       "updated_at": "2019-01-18T16:40:54.334Z",
       "version": 4
