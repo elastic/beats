@@ -63,6 +63,17 @@ overwrite the template to apply the changes.
 
 The rollover index pattern. The default is `%{now/d}-000001`.
 
+Date math is supported in this setting. For example:
+
+[source,yaml]
+----
+setup.ilm.pattern: "{now/M{YYYY.MM}}-000001"
+----
+
+For more information, see
+{ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
+date math with the rollover API].
+
 NOTE: If you modify this setting after loading the index template, you must
 overwrite the template to apply the changes.
 
