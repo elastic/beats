@@ -67,6 +67,24 @@ type s3Info struct {
 	name   string
 	key    string
 	region string
+	arn    string
+}
+
+type sqsMessage struct {
+	Records []struct {
+		EventSource string `json:"eventSource"`
+		AwsRegion   string `json:"awsRegion"`
+		EventName   string `json:"eventName"`
+		S3          struct {
+			Bucket struct {
+				Name string `json:"name"`
+				Arn  string `json:"arn"`
+			} `json:"bucket"`
+			Object struct {
+				Key string `json:"key"`
+			} `json:"object"`
+		} `json:"s3"`
+	} `json:"Records"`
 }
 
 // NewInput creates a new s3 input
@@ -270,27 +288,21 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 
 // handle message
 func handleMessage(m sqs.Message) ([]s3Info, error) {
-	msg := map[string]interface{}{}
+	msg := sqsMessage{}
 	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
 		return nil, errors.Wrap(err, "json unmarshal sqs message body failed")
 	}
 
 	var s3Infos []s3Info
-	records := msg["Records"].([]interface{})
-	for _, record := range records {
-		recordMap := record.(map[string]interface{})
-		if recordMap["eventSource"] == "aws:s3" && recordMap["eventName"] == "ObjectCreated:Put" {
-			s3Info := s3Info{}
-			s3Info.region = recordMap["awsRegion"].(string)
-			s3Record := recordMap["s3"].(map[string]interface{})
-
-			bucketInfo := s3Record["bucket"].(map[string]interface{})
-			s3Info.name = bucketInfo["name"].(string)
-
-			objectInfo := s3Record["object"].(map[string]interface{})
-			s3Info.key = objectInfo["key"].(string)
-			s3Infos = append(s3Infos, s3Info)
+	for _, record := range msg.Records {
+		if record.EventSource == "aws:s3" && record.EventName == "ObjectCreated:Put" {
+			s3Infos = append(s3Infos, s3Info{
+				region: record.AwsRegion,
+				name:   record.S3.Bucket.Name,
+				key:    record.S3.Object.Key,
+				arn:    record.S3.Bucket.Arn,
+			})
 		}
 	}
 	return s3Infos, nil
@@ -397,8 +409,10 @@ func createEvent(log string, offset int, s3Info s3Info) *beat.Event {
 		},
 		"aws": common.MapStr{
 			"s3": common.MapStr{
-				"bucket_name": s3Info.name,
-				"object_key":  s3Info.key,
+				"bucket": common.MapStr{
+					"name": s3Info.name,
+					"arn":  s3Info.arn},
+				"object.key": s3Info.key,
 			},
 		},
 		"cloud": common.MapStr{

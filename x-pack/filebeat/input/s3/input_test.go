@@ -127,6 +127,7 @@ func TestCreateEvent(t *testing.T) {
 		name:   "test-s3-ks",
 		key:    "log2019-06-21-16-16-54",
 		region: "us-west-1",
+		arn:    "arn:aws:s3:::test-s3-ks",
 	}
 
 	reader, err := bufferedIORead(mockSvc, s3Info)
@@ -149,11 +150,11 @@ func TestCreateEvent(t *testing.T) {
 
 	assert.Equal(t, 2, len(events))
 
-	bucketName, err := events[0].Fields.GetValue("aws.s3.bucket_name")
+	bucketName, err := events[0].Fields.GetValue("aws.s3.bucket.name")
 	assert.NoError(t, err)
 	assert.Equal(t, "test-s3-ks", bucketName.(string))
 
-	objectKey, err := events[0].Fields.GetValue("aws.s3.object_key")
+	objectKey, err := events[0].Fields.GetValue("aws.s3.object.key")
 	assert.NoError(t, err)
 	assert.Equal(t, "log2019-06-21-16-16-54", objectKey.(string))
 
