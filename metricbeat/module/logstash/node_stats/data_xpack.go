@@ -38,9 +38,8 @@ type commonStats struct {
 }
 
 type cpu struct {
-	Percent     int                    `json:"percent"`
-	LoadAverage map[string]interface{} `json:"load_average"`
-	NumCPUs     int                    `json:"num_cpus"`
+	Percent     int                    `json:"percent,omitempty"`
+	LoadAverage map[string]interface{} `json:"load_average,omitempty"`
 }
 
 type process struct {
@@ -119,7 +118,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	o := os{
 		cpu{
 			LoadAverage: nodeStats.Process.CPU.LoadAverage,
-			NumCPUs:     nodeStats.Process.CPU.NumCPUs,
 		},
 	}
 
