@@ -135,14 +135,12 @@ metricbeat.modules:
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  metrics:
+  cloudwatch_metrics:
     - namespace: AWS/EC2
-      name: ["CPUUtilization", "DiskWriteOps"]
-      tags.resource_type_filter: ec2:intance
+      metricname: CPUUtilization
       dimensions:
         - name: InstanceId
           value: i-0686946e22cf9494a
-      statistic: ["Average", "Maximum"]
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
