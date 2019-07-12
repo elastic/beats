@@ -49,10 +49,12 @@ To import the dashboards, run the `setup` command.
 The `setup` phase loads:
 
 - Index mapping template in Elasticsearch
-- Kibana dashboards
-- Machine Learning jobs (if available)
+- Kibana dashboards (where available)
+- Machine Learning (ML) jobs (where available)
+- Ingest pipelines (where available)
+- ILM policy (for Elasticsearch 6.5 and newer)
 
-For more details about the `setup` command, run the following:
+For more details about the `setup` command, run:
 
 [source,shell]
 ----
@@ -63,16 +65,18 @@ This command does initial setup of the environment:
  * Index mapping template in Elasticsearch to ensure fields are mapped.
  * Kibana dashboards (where available).
  * ML jobs (where available).
+ * Ingest pipelines (where available).
+ * ILM policy (for Elasticsearch 6.5 and newer).
 
 Usage:
-  filebeat setup [flags]
+  metricbeat setup [flags]
 
 Flags:
-      --dashboards         Setup dashboards only
+      --dashboards         Setup dashboards
   -h, --help               help for setup
-      --machine-learning   Setup machine learning job configurations only
-      --modules string     List of enabled modules (comma separated)
-      --index-management           Setup index template only
+      --index-management   Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias
+      --machine-learning   Setup machine learning job configurations
+      --pipelines          Setup Ingest pipelines
 ----
 
 The flags are useful when you don't want to load everything. For example, to
