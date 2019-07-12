@@ -26,6 +26,12 @@ func init() {
 	mage.BeatLicense = "Elastic License"
 }
 
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
+}
+
 // Build builds the Beat binary.
 func Build() error {
 	return mage.Build(mage.DefaultBuildArgs())
