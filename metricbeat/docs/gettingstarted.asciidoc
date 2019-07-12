@@ -272,10 +272,6 @@ or run {beatname_uc} with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
-//REVIEWERS: Do you really need sudo to run metricbeat? if so, under what
-//circumstances? Is this just a mistake from the first draft that never got
-//fixed?
-
 :requires-sudo:
 include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
 :requires-sudo!:
