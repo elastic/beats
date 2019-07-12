@@ -23,13 +23,14 @@ type ConfigAWS struct {
 // If not, then load from aws config file. If credential_profile_name is not
 // given, then load default profile from the aws config file.
 func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
-	// Check if accessKeyID and secretAccessKey is given from configuration
-	if config.AccessKeyID != "" && config.SecretAccessKey != "" {
+	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
+	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
 		awsConfig := defaults.Config()
 		awsCredentials := awssdk.Credentials{
 			AccessKeyID:     config.AccessKeyID,
 			SecretAccessKey: config.SecretAccessKey,
 		}
+
 		if config.SessionToken != "" {
 			awsCredentials.SessionToken = config.SessionToken
 		}
@@ -40,7 +41,7 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, nil
 	}
 
-	// If accessKeyID and secretAccessKey is not given, then load from default config
+	// If accessKeyID, secretAccessKey or sessionToken is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
 	if config.ProfileName != "" {
