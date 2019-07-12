@@ -23631,6 +23631,16 @@ type: long
 
 --
 
+*`rabbitmq.connection.client_provided.name`*::
++
+--
+User specified connection name.
+
+
+type: keyword
+
+--
+
 [float]
 === exchange
 

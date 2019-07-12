@@ -274,6 +274,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
 - Add Oracle Module {pull}11890[11890]
 - Add Oracle Tablespaces Dashboard {pull}12736[12736]
+- Collect client provided name for rabbitmq connection. {issue}12851[12851] {pull}12852[12852]
 
 *Packetbeat*
 
