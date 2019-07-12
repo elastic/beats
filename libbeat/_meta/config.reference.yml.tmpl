@@ -951,7 +951,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is beatname-{agent.version}. 
+# name is 'beatname-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "beat-index-prefix"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".

@@ -996,7 +996,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is winlogbeat-{agent.version}. 
+# name is 'winlogbeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "winlogbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".

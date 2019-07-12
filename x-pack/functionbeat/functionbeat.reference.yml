@@ -697,7 +697,7 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is functionbeat-{agent.version}. 
+# name is 'functionbeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "functionbeat"
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
