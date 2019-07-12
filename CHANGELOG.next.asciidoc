@@ -83,6 +83,8 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Filebeat*
 
+- Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
+
 *Heartbeat*
 
 *Journalbeat*
