@@ -65,6 +65,11 @@ type nodeInfo struct {
 	Pipeline    map[string]interface{} `json:"pipeline"`
 }
 
+type reloads struct {
+	Successes int `json:"successes"`
+	Failures  int `json:"failures"`
+}
+
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
 	nodeInfo
@@ -89,7 +94,7 @@ type PipelineStats struct {
 	Hash        string                   `json:"hash"`
 	EphemeralID string                   `json:"ephemeral_id"`
 	Events      map[string]interface{}   `json:"events"`
-	Reloads     map[string]interface{}   `json:"reloads"`
+	Reloads     reloads                  `json:"reloads"`
 	Queue       map[string]interface{}   `json:"queue"`
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
