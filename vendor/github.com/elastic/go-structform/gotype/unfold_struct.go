@@ -77,6 +77,10 @@ func fieldUnfolders(ctx *unfoldCtx, t reflect.Type) (map[string]fieldUnfolder, e
 		}
 
 		tagName, tagOpts := parseTags(st.Tag.Get(ctx.opts.tag))
+		if tagOpts.omit {
+			continue
+		}
+
 		if tagOpts.squash {
 			if st.Type.Kind() != reflect.Struct {
 				return nil, errSquashNeedObject
@@ -120,12 +124,16 @@ func fieldUnfolders(ctx *unfoldCtx, t reflect.Type) (map[string]fieldUnfolder, e
 
 func makeFieldUnfolder(ctx *unfoldCtx, st reflect.StructField) (fieldUnfolder, error) {
 	fu := fieldUnfolder{offset: st.Offset}
+	targetType := reflect.PtrTo(st.Type)
 
-	if pu := lookupGoPtrUnfolder(st.Type); pu != nil {
+	if uu := lookupReflUser(ctx, targetType); uu != nil {
+		fu.initState = wrapReflUnfolder(st.Type, uu)
+	} else if targetType.Implements(tExpander) {
+		fu.initState = wrapReflUnfolder(st.Type, newExpanderInit())
+	} else if pu := lookupGoPtrUnfolder(st.Type); pu != nil {
 		fu.initState = pu.initState
 	} else {
-		targetType := reflect.PtrTo(st.Type)
-		ru, err := lookupReflUnfolder(ctx, targetType)
+		ru, err := lookupReflUnfolder(ctx, targetType, false)
 		if err != nil {
 			return fu, err
 		}
