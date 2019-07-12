@@ -248,7 +248,6 @@ configuration file, or run Heartbeat with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
-//fixed?
 
 :requires-sudo:
 include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
