@@ -131,11 +131,9 @@ ifdef::only-elasticsearch[]
 :disable_logstash:
 endif::only-elasticsearch[]
 
-ifeval::["{requires-sudo}"=="yes"]
-
+ifdef::requires-sudo[]
 include::./shared-note-sudo.asciidoc[]
-
-endif::[]
+endif::requires-sudo[]
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*
