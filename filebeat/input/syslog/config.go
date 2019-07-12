@@ -77,7 +77,7 @@ func factory(
 			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
 		}
 
-		factory := tcp.SplitClientFactory(nf, splitFunc)
+		factory := tcp.SplitHandlerFactory(nf, splitFunc)
 
 		return tcp.New(&config.Config, factory)
 	case udp.Name:

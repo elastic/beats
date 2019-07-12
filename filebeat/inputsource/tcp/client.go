@@ -31,8 +31,8 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// splitClient is a TCP client that has splitting capabilities.
-type splitClient struct {
+// splitHandler is a TCP client that has splitting capabilities.
+type splitHandler struct {
 	conn           net.Conn
 	callback       inputsource.NetworkFunc
 	done           chan struct{}
@@ -42,30 +42,30 @@ type splitClient struct {
 	timeout        time.Duration
 }
 
-// ClientFactory returns a Client func
-type ClientFactory func(config *Config) Client
+// ClientFactory returns a ConnectionHandler func
+type ClientFactory func(config Config) ConnectionHandler
 
-// Client interface provides mechanisms for handling of incoming TCP connections
-type Client interface {
+// ConnectionHandler interface provides mechanisms for handling of incoming TCP connections
+type ConnectionHandler interface {
 	Handle(conn net.Conn) error
 	Close()
 }
 
-// SplitClientFactory allows creation of a Client that can do splitting of messages received on a TCP connection.
-func SplitClientFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) ClientFactory {
-	return func(config *Config) Client {
-		return NewSplitClient(callback, splitFunc, uint64(config.MaxMessageSize), config.Timeout)
+// SplitHandlerFactory allows creation of a ConnectionHandler that can do splitting of messages received on a TCP connection.
+func SplitHandlerFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) ClientFactory {
+	return func(config Config) ConnectionHandler {
+		return newSplitHandler(callback, splitFunc, uint64(config.MaxMessageSize), config.Timeout)
 	}
 }
 
-// NewSplitClient allows creation of a TCP client that has splitting capabilities.
-func NewSplitClient(
+// newSplitHandler allows creation of a TCP client that has splitting capabilities.
+func newSplitHandler(
 	callback inputsource.NetworkFunc,
 	splitFunc bufio.SplitFunc,
 	maxReadMessage uint64,
 	timeout time.Duration,
-) Client {
-	client := &splitClient{
+) ConnectionHandler {
+	client := &splitHandler{
 		callback:       callback,
 		done:           make(chan struct{}),
 		splitFunc:      splitFunc,
@@ -76,7 +76,7 @@ func NewSplitClient(
 }
 
 // Handle takes a connection as input and processes data received on it.
-func (c *splitClient) Handle(conn net.Conn) error {
+func (c *splitHandler) Handle(conn net.Conn) error {
 	c.conn = conn
 	c.metadata = inputsource.NetworkMetadata{
 		RemoteAddr: conn.RemoteAddr(),
@@ -112,7 +112,7 @@ func (c *splitClient) Handle(conn net.Conn) error {
 	}
 
 	// We are out of the scanner, either we reached EOF or another fatal error occurred.
-	// like we failed to complete the TLS handshake or we are missing the splitClient certificate when
+	// like we failed to complete the TLS handshake or we are missing the splitHandler certificate when
 	// mutual auth is on, which is the default.
 	if err := scanner.Err(); err != nil {
 		return err
@@ -122,9 +122,9 @@ func (c *splitClient) Handle(conn net.Conn) error {
 }
 
 // Close is used to perform clean up before the client is released.
-func (c *splitClient) Close() {
-	c.conn.Close()
+func (c *splitHandler) Close() {
 	close(c.done)
+	c.conn.Close()
 }
 
 func extractSSLInformation(c net.Conn) *inputsource.TLSMetadata {

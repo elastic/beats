@@ -80,7 +80,7 @@ func NewInput(
 		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
 	}
 
-	factory := tcp.SplitClientFactory(cb, splitFunc)
+	factory := tcp.SplitHandlerFactory(cb, splitFunc)
 
 	server, err := tcp.New(&config.Config, factory)
 	if err != nil {

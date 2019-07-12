@@ -71,7 +71,7 @@ type DeadlineReader struct {
 }
 
 // NewDeadlineReader returns a new DeadlineReader
-func NewDeadlineReader(c net.Conn, timeout time.Duration) io.Reader {
+func NewDeadlineReader(c net.Conn, timeout time.Duration) *DeadlineReader {
 	return &DeadlineReader{
 		conn:    c,
 		timeout: timeout,

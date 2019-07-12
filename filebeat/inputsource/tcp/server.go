@@ -37,7 +37,7 @@ type Server struct {
 	sync.RWMutex
 	config    *Config
 	Listener  net.Listener
-	clients   map[Client]struct{}
+	clients   map[ConnectionHandler]struct{}
 	wg        sync.WaitGroup
 	done      chan struct{}
 	factory   ClientFactory
@@ -61,7 +61,7 @@ func New(
 
 	return &Server{
 		config:    config,
-		clients:   make(map[Client]struct{}, 0),
+		clients:   make(map[ConnectionHandler]struct{}, 0),
 		done:      make(chan struct{}),
 		factory:   factory,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
@@ -87,7 +87,11 @@ func (s *Server) Start() error {
 	return nil
 }
 
-// Run start and run a new TCP listener to receive new data
+// Run start and run a new TCP listener to receive new data. When a new connection is accepted, the factory is used
+// to create a ConnectionHandler. The ConnectionHandler takes the connection as input and handles the data that is
+// being received via tha io.Reader. Most clients use the splitHandler which can take a bufio.SplitFunc and parse
+// out each message into an appropriate event. The Close() of the ConnectionHandler can be used to clean up the
+// connection either by client or server based on need.
 func (s *Server) run() {
 	for {
 		conn, err := s.Listener.Accept()
@@ -101,7 +105,7 @@ func (s *Server) run() {
 			}
 		}
 
-		client := s.factory(s.config)
+		client := s.factory(*s.config)
 
 		s.wg.Add(1)
 		go func() {
@@ -141,22 +145,22 @@ func (s *Server) Stop() {
 	s.log.Info("TCP server stopped")
 }
 
-func (s *Server) registerClient(client Client) {
+func (s *Server) registerClient(client ConnectionHandler) {
 	s.Lock()
 	defer s.Unlock()
 	s.clients[client] = struct{}{}
 }
 
-func (s *Server) unregisterClient(client Client) {
+func (s *Server) unregisterClient(client ConnectionHandler) {
 	s.Lock()
 	defer s.Unlock()
 	delete(s.clients, client)
 }
 
-func (s *Server) allClients() []Client {
+func (s *Server) allClients() []ConnectionHandler {
 	s.RLock()
 	defer s.RUnlock()
-	currentClients := make([]Client, len(s.clients))
+	currentClients := make([]ConnectionHandler, len(s.clients))
 	idx := 0
 	for client := range s.clients {
 		currentClients[idx] = client

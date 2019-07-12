@@ -231,7 +231,6 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...v7.0.0-rc1[Check the HEA
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945] {pull}11223[11223]
 - Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
-- Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
 
 *Metricbeat*
 
