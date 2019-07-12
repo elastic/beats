@@ -1121,7 +1121,7 @@ setup.template.settings:
 #setup.ilm.pattern: "{now/d}-000001"
 
 # Set the lifecycle policy name. The default policy name is
-# auditbeat-{agent.version}.
+# 'auditbeat-%{[agent.version]}'.
 #setup.ilm.policy_name: "mypolicy"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
