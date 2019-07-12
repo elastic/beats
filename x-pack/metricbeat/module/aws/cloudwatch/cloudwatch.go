@@ -226,8 +226,8 @@ func constructLabel(metric listMetricWithDetail, statistic string) string {
 func createMetricDataQueries(listMetricDetailTotal []listMetricWithDetail, period time.Duration) (metricDataQueries []cloudwatch.MetricDataQuery) {
 	for i, listMetricTypeStats := range listMetricDetailTotal {
 		for j, statistic := range listMetricTypeStats.statistic {
-			stat := new(string)
-			*stat = statistic
+			stat := statistic
+			metricName := listMetricTypeStats.cloudwatchMetric
 			label := constructLabel(listMetricTypeStats, statistic)
 			periodInSec := int64(period.Seconds())
 
@@ -236,8 +236,8 @@ func createMetricDataQueries(listMetricDetailTotal []listMetricWithDetail, perio
 				Id: &id,
 				MetricStat: &cloudwatch.MetricStat{
 					Period: &periodInSec,
-					Stat:   stat,
-					Metric: &listMetricTypeStats.cloudwatchMetric,
+					Stat:   &stat,
+					Metric: &metricName,
 				},
 				Label: &label,
 			})
@@ -332,7 +332,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	// Get tags
 	var resourceTypes []string
 	for _, listMetrics := range listMetricDetailTotal {
-		if !aws.StringInSlice(listMetrics.resourceTypeFilter, resourceTypes) {
+		if listMetrics.resourceTypeFilter != "" && !aws.StringInSlice(listMetrics.resourceTypeFilter, resourceTypes) {
 			resourceTypes = append(resourceTypes, listMetrics.resourceTypeFilter)
 		}
 	}
