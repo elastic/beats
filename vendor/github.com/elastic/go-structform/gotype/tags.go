@@ -22,11 +22,13 @@ import "strings"
 type tagOptions struct {
 	squash    bool
 	omitEmpty bool
+	omit      bool
 }
 
 var defaultTagOptions = tagOptions{
 	squash:    false,
 	omitEmpty: false,
+	omit:      false,
 }
 
 func parseTags(tag string) (string, tagOptions) {
@@ -34,6 +36,13 @@ func parseTags(tag string) (string, tagOptions) {
 	if len(s) == 0 {
 		return "", defaultTagOptions
 	}
+
+	if s[0] == "-" {
+		opts := defaultTagOptions
+		opts.omit = true
+		return "", opts
+	}
+
 	opts := defaultTagOptions
 	for _, opt := range s[1:] {
 		switch strings.TrimSpace(opt) {
@@ -41,6 +50,8 @@ func parseTags(tag string) (string, tagOptions) {
 			opts.squash = true
 		case "omitempty":
 			opts.omitEmpty = true
+		case "omit":
+			opts.omit = true
 		}
 	}
 	return strings.TrimSpace(s[0]), opts
