@@ -53,8 +53,8 @@ processors:
           to: "destination.packets"
 
         - from: "zeek.connection.conn_state"
-          to: "zeek.connection.state"
-          
+          to: "zeek.connection.state.code"
+
       ignore_missing: true
       fail_on_error: false
 {{ if .community_id }}
