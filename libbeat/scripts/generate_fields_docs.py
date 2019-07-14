@@ -90,7 +90,7 @@ def fields_to_asciidoc(input, output, beat):
 
     output.write("""
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
