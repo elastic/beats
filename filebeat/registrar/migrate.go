@@ -30,11 +30,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+type registryVersion string
+
 const (
-	legacyVersion  = "<legacy>"
-	currentVersion = "0"
+	noRegistry    registryVersion = ""
+	legacyVersion                 = "<legacy>"
+	version0                      = "0"
+	version1                      = "1"
 )
 
+const currentVersion = version1
+
+// ensureCurrent migrates old registry versions to the most recent version.
 func ensureCurrent(home, migrateFile string, perm os.FileMode) error {
 	if migrateFile == "" {
 		if isFile(home) {
@@ -50,19 +57,34 @@ func ensureCurrent(home, migrateFile string, perm os.FileMode) error {
 
 	logp.Debug("registrar", "Registry type '%v' found", version)
 
-	switch version {
-	case legacyVersion:
-		return migrateLegacy(home, fbRegHome, migrateFile, perm)
-	case currentVersion:
-		return nil
-	case "":
-		backupFile := migrateFile + ".bak"
-		if isFile(backupFile) {
-			return migrateLegacy(home, fbRegHome, backupFile, perm)
+	for {
+		switch version {
+		case legacyVersion:
+			if err := migrateLegacy(home, fbRegHome, migrateFile, perm); err != nil {
+				return err
+			}
+			fallthrough
+		case version0:
+			return migrateVersion1(home, fbRegHome, perm)
+
+		case currentVersion:
+			return nil
+		case noRegistry:
+			// check if we've been in the middle of a migration from the legacy
+			// format to the current version. If so continue with
+			// the migration and try again.
+			backupFile := migrateFile + ".bak"
+			if isFile(backupFile) {
+				migrateFile = backupFile
+				version = legacyVersion
+				break
+			}
+
+			// postpone registry creation, until we open and configure it.
+			return nil
+		default:
+			return fmt.Errorf("registry file version %v not supported", version)
 		}
-		return initRegistry(fbRegHome, perm)
-	default:
-		return fmt.Errorf("registry file version %v not supported", version)
 	}
 }
 
@@ -83,7 +105,7 @@ func migrateLegacy(home, regHome, migrateFile string, perm os.FileMode) error {
 		}
 	}
 
-	if err := initRegistry(regHome, perm); err != nil {
+	if err := initVersion0Registry(regHome, perm); err != nil {
 		return err
 	}
 
@@ -99,7 +121,7 @@ func migrateLegacy(home, regHome, migrateFile string, perm os.FileMode) error {
 	return nil
 }
 
-func initRegistry(regHome string, perm os.FileMode) error {
+func initVersion0Registry(regHome string, perm os.FileMode) error {
 	if !isDir(regHome) {
 		logp.Info("No registry home found. Create: %v", regHome)
 		if err := os.MkdirAll(regHome, 0750); err != nil {
@@ -119,31 +141,74 @@ func initRegistry(regHome string, perm os.FileMode) error {
 	return nil
 }
 
-func readVersion(regHome, migrateFile string) (string, error) {
+// migrateVersion1 migrates the filebeat registry from version 0 to version 1
+// only. Version 1 is based on the implementation of version 1 in
+// libbeat/registry/backend/memlog.
+// The migration itself only needs to rename the data file and update
+// meta.json.  During migration we take advantage of the fact that the memlog
+// snapshot format is backwards compatible to the old filebeat registry file,
+// and that timestamp decoding has support for different formats.
+func migrateVersion1(home, regHome string, perm os.FileMode) error {
+	logp.Info("Migrate registry version 0 to version 1")
+
+	origDataFile := filepath.Join(regHome, "data.json")
+	newDataFile := filepath.Join(regHome, "1.json")
+
+	if !isFile(newDataFile) && isFile(origDataFile) {
+		if err := helper.SafeFileRotate(newDataFile, origDataFile); err != nil {
+			return err
+		}
+	}
+
+	metaFile := filepath.Join(regHome, "meta.json")
+	tmpFile := metaFile + ".tmp"
+	if err := writeMeta(tmpFile, version1, perm); err != nil {
+		return err
+	}
+
+	return helper.SafeFileRotate(metaFile, tmpFile)
+}
+
+func writeMeta(path string, version string, perm os.FileMode) error {
+	logp.Info("Write registry meta file with version: %v", version)
+	doc := struct{ Version string }{version}
+	body, err := json.Marshal(doc)
+	if err != nil {
+		panic(err) // must not fail
+	}
+
+	if err = safeWriteFile(path+".tmp", body, perm); err != nil {
+		return errors.Wrap(err, "failed writing registry meta.json")
+	}
+
+	return helper.SafeFileRotate(path, path+".tmp")
+}
+
+func readVersion(regHome, migrateFile string) (registryVersion, error) {
 	if isFile(migrateFile) {
 		return legacyVersion, nil
 	}
 
 	if !isDir(regHome) {
-		return "", nil
+		return noRegistry, nil
 	}
 
 	metaFile := filepath.Join(regHome, "meta.json")
 	if !isFile(metaFile) {
-		return "", nil
+		return noRegistry, nil
 	}
 
 	tmp, err := ioutil.ReadFile(metaFile)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to open meta file")
+		return noRegistry, errors.Wrap(err, "failed to open meta file")
 	}
 
 	meta := struct{ Version string }{}
 	if err := json.Unmarshal(tmp, &meta); err != nil {
-		return "", errors.Wrap(err, "failed reading meta file")
+		return noRegistry, errors.Wrap(err, "failed reading meta file")
 	}
 
-	return meta.Version, nil
+	return registryVersion(meta.Version), nil
 }
 
 func isDir(path string) bool {

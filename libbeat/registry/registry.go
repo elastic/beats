@@ -46,7 +46,7 @@ type ValueDecoder interface {
 }
 
 // NewRegistry creates a new Registry with a configured backend.
-func NewRegistry(backend backend.Registry) *Registry {
+func New(backend backend.Registry) *Registry {
 	return &Registry{
 		backend: backend,
 		active:  map[string]*sharedStore{},

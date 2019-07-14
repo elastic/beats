@@ -70,14 +70,14 @@ type dataFileInfo struct {
 }
 
 type storeMeta struct {
-	Version uint `struct:"version"`
+	Version string `struct:"version"`
 }
 
 const (
 	logFileName  = "log.json"
 	metaFileName = "meta.json"
 
-	storeVersion = 1
+	storeVersion = "1"
 
 	keyField = "_key"
 )

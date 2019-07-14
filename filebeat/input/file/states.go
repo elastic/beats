@@ -94,6 +94,12 @@ func (s *States) findPrevious(id string) int {
 // The number of states that were cleaned up and number of states that can be
 // cleaned up in the future is returned.
 func (s *States) Cleanup() (int, int) {
+	return s.CleanupWith(nil)
+}
+
+// CleanupWith cleans up the state array. It calls `fn` with the state ID, for
+// each entry to be removed.
+func (s *States) CleanupWith(fn func(string)) (int, int) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -114,7 +120,11 @@ func (s *States) Cleanup() (int, int) {
 				continue
 			}
 
-			delete(s.idx, state.ID())
+			id := state.ID()
+			delete(s.idx, id)
+			if fn != nil {
+				fn(id)
+			}
 			logp.Debug("state", "State removed for %v because of older: %v", state.Source, state.TTL)
 
 			L--
