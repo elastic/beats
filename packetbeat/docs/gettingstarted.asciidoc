@@ -258,7 +258,6 @@ include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
 include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-:requires-sudo: yes
 include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
 include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
@@ -266,13 +265,11 @@ include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 [[packetbeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
-:requires-sudo: yes
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-:requires-sudo: yes
 include::{libbeat-dir}/docs/dashboards.asciidoc[]
 
 [[packetbeat-starting]]
@@ -308,6 +305,8 @@ sudo ./packetbeat -e
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
+
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
 
 *win:*
 
