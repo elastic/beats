@@ -2,10 +2,9 @@
   "description": "Pipeline for normalizing Zeek ntlm.log",
   "processors": [
     {
-      "date": {
-        "field": "@timestamp",
-        "target_field": "event.created",
-        "formats": ["ISO8601"]
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
       }
     },
     {
@@ -20,10 +19,10 @@
       }
     }
   ],
-  "on_failure" : [{ 
-    "set" : { 
-      "field" : "error.message", 
-      "value" : "{{ _ingest.on_failure_message }}" 
-    } 
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
   }]
 }

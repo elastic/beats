@@ -6,22 +6,29 @@
     - name: client
       type: keyword
       description: >
-        SSH client version
+        The client’s version string
+
+    - name: direction
+      type: keyword
+      description: |
+        Direction of the connection. If the client was a local host logging into
+        an external host, this would be OUTBOUND. INBOUND would be set for the
+        opposite situation.
 
     - name: host_key
       type: keyword
       description: >
-        SSH Server's key thumbprint
+        The server's key thumbprint
 
     - name: server
       type: keyword
       description: >
-        SSH server version
+        The server's version string
 
     - name: version
-      type: keyword
+      type: integer
       description: >
-        SSH protocol version
+        SSH major version (1 or 2)
 
     - name: algorithm
       type: group
@@ -30,30 +37,41 @@
       fields:
         - name: cipher
           type: keyword
+          description: >
+            The encryption algorithm in use
 
         - name: compression
           type: keyword
+          description: >
+            The compression algorithm in use
 
         - name: host_key
           type: keyword
+          description: >
+            The server host key’s algorithm
 
         - name: key_exchange
           type: keyword
+          description: >
+            The key exchange algorithm in use
 
         - name: mac
           type: keyword
+          description: >
+            The signing (MAC) algorithm in use
 
     - name: auth
       type: group
-      description: >
-        Authentication fields
       fields:
         - name: attempts
           type: integer
-          description: >
-            Number of authentication attempts in this session
+          description: |
+            The number of authentication attemps we observed. There’s always at
+            least one, since some servers might support no authentication at all.
+            It’s important to note that not all of these are failures, since some
+            servers require two-factor auth (e.g. password AND pubkey)
 
         - name: success
           type: boolean
           description: >
-            True if the login succeeded
+            Authentication result (T=success, F=failure, unset=unknown)

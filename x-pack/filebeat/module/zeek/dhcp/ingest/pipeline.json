@@ -2,10 +2,9 @@
   "description": "Pipeline for normalizing Zeek dhcp.log",
   "processors": [
     {
-      "date": {
-        "field": "@timestamp",
-        "target_field": "event.created",
-        "formats": ["ISO8601"]
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
       }
     },
     {

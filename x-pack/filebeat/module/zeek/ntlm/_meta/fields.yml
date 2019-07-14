@@ -6,22 +6,22 @@
     - name: domain
       type: keyword
       description: >
-        Domain of the authentication attempt
+        Domain name given by the client
 
     - name: hostname
       type: keyword
       description: >
-        Name of the requesting host
+        Hostname given by the client
 
     - name: success
       type: boolean
       description: >
-        True if the authentication was sucessful
+        Indicate whether or not the authentication was successful
 
     - name: username
       type: keyword
       description: >
-        Username of the authentication attempt
+        Username given by the client
 
     - name: server
       type: group
@@ -32,14 +32,14 @@
             - name: dns
               type: keyword
               description: >
-                DNS name of the server
+                DNS name given by the server in a CHALLENGE
 
             - name: netbios
               type: keyword
               description: >
-                NetBIOS name of the server
+                NetBIOS name given by the server in a CHALLENGE
 
             - name: tree
               type: keyword
               description: >
-                Tree name of the server
+                Tree name given by the server in a CHALLENGE

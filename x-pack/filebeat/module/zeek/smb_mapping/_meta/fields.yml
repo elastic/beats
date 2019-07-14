@@ -6,12 +6,20 @@
     - name: path
       type: keyword
       description: >
-        Path of the share
+        Name of the tree path
 
     - name: service
       type: keyword
       description: >
-        Service offered by this share
+        The type of resource of the tree (disk share, printer share, named pipe, etc.)
+
+    - name: native_file_system
+      type: keyword
+      description: >
+        File system of the tree
 
     - name: share_type
       type: keyword
+      description: |
+        If this is SMB2, a share type will be included. For SMB1, the type of share
+        will be deduced and included as well.

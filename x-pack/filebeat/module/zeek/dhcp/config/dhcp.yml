@@ -39,8 +39,63 @@ processors:
         - from: "zeek.dhcp.host_name"
           to: "zeek.dhcp.hostname"
 
+        - from: "zeek.dhcp.client_message"
+          to: "zeek.dhcp.msg.client"
+
+        - from: "zeek.dhcp.server_message"
+          to: "zeek.dhcp.msg.server"
+
+        - from: "zeek.dhcp.msg_types"
+          to: "zeek.dhcp.msg.types"
+
+        - from: "zeek.dhcp.msg_orig"
+          to: "zeek.dhcp.msg.origin"
+
+        - from: "zeek.dhcp.client_software"
+          to: "zeek.dhcp.software.client"
+
+        - from: "zeek.dhcp.server_software"
+          to: "zeek.dhcp.software.server"
+
+        - from: "zeek.dhcp.circuit_id"
+          to: "zeek.dhcp.id.circuit"
+
+        - from: "zeek.dhcp.agent_remote_id"
+          to: "zeek.dhcp.id.remote_agent"
+
+        - from: "zeek.dhcp.subscriber_id"
+          to: "zeek.dhcp.id.subscriber"
+
+        - from: "zeek.dhcp.client_port"
+          to: "source.port"
+
+        - from: "zeek.dhcp.server_port"
+          to: "destination.port"
+
       ignore_missing: true
       fail_on_error: false
 
-  - drop_fields:
-     fields: ["zeek.dhcp.client_fqdn"]
+  - if:
+      not:
+        has_fields: ["source.port"]
+    then:
+      - add_fields:
+          target: source
+          fields:
+            port: 68
+
+  - if:
+      not:
+        has_fields: ["destination.port"]
+    then:
+      - add_fields:
+          target: destination
+          fields:
+            port: 67
+
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: zeek.dhcp.address.client
+        destination_ip: zeek.dhcp.address.server
+{{ end }}

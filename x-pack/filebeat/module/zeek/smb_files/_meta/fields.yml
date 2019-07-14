@@ -6,17 +6,27 @@
     - name: action
       type: keyword
       description: >
-        SMB request type
+        Action this log record represents
+
+    - name: fid
+      type: integer
+      description: >
+        ID referencing this file
 
     - name: name
       type: keyword
       description: >
-        Name of the accessed file
+        Filename if one was seen
 
     - name: path
       type: keyword
       description: >
-        Path of the network share
+        Path pulled from the tree this file was transferred to or from
+
+    - name: previous_name
+      type: keyword
+      description: >
+        If the rename action was seen, this will be the file’s previous name
 
     - name: size
       type: long
@@ -30,12 +40,25 @@
       fields:
         - name: accessed
           type: keyword
+          description: >
+            The file's access time
 
         - name: changed
           type: keyword
+          description: >
+            The file's change time
 
         - name: created
           type: keyword
+          description: >
+            The file's create time
 
         - name: modified
           type: keyword
+          description: >
+            The file's modify time
+
+    - name: uuid
+      type: keyword
+      description: >
+        UUID referencing this file if DCE/RPC

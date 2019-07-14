@@ -2,10 +2,9 @@
   "description": "Pipeline for normalizing Zeek kerberos.log",
   "processors": [
     {
-      "date": {
-        "field": "@timestamp",
-        "target_field": "event.created",
-        "formats": ["ISO8601"]
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
       }
     },
     {
@@ -20,11 +19,58 @@
       }
     },
     {
+      "grok": {
+        "field": "zeek.kerberos.client",
+        "patterns": ["%{GREEDYDATA:zeek.kerberos.username}/%{GREEDYDATA:zeek.kerberos.domain}"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.kerberos.client",
+        "if": "ctx.zeek.kerberos.username != null"
+      }
+    },
+    {
+      "grok": {
+        "field": "zeek.kerberos.service",
+        "patterns": ["%{GREEDYDATA:tmp_service}/%{GREEDYDATA:zeek.kerberos.hostname}"],
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.kerberos.service",
+        "if": "ctx.tmp_service != null"
+      }
+    },
+    {
+      "rename": {
+        "field": "tmp_service",
+        "target_field": "zeek.kerberos.service",
+        "ignore_missing": true
+      }
+    },
+    {
+      "script": {
+        "source": "ctx.zeek.kerberos.valid.days = Math.round( (ctx.zeek.kerberos.valid.until - ctx.zeek.kerberos.valid.from) / 86400 )",
+        "if": "ctx.zeek.kerberos.valid?.from != null && ctx.zeek.kerberos.valid?.until != null"
+      }
+    },
+    {
       "date": {
-        "field": "zeek.kerberos.valid_until",
-        "target_field": "zeek.kerberos.valid_until",
+        "field": "zeek.kerberos.valid.until",
+        "target_field": "zeek.kerberos.valid.until",
         "formats": ["UNIX"],
-        "if": "ctx.zeek.kerberos.valid_until != null"
+        "if": "ctx.zeek.kerberos.valid?.until != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.kerberos.valid.from",
+        "target_field": "zeek.kerberos.valid.from",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.kerberos.valid?.from != null"
       }
     }
   ],
