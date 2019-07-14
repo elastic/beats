@@ -53,7 +53,11 @@ var security = (function () {
         .Add(convertAuthentication)
         .Add(setProcessNameUsingExe)
         .Build();
-
+    
+    var logout = new processor.Chain()
+        .Add(convertAuthentication)
+        .Build();
+        
     var logonFailed = new processor.Chain()
         .Add(addAuthFailed)
         .Add(convertAuthentication)
@@ -66,7 +70,10 @@ var security = (function () {
 
         // 4625 - An account failed to log on.
         4625: logonFailed.Run,
-
+        
+        // 4634 - An account fwas logged off.
+        4634: logout.Run,
+        
         // 4648 - A logon was attempted using explicit credentials.
         4648: logonSuccess.Run,
 
