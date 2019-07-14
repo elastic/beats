@@ -5,6 +5,8 @@
     enabled: true
   dns:
     enabled: true
+  dpd:
+    enabled: true
   files:
     enabled: true
   http:
@@ -14,6 +16,10 @@
   notice:
     enabled: true
   ntlm:
+    enabled: true
+  pe:
+    enabled: true
+  sip:
     enabled: true
   smb_files:
     enabled: true

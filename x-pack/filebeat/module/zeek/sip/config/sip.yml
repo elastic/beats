@@ -1,0 +1,77 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+fields_under_root: true
+fields:
+  network.transport: udp
+
+processors:
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.sip"
+
+        - from: "zeek.sip.id.orig_h"
+          to: "source.ip"
+
+        - from: "zeek.sip.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.sip.id.resp_h"
+          to: "destination.ip"
+
+        - from: "zeek.sip.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.sip.uid"
+          to: "zeek.session_id"
+
+        - from: "zeek.sip.trans_depth"
+          to: "zeek.sip.transaction_depth"
+
+        - from: "zeek.sip.method"
+          to: "zeek.sip.sequence.method"
+
+        - from: "zeek.sip.request_from"
+          to: "zeek.sip.request.from"
+
+        - from: "zeek.sip.request_to"
+          to: "zeek.sip.request.to"
+
+        - from: "zeek.sip.request_path"
+          to: "zeek.sip.request.path"
+
+        - from: "zeek.sip.request_body_len"
+          to: "zeek.sip.request.body_length"
+
+        - from: "zeek.sip.response_from"
+          to: "zeek.sip.response.from"
+
+        - from: "zeek.sip.response_to"
+          to: "zeek.sip.response.to"
+
+        - from: "zeek.sip.response_path"
+          to: "zeek.sip.response.path"
+
+        - from: "zeek.sip.response_body_len"
+          to: "zeek.sip.response.body_length"
+
+        - from: "zeek.sip.status_code"
+          to: "zeek.sip.status.code"
+
+        - from: "zeek.sip.status_msg"
+          to: "zeek.sip.status.msg"
+
+      ignore_missing: true
+      fail_on_error: false
+
+{{ if .community_id }}
+  - community_id:
+{{ end }}

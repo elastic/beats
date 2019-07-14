@@ -8,6 +8,8 @@
     enabled: true
   dns:
     enabled: true
+  dpd:
+    enabled: true
   files:
     enabled: true
   http:
@@ -18,6 +20,10 @@
     enabled: true
   ntlm:
     enabled: true
+  pe:
+    enabled: true
+  sip:
+    enabled: true
   smb_files:
     enabled: true
   smb_mapping:
@@ -26,7 +32,6 @@
     enabled: true
   ssl:
     enabled: true
-
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
