@@ -128,7 +128,7 @@ func (tx *Tx) Insert(val interface{}) (Key, error) {
 		key = tx.gen.Make()
 		exists, err := tx.backend.Has(backend.Key(key))
 		if err != nil {
-			return nil, err
+			return key, err
 		}
 
 		if !exists {
@@ -137,10 +137,7 @@ func (tx *Tx) Insert(val interface{}) (Key, error) {
 	}
 
 	err := tx.backend.Set(backend.Key(key), val)
-	if err != nil {
-		return nil, err
-	}
-	return key, nil
+	return key, err
 }
 
 // Remove removes a key-value pair from the store.

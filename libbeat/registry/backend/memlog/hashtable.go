@@ -18,9 +18,8 @@
 package memlog
 
 import (
-	"bytes"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/registry/backend"
 )
 
 type hashtable struct {
@@ -30,13 +29,13 @@ type hashtable struct {
 type bin []entry
 
 type entry struct {
-	key   []byte
+	key   backend.Key
 	value common.MapStr
 }
 
 type keyPair struct {
 	hash uint64
-	key  []byte
+	key  backend.Key
 }
 
 type valueRef struct {
@@ -59,7 +58,7 @@ func (tbl *hashtable) find(k keyPair) valueRef {
 	return valueRef{bin: bin, idx: i}
 }
 
-func (tbl *hashtable) findHash(hash uint64, k []byte) ([]entry, int) {
+func (tbl *hashtable) findHash(hash uint64, k backend.Key) ([]entry, int) {
 	bin := tbl.bins[hash]
 	return bin, bin.index(k)
 }
@@ -80,7 +79,7 @@ func (tbl *hashtable) copySpline() hashtable {
 	return to
 }
 
-func (tbl *hashtable) set(hash uint64, k []byte, v common.MapStr) {
+func (tbl *hashtable) set(hash uint64, k backend.Key, v common.MapStr) {
 	bin := tbl.bins[hash]
 	idx := bin.index(k)
 	if idx < 0 {
@@ -101,11 +100,11 @@ func (tbl *hashtable) Len() int {
 	return i
 }
 
-func (b *bin) keyFn(i int) []byte {
+func (b *bin) keyFn(i int) backend.Key {
 	return (*b)[i].key
 }
 
-func (b *bin) index(k []byte) int {
+func (b *bin) index(k backend.Key) int {
 	return tblBinFind(len(*b), k, b.keyFn)
 }
 
@@ -120,13 +119,13 @@ func (b *bin) remove(i int) {
 	(*b) = (*b)[:L-1]
 }
 
-func tblBinFind(L int, k []byte, keyFn func(idx int) []byte) int {
+func tblBinFind(L int, k backend.Key, keyFn func(idx int) backend.Key) int {
 	if L == 0 {
 		return -1
 	}
 
 	for i := 0; i < L; i++ {
-		if bytes.Equal(k, keyFn(i)) {
+		if k == keyFn(i) {
 			return i
 		}
 	}
