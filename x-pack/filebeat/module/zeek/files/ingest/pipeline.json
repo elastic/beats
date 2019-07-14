@@ -2,9 +2,20 @@
   "description": "Pipeline for normalizing Zeek files.log",
   "processors": [
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['files']['ts'] * 1000; ctx.zeek.files.remove('ts');"
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.files.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.files.ts"
       }
     },
     {
@@ -37,10 +48,10 @@
       }
     }
   ],
-  "on_failure" : [{ 
-    "set" : { 
-      "field" : "error.message", 
-      "value" : "{{ _ingest.on_failure_message }}" 
-    } 
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
   }]
 }
