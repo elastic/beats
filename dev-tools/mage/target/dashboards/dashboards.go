@@ -57,8 +57,9 @@ func (Dashboards) Import() error {
 // directory.
 //
 // Required environment variables:
-// - MODULE: Name of the module
-// - ID:     Dashboard ID
+// - KIBANA_URL: URL of Kibana
+// - MODULE:     Name of the module
+// - ID:         Dashboard ID
 func (Dashboards) Export() error {
 	return devtools.ExportDashboard()
 }
