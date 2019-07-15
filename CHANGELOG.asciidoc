@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
 *Affecting all Beats*
 
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
+- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
 
 *Filebeat*
 

@@ -30,9 +30,6 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
-- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
-
 *Auditbeat*
 
 *Filebeat*
@@ -42,8 +39,6 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 *Journalbeat*
 
 *Metricbeat*
-
-- In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
 
 *Packetbeat*
 
@@ -58,8 +53,6 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
-
-- Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
 
 *Heartbeat*
 
