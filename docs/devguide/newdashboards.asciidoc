@@ -54,6 +54,8 @@ The `setup` phase loads several dependencies, such as:
 - Ingest pipelines
 - ILM policy
 
+The dependencies vary depending on the Beat you're setting up.
+
 For more details about the `setup` command, run:
 
 [source,shell]
