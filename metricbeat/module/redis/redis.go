@@ -21,10 +21,12 @@ Package redis contains shared Redis functionality for the metric sets
 package redis
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 
 	rd "github.com/garyburd/redigo/redis"
 )
@@ -169,6 +171,23 @@ func FetchKeys(c rd.Conn, pattern string, limit uint) ([]string, error) {
 func Select(c rd.Conn, keyspace uint) error {
 	_, err := c.Do("SELECT", keyspace)
 	return err
+}
+
+// GetKeyspace gets the keyspace being used by this connection
+func GetKeyspace(c rd.Conn) (uint, error) {
+	info, err := rd.String(c.Do("CLIENT", "LIST"))
+	if err != nil {
+		return 0, err
+	}
+
+	for _, field := range strings.Split(info, " ") {
+		if strings.HasPrefix(field, "db=") {
+			keyspaceStr := strings.TrimPrefix(field, "db=")
+			keyspace, err := strconv.Atoi(keyspaceStr)
+			return uint(keyspace), err
+		}
+	}
+	return 0, errors.New("db not found in CLIENT LIST")
 }
 
 // CreatePool creates a redis connection pool

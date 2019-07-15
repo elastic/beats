@@ -39,11 +39,13 @@ func init() {
 type MetricSet struct {
 	*redis.MetricSet
 	patterns []KeyPattern
+
+	originalKeyspace *uint
 }
 
 // KeyPattern contains the information required to query keys
 type KeyPattern struct {
-	Keyspace uint   `config:"keyspace"`
+	Keyspace *uint  `config:"keyspace"`
 	Pattern  string `config:"pattern" validate:"required"`
 	Limit    uint   `config:"limit"`
 }
@@ -72,8 +74,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches information from Redis keys
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
+
+	if m.originalKeyspace == nil {
+		keyspace, err := redis.GetKeyspace(conn)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to get original keyspace")
+		}
+
+		m.originalKeyspace = &keyspace
+	}
+
 	for _, p := range m.patterns {
-		if err := redis.Select(conn, p.Keyspace); err != nil {
+		keyspace := *m.originalKeyspace
+		if p.Keyspace != nil {
+			keyspace = *p.Keyspace
+		}
+		if err := redis.Select(conn, keyspace); err != nil {
 			msg := errors.Wrapf(err, "Failed to select keyspace %d", p.Keyspace)
 			m.Logger().Error(msg)
 			r.Error(err)
@@ -100,9 +116,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				r.Error(err)
 				continue
 			}
-			event := eventMapping(p.Keyspace, keyInfo)
+			event := eventMapping(keyspace, keyInfo)
 			if !r.Event(event) {
-				return errors.New("metricset has closed")
+				m.Logger().Debug("Failed to report event, interrupting fetch")
+				return nil
 			}
 		}
 	}
