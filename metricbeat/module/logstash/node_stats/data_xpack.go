@@ -28,9 +28,18 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
+type jvm struct {
+	GC  map[string]interface{} `json:"gc"`
+	Mem struct {
+		HeapMaxInBytes  int `json:"heap_max_in_bytes"`
+		HeapUsedInBytes int `json:"heap_used_in_bytes"`
+		HeapUsedPercent int `json:"heap_used_percent"`
+	} `json:"mem"`
+}
+
 type commonStats struct {
 	Events  map[string]interface{} `json:"events"`
-	JVM     map[string]interface{} `json:"jvm"`
+	JVM     jvm                    `json:"jvm"`
 	Reloads map[string]interface{} `json:"reloads"`
 	Queue   struct {
 		EventsCount int `json:"events_count"`
