@@ -6,6 +6,7 @@ package s3
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"testing"
@@ -129,6 +130,7 @@ func TestCreateEvent(t *testing.T) {
 		region: "us-west-1",
 		arn:    "arn:aws:s3:::test-s3-ks",
 	}
+	s3ObjectHash := s3ObjectHash(s3Info)
 
 	reader, err := bufferedIORead(mockSvc, s3Info)
 	assert.NoError(t, err)
@@ -139,12 +141,12 @@ func TestCreateEvent(t *testing.T) {
 			break
 		}
 		if err == io.EOF {
-			event := createEvent(log, len([]byte(log)), s3Info)
+			event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash)
 			events = append(events, event)
 			break
 		}
 
-		event := createEvent(log, len([]byte(log)), s3Info)
+		event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash)
 		events = append(events, event)
 	}
 
@@ -204,4 +206,29 @@ func TestConstructObjectURL(t *testing.T) {
 			assert.Equal(t, c.expectedObjectURL, objectURL)
 		})
 	}
+}
+
+func TestConvertOffsetToString(t *testing.T) {
+	cases := []struct {
+		offset         int
+		expectedString string
+	}{
+		{
+			123,
+			"000000000123",
+		},
+		{
+			123456,
+			"000000123456",
+		},
+		{
+			123456789123,
+			"123456789123",
+		},
+	}
+	for _, c := range cases {
+		output := fmt.Sprintf("%012d", c.offset)
+		assert.Equal(t, c.expectedString, output)
+	}
+
 }

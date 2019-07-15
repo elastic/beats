@@ -9,8 +9,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -315,6 +315,7 @@ func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 		wg.Add(numS3Infos)
 
 		for i := range s3Infos {
+			objectHash := s3ObjectHash(s3Infos[i])
 			go func(s3Info s3Info) {
 				// launch goroutine to handle each message
 				defer wg.Done()
@@ -337,7 +338,7 @@ func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 						if err == io.EOF {
 							// create event for last line
 							offset += len([]byte(log))
-							err = p.forwardEvent(createEvent(log, offset, s3Info))
+							err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 							if err != nil {
 								p.logger.Error(errors.Wrap(err, "forwardEvent failed"))
 							}
@@ -350,7 +351,7 @@ func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 
 					// create event per log line
 					offset += len([]byte(log))
-					err = p.forwardEvent(createEvent(log, offset, s3Info))
+					err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 					if err != nil {
 						p.logger.Error(errors.Wrap(err, "forwardEvent failed"))
 					}
@@ -400,7 +401,7 @@ func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.SQ
 	return nil
 }
 
-func createEvent(log string, offset int, s3Info s3Info) *beat.Event {
+func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat.Event {
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
@@ -421,7 +422,7 @@ func createEvent(log string, offset int, s3Info s3Info) *beat.Event {
 		},
 	}
 	return &beat.Event{
-		Meta:      common.MapStr{"id": makeEventID(s3Info, offset)},
+		Meta:      common.MapStr{"id": objectHash + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
 	}
@@ -431,10 +432,10 @@ func constructObjectURL(info s3Info) string {
 	return "https://" + info.name + ".s3-" + info.region + ".amazonaws.com/" + info.key
 }
 
-// makeTopicID returns a short sha256 hash of the bucket name + object key name + offset.
-func makeEventID(s3Info s3Info, offset int) string {
+// s3ObjectHash returns a short sha256 hash of the bucket name + object key name.
+func s3ObjectHash(s3Info s3Info) string {
 	h := sha256.New()
-	h.Write([]byte(s3Info.name + s3Info.key + "-" + strconv.Itoa(offset)))
+	h.Write([]byte(s3Info.name + s3Info.key))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
 }
