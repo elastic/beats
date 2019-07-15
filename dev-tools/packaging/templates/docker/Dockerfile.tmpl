@@ -25,10 +25,10 @@ RUN chmod 755 /usr/local/bin/docker-entrypoint
 RUN groupadd --gid 1000 {{ .BeatName }}
 
 RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
-    chown -R root:{{ .BeatName }} {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
-    chmod 0750 {{ $beatBinary }} && \
+    chown -R root:root {{ $beatHome }} && \
+    find {{ $beatHome }} -type d -exec chmod 0770 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0660 {} \; && \
+    chmod 0770 {{ $beatBinary }} && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
@@ -38,7 +38,7 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 
 {{- if ne .user "root" }}
-RUN useradd -M --uid 1000 --gid 1000 --home {{ $beatHome }} {{ .user }}
+RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 {{- end }}
 USER {{ .user }}
 
