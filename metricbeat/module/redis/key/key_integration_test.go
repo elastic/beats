@@ -103,8 +103,8 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 		id := event.MetricSetFields["id"].(string)
 		assert.Equal(t, fmt.Sprintf("%d:%s", expectedKeyspace, name), id)
 		keyspace := event.ModuleFields["keyspace"].(common.MapStr)
-		keyspaceId := keyspace["id"].(string)
-		assert.Equal(t, fmt.Sprintf("db%d", expectedKeyspace), keyspaceId)
+		keyspaceID := keyspace["id"].(string)
+		assert.Equal(t, fmt.Sprintf("db%d", expectedKeyspace), keyspaceID)
 	}
 }
 
