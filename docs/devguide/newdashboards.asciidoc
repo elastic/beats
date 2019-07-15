@@ -46,12 +46,12 @@ To import the dashboards, run the `setup` command.
 ./metricbeat setup
 -------------------------
 
-The `setup` phase loads:
+The `setup` phase loads several dependencies, such as: 
 
 - Index mapping template in Elasticsearch
-- Kibana dashboards (where available)
-- Machine Learning (ML) jobs (where available)
-- Ingest pipelines (where available)
+- Kibana dashboards
+- Machine Learning (ML) jobs
+- Ingest pipelines
 - ILM policy (for Elasticsearch 6.5 and newer)
 
 For more details about the `setup` command, run:
