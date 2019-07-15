@@ -78,6 +78,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	value2 := 0.0
 	value3 := 0.0
 	value4 := 0.0
+	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
 		Request: &awssdk.Request{
@@ -105,11 +106,13 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
 
 func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
 	return resourcegroupstaggingapi.GetResourcesRequest{
 		Request: &awssdk.Request{
 			Data: &resourcegroupstaggingapi.GetResourcesOutput{
@@ -143,6 +146,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
