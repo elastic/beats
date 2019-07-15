@@ -61,17 +61,22 @@ type os struct {
 	CPU cpu `json:"cpu"`
 }
 
+type pipeline struct {
+	BatchSize int `json:"batch_size"`
+	Workers   int `json:"workers"`
+}
+
 type nodeInfo struct {
-	ID          string                 `json:"id,omitempty"`
-	UUID        string                 `json:"uuid"`
-	EphemeralID string                 `json:"ephemeral_id"`
-	Name        string                 `json:"name"`
-	Host        string                 `json:"host"`
-	Version     string                 `json:"version"`
-	Snapshot    bool                   `json:"snapshot"`
-	Status      string                 `json:"status"`
-	HTTPAddress string                 `json:"http_address"`
-	Pipeline    map[string]interface{} `json:"pipeline"`
+	ID          string   `json:"id,omitempty"`
+	UUID        string   `json:"uuid"`
+	EphemeralID string   `json:"ephemeral_id"`
+	Name        string   `json:"name"`
+	Host        string   `json:"host"`
+	Version     string   `json:"version"`
+	Snapshot    bool     `json:"snapshot"`
+	Status      string   `json:"status"`
+	HTTPAddress string   `json:"http_address"`
+	Pipeline    pipeline `json:"pipeline"`
 }
 
 type reloads struct {
