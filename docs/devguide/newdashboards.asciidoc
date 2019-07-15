@@ -52,7 +52,7 @@ The `setup` phase loads several dependencies, such as:
 - Kibana dashboards
 - Machine Learning (ML) jobs
 - Ingest pipelines
-- ILM policy (for Elasticsearch 6.5 and newer)
+- ILM policy
 
 For more details about the `setup` command, run:
 
