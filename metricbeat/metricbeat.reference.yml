@@ -1326,8 +1326,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -1717,22 +1717,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'metricbeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "metricbeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'metricbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 

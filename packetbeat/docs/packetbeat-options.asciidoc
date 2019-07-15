@@ -1336,6 +1336,39 @@ Valid values are `sha1`, `sha256` and `md5`.
 If `send_certificates` is false, this setting is ignored. The default is to
 output SHA-1 fingerprints.
 
+[[packetbeat-redis-options]]
+=== Capture Redis traffic
+
+++++
+<titleabbrev>Redis</titleabbrev>
+++++
+
+The Redis protocol has several specific configuration options. Here is a
+sample configuration for the `redis` section of the +{beatname_lc}.yml+ config file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols:
+- type: redis
+  ports: [6379]
+  queue_max_bytes: 1048576
+  queue_max_messages: 20000
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+Also see <<common-protocol-options>>.
+
+===== `queue_max_bytes` and `queue_max_messages`
+
+In order for request/response correlation to work, {beatname_uc} needs to
+store requests in memory until a response is received. These settings impose
+a limit on the number of bytes (`queue_max_bytes`) and number of requests
+(`queue_max_messages`) that can be stored. These limits are per-connection.
+The default is to queue up to 1MB or 20.000 requests per connection, which
+allows to use request pipelining while at the same time limiting the amount
+of memory consumed by replication sessions.
+
 [[configuration-processes]]
 == Specify which processes to monitor
 

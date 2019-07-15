@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -15526,7 +15526,7 @@ type: boolean
 --
 
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.bucket.*`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.bucket.*`*::
 +
 --
 End to end scheduling duration microseconds
@@ -15535,7 +15535,7 @@ type: object
 
 --
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.sum`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.sum`*::
 +
 --
 End to end scheduling duration microseconds sum
@@ -15544,7 +15544,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.e2e.duration.us.count`*::
+*`kubernetes.scheduler.scheduling.e2e.duration.us.count`*::
 +
 --
 End to end scheduling count
@@ -15553,7 +15553,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.pod.preemption.victims.count`*::
+*`kubernetes.scheduler.scheduling.pod.preemption.victims.count`*::
 +
 --
 Pod preemption victims
@@ -15562,7 +15562,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.pod.attempts.count`*::
+*`kubernetes.scheduler.scheduling.pod.attempts.count`*::
 +
 --
 Pod attempts count
@@ -15571,7 +15571,7 @@ type: long
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.percentile.*`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.percentile.*`*::
 +
 --
 Scheduling duration percentiles
@@ -15580,7 +15580,7 @@ type: object
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.sum`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.sum`*::
 +
 --
 Scheduling duration cumulative sum
@@ -15589,7 +15589,7 @@ type: double
 
 --
 
-*`kubernetes.scheduler.scheduler.duration.seconds.count`*::
+*`kubernetes.scheduler.scheduling.duration.seconds.count`*::
 +
 --
 Scheduling count
@@ -22251,7 +22251,9 @@ Size information about the file
 --
 Maximum file size in bytes
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22260,7 +22262,9 @@ type: bytes
 --
 Size of the file in bytes
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22270,7 +22274,9 @@ type: bytes
 The size of the file available for user data. The actual size of the file minus this value is used to store file related metadata.
 
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22304,7 +22310,9 @@ Tablespace space usage information
 --
 Tablespace total free space available, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22313,7 +22321,9 @@ type: bytes
 --
 Tablespace used space, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -22322,7 +22332,9 @@ type: bytes
 --
 Tablespace total size, in bytes.
 
-type: bytes
+type: long
+
+format: bytes
 
 --
 
@@ -23616,6 +23628,16 @@ Number of octets received on the connection.
 
 
 type: long
+
+--
+
+*`rabbitmq.connection.client_provided.name`*::
++
+--
+User specified connection name.
+
+
+type: keyword
 
 --
 
