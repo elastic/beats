@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
+	rd "github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
 
-	rd "github.com/garyburd/redigo/redis"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Redis types
@@ -184,7 +184,7 @@ func GetKeyspace(c rd.Conn) (uint, error) {
 		if strings.HasPrefix(field, "db=") {
 			keyspaceStr := strings.TrimPrefix(field, "db=")
 			keyspace, err := strconv.Atoi(keyspaceStr)
-			return uint(keyspace), err
+			return uint(keyspace), errors.Wrapf(err, "failed to parse db from CLIENT LIST response (%v)", field)
 		}
 	}
 	return 0, errors.New("db not found in CLIENT LIST")
