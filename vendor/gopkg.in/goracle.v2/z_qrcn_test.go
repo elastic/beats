@@ -67,7 +67,7 @@ func TestQRCN(t *testing.T) {
 	t.Log("--- Registrations ---")
 	for rows.Next() {
 		var regID, table string
-		if err := rows.Scan(&regID,&table); err != nil {
+		if err := rows.Scan(&regID, &table); err != nil {
 			t.Error(err)
 			break
 		}
