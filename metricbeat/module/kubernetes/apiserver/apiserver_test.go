@@ -23,7 +23,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
-
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes"
 )
@@ -41,12 +40,12 @@ func TestEventMappingV1_14(t *testing.T) {
 	)
 }
 
-func TestEventMappingV1_previous(t *testing.T) {
+func TestEventMappingV1_8(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "apiserver",
 		ptest.TestCases{
 			{
-				MetricsFile:  "./_meta/test/metrics.1.unknown",
-				ExpectedFile: "./_meta/test/metrics.1.unknown.expected",
+				MetricsFile:  "./_meta/test/metrics.1.8",
+				ExpectedFile: "./_meta/test/metrics.1.8.expected",
 			},
 		},
 	)

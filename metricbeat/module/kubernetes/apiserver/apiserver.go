@@ -23,27 +23,22 @@ import (
 )
 
 func init() {
+	//mapping := &prometheus.MetricsMapping{
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
-
-			// Process metrics
-			"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
-			"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
-			"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
-			"process_open_fds":              prometheus.Metric("process.fds.open.count"),
-			"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
-
-			// HTTP server metrics
-			"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
-			"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
-			"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
-			"http_requests_total":                prometheus.Metric("http.request.count"),
-
-			// REST metrics
-			"rest_client_requests_total": prometheus.Metric("client.request.count"),
-
+			"process_cpu_seconds_total":               prometheus.Metric("process.cpu.sec"),
+			"process_resident_memory_bytes":           prometheus.Metric("process.memory.resident.bytes"),
+			"process_virtual_memory_bytes":            prometheus.Metric("process.memory.virtual.bytes"),
+			"process_open_fds":                        prometheus.Metric("process.fds.open.count"),
+			"process_start_time_seconds":              prometheus.Metric("process.started.sec"),
+			"http_request_duration_microseconds":      prometheus.Metric("http.request.duration.us"),
+			"http_request_size_bytes":                 prometheus.Metric("http.request.size.bytes"),
+			"http_response_size_bytes":                prometheus.Metric("http.response.size.bytes"),
+			"http_requests_total":                     prometheus.Metric("http.request.count"),
+			"rest_client_requests_total":              prometheus.Metric("client.request.count"),
 			"apiserver_request_latencies":             prometheus.Metric("request.latency"),
 			"apiserver_request_total":                 prometheus.Metric("request.count"),
+			"apiserver_request_count":                 prometheus.Metric("request.beforev14.count"),
 			"apiserver_current_inflight_requests":     prometheus.Metric("request.current.count"),
 			"apiserver_longrunning_gauge":             prometheus.Metric("request.longrunning.count"),
 			"etcd_object_counts":                      prometheus.Metric("etcd.object.count"),
@@ -71,6 +66,6 @@ func init() {
 	}
 
 	mb.Registry.MustAddMetricSet("kubernetes", "apiserver",
-		prometheus.MetricSetBuilder(mapping),
+		getMetricsetFactory(mapping),
 		mb.WithHostParser(prometheus.HostParser))
 }
