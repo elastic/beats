@@ -6,6 +6,7 @@ package aws
 
 import (
 	"bytes"
+	"context"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -15,7 +16,7 @@ import (
 
 type opUploadToBucket struct {
 	log        *logp.Logger
-	svc        *s3.S3
+	svc        *s3.Client
 	bucketName string
 	path       string
 	raw        []byte
@@ -46,7 +47,7 @@ func (o *opUploadToBucket) Execute(_ executionContext) error {
 		Key:    aws.String(o.path),
 	}
 	req := o.svc.PutObjectRequest(input)
-	resp, err := req.Send()
+	resp, err := req.Send(context.TODO())
 
 	if err != nil {
 		o.log.Debugf("Could not upload object to S3, resp: %v", resp)

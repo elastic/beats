@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -21,13 +22,13 @@ type checkStatusFunc = func(*cloudformation.StackStatus) (bool, error)
 
 type opWaitCloudFormation struct {
 	log         *logp.Logger
-	svc         cloudformationiface.CloudFormationAPI
+	svc         cloudformationiface.ClientAPI
 	checkStatus checkStatusFunc
 }
 
 func newOpWaitCloudFormation(
 	log *logp.Logger,
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 ) *opWaitCloudFormation {
 	return &opWaitCloudFormation{
 		log:         log,
@@ -109,20 +110,20 @@ func checkDeleteStatus(status *cloudformation.StackStatus) (bool, error) {
 }
 
 func queryStack(
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 	stackID *string,
 ) (*cloudformation.DescribeStacksOutput, error) {
 	input := &cloudformation.DescribeStacksInput{StackName: stackID}
 	req := svc.DescribeStacksRequest(input)
-	resp, err := req.Send()
+	resp, err := req.Send(context.TODO())
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+	return resp.DescribeStacksOutput, nil
 }
 
 func queryStackStatus(
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 	stackID *string,
 ) (*cloudformation.StackStatus, *string, error) {
 	resp, err := queryStack(svc, stackID)
@@ -134,7 +135,7 @@ func queryStackStatus(
 	return &stack.StackStatus, stack.StackStatusReason, nil
 }
 
-func queryStackID(svc cloudformationiface.CloudFormationAPI, stackName *string) (*string, error) {
+func queryStackID(svc cloudformationiface.ClientAPI, stackName *string) (*string, error) {
 	resp, err := queryStack(svc, stackName)
 	if err != nil {
 		return nil, err
