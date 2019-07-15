@@ -3,6 +3,25 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.2.1]]
+=== Beats version 7.2.1
+https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
+
+*Filebeat*
+
+- Skipping unparsable log entries from docker json reader {pull}12268[12268]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
+
+*Packetbeat*
+
+- Limit memory usage of Redis replication sessions. {issue}12657[12657]
+
 [[release-notes-7.2.0]]
 === Beats version 7.2.0
 https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
