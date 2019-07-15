@@ -224,10 +224,12 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 	// process messages received from sqs
 	for i := range messages {
 		done := make(chan struct{})
+		errC := make(chan error)
 		// launch goroutine to handle each message from sqs
 		go func(message sqs.Message) {
 			defer wg.Done()
 			defer close(done)
+			defer close(errC)
 
 			s3Infos, err := handleSQSMessage(message)
 			if err != nil {
@@ -236,23 +238,7 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 			}
 
 			// read from s3 object and create event for each log line
-			errC := p.handleS3Objects(svcS3, s3Infos)
-			err = <-errC
-			if err != nil {
-				// Change visibility timeout to 0 so this message comes back to
-				// SQS queue immediately.
-				err := changeVisibilityTimeout(queueURL, 0, svcSQS, message.ReceiptHandle)
-				if err != nil {
-					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
-				}
-				return
-			}
-
-			// delete message after events are sent
-			err = deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
-			if err != nil {
-				p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
-			}
+			p.handleS3Objects(svcS3, s3Infos, errC)
 		}(messages[i])
 
 		go func(message sqs.Message) {
@@ -261,6 +247,17 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 				case <-p.close:
 					return
 				case <-done:
+					err := deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
+					}
+					return
+				case <-errC:
+					err := changeVisibilityTimeout(queueURL, 0, svcSQS, message.ReceiptHandle)
+					if err != nil {
+						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+					}
+					p.logger.Info("message visibility updated to 0")
 					return
 				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
 					// If half of the set visibilityTimeout passed and this is
@@ -269,6 +266,7 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 					if err != nil {
 						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 					}
+					p.logger.Infof("message visibility updated to %s", visibilityTimeout)
 				}
 			}
 		}(messages[i])
@@ -318,17 +316,16 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info) <-chan error {
-	errC := make(chan error)
-
+func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info, errC chan error) {
 	if len(s3Infos) > 0 {
 		var wg sync.WaitGroup
 		wg.Add(len(s3Infos))
 
 		for i := range s3Infos {
-			objectHash := s3ObjectHash(s3Infos[i])
+
 			go func(s3Info s3Info) {
 				defer wg.Done()
+				objectHash := s3ObjectHash(s3Info)
 
 				// read from s3 object
 				reader, err := bufferedIORead(svc, s3Info)
@@ -371,9 +368,6 @@ func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info) <-chan erro
 		}
 		wg.Wait()
 	}
-
-	close(errC)
-	return errC
 }
 
 func bufferedIORead(svc s3iface.S3API, s3Info s3Info) (*bufio.Reader, error) {
