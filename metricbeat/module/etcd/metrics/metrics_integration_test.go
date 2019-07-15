@@ -26,7 +26,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -36,13 +35,20 @@ func TestFetch(t *testing.T) {
 
 	compose.EnsureUp(t, "etcd")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
+	m := mbtest.NewFetcher(t, getConfig())
+	events, errs := m.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
+	t.Logf("%s/%s event: %+v", m.Module().Name(), m.Name(), events[0])
+}
+
+func TestData(t *testing.T) {
+	compose.EnsureUp(t, "etcd")
+
+	m := mbtest.NewFetcher(t, getConfig())
+	m.WriteEvents(t, "")
 }
 
 func getConfig() map[string]interface{} {
