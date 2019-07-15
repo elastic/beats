@@ -44,6 +44,7 @@ func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 		}
 	} else {
 		fields = common.MapStr{
+			"stat": memoryData.Stat,
 			"fail": common.MapStr{
 				"count": memoryData.Failcnt,
 			},
