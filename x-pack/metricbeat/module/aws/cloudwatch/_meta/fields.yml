@@ -8,7 +8,7 @@
       type: keyword
       description: >
         The namespace specified when query cloudwatch api.
-    - name: metrics.*
+    - name: metrics.*.*
       type: object
       object_type: double
       object_type_mapping_type: "*"
