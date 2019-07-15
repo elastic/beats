@@ -229,14 +229,24 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 			defer wg.Done()
 			defer close(done)
 
-			s3Infos, err := handleMessage(message)
+			s3Infos, err := handleSQSMessage(message)
 			if err != nil {
 				p.logger.Error(errors.Wrap(err, "handelMessage failed"))
 				return
 			}
 
 			// read from s3 object and create event for each log line
-			p.readS3CreateEvents(svcS3, s3Infos)
+			errC := p.handleS3Objects(svcS3, s3Infos)
+			err = <-errC
+			if err != nil {
+				// Change visibility timeout to 0 so this message comes back to
+				// SQS queue immediately.
+				err := changeVisibilityTimeout(queueURL, 0, svcSQS, message.ReceiptHandle)
+				if err != nil {
+					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+				}
+				return
+			}
 
 			// delete message after events are sent
 			err = deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
@@ -287,7 +297,7 @@ func getRegionFromQueueURL(queueURL string) (string, error) {
 }
 
 // handle message
-func handleMessage(m sqs.Message) ([]s3Info, error) {
+func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	msg := sqsMessage{}
 	err := json.Unmarshal([]byte(*m.Body), &msg)
 	if err != nil {
@@ -308,22 +318,22 @@ func handleMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
+func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info) <-chan error {
+	errC := make(chan error)
+
 	if len(s3Infos) > 0 {
 		var wg sync.WaitGroup
-		numS3Infos := len(s3Infos)
-		wg.Add(numS3Infos)
+		wg.Add(len(s3Infos))
 
 		for i := range s3Infos {
 			objectHash := s3ObjectHash(s3Infos[i])
 			go func(s3Info s3Info) {
-				// launch goroutine to handle each message
 				defer wg.Done()
 
 				// read from s3 object
 				reader, err := bufferedIORead(svc, s3Info)
 				if err != nil {
-					p.logger.Error(errors.Wrap(err, "bufferedIORead failed"))
+					errC <- errors.Wrap(err, "bufferedIORead failed")
 					return
 				}
 
@@ -340,26 +350,30 @@ func (p *Input) readS3CreateEvents(svc s3iface.S3API, s3Infos []s3Info) {
 							offset += len([]byte(log))
 							err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 							if err != nil {
-								p.logger.Error(errors.Wrap(err, "forwardEvent failed"))
+								errC <- errors.Wrap(err, "forwardEvent failed")
 							}
-							break
+							return
 						}
 
-						p.logger.Error(errors.Wrap(err, "ReadString failed"))
-						break
+						errC <- errors.Wrap(err, "ReadString failed")
+						return
 					}
 
 					// create event per log line
 					offset += len([]byte(log))
 					err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 					if err != nil {
-						p.logger.Error(errors.Wrap(err, "forwardEvent failed"))
+						errC <- errors.Wrap(err, "forwardEvent failed")
+						return
 					}
 				}
 			}(s3Infos[i])
 		}
 		wg.Wait()
 	}
+
+	close(errC)
+	return errC
 }
 
 func bufferedIORead(svc s3iface.S3API, s3Info s3Info) (*bufio.Reader, error) {
@@ -422,7 +436,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat
 		},
 	}
 	return &beat.Event{
-		Meta:      common.MapStr{"id": objectHash + fmt.Sprintf("%012d", offset)},
+		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
 	}
@@ -432,10 +446,10 @@ func constructObjectURL(info s3Info) string {
 	return "https://" + info.name + ".s3-" + info.region + ".amazonaws.com/" + info.key
 }
 
-// s3ObjectHash returns a short sha256 hash of the bucket name + object key name.
+// s3ObjectHash returns a short sha256 hash of the bucket arn + object key name.
 func s3ObjectHash(s3Info s3Info) string {
 	h := sha256.New()
-	h.Write([]byte(s3Info.name + s3Info.key))
+	h.Write([]byte(s3Info.arn + s3Info.key))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
 }

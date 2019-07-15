@@ -90,7 +90,7 @@ func TestHandleMessage(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			s3Info, err := handleMessage(c.message)
+			s3Info, err := handleSQSMessage(c.message)
 			assert.NoError(t, err)
 			assert.Equal(t, len(c.expectedS3Infos), len(s3Info))
 			if len(s3Info) > 0 {
