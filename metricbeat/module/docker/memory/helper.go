@@ -34,7 +34,7 @@ type MemoryData struct {
 	Usage     uint64
 	UsageP    float64
 	//Raw stats from the cgroup subsystem
-	Stat map[string]uint64
+	Stats map[string]uint64
 	//Windows-only memory stats
 	Commit            uint64
 	CommitPeak        uint64
@@ -72,7 +72,7 @@ func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) Memory
 		TotalRssP: float64(totalRSS) / float64(myRawStat.Stats.MemoryStats.Limit),
 		Usage:     myRawStat.Stats.MemoryStats.Usage,
 		UsageP:    float64(myRawStat.Stats.MemoryStats.Usage) / float64(myRawStat.Stats.MemoryStats.Limit),
-		Stat:      myRawStat.Stats.MemoryStats.Stats,
+		Stats:     myRawStat.Stats.MemoryStats.Stats,
 		//Windows memory statistics
 		Commit:            myRawStat.Stats.MemoryStats.Commit,
 		CommitPeak:        myRawStat.Stats.MemoryStats.CommitPeak,

@@ -5371,7 +5371,7 @@ Memory metrics.
 
 
 
-*`docker.memory.stat.*`*::
+*`docker.memory.stats.*`*::
 +
 --
 Raw memory stats from the cgroups memory.stat interface

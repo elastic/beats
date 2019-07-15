@@ -4,7 +4,7 @@
     Memory metrics.
   release: ga
   fields:
-    - name: stat.*
+    - name: stats.*
       type: object
       object_type: double
       object_type_mapping_type: "*"
