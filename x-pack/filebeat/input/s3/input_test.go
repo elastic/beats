@@ -22,7 +22,7 @@ import (
 
 // MockS3Client struct is used for unit tests.
 type MockS3Client struct {
-	s3iface.S3API
+	s3iface.ClientAPI
 }
 
 var (
