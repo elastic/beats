@@ -11,11 +11,11 @@ import (
 
 func TestGetAWSCredentials(t *testing.T) {
 	inputConfig := ConfigAWS{
-		AccessKeyID: "123",
+		AccessKeyID:     "123",
 		SecretAccessKey: "abc",
-		SessionToken: "fake-session-token",
+		SessionToken:    "fake-session-token",
 	}
-	awsConfig, err :=GetAWSCredentials(inputConfig)
+	awsConfig, err := GetAWSCredentials(inputConfig)
 	assert.NoError(t, err)
 
 	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve()

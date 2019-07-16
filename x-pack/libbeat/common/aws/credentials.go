@@ -12,10 +12,10 @@ import (
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID               string   `config:"access_key_id"`
-	SecretAccessKey           string   `config:"secret_access_key"`
-	SessionToken              string   `config:"session_token"`
-	ProfileName               string   `config:"credential_profile_name"`
+	AccessKeyID     string `config:"access_key_id"`
+	SecretAccessKey string `config:"secret_access_key"`
+	SessionToken    string `config:"session_token"`
+	ProfileName     string `config:"credential_profile_name"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
