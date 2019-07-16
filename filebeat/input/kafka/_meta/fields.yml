@@ -19,3 +19,19 @@
       type: long
       description: >
         Kafka offset of this message
+
+    - name: kafka.key
+      type: keyword
+      description: >
+        Kafka key, corresponding to the Kafka value stored in the message
+
+    - name: kafka.block_timestamp
+      type: date
+      description: >
+        Kafka outer (compressed) block timestamp
+
+    - name: kafka.headers
+      type: array
+      description: >
+        The array of kafka headers, each an object containing subfields
+        "key" and "value".
