@@ -64,6 +64,7 @@ func NewEventCapturer(events chan *util.Data) channel.Outleter {
 }
 
 func (o *eventCapturer) OnEvent(event *util.Data) bool {
+	fmt.Printf("event: %v\n", event)
 	o.events <- event
 	return true
 }

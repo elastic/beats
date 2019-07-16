@@ -19,7 +19,6 @@ package kafka
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -204,7 +203,6 @@ func (groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 func (h groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		event := h.createEvent(sess, claim, msg)
-		fmt.Printf("event: %v\n", event)
 		h.input.outlet.OnEvent(event)
 		sess.MarkMessage(msg, "")
 	}
