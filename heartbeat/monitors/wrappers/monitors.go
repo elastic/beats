@@ -126,12 +126,13 @@ func makeAddSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
-		mtx        sync.Mutex
-		remaining  uint16
-		up         uint16
-		down       uint16
-		checkGroup string
-		generation uint64
+		mtx          sync.Mutex
+		remaining    uint16
+		up           uint16
+		down         uint16
+		checkGroup   string
+		orderedGroup time.Time
+		generation   uint64
 	}{
 		mtx: sync.Mutex{},
 	}
@@ -146,6 +147,7 @@ func makeAddSummary() jobs.JobWrapper {
 			panic(fmt.Sprintf("cannot generate UUIDs on this system: %s", err))
 		}
 		state.checkGroup = u.String()
+		state.orderedGroup = time.Now()
 	}
 	resetState()
 
@@ -169,6 +171,7 @@ func makeAddSummary() jobs.JobWrapper {
 
 			// No error check needed here
 			event.PutValue("monitor.check_group", state.checkGroup)
+			event.PutValue("monitor.ordered_group", state.orderedGroup)
 
 			// Adjust the total remaining to account for new continuations
 			state.remaining += uint16(len(cont))
