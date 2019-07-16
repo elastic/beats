@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
+- Add statistic option into cloudwatch metricset. If there is no statistic method specified, default is to collect Average, Sum, Maximum, Minimum and SampleCount. {issue}12370[12370] {pull}12840[12840]
 
 *Packetbeat*
 
@@ -289,6 +290,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Oracle Tablespaces Dashboard {pull}12736[12736]
 - Collect client provided name for rabbitmq connection. {issue}12851[12851] {pull}12852[12852]
 - Add support to load default aws config file to get credentials. {pull}12727[12727] {issue}12708[12708]
+- Add statistic option into cloudwatch metricset. {issue}12370[12370] {pull}12840[12840]
 
 *Packetbeat*
 
