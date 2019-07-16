@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -23951,6 +23951,16 @@ Number of octets received on the connection.
 
 
 type: long
+
+--
+
+*`rabbitmq.connection.client_provided.name`*::
++
+--
+User specified connection name.
+
+
+type: keyword
 
 --
 

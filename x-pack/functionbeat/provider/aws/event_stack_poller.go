@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -27,7 +28,7 @@ type eventStackHandler interface {
 // its important to be able to skip some events and only report the meaningful events.
 type eventStackPoller struct {
 	log           *logp.Logger
-	svc           cloudformationiface.CloudFormationAPI
+	svc           cloudformationiface.ClientAPI
 	stackID       *string
 	periodicCheck time.Duration
 	handler       eventStackHandler
@@ -37,7 +38,7 @@ type eventStackPoller struct {
 
 func newEventStackPoller(
 	log *logp.Logger,
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 	stackID *string,
 	periodicCheck time.Duration,
 	handler eventStackHandler,
@@ -78,7 +79,7 @@ func (e *eventStackPoller) poll() {
 		// Currently no way to skip items based on time.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackEvents.html
 		req := e.svc.DescribeStackEventsRequest(input)
-		resp, err := req.Send()
+		resp, err := req.Send(context.TODO())
 		if err != nil {
 			// This is not a fatal error because the check is made out of bound from the current status logic.
 			// I wanted to keep them separate so it is easier to deal with states and reporting.

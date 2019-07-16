@@ -145,6 +145,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 - Reuse connections in PostgreSQL metricsets. {issue}12504[12504] {pull}12603[12603]
 - PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.{issue}12590[12590]{pull}12622[12622]
+- In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
+- Ramdisk is not filtered out when collecting disk performance counters in diskio metricset {issue}12814[12814] {pull}12829[12829]
+- Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
 
 *Packetbeat*
 
@@ -228,6 +231,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `google-pubsub` input type for consuming messages from a Google Cloud Pub/Sub topic subscription. {pull}12746[12746]
 - Add module for ingesting Cisco IOS logs over syslog. {pull}12748[12748]
 - Add module for ingesting Google Cloud VPC flow logs. {pull}12747[12747]
+- Add netflow dashboards based on Logstash netflow. {pull}12857[12857]
+- Parse more fields from Elasticsearch slowlogs. {pull}11939[11939]
 
 *Heartbeat*
 
@@ -273,6 +278,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
 - Add Oracle Module {pull}11890[11890]
 - Add Oracle Tablespaces Dashboard {pull}12736[12736]
+- Collect client provided name for rabbitmq connection. {issue}12851[12851] {pull}12852[12852]
 
 *Packetbeat*
 
