@@ -105,7 +105,7 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 
 	err = config.validate()
 	if err != nil {
-		return nil, errors.Wrapf(err, "validation for s3 input config failed: config = %s", config)
+		return nil, errors.Wrapf(err, "validation for s3 input config failed: config = %v", config)
 	}
 
 	awsConfig, err := getAWSCredentials(config)
@@ -223,12 +223,10 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 
 	// process messages received from sqs
 	for i := range messages {
-		done := make(chan struct{})
 		errC := make(chan error)
 		// launch goroutine to handle each message from sqs
 		go func(message sqs.Message) {
 			defer wg.Done()
-			defer close(done)
 			defer close(errC)
 
 			s3Infos, err := handleSQSMessage(message)
@@ -246,18 +244,19 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 				select {
 				case <-p.close:
 					return
-				case <-done:
-					err := deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
+				case err := <-errC:
 					if err != nil {
-						p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
+						err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
+						if err != nil {
+							p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+						}
+						p.logger.Infof("message visibility updated to %v", visibilityTimeout)
+					} else {
+						err := deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
+						if err != nil {
+							p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
+						}
 					}
-					return
-				case <-errC:
-					err := changeVisibilityTimeout(queueURL, 0, svcSQS, message.ReceiptHandle)
-					if err != nil {
-						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
-					}
-					p.logger.Info("message visibility updated to 0")
 					return
 				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
 					// If half of the set visibilityTimeout passed and this is
@@ -266,7 +265,7 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 					if err != nil {
 						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 					}
-					p.logger.Infof("message visibility updated to %s", visibilityTimeout)
+					p.logger.Infof("message visibility updated to %v", visibilityTimeout)
 				}
 			}
 		}(messages[i])
