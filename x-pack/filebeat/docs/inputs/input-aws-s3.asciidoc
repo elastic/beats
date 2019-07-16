@@ -12,10 +12,16 @@
 beta[]
 
 Use the `s3` input to retrieve logs from S3 objects that are pointed by messages
-from specific SQS queues.
+from specific SQS queues. This input can, for example, be used to receive S3
+server access logs to monitor detailed records for the requests that are made to
+a bucket.
 
-This input can, for example, be used to receive S3 server access logs to monitor
-detailed records for the requests that are made to a bucket.
+When processing a s3 object which pointed by a sqs message, if half of the set
+visibility timeout passed and the processing is still ongoing, then the
+visibility timeout of that sqs message will be reset to make sure the message
+does not go back to the queue in the middle of the processing. If there are
+errors happening during the processing of the s3 object, then the process will be
+stopped and the sqs message will be returned back to the queue.
 
 Example configuration 1:
 

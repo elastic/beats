@@ -6,6 +6,7 @@ package s3
 
 import (
 	"bufio"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -188,7 +189,7 @@ func (p *Input) Run() {
 				VisibilityTimeout:     &visibilityTimeout,
 				WaitTimeSeconds:       &waitTimeSecond,
 			})
-		output, err := req.Send()
+		output, err := req.Send(context.Background())
 		if err != nil {
 			p.logger.Error("failed to receive message from SQS:", err)
 			continue
@@ -216,7 +217,7 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
-func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 *s3.S3, svcSQS *sqs.SQS) {
+func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 *s3.Client, svcSQS *sqs.Client) {
 	var wg sync.WaitGroup
 	numMessages := len(messages)
 	wg.Add(numMessages)
@@ -246,11 +247,12 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 					return
 				case err := <-errC:
 					if err != nil {
+						p.logger.Warnf("Processing message failed: %v", err)
 						err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 						if err != nil {
 							p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 						}
-						p.logger.Infof("message visibility updated to %v", visibilityTimeout)
+						p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
 					} else {
 						err := deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 						if err != nil {
@@ -265,7 +267,7 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 					if err != nil {
 						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 					}
-					p.logger.Infof("message visibility updated to %v", visibilityTimeout)
+					p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
 				}
 			}
 		}(messages[i])
@@ -273,13 +275,13 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 	wg.Wait()
 }
 
-func changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svc *sqs.SQS, receiptHandle *string) error {
+func changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svc *sqs.Client, receiptHandle *string) error {
 	req := svc.ChangeMessageVisibilityRequest(&sqs.ChangeMessageVisibilityInput{
 		QueueUrl:          &queueURL,
 		VisibilityTimeout: &visibilityTimeout,
 		ReceiptHandle:     receiptHandle,
 	})
-	_, err := req.Send()
+	_, err := req.Send(context.Background())
 	return err
 }
 
@@ -315,13 +317,12 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info, errC chan error) {
+func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) {
 	if len(s3Infos) > 0 {
 		var wg sync.WaitGroup
 		wg.Add(len(s3Infos))
 
 		for i := range s3Infos {
-
 			go func(s3Info s3Info) {
 				defer wg.Done()
 				objectHash := s3ObjectHash(s3Info)
@@ -346,12 +347,12 @@ func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info, errC chan e
 							offset += len([]byte(log))
 							err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 							if err != nil {
-								errC <- errors.Wrap(err, "forwardEvent failed")
+								errC <- errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
 							}
 							return
 						}
 
-						errC <- errors.Wrap(err, "ReadString failed")
+						errC <- errors.Wrapf(err, "ReadString failed for %v", s3Info.key)
 						return
 					}
 
@@ -359,7 +360,7 @@ func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info, errC chan e
 					offset += len([]byte(log))
 					err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 					if err != nil {
-						errC <- errors.Wrap(err, "forwardEvent failed")
+						errC <- errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
 						return
 					}
 				}
@@ -369,16 +370,16 @@ func (p *Input) handleS3Objects(svc s3iface.S3API, s3Infos []s3Info, errC chan e
 	}
 }
 
-func bufferedIORead(svc s3iface.S3API, s3Info s3Info) (*bufio.Reader, error) {
+func bufferedIORead(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(s3Info.name),
 		Key:    awssdk.String(s3Info.key),
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
-	resp, err := req.Send()
+	resp, err := req.Send(context.Background())
 	if err != nil {
-		return nil, errors.Wrap(err, "s3 get object request failed")
+		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
 
 	return bufio.NewReader(resp.Body), nil
@@ -394,14 +395,14 @@ func (p *Input) forwardEvent(event *beat.Event) error {
 	return nil
 }
 
-func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.SQS) error {
+func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.Client) error {
 	deleteMessageInput := &sqs.DeleteMessageInput{
 		QueueUrl:      awssdk.String(queueURL),
 		ReceiptHandle: awssdk.String(messagesReceiptHandle),
 	}
 
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
-	_, err := req.Send()
+	_, err := req.Send(context.Background())
 	if err != nil {
 		return errors.Wrap(err, "DeleteMessageRequest failed")
 	}
