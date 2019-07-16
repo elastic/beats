@@ -178,12 +178,14 @@ func (h groupHandler) createEvent(
 		"offset":    message.Offset,
 		"key":       message.Key,
 	}
-	version, ok := h.input.config.Version.Get()
-	if ok && version.IsAtLeast(sarama.V0_10_0_0) {
+	version, versionOk := h.input.config.Version.Get()
+	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
 		data.Event.Timestamp = message.Timestamp
-		kafkaMetadata["block_timestamp"] = message.BlockTimestamp
+		if !message.BlockTimestamp.IsZero() {
+			kafkaMetadata["block_timestamp"] = message.BlockTimestamp
+		}
 	}
-	if ok && version.IsAtLeast(sarama.V0_11_0_0) {
+	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
 		kafkaMetadata["headers"] = arrayForKafkaHeaders(message.Headers)
 	}
 	eventFields["kafka"] = kafkaMetadata
