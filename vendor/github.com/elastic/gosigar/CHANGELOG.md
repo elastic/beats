@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Fixed uptime calculation under Windows. #126
+
 ### Changed
 
 ### Deprecated
