@@ -180,6 +180,7 @@ func writeToKafkaTopic(
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true
 	config.Producer.Partitioner = sarama.NewHashPartitioner
+	config.Version = sarama.V1_0_0_0
 
 	hosts := []string{getTestKafkaHost()}
 	producer, err := sarama.NewSyncProducer(hosts, config)
@@ -195,6 +196,12 @@ func writeToKafkaTopic(
 	msg := &sarama.ProducerMessage{
 		Topic: topic,
 		Value: sarama.StringEncoder(message),
+		Headers: []sarama.RecordHeader{
+			sarama.RecordHeader{
+				Key:   []byte("testkey"),
+				Value: []byte("testvalue"),
+			},
+		},
 	}
 
 	_, _, err = producer.SendMessage(msg)
