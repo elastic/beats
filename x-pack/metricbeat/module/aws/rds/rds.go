@@ -5,6 +5,7 @@
 package rds
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -150,10 +151,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func getDBInstancesPerRegion(svc rdsiface.RDSAPI) ([]string, map[string]DBDetails, error) {
+func getDBInstancesPerRegion(svc rdsiface.ClientAPI) ([]string, map[string]DBDetails, error) {
 	describeInstanceInput := &rds.DescribeDBInstancesInput{}
 	req := svc.DescribeDBInstancesRequest(describeInstanceInput)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Error DescribeDBInstancesRequest")
 	}
