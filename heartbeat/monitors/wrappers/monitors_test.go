@@ -22,6 +22,8 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/hbtest/hbisdef"
+
 	"github.com/elastic/go-lookslike/isdef"
 
 	"github.com/elastic/go-lookslike/validator"
@@ -75,6 +77,7 @@ func testCommonWrap(t *testing.T, tt testDef) {
 }
 
 func TestSimpleJob(t *testing.T) {
+
 	fields := fields{"myid", "myname", "mytyp"}
 	testCommonWrap(t, testDef{
 		"simple",
@@ -85,12 +88,13 @@ func TestSimpleJob(t *testing.T) {
 				urlValidator(t, "tcp://foo.com:80"),
 				lookslike.MustCompile(map[string]interface{}{
 					"monitor": map[string]interface{}{
-						"duration.us": isdef.IsDuration,
-						"id":          fields.id,
-						"name":        fields.name,
-						"type":        fields.typ,
-						"status":      "up",
-						"check_group": isdef.IsString,
+						"duration.us":   isdef.IsDuration,
+						"id":            fields.id,
+						"name":          fields.name,
+						"type":          fields.typ,
+						"status":        "up",
+						"check_group":   isdef.IsString,
+						"ordered_group": hbisdef.IsTime,
 					},
 				}),
 				summaryValidator(1, 0),
@@ -110,12 +114,13 @@ func TestErrorJob(t *testing.T) {
 		lookslike.MustCompile(map[string]interface{}{"error": map[string]interface{}{"message": "myerror", "type": "io"}}),
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
-				"duration.us": isdef.IsDuration,
-				"id":          fields.id,
-				"name":        fields.name,
-				"type":        fields.typ,
-				"status":      "down",
-				"check_group": isdef.IsString,
+				"duration.us":   isdef.IsDuration,
+				"id":            fields.id,
+				"name":          fields.name,
+				"type":          fields.typ,
+				"status":        "down",
+				"check_group":   isdef.IsString,
+				"ordered_group": hbisdef.IsTime,
 			},
 		}),
 	)
@@ -143,12 +148,13 @@ func TestMultiJobNoConts(t *testing.T) {
 			urlValidator(t, u),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": isdef.IsDuration,
-					"id":          uniqScope.IsUniqueTo("id"),
-					"name":        fields.name,
-					"type":        fields.typ,
-					"status":      "up",
-					"check_group": uniqScope.IsUniqueTo("check_group"),
+					"duration.us":   isdef.IsDuration,
+					"id":            uniqScope.IsUniqueTo("id"),
+					"name":          fields.name,
+					"type":          fields.typ,
+					"status":        "up",
+					"check_group":   uniqScope.IsUniqueTo("check_group"),
+					"ordered_group": uniqScope.IsUniqueTo("ordered_group"),
 				},
 			}),
 			summaryValidator(1, 0),
@@ -191,12 +197,13 @@ func TestMultiJobConts(t *testing.T) {
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": isdef.IsDuration,
-					"id":          uniqScope.IsUniqueTo(u),
-					"name":        fields.name,
-					"type":        fields.typ,
-					"status":      "up",
-					"check_group": uniqScope.IsUniqueTo(u),
+					"duration.us":   isdef.IsDuration,
+					"id":            uniqScope.IsUniqueTo(u),
+					"name":          fields.name,
+					"type":          fields.typ,
+					"status":        "up",
+					"check_group":   uniqScope.IsUniqueTo(u),
+					"ordered_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
 		)
@@ -250,12 +257,13 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": isdef.IsDuration,
-					"id":          uniqScope.IsUniqueTo(u),
-					"name":        fields.name,
-					"type":        fields.typ,
-					"status":      "up",
-					"check_group": uniqScope.IsUniqueTo(u),
+					"duration.us":   isdef.IsDuration,
+					"id":            uniqScope.IsUniqueTo(u),
+					"name":          fields.name,
+					"type":          fields.typ,
+					"status":        "up",
+					"check_group":   uniqScope.IsUniqueTo(u),
+					"ordered_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
 		)
