@@ -766,8 +766,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/gosigar
-Version: v0.10.4
-Revision: f75810decf6f4d88b130bfc4d2ba7ccdcea0c01d
+Version: HEAD
+Revision: f48d9dc84bc636d361c33fab2d7d753b705fd373
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/gosigar/LICENSE:
 --------------------------------------------------------------------
