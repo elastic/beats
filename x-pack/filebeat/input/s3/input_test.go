@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -38,11 +39,13 @@ var (
 
 func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
 	logBody := ioutil.NopCloser(bytes.NewReader([]byte(s3LogString1 + s3LogString2)))
+	httpReq, _ := http.NewRequest("", "", nil)
 	return s3.GetObjectRequest{
 		Request: &awssdk.Request{
 			Data: &s3.GetObjectOutput{
 				Body: logBody,
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
