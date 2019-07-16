@@ -56,7 +56,7 @@ The `setup` phase loads several dependencies, such as:
 
 The dependencies vary depending on the Beat you're setting up.
 
-For more details about the `setup` command, run:
+For more details about the `setup` command, see the command-line help. For example:
 
 [source,shell]
 ----
