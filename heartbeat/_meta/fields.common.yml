@@ -65,7 +65,7 @@
             A token unique to a simultaneously invoked group of checks as in the case where multiple IPs are checked for a single DNS entry. Superceeded by 'ordered_group'
 
         - name: ordered_group
-          type: keyword
+          type: date
           description: >
             A timestamp common to a group of checks executed as a group. This should be unique then scoped with `monitor.id` and either `agent.id` or `observer.geo.name`. Since this is a timestamp it can be sorted at query time.
 

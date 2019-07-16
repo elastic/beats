@@ -322,7 +322,7 @@ type: keyword
 A timestamp common to a group of checks executed as a group. This should be unique then scoped with `monitor.id` and either `agent.id` or `observer.geo.name`. Since this is a timestamp it can be sorted at query time.
 
 
-type: keyword
+type: date
 
 --
 
