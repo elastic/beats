@@ -36,6 +36,7 @@ func init() {
 			"http_response_size_bytes":                prometheus.Metric("http.response.size.bytes"),
 			"http_requests_total":                     prometheus.Metric("http.request.count"),
 			"rest_client_requests_total":              prometheus.Metric("client.request.count"),
+			"apiserver_request_duration_seconds":      prometheus.Metric("request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
 			"apiserver_request_latencies":             prometheus.Metric("request.latency"),
 			"apiserver_request_total":                 prometheus.Metric("request.count"),
 			"apiserver_request_count":                 prometheus.Metric("request.beforev14.count"),

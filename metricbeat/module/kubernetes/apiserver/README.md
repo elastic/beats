@@ -14,8 +14,24 @@
 
 ## Resources
 
-`apiserver_request_latencies` 
-    - needs to be replaced with `apiserver_request_duration_seconds_bucket`
+`apiserver_request_latencies`
+    - component
+    - group
+    - resource
+    - scope
+    - subresource
+    - verb
+    - version
+
+`apiserver_request_duration_seconds_bucket`
+    - component
+    - dry_run
+    - group
+    - resource
+    - scope
+    - subresource
+    - verb
+    - version
 
 `apiserver_request_total`
     - client

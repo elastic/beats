@@ -13649,7 +13649,7 @@ Kubernetes API server metrics
 *`kubernetes.apiserver.request.client`*::
 +
 --
-Client doing the requests
+Client executing requests
 
 
 type: keyword
@@ -13689,7 +13689,7 @@ type: keyword
 *`kubernetes.apiserver.request.verb`*::
 +
 --
-Request HTTP verb
+HTTP verb
 
 
 type: keyword
@@ -13699,7 +13699,7 @@ type: keyword
 *`kubernetes.apiserver.request.code`*::
 +
 --
-Request HTTP code
+HTTP code
 
 
 type: keyword
@@ -13719,7 +13719,7 @@ type: keyword
 *`kubernetes.apiserver.request.dry_run`*::
 +
 --
-Wether the request used dry run
+Wether the request uses dry run
 
 
 type: keyword
@@ -13739,7 +13739,7 @@ type: keyword
 *`kubernetes.apiserver.request.component`*::
 +
 --
-Component handling the task
+Component handling the request
 
 
 type: keyword
@@ -13802,7 +13802,7 @@ type: keyword
 --
 CPU seconds
 
-type: scaled_float
+type: double
 
 --
 
@@ -13813,6 +13813,8 @@ Bytes in resident memory
 
 type: long
 
+format: bytes
+
 --
 
 *`kubernetes.apiserver.process.memory.virtual.bytes`*::
@@ -13822,6 +13824,8 @@ Bytes in virtual memory
 
 type: long
 
+format: bytes
+
 --
 
 *`kubernetes.apiserver.process.fds.open.count`*::
@@ -13829,7 +13833,7 @@ type: long
 --
 Number of open file descriptors
 
-type: integer
+type: long
 
 --
 
@@ -13838,7 +13842,7 @@ type: integer
 --
 Seconds since the process started
 
-type: scaled_float
+type: double
 
 --
 
@@ -13848,7 +13852,7 @@ type: scaled_float
 --
 Request duration microseconds percentiles
 
-type: scaled_float
+type: object
 
 --
 
@@ -13857,7 +13861,7 @@ type: scaled_float
 --
 Request duration microseconds cumulative sum
 
-type: scaled_float
+type: double
 
 --
 
@@ -13875,7 +13879,7 @@ type: long
 --
 Request size percentiles
 
-type: integer
+type: object
 
 --
 
@@ -13885,6 +13889,8 @@ type: integer
 Request size cumulative sum
 
 type: long
+
+format: bytes
 
 --
 
@@ -13902,7 +13908,7 @@ type: long
 --
 Response size percentiles
 
-type: integer
+type: object
 
 --
 
@@ -13912,6 +13918,8 @@ type: integer
 Response size cumulative sum
 
 type: long
+
+format: bytes
 
 --
 
@@ -13938,16 +13946,15 @@ type: long
 --
 Number of requests as client
 
-
 type: long
 
 --
 
+
 *`kubernetes.apiserver.request.count`*::
 +
 --
-Total number of requests
-
+Number of requests
 
 type: long
 
@@ -13958,7 +13965,6 @@ type: long
 --
 Requests latency, sum of latencies in microseconds
 
-
 type: long
 
 --
@@ -13967,7 +13973,6 @@ type: long
 +
 --
 Request latency, number of requests
-
 
 type: long
 
@@ -13978,6 +13983,32 @@ type: long
 --
 Request latency histogram buckets
 
+type: object
+
+--
+
+*`kubernetes.apiserver.request.duration.us.sum`*::
++
+--
+Request duration, sum in microseconds
+
+type: long
+
+--
+
+*`kubernetes.apiserver.request.duration.us.count`*::
++
+--
+Request duration, number of operations
+
+type: long
+
+--
+
+*`kubernetes.apiserver.request.duration.us.bucket.*`*::
++
+--
+Request duration, histogram buckets
 
 type: object
 
@@ -13988,7 +14019,6 @@ type: object
 --
 Inflight requests
 
-
 type: long
 
 --
@@ -13997,7 +14027,6 @@ type: long
 +
 --
 Number of requests active long running requests
-
 
 type: long
 
@@ -14008,7 +14037,6 @@ type: long
 --
 Number of kubernetes objects at etcd
 
-
 type: long
 
 --
@@ -14018,7 +14046,6 @@ type: long
 --
 Number of audit events
 
-
 type: long
 
 --
@@ -14027,7 +14054,6 @@ type: long
 +
 --
 Number of audit rejected events
-
 
 type: long
 
