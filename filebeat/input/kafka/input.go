@@ -64,8 +64,6 @@ func NewInput(
 		return nil, err
 	}
 
-	//forwarder := harvester.NewForwarder(out)
-
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading kafka input config")
@@ -147,11 +145,22 @@ func (p *Input) Stop() {
 	p.kafkaCancel()
 }
 
+func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
+	array := []interface{}{}
+	for _, header := range headers {
+		array = append(array, common.MapStr{
+			"key":   header.Key,
+			"value": header.Value,
+		})
+	}
+	return array
+}
+
 type groupHandler struct {
 	input *Input
 }
 
-func createEvent(
+func (h groupHandler) createEvent(
 	sess sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
@@ -159,17 +168,26 @@ func createEvent(
 	data := util.NewData()
 	data.Event = beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"message": string(message.Value),
-			"kafka": common.MapStr{
-				"topic":     claim.Topic(),
-				"partition": claim.Partition(),
-				"offset":    message.Offset,
-				//message.Timestamp
-			},
-			// TODO: add more metadata
-		},
 	}
+	eventFields := common.MapStr{
+		"message": string(message.Value),
+	}
+	kafkaMetadata := common.MapStr{
+		"topic":     claim.Topic(),
+		"partition": claim.Partition(),
+		"offset":    message.Offset,
+		"key":       message.Key,
+	}
+	version, ok := h.input.config.Version.Get()
+	if ok && version.IsAtLeast(sarama.V0_10_0_0) {
+		data.Event.Timestamp = message.Timestamp
+		kafkaMetadata["block_timestamp"] = message.BlockTimestamp
+	}
+	if ok && version.IsAtLeast(sarama.V0_11_0_0) {
+		kafkaMetadata["headers"] = arrayForKafkaHeaders(message.Headers)
+	}
+	eventFields["kafka"] = kafkaMetadata
+	data.Event.Fields = eventFields
 	return data
 }
 
@@ -183,7 +201,7 @@ func (groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 
 func (h groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		event := createEvent(sess, claim, msg)
+		event := h.createEvent(sess, claim, msg)
 		fmt.Printf("event: %v\n", event)
 		h.input.outlet.OnEvent(event)
 		sess.MarkMessage(msg, "")
