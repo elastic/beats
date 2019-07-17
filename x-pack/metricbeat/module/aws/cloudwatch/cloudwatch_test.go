@@ -276,7 +276,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 
 func TestCompareAWSDimensions(t *testing.T) {
 	cases := []struct {
-		title                    string
+		title          string
 		dim1           []cloudwatch.Dimension
 		dim2           []cloudwatch.Dimension
 		expectedResult bool
