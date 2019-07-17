@@ -1,0 +1,6 @@
+- module: aws_light
+  metricsets: ['elb']
+  period: 300s
+
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.

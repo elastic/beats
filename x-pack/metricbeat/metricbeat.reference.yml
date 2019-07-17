@@ -210,6 +210,14 @@ metricbeat.modules:
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
 
+#------------------------------ Aws_light Module ------------------------------
+- module: aws_light
+  metricsets: ['elb']
+  period: 300s
+
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+
 #--------------------------------- Beat Module ---------------------------------
 - module: beat
   metricsets:

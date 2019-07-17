@@ -1,0 +1,31 @@
+Elastic Load Balancing publishes data points to Amazon CloudWatch for your load
+balancers and your back-end instances. This aws `elb` metricset collects these
+Cloudwatch metrics for monitoring purposes.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS RDS metrics.
+----
+ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+tag:getResources
+----
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 300s
+  metricsets:
+    - elb
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+  #cloudwatch_metrics:
+  # - namespace: AWS/ELB
+----

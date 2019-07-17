@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws_light": {
+        "elb": {
+            "dimensions": {
+                "AvailabilityZone": "us-east-1b"
+            },
+            "metrics": {
+                "BackendConnectionErrors": 1,
+                "HTTPCode_Backend_3XX": 1,
+                "HealthyHostCount": 1.3333333333333333,
+                "Latency": 0.001015424728393555,
+                "RequestCount": 1,
+                "UnHealthyHostCount": 0.3333333333333333
+            },
+            "namespace": "AWS/ELB"
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws_light.elb",
+        "duration": 115000,
+        "module": "aws_light"
+    },
+    "metricset": {
+        "name": "elb"
+    },
+    "service": {
+        "name": "cloudwatch",
+        "type": "cloudwatch"
+    }
+}
