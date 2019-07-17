@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/libbeat/common/kafka"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"

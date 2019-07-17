@@ -7024,6 +7024,36 @@ Kafka offset of this message
 
 --
 
+*`kafka.key`*::
++
+--
+type: keyword
+
+Kafka key, corresponding to the Kafka value stored in the message
+
+
+--
+
+*`kafka.block_timestamp`*::
++
+--
+type: date
+
+Kafka outer (compressed) block timestamp
+
+
+--
+
+*`kafka.headers`*::
++
+--
+type: array
+
+The array of kafka headers, each an object containing subfields "key" and "value".
+
+
+--
+
 [[exported-fields-kibana]]
 == kibana fields
 

@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/util"
