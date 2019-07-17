@@ -5,12 +5,16 @@ Incorrectly configured logrotation can result in either lost log messages or dup
 forward messages. When you see missing or duplicate events when running the Beat, be sure to check how input files are rotated.
 
 [float]
+[[log-rotation-linux]]
+=== Logrotation on Linux
+
+[float]
 [[log-rotation-strategies]]
 === Logrotation strategies
 
 [float]
 [[log-rotation-truncate]]
-==== Truncating the input file
+===== Truncating the input file
 
 In case of strategies which include copying and truncating the input file is going to result in sending duplicated events.
 It happens because {beatname_uc} identifies files by inode and device name. During rotation the already processed lines are
@@ -21,7 +25,7 @@ between the time of the copy and truncation. Those line get lost. We suggest you
 
 [float]
 [[log-rotation-move]]
-==== Moving the input file
+===== Moving the input file
 
 When the input file is moved or renamed, {beatname_uc} is able to recognize that the file was already read. After the input is
 rotated, a new log file is created, so the application can continue logging. The Beat picks up the new file during the
@@ -30,16 +34,16 @@ To avoid missing events from a rotated file, add the rotated files to the input.
 
 [float]
 [[log-rotate-example]]
-=== Example configurations
+==== Example configurations
 
-In this section we choose to share a sample configuration of logrotate, as it is a popular tools to do log rotation.
+In this section we choose to share a sample configuration of logrotate, as it is a popular tool to do log rotation.
 
 In this example {beatname_uc} reads the logs of a web server. The logs are rotated every day, and the new file is created
 with the specified permissions.
 
 [float]
 [[log-rotate-example-logrotate]]
-==== logrotate.conf
+===== logrotate.conf
 
 [source,yaml]
 -----------------------------------------------------
@@ -56,7 +60,7 @@ with the specified permissions.
 
 [float]
 [[log-rotate-example-filebeat]]
-==== filebeat.yml
+===== filebeat.yml
 
 [source,yaml]
 -----------------------------------------------------
@@ -66,3 +70,22 @@ filebeat.inputs:
   paths:
   - /var/log/my-server/my-server.log*
 -----------------------------------------------------
+
+[float]
+[[log-rotation-windows]]
+=== Logrotation on Windows
+
+Log rotation schemes deleting old files and renaming newer files to the old files might get blocked if old
+files are still processed by {beatname_uc}. This is due to Windows not deleting files and file meta-data,
+until the last process has closed the file. Unlike most *nix filesystems,
+one can not reuse a file name, until all processes accessing the file have closed the deleted file.
+
+For Windows users a better strategy is to use dates in the rotated file names.
+Thus, a file is never renamed to an older file, and the log writer cannot fail to open files
+(same for log rotator, if it's an external process).
+
+This highly reduces the chance of log writing, rotation, and collecting interfering with each other.
+
+Check out Frequently Asked Question about logrotation on Windows:
+
+* <<windows-file-rotation>>
