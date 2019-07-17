@@ -46,8 +46,7 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) common.MapS
 		return content
 	}
 
-	objectMaps, ok := content["objects"].([]common.MapStr)
-	if ok {
+	if objectMaps, ok := content["objects"].([]common.MapStr); ok {
 		// change index pattern name
 		for i, objectMap := range objectMaps {
 
