@@ -15,7 +15,6 @@ grouped in the following categories:
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
 * <<exported-fields-aws>>
-* <<exported-fields-aws_light>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -1157,6 +1156,12 @@ type: integer
 --
 
 [float]
+=== elb
+
+`elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
+
+
+[float]
 === rds
 
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
@@ -2023,20 +2028,6 @@ SQS queue name
 type: keyword
 
 --
-
-[[exported-fields-aws_light]]
-== aws_light fields
-
-aws_light module
-
-
-
-
-[float]
-=== elb
-
-`elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
-
 
 [[exported-fields-beat-common]]
 == Beat fields

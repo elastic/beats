@@ -4,7 +4,7 @@ Cloudwatch metrics for monitoring purposes.
 
 [float]
 === AWS Permissions
-Some specific AWS permissions are required for IAM user to collect AWS RDS metrics.
+Some specific AWS permissions are required for IAM user to collect AWS ELB metrics.
 ----
 ec2:DescribeRegions
 cloudwatch:GetMetricData
@@ -26,6 +26,4 @@ tag:getResources
   default_region: '${AWS_REGION:us-west-1}'
   # This module uses the aws cloudwatch metricset, all
   # the options for this metricset are also available here.
-  #cloudwatch_metrics:
-  # - namespace: AWS/ELB
 ----

@@ -1,9 +1,0 @@
-- key: aws_light
-  title: 'aws_light'
-  release: beta
-  description: >
-    aws_light module
-  fields:
-    - name: aws_light
-      type: group
-      fields:

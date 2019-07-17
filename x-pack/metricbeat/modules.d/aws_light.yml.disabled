@@ -1,9 +1,0 @@
-# Module: aws_light
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-aws_light.html
-
-- module: aws_light
-  metricsets: ['elb']
-  period: 300s
-
-  # This module uses the aws cloudwatch metricset, all
-  # the options for this metricset are also available here.

@@ -1,17 +1,15 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "aws_light": {
+    "aws": {
         "elb": {
             "dimensions": {
-                "AvailabilityZone": "us-east-1b"
+                "LoadBalancerName": "testauthelb"
             },
             "metrics": {
-                "BackendConnectionErrors": 1,
-                "HTTPCode_Backend_3XX": 1,
-                "HealthyHostCount": 1.3333333333333333,
-                "Latency": 0.001015424728393555,
-                "RequestCount": 1,
-                "UnHealthyHostCount": 0.3333333333333333
+                "EstimatedALBActiveConnectionCount": 3,
+                "EstimatedALBConsumedLCUs": 0.000155,
+                "EstimatedALBNewConnectionCount": 12.25,
+                "EstimatedProcessedBytes": 183
             },
             "namespace": "AWS/ELB"
         }
@@ -21,9 +19,9 @@
         "region": "us-east-1"
     },
     "event": {
-        "dataset": "aws_light.elb",
+        "dataset": "aws.elb",
         "duration": 115000,
-        "module": "aws_light"
+        "module": "aws"
     },
     "metricset": {
         "name": "elb"

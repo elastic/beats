@@ -1,3 +1,3 @@
-name: aws_light
+name: aws
 metricsets:
   - elb
