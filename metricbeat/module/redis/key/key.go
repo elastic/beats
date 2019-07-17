@@ -74,8 +74,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
 
 	for _, p := range m.patterns {
-		keyspace := m.OriginalDBNumber()
-		if p.Keyspace != nil {
+		var keyspace uint
+		if p.Keyspace == nil {
+			keyspace = m.OriginalDBNumber()
+		} else {
 			keyspace = *p.Keyspace
 		}
 		if err := redis.Select(conn, keyspace); err != nil {
