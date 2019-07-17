@@ -48,8 +48,17 @@ type process struct {
 	CPU                 cpu `json:"cpu"`
 }
 
+type cgroup struct {
+	CPUAcct map[string]interface{} `json:"cpuacct"`
+	CPU     struct {
+		Stat         map[string]interface{} `json:"stat"`
+		ControlGroup string                 `json:"control_group"`
+	} `json:"cpu"`
+}
+
 type os struct {
-	CPU cpu `json:"cpu"`
+	CPU    cpu    `json:"cpu"`
+	CGroup cgroup `json:"cgroup,omitempty"`
 }
 
 type nodeInfo struct {
@@ -75,6 +84,7 @@ type NodeStats struct {
 	nodeInfo
 	commonStats
 	Process   process                  `json:"process"`
+	OS        os                       `json:"os"`
 	Pipelines map[string]PipelineStats `json:"pipelines"`
 }
 
@@ -124,6 +134,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		cpu{
 			LoadAverage: nodeStats.Process.CPU.LoadAverage,
 		},
+		nodeStats.OS.CGroup,
 	}
 
 	var pipelines []PipelineStats
