@@ -39,8 +39,6 @@ func init() {
 type MetricSet struct {
 	*redis.MetricSet
 	patterns []KeyPattern
-
-	originalKeyspace *uint
 }
 
 // KeyPattern contains the information required to query keys
@@ -75,17 +73,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
 
-	if m.originalKeyspace == nil {
-		keyspace, err := redis.GetKeyspace(conn)
-		if err != nil {
-			return errors.Wrapf(err, "Failed to get original keyspace")
-		}
-
-		m.originalKeyspace = &keyspace
-	}
-
 	for _, p := range m.patterns {
-		keyspace := *m.originalKeyspace
+		keyspace := m.OriginalDBNumber()
 		if p.Keyspace != nil {
 			keyspace = *p.Keyspace
 		}

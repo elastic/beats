@@ -215,21 +215,3 @@ func TestFetchKeyInfo(t *testing.T) {
 		})
 	}
 }
-
-func TestSelect(t *testing.T) {
-	compose.EnsureUp(t, "redis")
-
-	conn, err := rd.Dial("tcp", host)
-	if err != nil {
-		t.Fatal("connect", err)
-	}
-	defer conn.Close()
-
-	keyspace := uint(7)
-
-	err = Select(conn, keyspace)
-	require.NoError(t, err)
-
-	currentKeyspace, err := GetKeyspace(conn)
-	assert.Equal(t, keyspace, currentKeyspace)
-}

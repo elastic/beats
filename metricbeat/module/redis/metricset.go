@@ -32,7 +32,7 @@ import (
 // MetricSet for fetching Redis server information and statistics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	pool *rd.Pool
+	pool *poolWithDBNumber
 }
 
 // NewMetricSet creates the base for Redis metricsets
@@ -72,6 +72,10 @@ func (m *MetricSet) Connection() rd.Conn {
 // Close redis connections
 func (m *MetricSet) Close() error {
 	return m.pool.Close()
+}
+
+func (m *MetricSet) OriginalDBNumber() uint {
+	return uint(m.pool.DBNumber())
 }
 
 func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {

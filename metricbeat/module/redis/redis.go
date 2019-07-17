@@ -21,12 +21,10 @@ Package redis contains shared Redis functionality for the metric sets
 package redis
 
 import (
-	"strconv"
 	"strings"
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -173,21 +171,14 @@ func Select(c rd.Conn, keyspace uint) error {
 	return err
 }
 
-// GetKeyspace gets the keyspace being used by this connection
-func GetKeyspace(c rd.Conn) (uint, error) {
-	info, err := rd.String(c.Do("CLIENT", "LIST"))
-	if err != nil {
-		return 0, err
-	}
+type poolWithDBNumber struct {
+	*rd.Pool
 
-	for _, field := range strings.Split(info, " ") {
-		if strings.HasPrefix(field, "db=") {
-			keyspaceStr := strings.TrimPrefix(field, "db=")
-			keyspace, err := strconv.Atoi(keyspaceStr)
-			return uint(keyspace), errors.Wrapf(err, "failed to parse db from CLIENT LIST response (%v)", field)
-		}
-	}
-	return 0, errors.New("db not found in CLIENT LIST")
+	dbNumber int
+}
+
+func (p poolWithDBNumber) DBNumber() int {
+	return p.dbNumber
 }
 
 // CreatePool creates a redis connection pool
@@ -196,8 +187,8 @@ func CreatePool(
 	dbNumber int,
 	maxConn int,
 	idleTimeout, connTimeout time.Duration,
-) *rd.Pool {
-	return &rd.Pool{
+) *poolWithDBNumber {
+	pool := &rd.Pool{
 		MaxIdle:     maxConn,
 		IdleTimeout: idleTimeout,
 		Dial: func() (rd.Conn, error) {
@@ -208,5 +199,10 @@ func CreatePool(
 				rd.DialReadTimeout(connTimeout),
 				rd.DialWriteTimeout(connTimeout))
 		},
+	}
+
+	return &poolWithDBNumber{
+		Pool:     pool,
+		dbNumber: dbNumber,
 	}
 }
