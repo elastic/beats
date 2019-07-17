@@ -9,6 +9,7 @@ package cloudwatch
 import (
 	"testing"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/stretchr/testify/assert"
 )
@@ -89,8 +90,26 @@ var (
 )
 
 func TestGetIdentifiers(t *testing.T) {
-	listMetricsOutput := []cloudwatch.Metric{listMetric1, listMetric2, listMetric3, listMetric4}
-	identifiers := getIdentifiers(listMetricsOutput)
+	listMetricWithDetail := []listMetricWithDetail{
+		{
+			cloudwatchMetric:   listMetric1,
+			resourceTypeFilter: "ec2",
+		},
+		{
+			cloudwatchMetric:   listMetric2,
+			resourceTypeFilter: "ec2",
+		},
+		{
+			cloudwatchMetric:   listMetric3,
+			resourceTypeFilter: "ec2",
+		},
+		{
+			cloudwatchMetric:   listMetric4,
+			resourceTypeFilter: "ec2",
+		},
+	}
+
+	identifiers := getIdentifiers(listMetricWithDetail)
 	assert.Equal(t, []string{instanceID1, instanceID2}, identifiers["InstanceId"])
 }
 
@@ -129,11 +148,10 @@ func TestConstructLabel(t *testing.T) {
 
 func TestReadCloudwatchConfig(t *testing.T) {
 	cases := []struct {
-		title                         string
-		cloudwatchMetricsConfig       []Config
-		expectedListMetric            []cloudwatch.Metric
-		expectedResourceTypes         []string
-		expectedNamespaceResourceType map[string]string
+		title                    string
+		cloudwatchMetricsConfig  []Config
+		expectedListMetricDetail []listMetricWithDetail
+		expectedNamespaceDetail  []namespaceWithDetail
 	}{
 		{
 			"test with a specific metric",
@@ -149,9 +167,18 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			[]cloudwatch.Metric{listMetric1},
+			[]listMetricWithDetail{{listMetric1, ""}},
 			nil,
-			map[string]string{},
+		},
+		{
+			"test with a namespace",
+			[]Config{
+				{
+					Namespace: "AWS/EC2",
+				},
+			},
+			nil,
+			[]namespaceWithDetail{{namespace: "AWS/EC2", resourceTypeFilter: ""}},
 		},
 		{
 			"test with a specific metric and a namespace",
@@ -170,9 +197,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace: "AWS/S3",
 				},
 			},
-			[]cloudwatch.Metric{listMetric1},
-			nil,
-			map[string]string{"AWS/S3": ""},
+			[]listMetricWithDetail{{listMetric1, ""}},
+			[]namespaceWithDetail{{namespace: "AWS/S3", resourceTypeFilter: ""}},
 		},
 		{
 			"test with two specific metrics and a namespace",
@@ -206,9 +232,11 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			[]cloudwatch.Metric{listMetric1, listMetric6},
-			[]string{"ec2:instance"},
-			map[string]string{"AWS/Lambda": ""},
+			[]listMetricWithDetail{
+				{listMetric1, "ec2:instance"},
+				{listMetric6, ""},
+			},
+			[]namespaceWithDetail{{namespace: "AWS/Lambda", resourceTypeFilter: ""}},
 		},
 		{
 			"Test a specific metric (only with metric name) and a namespace",
@@ -223,9 +251,11 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceTypeFilter: "s3",
 				},
 			},
-			[]cloudwatch.Metric{listMetric7},
-			[]string{"ec2:instance"},
-			map[string]string{"AWS/S3": "s3"},
+			nil,
+			[]namespaceWithDetail{
+				{namespace: "AWS/EC2", resourceTypeFilter: "ec2:instance", metricName: "CPUUtilization"},
+				{namespace: "AWS/S3", resourceTypeFilter: "s3"},
+			},
 		},
 		{
 			"test EBS namespace",
@@ -236,18 +266,62 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 			},
 			nil,
-			nil,
-			map[string]string{
-				"AWS/EBS": "ec2",
-			},
+			[]namespaceWithDetail{{namespace: "AWS/EBS", resourceTypeFilter: "ec2"}},
 		},
 	}
+
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			listMetrics, resourceTypes, namespaceResourceType := readCloudwatchConfig(c.cloudwatchMetricsConfig)
-			assert.Equal(t, c.expectedListMetric, listMetrics)
-			assert.Equal(t, c.expectedResourceTypes, resourceTypes)
-			assert.Equal(t, c.expectedNamespaceResourceType, namespaceResourceType)
+			m := &MetricSet{CloudwatchConfigs: c.cloudwatchMetricsConfig}
+			listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
+			assert.Equal(t, len(c.expectedListMetricDetail), len(listMetricDetailTotal))
+			assert.Equal(t, len(c.expectedNamespaceDetail), len(namespaceDetailTotal))
+			assert.Equal(t, c.expectedListMetricDetail, listMetricDetailTotal)
+			assert.Equal(t, c.expectedNamespaceDetail, namespaceDetailTotal)
 		})
+	}
+}
+
+func TestCompareAWSDimensions(t *testing.T) {
+	cases := []struct {
+		dim1           []cloudwatch.Dimension
+		dim2           []cloudwatch.Dimension
+		expectedResult bool
+	}{
+		{
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
+				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
+				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
+			},
+			true,
+		},
+		{
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
+				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
+			},
+			false,
+		},
+		{
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
+			},
+			false,
+		},
+	}
+
+	for _, c := range cases {
+		output := compareAWSDimensions(c.dim1, c.dim2)
+		assert.Equal(t, c.expectedResult, output)
 	}
 }

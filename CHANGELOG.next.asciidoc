@@ -152,6 +152,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
 - Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+- Fix cloudwatch metricset with given dimensions or metric name in config. {issue}12933[12933]
 
 *Packetbeat*
 
