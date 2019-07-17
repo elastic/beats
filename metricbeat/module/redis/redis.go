@@ -178,6 +178,7 @@ type Pool struct {
 	dbNumber int
 }
 
+// DBNumber returns the db number originally used to configure this pool
 func (p *Pool) DBNumber() int {
 	return p.dbNumber
 }

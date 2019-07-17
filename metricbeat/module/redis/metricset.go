@@ -74,6 +74,8 @@ func (m *MetricSet) Close() error {
 	return m.pool.Close()
 }
 
+// OriginalDBNumber returns the originally configured database number, this can be used by
+// metricsets that change keyspace to go back to the originally configured one
 func (m *MetricSet) OriginalDBNumber() uint {
 	return uint(m.pool.DBNumber())
 }
