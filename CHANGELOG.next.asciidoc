@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v7.1.1...7.1[Check the HEAD diff]
 - Require certificate authorities, certificate file, and key when SSL is enabled for module http metricset server. {pull}12355[12355]
 - In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12353[12353]
 - When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Fix connections leak in redis module {pull}12914[12914]
 
 *Packetbeat*
 
