@@ -162,14 +162,8 @@ endif::no_ilm[]
 |Index events into {es}
 
 |`create_index` privilege on +{beat_default_index_prefix}-*+ indices
-|Create daily indices when connecting to clusters that do not support ILM {es}
+|Create daily indices when connecting to clusters that do not support ILM
 |====
-
-// TODO: Find out if beats_admin is really required to read configs from central config. If so,
-// need to add:
-//ifdef::has_central_config[]
-//|`beats_admin` role |Read configurations from Beats central management
-//endif::has_central_config[]
 
 [[kibana-user-privileges]]
 ==== Reader role
