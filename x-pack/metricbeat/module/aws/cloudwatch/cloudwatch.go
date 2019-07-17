@@ -64,8 +64,8 @@ type Config struct {
 }
 
 type listMetricWithDetail struct {
-	cloudwatchMetric   cloudwatch.Metric
-	resourceTypeFilter string
+	cloudwatchMetrics   []cloudwatch.Metric
+	resourceTypeFilters []string
 }
 
 type namespaceWithDetail struct {
@@ -120,7 +120,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		svcCloudwatch := cloudwatch.New(awsConfig)
 		svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
 
-		err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal, regionName, startTime, endTime, report)
+		err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.cloudwatchMetrics, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime, report)
 		if err != nil {
 			return errors.Wrap(err, "createEvents failed")
 		}
@@ -143,38 +143,38 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
-			var filteredListMetricsOutput []listMetricWithDetail
+			var filteredListMetrics []cloudwatch.Metric
+			var resourceTypes []string
+
 			if namespaceResourceType.metricName != "" && namespaceResourceType.dimensions == nil {
 				for _, listMetric := range listMetricsOutput {
 					if *listMetric.MetricName != namespaceResourceType.metricName {
 						continue
 					}
-					filteredListMetricsOutput = append(filteredListMetricsOutput, listMetricWithDetail{
-						cloudwatchMetric:   listMetric,
-						resourceTypeFilter: namespaceResourceType.resourceTypeFilter,
-					})
+					filteredListMetrics = append(filteredListMetrics, listMetric)
+					if namespaceResourceType.resourceTypeFilter != "" && !aws.StringInSlice(namespaceResourceType.resourceTypeFilter, resourceTypes) {
+						resourceTypes = append(resourceTypes, namespaceResourceType.resourceTypeFilter)
+					}
 				}
 			} else if namespaceResourceType.metricName == "" && namespaceResourceType.dimensions != nil {
 				for _, listMetric := range listMetricsOutput {
 					if !compareAWSDimensions(listMetric.Dimensions, namespaceResourceType.dimensions) {
 						continue
 					}
-					filteredListMetricsOutput = append(filteredListMetricsOutput, listMetricWithDetail{
-						cloudwatchMetric:   listMetric,
-						resourceTypeFilter: namespaceResourceType.resourceTypeFilter,
-					})
+					filteredListMetrics = append(filteredListMetrics, listMetric)
+					if namespaceResourceType.resourceTypeFilter != "" && !aws.StringInSlice(namespaceResourceType.resourceTypeFilter, resourceTypes) {
+						resourceTypes = append(resourceTypes, namespaceResourceType.resourceTypeFilter)
+					}
 				}
 			} else {
-				for _, listMetric := range listMetricsOutput {
-					filteredListMetricsOutput = append(filteredListMetricsOutput, listMetricWithDetail{
-						cloudwatchMetric:   listMetric,
-						resourceTypeFilter: namespaceResourceType.resourceTypeFilter,
-					})
+				filteredListMetrics = listMetricsOutput
+				if namespaceResourceType.resourceTypeFilter != "" {
+					resourceTypes = []string{namespaceResourceType.resourceTypeFilter}
 				}
 			}
 
 			svcResourceAPI := resourcegroupstaggingapi.New(awsConfig)
-			err = m.createEvents(svcCloudwatch, svcResourceAPI, filteredListMetricsOutput, regionName, startTime, endTime, report)
+			err = m.createEvents(svcCloudwatch, svcResourceAPI, filteredListMetrics, resourceTypes, regionName, startTime, endTime, report)
 			if err != nil {
 				return errors.Wrap(err, "createEvents failed for region "+regionName)
 			}
@@ -202,9 +202,11 @@ func compareAWSDimensions(dim1 []cloudwatch.Dimension, dim2 []cloudwatch.Dimensi
 	return reflect.DeepEqual(dim1String, dim2String)
 }
 
-func (m *MetricSet) readCloudwatchConfig() ([]listMetricWithDetail, []namespaceWithDetail) {
-	var listMetricDetailTotal []listMetricWithDetail
+func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, []namespaceWithDetail) {
+	var listMetricDetailTotal listMetricWithDetail
 	var namespaceDetailTotal []namespaceWithDetail
+	var listMetrics []cloudwatch.Metric
+	var resourceTypes []string
 
 	for _, config := range m.CloudwatchConfigs {
 		var cloudwatchDimensions []cloudwatch.Dimension
@@ -220,14 +222,15 @@ func (m *MetricSet) readCloudwatchConfig() ([]listMetricWithDetail, []namespaceW
 		if config.MetricName != "" && config.Dimensions != nil {
 			namespace := config.Namespace
 			metricName := config.MetricName
-			listMetricDetailTotal = append(listMetricDetailTotal, listMetricWithDetail{
-				cloudwatchMetric: cloudwatch.Metric{
+			listMetrics = append(listMetrics,
+				cloudwatch.Metric{
 					Namespace:  &namespace,
 					MetricName: &metricName,
 					Dimensions: cloudwatchDimensions,
-				},
-				resourceTypeFilter: config.ResourceTypeFilter,
-			})
+				})
+			if config.ResourceTypeFilter != "" && !aws.StringInSlice(config.ResourceTypeFilter, resourceTypes) {
+				resourceTypes = append(resourceTypes, config.ResourceTypeFilter)
+			}
 			continue
 		}
 
@@ -238,13 +241,16 @@ func (m *MetricSet) readCloudwatchConfig() ([]listMetricWithDetail, []namespaceW
 			resourceTypeFilter: config.ResourceTypeFilter,
 		})
 	}
+
+	listMetricDetailTotal.resourceTypeFilters = resourceTypes
+	listMetricDetailTotal.cloudwatchMetrics = listMetrics
 	return listMetricDetailTotal, namespaceDetailTotal
 }
 
-func constructMetricQueries(listMetricDetailTotal []listMetricWithDetail, period time.Duration) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsTotal []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
-	for i, listMetricDetail := range listMetricDetailTotal {
-		metricDataQuery := createMetricDataQuery(listMetricDetail.cloudwatchMetric, i, period)
+	for i, listMetric := range listMetricsTotal {
+		metricDataQuery := createMetricDataQuery(listMetric, i, period)
 		metricDataQueries = append(metricDataQueries, metricDataQuery)
 	}
 	return metricDataQueries
@@ -290,23 +296,23 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 	return
 }
 
-func getIdentifiers(listMetricDetailTotal []listMetricWithDetail) map[string][]string {
-	if len(listMetricDetailTotal) == 0 {
+func getIdentifiers(listMetricsTotal []cloudwatch.Metric) map[string][]string {
+	if len(listMetricsTotal) == 0 {
 		return nil
 	}
 
 	identifiers := map[string][]string{}
-	for _, listMetricTypeStats := range listMetricDetailTotal {
+	for _, listMetric := range listMetricsTotal {
 		identifierName := ""
 		identifierValue := ""
-		if len(listMetricTypeStats.cloudwatchMetric.Dimensions) == 0 {
+		if len(listMetric.Dimensions) == 0 {
 			continue
 		}
 
-		for i, dim := range listMetricTypeStats.cloudwatchMetric.Dimensions {
+		for i, dim := range listMetric.Dimensions {
 			identifierName += *dim.Name
 			identifierValue += *dim.Value
-			if i != len(listMetricTypeStats.cloudwatchMetric.Dimensions)-1 {
+			if i != len(listMetric.Dimensions)-1 {
 				identifierName += ","
 				identifierValue += ","
 			}
@@ -384,22 +390,15 @@ func (m *MetricSet) convertConfigToListMetrics(cloudwatchConfig Config, namespac
 	return listMetricsOutputs
 }
 
-func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ClientAPI, listMetricDetailTotal []listMetricWithDetail, regionName string, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcResourceAPI resourcegroupstaggingapiiface.ClientAPI, listMetricTotal []cloudwatch.Metric, resourceTypes []string, regionName string, startTime time.Time, endTime time.Time, report mb.ReporterV2) error {
 	// Get tags
-	var resourceTypes []string
-	for _, listMetrics := range listMetricDetailTotal {
-		if listMetrics.resourceTypeFilter != "" && !aws.StringInSlice(listMetrics.resourceTypeFilter, resourceTypes) {
-			resourceTypes = append(resourceTypes, listMetrics.resourceTypeFilter)
-		}
-	}
-
 	resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, resourceTypes)
 	if err != nil {
 		// If GetResourcesTags failed, continue report event just without tags.
 		m.Logger().Info(errors.Wrap(err, "getResourcesTags failed, skipping region "+regionName))
 	}
 
-	identifiers := getIdentifiers(listMetricDetailTotal)
+	identifiers := getIdentifiers(listMetricTotal)
 	// Initialize events map per region, which stores one event per identifierValue
 	events := map[string]mb.Event{}
 	for _, values := range identifiers {
@@ -411,7 +410,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatchiface.ClientAPI, svcRes
 	var eventsNoIdentifier []mb.Event
 
 	// Construct metricDataQueries
-	metricDataQueries := constructMetricQueries(listMetricDetailTotal, m.Period)
+	metricDataQueries := constructMetricQueries(listMetricTotal, m.Period)
 	if len(metricDataQueries) == 0 {
 		return nil
 	}

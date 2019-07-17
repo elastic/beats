@@ -90,26 +90,11 @@ var (
 )
 
 func TestGetIdentifiers(t *testing.T) {
-	listMetricWithDetail := []listMetricWithDetail{
-		{
-			cloudwatchMetric:   listMetric1,
-			resourceTypeFilter: "ec2",
-		},
-		{
-			cloudwatchMetric:   listMetric2,
-			resourceTypeFilter: "ec2",
-		},
-		{
-			cloudwatchMetric:   listMetric3,
-			resourceTypeFilter: "ec2",
-		},
-		{
-			cloudwatchMetric:   listMetric4,
-			resourceTypeFilter: "ec2",
-		},
+	listMetricsTotal := []cloudwatch.Metric{
+		listMetric1, listMetric2, listMetric3, listMetric4,
 	}
 
-	identifiers := getIdentifiers(listMetricWithDetail)
+	identifiers := getIdentifiers(listMetricsTotal)
 	assert.Equal(t, []string{instanceID1, instanceID2}, identifiers["InstanceId"])
 }
 
@@ -150,7 +135,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	cases := []struct {
 		title                    string
 		cloudwatchMetricsConfig  []Config
-		expectedListMetricDetail []listMetricWithDetail
+		expectedListMetricDetail listMetricWithDetail
 		expectedNamespaceDetail  []namespaceWithDetail
 	}{
 		{
@@ -167,7 +152,10 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			[]listMetricWithDetail{{listMetric1, ""}},
+			listMetricWithDetail{
+				cloudwatchMetrics:   []cloudwatch.Metric{listMetric1},
+				resourceTypeFilters: nil,
+			},
 			nil,
 		},
 		{
@@ -177,7 +165,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace: "AWS/EC2",
 				},
 			},
-			nil,
+			listMetricWithDetail{},
 			[]namespaceWithDetail{{namespace: "AWS/EC2", resourceTypeFilter: ""}},
 		},
 		{
@@ -197,7 +185,10 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					Namespace: "AWS/S3",
 				},
 			},
-			[]listMetricWithDetail{{listMetric1, ""}},
+			listMetricWithDetail{
+				cloudwatchMetrics:   []cloudwatch.Metric{listMetric1},
+				resourceTypeFilters: nil,
+			},
 			[]namespaceWithDetail{{namespace: "AWS/S3", resourceTypeFilter: ""}},
 		},
 		{
@@ -232,9 +223,9 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					},
 				},
 			},
-			[]listMetricWithDetail{
-				{listMetric1, "ec2:instance"},
-				{listMetric6, ""},
+			listMetricWithDetail{
+				cloudwatchMetrics:   []cloudwatch.Metric{listMetric1, listMetric6},
+				resourceTypeFilters: []string{"ec2:instance"},
 			},
 			[]namespaceWithDetail{{namespace: "AWS/Lambda", resourceTypeFilter: ""}},
 		},
@@ -251,7 +242,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceTypeFilter: "s3",
 				},
 			},
-			nil,
+			listMetricWithDetail{},
 			[]namespaceWithDetail{
 				{namespace: "AWS/EC2", resourceTypeFilter: "ec2:instance", metricName: "CPUUtilization"},
 				{namespace: "AWS/S3", resourceTypeFilter: "s3"},
@@ -265,7 +256,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					ResourceTypeFilter: "ec2",
 				},
 			},
-			nil,
+			listMetricWithDetail{},
 			[]namespaceWithDetail{{namespace: "AWS/EBS", resourceTypeFilter: "ec2"}},
 		},
 	}
@@ -274,7 +265,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 		t.Run(c.title, func(t *testing.T) {
 			m := &MetricSet{CloudwatchConfigs: c.cloudwatchMetricsConfig}
 			listMetricDetailTotal, namespaceDetailTotal := m.readCloudwatchConfig()
-			assert.Equal(t, len(c.expectedListMetricDetail), len(listMetricDetailTotal))
+			assert.Equal(t, len(c.expectedListMetricDetail.resourceTypeFilters), len(listMetricDetailTotal.resourceTypeFilters))
+			assert.Equal(t, len(c.expectedListMetricDetail.cloudwatchMetrics), len(listMetricDetailTotal.cloudwatchMetrics))
 			assert.Equal(t, len(c.expectedNamespaceDetail), len(namespaceDetailTotal))
 			assert.Equal(t, c.expectedListMetricDetail, listMetricDetailTotal)
 			assert.Equal(t, c.expectedNamespaceDetail, namespaceDetailTotal)

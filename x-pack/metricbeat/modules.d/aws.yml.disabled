@@ -11,6 +11,7 @@
   default_region: '${AWS_REGION:us-west-1}'
   regions:
     - us-east-1
+
 - module: aws
   period: 300s
   metricsets:
@@ -20,6 +21,9 @@
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
   cloudwatch_metrics:
+    - namespace: AWS/EC2
+      metricname: CPUUtilization
+      tags.resource_type_filter: ec2
     - namespace: AWS/EBS
     - namespace: AWS/ELB
       tags.resource_type_filter: elasticloadbalancing
