@@ -32,8 +32,9 @@ Because temporary security credentials are short term, after they expire, the us
 the aws.yml config file with the new credentials. Unless https://www.elastic.co/guide/en/beats/metricbeat/current/_live_reloading.html[live reloading]
 feature is enabled for Metricbeat, the user needs to manually restart Metricbeat after updating the config file in order
 to continue collecting Cloudwatch metrics. This will cause data loss if the config file is not updated with new
-credentials before the old ones expire. For Metricbeat, we recommend users to use access keys in config file to enable
-aws module making AWS api calls without have to generate new temporary credentials and update the config frequently.
+credentials before the old ones expire. If you do not define the two variables, the IAM Role is used. For Metricbeat,
+we recommend users to use access keys in config file to enable aws module making AWS api calls without have to generate
+new temporary credentials and update the config frequently.
 
 IAM policy is an entity that defines permissions to an object within your AWS environment. Specific permissions needs
 to be added into the IAM user's policy to authorize Metricbeat to collect AWS monitoring metrics. Please see documentation
