@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -37,21 +36,43 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		return errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
 	}
 
-	var errors multierror.Errors
-	for _, followerIndex := range data.FollowStats.Indices {
+	now := common.Time(time.Now())
+	intervalMS := m.Module().Config().Period / time.Millisecond
+	index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+
+	indexCCRStats(r, data, info, now, intervalMS, index)
+	indexCCRAutoFollowStats(r, data, info, now, intervalMS, index)
+	return nil
+}
+
+func indexCCRStats(r mb.ReporterV2, ccrData response, esInfo elasticsearch.Info, now common.Time, intervalMS time.Duration, indexName string) {
+	for _, followerIndex := range ccrData.FollowStats.Indices {
 		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{
-				"cluster_uuid": info.ClusterID,
-				"timestamp":    common.Time(time.Now()),
-				"interval_ms":  m.Module().Config().Period / time.Millisecond,
+				"cluster_uuid": esInfo.ClusterID,
+				"timestamp":    now,
+				"interval_ms":  intervalMS,
 				"type":         "ccr_stats",
 				"ccr_stats":    followerShard,
 			}
 
-			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = indexName
 			r.Event(event)
 		}
 	}
-	return errors.Err()
+}
+
+func indexCCRAutoFollowStats(r mb.ReporterV2, ccrData response, esInfo elasticsearch.Info, now common.Time, intervalMS time.Duration, indexName string) {
+	event := mb.Event{}
+	event.RootFields = common.MapStr{
+		"cluster_uuid":          esInfo.ClusterID,
+		"timestamp":             now,
+		"interval_ms":           intervalMS,
+		"type":                  "ccr_auto_follow_stats",
+		"ccr_auto_follow_stats": ccrData.AutoFollowStats,
+	}
+
+	event.Index = indexName
+	r.Event(event)
 }
