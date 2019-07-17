@@ -171,13 +171,14 @@ func Select(c rd.Conn, keyspace uint) error {
 	return err
 }
 
-type poolWithDBNumber struct {
+// Pool is a redis pool that keeps track of the database number originally configured
+type Pool struct {
 	*rd.Pool
 
 	dbNumber int
 }
 
-func (p poolWithDBNumber) DBNumber() int {
+func (p *Pool) DBNumber() int {
 	return p.dbNumber
 }
 
@@ -187,7 +188,7 @@ func CreatePool(
 	dbNumber int,
 	maxConn int,
 	idleTimeout, connTimeout time.Duration,
-) *poolWithDBNumber {
+) *Pool {
 	pool := &rd.Pool{
 		MaxIdle:     maxConn,
 		IdleTimeout: idleTimeout,
@@ -201,7 +202,7 @@ func CreatePool(
 		},
 	}
 
-	return &poolWithDBNumber{
+	return &Pool{
 		Pool:     pool,
 		dbNumber: dbNumber,
 	}

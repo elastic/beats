@@ -32,7 +32,7 @@ import (
 // MetricSet for fetching Redis server information and statistics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	pool *poolWithDBNumber
+	pool *Pool
 }
 
 // NewMetricSet creates the base for Redis metricsets
