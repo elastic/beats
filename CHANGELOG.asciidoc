@@ -18,6 +18,11 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
 
 - Skipping unparsable log entries from docker json reader {pull}12268[12268]
 - Add support for client addresses with port in Apache error logs {pull}12695[12695]
+- Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
+
+*Metricbeat*
+
+- Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
 
 *Packetbeat*
 
