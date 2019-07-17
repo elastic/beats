@@ -5441,6 +5441,15 @@ example: doc
 
 --
 
+*`elasticsearch.slowlog.source`*::
++
+--
+Source of document that was indexed
+
+type: keyword
+
+--
+
 [[exported-fields-envoyproxy]]
 == Envoyproxy fields
 
