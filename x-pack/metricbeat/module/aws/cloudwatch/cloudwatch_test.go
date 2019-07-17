@@ -276,11 +276,13 @@ func TestReadCloudwatchConfig(t *testing.T) {
 
 func TestCompareAWSDimensions(t *testing.T) {
 	cases := []struct {
+		title                    string
 		dim1           []cloudwatch.Dimension
 		dim2           []cloudwatch.Dimension
 		expectedResult bool
 	}{
 		{
+			"same dimensions with length 2 but different order",
 			[]cloudwatch.Dimension{
 				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
@@ -292,6 +294,7 @@ func TestCompareAWSDimensions(t *testing.T) {
 			true,
 		},
 		{
+			"different dimensions with different length",
 			[]cloudwatch.Dimension{
 				{Name: awssdk.String("dept"), Value: awssdk.String("engineering")},
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
@@ -302,6 +305,7 @@ func TestCompareAWSDimensions(t *testing.T) {
 			false,
 		},
 		{
+			"different dimensions with same length",
 			[]cloudwatch.Dimension{
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
 			},
@@ -310,10 +314,20 @@ func TestCompareAWSDimensions(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"compare with an empty dimension",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
+			},
+			[]cloudwatch.Dimension{},
+			false,
+		},
 	}
 
 	for _, c := range cases {
-		output := compareAWSDimensions(c.dim1, c.dim2)
-		assert.Equal(t, c.expectedResult, output)
+		t.Run(c.title, func(t *testing.T) {
+			output := compareAWSDimensions(c.dim1, c.dim2)
+			assert.Equal(t, c.expectedResult, output)
+		})
 	}
 }
