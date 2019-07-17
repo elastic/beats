@@ -54,16 +54,33 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
+	rcPost14 := false
+	for _, event := range events {
+		if ok, _ := event.HasKey("request.count"); ok {
+			rcPost14 = true
+			break
+		}
+	}
+
 	for _, event := range events {
 		// Hack: super ugly trick. An improvement would be to add pipeline/lifecycle
 		// to metrics retrieval in general, so mappings, retrieved metrics, ... can be
-		// modified on events. Current design is limiting
+		// modified on events. Current design is limiting.
 		if ok, _ := event.HasKey("request.beforev14.count"); ok {
-			if ok, _ := event.HasKey("request.count"); !ok {
-				v, _ := event.GetValue("request.beforev14.count")
+			if rcPost14 {
+				if bothInformed, _ := event.HasKey("request.count"); !bothInformed {
+					continue
+				}
+				event.Delete("request.beforev14")
+			} else {
+				v, err := event.GetValue("request.beforev14.count")
+				if err != nil {
+					reporter.Error(err)
+					continue
+				}
 				event.Put("request.count", v)
+				event.Delete("request.beforev14")
 			}
-			event.Delete("request.beforev14")
 		}
 
 		reporter.Event(mb.Event{
