@@ -1,3 +1,9 @@
 name: aws
 metricsets:
+  - cloudwatch
+  - ec2
   - elb
+  - rds
+  - s3_daily_storage
+  - s3_request
+  - sqs
