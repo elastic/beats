@@ -11,6 +11,7 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
@@ -21,8 +22,8 @@ import (
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
 	Period          time.Duration `config:"period" validate:"nonzero,required"`
-	AccessKeyID     string        `config:"access_key_id" validate:"nonzero,required"`
-	SecretAccessKey string        `config:"secret_access_key" validate:"nonzero,required"`
+	AccessKeyID     string        `config:"access_key_id"`
+	SecretAccessKey string        `config:"secret_access_key"`
 	SessionToken    string        `config:"session_token"`
 	DefaultRegion   string        `config:"default_region"`
 	Regions         []string      `config:"regions"`
@@ -61,17 +62,26 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	awsConfig := defaults.Config()
-	awsCredentials := awssdk.Credentials{
-		AccessKeyID:     config.AccessKeyID,
-		SecretAccessKey: config.SecretAccessKey,
+	cfg := defaults.Config()
+	awsCredentials := awssdk.Credentials{}
+	if config.AccessKeyID != "" && config.SecretAccessKey != "" {
+		awsCredentials = awssdk.Credentials{
+			AccessKeyID:     config.AccessKeyID,
+			SecretAccessKey: config.SecretAccessKey,
+		}
 	}
+
 	if config.SessionToken != "" {
 		awsCredentials.SessionToken = config.SessionToken
 	}
 
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
+	cfg.Credentials = awssdk.StaticCredentialsProvider{
 		Value: awsCredentials,
+	}
+
+	awsConfig, err := external.LoadDefaultAWSConfig(cfg)
+	if err != nil {
+		return nil, err
 	}
 
 	awsConfig.Region = config.DefaultRegion
