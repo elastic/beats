@@ -366,6 +366,18 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         return data
 
+    def get_log_lines(self, logfile=None):
+        """
+        Returns the log lines as a list of strings
+        """
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+            data = f.readlines()
+
+        return data
+
     def wait_log_contains(self, msg, logfile=None,
                           max_timeout=10, poll_interval=0.1,
                           name="log_contains",
