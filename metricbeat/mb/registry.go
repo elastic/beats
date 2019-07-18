@@ -300,9 +300,22 @@ func (r *Register) Modules() []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
+	var dups = map[string]int{}
+
+	//for the sake of compatibility, grab modules the old way as well, right from the modules map
 	modules := make([]string, 0, len(r.modules))
 	for module := range r.modules {
+		dups[module]++
 		modules = append(modules, module)
+	}
+
+	//grab a more comprehensive list from the metricset keys, then reduce and merge
+	for mod := range r.metricSets {
+		//skip over values we got from the modules map
+		if _, ok := dups[mod]; ok {
+			continue
+		}
+		modules = append(modules, mod)
 	}
 
 	return modules
