@@ -56,7 +56,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches metrics from Redis by issuing the INFO command.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	conn := m.Connection()
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+		}
+	}()
 
 	// Fetch default INFO.
 	info, err := redis.FetchRedisInfo("default", conn)
@@ -80,7 +84,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		}
 	}
 
-	slowLogLength, err := redis.FetchSlowLogLength(m.Connection())
+	slowLogLength, err := redis.FetchSlowLogLength(conn)
 	if err != nil {
 		logp.Err("Failed to fetch slow log length: %s", err)
 		return
