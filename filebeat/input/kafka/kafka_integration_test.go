@@ -64,7 +64,6 @@ func NewEventCapturer(events chan *util.Data) channel.Outleter {
 }
 
 func (o *eventCapturer) OnEvent(event *util.Data) bool {
-	fmt.Printf("event: %v\n", event)
 	o.events <- event
 	return true
 }
@@ -81,6 +80,18 @@ func (o *eventCapturer) Done() <-chan struct{} {
 	return o.c
 }
 
+type testMessage struct {
+	message string
+	headers []sarama.RecordHeader
+}
+
+func recordHeader(key, value string) sarama.RecordHeader {
+	return sarama.RecordHeader{
+		Key:   []byte(key),
+		Value: []byte(value),
+	}
+}
+
 func TestInput(t *testing.T) {
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
@@ -90,9 +101,24 @@ func TestInput(t *testing.T) {
 	}
 
 	// Send test messages to the topic for the input to read.
-	messageStrs := []string{"testing", "stuff", "blah"}
-	for _, s := range messageStrs {
-		writeToKafkaTopic(t, testTopic, s, time.Second*20)
+	messages := []testMessage{
+		testMessage{message: "testing"},
+		testMessage{
+			message: "stuff",
+			headers: []sarama.RecordHeader{
+				recordHeader("X-Test-Header", "test header value"),
+			},
+		},
+		testMessage{
+			message: "things",
+			headers: []sarama.RecordHeader{
+				recordHeader("keys and things", "3^3 = 27"),
+				recordHeader("kafka yay", "3^3 - 2^4 = 11"),
+			},
+		},
+	}
+	for _, m := range messages {
+		writeToKafkaTopic(t, testTopic, m.message, m.headers, time.Second*20)
 	}
 
 	// Setup the input config
@@ -120,17 +146,56 @@ func TestInput(t *testing.T) {
 	input.Run()
 
 	timeout := time.After(30 * time.Second)
-	for _, m := range messageStrs {
+	for _, m := range messages {
 		select {
 		case event := <-events:
-			result, err := event.GetEvent().Fields.GetValue("message")
+			text, err := event.GetEvent().Fields.GetValue("message")
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, result, m)
+			assert.Equal(t, text, m.message)
+
+			checkMatchingHeaders(t, event.GetEvent(), m.headers)
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
+	}
+}
+
+func checkMatchingHeaders(
+	t *testing.T, event beat.Event, expected []sarama.RecordHeader,
+) {
+	kafka, err := event.Fields.GetValue("kafka")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	kafkaMap, ok := kafka.(common.MapStr)
+	if !ok {
+		t.Error("event.Fields.kafka isn't MapStr")
+		return
+	}
+	headers, err := kafkaMap.GetValue("headers")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	headerArray, ok := headers.([]interface{})
+	if !ok {
+		t.Error("event.Fields.kafka.headers isn't a []interface{}")
+		return
+	}
+	assert.Equal(t, len(expected), len(headerArray))
+	for i := 0; i < len(expected); i++ {
+		headerMap, ok := headerArray[i].(common.MapStr)
+		if !ok {
+			t.Errorf("event.Fields.kafka.headers[%v] isn't a MapStr", i)
+			continue
+		}
+		key, _ := headerMap.GetValue("key")
+		value, _ := headerMap.GetValue("value")
+		assert.Equal(t, expected[i].Key, key)
+		assert.Equal(t, expected[i].Value, value)
 	}
 }
 
@@ -153,7 +218,8 @@ func getTestKafkaHost() string {
 }
 
 func writeToKafkaTopic(
-	t *testing.T, topic string, message string, timeout time.Duration,
+	t *testing.T, topic string, message string,
+	headers []sarama.RecordHeader, timeout time.Duration,
 ) {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll
@@ -173,14 +239,9 @@ func writeToKafkaTopic(
 	}()
 
 	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder(message),
-		Headers: []sarama.RecordHeader{
-			sarama.RecordHeader{
-				Key:   []byte("testkey"),
-				Value: []byte("testvalue"),
-			},
-		},
+		Topic:   topic,
+		Value:   sarama.StringEncoder(message),
+		Headers: headers,
 	}
 
 	_, _, err = producer.SendMessage(msg)
