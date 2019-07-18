@@ -20,7 +20,6 @@
 package kafka
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
@@ -37,7 +36,6 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/json"
 )
@@ -99,7 +97,7 @@ func TestInput(t *testing.T) {
 
 	// Setup the input config
 	config, _ := common.NewConfigFrom(common.MapStr{
-		"hosts":    "kafka:9092",
+		"hosts":    getTestKafkaHost(),
 		"topics":   []string{testTopic},
 		"group_id": "filebeat",
 	})
@@ -133,28 +131,6 @@ func TestInput(t *testing.T) {
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
-	}
-}
-
-func validateJSON(t *testing.T, value []byte, event beat.Event) {
-	var decoded map[string]interface{}
-	err := json.Unmarshal(value, &decoded)
-	if err != nil {
-		t.Errorf("can not json decode event value: %v", value)
-		return
-	}
-	assert.Equal(t, decoded["type"], event.Fields["type"])
-	assert.Equal(t, decoded["message"], event.Fields["message"])
-}
-
-func makeValidateFmtStr(fmt string) func(*testing.T, []byte, beat.Event) {
-	fmtString := fmtstr.MustCompileEvent(fmt)
-	return func(t *testing.T, value []byte, event beat.Event) {
-		expectedMessage, err := fmtString.Run(&event)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, string(expectedMessage), string(value))
 	}
 }
 
