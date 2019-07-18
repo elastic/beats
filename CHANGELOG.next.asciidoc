@@ -34,8 +34,6 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Filebeat*
 
-- Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
-
 *Heartbeat*
 
 *Journalbeat*
@@ -43,7 +41,6 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 *Metricbeat*
 
 - Fix connections leak in redis module {pull}12914[12914]
-- Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
 
 *Packetbeat*
 
