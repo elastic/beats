@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
 - Fixed `json.add_error_key` property setting for delivering error messages from beat events  {pull}11298[11298]
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
+- ILM: Use GET instead of HEAD when checking for alias to expose detailed error message. {pull}12886[12886]
 
 *Auditbeat*
 
