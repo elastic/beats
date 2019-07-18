@@ -16,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("aws", "cloudwatch", "300s")
+	config, info := mtest.GetConfigForTest("cloudwatch", "300s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -32,7 +32,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("aws", "cloudwatch", "300s")
+	config, info := mtest.GetConfigForTest("cloudwatch", "300s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}

@@ -15,7 +15,7 @@ import (
 )
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func GetConfigForTest(modulename string, metricSetName string, period string) (map[string]interface{}, string) {
+func GetConfigForTest(metricSetName string, period string) (map[string]interface{}, string) {
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
 	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
 	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
@@ -32,7 +32,7 @@ func GetConfigForTest(modulename string, metricSetName string, period string) (m
 		info = "Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty"
 	} else {
 		config = map[string]interface{}{
-			"module":            modulename,
+			"module":            "aws",
 			"period":            period,
 			"metricsets":        []string{metricSetName},
 			"access_key_id":     accessKeyID,

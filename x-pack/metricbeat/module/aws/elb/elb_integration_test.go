@@ -14,7 +14,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("aws", "elb", "300s")
+	config, info := mtest.GetConfigForTest("elb", "300s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}

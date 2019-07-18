@@ -16,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("aws", "s3_request", "86400s")
+	config, info := mtest.GetConfigForTest("s3_request", "86400s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -56,7 +56,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("aws", "s3_request", "86400s")
+	config, info := mtest.GetConfigForTest("s3_request", "86400s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}
