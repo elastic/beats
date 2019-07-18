@@ -155,6 +155,18 @@ func (c *CLIManager) Remove(name string) error {
 	return nil
 }
 
+// Export prints the exported function data.
+func (c *CLIManager) Export(name string) error {
+	tmpl, err := c.templateBuilder.RawTemplate(name)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(tmpl)
+
+	return nil
+}
+
 func (c *CLIManager) bucket() string {
 	return string(c.config.DeployBucket)
 }

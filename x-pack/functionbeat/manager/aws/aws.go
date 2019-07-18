@@ -13,7 +13,7 @@ import (
 // Bundle exposes the trigger supported by the AWS provider.
 var Bundle = provider.MustCreate(
 	"aws",
-	provider.NewDefaultProvider("aws", NewCLI, NewTemplateBuilder),
+	provider.NewDefaultProvider("aws", NewCLI, NewTemplateBuilder, ZipResources),
 	feature.NewDetails("AWS Lambda", "listen to events on AWS lambda", feature.Stable),
 ).MustAddFunction("cloudwatch_logs",
 	aws.NewCloudwatchLogs,

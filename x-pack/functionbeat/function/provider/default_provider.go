@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
 )
 
 // DefaultProvider implements the minimal required to retrieve and start functions.
@@ -22,6 +23,7 @@ type DefaultProvider struct {
 	log             *logp.Logger
 	managerFactory  CLIManagerFactory
 	templateFactory TemplateBuilderFactory
+	zipResourcer    ZipResourcesFunc
 }
 
 // NewDefaultProvider returns factory methods to handle generic provider.
@@ -29,6 +31,7 @@ func NewDefaultProvider(
 	name string,
 	manager CLIManagerFactory,
 	templater TemplateBuilderFactory,
+	resourcer ZipResourcesFunc,
 ) func(*logp.Logger, *Registry, *common.Config) (Provider, error) {
 	return func(log *logp.Logger, registry *Registry, cfg *common.Config) (Provider, error) {
 		c := &config.ProviderConfig{}
@@ -49,8 +52,14 @@ func NewDefaultProvider(
 			log:             log,
 			managerFactory:  manager,
 			templateFactory: templater,
+			zipResourcer:    resourcer,
 		}, nil
 	}
+}
+
+// ZipResourcer returns the function to retrieve files to be zipped.
+func (d *DefaultProvider) ZipResourcer() ZipResourcesFunc {
+	return d.zipResourcer
 }
 
 // Name returns the name of the provider.
@@ -95,6 +104,7 @@ func NewNullCli(_ *logp.Logger, _ *common.Config, _ Provider) (CLIManager, error
 func (*nullCLI) Deploy(_ string) error { return fmt.Errorf("deploy not implemented") }
 func (*nullCLI) Update(_ string) error { return fmt.Errorf("update not implemented") }
 func (*nullCLI) Remove(_ string) error { return fmt.Errorf("remove not implemented") }
+func (*nullCLI) Export(_ string) error { return fmt.Errorf("export not implemented") }
 
 // nullTemplateBuilder is used when a provider does not implement a template builder functionality.
 type nullTemplateBuilder struct{}
@@ -107,4 +117,9 @@ func NewNullTemplateBuilder(_ *logp.Logger, _ *common.Config, _ Provider) (Templ
 // RawTemplate returns a empty string.
 func (*nullTemplateBuilder) RawTemplate(_ string) (string, error) {
 	return "", fmt.Errorf("raw temaplate not implemented")
+}
+
+// NullZipResources returns an empty list of resources.
+func NullZipResources() map[string][]bundle.Resource {
+	return nil
 }

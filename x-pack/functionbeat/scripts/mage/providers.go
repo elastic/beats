@@ -16,8 +16,20 @@ var (
 
 	availableProviders = []string{
 		"aws",
+		"gcp",
 	}
 )
+
+// IsBuildableProvider returns if the function needs to be built for the selected provider.
+func IsBuildableProvider(provider string) bool {
+	switch provider {
+	case "aws":
+		return true
+	default:
+		return false
+	}
+
+}
 
 func getConfiguredProviders() []string {
 	providers := os.Getenv("PROVIDERS")

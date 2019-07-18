@@ -34,6 +34,7 @@ type Provider interface {
 	EnabledFunctions() ([]string, error)
 	CLIManager() (CLIManager, error)
 	TemplateBuilder() (TemplateBuilder, error)
+	ZipResourcer() ZipResourcesFunc
 	Name() string
 }
 
@@ -93,6 +94,37 @@ func IsAvailable(name string) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+func ListFunctions(provider string) ([]string, error) {
+	functions, err := feature.GlobalRegistry().LookupAll(getNamespace(provider))
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, len(functions))
+	for i, f := range functions {
+		names[i] = f.Name()
+	}
+	return names, nil
+}
+
+// Get returns the provider from a configuration.
+func Get(cfg *common.Config) (Provider, error) {
+	providers, err := List()
+	if err != nil {
+		return nil, err
+	}
+	if len(providers) != 1 {
+		return nil, fmt.Errorf("too many providers are available, expected one, got: %s", providers)
+	}
+
+	providerCfg, err := cfg.Child(providers[0], -1)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewProvider(providers[0], providerCfg)
 }
 
 // List returns the list of available providers.

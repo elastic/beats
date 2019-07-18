@@ -45,6 +45,10 @@ func Build() error {
 
 	// Building functions to deploy
 	for _, provider := range functionbeat.SelectedProviders {
+		if !functionbeat.IsBuildableProvider(provider) {
+			continue
+		}
+
 		inputFiles := filepath.Join("provider", provider, "main.go")
 		params.InputFiles = []string{inputFiles}
 		params.Name = devtools.BeatName + "-" + provider
@@ -78,6 +82,10 @@ func CrossBuild() error {
 
 	// Building functions to deploy
 	for _, provider := range functionbeat.SelectedProviders {
+		if !functionbeat.IsBuildableProvider(provider) {
+			continue
+		}
+
 		err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"), devtools.InDir("x-pack", "functionbeat", "provider", provider))
 		if err != nil {
 			return err

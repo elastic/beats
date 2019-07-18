@@ -23,7 +23,7 @@ const stdinName = "stdin"
 // Bundle exposes the local provider and the STDIN function.
 var Bundle = provider.MustCreate(
 	"local",
-	provider.NewDefaultProvider("local", provider.NewNullCli, provider.NewNullTemplateBuilder),
+	provider.NewDefaultProvider("local", provider.NewNullCli, provider.NewNullTemplateBuilder, provider.NullZipResources),
 	feature.NewDetails("local events", "allows to trigger events locally.", feature.Experimental),
 ).MustAddFunction(
 	stdinName,

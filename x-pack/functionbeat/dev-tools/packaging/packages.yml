@@ -60,11 +60,24 @@ shared:
   #
   # Binaries used to run functions.
   #
+  - &functionbeat_aws:
+    pkg/functionbeat-aws:
+      source: 'provider/aws/build/golang-crossbuild/aws-linux-amd64'
+      mode: 0755
+  - &functionbeat_gcp_pubsub:
+    pkg/pubsub/go.mod:
+      source: 'provider/gcp/pubsub/go.mod'
+      mode: 0644
+    pkg/pubsub/go.sum:
+      source: 'provider/gcp/pubsub/go.sum'
+      mode: 0644
+    pkg/pubsub/pubsub.go:
+      source: 'provider/gcp/pubsub/pubsub.go'
+      mode: 0644
   - &functionbeat_binaries
     files:
-      pkg/functionbeat-aws:
-        source: 'provider/aws/build/golang-crossbuild/aws-linux-amd64'
-        mode: 0755
+      <<: *functionbeat_aws
+      <<: *functionbeat_gcp_pubsub
 # specs is a list of named packaging "flavors".
 specs:
   functionbeat:

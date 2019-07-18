@@ -6,8 +6,10 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -15,6 +17,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
 )
 
 var output string
@@ -116,17 +119,39 @@ func genRemoveCmd() *cobra.Command {
 	return genCLICmd("remove", "Remove a function", (*cliHandler).Remove)
 }
 
+func genExportFunctionCmd() *cobra.Command {
+	return genCLICmd("function", "Export function template", (*cliHandler).Export)
+}
+
 func genPackageCmd() *cobra.Command {
+	var outputPattern string
 	cmd := &cobra.Command{
 		Use:   "package",
 		Short: "Package the configuration and the executable in a zip",
 		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
-			h, err := handler()
+			providers, err := initProviders()
 			if err != nil {
 				return err
 			}
 
-			return h.BuildPackage(output)
+			for _, p := range providers {
+				resourcer := p.ZipResourcer()
+				for providerSuffix, resources := range resourcer() {
+					content, err := core.MakeZip(resources)
+					if err != nil {
+						return err
+					}
+
+					output := strings.ReplaceAll(outputPattern, "{{.Provider}}", providerSuffix)
+					err = ioutil.WriteFile(output, content, 0644)
+					if err != nil {
+						return err
+					}
+
+					fmt.Fprintf(os.Stderr, "Generated package for provider %s at: %s\n", providerSuffix, output)
+				}
+			}
+			return nil
 		}),
 	}
 
@@ -136,34 +161,6 @@ func genPackageCmd() *cobra.Command {
 	}
 
 	defaultOutput := filepath.Join(dir, "package-{{.Provider}}.zip")
-	cmd.Flags().StringVarP(&output, "output", "o", defaultOutput, "full path pattern to the package")
+	cmd.Flags().StringVarP(&outputPattern, "output", "o", defaultOutput, "full path pattern to the package")
 	return cmd
-}
-
-func genExportFunctionCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "function",
-		Short: "Export function template",
-		Run: cli.RunWith(func(_ *cobra.Command, args []string) error {
-			providers, err := initProviders()
-			if err != nil {
-				return err
-			}
-
-			for _, p := range providers {
-				builder, err := p.TemplateBuilder()
-				if err != nil {
-					return err
-				}
-				for _, name := range args {
-					template, err := builder.RawTemplate(name)
-					if err != nil {
-						return fmt.Errorf("error generating raw template for %s: %+v", name, err)
-					}
-					fmt.Println(template)
-				}
-			}
-			return nil
-		}),
-	}
 }

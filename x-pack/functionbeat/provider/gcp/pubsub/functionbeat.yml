@@ -1,0 +1,181 @@
+###################### Functionbeat Configuration Example #######################
+
+# This file is an example configuration file highlighting only the most common
+# options. The functionbeat.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/functionbeat/index.html
+#
+
+#============================  Provider ===============================
+# Configure functions to run on AWS Lambda, currently we assume that the credentials
+# are present in the environment to correctly create the function when using the CLI.
+#
+# Configure functions to run on Google Cloud Platform, currently we assume that the credentials
+# are present in the environment to correctly create the function when using the CLI.
+#
+# Configure which region your project is located in.
+functionbeat.provider.gcp.location_id: "europe-west-3"
+# Configure which Google Cloud project to deploy your functions.
+functionbeat.provider.gcp.project_id: "sacred-particle-242912"
+# Configure the Google Cloud Storage we should upload the function artifact.
+functionbeat.provider.gcp.storage_url: "zipzip"
+
+functionbeat.provider.gcp.functions:
+  # Define the list of function availables, each function required to have a unique name.
+  # Create a function that accepts events coming from Google Pub/Sub.
+  - name: pubsub
+    enabled: true
+    type: pubsub
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "Google Cloud Function for Pub/Sub"
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # Default is 256MiB.
+    #memory_size: 256MiB
+
+    # Execution timeout in seconds. If the function does not finish in time,
+    # it is considered failed and terminated. Default is 60s.
+    #timeout: 60s
+
+    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
+    #service_account_email: {projectid}@appspot.gserviceaccount.com
+
+    # Labels of the function.
+    #labels:
+    # mylabel: label
+
+    # VPC Connector this function can connect to.
+    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
+    #vpc_connector: ""
+
+    # Number of maximum instances running at the same time. Default is unlimited.
+    #maximum_instances: 0
+
+    trigger:
+      event_type: "providers/cloud.pubsub/eventTypes/topic.publish"
+      resource: "projects/sacred-particle-242912/topics/my-function-topic"
+      #service: "pubsub.googleapis.com"
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  #index.codec: best_compression
+  #_source.enabled: false
+
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
+
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here or by using the `setup` command.
+#setup.dashboards.enabled: false
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
+
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
+
+cloud.id: "fnbeattest:ZXVyb3BlLXdlc3QzLmdjcC5jbG91ZC5lcy5pbyQ5NTJkMmI5ZTU5Njg0ZGM0ODBiZmM5YjJhZTBjNzYwYyQ0MTgyOGZjMjZlYzA0NTRmYjM2M2M4YTQyMmQ0M2I2NA=="
+cloud.auth: "elastic:e8xYdPPdVkzBCDyG70LFXwR8"
+
+#================================ Outputs =====================================
+
+# Configure what output to use when sending the data collected by the beat.
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+
+#================================ Processors =====================================
+
+# Configure processors to enhance or manipulate events generated by the beat.
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+
+#================================ Logging =====================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]
+
+#============================== Xpack Monitoring ===============================
+# functionbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
+
+# Set to true to enable the monitoring reporter.
+#monitoring.enabled: false
+
+# Uncomment to send the metrics to Elasticsearch. Most settings from the
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
+
+#================================= Migration ==================================
+
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: true

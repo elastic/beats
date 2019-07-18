@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/x-pack/functionbeat/manager/core"
+	"github.com/elastic/beats/x-pack/functionbeat/manager/core/bundle"
 	fnaws "github.com/elastic/beats/x-pack/functionbeat/provider/aws/aws"
 )
 
@@ -81,7 +82,8 @@ func (d *defaultTemplateBuilder) findFunction(name string) (installer, error) {
 // execute generates a template
 func (d *defaultTemplateBuilder) execute(name string) (templateData, error) {
 	d.log.Debug("Compressing all assets into an artifact")
-	content, err := core.MakeZip("aws")
+
+	content, err := core.MakeZip(zipResources())
 	if err != nil {
 		return templateData{}, err
 	}
@@ -314,4 +316,17 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 func checksum(data []byte) string {
 	sha := sha256.Sum256(data)
 	return base64.RawURLEncoding.EncodeToString(sha[:])
+}
+
+// ZipResources return the list of zip resources
+func ZipResources() map[string][]bundle.Resource {
+	return map[string][]bundle.Resource{
+		"aws": zipResources(),
+	}
+}
+
+func zipResources() []bundle.Resource {
+	return []bundle.Resource{
+		&bundle.LocalFile{Path: "pkg/functionbeat-aws", FileMode: 0755},
+	}
 }
