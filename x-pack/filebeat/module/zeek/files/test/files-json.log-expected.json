@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": 1547688796000,
-        "ecs.version": "1.0.0",
         "event.dataset": "zeek.files",
         "event.id": "C8I0zn3r9EPbfLgta6",
         "event.module": "zeek",
@@ -39,7 +38,6 @@
     },
     {
         "@timestamp": 1547688801000,
-        "ecs.version": "1.0.0",
         "event.dataset": "zeek.files",
         "event.id": "C6sjVo23iNApLnlAt6",
         "event.module": "zeek",

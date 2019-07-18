@@ -168,7 +168,6 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "version").Set(b.Info.Version)
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
-		monitoring.NewString(registry, "uuid").Set(b.Info.ID.String())
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
 
 		// Add additional info to state registry. This is also reported to monitoring
@@ -176,7 +175,6 @@ func Run(settings Settings, bt beat.Creator) error {
 		serviceRegistry := stateRegistry.NewRegistry("service")
 		monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
 		monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-		monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
 		beatRegistry := stateRegistry.NewRegistry("beat")
 		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
@@ -368,6 +366,13 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
+	// Set Beat ID in registry vars, in case it was loaded from meta file
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+
+	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
+	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
+
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
@@ -447,11 +452,14 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 
 //SetupSettings holds settings necessary for beat setup
 type SetupSettings struct {
-	Template        bool
 	Dashboard       bool
 	MachineLearning bool
 	Pipeline        bool
-	ILMPolicy       bool
+	IndexManagement bool
+	//Deprecated: use IndexManagementKey instead
+	Template bool
+	//Deprecated: use IndexManagementKey instead
+	ILMPolicy bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
@@ -471,37 +479,31 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			return err
 		}
 
-		if setup.Template || setup.ILMPolicy {
+		if setup.IndexManagement || setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
-
 			if outCfg.Name() != "elasticsearch" {
 				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
 			}
-
-			esConfig := outCfg.Config()
-			if b.IdxSupporter.Enabled() {
-				esClient, err := elasticsearch.NewConnectedClient(esConfig)
-				if err != nil {
-					return err
-				}
-
-				// prepare index by loading templates, lifecycle policies and write aliases
-
-				m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
-				var tmplLoadMode, ilmLoadMode = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
-				if setup.Template {
-					tmplLoadMode = idxmgmt.LoadModeOverwrite
-				}
-				if setup.ILMPolicy {
-					ilmLoadMode = idxmgmt.LoadModeOverwrite
-				}
-
-				err = m.Setup(tmplLoadMode, ilmLoadMode)
-				if err != nil {
-					return err
-				}
+			esClient, err := elasticsearch.NewConnectedClient(outCfg.Config())
+			if err != nil {
+				return err
 			}
-			fmt.Println("Index setup complete.")
+
+			var loadTemplate, loadILM = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
+			if setup.IndexManagement || setup.Template {
+				loadTemplate = idxmgmt.LoadModeOverwrite
+			}
+			if setup.IndexManagement || setup.ILMPolicy {
+				loadILM = idxmgmt.LoadModeOverwrite
+			}
+			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
+				fmt.Println(warn)
+			}
+			if err = m.Setup(loadTemplate, loadILM); err != nil {
+				return err
+			}
+			fmt.Println("Index setup finished.")
 		}
 
 		if setup.Dashboard {

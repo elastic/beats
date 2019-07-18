@@ -35,7 +35,7 @@ func TestErrorJson(t *testing.T) {
 
 	conn := Connection{
 		URL:  kibanaTs.URL,
-		http: http.DefaultClient,
+		HTTP: http.DefaultClient,
 	}
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
 	assert.Equal(t, http.StatusOK, code)
@@ -50,7 +50,7 @@ func TestErrorBadJson(t *testing.T) {
 
 	conn := Connection{
 		URL:  kibanaTs.URL,
-		http: http.DefaultClient,
+		HTTP: http.DefaultClient,
 	}
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
 	assert.Equal(t, http.StatusOK, code)
@@ -68,7 +68,7 @@ func TestSuccess(t *testing.T) {
 
 	conn := Connection{
 		URL:  kibanaTs.URL,
-		http: http.DefaultClient,
+		HTTP: http.DefaultClient,
 	}
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, http.Header{"foo": []string{"bar"}}, nil)
 	assert.Equal(t, http.StatusOK, code)

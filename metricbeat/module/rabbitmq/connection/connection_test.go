@@ -33,7 +33,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])

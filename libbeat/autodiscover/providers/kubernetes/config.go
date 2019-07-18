@@ -33,12 +33,11 @@ type Config struct {
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout"`
 
-	Prefix         string                  `config:"prefix"`
-	HintsEnabled   bool                    `config:"hints.enabled"`
-	DefaultDisable bool                    `config:"default.disable"`
-	Builders       []*common.Config        `config:"builders"`
-	Appenders      []*common.Config        `config:"appenders"`
-	Templates      template.MapperSettings `config:"templates"`
+	Prefix    string                  `config:"prefix"`
+	Hints     *common.Config          `config:"hints"`
+	Builders  []*common.Config        `config:"builders"`
+	Appenders []*common.Config        `config:"appenders"`
+	Templates template.MapperSettings `config:"templates"`
 }
 
 func defaultConfig() *Config {

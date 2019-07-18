@@ -18,6 +18,8 @@
 package status
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -52,6 +54,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := kibana.NewMetricSet(base)
 	if err != nil {
 		return nil, err
+	}
+
+	if ms.XPackEnabled {
+		return nil, fmt.Errorf("The %s metricset cannot be used with xpack.enabled: true", ms.FullyQualifiedName())
 	}
 
 	http, err := helper.NewHTTP(base)

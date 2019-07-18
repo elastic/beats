@@ -20,7 +20,7 @@ package docs
 import (
 	"github.com/magefile/mage/mg"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 var (
@@ -36,5 +36,5 @@ func RegisterDeps(deps ...interface{}) {
 // automatically open the browser to the docs.
 func Docs() error {
 	mg.SerialDeps(docsDeps...)
-	return mage.Docs.AsciidocBook()
+	return devtools.Docs.AsciidocBook()
 }

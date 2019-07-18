@@ -35,7 +35,11 @@ import (
 
 // Select Docker API version
 const (
-	shortIDLen = 12
+	shortIDLen                         = 12
+	dockerRequestTimeout               = 10 * time.Second
+	dockerWatchRequestTimeout          = 60 * time.Minute
+	dockerEventsWatchPityTimerInterval = 10 * time.Second
+	dockerEventsWatchPityTimerTimeout  = 10 * time.Minute
 )
 
 // Watcher reads docker events and keeps a list of known containers
@@ -68,16 +72,17 @@ type TLSConfig struct {
 
 type watcher struct {
 	sync.RWMutex
-	client             Client
-	ctx                context.Context
-	stop               context.CancelFunc
-	containers         map[string]*Container
-	deleted            map[string]time.Time // deleted annotations key -> last access time
-	cleanupTimeout     time.Duration
-	lastValidTimestamp int64
-	stopped            sync.WaitGroup
-	bus                bus.Bus
-	shortID            bool // whether to store short ID in "containers" too
+	client                     Client
+	ctx                        context.Context
+	stop                       context.CancelFunc
+	containers                 map[string]*Container
+	deleted                    map[string]time.Time // deleted annotations key -> last access time
+	cleanupTimeout             time.Duration
+	lastValidTimestamp         int64
+	lastWatchReceivedEventTime time.Time
+	stopped                    sync.WaitGroup
+	bus                        bus.Bus
+	shortID                    bool // whether to store short ID in "containers" too
 }
 
 // Container info retrieved by the watcher
@@ -224,13 +229,22 @@ func (w *watcher) watch() {
 	filter := filters.NewArgs()
 	filter.Add("type", "container")
 
-	options := types.EventsOptions{
-		Since:   fmt.Sprintf("%d", w.lastValidTimestamp),
-		Filters: filter,
-	}
-
 	for {
-		events, errors := w.client.Events(w.ctx, options)
+		options := types.EventsOptions{
+			Since:   fmt.Sprintf("%d", w.lastValidTimestamp),
+			Filters: filter,
+		}
+
+		logp.Debug("docker", "Fetching events since %s", options.Since)
+		ctx, cancel := context.WithTimeout(w.ctx, dockerWatchRequestTimeout)
+		defer cancel()
+
+		events, errors := w.client.Events(ctx, options)
+
+		//ticker for timeout to restart watcher when no events are received
+		w.lastWatchReceivedEventTime = time.Now()
+		tickChan := time.NewTicker(dockerEventsWatchPityTimerInterval)
+		defer tickChan.Stop()
 
 	WATCH:
 		for {
@@ -238,6 +252,7 @@ func (w *watcher) watch() {
 			case event := <-events:
 				logp.Debug("docker", "Got a new docker event: %v", event)
 				w.lastValidTimestamp = event.Time
+				w.lastWatchReceivedEventTime = time.Now()
 
 				// Add / update
 				if event.Action == "start" || event.Action == "update" {
@@ -289,17 +304,29 @@ func (w *watcher) watch() {
 				time.Sleep(1 * time.Second)
 				break WATCH
 
+			case <-tickChan.C:
+				if time.Since(w.lastWatchReceivedEventTime) > dockerEventsWatchPityTimerTimeout {
+					logp.Info("No events received withing %s, restarting watch call", dockerEventsWatchPityTimerTimeout)
+					time.Sleep(1 * time.Second)
+					break WATCH
+				}
+
 			case <-w.ctx.Done():
 				logp.Debug("docker", "Watcher stopped")
 				w.stopped.Done()
 				return
 			}
 		}
+
 	}
 }
 
 func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Container, error) {
-	containers, err := w.client.ContainerList(w.ctx, options)
+	logp.Debug("docker", "List containers")
+	ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
+	defer cancel()
+
+	containers, err := w.client.ContainerList(ctx, options)
 	if err != nil {
 		return nil, err
 	}
@@ -316,7 +343,10 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 		// If there are no network interfaces, assume that the container is on host network
 		// Inspect the container directly and use the hostname as the IP address in order
 		if len(ipaddresses) == 0 {
-			info, err := w.client.ContainerInspect(w.ctx, c.ID)
+			logp.Debug("docker", "Inspect container %s", c.ID)
+			ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
+			defer cancel()
+			info, err := w.client.ContainerInspect(ctx, c.ID)
 			if err == nil {
 				ipaddresses = append(ipaddresses, info.Config.Hostname)
 			} else {

@@ -138,12 +138,12 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 		Fields: common.MapStr{},
 	}
 
-	next, err := job(event)
+	conts, err := job(event)
 	if err != nil {
 		logp.Err("Job %v failed with: ", err)
 	}
 
-	hasContinuations := len(next) > 0
+	hasContinuations := len(conts) > 0
 
 	if event.Fields != nil && !eventext.IsEventCancelled(event) {
 		// If continuations are present we defensively publish a clone of the event
@@ -162,15 +162,20 @@ func runPublishJob(job jobs.Job, client beat.Client) []scheduler.TaskFunc {
 		}
 	}
 
-	if len(next) == 0 {
+	if !hasContinuations {
 		return nil
 	}
 
-	continuations := make([]scheduler.TaskFunc, len(next))
-	for i, n := range next {
-		continuations[i] = func() []scheduler.TaskFunc {
-			return runPublishJob(n, client)
+	contTasks := make([]scheduler.TaskFunc, len(conts))
+	for i, cont := range conts {
+		// Move the continuation into the local block scope
+		// This is important since execution is deferred
+		// Without this only the last continuation will be executed len(conts) times
+		localCont := cont
+
+		contTasks[i] = func() []scheduler.TaskFunc {
+			return runPublishJob(localCont, client)
 		}
 	}
-	return continuations
+	return contTasks
 }

@@ -44,8 +44,8 @@ var sysmon = (function () {
         var userParts = evt.Get("winlog.event_data.User").split("\\");
         if (userParts.length === 2) {
             evt.Delete("user");
-            evt.Put("user.name", userParts[0]);
-            evt.Put("user.domain", userParts[1]);
+            evt.Put("user.domain", userParts[0]);
+            evt.Put("user.name", userParts[1]);
             evt.Delete("winlog.event_data.User");
         }
     };

@@ -65,11 +65,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // an event for each mount point.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	fss, err := GetFileSystemList()
 	if err != nil {
-		r.Error(errors.Wrap(err, "filesystem list"))
-		return
+		return errors.Wrap(err, "error getting filesystem list")
+
 	}
 
 	if len(m.config.IgnoreTypes) > 0 {
@@ -88,8 +88,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			MetricSetFields: GetFilesystemEvent(fsStat),
 		}
 		if !r.Event(event) {
-			debugf("Failed to report event, interrupting Fetch")
-			return
+			return nil
 		}
 	}
+	return nil
 }

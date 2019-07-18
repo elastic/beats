@@ -1,0 +1,32 @@
+# HELP kafka_consumer_records_lag_records The latest lag of the partition
+# TYPE kafka_consumer_records_lag_records gauge
+kafka_consumer_records_lag_records{client_id="consumer1",} NaN
+kafka_consumer_records_lag_records{client_id="consumer2",} +Inf
+kafka_consumer_records_lag_records{client_id="consumer3",} -Inf
+kafka_consumer_records_lag_records{client_id="consumer4",} 5
+# HELP http_failures Total number of http request failures
+# TYPE http_failures counter
+http_failures{method="GET"} 2
+http_failures{method="POST"} NaN
+http_failures{method="DELETE"} +Inf
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0",} NaN
+go_gc_duration_seconds{quantile="0.25",} +Inf
+go_gc_duration_seconds{quantile="0.5",} -Inf
+go_gc_duration_seconds{quantile="0.75"} 9.8154e-05
+go_gc_duration_seconds{quantile="1",} 0.011689149
+go_gc_duration_seconds_sum 3.451780079
+go_gc_duration_seconds_count 13118
+# HELP http_request_duration_seconds request duration histogram
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le="0.1"} +Inf
+http_request_duration_seconds_bucket{le="0.2"} -Inf
+http_request_duration_seconds_bucket{le="0.5"} NaN
+http_request_duration_seconds_bucket{le="1"} 1
+http_request_duration_seconds_bucket{le="2"} 2
+http_request_duration_seconds_bucket{le="3"} 3
+http_request_duration_seconds_bucket{le="5"} 3
+http_request_duration_seconds_bucket{le="+Inf"} 3
+http_request_duration_seconds_sum 6
+http_request_duration_seconds_count 3

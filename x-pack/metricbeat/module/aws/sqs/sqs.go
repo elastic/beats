@@ -149,7 +149,7 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.D
 }
 
 func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
-	statistic := "Average"
+	statistic := "Sum"
 	periodInSec := int64(period.Seconds())
 	id := "sqs" + strconv.Itoa(index)
 	metricDims := metric.Dimensions

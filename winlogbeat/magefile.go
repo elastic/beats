@@ -22,7 +22,7 @@ package main
 import (
 	"github.com/magefile/mage/mg"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 
 	// mage:import
 	_ "github.com/elastic/beats/dev-tools/mage/target/common"
@@ -43,7 +43,7 @@ import (
 )
 
 func init() {
-	winlogbeat.SelectLogic = mage.OSSProject
+	winlogbeat.SelectLogic = devtools.OSSProject
 }
 
 // Update is an alias for update:all. This is a workaround for

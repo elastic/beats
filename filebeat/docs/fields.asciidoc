@@ -35,14 +35,17 @@ grouped in the following categories:
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-mssql>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-netflow>>
 * <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
+* <<exported-fields-panw>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
+* <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
@@ -1261,6 +1264,16 @@ Name of the project in Google Cloud.
 
 --
 
+*`cloud.image.id`*::
++
+--
+example: ami-abcd1234
+
+Image ID for the cloud instance.
+
+
+--
+
 *`meta.cloud.provider`*::
 +
 --
@@ -1607,7 +1620,7 @@ Version of the agent.
 == client fields
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
-For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
 Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
@@ -1767,6 +1780,8 @@ Packets sent from the client to the server.
 +
 --
 type: long
+
+format: string
 
 Port of the client.
 
@@ -2149,6 +2164,8 @@ Packets sent from the destination to the source.
 --
 type: long
 
+format: string
+
 Port of the destination.
 
 --
@@ -2446,6 +2463,8 @@ This is mainly useful if you use more than one system that assigns risk scores, 
 type: long
 
 example: 7
+
+format: string
 
 Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
 
@@ -3150,6 +3169,8 @@ type: long
 
 example: 404
 
+format: string
+
 HTTP response status code.
 
 --
@@ -3715,6 +3736,10 @@ Sometimes called program name or similar.
 --
 type: long
 
+example: 4242
+
+format: string
+
 Process id.
 
 --
@@ -3724,7 +3749,11 @@ Process id.
 --
 type: long
 
-Process parent id.
+example: 4241
+
+format: string
+
+Parent process' pid.
 
 --
 
@@ -3745,6 +3774,8 @@ The time the process started.
 type: long
 
 example: 4242
+
+format: string
 
 Thread ID.
 
@@ -3952,6 +3983,8 @@ Packets sent from the server to the client.
 +
 --
 type: long
+
+format: string
 
 Port of the server.
 
@@ -4269,6 +4302,8 @@ Packets sent from the source to the destination.
 --
 type: long
 
+format: string
+
 Port of the source.
 
 --
@@ -4417,6 +4452,8 @@ Path of the request, such as "/search".
 type: long
 
 example: 443
+
+format: string
 
 Port of the request, such as 443.
 
@@ -5014,7 +5051,7 @@ CPU time spent outside the kernel.
 --
 type: float
 
-CPU time spent inside the kernel. 
+CPU time spent inside the kernel.
 
 
 --
@@ -5180,7 +5217,7 @@ Young GC
 --
 type: long
 
-example: 
+example:
 
 
 
@@ -5191,7 +5228,7 @@ example:
 --
 type: long
 
-example: 
+example:
 
 
 
@@ -5263,7 +5300,7 @@ Time it took to execute the query
 --
 type: keyword
 
-example: 
+example:
 
 Types
 
@@ -5307,7 +5344,7 @@ Slow query
 --
 type: keyword
 
-example: 
+example:
 
 Extra source information
 
@@ -5351,7 +5388,7 @@ Routing
 --
 type: keyword
 
-example: 
+example:
 
 Id
 
@@ -5895,6 +5932,18 @@ OS build information.
 
 --
 
+*`host.os.codename`*::
++
+--
+type: keyword
+
+example: stretch
+
+OS codename, if any.
+
+
+--
+
 [[exported-fields-ibmmq]]
 == ibmmq fields
 
@@ -5914,166 +5963,42 @@ ibmmq Module
 IBM MQ error logs
 
 
-*`ibmmq.errorlog.process`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.user`*::
-+
---
-type: keyword
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.program`*::
-+
---
-type: keyword
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.hostname`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
 *`ibmmq.errorlog.installation`*::
 +
 --
 type: keyword
 
-example: Please add example
+This is the installation name which can be given at installation time.
+Each installation of IBM MQ on UNIX, Linux, and Windows, has a unique identifier known as an installation name. The installation name is used to associate things such as queue managers and configuration files with an installation.
 
-Please add description
-
---
-
-*`ibmmq.errorlog.vrmf`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
 
 --
 
 *`ibmmq.errorlog.qmgr`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
+Name of the queue manager. Queue managers provide queuing services to applications, and manages the queues that belong to them.
 
-Please add description
 
 --
 
-*`ibmmq.errorlog.iso8601_timestamp`*::
+*`ibmmq.errorlog.arithinsert`*::
 +
 --
-example: Please add example
+type: keyword
 
-Please add description
+Changing content based on error.id
 
 --
 
-*`ibmmq.errorlog.remotehost`*::
+*`ibmmq.errorlog.commentinsert`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.arithinsert1`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.arithinsert2`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.commentinsert1`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.commentinsert2`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.commentinsert3`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
-
---
-
-*`ibmmq.errorlog.errorcode`*::
-+
---
-type: text
-
-example: Please add example
-
-Please add description
+Changing content based on error.id
 
 --
 
@@ -6091,33 +6016,27 @@ Please add description
 *`ibmmq.errorlog.explanation`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Explaines the error in more detail
 
 --
 
 *`ibmmq.errorlog.action`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Defines what to do when the error occurs
 
 --
 
-*`ibmmq.severity`*::
+*`ibmmq.errorlog.code`*::
 +
 --
-type: text
+type: keyword
 
-example: Please add example
-
-Please add description
+Error code.
 
 --
 
@@ -7583,6 +7502,16 @@ alias to: event.created
 
 --
 
+*`docker.attrs`*::
++
+--
+type: object
+
+docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
+
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 
@@ -7844,6 +7773,33 @@ alias to: log.level
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-mssql]]
+== mssql fields
+
+MS SQL Filebeat Module
+
+
+[float]
+== mssql fields
+
+Fields from the MSSQL log files
+
+
+[float]
+== log fields
+
+Common log fields
+
+
+*`mssql.log.origin`*::
++
+--
+type: keyword
+
+Origin of the message, usually the server but it can also be a recovery process
 
 --
 
@@ -8169,7 +8125,7 @@ Number of merge passes that the sort algorithm has had to do.
 --
 type: long
 
-Number of sorts that were done using ranges. 
+Number of sorts that were done using ranges.
 
 
 --
@@ -8269,7 +8225,7 @@ The number of requests to read the previous row in key order.
 --
 type: long
 
-The number of requests to read a row based on a fixed position. 
+The number of requests to read a row based on a fixed position.
 
 
 --
@@ -12046,7 +12002,260 @@ Unix timestamp of the event, in seconds since the epoch. Used for computing the 
 *`osquery.result.calendar_time`*::
 +
 --
+type: keyword
+
 String representation of the collection time, as formatted by osquery.
+
+
+--
+
+[[exported-fields-panw]]
+== panw fields
+
+Module for Palo Alto Networks (PAN-OS)
+
+
+
+[float]
+== panw fields
+
+Fields from the panw module.
+
+
+
+[float]
+== panos fields
+
+Fields for the Palo Alto Networks PAN-OS logs.
+
+
+
+*`panw.panos.ruleset`*::
++
+--
+type: keyword
+
+Name of the rule that matched this session.
+
+
+--
+
+[float]
+== source fields
+
+Fields to extend the top-level source object.
+
+
+
+*`panw.panos.source.zone`*::
++
+--
+type: keyword
+
+Source zone for this session.
+
+
+--
+
+*`panw.panos.source.interface`*::
++
+--
+type: keyword
+
+Source interface for this session.
+
+
+--
+
+[float]
+== nat fields
+
+Post-NAT source address, if source NAT is performed.
+
+
+
+*`panw.panos.source.nat.ip`*::
++
+--
+type: ip
+
+Post-NAT source IP.
+
+
+--
+
+*`panw.panos.source.nat.port`*::
++
+--
+type: long
+
+Post-NAT source port.
+
+
+--
+
+[float]
+== destination fields
+
+Fields to extend the top-level destination object.
+
+
+
+*`panw.panos.destination.zone`*::
++
+--
+type: keyword
+
+Destination zone for this session.
+
+
+--
+
+*`panw.panos.destination.interface`*::
++
+--
+type: keyword
+
+Destination interface for this session.
+
+
+--
+
+[float]
+== nat fields
+
+Post-NAT destination address, if destination NAT is performed.
+
+
+
+*`panw.panos.destination.nat.ip`*::
++
+--
+type: ip
+
+Post-NAT destination IP.
+
+
+--
+
+*`panw.panos.destination.nat.port`*::
++
+--
+type: long
+
+Post-NAT destination port.
+
+
+--
+
+[float]
+== network fields
+
+Fields to extend the top-level network object.
+
+
+
+*`panw.panos.network.pcap_id`*::
++
+--
+type: keyword
+
+Packet capture ID for a threat.
+
+
+--
+
+
+*`panw.panos.network.nat.community_id`*::
++
+--
+type: keyword
+
+Community ID flow-hash for the NAT 5-tuple.
+
+
+--
+
+[float]
+== file fields
+
+Fields to extend the top-level file object.
+
+
+
+*`panw.panos.file.hash`*::
++
+--
+type: keyword
+
+Binary hash for a threat file sent to be analyzed by the WildFire service.
+
+
+--
+
+[float]
+== url fields
+
+Fields to extend the top-level url object.
+
+
+
+*`panw.panos.url.category`*::
++
+--
+type: keyword
+
+For threat URLs, it's the URL category. For WildFire, the verdict on the file and is either 'malicious', 'grayware', or 'benign'.
+
+
+--
+
+*`panw.panos.flow_id`*::
++
+--
+type: keyword
+
+Internal numeric identifier for each session.
+
+
+--
+
+*`panw.panos.sequence_number`*::
++
+--
+type: long
+
+Log entry identifier that is incremented sequentially. Unique for each log type.
+
+
+--
+
+*`panw.panos.threat.resource`*::
++
+--
+type: keyword
+
+URL or file name for a threat.
+
+
+--
+
+*`panw.panos.threat.id`*::
++
+--
+type: keyword
+
+Palo Alto Networks identifier for the threat.
+
+
+--
+
+*`panw.panos.threat.name`*::
++
+--
+type: keyword
+
+Palo Alto Networks name for the threat.
 
 
 --
@@ -12075,6 +12284,9 @@ Fields from the PostgreSQL log files.
 *`postgresql.log.timestamp`*::
 +
 --
+
+deprecated[7.3.0]
+
 The timestamp from the log line.
 
 
@@ -12167,6 +12379,37 @@ Process metadata fields
 type: alias
 
 alias to: process.executable
+
+--
+
+[[exported-fields-rabbitmq]]
+== RabbitMQ fields
+
+RabbitMQ Module
+
+
+
+[float]
+== rabbitmq fields
+
+
+
+
+[float]
+== log fields
+
+RabbitMQ log files
+
+
+
+*`rabbitmq.log.pid`*::
++
+--
+type: keyword
+
+example: <0.222.0>
+
+The Erlang process id
 
 --
 
@@ -14577,7 +14820,7 @@ Fields from Zeek/Bro logs after normalization
 --
 type: keyword
 
-A unique identifier of the session 
+A unique identifier of the session
 
 
 --
@@ -14767,7 +15010,7 @@ A descriptive name for the response code value
 --
 type: boolean
 
-The Authoritative Answer bit for response messages specifies that the responding 
+The Authoritative Answer bit for response messages specifies that the responding
 name server is an authority for the domain name in the question section
 
 
@@ -14788,7 +15031,7 @@ The Truncation bit specifies that the message was truncated
 --
 type: boolean
 
-The Recursion Desired bit in a request message indicates that the client 
+The Recursion Desired bit in a request message indicates that the client
 wants recursive service for this query
 
 
@@ -14799,7 +15042,7 @@ wants recursive service for this query
 --
 type: boolean
 
-The Recursion Available bit in a response message indicates that the name 
+The Recursion Available bit in a response message indicates that the name
 server supports recursive queries.
 
 
@@ -14840,7 +15083,7 @@ Indicates whether the DNS query was rejected by the server
 --
 type: integer
 
-The total number of resource records in the reply 
+The total number of resource records in the reply
 
 
 --
@@ -14920,7 +15163,7 @@ Last seen 1xx informational reply message returned by the server.
 --
 type: keyword
 
-A set of indicators of various attributes discovered and related to a particular 
+A set of indicators of various attributes discovered and related to a particular
 request/response pair.
 
 
@@ -14971,7 +15214,7 @@ Indicates if this request can assume 206 partial content in response
 --
 type: keyword
 
-The vector of HTTP header names sent by the client. No header values 
+The vector of HTTP header names sent by the client. No header values
 are included here, just the header names.
 
 
@@ -14982,7 +15225,7 @@ are included here, just the header names.
 --
 type: keyword
 
-The vector of HTTP header names sent by the server. No header values 
+The vector of HTTP header names sent by the server. No header values
 are included here, just the header names
 
 
@@ -15113,8 +15356,8 @@ The sessions that have this file
 --
 type: keyword
 
-An identification of the source of the file data. E.g. it may be a network protocol 
-over which it was transferred, or a local file path which was read, or some other 
+An identification of the source of the file data. E.g. it may be a network protocol
+over which it was transferred, or a local file path which was read, or some other
 input source
 
 
@@ -15125,8 +15368,8 @@ input source
 --
 type: long
 
-A value to represent the depth of this file in relation to its source. In SMTP, it 
-is the depth of the MIME attachment on the message. In HTTP, it is the depth of the 
+A value to represent the depth of this file in relation to its source. In SMTP, it
+is the depth of the MIME attachment on the message. In HTTP, it is the depth of the
 request within the TCP connection
 
 
@@ -15167,7 +15410,7 @@ Name of the file if available
 --
 type: boolean
 
-If the source of this file is a network connection, this field indicates if the data 
+If the source of this file is a network connection, this field indicates if the data
 originated from the local network or not
 
 
@@ -15178,7 +15421,7 @@ originated from the local network or not
 --
 type: boolean
 
-If the source of this file is a network connection, this field indicates if the file is 
+If the source of this file is a network connection, this field indicates if the file is
 being sent by the originator of the connection or the responder
 
 
@@ -15219,7 +15462,7 @@ Total number of bytes that are supposed to comprise the full file
 --
 type: long
 
-The number of bytes in the file stream that were completely missed during the process 
+The number of bytes in the file stream that were completely missed during the process
 of analysis
 
 
@@ -15230,7 +15473,7 @@ of analysis
 --
 type: long
 
-The number of bytes in the file stream that were not delivered to stream file analyzers. 
+The number of bytes in the file stream that were not delivered to stream file analyzers.
 This could be overlapping bytes or bytes that couldn't be reassembled
 
 
@@ -15251,7 +15494,7 @@ Whether the file analysis timed out at least once for the file
 --
 type: keyword
 
-Identifier associated with a container file from which this one was extracted as part of 
+Identifier associated with a container file from which this one was extracted as part of
 the file analysis
 
 
@@ -15362,7 +15605,7 @@ Elliptic curve that was logged when using ECDH/ECDHE
 --
 type: keyword
 
-Value of the Server Name Indicator SSL/TLS extension. It indicates the server name 
+Value of the Server Name Indicator SSL/TLS extension. It indicates the server name
 that the client was requesting
 
 
@@ -15373,7 +15616,7 @@ that the client was requesting
 --
 type: boolean
 
-Flag to indicate if the session was resumed reusing the key material exchanged in an 
+Flag to indicate if the session was resumed reusing the key material exchanged in an
 earlier connection
 
 
@@ -15554,8 +15797,8 @@ Identifier associated with a container file from which this one was extracted
 --
 type: keyword
 
-An identification of the source of the file data. E.g. it may be a network protocol 
-over which it was transferred, or a local file path which was read, or some other 
+An identification of the source of the file data. E.g. it may be a network protocol
+over which it was transferred, or a local file path which was read, or some other
 input source
 
 
@@ -15576,7 +15819,7 @@ A mime type if the notice is related to a file
 --
 type: boolean
 
-If the source of this file is a network connection, this field indicates if the file is 
+If the source of this file is a network connection, this field indicates if the file is
 being sent by the originator of the connection or the responder
 
 
@@ -15607,7 +15850,7 @@ Total number of bytes that are supposed to comprise the full file
 --
 type: long
 
-The number of bytes in the file stream that were completely missed during the process 
+The number of bytes in the file stream that were completely missed during the process
 of analysis
 
 
@@ -15618,7 +15861,7 @@ of analysis
 --
 type: long
 
-The number of bytes in the file stream that were not delivered to stream file analyzers. 
+The number of bytes in the file stream that were not delivered to stream file analyzers.
 This could be overlapping bytes or bytes that couldn't be reassembled
 
 
@@ -15709,7 +15952,7 @@ The actions which have been applied to this notice
 --
 type: text
 
-By adding chunks of text into this element, other scripts can expand on notices 
+By adding chunks of text into this element, other scripts can expand on notices
 that are being emailed
 
 
@@ -15720,8 +15963,8 @@ that are being emailed
 --
 type: keyword
 
-Adding a string token to this set will cause the built-in emailing functionality 
-to delay sending the email either the token has been removed or the email 
+Adding a string token to this set will cause the built-in emailing functionality
+to delay sending the email either the token has been removed or the email
 has been delayed for the specified time duration
 
 
@@ -15756,4 +15999,3 @@ Indicate if the source IP address was dropped and denied network access
 
 
 --
-

@@ -1069,7 +1069,7 @@
       "category": "authentication",
       "code": 4625,
       "kind": "event",
-      "type": "authentication_failed"
+      "type": "authentication_failure"
     },
     "log": {
       "level": "information"

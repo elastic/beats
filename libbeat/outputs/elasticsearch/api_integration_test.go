@@ -61,7 +61,7 @@ func TestIndex(t *testing.T) {
 	}
 	_, result, err := client.SearchURIWithBody(index, "", nil, map[string]interface{}{})
 	if err != nil {
-		t.Errorf("SearchUriWithBody() returns an error: %s", err)
+		t.Fatalf("SearchUriWithBody() returns an error: %s", err)
 	}
 	if result.Hits.Total.Value != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
@@ -72,7 +72,7 @@ func TestIndex(t *testing.T) {
 	}
 	_, result, err = client.SearchURI(index, "test", params)
 	if err != nil {
-		t.Errorf("SearchUri() returns an error: %s", err)
+		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
 	if result.Hits.Total.Value != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)

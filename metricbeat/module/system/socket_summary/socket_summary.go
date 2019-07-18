@@ -20,6 +20,7 @@ package socket_summary
 import (
 	"syscall"
 
+	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -43,6 +44,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sockstat string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -114,17 +116,24 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
-
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// all network connections
 	conns, err := net.Connections("inet")
 
 	if err != nil {
-		report.Error(err)
-		return
+		return errors.Wrap(err, "error getting connections")
+	}
+
+	stats := calculateConnStats(conns)
+	newStats, err := applyEnhancements(stats, m)
+	if err != nil {
+		m.Logger().Debugf("error applying enhancements: %s", err)
+		newStats = stats
 	}
 
 	report.Event(mb.Event{
-		MetricSetFields: calculateConnStats(conns),
+		MetricSetFields: newStats,
 	})
+
+	return nil
 }

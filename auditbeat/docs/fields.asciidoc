@@ -2544,6 +2544,16 @@ Name of the project in Google Cloud.
 
 --
 
+*`cloud.image.id`*::
++
+--
+example: ami-abcd1234
+
+Image ID for the cloud instance.
+
+
+--
+
 *`meta.cloud.provider`*::
 +
 --
@@ -3055,7 +3065,7 @@ Version of the agent.
 == client fields
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
-For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
 Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
@@ -3215,6 +3225,8 @@ Packets sent from the client to the server.
 +
 --
 type: long
+
+format: string
 
 Port of the client.
 
@@ -3597,6 +3609,8 @@ Packets sent from the destination to the source.
 --
 type: long
 
+format: string
+
 Port of the destination.
 
 --
@@ -3894,6 +3908,8 @@ This is mainly useful if you use more than one system that assigns risk scores, 
 type: long
 
 example: 7
+
+format: string
 
 Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
 
@@ -4598,6 +4614,8 @@ type: long
 
 example: 404
 
+format: string
+
 HTTP response status code.
 
 --
@@ -5163,6 +5181,10 @@ Sometimes called program name or similar.
 --
 type: long
 
+example: 4242
+
+format: string
+
 Process id.
 
 --
@@ -5172,7 +5194,11 @@ Process id.
 --
 type: long
 
-Process parent id.
+example: 4241
+
+format: string
+
+Parent process' pid.
 
 --
 
@@ -5193,6 +5219,8 @@ The time the process started.
 type: long
 
 example: 4242
+
+format: string
 
 Thread ID.
 
@@ -5400,6 +5428,8 @@ Packets sent from the server to the client.
 +
 --
 type: long
+
+format: string
 
 Port of the server.
 
@@ -5717,6 +5747,8 @@ Packets sent from the source to the destination.
 --
 type: long
 
+format: string
+
 Port of the source.
 
 --
@@ -5865,6 +5897,8 @@ Path of the request, such as "/search".
 type: long
 
 example: 443
+
+format: string
 
 Port of the request, such as 443.
 
@@ -6276,6 +6310,18 @@ type: keyword
 example: 18D109
 
 OS build information.
+
+
+--
+
+*`host.os.codename`*::
++
+--
+type: keyword
+
+example: stretch
+
+OS codename, if any.
 
 
 --
@@ -6825,6 +6871,16 @@ IP addresses.
 `os` contains information about the operating system.
 
 
+
+*`system.audit.host.os.codename`*::
++
+--
+type: keyword
+
+OS codename, if any (e.g. stretch).
+
+
+--
 
 *`system.audit.host.os.platform`*::
 +

@@ -103,3 +103,10 @@
       type: alias
       path: event.created
       migration: true
+
+    - name: docker.attrs
+      type: object
+      object_type: keyword
+      description: >
+        docker.attrs contains labels and environment variables written by docker's JSON File logging driver.
+        These fields are only available when they are configured in the logging driver options.

@@ -86,7 +86,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +275,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	}
 
 	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(annotations, cname, p.config.Prefix, p.config.DefaultDisable)
+	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
 	logp.Debug("kubernetes", "Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints

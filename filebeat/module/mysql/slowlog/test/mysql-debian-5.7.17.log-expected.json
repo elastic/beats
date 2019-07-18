@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2017-04-28T09:07:39.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 4071491000,
         "event.module": "mysql",
@@ -24,7 +23,6 @@
     },
     {
         "@timestamp": "2017-04-28T09:16:30.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 10346539000,
         "event.module": "mysql",
@@ -47,7 +45,6 @@
     },
     {
         "@timestamp": "2017-04-28T09:31:31.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.slowlog",
         "event.duration": 10508030000,
         "event.module": "mysql",

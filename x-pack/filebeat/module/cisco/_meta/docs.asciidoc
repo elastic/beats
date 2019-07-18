@@ -5,6 +5,8 @@
 
 == Cisco module
 
+beta[]
+
 This is a module for Cisco network device's logs. Currently supports the `asa`
 fileset for Cisco ASA firewall logs received over syslog or read from a file.
 
@@ -13,9 +15,6 @@ supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
 {beatname_uc}.
 
 include::../include/what-happens.asciidoc[]
-
-[float]
-=== Compatibility
 
 include::../include/running-modules.asciidoc[]
 

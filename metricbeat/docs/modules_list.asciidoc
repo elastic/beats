@@ -23,9 +23,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
-|<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
-|<<metricbeat-module-coredns,coredns>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-coredns,coredns>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>> beta[]  
 |<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
@@ -144,9 +144,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-redis-key,key>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.14+| .14+|  |<<metricbeat-metricset-system-core,core>>   
+.15+| .15+|  |<<metricbeat-metricset-system-core,core>>   
 |<<metricbeat-metricset-system-cpu,cpu>>   
 |<<metricbeat-metricset-system-diskio,diskio>>   
+|<<metricbeat-metricset-system-entropy,entropy>>   
 |<<metricbeat-metricset-system-filesystem,filesystem>>   
 |<<metricbeat-metricset-system-fsstat,fsstat>>   
 |<<metricbeat-metricset-system-load,load>>   

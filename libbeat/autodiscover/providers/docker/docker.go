@@ -71,7 +71,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix, d.config.DefaultDisable)
+		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}
 	return e

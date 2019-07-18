@@ -1,6 +1,6 @@
 :modulename: ibmmq
 
-== ibmmq module
+== IBM MQ module
 
 This is the ibmmq module.
 
@@ -19,22 +19,29 @@ include::../include/running-modules.asciidoc[]
 
 This module comes with a sample dashboard. For example:
 
-TODO: include an image of a sample dashboard
+[role="screenshot"]
+image::./images/filebeat-ibmmq.png[]
+
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
 
-:fileset_ex: {fileset}
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for IBM MQ errorlog:
+
+["source","yaml",subs="attributes"]
+-----
+- module: ibmmq
+  errorlog:
+    enabled: true
+    var.paths: ["C:/ibmmq/logs/*.log"]
+-----
+:fileset_ex: errorlog
 
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
-
 [float]
-==== `{fileset}` log fileset settings
+==== `errorlog` log fileset settings
 
 include::../include/var-paths.asciidoc[]
 

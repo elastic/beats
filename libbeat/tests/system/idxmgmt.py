@@ -7,17 +7,20 @@ class IdxMgmt(object):
 
     def __init__(self, client, index):
         self._client = client
-        if index == "":
-            index == "mockbeat"
-        self._index = index
+        self._index = index if index != '' and index != '*' else 'mockbeat'
 
     def needs_init(self, s):
         return s == '' or s == '*'
 
-    def delete(self, index="", template="", policy=""):
-        self.delete_index_and_alias(index=index)
-        self.delete_template(template=template)
-        self.delete_policy(policy=policy)
+    def delete(self, indices=[]):
+        indices = list(filter(lambda x: x != '', indices))
+        if not indices:
+            indices == [self._index]
+        for i in indices:
+            self.delete_index_and_alias(i)
+            self.delete_template(template=i)
+        for i in indices:
+            self.delete_policy(policy=i)
 
     def delete_index_and_alias(self, index=""):
         if self.needs_init(index):

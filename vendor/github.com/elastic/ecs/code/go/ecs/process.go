@@ -35,7 +35,7 @@ type Process struct {
 	// Sometimes called program name or similar.
 	Name string `ecs:"name"`
 
-	// Process parent id.
+	// Parent process' pid.
 	PPID int64 `ecs:"ppid"`
 
 	// Array of process arguments.

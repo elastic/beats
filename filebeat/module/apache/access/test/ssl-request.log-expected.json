@@ -3,7 +3,6 @@
         "@timestamp": "2018-08-10T07:45:56.000Z",
         "apache.access.ssl.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
         "apache.access.ssl.protocol": "TLSv1.2",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",

@@ -7,14 +7,14 @@
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
-    {{ if eq .GOOS "linux" -}}
+    {{- if eq .GOOS "linux" }}
     - login   # User logins, logouts, and system boots.
-    {{- end }}
-    {{ if ne .GOOS "windows" -}}
+    {{- end -}}
+    {{- if ne .GOOS "windows" }}
     - package # Installed, updated, and removed packages
     {{- end }}
     - process # Started and stopped processes
-    {{ if eq .GOOS "linux" -}}
+    {{- if eq .GOOS "linux" }}
     - socket  # Opened and closed sockets
     - user    # User information
     {{- end }}
@@ -28,11 +28,11 @@
 
   # The state.period can be overridden for any dataset.
   # host.state.period: 12h
-  {{ if ne .GOOS "windows" -}}
+  {{- if ne .GOOS "windows" }}
   # package.state.period: 12h
   {{- end }}
   # process.state.period: 12h
-  {{ if eq .GOOS "linux" -}}
+  {{- if eq .GOOS "linux" }}
   # socket.state.period: 12h
   # user.state.period: 12h
   {{- end }}

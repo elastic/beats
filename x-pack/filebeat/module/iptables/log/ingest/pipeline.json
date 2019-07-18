@@ -64,11 +64,19 @@
                 "date": {
                     "field": "iptables.raw_date",
                     "ignore_failure": true,
-                    {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
                     "formats": [
                         "MMM  d HH:mm:ss",
                         "MMM dd HH:mm:ss"
                     ]
+                }
+            },
+            {
+                "date": {
+                    "if": "ctx.event.timezone != null",
+                    "field": "@timestamp",
+                    "formats": ["ISO8601"],
+                    "timezone": "{{ event.timezone }}",
+                    "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
                 }
             },
             {

@@ -25,9 +25,6 @@ When you run the module, it performs a few tasks under the hood:
 
 * Deploys dashboards for visualizing the log data.
 
-[float]
-=== Compatibility
-
 include::../include/running-modules.asciidoc[]
 
 [float]

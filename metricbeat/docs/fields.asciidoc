@@ -2392,6 +2392,16 @@ Name of the project in Google Cloud.
 
 --
 
+*`cloud.image.id`*::
++
+--
+example: ami-abcd1234
+
+Image ID for the cloud instance.
+
+
+--
+
 *`meta.cloud.provider`*::
 +
 --
@@ -4539,6 +4549,49 @@ Memory metrics.
 
 
 
+[float]
+== commit fields
+
+Committed bytes on Windows
+
+
+
+*`docker.memory.commit.total`*::
++
+--
+type: long
+
+format: bytes
+
+Total bytes
+
+
+--
+
+*`docker.memory.commit.peak`*::
++
+--
+type: long
+
+format: bytes
+
+Peak committed bytes on Windows
+
+
+--
+
+*`docker.memory.private_working_set.total`*::
++
+--
+type: long
+
+format: bytes
+
+private working sets on Windows
+
+
+--
+
 *`docker.memory.fail.count`*::
 +
 --
@@ -4991,7 +5044,7 @@ Version of the agent.
 == client fields
 
 A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records.
-For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields. Client fields are generally not populated for packet-level events.
 Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
@@ -5151,6 +5204,8 @@ Packets sent from the client to the server.
 +
 --
 type: long
+
+format: string
 
 Port of the client.
 
@@ -5533,6 +5588,8 @@ Packets sent from the destination to the source.
 --
 type: long
 
+format: string
+
 Port of the destination.
 
 --
@@ -5830,6 +5887,8 @@ This is mainly useful if you use more than one system that assigns risk scores, 
 type: long
 
 example: 7
+
+format: string
 
 Severity describes the original severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
 
@@ -6534,6 +6593,8 @@ type: long
 
 example: 404
 
+format: string
+
 HTTP response status code.
 
 --
@@ -7099,6 +7160,10 @@ Sometimes called program name or similar.
 --
 type: long
 
+example: 4242
+
+format: string
+
 Process id.
 
 --
@@ -7108,7 +7173,11 @@ Process id.
 --
 type: long
 
-Process parent id.
+example: 4241
+
+format: string
+
+Parent process' pid.
 
 --
 
@@ -7129,6 +7198,8 @@ The time the process started.
 type: long
 
 example: 4242
+
+format: string
 
 Thread ID.
 
@@ -7336,6 +7407,8 @@ Packets sent from the server to the client.
 +
 --
 type: long
+
+format: string
 
 Port of the server.
 
@@ -7653,6 +7726,8 @@ Packets sent from the source to the destination.
 --
 type: long
 
+format: string
+
 Port of the source.
 
 --
@@ -7801,6 +7876,8 @@ Path of the request, such as "/search".
 type: long
 
 example: 443
+
+format: string
 
 Port of the request, such as 443.
 
@@ -11704,6 +11781,18 @@ OS build information.
 
 --
 
+*`host.os.codename`*::
++
+--
+type: keyword
+
+example: stretch
+
+OS codename, if any.
+
+
+--
+
 [[exported-fields-http]]
 == HTTP fields
 
@@ -13855,7 +13944,7 @@ Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or
 *`kubernetes.container.cpu.limit.cores`*::
 +
 --
-type: long
+type: float
 
 Container CPU cores limit
 
@@ -13865,7 +13954,7 @@ Container CPU cores limit
 *`kubernetes.container.cpu.request.cores`*::
 +
 --
-type: long
+type: float
 
 Container CPU requested cores
 
@@ -19467,6 +19556,434 @@ The number of UPDATE queries since startup.
 
 --
 
+*`mysql.status.queries`*::
++
+--
+type: long
+
+The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable. It does not count COM_PING or COM_STATISTICS commands.
+
+
+--
+
+*`mysql.status.questions`*::
++
+--
+type: long
+
+The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable. This variable does not count COM_PING, COM_STATISTICS, COM_STMT_PREPARE, COM_STMT_CLOSE, or COM_STMT_RESET commands.
+
+
+--
+
+[float]
+== handler fields
+
+
+
+
+*`mysql.status.handler.commit`*::
++
+--
+type: long
+
+The number of internal COMMIT statements.
+
+
+--
+
+*`mysql.status.handler.delete`*::
++
+--
+type: long
+
+The number of times that rows have been deleted from tables.
+
+
+--
+
+*`mysql.status.handler.external_lock`*::
++
+--
+type: long
+
+The server increments this variable for each call to its external_lock() function, which generally occurs at the beginning and end of access to a table instance.
+
+
+--
+
+*`mysql.status.handler.mrr_init`*::
++
+--
+type: long
+
+The number of times the server uses a storage engine's own Multi-Range Read implementation for table access.
+
+
+--
+
+*`mysql.status.handler.prepare`*::
++
+--
+type: long
+
+A counter for the prepare phase of two-phase commit operations.
+
+
+--
+
+[float]
+== read fields
+
+
+
+
+*`mysql.status.handler.read.first`*::
++
+--
+type: long
+
+The number of times the first entry in an index was read.
+
+
+--
+
+*`mysql.status.handler.read.key`*::
++
+--
+type: long
+
+The number of requests to read a row based on a key.
+
+
+--
+
+*`mysql.status.handler.read.last`*::
++
+--
+type: long
+
+The number of requests to read the last key in an index. 
+
+
+--
+
+*`mysql.status.handler.read.next`*::
++
+--
+type: long
+
+The number of requests to read the next row in key order.
+
+
+--
+
+*`mysql.status.handler.read.prev`*::
++
+--
+type: long
+
+The number of requests to read the previous row in key order.
+
+
+--
+
+*`mysql.status.handler.read.rnd`*::
++
+--
+type: long
+
+The number of requests to read a row based on a fixed position. 
+
+
+--
+
+*`mysql.status.handler.read.rnd_next`*::
++
+--
+type: long
+
+The number of requests to read the next row in the data file. 
+
+
+--
+
+*`mysql.status.handler.rollback`*::
++
+--
+type: long
+
+The number of requests for a storage engine to perform a rollback operation.
+
+
+--
+
+*`mysql.status.handler.savepoint`*::
++
+--
+type: long
+
+The number of requests for a storage engine to place a savepoint.
+
+
+--
+
+*`mysql.status.handler.savepoint_rollback`*::
++
+--
+type: long
+
+The number of requests for a storage engine to roll back to a savepoint.
+
+
+--
+
+*`mysql.status.handler.update`*::
++
+--
+type: long
+
+The number of requests to update a row in a table.
+
+
+--
+
+*`mysql.status.handler.write`*::
++
+--
+type: long
+
+The number of requests to insert a row in a table.
+
+
+--
+
+[float]
+== innodb fields
+
+
+
+
+[float]
+== buffer_pool fields
+
+
+
+
+*`mysql.status.innodb.buffer_pool.dump_status`*::
++
+--
+type: long
+
+The progress of an operation to record the pages held in the InnoDB buffer pool, triggered by the setting of innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.load_status`*::
++
+--
+type: long
+
+The progress of an operation to warm up the InnoDB buffer pool by reading in a set of pages corresponding to an earlier point in time, triggered by the setting of innodb_buffer_pool_load_at_startup or innodb_buffer_pool_load_now.
+
+
+--
+
+[float]
+== bytes fields
+
+
+
+
+*`mysql.status.innodb.buffer_pool.bytes.data`*::
++
+--
+type: long
+
+The total number of bytes in the InnoDB buffer pool containing data. 
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.bytes.dirty`*::
++
+--
+type: long
+
+The total current number of bytes held in dirty pages in the InnoDB buffer pool.
+
+
+--
+
+[float]
+== pages fields
+
+
+
+
+*`mysql.status.innodb.buffer_pool.pages.data`*::
++
+--
+type: long
+
+he number of pages in the InnoDB buffer pool containing data.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pages.dirty`*::
++
+--
+type: long
+
+The current number of dirty pages in the InnoDB buffer pool.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pages.flushed`*::
++
+--
+type: long
+
+The number of requests to flush pages from the InnoDB buffer pool.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pages.free`*::
++
+--
+type: long
+
+The number of free pages in the InnoDB buffer pool.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pages.latched`*::
++
+--
+type: long
+
+The number of latched pages in the InnoDB buffer pool.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pages.misc`*::
++
+--
+type: long
+
+The number of pages in the InnoDB buffer pool that are busy because they have been allocated for administrative overhead, such as row locks or the adaptive hash index.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pages.total`*::
++
+--
+type: long
+
+The total size of the InnoDB buffer pool, in pages.
+
+
+--
+
+[float]
+== read fields
+
+
+
+
+*`mysql.status.innodb.buffer_pool.read.ahead`*::
++
+--
+type: long
+
+The number of pages read into the InnoDB buffer pool by the read-ahead background thread.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.read.ahead_evicted`*::
++
+--
+type: long
+
+The number of pages read into the InnoDB buffer pool by the read-ahead background thread that were subsequently evicted without having been accessed by queries.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.read.ahead_rnd`*::
++
+--
+type: long
+
+The number of "random" read-aheads initiated by InnoDB.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.read.requests`*::
++
+--
+type: long
+
+The number of logical read requests.
+
+
+--
+
+[float]
+== pool fields
+
+
+
+
+*`mysql.status.innodb.buffer_pool.pool.reads`*::
++
+--
+type: long
+
+The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pool.resize_status`*::
++
+--
+type: long
+
+The status of an operation to resize the InnoDB buffer pool dynamically, triggered by setting the innodb_buffer_pool_size parameter dynamically.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.pool.wait_free`*::
++
+--
+type: long
+
+Normally, writes to the InnoDB buffer pool happen in the background. When InnoDB needs to read or create a page and no clean pages are available, InnoDB flushes some dirty pages first and waits for that operation to finish. This counter counts instances of these waits.
+
+
+--
+
+*`mysql.status.innodb.buffer_pool.write_requests`*::
++
+--
+type: long
+
+The number of writes done to the InnoDB buffer pool.
+
+
+--
+
 [[exported-fields-nats]]
 == Nats fields
 
@@ -24052,6 +24569,35 @@ Percentage of CPU time during which I/O requests were issued to the device (band
 --
 
 [float]
+== entropy fields
+
+Available system entropy
+
+
+
+*`system.entropy.available_bits`*::
++
+--
+type: long
+
+The available bits of entropy
+
+
+--
+
+*`system.entropy.pct`*::
++
+--
+type: scaled_float
+
+format: percent
+
+The percentage of available entropy, relative to the pool size of 4096
+
+
+--
+
+[float]
 == filesystem fields
 
 `filesystem` contains local filesystem stats.
@@ -25959,12 +26505,34 @@ All TCP connections
 
 
 
+*`system.socket.summary.tcp.memory`*::
++
+--
+type: integer
+
+format: bytes
+
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
+
+
+--
+
 [float]
 == all fields
 
 All TCP connections
 
 
+
+*`system.socket.summary.tcp.all.orphan`*::
++
+--
+type: integer
+
+A count of all orphaned tcp sockets. Only available on Linux.
+
+
+--
 
 *`system.socket.summary.tcp.all.count`*::
 +
@@ -26022,6 +26590,18 @@ Number of TCP connections in _time_wait_ state
 All UDP connections
 
 
+
+*`system.socket.summary.udp.memory`*::
++
+--
+type: integer
+
+format: bytes
+
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
+
+
+--
 
 [float]
 == all fields
@@ -26641,6 +27221,16 @@ Host name
 type: keyword
 
 Virtual Machine name
+
+
+--
+
+*`vsphere.virtualmachine.os`*::
++
+--
+type: keyword
+
+Virtual Machine Operating System name
 
 
 --

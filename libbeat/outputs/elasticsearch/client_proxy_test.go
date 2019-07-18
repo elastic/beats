@@ -123,6 +123,36 @@ func TestClientSettingsOverrideEnvironmentProxy(t *testing.T) {
 	assert.Equal(t, 1, servers.proxyRequestCount())
 }
 
+// TestProxyDisableOverridesProxySettings confirms that setting
+// ClientSettings.ProxyDisable disables the proxy even if both HTTP_PROXY
+// and ClientSettings.Proxy are set.
+// This test is less robust than the others: when golang derives proxy settings
+// from HTTP[S]_PROXY, it still returns nil if it can detect that
+// a request will be routed to localhost (this is why many tests in this file
+// use invalid target URLs, so golang doesn't skip the proxy). In this test,
+// where we want to confirm that a proxy is *not* used, we still need to
+// use a remote URL (or we aren't really testing anything), but that means we
+// can't listen on the remote endpoint. Instead, we just have to listen on the
+// proxy endpoint and verify that it *doesn't* receive a request.
+// I'm not entirely satisfied with this approach, but it seems by nature of
+// golang's proxy handling that we can't do better without a multi-machine
+// integration test.
+func TestProxyDisableOverridesProxySettings(t *testing.T) {
+	servers, teardown := startServers(t)
+	defer teardown()
+
+	// Start a client with both ClientSettings.Proxy and HTTP_PROXY set to the
+	// proxy listener and ClientSettings.ProxyDisable set to true. We expect that
+	// ProxyDisable should override both the other proxy settings and the proxy
+	// should get zero requests.
+	execClient(t,
+		"TEST_SERVER_URL=http://fakeurl.fake.not-real",
+		"TEST_PROXY_URL="+servers.proxyURL,
+		"HTTP_PROXY="+servers.proxyURL,
+		"TEST_PROXY_DISABLE=true")
+	assert.Equal(t, 0, servers.proxyRequestCount())
+}
+
 // runClientTest executes the current test binary as a child process,
 // running only the TestClientPing, and calling it with the environment variable
 // TEST_START_CLIENT=1 (so the test can recognize that it is the child process),
@@ -151,10 +181,13 @@ func doClientPing(t *testing.T) {
 	serverURL := os.Getenv("TEST_SERVER_URL")
 	require.NotEqual(t, serverURL, "")
 	proxy := os.Getenv("TEST_PROXY_URL")
+	// if TEST_PROXY_DISABLE is nonempty, set ClientSettings.ProxyDisable.
+	proxyDisable := os.Getenv("TEST_PROXY_DISABLE")
 	clientSettings := ClientSettings{
-		URL:     serverURL,
-		Index:   outil.MakeSelector(outil.ConstSelectorExpr("test")),
-		Headers: map[string]string{headerTestField: headerTestValue},
+		URL:          serverURL,
+		Index:        outil.MakeSelector(outil.ConstSelectorExpr("test")),
+		Headers:      map[string]string{headerTestField: headerTestValue},
+		ProxyDisable: proxyDisable != "",
 	}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)

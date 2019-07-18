@@ -76,6 +76,7 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 		default:
 			return nil, errNoTimestamp
 		}
+		return nil, nil
 	} else if subKey, ok := metadataKey(key); ok {
 		if subKey == "" {
 			switch meta := v.(type) {

@@ -1147,6 +1147,10 @@ endif::[]
 
 The maximum number of events to bulk in a single Kafka request. The default is 2048.
 
+===== `bulk_flush_frequency`
+
+Duration to wait before sending bulk Kafka request. 0 is no delay. The default is 0.
+
 ===== `timeout`
 
 The number of seconds to wait for responses from the Kafka brokers before timing
@@ -1568,8 +1572,11 @@ endif::[]
 ++++
 
 ifdef::apm-server[]
-NOTE: This page refers to using a separate instance of APM Server with an existing Elasticsearch Service deployment.
-APM Server is not yet supported on Elasticsearch Service.
+NOTE: This page refers to using a separate instance of APM Server with an existing
+https://www.elastic.co/cloud/elasticsearch-service[Elasticsearch Service deployment].
+If you want to use APM on Elastic Cloud, see the cloud docs:
+{cloud}/ec-create-deployment.html[Create your deployment] or
+{cloud}/ec-manage-apm-settings.html[Add APM user settings].
 endif::apm-server[]
 
 {beatname_uc} comes with two settings that simplify the output configuration
