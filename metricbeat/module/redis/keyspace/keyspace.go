@@ -48,8 +48,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
+	conn := m.Connection()
+	defer conn.Close()
+
 	// Fetch default INFO.
-	info, err := redis.FetchRedisInfo("keyspace", m.Connection())
+	info, err := redis.FetchRedisInfo("keyspace", conn)
 	if err != nil {
 		return errors.Wrap(err, "Failed to fetch redis info for keyspaces")
 	}
