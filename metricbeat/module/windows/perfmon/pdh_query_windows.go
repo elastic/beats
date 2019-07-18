@@ -21,6 +21,7 @@ package perfmon
 
 import (
 	"regexp"
+	"runtime"
 	"syscall"
 	"unsafe"
 
@@ -114,8 +115,18 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	if wildCardPath == "" {
 		return nil, errors.New("no query path given")
 	}
+	utfPath, err := syscall.UTF16PtrFromString(wildCardPath)
+	if err != nil {
+		return nil, err
+	}
+	var expdPaths []uint16
 
-	expdPaths, err := PdhExpandWildCardPath(wildCardPath)
+	// PdhExpandWildCardPath will not return the counter paths for windows 32 bit systems but PdhExpandCounterPath will.
+	if runtime.GOARCH == "386" {
+		expdPaths, err = PdhExpandCounterPath(utfPath)
+	} else {
+		expdPaths, err = PdhExpandWildCardPath(utfPath)
+	}
 	if err != nil {
 		return nil, err
 	}

@@ -108,7 +108,7 @@ For example:
 ------
 +
 Similarly, for {beatname_uc} modules, you can define processors under the
-`input` section of the module definition. 
+`input` section of the module definition.
 endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 [source,yaml]
@@ -119,7 +119,7 @@ ifeval::["{beatname_lc}"=="metricbeat"]
   - <processor_name>:
       when:
         <condition>
-      <parameters> 
+      <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
@@ -133,7 +133,7 @@ auditbeat.modules:
   - <processor_name>:
       when:
         <condition>
-      <parameters> 
+      <parameters>
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
@@ -142,7 +142,7 @@ For example:
 [source,yaml]
 ----
 packetbeat.protocols:
-- type: <protocol_type>  
+- type: <protocol_type>
   processors:
   - <processor_name>:
       when:
@@ -202,27 +202,33 @@ The supported processors are:
  * <<add-docker-metadata,`add_docker_metadata`>>
  * <<add-fields, `add_fields`>>
  * <<add-host-metadata,`add_host_metadata`>>
- * <<add-observer-metadata,`add_observer_metadata`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-labels, `add_labels`>>
  * <<add-locale,`add_locale`>>
+ * <<add-observer-metadata,`add_observer_metadata`>>
  * <<add-process-metadata,`add_process_metadata`>>
  * <<add-tags, `add_tags`>>
  * <<community-id,`community_id`>>
  * <<convert,`convert`>>
+ * <<decode-base64-field,`decode_base64_field`>>
 ifdef::has_decode_csv_fields_processor[]
  * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
+ * <<decode-base64-field,`decode_base64_field`>>
+ * <<decompress-gzip-field,`decompress_gzip_field`>>
  * <<dissect, `dissect`>>
- * <<extract-array,`extract_array`>>
  * <<processor-dns, `dns`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
+ * <<extract-array,`extract_array`>>
  * <<include-fields,`include_fields`>>
  * <<rename-fields,`rename`>>
 ifdef::has_script_processor[]
  * <<processor-script,`script`>>
+endif::[]
+ifdef::has_timestamp_processor[]
+ * <<processor-timestamp,`timestamp`>>
 endif::[]
 
 [[conditions]]
@@ -651,7 +657,7 @@ scalar values, arrays, dictionaries, or any nested combination of these.  By
 default the fields that you specify will be grouped under the `fields`
 sub-dictionary in the event. To group the fields under a different
 sub-dictionary, use the `target` setting. To store the fields as
-top-level fields, set `target: ''`. 
+top-level fields, set `target: ''`.
 
 `target`:: (Optional) Sub-dictionary to put all fields into. Defaults to `fields`.
 `fields`:: Fields to be added.
@@ -847,6 +853,7 @@ processors:
      max_depth: 1
      target: ""
      overwrite_keys: false
+     add_error_key: true
 -----------------------------------------------------
 
 The `decode_json_fields` processor has the following configuration settings:
@@ -863,6 +870,79 @@ is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
+`add_error_key`:: (Optional) If it set to true, in case of error while decoding json keys
+`error` field is going to be part of event with error message. If it set to false, there
+will not be any error in event's field. Even error occurs while decoding json keys. The
+default value is false
+
+
+[[decode-base64-field]]
+=== Decode Base64 fields
+
+The `decode_base64_field` processor specifies a field to base64 decode.
+The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
+
+To overwrite fields either first rename the target field or use the `drop_fields`
+processor to drop the field and then rename the field.
+
+[source,yaml]
+-------
+processors:
+- decode_base64_field:
+    from: "field1"
+    to: "field2"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+In the example above:
+    - field1 is decoded in field2
+
+The `decode_base64_field` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be base64 decoded is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the base6 4decode
+of fields is stopped and the original event is returned. If set to false, decoding
+continues also if an error happened during decoding. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
+
+[[decompress-gzip-field]]
+=== Decompress gzip fields
+
+The `decompress_gzip_field` processor specifies a field to gzip decompress.
+The `field` key contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
+
+To overwrite fields either first rename the target field or use the `drop_fields`
+processor to drop the field and then rename the field.
+
+[source,yaml]
+-------
+processors:
+- decompress_gzip_field:
+    from: "field1"
+    to: "field2"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+In the example above:
+    - field1 is decoded in field2
+
+The `decompress_gzip_field` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be base64 decoded is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the base6 4decode
+of fields is stopped and the original event is returned. If set to false, decoding
+continues also if an error happened during decoding. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
 
 [[community-id]]
 === Community ID Network Flow Hash
@@ -899,7 +979,8 @@ processors:
         source_port: my_source_port
         destination_ip: my_dest_ip
         destination_port: my_dest_port
-        transport: proto
+        iana_number: my_iana_number
+        transport: my_transport
         icmp_type: my_icmp_type
         icmp_code: my_icmp_code
       target: network.community_id
@@ -995,6 +1076,49 @@ See <<conditions>> for a list of supported conditions.
 
 NOTE: If you define an empty list of fields under `drop_fields`, then no fields
 are dropped.
+
+[[extract-array]]
+=== Extract array
+
+experimental[]
+
+The `extract_array` processor populates fields with values read from an array
+field. The following example will populate `source.ip` with the first element of
+the `my_array` field, `destination.ip` with the second element, and
+`network.transport` with the third.
+
+[source,yaml]
+-----------------------------------------------------
+processors:
+ - extract_array:
+     field: my_array
+     mappings:
+        source.ip: 0
+        destination.ip: 1
+        network.transport: 2
+-----------------------------------------------------
+
+The following settings are supported:
+
+`field`:: The array field whose elements are to be extracted.
+`mappings`:: Maps each field name to an array index. Use 0 for the first element in
+             the array. Multiple fields can be mapped to the same array element.
+`ignore_missing`:: (Optional) Whether to ignore events where the array field is
+                   missing. The default is `false`, which will fail processing
+                   of an event if the specified field does not exist. Set it to
+                   `true` to ignore this condition.
+`overwrite_keys`:: Whether the target fields specified in the mapping are
+                   overwritten if they already exist. The default is `false`,
+                   which will fail processing if a target field already exists.
+`fail_on_error`:: (Optional) If set to `true` and an error happens, changes to
+                  the event are reverted, and the original event is returned. If
+                  set to `false`, processing continues despite errors.
+                  Default is `true`.
+`omit_empty`:: (Optional) Whether empty values are extracted from the array. If
+                  set to `true`, instead of the target field being set to an
+                  empty value, it is left unset. The empty string (`""`), an
+                  empty array (`[]`) or an empty object (`{}`) are considered
+                  empty values. Default is `false`.
 
 [[include-fields]]
 === Keep fields from events
@@ -1092,7 +1216,7 @@ construct a lookup key with the value of the field `metricset.host`.
 Each Beat can define its own default indexers and matchers which are enabled by
 default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
-the `log.file.path` field, extracts the container ID, and uses it to retrieve 
+the `log.file.path` field, extracts the container ID, and uses it to retrieve
 metadata.
 
 The configuration below enables the processor when {beatname_lc} is run as a pod in
@@ -1175,7 +1299,7 @@ You can do this by mounting the socket inside the container. For example:
 To avoid privilege issues, you may also need to add `--user=root` to the
 `docker run` flags. Because the user must be part of the docker group in order
 to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
-running as non-root inside the container. 
+running as non-root inside the container.
 =====
 
 [source,yaml]
@@ -1750,45 +1874,70 @@ thrown.
 |===
 endif::[]
 
-[[extract-array]]
-=== Extract array
+ifdef::has_timestamp_processor[]
+[[processor-timestamp]]
+=== Timestamp
 
-experimental[]
+beta[]
 
-The `extract_array` processor populates fields with values read from an array
-field. The following example will populate `source.ip` with the first element of
-the `my_array` field, `destination.ip` with the second element, and
-`network.transport` with the third.
+The `timestamp` processor parses a timestamp from a field. By default the
+timestamp processor writes the parsed result to the `@timestamp` field. You can
+specify a different field by setting the `target_field` parameter. The timestamp
+value is parsed according to the `layouts` parameter. Multiple layouts can be
+specified and they will be used sequentially to attempt parsing the timestamp
+field.
+
+NOTE: The timestamp layouts used by this processor are different than the
+      formats supported by date processors in Logstash and Elasticsearch Ingest
+      Node.
+
+The `layouts` are described using a reference time that is based on this
+specific time:
+
+    Mon Jan 2 15:04:05 MST 2006
+
+Since MST is GMT-0700, the reference time is:
+
+    01/02 03:04:05PM '06 -0700
+
+To define your own layout, rewrite the reference time in a format that matches
+the timestamps you expect to parse. For more layout examples and details see the
+https://godoc.org/time#pkg-constants[Go time package documentation].
+
+If a layout does not contain a year then the current year in the specified
+`timezone` is added to the time value.
+
+.Timestamp options
+[options="header"]
+|======
+| Name             | Required | Default    | Description                                                                                 |
+| `field`          | yes      |            | Source field containing the time to be parsed.                                              |
+| `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.          |
+| `layouts`        | yes      |            | Timestamp layouts that define the expected time value format.                               |
+| `timezone`       | no       | UTC        | Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone. |
+| `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                             |
+| `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                |
+| `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.               |
+| `id`             | no       |            | An identifier for this processor instance. Useful for debugging.                            |
+|======
+
+Here is an example that parses the `start_time` field and writes the result
+to the `@timestamp` field then deletes the `start_time` field. When the
+processor is loaded it will immediately validate that the two `test` timestamps
+parse with this configuration.
 
 [source,yaml]
------------------------------------------------------
+----
 processors:
- - extract_array:
-     field: my_array
-     mappings:
-        source.ip: 0
-        destination.ip: 1
-        network.transport: 2
------------------------------------------------------
-
-The following settings are supported:
-
-`field`:: The array field whose elements are to be extracted.
-`mappings`:: Maps each field name to an array index. Use 0 for the first element in
-             the array. Multiple fields can be mapped to the same array element.
-`ignore_missing`:: (Optional) Whether to ignore events where the array field is
-                   missing. The default is `false`, which will fail processing
-                   of an event if the specified field does not exist. Set it to
-                   `true` to ignore this condition.
-`overwrite_keys`:: Whether the target fields specified in the mapping are
-                   overwritten if they already exist. The default is `false`,
-                   which will fail processing if a target field already exists.
-`fail_on_error`:: (Optional) If set to `true` and an error happens, changes to
-                  the event are reverted, and the original event is returned. If
-                  set to `false`, processing continues despite errors.
-                  Default is `true`.
-`omit_empty`:: (Optional) Whether empty values are extracted from the array. If
-                  set to `true`, instead of the target field being set to an
-                  empty value, it is left unset. The empty string (`""`), an
-                  empty array (`[]`) or an empty object (`{}`) are considered
-                  empty values. Default is `false`.
+- timestamp:
+    field: start_time
+    layouts:
+      - '2006-01-02T15:04:05Z'
+      - '2006-01-02T15:04:05.999Z'
+    test:
+      - '2019-06-22T16:33:51Z'
+      - '2019-11-18T04:59:51.123Z'
+- drop_fields:
+    fields: [start_time]
+----
+endif::[]

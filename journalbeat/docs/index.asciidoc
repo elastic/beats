@@ -15,6 +15,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beat_default_index_prefix: {beatname_lc}
 :has_decode_csv_fields_processor:
 :has_script_processor:
+:has_timestamp_processor:
 :deb_os:
 :rpm_os:
 :linux_os:

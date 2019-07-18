@@ -62,6 +62,7 @@ var (
 	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
 	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
 	procPdhExpandWildCardPathW      = modpdh.NewProc("PdhExpandWildCardPathW")
+	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
@@ -131,6 +132,14 @@ func _PdhCloseQuery(query PdhQueryHandle) (errcode error) {
 
 func _PdhExpandWildCardPath(dataSource *uint16, wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procPdhExpandWildCardPathW.Addr(), 4, uintptr(unsafe.Pointer(dataSource)), uintptr(unsafe.Pointer(wildcardPath)), uintptr(unsafe.Pointer(expandedPathList)), uintptr(unsafe.Pointer(pathListLength)), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhExpandCounterPath(wildcardPath *uint16, expandedPathList *uint16, pathListLength *uint32) (errcode error) {
+	r0, _, _ := syscall.Syscall(procPdhExpandCounterPathW.Addr(), 3, uintptr(unsafe.Pointer(wildcardPath)), uintptr(unsafe.Pointer(expandedPathList)), uintptr(unsafe.Pointer(pathListLength)))
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

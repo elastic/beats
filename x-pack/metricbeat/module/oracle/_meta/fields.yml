@@ -1,0 +1,10 @@
+- key: oracle
+  title: "Oracle"
+  description: Oracle database module
+  short_config: false
+  release: beta
+  fields:
+    - name: oracle
+      type: group
+      description: Oracle module
+      fields:

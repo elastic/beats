@@ -91,9 +91,14 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 	}, nil
 }
 
+// Unpack unpacks the TLS Server configuration.
 func (c *ServerConfig) Unpack(cfg common.Config) error {
-	clientAuthKey := "client_authentication"
-	if !cfg.HasField(clientAuthKey) {
+	const clientAuthKey = "client_authentication"
+	const ca = "certificate_authorities"
+
+	// When we have explicitely defined the `certificate_authorities` in the configuration we default
+	// to `required` for the `client_authentication`, when CA is not defined we should set to `none`.
+	if cfg.HasField(ca) && !cfg.HasField(clientAuthKey) {
 		cfg.SetString(clientAuthKey, -1, "required")
 	}
 	type serverCfg ServerConfig

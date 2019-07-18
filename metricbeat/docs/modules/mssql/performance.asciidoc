@@ -1,11 +1,11 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-mssql-performance]]
-=== mssql performance metricset
+=== MSSQL performance metricset
 
-experimental[]
+beta[]
 
 include::../../../../x-pack/metricbeat/module/mssql/performance/_meta/docs.asciidoc[]
 

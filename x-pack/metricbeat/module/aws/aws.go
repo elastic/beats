@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -99,10 +100,10 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &metricSet, nil
 }
 
-func getRegions(svc ec2iface.EC2API) (completeRegionsList []string, err error) {
+func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error) {
 	input := &ec2.DescribeRegionsInput{}
 	req := svc.DescribeRegionsRequest(input)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		err = errors.Wrap(err, "Failed DescribeRegions")
 		return
@@ -128,6 +129,7 @@ func InitEvent(metricsetName string, regionName string) mb.Event {
 	event := mb.Event{}
 	event.Service = metricsetName
 	event.MetricSetFields = common.MapStr{}
+	event.ModuleFields = common.MapStr{}
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.provider", "aws")

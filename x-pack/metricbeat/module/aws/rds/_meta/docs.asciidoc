@@ -1,0 +1,31 @@
+The rds metricset of aws module allows you to monitor your AWS RDS service. `rds` metricset fetches a set of values from
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MonitoringOverview.html[Amazon RDS Metrics].
+Amazon RDS sends metrics and dimensions to Amazon CloudWatch every minute.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS RDS metrics.
+----
+cloudwatch:GetMetricData
+ec2:DescribeRegions
+rds:DescribeDBInstances
+----
+
+[float]
+=== Dashboard
+
+The aws rds metricset comes with a predefined dashboard.
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 60s
+  metricsets:
+    - rds
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+----

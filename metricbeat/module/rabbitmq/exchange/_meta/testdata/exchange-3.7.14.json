@@ -1,0 +1,72 @@
+[
+    {
+        "arguments": {},
+        "auto_delete": false,
+        "durable": true,
+        "internal": false,
+        "name": "",
+        "type": "direct",
+        "user_who_performed_action": "rmq-internal",
+        "vhost": "/"
+    },
+    {
+        "arguments": {},
+        "auto_delete": false,
+        "durable": true,
+        "internal": false,
+        "name": "amq.direct",
+        "type": "direct",
+        "user_who_performed_action": "rmq-internal",
+        "vhost": "/"
+    },
+    {
+        "arguments": {},
+        "auto_delete": false,
+        "durable": true,
+        "internal": false,
+        "name": "amq.fanout",
+        "type": "fanout",
+        "user_who_performed_action": "rmq-internal",
+        "vhost": "/"
+    },
+    {
+        "arguments": {},
+        "auto_delete": false,
+        "durable": true,
+        "internal": false,
+        "name": "amq.headers",
+        "type": "headers",
+        "user_who_performed_action": "rmq-internal",
+        "vhost": "/"
+    },
+    {
+        "arguments": {},
+        "auto_delete": false,
+        "durable": true,
+        "internal": false,
+        "name": "amq.match",
+        "type": "headers",
+        "user_who_performed_action": "rmq-internal",
+        "vhost": "/"
+    },
+    {
+        "arguments": {},
+        "auto_delete": false,
+        "durable": true,
+        "internal": true,
+        "name": "amq.rabbitmq.trace",
+        "type": "topic",
+        "user_who_performed_action": "rmq-internal",
+        "vhost": "/"
+    },
+    {
+        "arguments": {},
+        "auto_delete": false,
+        "durable": true,
+        "internal": false,
+        "name": "amq.topic",
+        "type": "topic",
+        "user_who_performed_action": "rmq-internal",
+        "vhost": "/"
+    }
+]
