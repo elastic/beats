@@ -990,7 +990,7 @@ alias to: destination.address
 [[exported-fields-aws]]
 == aws fields
 
-Aws fields from s3 input.
+AWS fields from s3 input.
 
 
 

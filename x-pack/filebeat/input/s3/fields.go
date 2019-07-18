@@ -19,5 +19,5 @@ func init() {
 // AssetS3 returns asset data.
 // This is the base64 encoded gzipped contents of input/s3.
 func AssetS3() string {
-	return "eJyskL1uwzAMhHc9xSF7snjTUKAv0KUPENDWOVH9I0Oka/jtCzluYaAtupSDAJKn+w48o+PqIYs6wKL19DjJoicHBGqT42QxjR5PDgCeF0Ub2QdFm9MArRDHabaLAzJ7itKjponDrvPbvzNGGeih1dYCtk70uOU0T/vkB1qp16oYizEgjm3KgxTFZd8fGUdOPTcd7Vqar90ntOO6pBwO81/QpV5kIFILu7NEefjC7lKeqOjTDZmWI98ZtptcvoVJ9Rsbu3Zc/zXLw/aPLB8BAAD//7PMioY="
+	return "eJyskL1OxDAQhHs/xej6S5POBRIvQHMF5WkTT+5MfhzZGyK/PXIuoEiAaNjC0u6O5xvtGT2zhazJAOp1oMVJ1nQygGNqo5/Vh8niyQDA8+sFnefgEroYRqQafpoXrQwQOVASLRqqGOw6u/07Y5KRFqneWkDzTItbDMu8T36glbrUxViUDn7qQhylKKp9f2QcOc3S9tRrab52n9CeeQ3RHea/oEu9yEiEDnpnifLwhd6lPD5hCDdEavR8p9tuUn0LE5o3tnrtmf81y8P2jywfAQAA//9H7IpG"
 }

@@ -104,11 +104,6 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, err
 	}
 
-	err = config.validate()
-	if err != nil {
-		return nil, errors.Wrapf(err, "validation for s3 input config failed: config = %v", config)
-	}
-
 	awsConfig, err := getAWSCredentials(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
@@ -125,7 +120,7 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	return p, nil
 }
 
-func (c *config) validate() error {
+func (c *config) Validate() error {
 	if c.VisibilityTimeout < 0 || c.VisibilityTimeout.Hours() > 12 {
 		return errors.New("visibilityTimeout is not defined within the " +
 			"expected bounds")
@@ -165,13 +160,13 @@ func getAWSCredentials(config config) (awssdk.Config, error) {
 
 // Run runs the input
 func (p *Input) Run() {
-	p.logger.Debugf("s3", "Run s3 input with queueURLs: %+v", p.config.QueueURLs)
+	p.logger.Debugf("Run s3 input with queueURLs: %v", p.config.QueueURLs)
 	visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 
 	for _, queueURL := range p.config.QueueURLs {
 		regionName, err := getRegionFromQueueURL(queueURL)
 		if err != nil {
-			p.logger.Errorf("failed to get region name from queueURL: %s", queueURL)
+			p.logger.Errorf("failed to get region name from queueURL: %v", queueURL)
 			continue
 		}
 
@@ -240,39 +235,41 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 			p.handleS3Objects(svcS3, s3Infos, errC)
 		}(messages[i])
 
-		go func(message sqs.Message) {
-			for {
-				select {
-				case <-p.close:
-					return
-				case err := <-errC:
-					if err != nil {
-						p.logger.Warnf("Processing message failed: %v", err)
-						err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
-						if err != nil {
-							p.logger.Error(errors.Wrap(err, "change message visibility failed"))
-						}
-						p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
-					} else {
-						err := deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
-						if err != nil {
-							p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
-						}
-					}
-					return
-				case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
-					// If half of the set visibilityTimeout passed and this is
-					// still ongoing, then change visibility timeout.
-					err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
-					if err != nil {
-						p.logger.Error(errors.Wrap(err, "change message visibility failed"))
-					}
-					p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
-				}
-			}
-		}(messages[i])
+		go p.sendKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
 	}
 	wg.Wait()
+}
+
+func (p *Input) sendKeepAlive(svcSQS *sqs.Client, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) {
+	for {
+		select {
+		case <-p.close:
+			return
+		case err := <-errC:
+			if err != nil {
+				p.logger.Warnf("Processing message failed: %v", err)
+				err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
+				if err != nil {
+					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+				}
+				p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
+			} else {
+				err := deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
+				if err != nil {
+					p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
+				}
+			}
+			return
+		case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
+			// If half of the set visibilityTimeout passed and this is
+			// still ongoing, then change visibility timeout.
+			err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
+			if err != nil {
+				p.logger.Error(errors.Wrap(err, "change message visibility failed"))
+			}
+			p.logger.Infof("Message visibility timeout updated to %v", visibilityTimeout)
+		}
+	}
 }
 
 func changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svc *sqs.Client, receiptHandle *string) error {

@@ -1,7 +1,7 @@
 - key: aws
   title: "aws"
   description: >
-    Aws fields from s3 input.
+    AWS fields from s3 input.
   release: beta
   fields:
     - name: s3
