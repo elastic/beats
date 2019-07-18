@@ -26,10 +26,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig())
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	f := mbtest.NewFetcher(t, getConfig())
+	f.WriteEvents(t, "")
 }
 
 func getConfig() map[string]interface{} {
