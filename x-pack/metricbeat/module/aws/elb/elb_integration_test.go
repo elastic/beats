@@ -19,8 +19,6 @@ func TestData(t *testing.T) {
 		t.Skip("Skipping TestData: " + info)
 	}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

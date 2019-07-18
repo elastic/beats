@@ -1,15 +1,14 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "aws": {
-        "elb": {
+        "cloudwatch": {
             "dimensions": {
-                "LoadBalancerName": "testauthelb"
+                "AvailabilityZone": "us-east-1c",
+                "LoadBalancerName": "DockerReg-EcsElast-1UFCSV3UVE46A"
             },
             "metrics": {
-                "EstimatedALBActiveConnectionCount": 3,
-                "EstimatedALBConsumedLCUs": 0.000155,
-                "EstimatedALBNewConnectionCount": 12.25,
-                "EstimatedProcessedBytes": 183
+                "HealthyHostCount": 2,
+                "UnHealthyHostCount": 0
             },
             "namespace": "AWS/ELB"
         }
