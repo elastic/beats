@@ -7,6 +7,30 @@ var security = (function () {
     var processor = require("processor");
     var winlogbeat = require("winlogbeat");
 
+    var logonTypes = {
+        "2": "Interactive",
+        "3": "Network",
+        "4": "Batch",
+        "5": "Service",
+        "7": "Unlock",
+        "8": "NetworkCleartext",
+        "9": "NewCredentials",
+        "10": "RemoteInteractive",
+        "11": "CachedInteractive",
+    };
+
+    var addLogonType = function(evt) {
+        var lt = evt.Get("winlog.event_data.LogonType");
+        if (!lt) {
+            return;
+        }
+        var descriptiveLogonType = logonTypes[lt];
+        if (descriptiveLogonType === undefined) {
+            return;
+        }
+        evt.Put("winlog.logon.type", descriptiveLogonType);
+    };
+
     var addAuthSuccess = new processor.AddFields({
         fields: {
             "event.category": "authentication",
@@ -48,15 +72,22 @@ var security = (function () {
         evt.Put("process.name", path.basename(exe));
     };
 
+    var logoff = new processor.Chain()
+        .Add(convertAuthentication)
+        .Add(addLogonType)
+        .Build();
+
     var logonSuccess = new processor.Chain()
         .Add(addAuthSuccess)
         .Add(convertAuthentication)
+        .Add(addLogonType)
         .Add(setProcessNameUsingExe)
         .Build();
 
     var logonFailed = new processor.Chain()
         .Add(addAuthFailed)
         .Add(convertAuthentication)
+        .Add(addLogonType)
         .Add(setProcessNameUsingExe)
         .Build();
 
@@ -66,6 +97,12 @@ var security = (function () {
 
         // 4625 - An account failed to log on.
         4625: logonFailed.Run,
+        
+        // 4634 - An account was logged off.
+        4634: logoff.Run,
+
+        // 4647 - User initiated logoff.
+        4647: logoff.Run,
 
         // 4648 - A logon was attempted using explicit credentials.
         4648: logonSuccess.Run,

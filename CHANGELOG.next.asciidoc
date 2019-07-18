@@ -294,6 +294,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add support for reading from .evtx files. {issue}4450[4450]
+- Add support for event ID 4634 and 4647 to the Security module. {pull}12906[12906]
 
 ==== Deprecated
 
