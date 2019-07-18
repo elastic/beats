@@ -7232,60 +7232,60 @@ Kafka metadata added by the kafka input
 *`kafka.topic`*::
 +
 --
-type: keyword
-
 Kafka topic
 
+
+type: keyword
 
 --
 
 *`kafka.partition`*::
 +
 --
-type: long
-
 Kafka partition number
 
+
+type: long
 
 --
 
 *`kafka.offset`*::
 +
 --
-type: long
-
 Kafka offset of this message
 
+
+type: long
 
 --
 
 *`kafka.key`*::
 +
 --
-type: keyword
-
 Kafka key, corresponding to the Kafka value stored in the message
 
+
+type: keyword
 
 --
 
 *`kafka.block_timestamp`*::
 +
 --
-type: date
-
 Kafka outer (compressed) block timestamp
 
+
+type: date
 
 --
 
 *`kafka.headers`*::
 +
 --
-type: array
-
 The array of kafka headers, each an object containing subfields "key" and "value".
 
+
+type: array
 
 --
 
