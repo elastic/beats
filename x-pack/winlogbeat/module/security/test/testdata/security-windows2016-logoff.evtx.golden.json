@@ -4,7 +4,8 @@
     "event": {
       "action": "Logoff",
       "code": 4634,
-      "kind": "event"
+      "kind": "event",
+      "module": "security"
     },
     "log": {
       "level": "information"
@@ -48,7 +49,8 @@
     "event": {
       "action": "Logoff",
       "code": 4634,
-      "kind": "event"
+      "kind": "event",
+      "module": "security"
     },
     "log": {
       "level": "information"

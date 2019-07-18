@@ -6,6 +6,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -71,6 +73,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -136,6 +140,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -204,6 +210,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -269,6 +277,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -334,6 +344,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -399,6 +411,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -464,6 +478,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -529,6 +545,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -597,6 +615,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -662,6 +682,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -730,6 +752,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -795,6 +819,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -860,6 +886,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -925,6 +953,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -990,6 +1020,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -1055,6 +1087,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -1120,6 +1154,8 @@
       "category": "authentication",
       "code": 4625,
       "kind": "event",
+      "module": "security",
+      "outcome": "failure",
       "type": "authentication_failure"
     },
     "log": {

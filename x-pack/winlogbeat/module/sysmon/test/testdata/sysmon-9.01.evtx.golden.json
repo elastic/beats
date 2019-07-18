@@ -3,7 +3,8 @@
     "@timestamp": "2019-03-18T16:57:37.933Z",
     "event": {
       "code": 16,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -35,7 +36,8 @@
     "@timestamp": "2019-03-18T16:57:38.011Z",
     "event": {
       "code": 4,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -71,8 +73,11 @@
   {
     "@timestamp": "2019-03-18T16:57:37.949Z",
     "event": {
+      "category": "process",
       "code": 1,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_start"
     },
     "hash": {
       "sha1": "ac93c3b38e57a2715572933dbcb2a1c2892dbc5e"
@@ -139,8 +144,11 @@
   {
     "@timestamp": "2019-03-18T16:57:37.964Z",
     "event": {
+      "category": "process",
       "code": 1,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_start"
     },
     "hash": {
       "sha1": "6df8163a6320b80b60733f9d62e2f39b4b16b678"
@@ -210,8 +218,11 @@
   {
     "@timestamp": "2019-03-18T16:57:38.981Z",
     "event": {
+      "category": "process",
       "code": 5,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
     },
     "log": {
       "level": "information"
@@ -248,8 +259,11 @@
   {
     "@timestamp": "2019-03-18T16:57:38.981Z",
     "event": {
+      "category": "process",
       "code": 5,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
     },
     "log": {
       "level": "information"
@@ -286,8 +300,11 @@
   {
     "@timestamp": "2019-03-18T16:57:39.012Z",
     "event": {
+      "category": "process",
       "code": 1,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_start"
     },
     "hash": {
       "sha1": "5a4c0e82ff95c9fb762d46a696ef9f1b68001c21"
@@ -362,7 +379,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -419,7 +437,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -477,7 +496,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -535,7 +555,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -593,7 +614,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -655,7 +677,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -715,7 +738,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -773,7 +797,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -830,7 +855,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -890,7 +916,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -950,7 +977,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1007,7 +1035,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1064,7 +1093,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1125,7 +1155,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1186,7 +1217,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1247,7 +1279,8 @@
     },
     "event": {
       "code": 3,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1303,8 +1336,11 @@
   {
     "@timestamp": "2019-03-18T16:57:52.35Z",
     "event": {
+      "category": "process",
       "code": 5,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
     },
     "log": {
       "level": "information"
@@ -1341,8 +1377,11 @@
   {
     "@timestamp": "2019-03-18T16:57:52.364Z",
     "event": {
+      "category": "process",
       "code": 5,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
     },
     "log": {
       "level": "information"
@@ -1380,7 +1419,8 @@
     "@timestamp": "2019-03-18T16:57:52.387Z",
     "event": {
       "code": 2,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp"
@@ -1425,7 +1465,8 @@
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "event": {
       "code": 2,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp"
@@ -1470,7 +1511,8 @@
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "event": {
       "code": 2,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp"
@@ -1515,7 +1557,8 @@
     "@timestamp": "2019-03-18T16:57:52.417Z",
     "event": {
       "code": 2,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp"
@@ -1559,8 +1602,11 @@
   {
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "event": {
+      "category": "process",
       "code": 5,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon",
+      "type:": "process_end"
     },
     "log": {
       "level": "information"
@@ -1598,7 +1644,8 @@
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "event": {
       "code": 2,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp"
@@ -1643,7 +1690,8 @@
     "@timestamp": "2019-03-18T16:57:52.433Z",
     "event": {
       "code": 2,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "file": {
       "path": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp"
