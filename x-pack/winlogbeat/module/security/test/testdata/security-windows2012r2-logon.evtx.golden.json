@@ -47,6 +47,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -109,6 +112,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -174,6 +180,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -236,6 +245,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -298,6 +310,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -360,6 +375,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -422,6 +440,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -484,6 +505,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -549,6 +573,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -611,6 +638,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -676,6 +706,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "RemoteInteractive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -738,6 +771,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -800,6 +836,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -862,6 +901,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -924,6 +966,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -986,6 +1031,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1048,6 +1096,9 @@
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1113,6 +1164,9 @@
       "keywords": [
         "Audit Failure"
       ],
+      "logon": {
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
