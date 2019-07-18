@@ -40,6 +40,32 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
+- Change diskio metrics retrieval method (only for Windows) from wmi query to DeviceIOControl function using the IOCTL_DISK_PERFORMANCE control code {pull}11635[11635]
+- Call GetMetricData api per region instead of per instance. {issue}11820[11820] {pull}11882[11882]
+- Update documentation with cloudwatch:ListMetrics permission. {pull}11987[11987]
+- Check permissions in system socket metricset based on capabilities. {pull}12039[12039]
+- Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Refactored Windows perfmon metricset: replaced method to retrieve counter paths with PdhExpandWildCardPathW, separated code by responsibility, removed unused functions {pull}12212[12212]
+- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
+- Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
+- In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12265[12265]
+- Fix an issue listing all processes when run under Windows as a non-privileged user. {issue}12301[12301] {pull}12475[12475]
+- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
+- When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Reuse connections in PostgreSQL metricsets. {issue}12504[12504] {pull}12603[12603]
+- PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.{issue}12590[12590]{pull}12622[12622]
+- In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
+- Ramdisk is not filtered out when collecting disk performance counters in diskio metricset {issue}12814[12814] {pull}12829[12829]
+- Fix connections leak in redis module {pull}12914[12914]
+- Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
+- Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+
 *Packetbeat*
 
 *Winlogbeat*
