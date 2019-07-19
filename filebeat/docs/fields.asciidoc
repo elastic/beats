@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -5438,6 +5438,15 @@ Type
 type: keyword
 
 example: doc
+
+--
+
+*`elasticsearch.slowlog.source`*::
++
+--
+Source of document that was indexed
+
+type: keyword
 
 --
 

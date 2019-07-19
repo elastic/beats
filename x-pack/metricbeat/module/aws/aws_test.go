@@ -8,6 +8,7 @@ package aws
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -18,12 +19,13 @@ import (
 
 // MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
-	ec2iface.EC2API
+	ec2iface.ClientAPI
 }
 
 var regionName = "us-west-1"
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
 	return ec2.DescribeRegionsRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeRegionsOutput{
@@ -33,6 +35,7 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 					},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }

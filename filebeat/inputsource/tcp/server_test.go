@@ -167,7 +167,9 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			if !assert.NoError(t, err) {
 				return
 			}
-			server, err := New(&config, test.splitFunc, to)
+
+			factory := SplitHandlerFactory(to, test.splitFunc)
+			server, err := New(&config, factory)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -217,7 +219,10 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	if !assert.NoError(t, err) {
 		return
 	}
-	server, err := New(&config, bufio.ScanLines, to)
+
+	factory := SplitHandlerFactory(to, bufio.ScanLines)
+
+	server, err := New(&config, factory)
 	if !assert.NoError(t, err) {
 		return
 	}
