@@ -86,7 +86,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			keyspace = *p.Keyspace
 		}
 		if err := redis.Select(conn, keyspace); err != nil {
-			msg := errors.Wrapf(err, "Failed to select keyspace %d", p.Keyspace)
+			msg := errors.Wrapf(err, "Failed to select keyspace %d", keyspace)
 			m.Logger().Error(msg)
 			r.Error(err)
 			continue
@@ -94,7 +94,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 		keys, err := redis.FetchKeys(conn, p.Pattern, p.Limit)
 		if err != nil {
-			msg := errors.Wrapf(err, "Failed to list keys in keyspace %d with pattern '%s'", p.Keyspace, p.Pattern)
+			msg := errors.Wrapf(err, "Failed to list keys in keyspace %d with pattern '%s'", keyspace, p.Pattern)
 			m.Logger().Error(msg)
 			r.Error(err)
 			continue
@@ -107,7 +107,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		for _, key := range keys {
 			keyInfo, err := redis.FetchKeyInfo(conn, key)
 			if err != nil {
-				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, p.Keyspace)
+				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, keyspace)
 				m.Logger().Error(msg)
 				r.Error(err)
 				continue
