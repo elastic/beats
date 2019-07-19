@@ -5,10 +5,6 @@ Incorrectly configured logrotation can result in either lost log messages or dup
 forward messages. When you see missing or duplicate events when running the Beat, be sure to check how input files are rotated.
 
 [float]
-[[log-rotation-linux]]
-=== Logrotation on Linux
-
-[float]
 [[log-rotation-strategies]]
 === Logrotation strategies
 
@@ -21,7 +17,7 @@ It happens because {beatname_uc} identifies files by inode and device name. Duri
 moved to a new file. When {beatname_uc} encounters this new file, it is going to read it from the beginning, as previous state
 information (offset, read timestamp) are not found for this inode and device name combination in its state registry.
 Furthermore, when the input file is truncated it is possible that the application writing it might added new lines
-between the time of the copy and truncation. Those line get lost. We suggest you avoid using this method for rotating logs.
+between the time of the copy and truncation. Those lines get lost. We suggest you avoid using this method for rotating logs.
 
 [float]
 [[log-rotation-move]]
@@ -36,7 +32,7 @@ To avoid missing events from a rotated file, add the rotated files to the input.
 [[log-rotate-example]]
 ==== Example configurations
 
-In this section we choose to share a sample configuration of logrotate, as it is a popular tool to do log rotation.
+In this section we choose to share a sample configuration of logrotate, as it is a popular tool to do log rotation on Linux.
 
 In this example {beatname_uc} reads the logs of a web server. The logs are rotated every day, and the new file is created
 with the specified permissions.
@@ -73,7 +69,7 @@ filebeat.inputs:
 
 [float]
 [[log-rotation-windows]]
-=== Logrotation on Windows
+=== Additional notes on logrotation on Windows
 
 Log rotation schemes deleting old files and renaming newer files to the old files might get blocked if old
 files are still processed by {beatname_uc}. This is due to Windows not deleting files and file meta-data,
