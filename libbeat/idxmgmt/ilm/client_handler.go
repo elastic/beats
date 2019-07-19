@@ -153,7 +153,7 @@ func (h *ESClientHandler) HasILMPolicy(name string) (bool, error) {
 // HasAlias queries Elasticsearch to see if alias exists.
 func (h *ESClientHandler) HasAlias(name string) (bool, error) {
 	path := path.Join(esAliasPath, name)
-	status, b, err := h.client.Request("HEAD", path, "", nil, nil)
+	status, b, err := h.client.Request("GET", path, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, wrapErrf(err, ErrRequestFailed,
 			"failed to check for alias '%v': (status=%v) %s", name, status, b)
