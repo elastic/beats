@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
 - Fixed `json.add_error_key` property setting for delivering error messages from beat events  {pull}11298[11298]
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
+- ILM: Use GET instead of HEAD when checking for alias to expose detailed error message. {pull}12886[12886]
 
 *Auditbeat*
 
@@ -149,7 +150,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
 - Ramdisk is not filtered out when collecting disk performance counters in diskio metricset {issue}12814[12814] {pull}12829[12829]
 - Fix incoherent behaviour in redis key metricset when keyspace is specified both in host URL and key pattern {pull}12913[12913]
+- Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
+- Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
 
 *Packetbeat*
 
@@ -272,6 +275,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Kubernetes controller manager dashboard to Kubernetes module {pull}12744[12744]
 - Allow redis URL format in redis hosts config. {pull}12408[12408]
 - Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
+- Add metrics to kubernetes apiserver metricset. {pull}12922[12922]
 - Add kubernetes metricset `scheduler` {pull}12521[12521]
 - Add Kubernetes scheduler dashboard to Kubernetes module {pull}12749[12749]
 - Add `beat` module. {pull}12181[12181] {pull}12615[12615]
@@ -292,6 +296,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add support for reading from .evtx files. {issue}4450[4450]
+- Add support for event ID 4634 and 4647 to the Security module. {pull}12906[12906]
 
 ==== Deprecated
 
