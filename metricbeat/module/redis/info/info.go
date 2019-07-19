@@ -58,7 +58,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	conn := m.Connection()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+			debugf("failed to release connection: %v", err)
 		}
 	}()
 
