@@ -31,10 +31,12 @@ import (
 )
 
 type Config struct {
-	URLs         []string      `config:"urls" validate:"required"`
-	ProxyURL     string        `config:"proxy_url"`
-	Timeout      time.Duration `config:"timeout"`
-	MaxRedirects int           `config:"max_redirects"`
+	URLs                 []string       `config:"urls" validate:"required"`
+	ProxyURL             string         `config:"proxy_url"`
+	Timeout              time.Duration  `config:"timeout"`
+	MaxRedirects         int            `config:"max_redirects"`
+	Response             responseConfig `config:"response"`
+	TruncateResponseBody string         `config:truncate_response_body`
 
 	Mode monitors.IPSettings `config:",inline"`
 
@@ -47,6 +49,11 @@ type Config struct {
 
 	// http(s) ping validation
 	Check checkConfig `config:"check"`
+}
+
+type responseConfig struct {
+	IncludeBody         string `config:"include_body"`
+	IncludeBodyMaxBytes int    `config:"include_body_max_bytes"`
 }
 
 type checkConfig struct {
@@ -87,7 +94,11 @@ type compressionConfig struct {
 var defaultConfig = Config{
 	Timeout:      16 * time.Second,
 	MaxRedirects: 10,
-	Mode:         monitors.DefaultIPSettings,
+	Response: responseConfig{
+		IncludeBody:         "on_error",
+		IncludeBodyMaxBytes: 2048,
+	},
+	Mode: monitors.DefaultIPSettings,
 	Check: checkConfig{
 		Request: requestParameters{
 			Method:      "GET",
@@ -101,6 +112,20 @@ var defaultConfig = Config{
 			RecvJSON:    nil,
 		},
 	},
+}
+
+func (r *responseConfig) Validate() error {
+	switch strings.ToLower(r.IncludeBody) {
+	case "always", "on_error", "never":
+	default:
+		return fmt.Errorf("unknown option for `include_body`: '%s', please use one of 'always', 'on_error', 'never'")
+	}
+
+	if r.IncludeBodyMaxBytes < 0 {
+		return fmt.Errorf("include_body_max_bytes must be a positive integer, got %d", r.IncludeBodyMaxBytes)
+	}
+
+	return nil
 }
 
 func (r *requestParameters) Validate() error {

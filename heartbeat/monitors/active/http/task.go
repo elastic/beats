@@ -65,7 +65,7 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator)
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.IncludeBody)
 		return err
 	}), nil
 }
@@ -213,6 +213,7 @@ func execPing(
 	reqBody []byte,
 	timeout time.Duration,
 	validator func(*http.Response) error,
+	responseConfig responseConfig,
 ) (start, end time.Time, errReason reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -221,7 +222,15 @@ func execPing(
 
 	start, end, resp, errReason := execRequest(client, req, validator)
 
-	respBody, respSize := readBodySampleAndClose(resp, 1024)
+	maxBodyBytes := responseConfig.IncludeBodyMaxBytes
+	if responseConfig.IncludeBody == "never" {
+		// Don't return the body if the config says not to
+		maxBodyBytes = 0
+	} else if errReason == nil && responseConfig.IncludeBody == "on_error" {
+		// If configured to only return the body on error, don't return it on success
+		maxBodyBytes = 0
+	}
+	respBody, respSize := readBodySampleAndClose(resp, maxBodyBytes)
 
 	if errReason == nil || errReason.Type() != "io" {
 		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
@@ -234,8 +243,8 @@ func execPing(
 	if resp != nil {
 		responseFields := common.MapStr{"status_code": resp.StatusCode}
 		if respSize > -1 {
-			responseFields["body"] = respBody
-			responseFields["body_size_bytes"] = respSize
+			responseFields["body.content"] = respBody
+			responseFields["body.bytes"] = respSize
 		}
 		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
 			"response": responseFields,
@@ -255,14 +264,16 @@ func execPing(
 // readBodySampleAndClose reads the first sampleSize bytes from the httpResponse,
 // then closes the body (which closes the connection). It doesn't return any errors
 // but does log them. During an error case the return values will be (nil, -1).
-func readBodySampleAndClose(resp *http.Response, sampleSize int) (bodySample *string, bodySize int64) {
+// The maxBytes params controls how many bytes will be returned in a string, not how many will be read.
+// We always read the full response here since we want to time downloading the full thing.
+func readBodySampleAndClose(resp *http.Response, maxBytes int) (bodySample *string, bodySize int64) {
 	if resp == nil {
 		return nil, -1
 	}
 	defer resp.Body.Close()
 
 	// Function to lazily get the body of the response
-	buf := make([]byte, 1024)
+	buf := make([]byte, maxBytes)
 	respSize := int64(-1)
 	if resp != nil {
 		startSize, readErr := resp.Body.Read(buf)

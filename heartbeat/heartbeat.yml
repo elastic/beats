@@ -101,6 +101,8 @@ setup.kibana:
 
 # Configure what output to use when sending the data collected by the beat.
 
+#output.console: ~
+
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
