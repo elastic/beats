@@ -264,6 +264,12 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	// First, check the cache
 	license := licenseCache.get()
 
+	// License found in cache, return it
+	if license != nil {
+		return license, nil
+	}
+
+	// License not found in cache, fetch it from Elasticsearch
 	info, err := GetInfo(http, resetURI)
 	if err != nil {
 		return nil, err
@@ -275,24 +281,22 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 		licensePath = "_license"
 	}
 
-	// Not cached, fetch license from Elasticsearch
-	if license == nil {
-		content, err := fetchPath(http, resetURI, licensePath, "")
-		if err != nil {
-			return nil, err
-		}
-
-		var data licenseWrapper
-		err = json.Unmarshal(content, &data)
-		if err != nil {
-			return nil, err
-		}
-
-		// Cache license for a minute
-		licenseCache.set(&data.License, time.Minute)
+	content, err := fetchPath(http, resetURI, licensePath, "")
+	if err != nil {
+		return nil, err
 	}
 
-	return licenseCache.get(), nil
+	var data licenseWrapper
+	err = json.Unmarshal(content, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	// Cache license for a minute
+	license = &data.License
+	licenseCache.set(license, time.Minute)
+
+	return license, nil
 }
 
 // GetClusterState returns cluster state information.

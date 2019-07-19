@@ -10,6 +10,8 @@ The module has transformations for the following event IDs:
 
 * 4624 - An account was successfully logged on.
 * 4625 - An account failed to log on.
+* 4634 - An account was logged off.
+* 4647 - User initiated logoff (interactive logon types).
 * 4648 - A logon was attempted using explicit credentials.
 
 More event IDs will be added.

@@ -118,13 +118,15 @@ var ciscoIOS = (function() {
     var processMessage = new processor.Chain()
         // Parse the header of the message that is common to all messages.
         .Dissect({
-            "tokenizer": "%{}%%{cisco.ios.facility}-%{event.severity}-%{event.code}: %{_message}",
+            "tokenizer": "%{}%%{cisco.ios.facility}-%{_event_severity}-%{event.code}: %{_message}",
             "field": "message",
             "target_prefix": "",
         })
         .Add(function(evt) {
             evt.Delete("message");
             evt.Rename("_message", "message");
+            evt.Delete("event.severity");
+            evt.Rename("_event_severity", "event.severity");
         })
         .Convert({
             fields: [
