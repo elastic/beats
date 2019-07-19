@@ -35,6 +35,7 @@ type jvm struct {
 		HeapUsedInBytes int `json:"heap_used_in_bytes"`
 		HeapUsedPercent int `json:"heap_used_percent"`
 	} `json:"mem"`
+	UptimeInMillis int `json:"uptime_in_millis"`
 }
 
 type events struct {
