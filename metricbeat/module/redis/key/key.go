@@ -73,6 +73,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches information from Redis keys
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	conn := m.Connection()
+	defer conn.Close()
+
 	for _, p := range m.patterns {
 		if err := redis.Select(conn, p.Keyspace); err != nil {
 			logp.Err("Failed to select keyspace %d: %s", p.Keyspace, err)
