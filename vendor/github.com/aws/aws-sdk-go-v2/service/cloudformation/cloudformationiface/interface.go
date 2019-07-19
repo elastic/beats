@@ -9,14 +9,15 @@
 package cloudformationiface
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 )
 
-// CloudFormationAPI provides an interface to enable mocking the
-// cloudformation.CloudFormation service client's API operation,
-// paginators, and waiters. This make unit testing your code that calls out
-// to the SDK's service client's calls easier.
+// ClientAPI provides an interface to enable mocking the
+// cloudformation.Client methods. This make unit testing your code that
+// calls out to the SDK's service client's calls easier.
 //
 // The best way to use this interface is so the SDK's service client's calls
 // can be stubbed out for unit testing your code with the SDK without needing
@@ -24,7 +25,7 @@ import (
 //
 //    // myFunc uses an SDK service client to make a request to
 //    // AWS CloudFormation.
-//    func myFunc(svc cloudformationiface.CloudFormationAPI) bool {
+//    func myFunc(svc cloudformationiface.ClientAPI) bool {
 //        // Make svc.CancelUpdateStack request
 //    }
 //
@@ -42,16 +43,16 @@ import (
 // In your _test.go file:
 //
 //    // Define a mock struct to be used in your unit tests of myFunc.
-//    type mockCloudFormationClient struct {
-//        cloudformationiface.CloudFormationAPI
+//    type mockClientClient struct {
+//        cloudformationiface.ClientPI
 //    }
-//    func (m *mockCloudFormationClient) CancelUpdateStack(input *cloudformation.CancelUpdateStackInput) (*cloudformation.CancelUpdateStackOutput, error) {
+//    func (m *mockClientClient) CancelUpdateStack(input *cloudformation.CancelUpdateStackInput) (*cloudformation.CancelUpdateStackOutput, error) {
 //        // mock response/functionality
 //    }
 //
 //    func TestMyFunc(t *testing.T) {
 //        // Setup Test
-//        mockSvc := &mockCloudFormationClient{}
+//        mockSvc := &mockClientClient{}
 //
 //        myfunc(mockSvc)
 //
@@ -62,7 +63,7 @@ import (
 // when the service model is updated and adds new API operations, paginators,
 // and waiters. Its suggested to use the pattern above for testing, or using
 // tooling to generate mocks to satisfy the interfaces.
-type CloudFormationAPI interface {
+type ClientAPI interface {
 	CancelUpdateStackRequest(*cloudformation.CancelUpdateStackInput) cloudformation.CancelUpdateStackRequest
 
 	ContinueUpdateRollbackRequest(*cloudformation.ContinueUpdateRollbackInput) cloudformation.ContinueUpdateRollbackRequest
@@ -87,11 +88,15 @@ type CloudFormationAPI interface {
 
 	DescribeChangeSetRequest(*cloudformation.DescribeChangeSetInput) cloudformation.DescribeChangeSetRequest
 
+	DescribeStackDriftDetectionStatusRequest(*cloudformation.DescribeStackDriftDetectionStatusInput) cloudformation.DescribeStackDriftDetectionStatusRequest
+
 	DescribeStackEventsRequest(*cloudformation.DescribeStackEventsInput) cloudformation.DescribeStackEventsRequest
 
 	DescribeStackInstanceRequest(*cloudformation.DescribeStackInstanceInput) cloudformation.DescribeStackInstanceRequest
 
 	DescribeStackResourceRequest(*cloudformation.DescribeStackResourceInput) cloudformation.DescribeStackResourceRequest
+
+	DescribeStackResourceDriftsRequest(*cloudformation.DescribeStackResourceDriftsInput) cloudformation.DescribeStackResourceDriftsRequest
 
 	DescribeStackResourcesRequest(*cloudformation.DescribeStackResourcesInput) cloudformation.DescribeStackResourcesRequest
 
@@ -100,6 +105,10 @@ type CloudFormationAPI interface {
 	DescribeStackSetOperationRequest(*cloudformation.DescribeStackSetOperationInput) cloudformation.DescribeStackSetOperationRequest
 
 	DescribeStacksRequest(*cloudformation.DescribeStacksInput) cloudformation.DescribeStacksRequest
+
+	DetectStackDriftRequest(*cloudformation.DetectStackDriftInput) cloudformation.DetectStackDriftRequest
+
+	DetectStackResourceDriftRequest(*cloudformation.DetectStackResourceDriftInput) cloudformation.DetectStackResourceDriftRequest
 
 	EstimateTemplateCostRequest(*cloudformation.EstimateTemplateCostInput) cloudformation.EstimateTemplateCostRequest
 
@@ -145,20 +154,15 @@ type CloudFormationAPI interface {
 
 	ValidateTemplateRequest(*cloudformation.ValidateTemplateInput) cloudformation.ValidateTemplateRequest
 
-	WaitUntilChangeSetCreateComplete(*cloudformation.DescribeChangeSetInput) error
-	WaitUntilChangeSetCreateCompleteWithContext(aws.Context, *cloudformation.DescribeChangeSetInput, ...aws.WaiterOption) error
+	WaitUntilChangeSetCreateComplete(context.Context, *cloudformation.DescribeChangeSetInput, ...aws.WaiterOption) error
 
-	WaitUntilStackCreateComplete(*cloudformation.DescribeStacksInput) error
-	WaitUntilStackCreateCompleteWithContext(aws.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
+	WaitUntilStackCreateComplete(context.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
 
-	WaitUntilStackDeleteComplete(*cloudformation.DescribeStacksInput) error
-	WaitUntilStackDeleteCompleteWithContext(aws.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
+	WaitUntilStackDeleteComplete(context.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
 
-	WaitUntilStackExists(*cloudformation.DescribeStacksInput) error
-	WaitUntilStackExistsWithContext(aws.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
+	WaitUntilStackExists(context.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
 
-	WaitUntilStackUpdateComplete(*cloudformation.DescribeStacksInput) error
-	WaitUntilStackUpdateCompleteWithContext(aws.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
+	WaitUntilStackUpdateComplete(context.Context, *cloudformation.DescribeStacksInput, ...aws.WaiterOption) error
 }
 
-var _ CloudFormationAPI = (*cloudformation.CloudFormation)(nil)
+var _ ClientAPI = (*cloudformation.Client)(nil)

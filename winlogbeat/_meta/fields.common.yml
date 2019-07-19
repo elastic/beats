@@ -193,6 +193,13 @@
           required: false
           description: The version number of the event's definition.
 
+        - name: logon.type
+          type: keyword
+          description: >
+            Logon type name. This is the descriptive version of the
+            `winlog.event_data.LogonType` ordinal. This is an enrichment added
+            by the Security module.
+
 # Aliases for the old fields
 - key: eventlog
   title: Event log record

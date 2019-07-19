@@ -13,7 +13,10 @@ MAGE_IMPORT_PATH=${BEAT_PATH}/vendor/github.com/magefile/mage
 
 # Initial beat setup
 .PHONY: setup
-setup: copy-vendor git-init create-metricset collect git-add
+setup: copy-vendor git-init
+	#call make recursively so we can reload the above include.
+	#Only needed during the first setup phase, before /vendor exists
+	$(MAKE) create-metricset collect git-add
 
 # Copy beats into vendor directory
 .PHONY: copy-vendor

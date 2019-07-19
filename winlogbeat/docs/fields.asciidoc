@@ -1,6 +1,6 @@
 
 ////
-This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
+This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 ////
 
 [[exported-fields]]
@@ -4154,6 +4154,16 @@ The version number of the event's definition.
 type: long
 
 required: False
+
+--
+
+*`winlog.logon.type`*::
++
+--
+Logon type name. This is the descriptive version of the `winlog.event_data.LogonType` ordinal. This is an enrichment added by the Security module.
+
+
+type: keyword
 
 --
 

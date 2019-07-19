@@ -28,6 +28,13 @@ must include the module and fileset name. For example:
 ./{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
 ----
 
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} -e -M "nginx.access.var.paths=[/usr/local/var/log/nginx/access.log*]"
+----
+
 *linux:*
 
 ["source","sh",subs="attributes"]
