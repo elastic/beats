@@ -37,8 +37,15 @@ type jvm struct {
 	} `json:"mem"`
 }
 
+type events struct {
+	DurationInMillis int `json:"duration_in_millis"`
+	In               int `json:"in"`
+	Filtered         int `json:"filtered"`
+	Out              int `json:"out"`
+}
+
 type commonStats struct {
-	Events  map[string]interface{} `json:"events"`
+	Events  events                 `json:"events"`
 	JVM     jvm                    `json:"jvm"`
 	Reloads map[string]interface{} `json:"reloads"`
 	Queue   struct {
@@ -93,13 +100,6 @@ type reloads struct {
 	Failures  int `json:"failures"`
 }
 
-type events struct {
-	DurationInMillis int `json:"duration_in_millis"`
-	In               int `json:"in"`
-	Filtered         int `json:"filtered"`
-	Out              int `json:"out"`
-}
-
 // NodeStats represents the stats of a Logstash node
 type NodeStats struct {
 	nodeInfo
@@ -124,7 +124,7 @@ type PipelineStats struct {
 	ID          string                   `json:"id"`
 	Hash        string                   `json:"hash"`
 	EphemeralID string                   `json:"ephemeral_id"`
-	Events      events                   `json:"events"`
+	Events      map[string]interface{}   `json:"events"`
 	Reloads     reloads                  `json:"reloads"`
 	Queue       map[string]interface{}   `json:"queue"`
 	Vertices    []map[string]interface{} `json:"vertices"`
