@@ -125,7 +125,13 @@
             "version": "7.0.0"
           }
         ],
-        "timeRestore": false,
+        "refreshInterval": {
+          "pause": true,
+          "value": 0
+        },
+        "timeFrom": "now-2M",
+        "timeRestore": true,
+        "timeTo": "now",
         "title": "[Filebeat] IBM MQ error log overview",
         "version": 1
       },
@@ -176,8 +182,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-05-22T10:53:52.247Z",
-      "version": "WzExODEsMV0="
+      "updated_at": "2019-06-11T08:33:58.464Z",
+      "version": "WzkwLDFd"
     },
     {
       "attributes": {
@@ -238,12 +244,12 @@
       },
       "id": "4b2794c0-d901-11e8-aa1c-3fc8e6195a8e",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [],
       "type": "visualization",
       "updated_at": "2019-05-22T10:33:56.383Z",
-      "version": "WzExNzMsMV0="
+      "version": "Wzg4LDFd"
     },
     {
       "attributes": {
@@ -275,7 +281,7 @@
               "id": "4",
               "params": {
                 "customLabel": "Errorcode",
-                "field": "ibmmq.errorlog.errorcode",
+                "field": "ibmmq.errorlog.code",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -309,7 +315,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Host",
-                "field": "ibmmq.errorlog.hostname",
+                "field": "host.name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -341,7 +347,7 @@
       },
       "id": "08ac8160-d90f-11e8-aa1c-3fc8e6195a8e",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -351,8 +357,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-22T10:35:04.875Z",
-      "version": "WzExNzQsMV0="
+      "updated_at": "2019-07-19T10:02:23.159Z",
+      "version": "WzI0MiwxXQ=="
     },
     {
       "attributes": {
@@ -417,7 +423,7 @@
       },
       "id": "52a959d0-7c7c-11e9-9645-e37efaf5baff",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -428,7 +434,7 @@
       ],
       "type": "visualization",
       "updated_at": "2019-05-22T10:28:21.613Z",
-      "version": "WzExNjcsMV0="
+      "version": "WzgyLDFd"
     },
     {
       "attributes": {
@@ -453,7 +459,7 @@
               "id": "1",
               "params": {
                 "customLabel": "Error Codes",
-                "field": "ibmmq.errorlog.errorcode"
+                "field": "ibmmq.errorlog.code"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -493,7 +499,7 @@
       },
       "id": "679ef390-7c7c-11e9-9645-e37efaf5baff",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -503,8 +509,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-22T10:29:16.727Z",
-      "version": "WzExNjksMV0="
+      "updated_at": "2019-07-19T10:01:33.570Z",
+      "version": "WzI0MSwxXQ=="
     },
     {
       "attributes": {
@@ -569,7 +575,7 @@
       },
       "id": "9387a4c0-7c7c-11e9-9645-e37efaf5baff",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -580,7 +586,7 @@
       ],
       "type": "visualization",
       "updated_at": "2019-05-22T10:30:10.444Z",
-      "version": "WzExNzAsMV0="
+      "version": "Wzg0LDFd"
     },
     {
       "attributes": {
@@ -624,7 +630,7 @@
               "params": {
                 "aggregate": "concat",
                 "customLabel": "Description",
-                "field": "ibmmq.errorlog.errordescription",
+                "field": "message",
                 "size": 1,
                 "sortField": "@timestamp",
                 "sortOrder": "desc"
@@ -665,7 +671,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Error Codes",
-                "field": "ibmmq.errorlog.errorcode",
+                "field": "ibmmq.errorlog.code",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -695,7 +701,7 @@
       },
       "id": "b6308f30-7c7e-11e9-9645-e37efaf5baff",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -705,15 +711,15 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-22T10:49:11.146Z",
-      "version": "WzExNzgsMV0="
+      "updated_at": "2019-07-19T10:03:39.835Z",
+      "version": "WzI0MywxXQ=="
     },
     {
       "attributes": {
         "columns": [
-          "ibmmq.errorlog.hostname",
+          "host.name",
           "ibmmq.errorlog.qmgr",
-          "ibmmq.errorlog.errordescription"
+          "message"
         ],
         "description": "",
         "hits": 0,
@@ -748,8 +754,8 @@
         }
       ],
       "type": "search",
-      "updated_at": "2018-10-26T09:13:14.466Z",
-      "version": "WzMzLDFd"
+      "updated_at": "2019-07-19T10:04:54.699Z",
+      "version": "WzI0NiwxXQ=="
     },
     {
       "attributes": {
@@ -796,7 +802,7 @@
       },
       "id": "bf8e5de0-7c7f-11e9-9645-e37efaf5baff",
       "migrationVersion": {
-        "visualization": "7.0.0"
+        "visualization": "7.2.0"
       },
       "references": [
         {
@@ -807,8 +813,8 @@
       ],
       "type": "visualization",
       "updated_at": "2019-05-22T10:52:52.798Z",
-      "version": "WzExODAsMV0="
+      "version": "Wzg3LDFd"
     }
   ],
-  "version": "7.0.0"
+  "version": "7.2.0"
 }
