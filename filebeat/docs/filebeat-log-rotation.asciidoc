@@ -82,6 +82,8 @@ Thus, a file is never renamed to an older file, and the log writer cannot fail t
 
 This highly reduces the chance of log writing, rotation, and collecting interfering with each other.
 
-Check out Frequently Asked Question about logrotation on Windows:
+As it's usually the logging application doing the rotation, we are not providing an example configuration for Windows.
+
+To learn more the topic check out Frequently Asked Question about logrotation on Windows:
 
 * <<windows-file-rotation>>
