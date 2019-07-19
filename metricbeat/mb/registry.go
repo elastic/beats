@@ -309,6 +309,15 @@ func (r *Register) Modules() []string {
 		modules = append(modules, module)
 	}
 
+	// List also modules from secondary sources
+	if source := r.secondarySource; source != nil {
+		sourceModules, err := source.Modules()
+		if err != nil {
+			logp.Error(errors.Wrap(err, "failed to get modules from secondary source"))
+		}
+		modules = append(modules, sourceModules...)
+	}
+
 	//grab a more comprehensive list from the metricset keys, then reduce and merge
 	for mod := range r.metricSets {
 		//skip over values we got from the modules map
