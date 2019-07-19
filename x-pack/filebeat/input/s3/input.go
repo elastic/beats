@@ -220,24 +220,24 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 	// process messages received from sqs
 	for i := range messages {
 		errC := make(chan error)
-		// launch goroutine to handle each message from sqs
-		go func(message sqs.Message) {
-			defer wg.Done()
-			defer close(errC)
-
-			s3Infos, err := handleSQSMessage(message)
-			if err != nil {
-				p.logger.Error(errors.Wrap(err, "handelMessage failed"))
-				return
-			}
-
-			// read from s3 object and create event for each log line
-			p.handleS3Objects(svcS3, s3Infos, errC)
-		}(messages[i])
-
+		go p.processMessage(svcS3, messages[i], &wg, errC)
 		go p.sendKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
 	}
 	wg.Wait()
+}
+
+func (p *Input) processMessage(svcS3 *s3.Client, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
+	defer wg.Done()
+	defer close(errC)
+
+	s3Infos, err := handleSQSMessage(message)
+	if err != nil {
+		p.logger.Error(errors.Wrap(err, "handelMessage failed"))
+		return
+	}
+
+	// read from s3 object and create event for each log line
+	p.handleS3Objects(svcS3, s3Infos, errC)
 }
 
 func (p *Input) sendKeepAlive(svcSQS *sqs.Client, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) {
