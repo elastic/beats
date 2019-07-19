@@ -300,12 +300,12 @@ func (r *Register) Modules() []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	var dups = map[string]int{}
+	var dups = map[string]bool{}
 
-	//for the sake of compatibility, grab modules the old way as well, right from the modules map
+	// For the sake of compatibility, grab modules the old way as well, right from the modules map
 	modules := make([]string, 0, len(r.modules))
 	for module := range r.modules {
-		dups[module]++
+		dups[module] = true
 		modules = append(modules, module)
 	}
 
@@ -318,9 +318,9 @@ func (r *Register) Modules() []string {
 		modules = append(modules, sourceModules...)
 	}
 
-	//grab a more comprehensive list from the metricset keys, then reduce and merge
+	// Grab a more comprehensive list from the metricset keys, then reduce and merge
 	for mod := range r.metricSets {
-		//skip over values we got from the modules map
+		// Skip over values we got from the modules map
 		if _, ok := dups[mod]; ok {
 			continue
 		}
