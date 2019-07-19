@@ -30,6 +30,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
@@ -208,15 +210,18 @@ func execPing(
 	event *beat.Event,
 	client *http.Client,
 	req *http.Request,
-	body []byte,
+	reqBody []byte,
 	timeout time.Duration,
 	validator func(*http.Response) error,
 ) (start, end time.Time, errReason reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	req = attachRequestBody(&ctx, req, body)
+	req = attachRequestBody(&ctx, req, reqBody)
+
 	start, end, resp, errReason := execRequest(client, req, validator)
+
+	respBody, respSize := readBodySampleAndClose(resp, 1024)
 
 	if errReason == nil || errReason.Type() != "io" {
 		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
@@ -227,8 +232,13 @@ func execPing(
 	}
 
 	if resp != nil {
+		responseFields := common.MapStr{"status_code": resp.StatusCode}
+		if respSize > -1 {
+			responseFields["body"] = respBody
+			responseFields["body_size_bytes"] = respSize
+		}
 		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-			"response": common.MapStr{"status_code": resp.StatusCode},
+			"response": responseFields,
 		}})
 	}
 
@@ -242,6 +252,36 @@ func execPing(
 	return start, end, nil
 }
 
+// readBodySampleAndClose reads the first sampleSize bytes from the httpResponse,
+// then closes the body (which closes the connection). It doesn't return any errors
+// but does log them. During an error case the return values will be (nil, -1).
+func readBodySampleAndClose(resp *http.Response, sampleSize int) (bodySample *string, bodySize int64) {
+	if resp == nil {
+		return nil, -1
+	}
+	defer resp.Body.Close()
+
+	// Function to lazily get the body of the response
+	buf := make([]byte, 1024)
+	respSize := int64(-1)
+	if resp != nil {
+		startSize, readErr := resp.Body.Read(buf)
+		if startSize > 0 {
+			buf = buf[0:startSize]
+			// Read the entirety of the body. Otherwise, the stats for the check
+			// don't include download time.
+			restSize, _ := io.Copy(ioutil.Discard, resp.Body)
+			respSize = int64(startSize) + restSize
+		} else if readErr != nil {
+			logp.Warn("could not read HTTP response body after ping: %s", readErr)
+			buf = buf[:0]
+		}
+	}
+
+	bodyStr := string(buf)
+	return &bodyStr, respSize
+}
+
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
 	req = req.WithContext(*ctx)
 	if len(body) > 0 {
@@ -252,12 +292,10 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 	return req
 }
 
+// execute the request. Note that this does not close the resp body, which should be done by caller
 func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, end time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
-	if resp != nil { // If above errors, the response will be nil
-		defer resp.Body.Close()
-	}
 	end = time.Now()
 
 	if err != nil {
@@ -268,10 +306,6 @@ func execRequest(client *http.Client, req *http.Request, validator func(*http.Re
 	if err != nil {
 		return start, time.Now(), resp, reason.ValidateFailed(err)
 	}
-
-	// Read the entirety of the body. Otherwise, the stats for the check
-	// don't include download time.
-	io.Copy(ioutil.Discard, resp.Body)
 
 	return start, time.Now(), resp, nil
 }

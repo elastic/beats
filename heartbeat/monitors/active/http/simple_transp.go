@@ -144,7 +144,7 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		// finally, return the real error. No need to return a response here
 		return nil, errors.New("http: request timed out while waiting for response")
 	}
-	close(readerDone)
+	//close(readerDone)
 
 	return ret.resp, ret.err
 }
