@@ -40,10 +40,15 @@ type Processor interface {
 	String() string
 }
 
-func New(config PluginConfig) (*Processors, error) {
-	procs := &Processors{
-		log: logp.NewLogger(logName),
+func NewList(log *logp.Logger) *Processors {
+	if log == nil {
+		log = logp.NewLogger(logName)
 	}
+	return &Processors{log: log}
+}
+
+func New(config PluginConfig) (*Processors, error) {
+	procs := NewList(nil)
 
 	for _, procConfig := range config {
 		// Handle if/then/else processor which has multiple top-level keys.
