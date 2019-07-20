@@ -50,6 +50,7 @@ func init() {
 					"fdatasync",
 					"flock",
 					"fstat64",
+					"fstatat64",
 					"fsync",
 					"ftruncate64",
 					"futex",
