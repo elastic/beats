@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/tests/resources"
@@ -147,7 +147,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 		"close_eof": true,
 	})
 
-	events := make(chan *util.Data, 100)
+	events := make(chan beat.Event, 100)
 	defer close(events)
 	capturer := NewEventCapturer(events)
 	defer capturer.Close()
@@ -169,7 +169,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	for {
 		select {
 		case event := <-events:
-			if state := event.GetState(); state.Finished {
+			if state, ok := event.Private.(file.State); ok && state.Finished {
 				assert.Equal(t, len(logs), int(state.Offset), "file has not been fully read")
 				go func() {
 					closer(context, input.(*Input))
@@ -292,17 +292,17 @@ type eventCapturer struct {
 	closed    bool
 	c         chan struct{}
 	closeOnce sync.Once
-	events    chan *util.Data
+	events    chan beat.Event
 }
 
-func NewEventCapturer(events chan *util.Data) channel.Outleter {
+func NewEventCapturer(events chan beat.Event) channel.Outleter {
 	return &eventCapturer{
 		c:      make(chan struct{}),
 		events: events,
 	}
 }
 
-func (o *eventCapturer) OnEvent(event *util.Data) bool {
+func (o *eventCapturer) OnEvent(event beat.Event) bool {
 	o.events <- event
 	return true
 }
@@ -322,6 +322,6 @@ func (o *eventCapturer) Done() <-chan struct{} {
 // TestOutlet is an empty outlet for testing
 type TestOutlet struct{}
 
-func (o TestOutlet) OnEvent(event *util.Data) bool { return true }
+func (o TestOutlet) OnEvent(event beat.Event) bool { return true }
 func (o TestOutlet) Close() error                  { return nil }
 func (o TestOutlet) Done() <-chan struct{}         { return nil }
