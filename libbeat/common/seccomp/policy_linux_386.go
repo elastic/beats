@@ -78,6 +78,7 @@ func init() {
 					"mprotect",
 					"munmap",
 					"nanosleep",
+					"newfstatat",
 					"open",
 					"openat",
 					"pipe",
