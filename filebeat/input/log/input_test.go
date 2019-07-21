@@ -49,6 +49,8 @@ func TestInputFileExclude(t *testing.T) {
 	assert.False(t, p.isFileExcluded("/tmp/log/logw.log"))
 }
 
+type connectorFn func(*common.Config, *common.MapStrPointer) (channel.Outleter, error)
+
 var cleanInactiveTests = []struct {
 	cleanInactive time.Duration
 	fileTime      time.Time
@@ -69,6 +71,14 @@ var cleanInactiveTests = []struct {
 		fileTime:      time.Now().Add(-5 * time.Second),
 		result:        false,
 	},
+}
+
+func (fn connectorFn) Connect(cfg *common.Config) (channel.Outleter, error) {
+	return fn(cfg, nil)
+}
+
+func (fn connectorFn) ConnectWith(cfg *common.Config, clientCfg beat.ClientConfig) (channel.Outleter, error) {
+	return fn(cfg, clientCfg.Processing.DynamicFields)
 }
 
 func TestIsCleanInactive(t *testing.T) {
@@ -155,7 +165,7 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 		return channel.SubOutlet(capturer), nil
 	}
 
-	input, err := NewInput(config, connector, context)
+	input, err := NewInput(config, connectorFn(connector), context)
 	if err != nil {
 		t.Error(err)
 		return
@@ -200,7 +210,7 @@ func TestNewInputDone(t *testing.T) {
 		Done: make(chan struct{}),
 	}
 
-	_, err := NewInput(config, connector, context)
+	_, err := NewInput(config, connectorFn(connector), context)
 	assert.NoError(t, err)
 
 	close(context.Done)
@@ -218,7 +228,7 @@ func TestNewInputError(t *testing.T) {
 
 	context := input.Context{}
 
-	_, err := NewInput(config, connector, context)
+	_, err := NewInput(config, connectorFn(connector), context)
 	assert.Error(t, err)
 }
 
