@@ -160,9 +160,9 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
-                message_key="msg",
                 keys_under_root=True,
-                overwrite_keys=True
+                overwrite_keys=True,
+                add_error_key=True,
             ),
         )
         os.mkdir(self.working_dir + "/log/")
@@ -203,7 +203,8 @@ class Test(BaseTest):
             json=dict(
                 message_key="msg",
                 keys_under_root=True,
-                overwrite_keys=True
+                overwrite_keys=True,
+                add_error_key=True,
             ),
         )
         os.mkdir(self.working_dir + "/log/")

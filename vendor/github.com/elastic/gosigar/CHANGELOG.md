@@ -8,9 +8,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Fixed uptime calculation under Windows. #126
+
 ### Changed
 
 ### Deprecated
+
+## [0.10.4]
+
+### Fixed
+
+- Fixed a crash when splitting command-line arguments under Windows. #124
 
 ## [0.10.3]
 

@@ -7,6 +7,4 @@ If `management.path_prefix` is set in RabbitMQ configuration, `management_path_p
 [float]
 === Compatibility
 
-The rabbitmq module is tested with RabbitMQ 3.7.4, and it should be compatible
-with any version supporting the management plugin. This plugin needs to be
-enabled.
+The rabbitmq module is fully tested with RabbitMQ 3.7.4 and it should be compatible with any version supporting the management plugin (which needs to be installed and enabled). Exchange metricset is also tested with 3.6.0, 3.6.5 and 3.7.14
