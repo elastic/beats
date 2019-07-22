@@ -19,7 +19,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
 // MockEC2Client struct is used for unit tests.
@@ -126,11 +125,6 @@ func TestGetInstanceIDs(t *testing.T) {
 }
 
 func TestCreateCloudWatchEvents(t *testing.T) {
-	mockModuleConfig := aws.Config{
-		Period:        300 * time.Second,
-		DefaultRegion: regionName,
-	}
-
 	expectedEvent := mb.Event{
 		RootFields: common.MapStr{
 			"service": common.MapStr{"name": "ec2"},
@@ -199,7 +193,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	}
 
 	metricSet := MetricSet{}
-	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)
