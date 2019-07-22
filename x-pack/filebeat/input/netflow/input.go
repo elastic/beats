@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package netflow
 
@@ -17,7 +30,6 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/udp"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -67,13 +79,18 @@ func init() {
 // NewInput creates a new Netflow input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	initLogger.Do(func() {
 		logger = logp.NewLogger(inputName)
 	})
-	out, err := outlet(cfg, context.DynamicFields)
+
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -113,10 +130,8 @@ func NewInput(
 }
 
 func (p *netflowInput) Publish(events []beat.Event) error {
-	for _, ev := range events {
-		e := util.NewData()
-		e.Event = ev
-		p.forwarder.Send(e)
+	for _, evt := range events {
+		p.forwarder.Send(evt)
 	}
 	return nil
 }

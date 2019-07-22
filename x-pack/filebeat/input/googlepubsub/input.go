@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package googlepubsub
 
@@ -19,7 +32,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
@@ -57,7 +69,7 @@ type pubsubInput struct {
 // a topic subscription.
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
 	// Extract and validate the input's configuration.
@@ -67,7 +79,11 @@ func NewInput(
 	}
 
 	// Build outlet for events.
-	out, err := outlet(cfg, inputContext.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: inputContext.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -191,27 +207,27 @@ func makeTopicID(project, topic string) string {
 	return prefix[:10]
 }
 
-func makeEvent(topicID string, msg *pubsub.Message) *util.Data {
+func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 	id := topicID + "-" + msg.ID
 
-	event := beat.Event{
+	fields := common.MapStr{
+		"event": common.MapStr{
+			"id":      id,
+			"created": time.Now().UTC(),
+		},
+		"message": string(msg.Data),
+	}
+	if len(msg.Attributes) > 0 {
+		fields.Put("labels", msg.Attributes)
+	}
+
+	return beat.Event{
 		Timestamp: msg.PublishTime.UTC(),
 		Meta: common.MapStr{
 			"id": id,
 		},
-		Fields: common.MapStr{
-			"event": common.MapStr{
-				"id":      id,
-				"created": time.Now().UTC(),
-			},
-			"message": string(msg.Data),
-		},
+		Fields: fields,
 	}
-	if len(msg.Attributes) > 0 {
-		event.Fields.Put("labels", msg.Attributes)
-	}
-
-	return &util.Data{Event: event}
 }
 
 func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscription, error) {
