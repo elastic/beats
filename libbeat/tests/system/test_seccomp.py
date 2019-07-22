@@ -23,7 +23,7 @@ def is_seccomp_supported():
     return {'i386', 'i686', 'x86_64', 'amd64'}.intersection(p)
 
 
-@unittest.skipUnless(is_seccomp_supported(), "Requires Linux 2.6.12 and i386/amd64")
+@unittest.skipUnless(is_seccomp_supported(), "Requires Linux 3.17 or greater and i386/amd64 architecture")
 class Test(BaseTest):
     """
     Test Beat seccomp policy is loaded
