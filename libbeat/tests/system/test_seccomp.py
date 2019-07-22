@@ -13,12 +13,12 @@ def is_version_below(version, target):
     return False
 
 
-# Require Linux greater than 2.6.12 and 386/amd64 platform
+# Require Linux greater or equal than 3.17 and 386/amd64 platform
 def is_seccomp_supported():
     p = platform.platform().split('-')
     if p[0] != 'Linux':
         return False
-    if is_version_below(p[1], '2.6.12'):
+    if is_version_below(p[1], '3.17'):
         return False
     return {'i386', 'i686', 'x86_64', 'amd64'}.intersection(p)
 
