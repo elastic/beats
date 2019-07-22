@@ -47,8 +47,10 @@ func addRespBodyFields(event *beat.Event, resp *http.Response, responseConfig re
 		if respSize > -1 {
 			eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
 				"response": common.MapStr{
-					"body.content": respBody,
-					"body.bytes":   respSize,
+					"body": common.MapStr{
+						"content": *respBody,
+						"bytes":   respSize,
+					},
 				},
 			}})
 		}
