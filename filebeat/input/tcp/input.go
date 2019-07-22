@@ -52,11 +52,11 @@ type Input struct {
 // NewInput creates a new TCP input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Connector,
+	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 
-	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
 		},

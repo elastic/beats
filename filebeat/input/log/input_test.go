@@ -49,8 +49,6 @@ func TestInputFileExclude(t *testing.T) {
 	assert.False(t, p.isFileExcluded("/tmp/log/logw.log"))
 }
 
-type connectorFn func(*common.Config, *common.MapStrPointer) (channel.Outleter, error)
-
 var cleanInactiveTests = []struct {
 	cleanInactive time.Duration
 	fileTime      time.Time
@@ -71,14 +69,6 @@ var cleanInactiveTests = []struct {
 		fileTime:      time.Now().Add(-5 * time.Second),
 		result:        false,
 	},
-}
-
-func (fn connectorFn) Connect(cfg *common.Config) (channel.Outleter, error) {
-	return fn(cfg, nil)
-}
-
-func (fn connectorFn) ConnectWith(cfg *common.Config, clientCfg beat.ClientConfig) (channel.Outleter, error) {
-	return fn(cfg, clientCfg.Processing.DynamicFields)
 }
 
 func TestIsCleanInactive(t *testing.T) {
@@ -161,11 +151,11 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 	defer close(events)
 	capturer := NewEventCapturer(events)
 	defer capturer.Close()
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(capturer), nil
-	}
+	})
 
-	input, err := NewInput(config, connectorFn(connector), context)
+	input, err := NewInput(config, connector, context)
 	if err != nil {
 		t.Error(err)
 		return
@@ -202,15 +192,15 @@ func TestNewInputDone(t *testing.T) {
 		"paths": path.Join(os.TempDir(), "logs", "*.log"),
 	})
 
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
 		return TestOutlet{}, nil
-	}
+	})
 
 	context := input.Context{
 		Done: make(chan struct{}),
 	}
 
-	_, err := NewInput(config, connectorFn(connector), context)
+	_, err := NewInput(config, connector, context)
 	assert.NoError(t, err)
 
 	close(context.Done)
@@ -222,13 +212,13 @@ func TestNewInputError(t *testing.T) {
 
 	config := common.NewConfig()
 
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
 		return TestOutlet{}, nil
-	}
+	})
 
 	context := input.Context{}
 
-	_, err := NewInput(config, connectorFn(connector), context)
+	_, err := NewInput(config, connector, context)
 	assert.Error(t, err)
 }
 
