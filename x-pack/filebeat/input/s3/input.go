@@ -10,7 +10,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -57,11 +56,12 @@ func init() {
 
 // Input is a input for s3
 type Input struct {
-	outlet    channel.Outleter
-	config    config
-	awsConfig awssdk.Config
-	logger    *logp.Logger
-	close     chan struct{}
+	outlet     channel.Outleter // Output of received s3 logs.
+	config     config
+	awsConfig  awssdk.Config
+	logger     *logp.Logger
+	close      chan struct{}
+	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
 }
 
 type s3Info struct {
@@ -125,10 +125,6 @@ func (c *config) Validate() error {
 		return errors.New("visibilityTimeout is not defined within the " +
 			"expected bounds")
 	}
-
-	if len(c.QueueURLs) == 0 {
-		return errors.New("no SQS queueURLs are configured")
-	}
 	return nil
 }
 
@@ -160,14 +156,13 @@ func getAWSCredentials(config config) (awssdk.Config, error) {
 
 // Run runs the input
 func (p *Input) Run() {
-	p.logger.Debugf("Run s3 input with queueURLs: %v", p.config.QueueURLs)
-	visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
+	p.workerOnce.Do(func() {
+		p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 
-	for _, queueURL := range p.config.QueueURLs {
-		regionName, err := getRegionFromQueueURL(queueURL)
+		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
+		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
-			p.logger.Errorf("failed to get region name from queueURL: %v", queueURL)
-			continue
+			p.logger.Errorf("failed to get region name from queueURL: %v", p.config.QueueURL)
 		}
 
 		awsConfig := p.awsConfig.Copy()
@@ -175,35 +170,51 @@ func (p *Input) Run() {
 		svcSQS := sqs.New(awsConfig)
 		svcS3 := s3.New(awsConfig)
 
+		go p.run(svcSQS, svcS3, visibilityTimeout)
+		go p.runKeepAlive()
+	})
+}
+
+func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int64) {
+	for {
 		// receive messages from sqs
 		req := svcSQS.ReceiveMessageRequest(
 			&sqs.ReceiveMessageInput{
-				QueueUrl:              &queueURL,
+				QueueUrl:              &p.config.QueueURL,
 				MessageAttributeNames: []string{"All"},
 				MaxNumberOfMessages:   &maxNumberOfMessage,
 				VisibilityTimeout:     &visibilityTimeout,
 				WaitTimeSeconds:       &waitTimeSecond,
 			})
+
 		output, err := req.Send(context.Background())
 		if err != nil {
 			p.logger.Error("failed to receive message from SQS:", err)
-			continue
+			close(p.close)
 		}
 
-		if len(output.Messages) == 0 {
-			p.logger.Debug("no message received from SQS:", queueURL)
+		if output == nil || len(output.Messages) == 0 {
+			p.logger.Debug("no message received from SQS:", p.config.QueueURL)
 			continue
 		}
 
 		// process messages received from sqs, get logs from s3 and create events
-		p.processor(queueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
+		p.processor(p.config.QueueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
+	}
+}
+
+func (p *Input) runKeepAlive() {
+	select {
+	case <-p.close:
+		return
+	default:
 	}
 }
 
 // Stop stops the s3 input
 func (p *Input) Stop() {
-	close(p.close)
 	defer p.outlet.Close()
+	close(p.close)
 	p.logger.Info("Stopping s3 input")
 }
 
@@ -221,7 +232,7 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 	for i := range messages {
 		errC := make(chan error)
 		go p.processMessage(svcS3, messages[i], &wg, errC)
-		go p.sendKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
+		go p.processorKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
 	}
 	wg.Wait()
 }
@@ -240,7 +251,7 @@ func (p *Input) processMessage(svcS3 *s3.Client, message sqs.Message, wg *sync.W
 	p.handleS3Objects(svcS3, s3Infos, errC)
 }
 
-func (p *Input) sendKeepAlive(svcSQS *sqs.Client, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) {
+func (p *Input) processorKeepAlive(svcSQS *sqs.Client, message sqs.Message, queueURL string, visibilityTimeout int64, errC chan error) {
 	for {
 		select {
 		case <-p.close:
@@ -427,7 +438,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat
 		},
 	}
 	return &beat.Event{
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
+		// Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
 	}

@@ -29,7 +29,7 @@ Example configuration 1:
 ----
 {beatname_lc}.inputs:
 - type: s3
-  queue_urls: ["https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue"]
+  queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:"”}'
@@ -41,7 +41,7 @@ Example configuration 2:
 ----
 {beatname_lc}.inputs:
 - type: s3
-  queue_urls: ["https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue"]
+  queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
   credential_profile_name: test-s3-input
 ----
 
@@ -49,9 +49,9 @@ The `s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
-==== `queue_urls`
+==== `queue_url`
 
-URLs of the AWS SQS queues that messages will be received from. Required.
+URL of the AWS SQS queue that messages will be received from. Required.
 
 [float]
 ==== `visibility_timeout`
