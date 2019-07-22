@@ -1,0 +1,62 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"active": {
+				"count": 1
+			},
+			"created": {
+				"sec": 1563559848
+			},
+			"is_suspended": false,
+			"lastschedule": {
+				"sec": 1563561180
+			},
+			"name": "bye",
+			"namespace": "default",
+			"nextschedule": {
+				"sec": 1563561240
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"active": {
+				"count": 1
+			},
+			"created": {
+				"sec": 1563559712
+			},
+			"is_suspended": false,
+			"lastschedule": {
+				"sec": 1563561180
+			},
+			"name": "hello",
+			"namespace": "default",
+			"nextschedule": {
+				"sec": 1563561240
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"DisableTimeSeries": false
+	}
+]
