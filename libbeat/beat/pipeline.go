@@ -129,6 +129,7 @@ type PipelineACKHandler struct {
 }
 
 type ProcessorList interface {
+	Processor
 	All() []Processor
 }
 
@@ -144,9 +145,15 @@ type Processor interface {
 type PublishMode uint8
 
 const (
-	// DefaultGuarantees are up to the pipeline configuration, as configured by the
-	// operator.
+	// DefaultGuarantees are up to the pipeline configuration itself.
 	DefaultGuarantees PublishMode = iota
+
+	// OutputChooses mode fully depends on the output and its configuration.
+	// Events might be dropped based on the users output configuration.
+	// In this mode no events are dropped within the pipeline. Events are only removed
+	// after the output has ACKed the events to the pipeline, even if the output
+	// did drop the events.
+	OutputChooses
 
 	// GuaranteedSend ensures events are retried until acknowledged by the output.
 	// Normally guaranteed sending should be used with some client ACK-handling
