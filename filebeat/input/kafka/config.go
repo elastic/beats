@@ -31,26 +31,6 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
-type initialOffset int
-
-const (
-	initialOffsetOldest initialOffset = iota
-	initialOffsetNewest
-)
-
-var (
-	defaultConfig = kafkaInputConfig{
-		Version:       kafka.Version("1.0.0"),
-		InitialOffset: initialOffsetOldest,
-		ClientID:      "filebeat",
-	}
-
-	initialOffsets = map[string]initialOffset{
-		"oldest": initialOffsetOldest,
-		"newest": initialOffsetNewest,
-	}
-)
-
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
 	Hosts         []string          `config:"hosts" validate:"required"`
@@ -62,6 +42,28 @@ type kafkaInputConfig struct {
 	TLS           *tlscommon.Config `config:"ssl"`
 	Username      string            `config:"username"`
 	Password      string            `config:"password"`
+}
+
+type initialOffset int
+
+const (
+	initialOffsetOldest initialOffset = iota
+	initialOffsetNewest
+)
+
+var (
+	initialOffsets = map[string]initialOffset{
+		"oldest": initialOffsetOldest,
+		"newest": initialOffsetNewest,
+	}
+)
+
+func defaultConfig() kafkaInputConfig {
+	return kafkaInputConfig{
+		Version:       kafka.Version("1.0.0"),
+		InitialOffset: initialOffsetOldest,
+		ClientID:      "filebeat",
+	}
 }
 
 // Validate validates the config.

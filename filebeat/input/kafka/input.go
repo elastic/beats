@@ -41,7 +41,7 @@ func init() {
 }
 
 // Input contains the input and its config
-type Input struct {
+type kafkaInput struct {
 	config        kafkaInputConfig
 	rawConfig     *common.Config // The Config given to NewInput
 	started       bool
@@ -64,7 +64,7 @@ func NewInput(
 		return nil, err
 	}
 
-	config := defaultConfig
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "reading kafka input config")
 	}
@@ -91,7 +91,7 @@ func NewInput(
 		}
 	}()
 
-	input := &Input{
+	input := &kafkaInput{
 		config:        config,
 		rawConfig:     cfg,
 		started:       false,
@@ -105,44 +105,39 @@ func NewInput(
 	return input, nil
 }
 
-func (p *Input) newConsumerGroup() (sarama.ConsumerGroup, error) {
-	consumerGroup, err :=
-		sarama.NewConsumerGroup(p.config.Hosts, p.config.GroupID, nil)
-	return consumerGroup, err
-}
-
 // Run starts the input by scanning for incoming messages and errors.
-func (p *Input) Run() {
-	if !p.started {
+func (input *kafkaInput) Run() {
+	if !input.started {
 		// Track errors
 		go func() {
-			for err := range p.consumerGroup.Errors() {
-				p.log.Errorw("Error reading from kafka", "error", err)
+			for err := range input.consumerGroup.Errors() {
+				input.log.Errorw("Error reading from kafka", "error", err)
 			}
 		}()
 
 		go func() {
 			for {
-				handler := groupHandler{input: p}
+				handler := groupHandler{input: input}
 
-				err := p.consumerGroup.Consume(p.kafkaContext, p.config.Topics, handler)
+				err := input.consumerGroup.Consume(
+					input.kafkaContext, input.config.Topics, handler)
 				if err != nil {
-					p.log.Errorw("Kafka consume error", "error", err)
+					input.log.Errorw("Kafka consume error", "error", err)
 				}
 			}
 		}()
-		p.started = true
+		input.started = true
 	}
 }
 
 // Wait shuts down the Input by cancelling the internal context.
-func (p *Input) Wait() {
-	p.Stop()
+func (input *kafkaInput) Wait() {
+	input.Stop()
 }
 
 // Stop shuts down the Input by cancelling the internal context.
-func (p *Input) Stop() {
-	p.kafkaCancel()
+func (input *kafkaInput) Stop() {
+	input.kafkaCancel()
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
@@ -157,7 +152,7 @@ func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
 }
 
 type groupHandler struct {
-	input *Input
+	input *kafkaInput
 }
 
 func (h groupHandler) createEvent(
