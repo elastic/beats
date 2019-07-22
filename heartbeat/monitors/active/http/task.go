@@ -221,27 +221,30 @@ func execPing(
 	// we may want to add additional fields to contextualize the error.
 	start, resp, errReason := execRequest(client, req, validator)
 
+	// If we have no response object there probably was an IO error, we can skip the rest of the logic
+	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
+	// in other ways
+	if resp == nil {
+		return start, time.Now(), errReason
+	}
+
 	// Add response.status_code
-	if resp != nil {
-		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}})
-		// Download the body, close the response body, then attach all fields
-		err := handleRespBody(event, resp, responseConfig, errReason)
-		if err != nil {
-			return start, time.Now(), reason.IOFailed(err)
-		}
+	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}})
+	// Download the body, close the response body, then attach all fields
+	err := handleRespBody(event, resp, responseConfig, errReason)
+	if err != nil {
+		return start, time.Now(), reason.IOFailed(err)
 	}
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
 
 	// Add total HTTP RTT
-	if errReason == nil || errReason.Type() != "io" {
-		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-			"rtt": common.MapStr{
-				"total": look.RTT(end.Sub(start)),
-			},
-		}})
-	}
+	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+		"rtt": common.MapStr{
+			"total": look.RTT(end.Sub(start)),
+		},
+	}})
 
 	return start, end, errReason
 }
