@@ -7,14 +7,14 @@ The default metricsets are `ec2`, `sqs`, `s3_request`, `s3_daily_storage`, `clou
 [float]
 === Module-specific configuration notes
 
-`aws` module requires AWS credentials configuration in order to make AWS API calls.
+The `aws` module requires AWS credentials configuration in order to make AWS API calls.
 Users can either use `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and/or
 `AWS_SESSION_TOKEN`, or use shared AWS credentials file.
 Please see <<aws-credentials-config>> for more details.
 
-This module also accepts optional configuration `regions` to specify what are
-the AWS regions to query metrics from. If `regions` parameter is not set in the
-config file, then by default, `aws` module will query metrics from all available
+This module also accepts optional configuration `regions` to specify which
+AWS regions to query metrics from. If the `regions` parameter is not set in the
+config file, then by default, the `aws` module will query metrics from all available
 AWS regions.
 
 The aws module comes with a predefined dashboard. For example:
