@@ -16,8 +16,6 @@ import (
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/defaults"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -31,6 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 )
 
 const inputName = "s3"
@@ -104,7 +103,7 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, err
 	}
 
-	awsConfig, err := getAWSCredentials(config)
+	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
 	}
@@ -126,32 +125,6 @@ func (c *config) Validate() error {
 			"expected bounds")
 	}
 	return nil
-}
-
-func getAWSCredentials(config config) (awssdk.Config, error) {
-	// Check if accessKeyID and secretAccessKey is given from configuration
-	if config.AccessKeyID != "" && config.SecretAccessKey != "" {
-		awsConfig := defaults.Config()
-		awsCredentials := awssdk.Credentials{
-			AccessKeyID:     config.AccessKeyID,
-			SecretAccessKey: config.SecretAccessKey,
-		}
-		if config.SessionToken != "" {
-			awsCredentials.SessionToken = config.SessionToken
-		}
-
-		awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-			Value: awsCredentials,
-		}
-		return awsConfig, nil
-	}
-
-	// If accessKeyID and secretAccessKey is not given, then load from default config
-	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
-	// with more details.
-	return external.LoadDefaultAWSConfig(
-		external.WithSharedConfigProfile(config.ProfileName),
-	)
 }
 
 // Run runs the input
