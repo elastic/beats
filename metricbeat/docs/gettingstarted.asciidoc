@@ -182,7 +182,7 @@ configurations for all available {beatname_uc} modules.
 If you are using a Docker image, see <<running-on-docker>>.
 +
 The following examples enable the `apache` and `mysql` configs in the
-`modules.d` directory :
+`modules.d` directory:
 +
 *deb and rpm:*
 +
