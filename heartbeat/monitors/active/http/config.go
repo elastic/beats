@@ -118,7 +118,7 @@ func (r *responseConfig) Validate() error {
 	switch strings.ToLower(r.IncludeBody) {
 	case "always", "on_error", "never":
 	default:
-		return fmt.Errorf("unknown option for `include_body`: '%s', please use one of 'always', 'on_error', 'never'")
+		return fmt.Errorf("unknown option for `include_body`: '%s', please use one of 'always', 'on_error', 'never'", r.IncludeBody)
 	}
 
 	if r.IncludeBodyMaxBytes < 0 {

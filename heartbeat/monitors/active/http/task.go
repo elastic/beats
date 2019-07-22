@@ -29,6 +29,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -65,7 +66,7 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.IncludeBody)
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		return err
 	}), nil
 }
@@ -156,7 +157,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator)
+		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -266,6 +267,7 @@ func execPing(
 // but does log them. During an error case the return values will be (nil, -1).
 // The maxBytes params controls how many bytes will be returned in a string, not how many will be read.
 // We always read the full response here since we want to time downloading the full thing.
+// This may return a nil body if the response is not valid UTF-8
 func readBodySampleAndClose(resp *http.Response, maxBytes int) (bodySample *string, bodySize int64) {
 	if resp == nil {
 		return nil, -1
@@ -289,8 +291,12 @@ func readBodySampleAndClose(resp *http.Response, maxBytes int) (bodySample *stri
 		}
 	}
 
-	bodyStr := string(buf)
-	return &bodyStr, respSize
+	if utf8.Valid(buf) {
+		bodyStr := string(buf)
+		return &bodyStr, respSize
+	} else {
+		return nil, respSize
+	}
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
