@@ -11,16 +11,18 @@ import (
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 )
 
-var defaultConfig = config{
-	ForwarderConfig: harvester.ForwarderConfig{
-		Type: "s3",
-	},
-	VisibilityTimeout: 300 * time.Second,
-}
-
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	QueueURL                  string        `config:"queue_url" validate:"nonzero,required"`
 	VisibilityTimeout         time.Duration `config:"visibility_timeout"`
 	AwsConfig                 awscommon.ConfigAWS
+}
+
+func defaultConfig() config {
+	return config{
+		ForwarderConfig: harvester.ForwarderConfig{
+			Type: "s3",
+		},
+		VisibilityTimeout: 300 * time.Second,
+	}
 }

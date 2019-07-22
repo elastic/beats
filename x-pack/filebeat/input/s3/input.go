@@ -10,6 +10,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -90,13 +91,19 @@ type sqsMessage struct {
 // NewInput creates a new s3 input
 func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Beta("s3 input type is used")
-
 	logger := logp.NewLogger(inputName)
 
-	config := defaultConfig
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
+
+	var awsCred awscommon.ConfigAWS
+	if err := cfg.Unpack(&awsCred); err != nil {
+		return nil, errors.Wrap(err, "failed unpacking aws config")
+	}
+
+	config.AwsConfig = awsCred
 
 	outlet, err := outletFactory(cfg, context.DynamicFields)
 	if err != nil {
@@ -115,7 +122,6 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		logger:    logger,
 		close:     make(chan struct{}),
 	}
-
 	return p, nil
 }
 
@@ -411,7 +417,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat
 		},
 	}
 	return &beat.Event{
-		// Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
+		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
 	}
