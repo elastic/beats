@@ -161,14 +161,15 @@ these fields, but your {kib} visualizations and aggregations will not work on
 these fields until the conflicts are resolved. Some of your  {es} API queries
 may continue to work, if the old and new types are compatible.
 
-// TODO: Add a link to the breaking changes after we've added the list of type
-// changes. 
-// TODO: Add link to docs about resolving conflicts when they are available.
-
 We strongly advise that you adjust your custom {kib} dashboards, machine
-learning jobs, and other content to use the new ECS field names. After removing
-all references to old fields, you should set `migration.6_to_7.enabled: false`
-so that field aliases will not be created during your next minor upgrade.
+learning jobs, and other content to use the new ECS field names. To learn more
+about migrating to ECS, see the
+https://www.elastic.co/blog/migrating-to-elastic-common-schema-in-beats-environments[Migrating
+to Elastic Common Schema (ECS) in Beats environments] blog post.
+
+After removing all references to old fields, you should set
+`migration.6_to_7.enabled: false` so that field aliases will not be created
+during your next minor upgrade.
 
 The aliases will be removed in 8.0.
 
