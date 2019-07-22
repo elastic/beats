@@ -10,6 +10,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -40,9 +41,6 @@ var (
 	// than this value (however, fewer messages might be returned).
 	maxNumberOfMessage int64 = 10
 
-	// The maximum size of message queue for storing SQS messages.
-	maxMessageQueue int64 = 2
-
 	// The duration (in seconds) for which the call waits for a message to arrive
 	// in the queue before returning. If a message is available, the call returns
 	// sooner than WaitTimeSeconds. If no messages are available and the wait time
@@ -59,13 +57,11 @@ func init() {
 
 // Input is a input for s3
 type Input struct {
-	mutex        sync.Mutex
-	outlet       channel.Outleter
-	config       config
-	awsConfig    awssdk.Config
-	logger       *logp.Logger
-	close        chan struct{}
-	messageQueue chan sqs.Message
+	outlet    channel.Outleter
+	config    config
+	awsConfig awssdk.Config
+	logger    *logp.Logger
+	close     chan struct{}
 }
 
 type s3Info struct {
@@ -114,12 +110,11 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	}
 
 	p := &Input{
-		outlet:       outlet,
-		config:       config,
-		awsConfig:    awsConfig,
-		logger:       logger,
-		close:        make(chan struct{}),
-		messageQueue: make(chan sqs.Message, maxMessageQueue),
+		outlet:    outlet,
+		config:    config,
+		awsConfig: awsConfig,
+		logger:    logger,
+		close:     make(chan struct{}),
 	}
 
 	return p, nil
@@ -200,18 +195,14 @@ func (p *Input) Run() {
 			continue
 		}
 
-		for _, message := range output.Messages {
-			p.messageQueue <- message
-			// process messages received from sqs, get logs from s3 and create events
-			go p.processor(queueURL, visibilityTimeout, svcS3, svcSQS)
-		}
+		// process messages received from sqs, get logs from s3 and create events
+		p.processor(queueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
 	}
 }
 
 // Stop stops the s3 input
 func (p *Input) Stop() {
 	close(p.close)
-	close(p.messageQueue)
 	defer p.outlet.Close()
 	p.logger.Info("Stopping s3 input")
 }
@@ -221,22 +212,18 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
-func (p *Input) processor(queueURL string, visibilityTimeout int64, svcS3 *s3.Client, svcSQS *sqs.Client) {
-	wg := new(sync.WaitGroup)
+func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 *s3.Client, svcSQS *sqs.Client) {
+	var wg sync.WaitGroup
+	numMessages := len(messages)
+	wg.Add(numMessages)
 
 	// process messages received from sqs
-	for {
-		select {
-		case msg := <-p.messageQueue:
-			wg.Add(1)
-			errC := make(chan error)
-			go p.processMessage(svcS3, msg, wg, errC)
-			go p.sendKeepAlive(svcSQS, msg, queueURL, visibilityTimeout, errC)
-		default:
-			wg.Wait()
-			return
-		}
+	for i := range messages {
+		errC := make(chan error)
+		go p.processMessage(svcS3, messages[i], &wg, errC)
+		go p.sendKeepAlive(svcSQS, messages[i], queueURL, visibilityTimeout, errC)
 	}
+	wg.Wait()
 }
 
 func (p *Input) processMessage(svcS3 *s3.Client, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
@@ -440,7 +427,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat
 		},
 	}
 	return &beat.Event{
-		// Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
+		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
 	}
