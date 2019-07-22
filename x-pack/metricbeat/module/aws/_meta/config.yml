@@ -2,20 +2,12 @@
   period: 300s
   metricsets:
     - ec2
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   regions:
     - us-east-1
 - module: aws
   period: 300s
   metricsets:
     - cloudwatch
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
-  default_region: '${AWS_REGION:us-west-1}'
   cloudwatch_metrics:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
