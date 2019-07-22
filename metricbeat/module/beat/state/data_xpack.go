@@ -19,6 +19,7 @@ package state
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -54,7 +55,16 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []
 		"timestamp": now,
 	}
 
-	clusterUUID := getClusterUUID(state)
+	var clusterUUID string
+	if isOutputES(state) {
+		clusterUUID = getClusterUUID(state)
+		if clusterUUID == "" {
+			// Output is ES but cluster UUID could not be determined. No point sending monitoring
+			// data with empty cluster UUID since it will not be associated with the correct ES
+			// production cluster. Log error instead.
+			return fmt.Errorf("monitored beat is using Elasticsearch output but cluster UUID cannot be determined")
+		}
+	}
 
 	var event mb.Event
 	event.RootFields = common.MapStr{
@@ -107,4 +117,28 @@ func getClusterUUID(state map[string]interface{}) string {
 	}
 
 	return clusterUUID
+}
+
+func isOutputES(state map[string]interface{}) bool {
+	o, exists := state["output"]
+	if !exists {
+		return false
+	}
+
+	output, ok := o.(map[string]interface{})
+	if !ok {
+		return false
+	}
+
+	n, exists := output["name"]
+	if !exists {
+		return false
+	}
+
+	name, ok := n.(string)
+	if !ok {
+		return false
+	}
+
+	return name == "elasticsearch"
 }
