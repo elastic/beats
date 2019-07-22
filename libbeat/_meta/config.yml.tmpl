@@ -14,8 +14,7 @@
 #fields:
 #  env: staging
 
-
-{{if not .NoDashboards}}
+{{if not .ExcludeDashboards }}
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
@@ -28,7 +27,6 @@
 # website.
 #setup.dashboards.url:
 {{end}}
-
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
