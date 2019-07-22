@@ -58,6 +58,13 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
+	var awsCred awscommon.ConfigAWS
+	err = base.Module().UnpackConfig(&awsCred)
+	if err != nil {
+		return nil, err
+	}
+
+	config.AWSConfig = awsCred
 	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get aws credentials")
@@ -71,6 +78,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
+		// set default region to make initial aws api call
+		awsConfig.Region = "us-west-1"
 		svcEC2 := ec2.New(awsConfig)
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
