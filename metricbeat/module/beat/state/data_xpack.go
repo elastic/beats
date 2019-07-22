@@ -19,7 +19,6 @@ package state
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -28,10 +27,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/beat"
+	b "github.com/elastic/beats/metricbeat/module/beat"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info b.Info, content []byte) error {
 	now := time.Now()
 
 	// Massage info into beat
@@ -62,7 +61,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info beat.Info, content []
 			// Output is ES but cluster UUID could not be determined. No point sending monitoring
 			// data with empty cluster UUID since it will not be associated with the correct ES
 			// production cluster. Log error instead.
-			return fmt.Errorf("monitored beat is using Elasticsearch output but cluster UUID cannot be determined")
+			return errors.Wrap(b.ErrClusterUUID, "could not determine cluster UUID")
 		}
 	}
 
