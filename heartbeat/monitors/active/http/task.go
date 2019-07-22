@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -29,9 +28,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode/utf8"
-
-	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
@@ -221,18 +217,24 @@ func execPing(
 
 	req = attachRequestBody(&ctx, req, reqBody)
 
-	start, end, resp, errReason := execRequest(client, req, validator)
+	// Send the HTTP request. We don't immediately return on error since
+	// we may want to add additional fields to contextualize the error.
+	start, resp, errReason := execRequest(client, req, validator)
 
-	maxBodyBytes := responseConfig.IncludeBodyMaxBytes
-	if responseConfig.IncludeBody == "never" {
-		// Don't return the body if the config says not to
-		maxBodyBytes = 0
-	} else if errReason == nil && responseConfig.IncludeBody == "on_error" {
-		// If configured to only return the body on error, don't return it on success
-		maxBodyBytes = 0
+	// Add response.status_code
+	if resp != nil {
+		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{"response": common.MapStr{"status_code": resp.StatusCode}}})
+		// Download the body, close the response body, then attach all fields
+		err := handleRespBody(event, resp, responseConfig, errReason)
+		if err != nil {
+			return start, time.Now(), reason.IOFailed(err)
+		}
 	}
-	respBody, respSize := readBodySampleAndClose(resp, maxBodyBytes)
 
+	// Mark the end time as now, since we've finished downloading
+	end = time.Now()
+
+	// Add total HTTP RTT
 	if errReason == nil || errReason.Type() != "io" {
 		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
 			"rtt": common.MapStr{
@@ -241,62 +243,7 @@ func execPing(
 		}})
 	}
 
-	if resp != nil {
-		responseFields := common.MapStr{"status_code": resp.StatusCode}
-		if respSize > -1 {
-			responseFields["body.content"] = respBody
-			responseFields["body.bytes"] = respSize
-		}
-		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-			"response": responseFields,
-		}})
-	}
-
-	if errReason != nil {
-		if resp != nil {
-			return start, end, errReason
-		}
-		return start, end, errReason
-	}
-
-	return start, end, nil
-}
-
-// readBodySampleAndClose reads the first sampleSize bytes from the httpResponse,
-// then closes the body (which closes the connection). It doesn't return any errors
-// but does log them. During an error case the return values will be (nil, -1).
-// The maxBytes params controls how many bytes will be returned in a string, not how many will be read.
-// We always read the full response here since we want to time downloading the full thing.
-// This may return a nil body if the response is not valid UTF-8
-func readBodySampleAndClose(resp *http.Response, maxBytes int) (bodySample *string, bodySize int64) {
-	if resp == nil {
-		return nil, -1
-	}
-	defer resp.Body.Close()
-
-	// Function to lazily get the body of the response
-	buf := make([]byte, maxBytes)
-	respSize := int64(-1)
-	if resp != nil {
-		startSize, readErr := resp.Body.Read(buf)
-		if startSize > 0 {
-			buf = buf[0:startSize]
-			// Read the entirety of the body. Otherwise, the stats for the check
-			// don't include download time.
-			restSize, _ := io.Copy(ioutil.Discard, resp.Body)
-			respSize = int64(startSize) + restSize
-		} else if readErr != nil {
-			logp.Warn("could not read HTTP response body after ping: %s", readErr)
-			buf = buf[:0]
-		}
-	}
-
-	if utf8.Valid(buf) {
-		bodyStr := string(buf)
-		return &bodyStr, respSize
-	} else {
-		return nil, respSize
-	}
+	return start, end, errReason
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
@@ -310,21 +257,20 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 }
 
 // execute the request. Note that this does not close the resp body, which should be done by caller
-func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, end time.Time, resp *http.Response, errReason reason.Reason) {
+func execRequest(client *http.Client, req *http.Request, validator func(*http.Response) error) (start time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
-	end = time.Now()
 
 	if err != nil {
-		return start, end, nil, reason.IOFailed(err)
+		return start, nil, reason.IOFailed(err)
 	}
 
 	err = validator(resp)
 	if err != nil {
-		return start, time.Now(), resp, reason.ValidateFailed(err)
+		return start, resp, reason.ValidateFailed(err)
 	}
 
-	return start, time.Now(), resp, nil
+	return start, resp, nil
 }
 
 func splitHostnamePort(requ *http.Request) (string, uint16, error) {
