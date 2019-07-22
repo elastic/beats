@@ -181,6 +181,12 @@ default config file, `metricbeat.yml`, the System module is enabled (set to
 `enabled: true`) by default. If the `enabled` option is missing from the
 configuration block, the module is enabled by default.
 
+Note: If you wish to use different settings for the System module which is 
+enabled by default, then edit the System module. Don't add another System module
+(unless you want to run different combinations).
+There isn't a concept of inheritance.
+
+
 [float]
 [[metricset-period]]
 ==== `period`
