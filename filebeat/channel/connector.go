@@ -23,9 +23,20 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
+// ConnectorFunc is an adapter for using ordinary functions as Connector.
+type ConnectorFunc func(*common.Config, beat.ClientConfig) (Outleter, error)
+
 type pipelineConnector struct {
 	parent   *OutletFactory
 	pipeline beat.Pipeline
+}
+
+func (fn ConnectorFunc) Connect(cfg *common.Config) (Outleter, error) {
+	return fn(cfg, beat.ClientConfig{})
+}
+
+func (fn ConnectorFunc) ConnectWith(cfg *common.Config, clientCfg beat.ClientConfig) (Outleter, error) {
+	return fn(cfg, clientCfg)
 }
 
 func (c *pipelineConnector) Connect(cfg *common.Config) (Outleter, error) {
