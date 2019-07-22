@@ -10,7 +10,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -197,12 +196,11 @@ func (p *Input) Run() {
 		}
 
 		if len(output.Messages) == 0 {
-			p.logger.Debugf("no message received from SQS %v", queueURL)
+			p.logger.Debug("no message received from SQS:", queueURL)
 			continue
 		}
 
 		for _, message := range output.Messages {
-			// store messages queried from sqs into a buffered channel
 			p.messageQueue <- message
 			// process messages received from sqs, get logs from s3 and create events
 			go p.processor(queueURL, visibilityTimeout, svcS3, svcSQS)
@@ -442,7 +440,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat
 		},
 	}
 	return &beat.Event{
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
+		// Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
 	}
