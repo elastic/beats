@@ -39,8 +39,8 @@ func TestFetch(t *testing.T) {
 
 	addEntry(t, "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig())
-	events, err := ms.FetchEvents()
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, err := mbtest.ReportingFetchV2Error(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
@@ -54,8 +54,11 @@ func TestData(t *testing.T) {
 
 	addEntry(t, "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig())
-	ms.WriteEvents(t, "")
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func TestFetchMultipleKeyspaces(t *testing.T) {
@@ -88,8 +91,8 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 		},
 	}
 
-	ms := mbtest.NewFetcher(t, config)
-	events, err := ms.FetchEvents()
+	ms := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, err := mbtest.ReportingFetchV2Error(ms)
 
 	assert.Len(t, err, 0)
 	assert.Len(t, events, expectedEvents)
