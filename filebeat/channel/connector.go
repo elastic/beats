@@ -31,10 +31,12 @@ type pipelineConnector struct {
 	pipeline beat.Pipeline
 }
 
+// Connect passes the cfg and the zero value of beat.ClientConfig to the underlying function.
 func (fn ConnectorFunc) Connect(cfg *common.Config) (Outleter, error) {
 	return fn(cfg, beat.ClientConfig{})
 }
 
+// ConnectWith passes the configuration and the pipeline connection setting to the underlying function.
 func (fn ConnectorFunc) ConnectWith(cfg *common.Config, clientCfg beat.ClientConfig) (Outleter, error) {
 	return fn(cfg, clientCfg)
 }
