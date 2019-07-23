@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed `json.add_error_key` property setting for delivering error messages from beat events  {pull}11298[11298]
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 - ILM: Use GET instead of HEAD when checking for alias to expose detailed error message. {pull}12886[12886]
+- Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
 
 *Auditbeat*
 
