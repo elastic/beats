@@ -200,7 +200,7 @@ func checkMatchingHeaders(
 }
 
 func strDefault(a, defaults string) string {
-	if len(a) == 0 {
+	if a == "" {
 		return defaults
 	}
 	return a

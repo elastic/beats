@@ -44,7 +44,6 @@ func init() {
 type kafkaInput struct {
 	config        kafkaInputConfig
 	rawConfig     *common.Config // The Config given to NewInput
-	started       bool
 	outlet        channel.Outleter
 	consumerGroup sarama.ConsumerGroup
 	kafkaContext  context.Context
@@ -94,7 +93,6 @@ func NewInput(
 	input := &kafkaInput{
 		config:        config,
 		rawConfig:     cfg,
-		started:       false,
 		outlet:        out,
 		consumerGroup: consumerGroup,
 		kafkaContext:  kafkaContext,
@@ -107,32 +105,32 @@ func NewInput(
 
 // Run starts the input by scanning for incoming messages and errors.
 func (input *kafkaInput) Run() {
-	if !input.started {
-		// Track errors
-		go func() {
-			for err := range input.consumerGroup.Errors() {
-				input.log.Errorw("Error reading from kafka", "error", err)
-			}
-		}()
+	// Track errors
+	go func() {
+		for err := range input.consumerGroup.Errors() {
+			input.log.Errorw("Error reading from kafka", "error", err)
+		}
+	}()
 
-		go func() {
-			for {
-				handler := groupHandler{input: input}
+	go func() {
+		for {
+			handler := groupHandler{input: input}
 
-				err := input.consumerGroup.Consume(
-					input.kafkaContext, input.config.Topics, handler)
-				if err != nil {
-					input.log.Errorw("Kafka consume error", "error", err)
-				}
+			err := input.consumerGroup.Consume(
+				input.kafkaContext, input.config.Topics, handler)
+			if err != nil {
+				input.log.Errorw("Kafka consume error", "error", err)
 			}
-		}()
-		input.started = true
-	}
+		}
+	}()
 }
 
 // Wait shuts down the Input by cancelling the internal context.
 func (input *kafkaInput) Wait() {
 	input.Stop()
+	// TODO: wait on any messages still pending internal delivery
+	// Wait for the consumer group to shut down
+	input.consumerGroup.Close()
 }
 
 // Stop shuts down the Input by cancelling the internal context.
