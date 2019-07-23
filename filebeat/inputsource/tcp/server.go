@@ -105,7 +105,7 @@ func (s *Server) run() {
 			}
 		}
 
-		client := s.factory(*s.config)
+		client := s.factory(*s.config, conn)
 
 		s.wg.Add(1)
 		go func() {
@@ -117,7 +117,7 @@ func (s *Server) run() {
 			defer s.unregisterClient(client)
 			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
 
-			err := client.Handle(conn)
+			err := client.Handle()
 			if err != nil {
 				s.log.Debugw("client error", "error", err)
 			}

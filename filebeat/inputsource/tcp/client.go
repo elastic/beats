@@ -43,29 +43,37 @@ type splitHandler struct {
 }
 
 // ClientFactory returns a ConnectionHandler func
-type ClientFactory func(config Config) ConnectionHandler
+type ClientFactory func(config Config, conn net.Conn) ConnectionHandler
 
 // ConnectionHandler interface provides mechanisms for handling of incoming TCP connections
 type ConnectionHandler interface {
-	Handle(conn net.Conn) error
+	Handle() error
 	Close()
 }
 
 // SplitHandlerFactory allows creation of a ConnectionHandler that can do splitting of messages received on a TCP connection.
 func SplitHandlerFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) ClientFactory {
-	return func(config Config) ConnectionHandler {
-		return newSplitHandler(callback, splitFunc, uint64(config.MaxMessageSize), config.Timeout)
+	return func(config Config, conn net.Conn) ConnectionHandler {
+		return newSplitHandler(
+			conn,
+			callback,
+			splitFunc,
+			uint64(config.MaxMessageSize),
+			config.Timeout,
+		)
 	}
 }
 
 // newSplitHandler allows creation of a TCP client that has splitting capabilities.
 func newSplitHandler(
+	conn net.Conn,
 	callback inputsource.NetworkFunc,
 	splitFunc bufio.SplitFunc,
 	maxReadMessage uint64,
 	timeout time.Duration,
 ) ConnectionHandler {
 	client := &splitHandler{
+		conn:           conn,
 		callback:       callback,
 		done:           make(chan struct{}),
 		splitFunc:      splitFunc,
@@ -76,16 +84,15 @@ func newSplitHandler(
 }
 
 // Handle takes a connection as input and processes data received on it.
-func (c *splitHandler) Handle(conn net.Conn) error {
-	c.conn = conn
+func (c *splitHandler) Handle() error {
 	c.metadata = inputsource.NetworkMetadata{
-		RemoteAddr: conn.RemoteAddr(),
-		TLS:        extractSSLInformation(conn),
+		RemoteAddr: c.conn.RemoteAddr(),
+		TLS:        extractSSLInformation(c.conn),
 	}
 
-	log := logp.NewLogger("split_client").With("remote_addr", conn.RemoteAddr().String())
+	log := logp.NewLogger("split_client").With("remote_addr", c.conn.RemoteAddr().String())
 
-	r := NewResetableLimitedReader(NewDeadlineReader(conn, c.timeout), c.maxMessageSize)
+	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxMessageSize)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
 	scanner.Split(c.splitFunc)
