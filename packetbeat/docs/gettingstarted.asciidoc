@@ -83,6 +83,8 @@ tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -113,10 +115,13 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-. Download https://nmap.org/npcap/[Npcap] and install it in WinPcap
-API-compatible mode. Npcap is a packet sniffing library for Windows. If you plan
-to capture traffic from the loopback device (127.0.0.1 traffic), also select the
-option to support loopback traffic. 
+. Download and install a packet sniffing library,
+such as https://nmap.org/npcap/[Npcap], that implements the
+https://github.com/the-tcpdump-group/libpcap[libpcap] interfaces.
++
+If you use Npcap, make sure you install it in WinPcap API-compatible mode. If
+you plan to capture traffic from the loopback device (127.0.0.1 traffic), also
+select the option to support loopback traffic. 
 
 . Download the Packetbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/packetbeat[downloads page].
@@ -234,7 +239,6 @@ include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
 include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-:requires-sudo: yes
 include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
 include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
@@ -242,13 +246,11 @@ include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 [[packetbeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
-:requires-sudo: yes
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-:requires-sudo: yes
 include::{libbeat-dir}/docs/dashboards.asciidoc[]
 
 [[packetbeat-starting]]
@@ -284,6 +286,8 @@ sudo ./packetbeat -e
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
+
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
 
 *win:*
 

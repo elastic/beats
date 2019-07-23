@@ -5,14 +5,21 @@ services:
     depends_on:
       - proxy_dep
     environment:
+      - ES_BEATS=/go/src/github.com/elastic/beats
       - BEAT_STRICT_PERMS=false
       - ES_HOST=elasticsearch
       - ES_PORT=9200
+      - PUBSUB_EMULATOR_HOST=googlepubsub:8432
     working_dir: /go/src/github.com/elastic/beats/x-pack/filebeat
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
+
+  googlepubsub:
+    build: input/googlepubsub/_meta
+    ports:
+      - 8432
 
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
@@ -23,6 +30,6 @@ services:
 
   elasticsearch:
     extends:
-      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
       service: elasticsearch
 

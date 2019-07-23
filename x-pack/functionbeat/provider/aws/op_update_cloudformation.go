@@ -5,6 +5,8 @@
 package aws
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
@@ -15,7 +17,7 @@ import (
 
 type opUpdateCloudFormation struct {
 	log         *logp.Logger
-	svc         cloudformationiface.CloudFormationAPI
+	svc         cloudformationiface.ClientAPI
 	templateURL string
 	stackName   string
 }
@@ -40,7 +42,7 @@ func (o *opUpdateCloudFormation) Execute(ctx executionContext) error {
 	}
 
 	req := o.svc.UpdateStackRequest(input)
-	resp, err := req.Send()
+	resp, err := req.Send(context.TODO())
 	if err != nil {
 		o.log.Debugf("Could not update the cloudformation stack, resp: %+v", resp)
 		return err
@@ -53,7 +55,7 @@ func (o *opUpdateCloudFormation) Execute(ctx executionContext) error {
 
 func newOpUpdateCloudFormation(
 	log *logp.Logger,
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 	templateURL, stackName string,
 ) *opUpdateCloudFormation {
 	return &opUpdateCloudFormation{

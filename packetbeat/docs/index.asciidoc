@@ -14,6 +14,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
 :has_ml_jobs: yes
+:requires-sudo:
 :has_map:
 :deb_os:
 :rpm_os:

@@ -5,6 +5,8 @@
 package aws
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
@@ -15,7 +17,7 @@ import (
 
 type opDeleteCloudFormation struct {
 	log       *logp.Logger
-	svc       cloudformationiface.CloudFormationAPI
+	svc       cloudformationiface.ClientAPI
 	stackName string
 }
 
@@ -44,7 +46,7 @@ func (o *opDeleteCloudFormation) Execute(ctx executionContext) error {
 	}
 
 	req := o.svc.DeleteStackRequest(input)
-	resp, err := req.Send()
+	resp, err := req.Send(context.TODO())
 	if err != nil {
 		o.log.Debugf("Could not delete the stack, response: %v", resp)
 		return err
@@ -55,7 +57,7 @@ func (o *opDeleteCloudFormation) Execute(ctx executionContext) error {
 
 func newOpDeleteCloudFormation(
 	log *logp.Logger,
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 	stackName string,
 ) *opDeleteCloudFormation {
 	return &opDeleteCloudFormation{log: log, svc: svc, stackName: stackName}

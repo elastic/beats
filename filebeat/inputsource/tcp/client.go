@@ -31,10 +31,9 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Client is a remote client.
-type client struct {
+// splitHandler is a TCP client that has splitting capabilities.
+type splitHandler struct {
 	conn           net.Conn
-	log            *logp.Logger
 	callback       inputsource.NetworkFunc
 	done           chan struct{}
 	metadata       inputsource.NetworkMetadata
@@ -43,41 +42,60 @@ type client struct {
 	timeout        time.Duration
 }
 
-func newClient(
-	conn net.Conn,
-	log *logp.Logger,
+// ClientFactory returns a ConnectionHandler func
+type ClientFactory func(config Config) ConnectionHandler
+
+// ConnectionHandler interface provides mechanisms for handling of incoming TCP connections
+type ConnectionHandler interface {
+	Handle(conn net.Conn) error
+	Close()
+}
+
+// SplitHandlerFactory allows creation of a ConnectionHandler that can do splitting of messages received on a TCP connection.
+func SplitHandlerFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) ClientFactory {
+	return func(config Config) ConnectionHandler {
+		return newSplitHandler(callback, splitFunc, uint64(config.MaxMessageSize), config.Timeout)
+	}
+}
+
+// newSplitHandler allows creation of a TCP client that has splitting capabilities.
+func newSplitHandler(
 	callback inputsource.NetworkFunc,
 	splitFunc bufio.SplitFunc,
 	maxReadMessage uint64,
 	timeout time.Duration,
-) *client {
-	client := &client{
-		conn:           conn,
-		log:            log.With("remote_address", conn.RemoteAddr()),
+) ConnectionHandler {
+	client := &splitHandler{
 		callback:       callback,
 		done:           make(chan struct{}),
 		splitFunc:      splitFunc,
 		maxMessageSize: maxReadMessage,
 		timeout:        timeout,
-		metadata: inputsource.NetworkMetadata{
-			RemoteAddr: conn.RemoteAddr(),
-			TLS:        extractSSLInformation(conn),
-		},
 	}
-	extractSSLInformation(conn)
 	return client
 }
 
-func (c *client) handle() error {
-	r := NewResetableLimitedReader(NewDeadlineReader(c.conn, c.timeout), c.maxMessageSize)
+// Handle takes a connection as input and processes data received on it.
+func (c *splitHandler) Handle(conn net.Conn) error {
+	c.conn = conn
+	c.metadata = inputsource.NetworkMetadata{
+		RemoteAddr: conn.RemoteAddr(),
+		TLS:        extractSSLInformation(conn),
+	}
+
+	log := logp.NewLogger("split_client").With("remote_addr", conn.RemoteAddr().String())
+
+	r := NewResetableLimitedReader(NewDeadlineReader(conn, c.timeout), c.maxMessageSize)
 	buf := bufio.NewReader(r)
 	scanner := bufio.NewScanner(buf)
 	scanner.Split(c.splitFunc)
-
+	//16 is ratio of MaxScanTokenSize/startBufSize
+	buffer := make([]byte, c.maxMessageSize/16)
+	scanner.Buffer(buffer, int(c.maxMessageSize))
 	for scanner.Scan() {
 		err := scanner.Err()
 		if err != nil {
-			// we are forcing a close on the socket, lets ignore any error that could happen.
+			// we are forcing a Close on the socket, lets ignore any error that could happen.
 			select {
 			case <-c.done:
 				break
@@ -85,16 +103,16 @@ func (c *client) handle() error {
 			}
 			// This is a user defined limit and we should notify the user.
 			if IsMaxReadBufferErr(err) {
-				c.log.Errorw("client error", "error", err)
+				log.Errorw("split_client error", "error", err)
 			}
-			return errors.Wrap(err, "tcp client error")
+			return errors.Wrap(err, "tcp split_client error")
 		}
 		r.Reset()
 		c.callback(scanner.Bytes(), c.metadata)
 	}
 
 	// We are out of the scanner, either we reached EOF or another fatal error occurred.
-	// like we failed to complete the TLS handshake or we are missing the client certificate when
+	// like we failed to complete the TLS handshake or we are missing the splitHandler certificate when
 	// mutual auth is on, which is the default.
 	if err := scanner.Err(); err != nil {
 		return err
@@ -103,7 +121,8 @@ func (c *client) handle() error {
 	return nil
 }
 
-func (c *client) close() {
+// Close is used to perform clean up before the client is released.
+func (c *splitHandler) Close() {
 	close(c.done)
 	c.conn.Close()
 }

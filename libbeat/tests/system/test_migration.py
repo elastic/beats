@@ -18,7 +18,7 @@ class TestCommands(BaseTest):
 
     def setUp(self):
         super(BaseTest, self).setUp()
-        shutil.copy(self.beat_path + "/_meta/config.yml",
+        shutil.copy(os.path.join(self.beat_path, "tests", "system", "input", "libbeat.yml"),
                     os.path.join(self.working_dir, "libbeat.yml"))
         self.fields_path = os.path.join(self.beat_path, "template/testdata/fields.yml")
 

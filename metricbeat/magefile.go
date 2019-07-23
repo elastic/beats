@@ -23,19 +23,23 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
 )
 
 func init() {
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
+}
+
+//CollectAll generates the docs and the fields.
+func CollectAll() {
+	mg.Deps(CollectDocs, FieldsDocs)
 }
 
 // Build builds the Beat binary.
@@ -78,9 +82,9 @@ func Package() {
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
 	devtools.UseElasticBeatOSSPackaging()
-	customizePackaging()
+	metricbeat.CustomizePackaging()
 
-	mg.Deps(Update)
+	mg.Deps(Update, metricbeat.PrepareModulePackagingOSS)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
@@ -90,8 +94,29 @@ func TestPackages() error {
 	return devtools.TestPackages(devtools.WithModulesD())
 }
 
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return devtools.KibanaDashboards("module")
+}
+
+// Config generates both the short and reference configs.
+func Config() {
+	mg.Deps(configYML, metricbeat.GenerateDirModulesD)
+}
+
+func configYML() error {
+	return devtools.Config(devtools.AllConfigTypes, metricbeat.OSSConfigFileParams(), ".")
+}
+
 // Update updates the generated files (aka make update).
 func Update() error {
+	// TODO to replace by a pure mage implementation:
+	// - Generate docs/fields.asciidoc
+	/*
+		mg.SerialDeps(Fields, Dashboards, Config,
+			metricbeat.PrepareModulePackagingOSS,
+			devtools.GenerateModuleIncludeListGo)
+	*/
 	return sh.Run("make", "update")
 }
 
@@ -158,72 +183,7 @@ func FieldsDocs() error {
 	return devtools.Docs.FieldDocs(output)
 }
 
-// -----------------------------------------------------------------------------
-// Customizations specific to Metricbeat.
-// - Include modules.d directory in packages.
-// - Disable system/load metricset for Windows.
-
-// customizePackaging modifies the package specs to add the modules.d directory.
-// And for Windows it comments out the system/load metricset because it's
-// not supported.
-func customizePackaging() {
-	var (
-		archiveModulesDir = "modules.d"
-		unixModulesDir    = "/etc/{{.BeatName}}/modules.d"
-
-		modulesDir = devtools.PackageFile{
-			Mode:    0644,
-			Source:  "modules.d",
-			Config:  true,
-			Modules: true,
-		}
-		windowsModulesDir = devtools.PackageFile{
-			Mode:    0644,
-			Source:  "{{.PackageDir}}/modules.d",
-			Config:  true,
-			Modules: true,
-			Dep: func(spec devtools.PackageSpec) error {
-				if err := devtools.Copy("modules.d", spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
-					return errors.Wrap(err, "failed to copy modules.d dir")
-				}
-
-				return devtools.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/modules.d/system.yml"),
-					regexp.MustCompile(`- load`), `#- load`)
-			},
-		}
-		windowsReferenceConfig = devtools.PackageFile{
-			Mode:   0644,
-			Source: "{{.PackageDir}}/metricbeat.reference.yml",
-			Dep: func(spec devtools.PackageSpec) error {
-				err := devtools.Copy("metricbeat.reference.yml",
-					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"))
-				if err != nil {
-					return errors.Wrap(err, "failed to copy reference config")
-				}
-
-				return devtools.FindReplace(
-					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"),
-					regexp.MustCompile(`- load`), `#- load`)
-			},
-		}
-	)
-
-	for _, args := range devtools.Packages {
-		switch args.OS {
-		case "windows":
-			args.Spec.Files[archiveModulesDir] = windowsModulesDir
-			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", windowsReferenceConfig)
-		default:
-			pkgType := args.Types[0]
-			switch pkgType {
-			case devtools.TarGz, devtools.Zip, devtools.Docker:
-				args.Spec.Files[archiveModulesDir] = modulesDir
-			case devtools.Deb, devtools.RPM, devtools.DMG:
-				args.Spec.Files[unixModulesDir] = modulesDir
-			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
-			}
-		}
-	}
+// CollectDocs creates the documentation under docs/
+func CollectDocs() error {
+	return metricbeat.CollectDocs()
 }

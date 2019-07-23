@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -24,11 +23,6 @@ var (
 	// 2003 and XP where PROCESS_QUERY_LIMITED_INFORMATION is unknown. For all newer
 	// OS versions it is set to PROCESS_QUERY_LIMITED_INFORMATION.
 	processQueryLimitedInfoAccess = windows.PROCESS_QUERY_LIMITED_INFORMATION
-
-	// bootTime is the time when the OS was last booted. This value may be nil
-	// on operating systems that do not support the WMI query used to obtain it.
-	bootTime     *time.Time
-	bootTimeLock sync.Mutex
 )
 
 func init() {
@@ -63,19 +57,11 @@ func (self *Uptime) Get() error {
 	if !version.IsWindowsVistaOrGreater() {
 		return ErrNotImplemented{runtime.GOOS}
 	}
-
-	bootTimeLock.Lock()
-	defer bootTimeLock.Unlock()
-	if bootTime == nil {
-		uptime, err := windows.GetTickCount64()
-		if err != nil {
-			return errors.Wrap(err, "failed to get boot time using win32 api")
-		}
-		var boot = time.Unix(int64(uptime), 0)
-		bootTime = &boot
+	uptimeMs, err := windows.GetTickCount64()
+	if err != nil {
+		return errors.Wrap(err, "failed to get boot time using GetTickCount64 api")
 	}
-
-	self.Length = time.Since(*bootTime).Seconds()
+	self.Length = float64(time.Duration(uptimeMs)*time.Millisecond) / float64(time.Second)
 	return nil
 }
 

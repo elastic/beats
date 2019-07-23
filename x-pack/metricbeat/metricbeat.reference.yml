@@ -173,8 +173,8 @@ metricbeat.modules:
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
+  regions:
+    - us-west-1
 - module: aws
   period: 86400s
   metricsets:
@@ -184,8 +184,6 @@ metricbeat.modules:
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
-  #regions:
-  #  - us-west-1
 - module: aws
   period: 300s
   metricsets:
@@ -201,9 +199,29 @@ metricbeat.modules:
         - name: InstanceId
           value: i-0686946e22cf9494a
     - namespace: AWS/EBS
-  #regions:
-  #  - us-east-1
-  #  - us-east-2
+    - namespace: AWS/ELB
+      tags.resource_type_filter: elasticloadbalancing
+- module: aws
+  period: 60s
+  metricsets:
+    - rds
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+
+#--------------------------------- Beat Module ---------------------------------
+- module: beat
+  metricsets:
+    - stats
+    - state
+  period: 10s
+  hosts: ["http://localhost:5066"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph
@@ -211,6 +229,16 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
+
+#----------------------------- CockroachDB Module -----------------------------
+- module: cockroachdb
+  metricsets: ['status']
+  period: 10s
+  hosts: ['localhost:8080']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  #metrics_path: /_status/vars
 
 #-------------------------------- Consul Module --------------------------------
 - module: consul
@@ -507,11 +535,39 @@ metricbeat.modules:
     - event
 
 # Kubernetes API server
+# (when running metricbeat as a pod)
 - module: kubernetes
   enabled: true
   metricsets:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+
+# Kubernetes proxy server
+# (when running metricbeat locally at hosts or as a daemonset + host network)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - proxy
+  hosts: ["localhost:10249"]
+  period: 10s
+
+# Kubernetes controller manager
+# (URL and deployment will need to be modified to match the controller manager deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - controllermanager
+  hosts: ["http://localhost:10252"]
+  period: 10s
+
+# Kubernetes scheduler
+# (URL and deployment method will need to be adapted to match scheduler deployment)
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - scheduler
+  hosts: ["localhost:10251"]
+  period: 10s
 
 #--------------------------------- Kvm Module ---------------------------------
 - module: kvm
@@ -574,7 +630,7 @@ metricbeat.modules:
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
 
-#-------------------------------- Mssql Module --------------------------------
+#-------------------------------- MSSQL Module --------------------------------
 - module: mssql
   metricsets:
     - "transaction_log"
@@ -641,6 +697,17 @@ metricbeat.modules:
 
   # Path to server status. Default server-status
   server_status_path: "server-status"
+
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  metricsets: ["tablespace"]
+  enabled: false
+  period: 10s
+  hosts: ["oracle://user:pass@localhost:1521/ORCLPDB1.localdomain?sysdba=1"]
+
+  # username: ""
+  # password: ""
+
 
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
@@ -1011,6 +1078,13 @@ metricbeat.modules:
 #    target: ""
 #    overwrite_keys: false
 #
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
 # The following example copies the value of message to message_copied
 #
 #processors:
@@ -1049,7 +1123,7 @@ metricbeat.modules:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using metricbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Metricbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -1174,7 +1248,6 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1319,7 +1392,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version metricbeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Metricbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -1343,8 +1416,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -1576,7 +1649,7 @@ output.elasticsearch:
   #filename: metricbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every metricbeat restart, the files are rotated. The default value is 10240
+  # every Metricbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -1587,7 +1660,6 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
 
 #----------------------------- Console output ---------------------------------
 #output.console:
@@ -1604,26 +1676,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the metricbeat installation. This is the default base path
+# The home path for the Metricbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the metricbeat installation. This is the default
+# The configuration path for the Metricbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the metricbeat installation. This is the default base path
-# for all the files in which metricbeat needs to store its data. If not set by a
+# The data path for the Metricbeat installation. This is the default base path
+# for all the files in which Metricbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a metricbeat installation. This is the default location for
+# The logs path for a Metricbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1735,22 +1807,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'metricbeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "metricbeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'metricbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 
@@ -1819,13 +1907,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, metricbeat periodically logs its internal metrics that have changed
+# If enabled, Metricbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1872,7 +1963,7 @@ logging.files:
 
 
 #============================== Xpack Monitoring ===============================
-# metricbeat can export internal metrics to a central Elasticsearch monitoring
+# Metricbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 

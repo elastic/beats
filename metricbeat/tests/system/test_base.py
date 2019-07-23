@@ -57,9 +57,7 @@ class Test(BaseTest):
         """
         Test that the dashboards can be loaded with `setup --dashboards`
         """
-
-        kibana_dir = os.path.join(self.beat_path, "_meta", "kibana.generated")
-        shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
+        shutil.copytree(self.kibana_dir(), os.path.join(self.working_dir, "kibana"))
 
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
@@ -106,3 +104,6 @@ class Test(BaseTest):
         Returns kibana host URL
         """
         return "http://" + self.compose_host("kibana")
+
+    def kibana_dir(self):
+        return os.path.join(self.beat_path, "_meta", "kibana.generated")

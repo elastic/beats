@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -19,14 +20,14 @@ import (
 
 type opCreateCloudFormation struct {
 	log         *logp.Logger
-	svc         cloudformationiface.CloudFormationAPI
+	svc         cloudformationiface.ClientAPI
 	templateURL string
 	stackName   string
 }
 
 func newOpCreateCloudFormation(
 	log *logp.Logger,
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 	templateURL, stackName string,
 ) *opCreateCloudFormation {
 	return &opCreateCloudFormation{
@@ -58,7 +59,7 @@ func (o *opCreateCloudFormation) Execute(ctx executionContext) error {
 	}
 
 	req := o.svc.CreateStackRequest(input)
-	resp, err := req.Send()
+	resp, err := req.Send(context.TODO())
 	if err != nil {
 		o.log.Debugf("Could not create the CloudFormation stack request, resp: %v", resp)
 		return err
@@ -71,7 +72,7 @@ func (o *opCreateCloudFormation) Execute(ctx executionContext) error {
 
 func makeEventStackPoller(
 	log *logp.Logger,
-	svc cloudformationiface.CloudFormationAPI,
+	svc cloudformationiface.ClientAPI,
 	periodicCheck time.Duration,
 	ctx *stackContext,
 ) *eventStackPoller {
