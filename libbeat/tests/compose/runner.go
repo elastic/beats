@@ -18,6 +18,8 @@
 package compose
 
 import (
+	"crypto/sha1"
+	"flag"
 	"fmt"
 	"math/rand"
 	"net"
@@ -30,8 +32,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+var composeReuse bool
+var composeCleanup bool
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
+
+	flag.BoolVar(&composeReuse, "compose.reuse", false, "Set to true to reuse scenarios")
+	flag.BoolVar(&composeCleanup, "compose.cleanup", false, "Set to true to remove reused scenarios")
 }
 
 // TestRunner starts a service with different combinations of options and
@@ -151,9 +159,14 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 			desc = "WithoutOptions"
 		}
 
-		seq := make([]byte, 16)
-		rand.Read(seq)
-		name := fmt.Sprintf("%s_%x", r.Service, seq)
+		var name string
+		if composeReuse {
+			name = fmt.Sprintf("%s_%x", r.Service, sha1.Sum([]byte(desc)))
+		} else {
+			seq := make([]byte, 16)
+			rand.Read(seq)
+			name = fmt.Sprintf("%s_%x", r.Service, seq)
+		}
 
 		project, err := getComposeProject(name)
 		if err != nil {
@@ -162,14 +175,21 @@ func (r *TestRunner) Run(t *testing.T, tests Suite) {
 		project.SetParameters(s)
 
 		t.Run(desc, func(t *testing.T) {
-			if r.Parallel {
+			if composeReuse && composeCleanup {
+				project.Down()
+				t.Skipf("Stopping scenario, test won't run")
+			}
+
+			if !composeReuse && r.Parallel {
 				t.Parallel()
 			}
 
-			err := project.Start(r.Service)
-			// Down() is "idempotent", Start() has several points where it can fail,
-			// so run Down() even if Start() fails.
-			defer project.Down()
+			err := project.Start(r.Service, RecreateOnUp(!composeReuse))
+			if !composeReuse {
+				// Down() is "idempotent", Start() has several points where it can fail,
+				// so run Down() even if Start() fails.
+				defer project.Down()
+			}
 			if err != nil {
 				t.Fatal(err)
 			}
