@@ -35,6 +35,7 @@ var (
 		key:    "log2019-06-21-16-16-54",
 		region: "us-west-1",
 	}
+	p = Input{}
 )
 
 func (m *MockS3Client) GetObjectRequest(input *s3.GetObjectInput) s3.GetObjectRequest {
@@ -105,7 +106,7 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestBufferedIORead(t *testing.T) {
-	reader, err := bufferedIORead(mockSvc, info)
+	reader, err := p.bufferedIORead(mockSvc, info)
 	assert.NoError(t, err)
 	for i := 0; i < 3; i++ {
 		switch i {
@@ -135,7 +136,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	s3ObjectHash := s3ObjectHash(s3Info)
 
-	reader, err := bufferedIORead(mockSvc, s3Info)
+	reader, err := p.bufferedIORead(mockSvc, s3Info)
 	assert.NoError(t, err)
 	var events []*beat.Event
 	for {
