@@ -7,8 +7,8 @@ package elb
 import (
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
+	aws2 "github.com/elastic/beats/x-pack/libbeat/common/aws"
+
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"github.com/gofrs/uuid"
@@ -52,12 +52,14 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 
 	var clients []elasticloadbalancingv2iface.ClientAPI
 	for _, region := range config.Regions {
-		awsCfg, err := external.LoadDefaultAWSConfig()
+		awsCfg, err := aws2.GetAWSCredentials(aws2.ConfigAWS{
+			AccessKeyID:     config.AccessKeyID,
+			SecretAccessKey: config.SecretAccessKey,
+			SessionToken:    config.SessionToken,
+			ProfileName:     config.ProfileName,
+		})
 		if err != nil {
 			logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
-		}
-		if config.AccessKeyID != "" && config.SecretAccessKey != "" {
-			awsCfg.Credentials = aws.NewStaticCredentialsProvider(config.AccessKeyID, config.SecretAccessKey, config.SessionToken)
 		}
 		awsCfg.Region = region
 		clients = append(clients, elasticloadbalancingv2.New(awsCfg))

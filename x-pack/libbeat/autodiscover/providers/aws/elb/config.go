@@ -7,6 +7,8 @@ package elb
 import (
 	"time"
 
+	"github.com/elastic/beats/x-pack/libbeat/common/aws"
+
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -28,10 +30,8 @@ type Config struct {
 
 	// AWS Specific autodiscover fields
 
-	Regions         []string `config:"regions" validate:"required"`
-	AccessKeyID     string   `config:"access_key_id"`
-	SecretAccessKey string   `config:"secret_access_key"`
-	SessionToken    string   `config:"session_token"`
+	Regions []string `config:"regions" validate:"required"`
+	aws.ConfigAWS
 }
 
 func defaultConfig() *Config {
