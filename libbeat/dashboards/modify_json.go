@@ -46,18 +46,8 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) common.MapS
 		return content
 	}
 
-	if objectMaps, ok := content["objects"].([]common.MapStr); ok {
-		// change index pattern name
-		for i, objectMap := range objectMaps {
-
-			objectMap["id"] = index
-			if attributes, ok := objectMap["attributes"].(common.MapStr); ok {
-				attributes["title"] = index
-			}
-			objectMaps[i] = objectMap
-		}
-		content["objects"] = objectMaps
-	} else if objects, ok := content["objects"].([]interface{}); ok {
+	switch objects := content["objects"].(type) {
+	case []interface{}:
 		// change index pattern name
 		for i, object := range objects {
 			objectMap, ok := object.(map[string]interface{})
@@ -72,6 +62,19 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) common.MapS
 			objects[i] = objectMap
 		}
 		content["objects"] = objects
+	case []common.MapStr:
+		// change index pattern name
+		for i, objectMap := range objects {
+
+			objectMap["id"] = index
+			if attributes, ok := objectMap["attributes"].(common.MapStr); ok {
+				attributes["title"] = index
+			}
+			objects[i] = objectMap
+		}
+		content["objects"] = objects
+	default:
+		logp.Err("Unexpected object type %T, expected list of objects. Got: %#v", content["objects"], content["objects"])
 	}
 
 	return content
