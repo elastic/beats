@@ -2,6 +2,8 @@
     {
         "@timestamp": 1547688736000,
         "destination.address": "35.199.178.4",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -46,6 +48,8 @@
     {
         "@timestamp": 1547688736000,
         "destination.address": "35.199.178.4",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
