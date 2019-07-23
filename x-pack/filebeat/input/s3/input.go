@@ -86,6 +86,13 @@ type s3BucketOjbect struct {
 	object `json:"object"`
 }
 
+type s3Context struct {
+	mux  sync.Mutex
+	refs int
+	err  error // first error witnessed or multi error
+	errC chan error
+}
+
 type sqsMessage struct {
 	Records []struct {
 		EventSource string         `json:"eventSource"`
@@ -226,7 +233,6 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 
 func (p *Input) processMessage(svcS3 *s3.Client, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
 	defer wg.Done()
-	defer close(errC)
 
 	s3Infos, err := handleSQSMessage(message)
 	if err != nil {
@@ -312,20 +318,50 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
+func (c *s3Context) Done() {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	c.done()
+}
+
+func (c *s3Context) Fail(err error) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
+	// only care about the last error for now
+	// TODO: add "Typed" error to error for context
+	c.err = err
+	c.done()
+}
+
+func (c *s3Context) done() {
+	c.refs--
+	if c.refs == 0 {
+		c.errC <- c.err
+		close(c.errC)
+	}
+}
+
 func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) {
 	if len(s3Infos) > 0 {
 		var wg sync.WaitGroup
 		wg.Add(len(s3Infos))
 
+		s3Context := &s3Context{
+			refs: len(s3Infos),
+			errC: errC,
+		}
+
 		for i := range s3Infos {
 			go func(s3Info s3Info) {
 				defer wg.Done()
+				defer s3Context.Done()
 				objectHash := s3ObjectHash(s3Info)
 
 				// read from s3 object
 				reader, err := p.bufferedIORead(svc, s3Info)
 				if err != nil {
-					errC <- errors.Wrap(err, "bufferedIORead failed")
+					s3Context.Fail(errors.Wrap(err, "bufferedIORead failed"))
 					return
 				}
 
@@ -342,12 +378,12 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 							offset += len([]byte(log))
 							err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 							if err != nil {
-								errC <- errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+								s3Context.Fail(errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key))
 							}
 							return
 						}
 
-						errC <- errors.Wrapf(err, "ReadString failed for %v", s3Info.key)
+						s3Context.Fail(errors.Wrapf(err, "ReadString failed for %v", s3Info.key))
 						return
 					}
 
@@ -355,7 +391,7 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 					offset += len([]byte(log))
 					err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
 					if err != nil {
-						errC <- errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+						s3Context.Fail(errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key))
 						return
 					}
 				}
