@@ -330,6 +330,14 @@ var sysmon = (function () {
         evt.Put("sysmon.dns.status", statusName);
     };
 
+    var addDnsQuestionLength = function(evt) {
+        var question = evt.Get("dns.question.name");
+        if (!question) {
+            return;
+        }
+        evt.Put("dns.question.length", question.length);
+    };
+
     // Splits the QueryResults field that contains the DNS responses.
     // Example: "type:  5 f2.taboola.map.fastly.net;::ffff:151.101.66.2;::ffff:151.101.130.2;::ffff:151.101.194.2;::ffff:151.101.2.2;"
     var splitDnsQueryResults = function(evt) {
@@ -373,6 +381,7 @@ var sysmon = (function () {
 
         if (answers.length > 0) {
             evt.Put("dns.answers", answers);
+            evt.Put("dns.answers_count", answers.length);
         }
         if (ips.length > 0) {
             evt.Put("dns.grouped.ip", ips);
@@ -791,6 +800,7 @@ var sysmon = (function () {
             ignore_missing: true,
             fail_on_error: false,
         })
+        .Add(addDnsQuestionLength)
         .Add(translateDnsQueryStatus)
         .Add(splitDnsQueryResults)
         .Add(setProcessNameUsingExe)

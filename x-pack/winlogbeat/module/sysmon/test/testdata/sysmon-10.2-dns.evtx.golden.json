@@ -16,12 +16,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.223.14.67"
         ]
       },
       "question": {
+        "length": 16,
         "name": "go.microsoft.com"
       }
     },
@@ -83,12 +85,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "204.79.197.203"
         ]
       },
       "question": {
+        "length": 11,
         "name": "www.msn.com"
       }
     },
@@ -150,6 +154,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.50.53.192",
@@ -157,6 +162,7 @@
         ]
       },
       "question": {
+        "length": 37,
         "name": "static-global-s-msn-com.akamaized.net"
       }
     },
@@ -222,6 +228,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "204.79.197.200",
@@ -229,6 +236,7 @@
         ]
       },
       "question": {
+        "length": 12,
         "name": "www.bing.com"
       }
     },
@@ -290,12 +298,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.64.104.249"
         ]
       },
       "question": {
+        "length": 26,
         "name": "linkmaker.itunes.apple.com"
       }
     },
@@ -361,6 +371,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "151.101.1.194",
@@ -370,6 +381,7 @@
         ]
       },
       "question": {
+        "length": 43,
         "name": "confiant-integrations.global.ssl.fastly.net"
       }
     },
@@ -427,12 +439,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "20.36.253.92"
         ]
       },
       "question": {
+        "length": 9,
         "name": "c.msn.com"
       }
     },
@@ -498,6 +512,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "13.107.21.200",
@@ -505,6 +520,7 @@
         ]
       },
       "question": {
+        "length": 10,
         "name": "c.bing.com"
       }
     },
@@ -558,12 +574,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 1,
       "grouped": {
         "ip": [
           "23.52.167.93"
         ]
       },
       "question": {
+        "length": 20,
         "name": "contextual.media.net"
       }
     },
@@ -633,12 +651,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "152.195.32.120"
         ]
       },
       "question": {
+        "length": 13,
         "name": "at.atwola.com"
       }
     },
@@ -732,6 +752,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "204.13.192.56",
@@ -746,6 +767,7 @@
         ]
       },
       "question": {
+        "length": 11,
         "name": "m.adnxs.com"
       }
     },
@@ -803,12 +825,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "74.6.137.78"
         ]
       },
       "question": {
+        "length": 23,
         "name": "cms.analytics.yahoo.com"
       }
     },
@@ -870,12 +894,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.167.93"
         ]
       },
       "question": {
+        "length": 17,
         "name": "cvision.media.net"
       }
     },
@@ -941,6 +967,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "204.79.197.200",
@@ -948,6 +975,7 @@
         ]
       },
       "question": {
+        "length": 10,
         "name": "g.bing.com"
       }
     },
@@ -1001,12 +1029,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 1,
       "grouped": {
         "ip": [
           "23.52.167.93"
         ]
       },
       "question": {
+        "length": 13,
         "name": "lg3.media.net"
       }
     },
@@ -1072,6 +1102,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "54.88.96.255",
@@ -1080,6 +1111,7 @@
         ]
       },
       "question": {
+        "length": 26,
         "name": "service.sp.advertising.com"
       }
     },
@@ -1141,12 +1173,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "184.25.176.117"
         ]
       },
       "question": {
+        "length": 24,
         "name": "sb.scorecardresearch.com"
       }
     },
@@ -1208,12 +1242,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "40.114.54.223"
         ]
       },
       "question": {
+        "length": 11,
         "name": "otf.msn.com"
       }
     },
@@ -1295,6 +1331,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 8,
       "grouped": {
         "ip": [
           "35.171.101.225",
@@ -1308,6 +1345,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "ping.chartbeat.net"
       }
     },
@@ -1373,6 +1411,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "151.101.194.79",
@@ -1382,6 +1421,7 @@
         ]
       },
       "question": {
+        "length": 26,
         "name": "clarium.freetls.fastly.net"
       }
     },
@@ -1483,6 +1523,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 13,
       "grouped": {
         "ip": [
           "68.67.178.252",
@@ -1501,6 +1542,7 @@
         ]
       },
       "question": {
+        "length": 17,
         "name": "nym1-ib.adnxs.com"
       }
     },
@@ -1594,6 +1636,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "34.196.86.129",
@@ -1608,6 +1651,7 @@
         ]
       },
       "question": {
+        "length": 13,
         "name": "eb2.3lift.com"
       }
     },
@@ -1705,6 +1749,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "108.174.10.14",
@@ -1720,6 +1765,7 @@
         ]
       },
       "question": {
+        "length": 19,
         "name": "px.ads.linkedin.com"
       }
     },
@@ -1789,6 +1835,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "40.90.23.239",
@@ -1797,6 +1844,7 @@
         ]
       },
       "question": {
+        "length": 14,
         "name": "login.live.com"
       }
     },
@@ -1894,6 +1942,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "74.119.119.150",
@@ -1911,6 +1960,7 @@
         ]
       },
       "question": {
+        "length": 14,
         "name": "dis.criteo.com"
       }
     },
@@ -2012,6 +2062,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 13,
       "grouped": {
         "ip": [
           "68.67.180.12",
@@ -2028,6 +2079,7 @@
         ]
       },
       "question": {
+        "length": 12,
         "name": "ib.adnxs.com"
       }
     },
@@ -2085,12 +2137,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "172.217.10.34"
         ]
       },
       "question": {
+        "length": 20,
         "name": "cm.g.doubleclick.net"
       }
     },
@@ -2184,6 +2238,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "54.208.129.24",
@@ -2199,6 +2254,7 @@
         ]
       },
       "question": {
+        "length": 16,
         "name": "match.adsrvr.org"
       }
     },
@@ -2260,12 +2316,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.162.21"
         ]
       },
       "question": {
+        "length": 24,
         "name": "ssum-sec.casalemedia.com"
       }
     },
@@ -2359,6 +2417,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "18.204.130.216",
@@ -2374,6 +2433,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "protected-by.clarium.io"
       }
     },
@@ -2431,12 +2491,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "172.217.10.66"
         ]
       },
       "question": {
+        "length": 29,
         "name": "pagead2.googlesyndication.com"
       }
     },
@@ -2494,12 +2556,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "172.217.10.66"
         ]
       },
       "question": {
+        "length": 27,
         "name": "googleads.g.doubleclick.net"
       }
     },
@@ -2589,6 +2653,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 10,
       "grouped": {
         "ip": [
           "52.22.184.73",
@@ -2602,6 +2667,7 @@
         ]
       },
       "question": {
+        "length": 21,
         "name": "pixel.advertising.com"
       }
     },
@@ -2683,6 +2749,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 8,
       "grouped": {
         "ip": [
           "54.210.214.197",
@@ -2693,6 +2760,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "onevideosync.uplynk.com"
       }
     },
@@ -2750,12 +2818,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "50.116.194.21"
         ]
       },
       "question": {
+        "length": 11,
         "name": "ad.turn.com"
       }
     },
@@ -2841,6 +2911,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 9,
       "grouped": {
         "ip": [
           "34.225.20.218",
@@ -2854,6 +2925,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "ups.analytics.yahoo.com"
       }
     },
@@ -2951,6 +3023,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "34.237.248.89",
@@ -2967,6 +3040,7 @@
         ]
       },
       "question": {
+        "length": 11,
         "name": "pm.w55c.net"
       }
     },
@@ -3064,6 +3138,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "35.186.239.238",
@@ -3081,6 +3156,7 @@
         ]
       },
       "question": {
+        "length": 16,
         "name": "cm.eyereturn.com"
       }
     },
@@ -3138,12 +3214,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "172.217.10.66"
         ]
       },
       "question": {
+        "length": 25,
         "name": "www.googletagservices.com"
       }
     },
@@ -3241,6 +3319,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "173.231.178.117",
@@ -3257,6 +3336,7 @@
         ]
       },
       "question": {
+        "length": 12,
         "name": "cm.adgrx.com"
       }
     },
@@ -3350,6 +3430,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "104.193.83.156",
@@ -3364,6 +3445,7 @@
         ]
       },
       "question": {
+        "length": 24,
         "name": "csm2waycm-atl.netmng.com"
       }
     },
@@ -3421,12 +3503,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "72.30.2.182"
         ]
       },
       "question": {
+        "length": 19,
         "name": "pr-bh.ybp.yahoo.com"
       }
     },
@@ -3480,12 +3564,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 1,
       "grouped": {
         "ip": [
           "3.83.220.223"
         ]
       },
       "question": {
+        "length": 13,
         "name": "ps.eyeota.net"
       }
     },
@@ -3555,6 +3641,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "204.2.197.201",
@@ -3562,6 +3649,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "idpix.media6degrees.com"
       }
     },
@@ -3651,6 +3739,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 10,
       "grouped": {
         "ip": [
           "172.217.10.1",
@@ -3665,6 +3754,7 @@
         ]
       },
       "question": {
+        "length": 25,
         "name": "tpc.googlesyndication.com"
       }
     },
@@ -3758,6 +3848,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "162.248.19.147",
@@ -3772,6 +3863,7 @@
         ]
       },
       "question": {
+        "length": 19,
         "name": "image2.pubmatic.com"
       }
     },
@@ -3837,12 +3929,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "204.79.197.203"
         ]
       },
       "question": {
+        "length": 11,
         "name": "sam.msn.com"
       }
     },
@@ -3940,6 +4034,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "52.85.89.250",
@@ -3957,6 +4052,7 @@
         ]
       },
       "question": {
+        "length": 26,
         "name": "ocsp.sca1b.amazontrust.com"
       }
     },
@@ -4022,6 +4118,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "185.167.164.43",
@@ -4029,6 +4126,7 @@
         ]
       },
       "question": {
+        "length": 13,
         "name": "c1.adform.net"
       }
     },
@@ -4110,6 +4208,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 8,
       "grouped": {
         "ip": [
           "40.84.140.84",
@@ -4121,6 +4220,7 @@
         ]
       },
       "question": {
+        "length": 17,
         "name": "urs.microsoft.com"
       }
     },
@@ -4182,12 +4282,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.162.21"
         ]
       },
       "question": {
+        "length": 24,
         "name": "dsum-sec.casalemedia.com"
       }
     },
@@ -4245,12 +4347,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "72.167.239.239"
         ]
       },
       "question": {
+        "length": 16,
         "name": "ocsp.godaddy.com"
       }
     },
@@ -4299,6 +4403,7 @@
     "@timestamp": "2019-07-18T03:34:03.315Z",
     "dns": {
       "question": {
+        "length": 27,
         "name": "googleads.g.doubleclick.net"
       }
     },
@@ -4347,6 +4452,7 @@
     "@timestamp": "2019-07-18T03:34:03.315Z",
     "dns": {
       "question": {
+        "length": 25,
         "name": "tpc.googlesyndication.com"
       }
     },
@@ -4440,6 +4546,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "151.139.128.14",
@@ -4455,6 +4562,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "ocsp.usertrust.com"
       }
     },
@@ -4520,6 +4628,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "23.50.53.179",
@@ -4527,6 +4636,7 @@
         ]
       },
       "question": {
+        "length": 31,
         "name": "isrg.trustid.ocsp.identrust.com"
       }
     },
@@ -4584,12 +4694,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "172.217.6.198"
         ]
       },
       "question": {
+        "length": 18,
         "name": "ad.doubleclick.net"
       }
     },
@@ -4683,6 +4795,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "151.139.128.14",
@@ -4698,6 +4811,7 @@
         ]
       },
       "question": {
+        "length": 16,
         "name": "ocsp.sectigo.com"
       }
     },
@@ -4763,6 +4877,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "23.50.53.179",
@@ -4770,6 +4885,7 @@
         ]
       },
       "question": {
+        "length": 27,
         "name": "ocsp.int-x3.letsencrypt.org"
       }
     },
@@ -4863,6 +4979,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "172.217.12.195",
@@ -4878,6 +4995,7 @@
         ]
       },
       "question": {
+        "length": 13,
         "name": "ocsp.pki.goog"
       }
     },
@@ -4935,12 +5053,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "172.217.10.34"
         ]
       },
       "question": {
+        "length": 28,
         "name": "googleads4.g.doubleclick.net"
       }
     },
@@ -5010,6 +5130,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "151.101.2.2",
@@ -5019,6 +5140,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "images.taboola.com"
       }
     },
@@ -5088,6 +5210,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "151.101.66.2",
@@ -5097,6 +5220,7 @@
         ]
       },
       "question": {
+        "length": 19,
         "name": "api-s2s.taboola.com"
       }
     },
@@ -5154,6 +5278,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "35.231.30.22",
@@ -5161,6 +5286,7 @@
         ]
       },
       "question": {
+        "length": 15,
         "name": "x.bidswitch.net"
       }
     },
@@ -5254,6 +5380,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "199.166.0.26",
@@ -5269,6 +5396,7 @@
         ]
       },
       "question": {
+        "length": 25,
         "name": "pixel.adsafeprotected.com"
       }
     },
@@ -5366,6 +5494,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "35.171.48.231",
@@ -5383,6 +5512,7 @@
         ]
       },
       "question": {
+        "length": 9,
         "name": "ml314.com"
       }
     },
@@ -5480,6 +5610,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "156.154.200.36",
@@ -5497,6 +5628,7 @@
         ]
       },
       "question": {
+        "length": 11,
         "name": "aa.agkn.com"
       }
     },
@@ -5590,6 +5722,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "172.217.10.134",
@@ -5605,6 +5738,7 @@
         ]
       },
       "question": {
+        "length": 11,
         "name": "s0.2mdn.net"
       }
     },
@@ -5670,6 +5804,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "23.50.53.195",
@@ -5677,6 +5812,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "b.scorecardresearch.com"
       }
     },
@@ -5746,6 +5882,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "151.101.130.2",
@@ -5755,6 +5892,7 @@
         ]
       },
       "question": {
+        "length": 15,
         "name": "edw.edmunds.com"
       }
     },
@@ -5812,12 +5950,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "72.21.91.29"
         ]
       },
       "question": {
+        "length": 17,
         "name": "ocsp.digicert.com"
       }
     },
@@ -5911,6 +6051,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "35.167.55.0",
@@ -5926,6 +6067,7 @@
         ]
       },
       "question": {
+        "length": 39,
         "name": "pre-usermatch.targeting.unrulymedia.com"
       }
     },
@@ -6027,6 +6169,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 13,
       "grouped": {
         "ip": [
           "144.76.67.119",
@@ -6044,6 +6187,7 @@
         ]
       },
       "question": {
+        "length": 15,
         "name": "farm.plista.com"
       }
     },
@@ -6137,6 +6281,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "50.17.180.35",
@@ -6151,6 +6296,7 @@
         ]
       },
       "question": {
+        "length": 15,
         "name": "beacon.krxd.net"
       }
     },
@@ -6212,12 +6358,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.162.21"
         ]
       },
       "question": {
+        "length": 20,
         "name": "dsum.casalemedia.com"
       }
     },
@@ -6315,6 +6463,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "216.200.232.235",
@@ -6331,6 +6480,7 @@
         ]
       },
       "question": {
+        "length": 16,
         "name": "sync.mathtag.com"
       }
     },
@@ -6392,12 +6542,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "72.21.91.29"
         ]
       },
       "question": {
+        "length": 19,
         "name": "status.rapidssl.com"
       }
     },
@@ -6495,6 +6647,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "34.197.195.131",
@@ -6511,6 +6664,7 @@
         ]
       },
       "question": {
+        "length": 14,
         "name": "sync.extend.tv"
       }
     },
@@ -6604,6 +6758,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "151.139.128.14",
@@ -6619,6 +6774,7 @@
         ]
       },
       "question": {
+        "length": 17,
         "name": "ocsp.comodoca.com"
       }
     },
@@ -6696,6 +6852,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 7,
       "grouped": {
         "ip": [
           "151.101.2.49",
@@ -6705,6 +6862,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "sync-tm.everesttech.net"
       }
     },
@@ -6802,6 +6960,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "34.95.92.78",
@@ -6819,6 +6978,7 @@
         ]
       },
       "question": {
+        "length": 16,
         "name": "idsync.rlcdn.com"
       }
     },
@@ -6896,6 +7056,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 7,
       "grouped": {
         "ip": [
           "37.157.2.239",
@@ -6907,6 +7068,7 @@
         ]
       },
       "question": {
+        "length": 13,
         "name": "cm.adform.net"
       }
     },
@@ -6960,12 +7122,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 1,
       "grouped": {
         "ip": [
           "37.18.16.16"
         ]
       },
       "question": {
+        "length": 12,
         "name": "dm.hybrid.ai"
       }
     },
@@ -7059,6 +7223,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "199.166.0.32",
@@ -7074,6 +7239,7 @@
         ]
       },
       "question": {
+        "length": 26,
         "name": "static.adsafeprotected.com"
       }
     },
@@ -7143,6 +7309,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "151.101.130.2",
@@ -7152,6 +7319,7 @@
         ]
       },
       "question": {
+        "length": 15,
         "name": "trc.taboola.com"
       }
     },
@@ -7205,12 +7373,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 1,
       "grouped": {
         "ip": [
           "107.178.254.65"
         ]
       },
       "question": {
+        "length": 10,
         "name": "pippio.com"
       }
     },
@@ -7304,6 +7474,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "209.15.36.34",
@@ -7319,6 +7490,7 @@
         ]
       },
       "question": {
+        "length": 24,
         "name": "pixel-sync.sitescout.com"
       }
     },
@@ -7412,6 +7584,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "35.186.202.217",
@@ -7428,6 +7601,7 @@
         ]
       },
       "question": {
+        "length": 20,
         "name": "prod.y-medialink.com"
       }
     },
@@ -7505,6 +7679,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 7,
       "grouped": {
         "ip": [
           "54.80.117.178",
@@ -7516,6 +7691,7 @@
         ]
       },
       "question": {
+        "length": 24,
         "name": "jadserve.postrelease.com"
       }
     },
@@ -7609,6 +7785,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "107.21.43.184",
@@ -7624,6 +7801,7 @@
         ]
       },
       "question": {
+        "length": 31,
         "name": "appnexus-partners.tremorhub.com"
       }
     },
@@ -7709,6 +7887,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 9,
       "grouped": {
         "ip": [
           "107.21.14.70",
@@ -7721,6 +7900,7 @@
         ]
       },
       "question": {
+        "length": 17,
         "name": "x.dlx.addthis.com"
       }
     },
@@ -7806,6 +7986,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 9,
       "grouped": {
         "ip": [
           "18.205.112.71",
@@ -7818,6 +7999,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "dh.serving-sys.com"
       }
     },
@@ -7919,6 +8101,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 13,
       "grouped": {
         "ip": [
           "52.55.160.246",
@@ -7936,6 +8119,7 @@
         ]
       },
       "question": {
+        "length": 22,
         "name": "match.sharethrough.com"
       }
     },
@@ -8029,6 +8213,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "35.241.16.233",
@@ -8045,6 +8230,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "tags.rd.linksynergy.com"
       }
     },
@@ -8134,6 +8320,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 10,
       "grouped": {
         "ip": [
           "199.187.193.166",
@@ -8147,6 +8334,7 @@
         ]
       },
       "question": {
+        "length": 27,
         "name": "rtb-csync.smartadserver.com"
       }
     },
@@ -8240,6 +8428,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "199.166.0.200",
@@ -8255,6 +8444,7 @@
         ]
       },
       "question": {
+        "length": 14,
         "name": "sc.iasds01.com"
       }
     },
@@ -8348,6 +8538,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "104.244.38.20",
@@ -8363,6 +8554,7 @@
         ]
       },
       "question": {
+        "length": 22,
         "name": "dt.adsafeprotected.com"
       }
     },
@@ -8424,12 +8616,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "72.21.91.29"
         ]
       },
       "question": {
+        "length": 17,
         "name": "status.thawte.com"
       }
     },
@@ -8523,6 +8717,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "38.134.110.101",
@@ -8536,6 +8731,7 @@
         ]
       },
       "question": {
+        "length": 19,
         "name": "ads.stickyadstv.com"
       }
     },
@@ -8597,12 +8793,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.167.93"
         ]
       },
       "question": {
+        "length": 13,
         "name": "hbx.media.net"
       }
     },
@@ -8672,6 +8870,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "151.101.194.49",
@@ -8681,6 +8880,7 @@
         ]
       },
       "question": {
+        "length": 17,
         "name": "match.taboola.com"
       }
     },
@@ -8742,6 +8942,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.50.53.185",
@@ -8749,6 +8950,7 @@
         ]
       },
       "question": {
+        "length": 27,
         "name": "img-s-msn-com.akamaized.net"
       }
     },
@@ -8810,6 +9012,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.50.53.194",
@@ -8817,6 +9020,7 @@
         ]
       },
       "question": {
+        "length": 48,
         "name": "static-entertainment-eus-s-msn-com.akamaized.net"
       }
     },
@@ -8878,12 +9082,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.217.149.91"
         ]
       },
       "question": {
+        "length": 31,
         "name": "radarmaps.weather.microsoft.com"
       }
     },
@@ -8945,6 +9151,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.50.53.194",
@@ -8952,6 +9159,7 @@
         ]
       },
       "question": {
+        "length": 48,
         "name": "static-entertainment-eus-s-msn-com.akamaized.net"
       }
     },
@@ -9009,12 +9217,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "152.195.32.163"
         ]
       },
       "question": {
+        "length": 22,
         "name": "tag.sp.advertising.com"
       }
     },
@@ -9080,6 +9290,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "204.79.197.200",
@@ -9087,6 +9298,7 @@
         ]
       },
       "question": {
+        "length": 12,
         "name": "www.bing.com"
       }
     },
@@ -9148,12 +9360,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.164.109"
         ]
       },
       "question": {
+        "length": 20,
         "name": "cdn.doubleverify.com"
       }
     },
@@ -9219,12 +9433,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "23.52.164.109"
         ]
       },
       "question": {
+        "length": 21,
         "name": "cdn3.doubleverify.com"
       }
     },
@@ -9286,12 +9502,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "204.154.111.122"
         ]
       },
       "question": {
+        "length": 21,
         "name": "rtb0.doubleverify.com"
       }
     },
@@ -9353,12 +9571,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "20.36.236.157"
         ]
       },
       "question": {
+        "length": 20,
         "name": "dev.virtualearth.net"
       }
     },
@@ -9420,12 +9640,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.161.238"
         ]
       },
       "question": {
+        "length": 39,
         "name": "t.ssl.ak.dynamic.tiles.virtualearth.net"
       }
     },
@@ -9523,6 +9745,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "74.217.253.61",
@@ -9540,6 +9763,7 @@
         ]
       },
       "question": {
+        "length": 14,
         "name": "rp.gwallet.com"
       }
     },
@@ -9609,6 +9833,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 5,
       "grouped": {
         "ip": [
           "98.139.225.43",
@@ -9618,6 +9843,7 @@
         ]
       },
       "question": {
+        "length": 13,
         "name": "ads.yahoo.com"
       }
     },
@@ -9679,6 +9905,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "169.55.104.49",
@@ -9687,6 +9914,7 @@
         ]
       },
       "question": {
+        "length": 12,
         "name": "um.simpli.fi"
       }
     },
@@ -9780,6 +10008,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "35.186.236.204",
@@ -9796,6 +10025,7 @@
         ]
       },
       "question": {
+        "length": 20,
         "name": "mpp.vindicosuite.com"
       }
     },
@@ -9849,12 +10079,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 1,
       "grouped": {
         "ip": [
           "8.41.222.152"
         ]
       },
       "question": {
+        "length": 11,
         "name": "sync.1rx.io"
       }
     },
@@ -9916,12 +10148,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.52.160.7"
         ]
       },
       "question": {
+        "length": 13,
         "name": "sync.teads.tv"
       }
     },
@@ -10019,6 +10253,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "3.15.109.176",
@@ -10035,6 +10270,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "s.thebrighttag.com"
       }
     },
@@ -10092,12 +10328,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "54.192.55.189"
         ]
       },
       "question": {
+        "length": 13,
         "name": "t.a3cloud.net"
       }
     },
@@ -10159,12 +10397,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "204.154.111.122"
         ]
       },
       "question": {
+        "length": 23,
         "name": "tps618.doubleverify.com"
       }
     },
@@ -10262,6 +10502,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "54.157.69.185",
@@ -10276,6 +10517,7 @@
         ]
       },
       "question": {
+        "length": 14,
         "name": "dpm.demdex.net"
       }
     },
@@ -10377,6 +10619,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 13,
       "grouped": {
         "ip": [
           "68.67.179.228",
@@ -10393,6 +10636,7 @@
         ]
       },
       "question": {
+        "length": 16,
         "name": "secure.adnxs.com"
       }
     },
@@ -10454,12 +10698,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "204.154.111.122"
         ]
       },
       "question": {
+        "length": 20,
         "name": "tps.doubleverify.com"
       }
     },
@@ -10557,6 +10803,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "52.71.175.22",
@@ -10573,6 +10820,7 @@
         ]
       },
       "question": {
+        "length": 11,
         "name": "i.liadm.com"
       }
     },
@@ -10670,6 +10918,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "67.231.251.189",
@@ -10687,6 +10936,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "pixel.s3xified.com"
       }
     },
@@ -10780,6 +11030,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "104.20.252.85",
@@ -10796,6 +11047,7 @@
         ]
       },
       "question": {
+        "length": 20,
         "name": "router.infolinks.com"
       }
     },
@@ -10885,6 +11137,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 10,
       "grouped": {
         "ip": [
           "94.23.171.206",
@@ -10900,6 +11153,7 @@
         ]
       },
       "question": {
+        "length": 12,
         "name": "grey.erne.co"
       }
     },
@@ -10997,6 +11251,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "54.243.145.203",
@@ -11014,6 +11269,7 @@
         ]
       },
       "question": {
+        "length": 14,
         "name": "sync.jivox.com"
       }
     },
@@ -11279,6 +11535,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 54,
       "grouped": {
         "ip": [
           "207.244.121.25",
@@ -11337,6 +11594,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "b1sync.zemanta.com"
       }
     },
@@ -11446,6 +11704,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 15,
       "grouped": {
         "ip": [
           "124.146.215.43",
@@ -11465,6 +11724,7 @@
         ]
       },
       "question": {
+        "length": 12,
         "name": "tg.socdm.com"
       }
     },
@@ -11522,12 +11782,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "68.67.153.75"
         ]
       },
       "question": {
+        "length": 16,
         "name": "prebid.adnxs.com"
       }
     },
@@ -11593,12 +11855,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "204.154.111.122"
         ]
       },
       "question": {
+        "length": 13,
         "name": "ul1.dvtps.com"
       }
     },
@@ -11647,6 +11911,7 @@
     "@timestamp": "2019-07-18T03:34:08.912Z",
     "dns": {
       "question": {
+        "length": 13,
         "name": "ul1.dvtps.com"
       }
     },
@@ -11708,12 +11973,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "23.3.125.199"
         ]
       },
       "question": {
+        "length": 16,
         "name": "tags.bluekai.com"
       }
     },
@@ -11811,6 +12078,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "104.19.195.151",
@@ -11828,6 +12096,7 @@
         ]
       },
       "question": {
+        "length": 20,
         "name": "cdnjs.cloudflare.com"
       }
     },
@@ -11925,6 +12194,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "85.194.243.23",
@@ -11942,6 +12212,7 @@
         ]
       },
       "question": {
+        "length": 20,
         "name": "pixel.onaudience.com"
       }
     },
@@ -12003,12 +12274,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "72.21.91.29"
         ]
       },
       "question": {
+        "length": 19,
         "name": "status.geotrust.com"
       }
     },
@@ -12102,6 +12375,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "151.139.128.14",
@@ -12117,6 +12391,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "ocsp.trust-provider.com"
       }
     },
@@ -12210,6 +12485,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "151.139.128.14",
@@ -12225,6 +12501,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "ocsp.comodoca4.com"
       }
     },
@@ -12318,6 +12595,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "52.4.111.14",
@@ -12332,6 +12610,7 @@
         ]
       },
       "question": {
+        "length": 18,
         "name": "sync.crwdcntrl.net"
       }
     },
@@ -12417,6 +12696,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 9,
       "grouped": {
         "ip": [
           "159.127.42.114",
@@ -12428,6 +12708,7 @@
         ]
       },
       "question": {
+        "length": 28,
         "name": "match.sync.ad.cpe.dotomi.com"
       }
     },
@@ -12489,12 +12770,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "204.154.111.122"
         ]
       },
       "question": {
+        "length": 25,
         "name": "tps10230.doubleverify.com"
       }
     },
@@ -12556,12 +12839,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "204.154.111.122"
         ]
       },
       "question": {
+        "length": 25,
         "name": "tps10221.doubleverify.com"
       }
     },
@@ -12655,6 +12940,7 @@
           "type": "A"
         }
       ],
+      "answers_count": 11,
       "grouped": {
         "ip": [
           "31.13.71.36",
@@ -12670,6 +12956,7 @@
         ]
       },
       "question": {
+        "length": 16,
         "name": "www.facebook.com"
       }
     },
@@ -12743,12 +13030,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 6,
       "grouped": {
         "ip": [
           "192.229.163.25"
         ]
       },
       "question": {
+        "length": 20,
         "name": "platform.twitter.com"
       }
     },
@@ -12846,6 +13135,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 12,
       "grouped": {
         "ip": [
           "104.244.42.8",
@@ -12863,6 +13153,7 @@
         ]
       },
       "question": {
+        "length": 23,
         "name": "syndication.twitter.com"
       }
     },
@@ -12920,12 +13211,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "172.217.10.34"
         ]
       },
       "question": {
+        "length": 25,
         "name": "ade.googlesyndication.com"
       }
     },
@@ -12987,12 +13280,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 3,
       "grouped": {
         "ip": [
           "72.21.81.200"
         ]
       },
       "question": {
+        "length": 22,
         "name": "iecvlist.microsoft.com"
       }
     },
@@ -13050,12 +13345,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "40.77.232.95"
         ]
       },
       "question": {
+        "length": 40,
         "name": "tsfe.trafficshaping.dsp.mp.microsoft.com"
       }
     },
@@ -13104,6 +13401,7 @@
     "@timestamp": "2019-07-18T03:39:20.413Z",
     "dns": {
       "question": {
+        "length": 25,
         "name": "isatap.local.crowbird.com"
       }
     },
@@ -13152,6 +13450,7 @@
     "@timestamp": "2019-07-18T03:39:40.504Z",
     "dns": {
       "question": {
+        "length": 6,
         "name": "puppet"
       }
     },
@@ -13200,6 +13499,7 @@
     "@timestamp": "2019-07-18T03:40:40.433Z",
     "dns": {
       "question": {
+        "length": 4,
         "name": "wpad"
       }
     },
@@ -13265,12 +13565,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 4,
       "grouped": {
         "ip": [
           "65.55.44.109"
         ]
       },
       "question": {
+        "length": 33,
         "name": "v10.vortex-win.data.microsoft.com"
       }
     },
@@ -13328,12 +13630,14 @@
           "type": "A"
         }
       ],
+      "answers_count": 2,
       "grouped": {
         "ip": [
           "20.36.218.63"
         ]
       },
       "question": {
+        "length": 31,
         "name": "settings-win.data.microsoft.com"
       }
     },
@@ -13419,6 +13723,7 @@
           "type": "AAAA"
         }
       ],
+      "answers_count": 9,
       "grouped": {
         "ip": [
           "40.121.17.79",
@@ -13431,6 +13736,7 @@
         ]
       },
       "question": {
+        "length": 19,
         "name": "c.urs.microsoft.com"
       }
     },

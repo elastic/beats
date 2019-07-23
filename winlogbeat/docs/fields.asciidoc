@@ -3921,6 +3921,18 @@ type: keyword
 
 --
 
+*`dns.question.length`*::
++
+--
+The length of the name being queried (in bytes). This is useful to detect data exfiltration via DNS queries.
+
+
+type: long
+
+example: 42
+
+--
+
 *`dns.answers`*::
 +
 --
@@ -3946,6 +3958,18 @@ example: CNAME
 +
 --
 type: keyword
+
+--
+
+*`dns.answers_count`*::
++
+--
+The number of resource records contained in the `dns.answers` field.
+
+
+type: long
+
+example: 3
 
 --
 
