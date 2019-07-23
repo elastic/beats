@@ -20,6 +20,7 @@ package kafka
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/Shopify/sarama"
 
@@ -39,9 +40,26 @@ type kafkaInputConfig struct {
 	ClientID      string            `config:"client_id"`
 	Version       kafka.Version     `config:"version"`
 	InitialOffset initialOffset     `config:"initial_offset"`
+	RetryBackoff  time.Duration     `config:"retry_backoff" validate:"min=0"`
+	MaxWaitTime   time.Duration     `config:"max_wait_time"`
+	Fetch         *kafkaFetch       `config:"fetch"`
+	Rebalance     *kafkaRebalance   `config:"rebalance"`
 	TLS           *tlscommon.Config `config:"ssl"`
 	Username      string            `config:"username"`
 	Password      string            `config:"password"`
+}
+
+type kafkaFetch struct {
+	Min     int32 `config:"min" validate:"min=1"`
+	Default int32 `config:"default" validate:"min=1"`
+	Max     int32 `config:"max" validate:"min=0"`
+}
+
+type kafkaRebalance struct {
+	Strategy     rebalanceStrategy `config:"strategy"`
+	Timeout      time.Duration     `config:"timeout"`
+	MaxRetries   int               `config:"max_retries"`
+	RetryBackoff time.Duration     `config:"retry_backoff" validate:"min=0"`
 }
 
 type initialOffset int
@@ -51,18 +69,44 @@ const (
 	initialOffsetNewest
 )
 
+type rebalanceStrategy int
+
+const (
+	rebalanceStrategyRange rebalanceStrategy = iota
+	rebalanceStrategyRoundRobin
+)
+
 var (
 	initialOffsets = map[string]initialOffset{
 		"oldest": initialOffsetOldest,
 		"newest": initialOffsetNewest,
 	}
+	rebalanceStrategies = map[string]rebalanceStrategy{
+		"range":      rebalanceStrategyRange,
+		"roundrobin": rebalanceStrategyRoundRobin,
+	}
 )
 
+// The default config for the kafka input. When in doubt, default values
+// were chosen to match sarama's defaults.
 func defaultConfig() kafkaInputConfig {
 	return kafkaInputConfig{
 		Version:       kafka.Version("1.0.0"),
 		InitialOffset: initialOffsetOldest,
 		ClientID:      "filebeat",
+		RetryBackoff:  2 * time.Second,
+		MaxWaitTime:   250 * time.Millisecond,
+		Fetch: &kafkaFetch{
+			Min:     1,
+			Default: (1 << 20), // 1 MB
+			Max:     0,
+		},
+		Rebalance: &kafkaRebalance{
+			Strategy:     rebalanceStrategyRange,
+			Timeout:      60 * time.Second,
+			MaxRetries:   4,
+			RetryBackoff: 2 * time.Second,
+		},
 	}
 }
 
@@ -93,6 +137,18 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 
 	k.Consumer.Return.Errors = true
 	k.Consumer.Offsets.Initial = config.InitialOffset.asSaramaOffset()
+	k.Consumer.Retry.Backoff = config.RetryBackoff
+	k.Consumer.MaxWaitTime = config.MaxWaitTime
+
+	k.Consumer.Fetch.Min = config.Fetch.Min
+	k.Consumer.Fetch.Default = config.Fetch.Default
+	k.Consumer.Fetch.Max = config.Fetch.Max
+
+	k.Consumer.Group.Rebalance.Strategy =
+		config.Rebalance.Strategy.asSaramaStrategy()
+	k.Consumer.Group.Rebalance.Timeout = config.Rebalance.Timeout
+	k.Consumer.Group.Rebalance.Retry.Backoff = config.Rebalance.RetryBackoff
+	k.Consumer.Group.Rebalance.Retry.Max = config.Rebalance.MaxRetries
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
@@ -142,8 +198,23 @@ func (off *initialOffset) Unpack(value string) error {
 	if !ok {
 		return fmt.Errorf("invalid initialOffset '%s'", value)
 	}
-
 	*off = initialOffset
+	return nil
+}
 
+func (st rebalanceStrategy) asSaramaStrategy() sarama.BalanceStrategy {
+	return map[rebalanceStrategy]sarama.BalanceStrategy{
+		rebalanceStrategyRange:      sarama.BalanceStrategyRange,
+		rebalanceStrategyRoundRobin: sarama.BalanceStrategyRoundRobin,
+	}[st]
+}
+
+// Unpack validates and unpack the "rebalance.strategy" config option
+func (st *rebalanceStrategy) Unpack(value string) error {
+	strategy, ok := rebalanceStrategies[value]
+	if !ok {
+		return fmt.Errorf("invalid rebalance strategy '%s'", value)
+	}
+	*st = strategy
 	return nil
 }
