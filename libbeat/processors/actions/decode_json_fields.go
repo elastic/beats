@@ -67,7 +67,7 @@ func init() {
 	processors.RegisterPlugin("decode_json_fields",
 		checks.ConfigChecked(NewDecodeJSONFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when")))
+			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "substring", "target", "when")))
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
