@@ -368,6 +368,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:EQDBfI6vAylArTBQHY8kNmaweOA=",
       "direction": "outbound",
       "protocol": "domain",
       "transport": "udp",
@@ -424,6 +425,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:TXczQujzvcGYSvZ/CKEBu1p2riE=",
       "direction": "inbound",
       "protocol": "domain",
       "transport": "udp",
@@ -481,6 +483,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:W2ZbP8nXMY+YAGYw2h/3Sa8Gu/w=",
       "direction": "outbound",
       "protocol": "https",
       "transport": "tcp",
@@ -538,6 +541,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:5MsyqYltV9KkhIFGPWiByzQqHDo=",
       "direction": "outbound",
       "protocol": "https",
       "transport": "tcp",
@@ -595,6 +599,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
       "direction": "outbound",
       "protocol": "netbios-ns",
       "transport": "udp",
@@ -656,6 +661,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
       "direction": "inbound",
       "protocol": "netbios-ns",
       "transport": "udp",
@@ -715,6 +721,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:4DSgubObvMEI9IKNWPDqltrux+k=",
       "direction": "outbound",
       "protocol": "llmnr",
       "transport": "udp",
@@ -772,6 +779,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:sejGGvgk92xTvKdzlFitndKqdWw=",
       "direction": "outbound",
       "protocol": "llmnr",
       "transport": "udp",
@@ -828,6 +836,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
       "direction": "outbound",
       "protocol": "netbios-ns",
       "transport": "udp",
@@ -887,6 +896,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
       "direction": "inbound",
       "protocol": "netbios-ns",
       "transport": "udp",
@@ -946,6 +956,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:Zt/ImHlMNf4MciHXlRDkivgw2jY=",
       "direction": "outbound",
       "protocol": "llmnr",
       "transport": "udp",
@@ -1002,6 +1013,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:SHkoHfPFDYWai8qQBwIiRxvCPZw=",
       "direction": "outbound",
       "protocol": "llmnr",
       "transport": "udp",
@@ -1058,6 +1070,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:DI+g4BImhWaUwPmLEjdMMQVYPLs=",
       "direction": "outbound",
       "protocol": "netbios-ns",
       "transport": "udp",
@@ -1118,6 +1131,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:okFVyky/zOY2Q0BATy37YsbiveA=",
       "direction": "outbound",
       "protocol": "netbios-ns",
       "transport": "udp",
@@ -1178,6 +1192,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:ZHyFuF2PjubLSbAh4zRQIZHOZK8=",
       "direction": "outbound",
       "protocol": "netbios-ns",
       "transport": "udp",
@@ -1238,6 +1253,7 @@
       "level": "information"
     },
     "network": {
+      "community_id": "1:r3C/WjbATNIislTQ0M+ySzwnuiw=",
       "direction": "outbound",
       "protocol": "netbios-ns",
       "transport": "udp",

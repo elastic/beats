@@ -185,6 +185,7 @@ var sysmon = (function () {
         .Add(addUser)
         .Add(addNetworkDirection)
         .Add(addNetworkType)
+        .CommunityID()
         .Add(removeEmptyEventData)
         .Build();
 
