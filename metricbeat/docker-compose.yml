@@ -13,7 +13,6 @@ services:
     command: make
     env_file:
       - ./module/aerospike/_meta/env
-      - ./module/apache/_meta/env
       - ./module/beat/_meta/env
       - ./module/ceph/_meta/env
       - ./module/consul/_meta/env
@@ -53,16 +52,17 @@ services:
       - 3000
 
   apache:
-    build: ./module/apache/_meta
-    ports:
-      - 80
+    extends:
+      file: ./module/apache/docker-compose.yml
+      service: apache
 
   apache_2_4_12:
+    extends:
+      file: ./module/apache/docker-compose.yml
+      service: apache
     build:
-      context: ./module/apache/_meta
-      dockerfile: Dockerfile.2.4.12
-    ports:
-      - 80
+      args:
+        APACHE_VERSION: 2.4.12
 
   metricbeat:
     build: ./module/beat/_meta
