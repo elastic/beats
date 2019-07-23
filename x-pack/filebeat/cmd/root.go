@@ -10,6 +10,9 @@ import (
 
 	// Register the includes.
 	_ "github.com/elastic/beats/x-pack/filebeat/include"
+
+	// Register fleet
+	_ "github.com/elastic/beats/x-pack/libbeat/management/fleet"
 )
 
 // RootCmd to handle beats CLI.
