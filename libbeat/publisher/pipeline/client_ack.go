@@ -33,6 +33,7 @@ func (p *Pipeline) makeACKer(
 	canDrop bool,
 	cfg *beat.ClientConfig,
 	waitClose time.Duration,
+	afterClose func(),
 ) acker {
 	var (
 		bld   = p.ackBuilder
@@ -56,9 +57,9 @@ func (p *Pipeline) makeACKer(
 	}
 
 	if waitClose <= 0 {
-		return acker
+		return newCloseACKer(acker, afterClose)
 	}
-	return newWaitACK(acker, waitClose)
+	return newWaitACK(acker, waitClose, afterClose)
 }
 
 func lastEventACK(fn func(interface{})) func([]interface{}) {
