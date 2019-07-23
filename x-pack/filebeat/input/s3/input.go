@@ -71,20 +71,26 @@ type s3Info struct {
 	arn    string
 }
 
+type bucket struct {
+	Name string `json:"name"`
+	Arn  string `json:"arn"`
+}
+
+type object struct {
+	Key string `json:"key"`
+}
+
+type s3BucketOjbect struct {
+	bucket `json:"bucket"`
+	object `json:"object"`
+}
+
 type sqsMessage struct {
 	Records []struct {
-		EventSource string `json:"eventSource"`
-		AwsRegion   string `json:"awsRegion"`
-		EventName   string `json:"eventName"`
-		S3          struct {
-			Bucket struct {
-				Name string `json:"name"`
-				Arn  string `json:"arn"`
-			} `json:"bucket"`
-			Object struct {
-				Key string `json:"key"`
-			} `json:"object"`
-		} `json:"s3"`
+		EventSource string         `json:"eventSource"`
+		AwsRegion   string         `json:"awsRegion"`
+		EventName   string         `json:"eventName"`
+		S3          s3BucketOjbect `json:"s3"`
 	} `json:"Records"`
 }
 
@@ -97,13 +103,6 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
-
-	var awsCred awscommon.ConfigAWS
-	if err := cfg.Unpack(&awsCred); err != nil {
-		return nil, errors.Wrap(err, "failed unpacking aws config")
-	}
-
-	config.AwsConfig = awsCred
 
 	outlet, err := outletFactory(cfg, context.DynamicFields)
 	if err != nil {
@@ -125,17 +124,10 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	return p, nil
 }
 
-func (c *config) Validate() error {
-	if c.VisibilityTimeout < 0 || c.VisibilityTimeout.Hours() > 12 {
-		return errors.New("visibilityTimeout is not defined within the " +
-			"expected bounds")
-	}
-	return nil
-}
-
 // Run runs the input
 func (p *Input) Run() {
 	p.workerOnce.Do(func() {
+		defer p.logger.Infof("S3 input worker for '%v' has stopped.", p.config.QueueURL)
 		p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
@@ -295,9 +287,9 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 		if record.EventSource == "aws:s3" && record.EventName == "ObjectCreated:Put" {
 			s3Infos = append(s3Infos, s3Info{
 				region: record.AwsRegion,
-				name:   record.S3.Bucket.Name,
-				key:    record.S3.Object.Key,
-				arn:    record.S3.Bucket.Arn,
+				name:   record.S3.bucket.Name,
+				key:    record.S3.object.Key,
+				arn:    record.S3.bucket.Arn,
 			})
 		}
 	}

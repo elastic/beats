@@ -5,6 +5,7 @@
 package s3
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
@@ -13,9 +14,9 @@ import (
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
-	QueueURL                  string        `config:"queue_url" validate:"nonzero,required"`
-	VisibilityTimeout         time.Duration `config:"visibility_timeout"`
-	AwsConfig                 awscommon.ConfigAWS
+	QueueURL                  string              `config:"queue_url" validate:"nonzero,required"`
+	VisibilityTimeout         time.Duration       `config:"visibility_timeout"`
+	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
 }
 
 func defaultConfig() config {
@@ -25,4 +26,12 @@ func defaultConfig() config {
 		},
 		VisibilityTimeout: 300 * time.Second,
 	}
+}
+
+func (c *config) Validate() error {
+	if c.VisibilityTimeout < 0 || c.VisibilityTimeout.Hours() > 12 {
+		return fmt.Errorf("visibility timeout %v is not within the "+
+			"required range 0s to 12h", c.VisibilityTimeout)
+	}
+	return nil
 }
