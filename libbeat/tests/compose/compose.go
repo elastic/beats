@@ -27,66 +27,74 @@ import (
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 300 seconds
-func EnsureUp(t *testing.T, services ...string) {
-	EnsureUpWithTimeout(t, 60, services...)
+func EnsureUp(t *testing.T, service string) {
+	EnsureUpWithTimeout(t, 60, service)
 }
 
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
 // Wait for `timeout` seconds for health
-func EnsureUpWithTimeout(t *testing.T, timeout int, services ...string) {
+func EnsureUpWithTimeout(t *testing.T, timeout int, service string) {
 	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
 	// This is useful if the service is already running locally.
 	if noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE")); err == nil && noCompose {
 		return
 	}
 
-	compose, err := getComposeProject()
+	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Kill no longer used containers
-	err = compose.KillOld(services)
+	err = compose.KillOld([]string{service})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for _, service := range services {
-		err = compose.Start(service)
-		if err != nil {
-			t.Fatal("failed to start service", service, err)
-		}
+	// Start container
+	err = compose.Start(service)
+	if err != nil {
+		t.Fatal("failed to start service", service, err)
 	}
 
 	// Wait for health
-	err = compose.Wait(timeout, services...)
+	err = compose.Wait(timeout, service)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func getComposeProject() (*Project, error) {
+func findComposePath() (string, error) {
 	// find docker-compose
 	path, err := os.Getwd()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	for {
 		if path == "/" {
-			return nil, errors.New("docker-compose.yml not found")
-		}
-
-		if _, err = os.Stat(filepath.Join(path, "docker-compose.yml")); err != nil {
-			path = filepath.Dir(path)
-		} else {
 			break
 		}
+
+		composePath := filepath.Join(path, "docker-compose.yml")
+		if _, err = os.Stat(composePath); err == nil {
+			return composePath, nil
+		}
+		path = filepath.Dir(path)
+	}
+
+	return "", errors.New("docker-compose.yml not found")
+}
+
+func getComposeProject(name string) (*Project, error) {
+	path, err := findComposePath()
+	if err != nil {
+		return nil, err
 	}
 
 	return NewProject(
-		os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"),
+		name,
 		[]string{
-			filepath.Join(path, "docker-compose.yml"),
+			path,
 		},
 	)
 }
