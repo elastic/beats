@@ -20,9 +20,13 @@ package beater
 import (
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 
+	"github.com/elastic/beats/x-pack/libbeat/management/fleet"
+
 	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/fleet/x-pack/pkg/core/plugin/server"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -143,6 +147,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	if cm, ok := b.ConfigManager.(fleet.ConfigManager); ok {
+		s := cfg.NewConfigServer(cm.ConfigChan())
+		if err := server.NewGrpcServer(os.Stdin, s); err != nil {
+			return nil, err
+		}
+	}
 	return fb, nil
 }
 

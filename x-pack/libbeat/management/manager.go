@@ -282,7 +282,7 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) *Error {
 		if len(blocks) > 1 {
 			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
 			cm.logger.Error(err)
-			return newConfigError(err)
+			return NewConfigError(err)
 		}
 
 		var config *reload.ConfigWithMeta
@@ -291,13 +291,13 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) *Error {
 			config, err = blocks[0].ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return newConfigError(err)
+				return NewConfigError(err)
 			}
 		}
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
-			return newConfigError(err)
+			return NewConfigError(err)
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
@@ -306,14 +306,14 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) *Error {
 			config, err := block.ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return newConfigError(err)
+				return NewConfigError(err)
 			}
 			configs = append(configs, config)
 		}
 
 		if err := obj.Reload(configs); err != nil {
 			cm.logger.Error(err)
-			return newConfigError(err)
+			return NewConfigError(err)
 		}
 	}
 

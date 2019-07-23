@@ -428,6 +428,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	b.ConfigManager.Start()
 	defer b.ConfigManager.Stop()
 
+	// Start consuming configuration changes from agent
+
 	return beater.Run(&b.Beat)
 }
 
