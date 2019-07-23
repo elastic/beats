@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add read_buffer configuration option. {pull}11739[11739]
 - `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
+- Fix a race condition in the TCP input when close the client socket. {pull}x[x]
 
 *Heartbeat*
 
