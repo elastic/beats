@@ -313,7 +313,7 @@ func (r *Register) Modules() []string {
 	if source := r.secondarySource; source != nil {
 		sourceModules, err := source.Modules()
 		if err != nil {
-			logp.Error(errors.Wrap(err, "failed to get modules from secondary source"))
+			logp.L().Errorf("failed to get modules from secondary source: %s", err)
 		}
 		modules = append(modules, sourceModules...)
 	}
