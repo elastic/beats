@@ -38,6 +38,16 @@ type UpOptions struct {
 	Create CreateOptions
 }
 
+// UpOption customizes UpOptions
+type UpOption func(*UpOptions)
+
+// RecreateOnUp enables or disables recreation of container on startup
+func RecreateOnUp(recreate bool) UpOption {
+	return func(opts *UpOptions) {
+		opts.Create.ForceRecreate = recreate
+	}
+}
+
 // Filter options for services
 type Filter struct {
 	State State
@@ -96,16 +106,22 @@ func NewProject(name string, files []string) (*Project, error) {
 }
 
 // Start the container, unless it's running already
-func (c *Project) Start(service string) error {
+func (c *Project) Start(service string, upOptions ...UpOption) error {
 	c.Lock()
 	defer c.Unlock()
 
-	return c.Driver.Up(context.Background(), UpOptions{
+	options := UpOptions{
 		Create: CreateOptions{
 			Build:         true,
 			ForceRecreate: true,
 		},
-	}, service)
+	}
+
+	for _, option := range upOptions {
+		option(&options)
+	}
+
+	return c.Driver.Up(context.Background(), options, service)
 }
 
 // Wait ensures all wanted services are healthy. Wait loop (60s timeout)
