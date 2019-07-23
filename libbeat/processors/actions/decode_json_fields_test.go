@@ -142,6 +142,103 @@ func TestValidJSONDepthTwo(t *testing.T) {
 	assert.Equal(t, expected.String(), actual.String())
 }
 
+func TestJSONSubstringDisabledDepthOne(t *testing.T) {
+	input := common.MapStr{
+		"msg":      "Some string {\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3} with suffix",
+		"pipeline": "us1",
+	}
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg":      "Some string {\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3} with suffix",
+		"pipeline": "us1",
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestJSONSuffixEnabledDepthOne(t *testing.T) {
+	input := common.MapStr{
+		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3} with suffix",
+		"pipeline": "us1",
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"process_array": false,
+		"substring":     true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": map[string]interface{}{
+			"log":    "{\"level\":\"info\"}",
+			"stream": "stderr",
+			"count":  3,
+		},
+		"pipeline": "us1",
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestJSONSubstringEnabledDepthOne(t *testing.T) {
+	input := common.MapStr{
+		"msg":      "Some prefix {\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3} with suffix",
+		"pipeline": "us1",
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"process_array": false,
+		"substring":     true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": map[string]interface{}{
+			"log":    "{\"level\":\"info\"}",
+			"stream": "stderr",
+			"count":  3,
+		},
+		"pipeline": "us1",
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestJSONSubstringEnabledDepthTwo(t *testing.T) {
+	input := common.MapStr{
+		"msg":      "Some prefix {\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3} with suffix",
+		"pipeline": "us1",
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"process_array": false,
+		"substring":     true,
+		"max_depth":     2,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": map[string]interface{}{
+			"log": map[string]interface{}{
+				"level": "info",
+			},
+			"stream": "stderr",
+			"count":  3,
+		},
+		"pipeline": "us1",
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
 func TestTargetOption(t *testing.T) {
 	input := common.MapStr{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3}",
@@ -365,6 +462,56 @@ func TestAddErrKeyOption(t *testing.T) {
 
 		})
 	}
+}
+
+func TestSubstringArrayWithArraysDisabled(t *testing.T) {
+	input := common.MapStr{
+		"msg": `prefix {
+			"arrayOfMap": "[{\"a\":\"b\"}]"
+		  } suffix`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"max_depth":     10,
+		"process_array": false,
+		"substring":     true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"arrayOfMap": "[{\"a\":\"b\"}]",
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestSubstringArrayWithArraysEnabled(t *testing.T) {
+	input := common.MapStr{
+		"msg": `prefix {
+			"arrayOfMap": "[{\"a\":\"b\"}]"
+		  } suffix`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"max_depth":     10,
+		"process_array": true,
+		"substring":     true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"arrayOfMap": []common.MapStr{common.MapStr{"a": "b"}},
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {

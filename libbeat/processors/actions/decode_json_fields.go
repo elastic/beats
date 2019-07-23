@@ -39,6 +39,7 @@ type decodeJSONFields struct {
 	overwriteKeys bool
 	addErrorKey   bool
 	processArray  bool
+	substring     bool
 	target        *string
 }
 
@@ -48,6 +49,7 @@ type config struct {
 	OverwriteKeys bool     `config:"overwrite_keys"`
 	AddErrorKey   bool     `config:"add_error_key"`
 	ProcessArray  bool     `config:"process_array"`
+	Substring     bool     `config:"substring"`
 	Target        *string  `config:"target"`
 }
 
@@ -78,7 +80,7 @@ func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the decode_json_fields configuration: %s", err)
 	}
 
-	f := &decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, addErrorKey: config.AddErrorKey, processArray: config.ProcessArray, target: config.Target}
+	f := &decodeJSONFields{fields: config.Fields, maxDepth: config.MaxDepth, overwriteKeys: config.OverwriteKeys, addErrorKey: config.AddErrorKey, processArray: config.ProcessArray, substring: config.Substring, target: config.Target}
 	return f, nil
 }
 
@@ -99,8 +101,24 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			continue
 		}
 
+		if(f.substring) {
+			idx := strings.Index(text, "{")
+			if(f.processArray) {
+				arrayIdx := strings.Index(text, "[")
+				if(idx < 0 || arrayIdx >= 0 && arrayIdx < idx) {
+					arrayIdx = idx
+				}
+			}
+			if(idx < 0) {
+				// JSON array/object substring not found
+				debug("JSON object not found in string")
+				continue
+			}
+			text = text[idx:]
+		}
+
 		var output interface{}
-		err = unmarshal(f.maxDepth, text, &output, f.processArray)
+		err = unmarshal(f.maxDepth, text, &output, f.processArray, f.substring)
 		if err != nil {
 			debug("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
@@ -136,8 +154,8 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
-	if err := decodeJSON(text, fields); err != nil {
+func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool, substring bool) error {
+	if err := decodeJSON(text, fields, substring); err != nil {
 		return err
 	}
 
@@ -155,7 +173,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		}
 
 		var tmp interface{}
-		err := unmarshal(maxDepth, str, &tmp, processArray)
+		err := unmarshal(maxDepth, str, &tmp, processArray, false)
 		if err != nil {
 			return v, err == errProcessingSkipped
 		}
@@ -186,7 +204,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	return nil
 }
 
-func decodeJSON(text string, to *interface{}) error {
+func decodeJSON(text string, to *interface{}, substring bool) error {
 	dec := json.NewDecoder(strings.NewReader(text))
 	dec.UseNumber()
 	err := dec.Decode(to)
@@ -195,12 +213,14 @@ func decodeJSON(text string, to *interface{}) error {
 		return err
 	}
 
-	if dec.More() {
-		return errors.New("multiple json elements found")
-	}
+	if(!substring) {
+		if dec.More() {
+			return errors.New("multiple json elements found")
+		}
 
-	if _, err := dec.Token(); err != nil && err != io.EOF {
-		return err
+		if _, err := dec.Token(); err != nil && err != io.EOF {
+			return err
+		}
 	}
 
 	switch O := interface{}(*to).(type) {
