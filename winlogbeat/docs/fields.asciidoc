@@ -3911,6 +3911,63 @@ The XML representation of the event is useful for troubleshooting purposes. The 
 
 --
 
+*`dns.question.name`*::
++
+--
+The name being queried.
+
+
+type: keyword
+
+--
+
+*`dns.answers`*::
++
+--
+An array containing a dictionary about each answer section returned by the server.
+
+
+type: object
+
+--
+
+*`dns.answers.type`*::
++
+--
+The type of data contained in this resource record.
+
+type: keyword
+
+example: CNAME
+
+--
+
+*`dns.answers.data`*::
++
+--
+type: keyword
+
+--
+
+*`dns.grouped.ip`*::
++
+--
+Array containing all IPs seen in `answers.data`.
+
+
+type: ip
+
+--
+
+*`sysmon.dns.status`*::
++
+--
+Windows status code returned for the DNS query.
+
+type: keyword
+
+--
+
 [float]
 === winlog
 
