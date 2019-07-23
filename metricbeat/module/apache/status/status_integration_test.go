@@ -24,16 +24,26 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/apache"
+	"github.com/elastic/beats/metricbeat/module/apache/mtest"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "apache")
+func TestStatus(t *testing.T) {
+	mtest.Runner.Run(t, compose.Suite{
+		"Data":  testData,
+		"Fetch": testFetch,
+	})
+}
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2Error(f)
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewFetcher(t, getConfig(r.Host()))
+	f.WriteEvents(t, "")
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewFetcher(t, getConfig(r.Host()))
+	events, errs := f.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
@@ -48,10 +58,10 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "apache",
 		"metricsets": []string{"status"},
-		"hosts":      []string{apache.GetApacheEnvHost()},
+		"hosts":      []string{host},
 	}
 }

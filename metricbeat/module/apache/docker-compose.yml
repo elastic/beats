@@ -1,0 +1,8 @@
+version: '2.3'
+
+services:
+  apache:
+    build:
+      context: ./_meta
+    ports:
+    - 80
