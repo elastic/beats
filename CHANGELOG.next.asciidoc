@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 - Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
+- Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
 
 *Auditbeat*
 
