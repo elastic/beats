@@ -62,6 +62,7 @@ type Input struct {
 	logger     *logp.Logger
 	close      chan struct{}
 	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
+	context    *channelContext
 }
 
 type s3Info struct {
@@ -94,6 +95,23 @@ type sqsMessage struct {
 	} `json:"Records"`
 }
 
+// channelContext implements context.Context by wrapping a channel
+type channelContext struct {
+	done <-chan struct{}
+}
+
+func (r *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (r *channelContext) Done() <-chan struct{}       { return r.done }
+func (r *channelContext) Err() error {
+	select {
+	case <-r.done:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+func (r *channelContext) Value(key interface{}) interface{} { return nil }
+
 // NewInput creates a new s3 input
 func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Beta("s3 input type is used")
@@ -114,12 +132,14 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
 	}
 
+	closeChannel := make(chan struct{})
 	p := &Input{
 		outlet:    outlet,
 		config:    config,
 		awsConfig: awsConfig,
 		logger:    logger,
-		close:     make(chan struct{}),
+		close:     closeChannel,
+		context:   &channelContext{closeChannel},
 	}
 	return p, nil
 }
@@ -127,9 +147,6 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 // Run runs the input
 func (p *Input) Run() {
 	p.workerOnce.Do(func() {
-		defer p.logger.Infof("S3 input worker for '%v' has stopped.", p.config.QueueURL)
-		p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
-
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
@@ -142,12 +159,18 @@ func (p *Input) Run() {
 		svcS3 := s3.New(awsConfig)
 
 		go p.run(svcSQS, svcS3, visibilityTimeout)
-		go p.runKeepAlive()
 	})
 }
 
 func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int64) {
+	defer p.logger.Infof("S3 input worker for '%v' has stopped.", p.config.QueueURL)
+	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 	for {
+		select {
+		case <-p.close:
+			return
+		default:
+		}
 		// receive messages from sqs
 		req := svcSQS.ReceiveMessageRequest(
 			&sqs.ReceiveMessageInput{
@@ -158,10 +181,11 @@ func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int6
 				WaitTimeSeconds:       &waitTimeSecond,
 			})
 
-		output, err := req.Send(context.Background())
+		output, err := req.Send(p.context)
 		if err != nil {
 			p.logger.Error("failed to receive message from SQS:", err)
-			close(p.close)
+			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
+			continue
 		}
 
 		if output == nil || len(output.Messages) == 0 {
@@ -171,14 +195,6 @@ func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int6
 
 		// process messages received from sqs, get logs from s3 and create events
 		p.processor(p.config.QueueURL, output.Messages, visibilityTimeout, svcS3, svcSQS)
-	}
-}
-
-func (p *Input) runKeepAlive() {
-	select {
-	case <-p.close:
-		return
-	default:
 	}
 }
 
@@ -230,13 +246,13 @@ func (p *Input) processorKeepAlive(svcSQS *sqs.Client, message sqs.Message, queu
 		case err := <-errC:
 			if err != nil {
 				p.logger.Warnf("Processing message failed: %v", err)
-				err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
+				err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 				if err != nil {
 					p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 				}
 				p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
-				err := deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
+				err := p.deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 				if err != nil {
 					p.logger.Error(errors.Wrap(err, "deleteMessages failed"))
 				}
@@ -245,7 +261,7 @@ func (p *Input) processorKeepAlive(svcSQS *sqs.Client, message sqs.Message, queu
 		case <-time.After(time.Duration(visibilityTimeout/2) * time.Second):
 			// If half of the set visibilityTimeout passed and this is
 			// still ongoing, then change visibility timeout.
-			err := changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
+			err := p.changeVisibilityTimeout(queueURL, visibilityTimeout, svcSQS, message.ReceiptHandle)
 			if err != nil {
 				p.logger.Error(errors.Wrap(err, "change message visibility failed"))
 			}
@@ -254,13 +270,13 @@ func (p *Input) processorKeepAlive(svcSQS *sqs.Client, message sqs.Message, queu
 	}
 }
 
-func changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svc *sqs.Client, receiptHandle *string) error {
+func (p *Input) changeVisibilityTimeout(queueURL string, visibilityTimeout int64, svc *sqs.Client, receiptHandle *string) error {
 	req := svc.ChangeMessageVisibilityRequest(&sqs.ChangeMessageVisibilityInput{
 		QueueUrl:          &queueURL,
 		VisibilityTimeout: &visibilityTimeout,
 		ReceiptHandle:     receiptHandle,
 	})
-	_, err := req.Send(context.Background())
+	_, err := req.Send(p.context)
 	return err
 }
 
@@ -307,7 +323,7 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 				objectHash := s3ObjectHash(s3Info)
 
 				// read from s3 object
-				reader, err := bufferedIORead(svc, s3Info)
+				reader, err := p.bufferedIORead(svc, s3Info)
 				if err != nil {
 					errC <- errors.Wrap(err, "bufferedIORead failed")
 					return
@@ -349,14 +365,14 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 	}
 }
 
-func bufferedIORead(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
+func (p *Input) bufferedIORead(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(s3Info.name),
 		Key:    awssdk.String(s3Info.key),
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
-	resp, err := req.Send(context.Background())
+	resp, err := req.Send(p.context)
 	if err != nil {
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
@@ -374,14 +390,14 @@ func (p *Input) forwardEvent(event *beat.Event) error {
 	return nil
 }
 
-func deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.Client) error {
+func (p *Input) deleteMessage(queueURL string, messagesReceiptHandle string, svcSQS *sqs.Client) error {
 	deleteMessageInput := &sqs.DeleteMessageInput{
 		QueueUrl:      awssdk.String(queueURL),
 		ReceiptHandle: awssdk.String(messagesReceiptHandle),
 	}
 
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
-	_, err := req.Send(context.Background())
+	_, err := req.Send(p.context)
 	if err != nil {
 		return errors.Wrap(err, "DeleteMessageRequest failed")
 	}
