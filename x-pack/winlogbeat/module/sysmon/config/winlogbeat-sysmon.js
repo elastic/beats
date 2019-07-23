@@ -776,7 +776,6 @@ var sysmon = (function () {
         .Add(removeEmptyEventData)
         .Build();
 
-
     var event22 = new processor.Chain()
         .Add(parseUtcTime)
         .Convert({
