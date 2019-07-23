@@ -44,3 +44,5 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - New ReporterV2 interfaces that can receive a context on `Fetch(ctx, reporter)`, or `Run(ctx, reporter)`. {pull}11981[11981]
 - Generate configuration from `mage` for all Beats. {pull}12618[12618]
 - Add ClientFactory to TCP input source to add SplitFunc/NetworkFuncs per client. {pull}8543[8543]
+- Introduce beat.OutputChooses publisher mode. {pull}12996[12996]
+- Ensure that beat.Processor, beat.ProcessorList, and processors.ProcessorList are compatible and can be composed more easily. {pull}12996[12996]

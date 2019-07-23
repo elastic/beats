@@ -49,6 +49,9 @@ import (
 // the output clients using a shared work queue for the active outputs.Group.
 // Processors in the pipeline are executed in the clients go-routine, before
 // entering the queue. No filtering/processing will occur on the output side.
+//
+// For client connecting to this pipeline, the default PublishMode is
+// OutputChooses.
 type Pipeline struct {
 	beatInfo beat.Info
 
@@ -273,7 +276,7 @@ func (p *Pipeline) Close() error {
 	return nil
 }
 
-// Connect creates a new client with default settings
+// Connect creates a new client with default settings.
 func (p *Pipeline) Connect() (beat.Client, error) {
 	return p.ConnectWith(beat.ClientConfig{})
 }
@@ -281,6 +284,7 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // ConnectWith create a new Client for publishing events to the pipeline.
 // The client behavior on close and ACK handling can be configured by setting
 // the appropriate fields in the passed ClientConfig.
+// If not set otherwise the defaut publish mode is OutputChooses.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var (
 		canDrop      bool
