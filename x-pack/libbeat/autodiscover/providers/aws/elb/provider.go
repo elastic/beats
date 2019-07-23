@@ -7,7 +7,7 @@ package elb
 import (
 	"time"
 
-	aws2 "github.com/elastic/beats/x-pack/libbeat/common/aws"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
@@ -52,7 +52,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 
 	var clients []elasticloadbalancingv2iface.ClientAPI
 	for _, region := range config.Regions {
-		awsCfg, err := aws2.GetAWSCredentials(aws2.ConfigAWS{
+		awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
 			AccessKeyID:     config.AccessKeyID,
 			SecretAccessKey: config.SecretAccessKey,
 			SessionToken:    config.SessionToken,
