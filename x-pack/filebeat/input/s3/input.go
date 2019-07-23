@@ -100,17 +100,17 @@ type channelContext struct {
 	done <-chan struct{}
 }
 
-func (r *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
-func (r *channelContext) Done() <-chan struct{}       { return r.done }
-func (r *channelContext) Err() error {
+func (c *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (c *channelContext) Done() <-chan struct{}       { return c.done }
+func (c *channelContext) Err() error {
 	select {
-	case <-r.done:
+	case <-c.done:
 		return context.Canceled
 	default:
 		return nil
 	}
 }
-func (r *channelContext) Value(key interface{}) interface{} { return nil }
+func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new s3 input
 func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
@@ -165,12 +165,7 @@ func (p *Input) Run() {
 func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int64) {
 	defer p.logger.Infof("S3 input worker for '%v' has stopped.", p.config.QueueURL)
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
-	for {
-		select {
-		case <-p.close:
-			return
-		default:
-		}
+	for p.context.Err() == nil {
 		// receive messages from sqs
 		req := svcSQS.ReceiveMessageRequest(
 			&sqs.ReceiveMessageInput{
