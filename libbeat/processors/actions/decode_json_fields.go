@@ -101,15 +101,15 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			continue
 		}
 
-		if(f.substring) {
+		if f.substring {
 			idx := strings.Index(text, "{")
-			if(f.processArray) {
+			if f.processArray {
 				arrayIdx := strings.Index(text, "[")
-				if(idx < 0 || arrayIdx >= 0 && arrayIdx < idx) {
+				if idx < 0 || arrayIdx >= 0 && arrayIdx < idx {
 					arrayIdx = idx
 				}
 			}
-			if(idx < 0) {
+			if idx < 0 {
 				// JSON array/object substring not found
 				debug("JSON object not found in string")
 				continue
@@ -213,7 +213,7 @@ func decodeJSON(text string, to *interface{}, substring bool) error {
 		return err
 	}
 
-	if(!substring) {
+	if !substring {
 		if dec.More() {
 			return errors.New("multiple json elements found")
 		}
