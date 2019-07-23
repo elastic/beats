@@ -48,19 +48,24 @@ func readConfig(
 	validKeys []string,
 ) error {
 	if err := c.Unpack(config); err != nil {
-		return fmt.Errorf("Failed unpacking config. %v", err)
+		return fmt.Errorf("failed unpacking config. %v", err)
+	}
+
+	isValidKey := func(key string) bool {
+		for _, validKey := range validKeys {
+			if key == validKey {
+				return true
+			}
+		}
+		return false
 	}
 
 	var errs multierror.Errors
 	if len(validKeys) > 0 {
-		sort.Strings(validKeys)
-
 		// Check for invalid keys.
 		for _, k := range c.GetFields() {
-			k = strings.ToLower(k)
-			i := sort.SearchStrings(validKeys, k)
-			if i >= len(validKeys) || validKeys[i] != k {
-				errs = append(errs, fmt.Errorf("Invalid event log key '%s' "+
+			if !isValidKey(k) {
+				errs = append(errs, fmt.Errorf("invalid event log key '%s' "+
 					"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
 			}
 		}
