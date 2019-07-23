@@ -20,9 +20,9 @@ import (
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period    time.Duration `config:"period" validate:"nonzero,required"`
-	Regions   []string      `config:"regions"`
-	AWSConfig awscommon.ConfigAWS
+	Period    time.Duration       `config:"period" validate:"nonzero,required"`
+	Regions   []string            `config:"regions"`
+	AWSConfig awscommon.ConfigAWS `config:",inline"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
@@ -58,13 +58,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	var awsCred awscommon.ConfigAWS
-	err = base.Module().UnpackConfig(&awsCred)
-	if err != nil {
-		return nil, err
-	}
-
-	config.AWSConfig = awsCred
 	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get aws credentials")
