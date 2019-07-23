@@ -2,6 +2,8 @@
     {
         "@timestamp": 1547687130000,
         "destination.address": "17.253.5.203",
+        "destination.as.number": 6185,
+        "destination.as.organization.name": "Apple Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
