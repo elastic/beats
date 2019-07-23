@@ -15,7 +15,7 @@ class Test(metricbeat.BaseTest):
         'java.lang:name=*,type=GarbageCollector',
         'java.lang:type=GarbageCollector,name=*',
     ])
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @unittest.skip('flaky test https://github.com/elastic/beats/issues/13040')
     def test_jmx(self, mbean):
         """
         jolokia jmx  metricset test

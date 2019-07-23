@@ -8,7 +8,7 @@ class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['jolokia']
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @unittest.skip('flaky test https://github.com/elastic/beats/issues/13040')
     def test_jolokia_jmx(self):
         """
         jolokia autodiscover with jmx metricset
