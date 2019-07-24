@@ -35,8 +35,6 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Auditbeat*
 
-- Host dataset: Export Host fields to gob encoder. {pull}12940[12940]
-
 *Filebeat*
 
 *Heartbeat*
