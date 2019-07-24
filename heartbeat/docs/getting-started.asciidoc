@@ -81,6 +81,8 @@ tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
+
 [[linux]]
 *linux:*
 
@@ -245,6 +247,10 @@ sudo ./heartbeat -e
 configuration file, or run Heartbeat with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
+
+:requires-sudo:
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+:requires-sudo!:
 
 *win:*
 

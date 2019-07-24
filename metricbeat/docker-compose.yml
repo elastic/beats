@@ -14,6 +14,7 @@ services:
     env_file:
       - ./module/aerospike/_meta/env
       - ./module/apache/_meta/env
+      - ./module/beat/_meta/env
       - ./module/ceph/_meta/env
       - ./module/consul/_meta/env
       - ./module/couchbase/_meta/env
@@ -62,6 +63,11 @@ services:
       dockerfile: Dockerfile.2.4.12
     ports:
       - 80
+
+  metricbeat:
+    build: ./module/beat/_meta
+    ports:
+      - 5066
 
   ceph:
     build: ./module/ceph/_meta

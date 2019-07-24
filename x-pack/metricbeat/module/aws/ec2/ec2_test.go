@@ -7,6 +7,7 @@
 package ec2
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
@@ -18,12 +19,11 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
 // MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
-	ec2iface.EC2API
+	ec2iface.ClientAPI
 }
 
 var (
@@ -94,13 +94,16 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 		PrivateDnsName:   &privateDNSName,
 		PrivateIpAddress: &privateIP,
 	}
+
+	httpReq, _ := http.NewRequest("", "", nil)
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeInstancesOutput{
-				Reservations: []ec2.RunInstancesOutput{
+				Reservations: []ec2.Reservation{
 					{Instances: []ec2.Instance{instance}},
 				},
 			},
+			HTTPRequest: httpReq,
 		},
 	}
 }
@@ -122,11 +125,6 @@ func TestGetInstanceIDs(t *testing.T) {
 }
 
 func TestCreateCloudWatchEvents(t *testing.T) {
-	mockModuleConfig := aws.Config{
-		Period:        300 * time.Second,
-		DefaultRegion: regionName,
-	}
-
 	expectedEvent := mb.Event{
 		RootFields: common.MapStr{
 			"service": common.MapStr{"name": "ec2"},
@@ -195,7 +193,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	}
 
 	metricSet := MetricSet{}
-	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, mockModuleConfig.DefaultRegion)
+	events, err := metricSet.createCloudWatchEvents(getMetricDataOutput, instancesOutputs, "us-west-1")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, expectedEvent.RootFields, events[instanceID].RootFields)

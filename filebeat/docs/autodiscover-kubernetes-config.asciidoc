@@ -10,9 +10,9 @@ filebeat.autodiscover:
             equals:
               kubernetes.namespace: kube-system
           config:
-            - type: docker
-              containers.ids:
-                - "${data.kubernetes.container.id}"
+            - type: container
+              paths:
+                - /var/log/container/*-${data.kubernetes.container.id}.log
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ filebeat.autodiscover:
             - module: redis
               log:
                 input:
-                  type: docker
-                  containers.ids:
-                    - "${data.kubernetes.container.id}"
+                  type: container
+                  paths:
+                    - /var/log/container/*-${data.kubernetes.container.id}.log
 -------------------------------------------------------------------------------------

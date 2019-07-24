@@ -42,12 +42,12 @@ func configFileParams() devtools.ConfigFileParams {
 		ShortParts: []string{
 			devtools.OSSBeatDir("_meta/common.yml.tmpl"),
 			beatDir("_meta/beat.yml.tmpl"),
-			devtools.LibbeatDir("_meta/config.yml"),
+			devtools.LibbeatDir("_meta/config.yml.tmpl"),
 		},
 		ReferenceParts: []string{
 			devtools.OSSBeatDir("_meta/common.yml.tmpl"),
 			beatDir("_meta/beat.yml.tmpl"),
-			devtools.LibbeatDir("_meta/config.reference.yml"),
+			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
 		},
 		DockerParts: []string{
 			devtools.OSSBeatDir("_meta/beat.docker.yml"),

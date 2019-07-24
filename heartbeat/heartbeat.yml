@@ -55,18 +55,6 @@ setup.template.settings:
 #  env: staging
 
 
-#============================== Dashboards =====================================
-# These settings control loading the sample dashboards to the Kibana index. Loading
-# the dashboards is disabled by default and can be enabled either by setting the
-# options here or by using the `setup` command.
-#setup.dashboards.enabled: false
-
-# The URL from where to download the dashboards archive. By default this URL
-# has a value which is computed based on the Beat name and version. For released
-# versions, this URL points to the dashboard archive on the artifacts.elastic.co
-# website.
-#setup.dashboards.url:
-
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -86,7 +74,7 @@ setup.kibana:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -127,16 +115,16 @@ output.elasticsearch:
   #ssl.key: "/etc/pki/client/cert.key"
 
 #================================ Processors =====================================
+
 processors:
   - add_observer_metadata: 
-  # Optional, but recommended geo settings for the location heartbeat is running in 
+  # Optional, but recommended geo settings for the location Heartbeat is running in
   #geo: 
     # Token describing this location
     #name: us-east-1a
 
     # Lat, Lon "
     #location: "37.926868, -78.024902"
-
 
 #================================ Logging =====================================
 

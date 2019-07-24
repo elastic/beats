@@ -41,11 +41,9 @@ If you've configured the Logstash output, see
 <<load-dashboards-logstash>>.
 endif::only-elasticsearch[]
 
-ifeval::["{requires-sudo}"=="yes"]
-
+ifdef::requires-sudo[]
 include::../../libbeat/docs/shared-note-sudo.asciidoc[]
-
-endif::[]
+endif::requires-sudo[]
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*
@@ -62,6 +60,13 @@ ifdef::mac_os[]
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 ./{beatname_lc} setup --dashboards
+----------------------------------------------------------------------
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+{beatname_lc} setup --dashboards
 ----------------------------------------------------------------------
 endif::mac_os[]
 
@@ -133,6 +138,18 @@ ifdef::mac_os[]
 ["source","sh",subs="attributes"]
 ----
 ./{beatname_lc} setup -e \
+  -E output.logstash.enabled=false \
+  -E output.elasticsearch.hosts=['localhost:9200'] \
+  -E output.elasticsearch.username={beat_default_index_prefix}_internal \
+  -E output.elasticsearch.password={pwd} \
+  -E setup.kibana.host=localhost:5601 
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username={beat_default_index_prefix}_internal \

@@ -99,6 +99,12 @@ func WriteEventsReporterV2Error(f mb.ReportingMetricSetV2Error, t testing.TB, pa
 	return WriteEventsReporterV2ErrorCond(f, t, path, nil)
 }
 
+// WriteEventsReporterV2WithContext fetches events and writes the first event to a ./_meta/data.json
+// file.
+func WriteEventsReporterV2WithContext(f mb.ReportingMetricSetV2WithContext, t testing.TB, path string) error {
+	return WriteEventsReporterV2WithContextCond(f, t, path, nil)
+}
+
 // WriteEventsReporterV2Cond fetches events and writes the first event that matches
 // the condition to a file.
 func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path string, cond func(common.MapStr) bool) error {
@@ -122,6 +128,21 @@ func WriteEventsReporterV2ErrorCond(f mb.ReportingMetricSetV2Error, t testing.TB
 	}
 
 	events, errs := ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	return writeEvent(events, f, t, path, cond)
+}
+
+// WriteEventsReporterV2WithContextCond fetches events and writes the first event that matches
+// the condition to a file.
+func WriteEventsReporterV2WithContextCond(f mb.ReportingMetricSetV2WithContext, t testing.TB, path string, cond func(common.MapStr) bool) error {
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
+
+	events, errs := ReportingFetchV2WithContext(f)
 	if len(errs) > 0 {
 		return errs[0]
 	}

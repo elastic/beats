@@ -82,21 +82,41 @@ filebeat.modules:
     enabled: true
 
     # Set which input to use between syslog (default) or file.
-    #var.input:
+    #var.input: syslog
 
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    #var.syslog_port: 9001
 
     # Set the log level from 1 (alerts only) to 7 (include all messages).
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
     #var.log_level: 7
 
+  ios:
+    enabled: true
+
+    # Set which input to use between syslog (default) or file.
+    #var.input: syslog
+
+    # The interface to listen to UDP based syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The UDP port to listen for syslog traffic. Defaults to 9002.
+    #var.syslog_port: 9002
+
+    # Set custom paths for the log files when using file input. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -140,12 +160,32 @@ filebeat.modules:
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#----------------------------- Google Cloud Module -----------------------------
+- module: googlecloud
+  vpcflow:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
+    # configured to use this topic as a sink for VPC flow logs.
+    var.topic: googlecloud-vpc-flowlogs
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
@@ -488,7 +528,7 @@ filebeat.modules:
   # All logs
   connection:
     enabled: true
-  dns:
+  dns: 
     enabled: true
   http:
     enabled: true
@@ -769,6 +809,9 @@ filebeat.inputs:
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
 
+  # Max number of concurrent connections, or 0 for no limit. Default: 0
+  #max_connections: 0
+
   # The number of seconds of inactivity before a remote connection is closed.
   #timeout: 300s
 
@@ -799,7 +842,8 @@ filebeat.inputs:
   #ssl.curve_types: []
 
   # Configure what types of client authentication are supported. Valid options
-  # are `none`, `optional`, and `required`. Default is required.
+  # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+  # default to `required` otherwise it will be set to `none`.
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
@@ -858,22 +902,20 @@ filebeat.inputs:
     #ssl.curve_types: []
 
     # Configure what types of client authentication are supported. Valid options
-    # are `none`, `optional`, and `required`. Default is required.
+    # are `none`, `optional`, and `required`. When `certificate_authorities` is set it will
+    # default to `required` otherwise it will be set to `none`.
     #ssl.client_authentication: "required"
 
-#------------------------------ Docker input --------------------------------
-# Experimental: Docker input reads and parses `json-file` logs from Docker
-#- type: docker
+#------------------------------ Container input --------------------------------
+#- type: container
   #enabled: false
 
-  # Combine partial lines flagged by `json-file` format
-  #combine_partials: true
+  # Paths for container logs that should be crawled and fetched.
+  #paths:
+  #  -/var/lib/docker/containers/*/*.log
 
-  # Use this to read from all containers, replace * with a container id to read from one:
-  #containers:
-  #  stream: all # can be all, stdout or stderr
-  #  ids:
-  #    - '*'
+  # Configure stream to filter to a specific stream: stdout, stderr or all (default)
+  #stream: all
 
 #------------------------------ NetFlow input --------------------------------
 # Experimental: Config options for the Netflow/IPFIX collector over UDP input
@@ -904,6 +946,32 @@ filebeat.inputs:
   #custom_definitions:
   #- path/to/ipfix.yaml
   #- path/to/netflow.yaml
+
+#---------------------------- Google Cloud Pub/Sub Input -----------------------
+# Input for reading messages from a Google Cloud Pub/Sub topic subscription.
+- type: google-pubsub
+  enabled: false
+
+  # Google Cloud project ID. Required.
+  project_id: my-gcp-project-id
+
+  # Google Cloud Pub/Sub topic name. Required.
+  topic: my-gcp-pubsub-topic-name
+
+  # Google Cloud Pub/Sub topic subscription name. Required.
+  subscription.name: my-gcp-pubsub-subscription-name
+
+  # Create subscription if it does not exist.
+  #subscription.create: true
+
+  # Number of goroutines to create to read from the subscription.
+  #subscription.num_goroutines: 1
+
+  # Maximum number of unprocessed messages to allow at any time.
+  #subscription.max_outstanding_messages: 1000
+
+  # Path to a JSON file containing the credentials and key used to subscribe.
+  credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -917,7 +985,7 @@ filebeat.inputs:
 #        - condition:
 #            equals.docker.container.image: busybox
 #          config:
-#            - type: log
+#            - type: container
 #              paths:
 #                - /var/lib/docker/containers/${data.docker.container.id}/*.log
 
@@ -1187,6 +1255,13 @@ filebeat.inputs:
 #    target: ""
 #    overwrite_keys: false
 #
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
 # The following example copies the value of message to message_copied
 #
 #processors:
@@ -1225,7 +1300,7 @@ filebeat.inputs:
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using filebeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Filebeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -1350,7 +1425,6 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -1495,7 +1569,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version filebeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Filebeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -1519,8 +1593,8 @@ output.elasticsearch:
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
-    # Strategy for fetching the topics metadata from the broker. Default is true.
-    #full: true
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -1752,7 +1826,7 @@ output.elasticsearch:
   #filename: filebeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every filebeat restart, the files are rotated. The default value is 10240
+  # every Filebeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -1763,7 +1837,6 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
 
 #----------------------------- Console output ---------------------------------
 #output.console:
@@ -1780,26 +1853,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the filebeat installation. This is the default base path
+# The home path for the Filebeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the filebeat installation. This is the default
+# The configuration path for the Filebeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the filebeat installation. This is the default base path
-# for all the files in which filebeat needs to store its data. If not set by a
+# The data path for the Filebeat installation. This is the default base path
+# for all the files in which Filebeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a filebeat installation. This is the default location for
+# The logs path for a Filebeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1911,22 +1984,38 @@ setup.template.settings:
 
 #============================== Setup ILM =====================================
 
-# Configure Index Lifecycle Management Index Lifecycle Management creates a
-# write alias and adds additional settings to the template.
-# The elasticsearch.output.index setting will be replaced with the write alias
-# if ILM is enabled.
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
 
-# Enabled ILM support. Valid values are true, false, and auto. The beat will
-# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
-# or disable ILM support.
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Configure the ILM write alias name.
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'filebeat-%{[agent.version]}'. 
 #setup.ilm.rollover_alias: "filebeat"
 
-# Configure rollover index pattern.
+# Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
 
+# Set the lifecycle policy name. The default policy name is
+# 'filebeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
 
 #============================== Kibana =====================================
 
@@ -1995,13 +2084,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, filebeat periodically logs its internal metrics that have changed
+# If enabled, Filebeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -2048,7 +2140,7 @@ logging.files:
 
 
 #============================== Xpack Monitoring ===============================
-# filebeat can export internal metrics to a central Elasticsearch monitoring
+# Filebeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 

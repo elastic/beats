@@ -105,21 +105,14 @@ var sysmon = (function () {
         }
     };
 
-    var parseUtcTime = function(evt) {
-        var timestamp = evt.Get("winlog.event_data.UtcTime");
-        if (!timestamp) {
-            return;
-        }
-
-        var ms = Date.parse(timestamp.split(' ').join('T'));
-        if (isNaN(ms)) {
-            evt.Delete("winlog.event_data.UtcTime");
-            return;
-        }
-
-        var date = new Date(ms);
-        evt.Put("winlog.event_data.UtcTime", date);
-    };
+    var parseUtcTime = new processor.Timestamp({
+        field: "winlog.event_data.UtcTime",
+        target_field: "winlog.event_data.UtcTime",
+        timezone: "UTC",
+        layouts: ["2006-01-02 15:04:05.999"],
+        tests: ["2019-06-26 21:19:43.237"],
+        ignore_missing: true,
+    });
 
     var event1 = new processor.Chain()
         .Add(parseUtcTime)
@@ -192,6 +185,7 @@ var sysmon = (function () {
         .Add(addUser)
         .Add(addNetworkDirection)
         .Add(addNetworkType)
+        .CommunityID()
         .Add(removeEmptyEventData)
         .Build();
 

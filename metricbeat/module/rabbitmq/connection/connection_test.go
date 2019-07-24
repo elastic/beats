@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -71,4 +73,8 @@ func getConfig(url string) map[string]interface{} {
 		"metricsets": []string{"connection"},
 		"hosts":      []string{url},
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "rabbitmq", "connection")
 }

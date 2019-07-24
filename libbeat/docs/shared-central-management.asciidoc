@@ -2,10 +2,6 @@
 [role="xpack"]
 = {beats} central management
 
-++++
-<titleabbrev>Central management</titleabbrev>
-++++
-
 [partintro]
 --
 

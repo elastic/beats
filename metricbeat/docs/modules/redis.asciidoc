@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-redis]]
@@ -14,6 +14,10 @@ The defaut metricsets are `info` and `keyspace`.
 
 The Redis module has these additional config options:
 
+*`hosts`*:: URLs that are used to connect to Redis.
+URL format:
+redis://[:password@]host[:port][/db-number][?option=value]
+redis://HOST[:PORT][?password=PASSWORD[&db=DATABASE]]
 *`password`*:: The password to authenticate, by default it's empty.
 *`idle_timeout`*:: The duration to remain idle before closing connections. If
   the value is zero, then idle connections are not closed. The default value

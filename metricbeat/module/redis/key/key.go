@@ -27,9 +27,11 @@ import (
 	"github.com/elastic/beats/metricbeat/module/redis"
 )
 
+var hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()
+
 func init() {
 	mb.Registry.MustAddMetricSet("redis", "key", New,
-		mb.WithHostParser(parse.PassThruHostParser),
+		mb.WithHostParser(hostParser),
 	)
 }
 
@@ -41,7 +43,7 @@ type MetricSet struct {
 
 // KeyPattern contains the information required to query keys
 type KeyPattern struct {
-	Keyspace uint   `config:"keyspace"`
+	Keyspace *uint  `config:"keyspace"`
 	Pattern  string `config:"pattern" validate:"required"`
 	Limit    uint   `config:"limit"`
 }
@@ -70,9 +72,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches information from Redis keys
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+		}
+	}()
+
 	for _, p := range m.patterns {
-		if err := redis.Select(conn, p.Keyspace); err != nil {
-			msg := errors.Wrapf(err, "Failed to select keyspace %d", p.Keyspace)
+		var keyspace uint
+		if p.Keyspace == nil {
+			keyspace = m.OriginalDBNumber()
+		} else {
+			keyspace = *p.Keyspace
+		}
+		if err := redis.Select(conn, keyspace); err != nil {
+			msg := errors.Wrapf(err, "Failed to select keyspace %d", keyspace)
 			m.Logger().Error(msg)
 			r.Error(err)
 			continue
@@ -80,7 +94,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 		keys, err := redis.FetchKeys(conn, p.Pattern, p.Limit)
 		if err != nil {
-			msg := errors.Wrapf(err, "Failed to list keys in keyspace %d with pattern '%s'", p.Keyspace, p.Pattern)
+			msg := errors.Wrapf(err, "Failed to list keys in keyspace %d with pattern '%s'", keyspace, p.Pattern)
 			m.Logger().Error(msg)
 			r.Error(err)
 			continue
@@ -93,14 +107,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		for _, key := range keys {
 			keyInfo, err := redis.FetchKeyInfo(conn, key)
 			if err != nil {
-				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, p.Keyspace)
+				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, keyspace)
 				m.Logger().Error(msg)
 				r.Error(err)
 				continue
 			}
-			event := eventMapping(p.Keyspace, keyInfo)
+			event := eventMapping(keyspace, keyInfo)
 			if !r.Event(event) {
-				return errors.New("metricset has closed")
+				m.Logger().Debug("Failed to report event, interrupting fetch")
+				return nil
 			}
 		}
 	}

@@ -35,6 +35,7 @@ https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log e
 https://github.com/eBay/collectbeat[collectbeat]:: Adds discovery on top of Filebeat and Metricbeat in environments like Kubernetes.
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
 https://github.com/Pravoru/consulbeat[consulbeat]:: Reads services health checks from consul and pushes them to Elastic.
+https://github.com/hellmouthengine/discobeat[discobeat]:: Reads messages from Discord and indexes them in Elasticsearch
 https://github.com/Ingensi/dockbeat[dockbeat]:: Reads Docker container
 statistics and indexes them in Elasticsearch.
 https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Elasticsearch cluster and indexes them in Elasticsearch.
@@ -44,6 +45,7 @@ https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
 https://github.com/ctindel/fastcombeat[fastcombeat]:: Periodically gather internet download speed from  https://fast.com[fast.com].
+https://github.com/cloudronics/fileoccurancebeat[fileoccurencebeat]:: Checks for file existence recurssively under a given directory, handy while handling queues/pipeline buffers.
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/GeneralElectric/GABeat[gabeat]:: Collects data from Google Analytics Realtime API.
 https://github.com/GoogleCloudPlatform/gcsbeat[gcsbeat]:: Reads data from https://cloud.google.com/storage/[Google Cloud Storage] buckets.
@@ -86,6 +88,7 @@ https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.
 https://github.com/kckecheng/powermaxbeat[powermaxbeat]:: Collects performance metrics from Dell EMC PowerMax storage array.
+https://github.com/pawankt/processbeat[processbeat]:: Collects process health status and performance.
 https://github.com/carlpett/prombeat[prombeat]:: Indexes https://prometheus.io[Prometheus] metrics.
 https://github.com/infonova/prometheusbeat[prometheusbeat]:: Send Prometheus metrics to Elasticsearch via the remote write feature.
 https://github.com/hartfordfive/protologbeat[protologbeat]:: Accepts structured and unstructured logs via UDP or TCP.  Can also be used to receive syslog messages or GELF formatted messages. (To be used as a successor to udplogbeat)
