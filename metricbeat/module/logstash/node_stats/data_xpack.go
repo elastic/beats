@@ -39,10 +39,10 @@ type jvm struct {
 }
 
 type events struct {
-	DurationInMillis int `json:"duration_in_millis"`
-	In               int `json:"in"`
-	Filtered         int `json:"filtered"`
-	Out              int `json:"out"`
+	QueuePushDurationInMillis int `json:"queue_push_duration_in_millis"`
+	In                        int `json:"in"`
+	Filtered                  int `json:"filtered"`
+	Out                       int `json:"out"`
 }
 
 type commonStats struct {
