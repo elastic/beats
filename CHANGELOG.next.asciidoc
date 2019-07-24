@@ -166,6 +166,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Fix data race affecting config validation at startup. {issue}13005[13005]
+
 *Functionbeat*
 
 - Fix function name reference for Kinesis streams in CloudFormation templates {pull}11646[11646]
