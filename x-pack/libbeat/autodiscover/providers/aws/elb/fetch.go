@@ -8,12 +8,11 @@ import (
 	"context"
 	"sync"
 
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
+	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"go.uber.org/multierr"
 )
 
 const logSelector = "autodiscover-elb-fetch"
@@ -137,12 +136,11 @@ func (p *fetchRequest) fetch() ([]*lbListener, error) {
 
 func (p *fetchRequest) fetchAllPages() {
 	// Keep fetching pages unless we're stopped OR there are no pages left
-Outer:
 	for {
 		select {
 		case <-p.context.Done():
 			logp.Debug(logSelector, "done fetching ELB pages, context cancelled")
-			break Outer
+			return
 		default:
 			p.fetchNextPage()
 			logp.Debug(logSelector, "API page fetched")
@@ -189,12 +187,15 @@ func (p *fetchRequest) fetchListeners(lb elasticloadbalancingv2.LoadBalancer) {
 		p.recordErrResult(listen.Err())
 	}
 
-Outer:
-	for listen.Next(p.context) {
+	for {
 		select {
 		case <-p.context.Done():
-			break Outer
+			return
 		default:
+			if !listen.Next(p.context) {
+				return
+			}
+
 			for _, listener := range listen.CurrentPage().Listeners {
 				p.recordGoodResult(&lb, &listener)
 			}

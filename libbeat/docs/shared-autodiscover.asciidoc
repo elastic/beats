@@ -265,6 +265,9 @@ ifdef::autodiscoverAWSELB[]
 [float]
 ===== Amazon ELBs
 
+*Note: This provider is experimental*
+
+
 The Amazon ELB autodiscover provider discovers https://aws.amazon.com/elasticloadbalancing/[ELBs] and their listeners. This is useful when you don't want to connect
 directly to a service, but rather to the ELB fronting a pool of services.
 
