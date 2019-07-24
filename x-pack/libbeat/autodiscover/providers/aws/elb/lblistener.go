@@ -21,9 +21,8 @@ func (l *lbListener) toMap() common.MapStr {
 	// We fully spell out listener_arn to avoid confusion with the ARN for the whole ELB
 	m := common.MapStr{
 		"listener_arn":       l.listener.ListenerArn,
-		"load_balancer_arn":  *l.lb.LoadBalancerArn,
-		"host":               *l.lb.DNSName,
-		"port":               *l.listener.Port,
+		"load_balancer_arn":  safeStrp(l.lb.LoadBalancerArn),
+		"host":               safeStrp(l.lb.DNSName),
 		"protocol":           l.listener.Protocol,
 		"type":               string(l.lb.Type),
 		"scheme":             l.lb.Scheme,
@@ -32,11 +31,27 @@ func (l *lbListener) toMap() common.MapStr {
 		"state":              l.stateMap(),
 		"ip_address_type":    string(l.lb.IpAddressType),
 		"security_groups":    l.lb.SecurityGroups,
-		"vpc_id":             *l.lb.VpcId,
+		"vpc_id":             safeStrp(l.lb.VpcId),
 		"ssl_policy":         l.listener.SslPolicy,
 	}
 
+	if l.listener.Port != nil {
+		m["port"] = *l.listener.Port
+	}
+
 	return m
+}
+
+// safeStrp makes handling AWS *string types easier.
+// The AWS lib never returns plain strings, always using pointers, probably for memory efficiency reasons.
+// This is a bit odd, because strings are just pointers into byte arrays, however this is the choice they've made.
+// This will return the plain version of the given string or an empty string if the pointer is null
+func safeStrp(strp *string) string {
+	if strp == nil {
+		return ""
+	}
+
+	return *strp
 }
 
 func (l *lbListener) toCloudMap() common.MapStr {

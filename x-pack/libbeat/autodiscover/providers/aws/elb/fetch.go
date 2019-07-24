@@ -66,7 +66,7 @@ type apiFetcher struct {
 	ctx    context.Context
 }
 
-func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI, ctx context.Context) fetcher {
+func newAPIFetcher(ctx context.Context, clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
 		fetchers[idx] = &apiFetcher{client, ctx}

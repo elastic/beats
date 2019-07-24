@@ -14,6 +14,6 @@ import (
 
 func Test_newAPIFetcher(t *testing.T) {
 	client := newMockELBClient(0)
-	fetcher := newAPIFetcher([]elasticloadbalancingv2iface.ClientAPI{client}, context.TODO())
+	fetcher := newAPIFetcher(context.TODO(), []elasticloadbalancingv2iface.ClientAPI{client})
 	require.NotNil(t, fetcher)
 }

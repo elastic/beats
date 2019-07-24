@@ -66,7 +66,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		clients = append(clients, elasticloadbalancingv2.New(awsCfg))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients, context.TODO()))
+	return internalBuilder(uuid, bus, config, newAPIFetcher(context.TODO(), clients))
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
