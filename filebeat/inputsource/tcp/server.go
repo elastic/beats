@@ -27,22 +27,27 @@ import (
 
 	"golang.org/x/net/netutil"
 
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
+var errClosed = errors.New("connection closed")
+
 // Server represent a TCP server
 type Server struct {
-	sync.RWMutex
-	config    *Config
-	Listener  net.Listener
-	clients   map[ConnectionHandler]struct{}
-	wg        sync.WaitGroup
-	done      chan struct{}
-	factory   ClientFactory
-	log       *logp.Logger
-	tlsConfig *transport.TLSConfig
+	config       *Config
+	Listener     net.Listener
+	wg           sync.WaitGroup
+	done         chan struct{}
+	factory      ClientFactory
+	log          *logp.Logger
+	tlsConfig    *transport.TLSConfig
+	closer       *closer
+	clientsCount atomic.Int
 }
 
 // New creates a new tcp server
@@ -61,11 +66,11 @@ func New(
 
 	return &Server{
 		config:    config,
-		clients:   make(map[ConnectionHandler]struct{}, 0),
 		done:      make(chan struct{}),
 		factory:   factory,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
 		tlsConfig: tlsConfig,
+		closer:    &closer{done: make(chan struct{})},
 	}, nil
 }
 
@@ -77,6 +82,7 @@ func (s *Server) Start() error {
 		return err
 	}
 
+	s.closer.callback = func() { s.Listener.Close() }
 	s.log.Info("Started listening for TCP connection")
 
 	s.wg.Add(1)
@@ -97,7 +103,7 @@ func (s *Server) run() {
 		conn, err := s.Listener.Accept()
 		if err != nil {
 			select {
-			case <-s.done:
+			case <-s.closer.Done():
 				return
 			default:
 				s.log.Debugw("Can not accept the connection", "error", err)
@@ -105,19 +111,20 @@ func (s *Server) run() {
 			}
 		}
 
-		client := s.factory(*s.config, conn)
+		client := s.factory(*s.config)
+		closer := withCloser(s.closer, conn)
 
 		s.wg.Add(1)
 		go func() {
 			defer logp.Recover("recovering from a tcp client crash")
 			defer s.wg.Done()
-			defer conn.Close()
+			defer closer.Close()
 
 			s.registerClient(client)
 			defer s.unregisterClient(client)
-			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
+			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount.Load())
 
-			err := client.Handle()
+			err := client.Handle(closer, conn)
 			if err != nil {
 				s.log.Debugw("client error", "error", err)
 			}
@@ -127,7 +134,7 @@ func (s *Server) run() {
 				"remote_address",
 				conn.RemoteAddr(),
 				"total",
-				s.clientsCount(),
+				s.clientsCount.Load(),
 			)
 		}()
 	}
@@ -136,37 +143,17 @@ func (s *Server) run() {
 // Stop stops accepting new incoming TCP connection and Close any active clients
 func (s *Server) Stop() {
 	s.log.Info("Stopping TCP server")
-	close(s.done)
-	s.Listener.Close()
-	for _, client := range s.allClients() {
-		client.Close()
-	}
+	s.closer.Close()
 	s.wg.Wait()
 	s.log.Info("TCP server stopped")
 }
 
 func (s *Server) registerClient(client ConnectionHandler) {
-	s.Lock()
-	defer s.Unlock()
-	s.clients[client] = struct{}{}
+	s.clientsCount.Inc()
 }
 
 func (s *Server) unregisterClient(client ConnectionHandler) {
-	s.Lock()
-	defer s.Unlock()
-	delete(s.clients, client)
-}
-
-func (s *Server) allClients() []ConnectionHandler {
-	s.RLock()
-	defer s.RUnlock()
-	currentClients := make([]ConnectionHandler, len(s.clients))
-	idx := 0
-	for client := range s.clients {
-		currentClients[idx] = client
-		idx++
-	}
-	return currentClients
+	s.clientsCount.Dec()
 }
 
 func (s *Server) createServer() (net.Listener, error) {
@@ -192,12 +179,6 @@ func (s *Server) createServer() (net.Listener, error) {
 	return l, nil
 }
 
-func (s *Server) clientsCount() int {
-	s.RLock()
-	defer s.RUnlock()
-	return len(s.clients)
-}
-
 // SplitFunc allows to create a `bufio.SplitFunc` based on a delimiter provided.
 func SplitFunc(lineDelimiter []byte) bufio.SplitFunc {
 	ld := []byte(lineDelimiter)
@@ -208,4 +189,85 @@ func SplitFunc(lineDelimiter []byte) bufio.SplitFunc {
 		return bufio.ScanLines
 	}
 	return factoryDelimiter(ld)
+}
+
+func withCloser(parent *closer, conn net.Conn) *closer {
+	child := &closer{
+		done:   make(chan struct{}),
+		parent: parent,
+		callback: func() {
+			conn.Close()
+		},
+	}
+	parent.addChild(child)
+	return child
+}
+
+type closeRef interface {
+	Done() <-chan struct{}
+	Err() error
+}
+
+type closer struct {
+	mu       sync.Mutex
+	done     chan struct{}
+	err      error
+	parent   *closer
+	children map[*closer]struct{}
+	callback func()
+}
+
+func (c *closer) Close() {
+	c.mu.Lock()
+	if c.err != nil {
+		c.mu.Unlock()
+		return
+	}
+
+	if c.callback != nil {
+		c.callback()
+	}
+
+	close(c.done)
+
+	// propagate close to children.
+	if c.children != nil {
+		for child := range c.children {
+			child.Close()
+		}
+		c.children = nil
+	}
+
+	c.err = errClosed
+	c.mu.Unlock()
+
+	if c.parent != nil {
+		c.removeChild(c)
+	}
+}
+
+func (c *closer) Done() <-chan struct{} {
+	return c.done
+}
+
+func (c *closer) Err() error {
+	c.mu.Lock()
+	err := c.err
+	c.mu.Unlock()
+	return err
+}
+
+func (c *closer) removeChild(child *closer) {
+	c.mu.Lock()
+	delete(c.children, child)
+	c.mu.Unlock()
+}
+
+func (c *closer) addChild(child *closer) {
+	c.mu.Lock()
+	if c.children == nil {
+		c.children = make(map[*closer]struct{})
+	}
+	c.children[child] = struct{}{}
+	c.mu.Unlock()
 }
