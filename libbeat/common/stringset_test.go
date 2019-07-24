@@ -68,3 +68,7 @@ func TestEquals(t *testing.T) {
 		})
 	}
 }
+
+func TestToSlice(t *testing.T) {
+	assert.Equal(t, []string{"a", "b", "c"}, MakeStringSet("c", "b", "a").ToSlice())
+}
