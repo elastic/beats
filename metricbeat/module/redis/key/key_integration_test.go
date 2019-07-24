@@ -29,17 +29,14 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/redis"
 )
 
-var host = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
-
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
 
-	addEntry(t, "foo", 1)
+	addEntry(t, r.Host(), "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig())
+	ms := mbtest.NewFetcher(t, getConfig(r.Host()))
 	events, err := ms.FetchEvents()
 	if err != nil {
 		t.Fatal("fetch", err)
@@ -50,16 +47,16 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
 
-	addEntry(t, "foo", 1)
+	addEntry(t, r.Host(), "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig())
+	ms := mbtest.NewFetcher(t, getConfig(r.Host()))
 	ms.WriteEvents(t, "")
 }
 
 func TestFetchMultipleKeyspaces(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
 
 	expectedKeyspaces := map[string]uint{
 		"foo": 0,
@@ -69,10 +66,10 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 	expectedEvents := len(expectedKeyspaces)
 
 	for name, keyspace := range expectedKeyspaces {
-		addEntry(t, name, keyspace)
+		addEntry(t, r.Host(), name, keyspace)
 	}
 
-	config := getConfig()
+	config := getConfig(r.Host())
 	config["key.patterns"] = []map[string]interface{}{
 		{
 			"pattern":  "foo",
@@ -109,7 +106,7 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 }
 
 // addEntry adds an entry to redis
-func addEntry(t *testing.T, key string, keyspace uint) {
+func addEntry(t *testing.T, host string, key string, keyspace uint) {
 	// Insert at least one event to make sure db exists
 	c, err := rd.Dial("tcp", host)
 	if err != nil {
@@ -126,7 +123,7 @@ func addEntry(t *testing.T, key string, keyspace uint) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"key"},
