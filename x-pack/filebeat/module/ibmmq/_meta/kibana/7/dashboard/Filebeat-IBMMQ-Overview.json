@@ -100,20 +100,6 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 21,
-              "i": "7",
-              "w": 48,
-              "x": 0,
-              "y": 30
-            },
-            "panelIndex": "7",
-            "panelRefName": "panel_6",
-            "title": "[Filebeat] IBM MQ Errorlogs",
-            "version": "7.0.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
               "h": 7,
               "i": "8",
               "w": 13,
@@ -121,8 +107,21 @@
               "y": 0
             },
             "panelIndex": "8",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_6",
             "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 27,
+              "i": "9",
+              "w": 48,
+              "x": 0,
+              "y": 30
+            },
+            "panelIndex": "9",
+            "panelRefName": "panel_7",
+            "version": "7.2.0"
           }
         ],
         "refreshInterval": {
@@ -171,19 +170,19 @@
           "type": "visualization"
         },
         {
-          "id": "5e457330-d8ff-11e8-aa1c-3fc8e6195a8e",
+          "id": "bf8e5de0-7c7f-11e9-9645-e37efaf5baff",
           "name": "panel_6",
-          "type": "search"
+          "type": "visualization"
         },
         {
-          "id": "bf8e5de0-7c7f-11e9-9645-e37efaf5baff",
+          "id": "82db7ba0-adec-11e9-8358-1517661d7c84",
           "name": "panel_7",
-          "type": "visualization"
+          "type": "search"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-06-11T08:33:58.464Z",
-      "version": "WzkwLDFd"
+      "updated_at": "2019-07-24T08:25:36.887Z",
+      "version": "WzI3MywxXQ=="
     },
     {
       "attributes": {
@@ -351,14 +350,14 @@
       },
       "references": [
         {
-          "id": "92495760-d8f4-11e8-aa1c-3fc8e6195a8e",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-19T10:02:23.159Z",
-      "version": "WzI0MiwxXQ=="
+      "updated_at": "2019-07-24T08:18:04.280Z",
+      "version": "WzI1OSwxXQ=="
     },
     {
       "attributes": {
@@ -427,14 +426,14 @@
       },
       "references": [
         {
-          "id": "92495760-d8f4-11e8-aa1c-3fc8e6195a8e",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-22T10:28:21.613Z",
-      "version": "WzgyLDFd"
+      "updated_at": "2019-07-24T08:18:38.851Z",
+      "version": "WzI2MSwxXQ=="
     },
     {
       "attributes": {
@@ -503,14 +502,14 @@
       },
       "references": [
         {
-          "id": "92495760-d8f4-11e8-aa1c-3fc8e6195a8e",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-19T10:01:33.570Z",
-      "version": "WzI0MSwxXQ=="
+      "updated_at": "2019-07-24T08:21:31.870Z",
+      "version": "WzI2NiwxXQ=="
     },
     {
       "attributes": {
@@ -579,14 +578,14 @@
       },
       "references": [
         {
-          "id": "92495760-d8f4-11e8-aa1c-3fc8e6195a8e",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-22T10:30:10.444Z",
-      "version": "Wzg0LDFd"
+      "updated_at": "2019-07-24T08:18:58.477Z",
+      "version": "WzI2MiwxXQ=="
     },
     {
       "attributes": {
@@ -705,57 +704,14 @@
       },
       "references": [
         {
-          "id": "92495760-d8f4-11e8-aa1c-3fc8e6195a8e",
+          "id": "filebeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-19T10:03:39.835Z",
-      "version": "WzI0MywxXQ=="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "host.name",
-          "ibmmq.errorlog.qmgr",
-          "message"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [
-          "@timestamp",
-          "desc"
-        ],
-        "title": "[QBeat] Errorlogs",
-        "version": 1
-      },
-      "id": "5e457330-d8ff-11e8-aa1c-3fc8e6195a8e",
-      "migrationVersion": {
-        "search": "7.0.0"
-      },
-      "references": [
-        {
-          "id": "92495760-d8f4-11e8-aa1c-3fc8e6195a8e",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2019-07-19T10:04:54.699Z",
-      "version": "WzI0NiwxXQ=="
+      "updated_at": "2019-07-24T08:21:52.292Z",
+      "version": "WzI2NywxXQ=="
     },
     {
       "attributes": {
@@ -812,8 +768,52 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-05-22T10:52:52.798Z",
-      "version": "Wzg3LDFd"
+      "updated_at": "2019-07-24T08:20:32.926Z",
+      "version": "WzI2NSwxXQ=="
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "message",
+          "ibmmq.errorlog.explanation",
+          "ibmmq.errorlog.action"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "[Filebeat] Errorlogs",
+        "version": 1
+      },
+      "id": "82db7ba0-adec-11e9-8358-1517661d7c84",
+      "migrationVersion": {
+        "search": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2019-07-24T08:24:53.082Z",
+      "version": "WzI3MiwxXQ=="
     }
   ],
   "version": "7.2.0"
