@@ -14,8 +14,7 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
-
+This module has been tested with IBM MQ v9.1.0.0, but it should be compatible with older versions.
 
 include::../include/running-modules.asciidoc[]
 
