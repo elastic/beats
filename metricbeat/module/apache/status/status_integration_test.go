@@ -22,28 +22,17 @@ package status
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/apache/mtest"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestStatus(t *testing.T) {
-	mtest.Runner.Run(t, compose.Suite{
-		"Data":  testData,
-		"Fetch": testFetch,
-	})
-}
+func TestFetch(t *testing.T) {
+	r := compose.EnsureUp(t, "apache")
 
-func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewFetcher(t, getConfig(r.Host()))
-	f.WriteEvents(t, "")
-}
-
-func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewFetcher(t, getConfig(r.Host()))
-	events, errs := f.FetchEvents()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
