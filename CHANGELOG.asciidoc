@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v6.8.1...v6.8.2[View commits]
 *Auditbeat*
 
 - Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
+- Host dataset: Export Host fields to gob encoder. {pull}12940[12940]
 
 *Filebeat*
 
