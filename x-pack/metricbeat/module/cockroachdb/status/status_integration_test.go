@@ -29,9 +29,9 @@ func init() {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "cockroachdb")
+	r := compose.EnsureUp(t, "cockroachdb")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -40,18 +40,10 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func getConfig() map[string]interface{} {
-	host := os.Getenv("COCKROACHDB_HOST")
-	if host == "" {
-		host = "127.0.0.1"
-	}
-	port := os.Getenv("COCKROACHDB_PORT")
-	if port == "" {
-		port = "8080"
-	}
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "cockroachdb",
 		"metricsets": []string{"status"},
-		"hosts":      []string{host + ":" + port},
+		"hosts":      []string{host},
 	}
 }

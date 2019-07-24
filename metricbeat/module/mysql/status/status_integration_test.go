@@ -31,9 +31,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "mysql")
+	r := compose.EnsureUp(t, "mysql")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(false))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), false))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
@@ -56,9 +56,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchRaw(t *testing.T) {
-	compose.EnsureUp(t, "mysql")
+	r := compose.EnsureUp(t, "mysql")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(true))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), true))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
@@ -83,7 +83,9 @@ func TestFetchRaw(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(false))
+	r := compose.EnsureUp(t, "mysql")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), false))
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	if err != nil {
@@ -91,11 +93,11 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig(raw bool) map[string]interface{} {
+func getConfig(host string, raw bool) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "mysql",
 		"metricsets": []string{"status"},
-		"hosts":      []string{mysql.GetMySQLEnvDSN()},
+		"hosts":      []string{mysql.GetMySQLEnvDSN(host)},
 		"raw":        raw,
 	}
 }

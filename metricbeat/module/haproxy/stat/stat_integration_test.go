@@ -26,13 +26,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/haproxy"
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "haproxy")
+	r := compose.EnsureUp(t, "haproxy")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
@@ -46,9 +45,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "haproxy")
+	r := compose.EnsureUp(t, "haproxy")
 
-	config := getConfig()
+	config := getConfig(r.Host())
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
@@ -57,10 +56,10 @@ func TestData(t *testing.T) {
 
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "haproxy",
 		"metricsets": []string{"stat"},
-		"hosts":      []string{"tcp://" + haproxy.GetEnvHost() + ":" + haproxy.GetEnvPort()},
+		"hosts":      []string{"tcp://" + host},
 	}
 }

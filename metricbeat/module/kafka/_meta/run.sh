@@ -1,6 +1,26 @@
 #!/bin/bash
 
-KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME):9092
+if [ -n "$KAFKA_ADVERTISED_HOST_AUTO" ]; then
+	KAFKA_ADVERTISED_HOST=$(dig +short $HOSTNAME):9092
+fi
+
+# Check if KAFKA_ADVERTISED_HOST is set
+# if not wait to read it from file
+if [ -z "$KAFKA_ADVERTISED_HOST" ]; then
+       echo "KAFKA_ADVERTISED_HOST needed, will wait for it on /var/run/compose_env"
+       while true; do
+               if [ -f /run/compose_env ]; then
+                       source /run/compose_env
+                       KAFKA_ADVERTISED_HOST=$SERVICE_HOST
+               fi
+               if [ -n "$KAFKA_ADVERTISED_HOST" ]; then
+                       # Remove it so it is not reused
+                       > /run/compose_env
+                       break
+               fi
+               sleep 1
+       done
+fi
 
 wait_for_port() {
     count=20
@@ -13,6 +33,7 @@ wait_for_port() {
     # just in case, one more time
     nc -z localhost $port
 }
+
 
 echo "Starting ZooKeeper"
 ${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
