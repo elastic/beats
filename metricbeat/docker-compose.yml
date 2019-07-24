@@ -10,40 +10,8 @@ services:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
       # This is required to on-demand launching the rest on containers for tests & also docker module tests:
       - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
     command: make
-    env_file:
-      - ./module/aerospike/_meta/env
-      - ./module/beat/_meta/env
-      - ./module/ceph/_meta/env
-      - ./module/consul/_meta/env
-      - ./module/couchbase/_meta/env
-      - ./module/couchdb/_meta/env
-      - ./module/dropwizard/_meta/env
-      - ./module/elasticsearch/_meta/env
-      - ./module/envoyproxy/_meta/env
-      - ./module/etcd/_meta/env
-      - ./module/golang/_meta/env
-      - ./module/haproxy/_meta/env
-      - ./module/http/_meta/env
-      - ./module/jolokia/_meta/env
-      - ./module/kafka/_meta/env
-      - ./module/kibana/_meta/env
-      #- ./module/kubernetes/_meta/env
-      - ./module/logstash/_meta/env
-      - ./module/memcached/_meta/env
-      - ./module/mongodb/_meta/env
-      - ./module/munin/_meta/env
-      - ./module/mysql/_meta/env
-      - ./module/nats/_meta/env
-      - ./module/nginx/_meta/env
-      - ./module/php_fpm/_meta/env
-      - ./module/postgresql/_meta/env
-      - ./module/prometheus/_meta/env
-      - ./module/rabbitmq/_meta/env
-      - ./module/redis/_meta/env
-      - ./module/traefik/_meta/env
-      - ./module/uwsgi/_meta/env
-      - ./module/zookeeper/_meta/env
 
   # Modules
   aerospike:
