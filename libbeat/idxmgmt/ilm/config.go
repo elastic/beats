@@ -110,7 +110,7 @@ func (cfg *Config) Validate() error {
 }
 
 func defaultConfig(info beat.Info) Config {
-	const name = "%{[beat.name]}-%{[beat.version]}"
+	name := info.Beat + "-%{[agent.version]}"
 	nameFmt := fmtstr.MustCompileEvent(name)
 
 	return Config{
