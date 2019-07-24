@@ -779,7 +779,7 @@
               {
                 "fieldName": "ibmmq.errorlog.qmgr",
                 "id": "1558522305526",
-                "indexPatternRefName": "control_0_index_pattern",
+                "indexPatternRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
                 "label": "Queue Manager",
                 "options": {
                   "dynamicOptions": true,
@@ -806,8 +806,8 @@
       },
       "references": [
         {
-          "id": "92495760-d8f4-11e8-aa1c-3fc8e6195a8e",
-          "name": "control_0_index_pattern",
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
           "type": "index-pattern"
         }
       ],
