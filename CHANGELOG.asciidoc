@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
 
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 - Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
+- Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
 
 *Filebeat*
 
@@ -23,6 +24,7 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
 *Metricbeat*
 
 - Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
+- Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 
 *Packetbeat*
 
