@@ -5,6 +5,7 @@
 package elb
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -22,7 +23,7 @@ func newMockFetcher(lbListeners []*lbListener, err error) *mockFetcher {
 	return &mockFetcher{lblListeners: lbListeners, err: err}
 }
 
-func (f *mockFetcher) fetch() ([]*lbListener, error) {
+func (f *mockFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 

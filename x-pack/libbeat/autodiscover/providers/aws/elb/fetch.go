@@ -20,7 +20,7 @@ const logSelector = "autodiscover-elb-fetch"
 
 // fetcher is an interface that can fetch a list of lbListener (load balancer + listener) objects without pagination being necessary.
 type fetcher interface {
-	fetch() ([]*lbListener, error)
+	fetch(ctx context.Context) ([]*lbListener, error)
 }
 
 // apiMultiFetcher fetches results from multiple clients concatenating their results together
@@ -29,14 +29,14 @@ type apiMultiFetcher struct {
 	fetchers []fetcher
 }
 
-func (amf *apiMultiFetcher) fetch() ([]*lbListener, error) {
+func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 	fetchResults := make(chan []*lbListener)
 	fetchErr := make(chan error)
 
 	// Simultaneously fetch all from each region
 	for _, f := range amf.fetchers {
 		go func(f fetcher) {
-			fres, ferr := f.fetch()
+			fres, ferr := f.fetch(ctx)
 			if ferr != nil {
 				fetchErr <- ferr
 			} else {
@@ -63,13 +63,12 @@ func (amf *apiMultiFetcher) fetch() ([]*lbListener, error) {
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
 	client elasticloadbalancingv2iface.ClientAPI
-	ctx    context.Context
 }
 
 func newAPIFetcher(ctx context.Context, clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
-		fetchers[idx] = &apiFetcher{client, ctx}
+		fetchers[idx] = &apiFetcher{client}
 	}
 	return &apiMultiFetcher{fetchers}
 }
@@ -79,7 +78,7 @@ func newAPIFetcher(ctx context.Context, clients []elasticloadbalancingv2iface.Cl
 // per listener API request. Each page of results has O(n)+1 perf since we need that
 // additional fetch per lb. We let the goroutine scheduler sort things out, and use
 // a sync.Pool to limit the number of in-flight requests.
-func (f *apiFetcher) fetch() ([]*lbListener, error) {
+func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 	var pageSize int64 = 50
 
 	req := f.client.DescribeLoadBalancersRequest(&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize})
@@ -91,7 +90,7 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 		taskPool.Put(nil)
 	}
 
-	ctx, cancel := context.WithCancel(f.ctx)
+	ctx, cancel := context.WithCancel(ctx)
 	ir := &fetchRequest{
 		paginator: elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(req),
 		client:    f.client,

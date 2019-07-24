@@ -5,6 +5,7 @@
 package elb
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -18,6 +19,7 @@ type watcher struct {
 	onStop      func(uuid string)
 	done        chan struct{}
 	ticker      *time.Ticker
+	interval    time.Duration
 	lbListeners map[string]uint64
 }
 
@@ -32,6 +34,7 @@ func newWatcher(
 		onStop:      onStop,
 		done:        make(chan struct{}),
 		ticker:      time.NewTicker(interval),
+		interval:    interval,
 		lbListeners: map[string]uint64{},
 	}
 }
@@ -63,7 +66,8 @@ func (w *watcher) forever() {
 // once executes the watch loop a single time.
 // This is mostly useful for testing.
 func (w *watcher) once() error {
-	fetchedLbls, err := w.fetcher.fetch()
+	ctx, _ := context.WithTimeout(context.Background(), w.interval)
+	fetchedLbls, err := w.fetcher.fetch(ctx)
 	if err != nil {
 		return err
 	}
