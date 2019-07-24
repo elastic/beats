@@ -135,14 +135,6 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 	return cmd
 }
 
-func (d *wrapperDriver) SetParameters(params map[string]string) {
-	var env []string
-	for k, v := range params {
-		env = append(env, fmt.Sprintf("%s=%s", k, v))
-	}
-	d.Environment = env
-}
-
 func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) error {
 	var args []string
 
@@ -235,10 +227,6 @@ func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string)
 		}
 	}
 	return nil
-}
-
-func (d *wrapperDriver) Down(ctx context.Context) error {
-	return d.cmd(ctx, "down", "-v", "--rmi=local").Run()
 }
 
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {

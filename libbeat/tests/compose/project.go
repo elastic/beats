@@ -66,11 +66,8 @@ const (
 // Driver is the interface of docker compose implementations
 type Driver interface {
 	Up(ctx context.Context, opts UpOptions, service string) error
-	Down(ctx context.Context) error
 	Kill(ctx context.Context, signal string, service string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
-
-	SetParameters(map[string]string)
 
 	LockFile() string
 }
@@ -214,14 +211,6 @@ func (c *Project) KillOld(except []string) error {
 	}
 
 	return nil
-}
-
-// Down removes all resources of a project
-func (c *Project) Down() error {
-	c.Lock()
-	defer c.Unlock()
-
-	return c.Driver.Down(context.Background())
 }
 
 // Lock acquires the lock (300s) timeout
