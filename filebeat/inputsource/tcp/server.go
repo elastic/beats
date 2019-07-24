@@ -27,15 +27,11 @@ import (
 
 	"golang.org/x/net/netutil"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
-
-var errClosed = errors.New("connection closed")
 
 // Server represent a TCP server
 type Server struct {
@@ -46,7 +42,7 @@ type Server struct {
 	factory      HandlerFactory
 	log          *logp.Logger
 	tlsConfig    *transport.TLSConfig
-	closer       *closer
+	closer       *Closer
 	clientsCount atomic.Int
 }
 
@@ -70,7 +66,7 @@ func New(
 		factory:   factory,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
 		tlsConfig: tlsConfig,
-		closer:    &closer{done: make(chan struct{})},
+		closer:    NewCloser(nil),
 	}, nil
 }
 
@@ -112,7 +108,7 @@ func (s *Server) run() {
 		}
 
 		handler := s.factory(*s.config)
-		closer := withCloser(s.closer, conn)
+		closer := WithCloser(s.closer, func() { conn.Close() })
 
 		s.wg.Add(1)
 		go func() {
@@ -189,85 +185,4 @@ func SplitFunc(lineDelimiter []byte) bufio.SplitFunc {
 		return bufio.ScanLines
 	}
 	return factoryDelimiter(ld)
-}
-
-func withCloser(parent *closer, conn net.Conn) *closer {
-	child := &closer{
-		done:   make(chan struct{}),
-		parent: parent,
-		callback: func() {
-			conn.Close()
-		},
-	}
-	parent.addChild(child)
-	return child
-}
-
-type closeRef interface {
-	Done() <-chan struct{}
-	Err() error
-}
-
-type closer struct {
-	mu       sync.Mutex
-	done     chan struct{}
-	err      error
-	parent   *closer
-	children map[*closer]struct{}
-	callback func()
-}
-
-func (c *closer) Close() {
-	c.mu.Lock()
-	if c.err != nil {
-		c.mu.Unlock()
-		return
-	}
-
-	if c.callback != nil {
-		c.callback()
-	}
-
-	close(c.done)
-
-	// propagate close to children.
-	if c.children != nil {
-		for child := range c.children {
-			child.Close()
-		}
-		c.children = nil
-	}
-
-	c.err = errClosed
-	c.mu.Unlock()
-
-	if c.parent != nil {
-		c.removeChild(c)
-	}
-}
-
-func (c *closer) Done() <-chan struct{} {
-	return c.done
-}
-
-func (c *closer) Err() error {
-	c.mu.Lock()
-	err := c.err
-	c.mu.Unlock()
-	return err
-}
-
-func (c *closer) removeChild(child *closer) {
-	c.mu.Lock()
-	delete(c.children, child)
-	c.mu.Unlock()
-}
-
-func (c *closer) addChild(child *closer) {
-	c.mu.Lock()
-	if c.children == nil {
-		c.children = make(map[*closer]struct{})
-	}
-	c.children[child] = struct{}{}
-	c.mu.Unlock()
 }

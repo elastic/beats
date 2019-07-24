@@ -46,7 +46,7 @@ type HandlerFactory func(config Config) ConnectionHandler
 
 // ConnectionHandler interface provides mechanisms for handling of incoming TCP connections
 type ConnectionHandler interface {
-	Handle(closeRef, net.Conn) error
+	Handle(CloseRef, net.Conn) error
 }
 
 // SplitHandlerFactory allows creation of a ConnectionHandler that can do splitting of messages received on a TCP connection.
@@ -79,7 +79,7 @@ func newSplitHandler(
 }
 
 // Handle takes a connection as input and processes data received on it.
-func (c *splitHandler) Handle(closer closeRef, conn net.Conn) error {
+func (c *splitHandler) Handle(closer CloseRef, conn net.Conn) error {
 	c.metadata = inputsource.NetworkMetadata{
 		RemoteAddr: conn.RemoteAddr(),
 		TLS:        extractSSLInformation(conn),
