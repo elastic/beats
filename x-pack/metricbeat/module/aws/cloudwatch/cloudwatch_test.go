@@ -218,7 +218,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]Config{
 				{
 					Namespace:  "AWS/EC2",
-					MetricName: "CPUUtilization",
+					MetricName: []string{"CPUUtilization"},
 					Dimensions: []Dimension{
 						{
 							Name:  "InstanceId",
@@ -237,7 +237,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]Config{
 				{
 					Namespace:  "AWS/EC2",
-					MetricName: "CPUUtilization",
+					MetricName: []string{"CPUUtilization"},
 					Dimensions: []Dimension{
 						{
 							Name:  "InstanceId",
@@ -259,7 +259,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]Config{
 				{
 					Namespace:  "AWS/EC2",
-					MetricName: "CPUUtilization",
+					MetricName: []string{"CPUUtilization"},
 					Dimensions: []Dimension{
 						{
 							Name:  "InstanceId",
@@ -274,7 +274,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				},
 				{
 					Namespace:  "AWS/RDS",
-					MetricName: "CommitThroughput",
+					MetricName: []string{"CommitThroughput"},
 					Dimensions: []Dimension{
 						{
 							Name:  "DBClusterIdentifier",
@@ -300,7 +300,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			[]Config{
 				{
 					Namespace:          "AWS/EC2",
-					MetricName:         "CPUUtilization",
+					MetricName:         []string{"CPUUtilization"},
 					ResourceTypeFilter: resourceTypeEC2,
 				},
 				{
@@ -313,7 +313,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				{
 					namespace:          "AWS/EC2",
 					resourceTypeFilter: resourceTypeEC2,
-					metricName:         "CPUUtilization",
+					metricNames:        []string{"CPUUtilization"},
 					statistic:          defaultStatistics,
 				},
 				{
@@ -337,6 +337,26 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				resourceTypeFilter: "ec2",
 				statistic:          defaultStatistics,
 			}},
+		},
+		{
+			"test with two metrics and no dimension",
+			[]Config{
+				{
+					Namespace:          "AWS/EC2",
+					MetricName:         []string{"CPUUtilization", "StatusCheckFailed"},
+					ResourceTypeFilter: resourceTypeEC2,
+					Statistic:          []string{"Average", "Maximum"},
+				},
+			},
+			listMetricWithDetail{},
+			[]namespaceWithDetail{
+				{
+					namespace:          "AWS/EC2",
+					resourceTypeFilter: resourceTypeEC2,
+					metricNames:        []string{"CPUUtilization", "StatusCheckFailed"},
+					statistic:          []string{"Average", "Maximum"},
+				},
+			},
 		},
 	}
 	for _, c := range cases {
