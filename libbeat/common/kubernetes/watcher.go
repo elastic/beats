@@ -33,6 +33,12 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+const (
+	add    = "add"
+	update = "update"
+	delete = "delete"
+)
+
 // Watcher watches Kubernetes resources events
 type Watcher interface {
 	// Start watching Kubernetes API for new events after resources were listed
@@ -183,53 +189,32 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 
 	w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(o interface{}) {
-			w.enqueue(&item{
-				object: o,
-				state:  "add",
-			})
+			w.enqueue(o, add)
 		},
 		DeleteFunc: func(o interface{}) {
-			w.enqueue(&item{
-				object: o,
-				state:  "delete",
-			})
+			w.enqueue(o, delete)
 		},
 		// TODO: When we move to one watcher per object model, we should check resource verion of
 		// TODO: the old vs new and avoid reconciliation during relisting.
 		UpdateFunc: func(_, o interface{}) {
-			w.enqueue(&item{
-				object: o,
-				state:  "update",
-			})
+			w.enqueue(o, update)
 		},
 	})
 
 	return w, nil
 }
 
-func (w *watcher) enqueue(obj interface{}) {
+func (w *watcher) enqueue(obj interface{}, state string) {
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
 		return
 	}
 
-	w.queue.Add(key)
+	w.queue.Add(&item{key, state})
 }
 
 func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 	w.handler = h
-}
-
-func (w *watcher) onAdd(obj runtime.Object) {
-	w.handler.OnAdd(obj)
-}
-
-func (w *watcher) onUpdate(obj runtime.Object) {
-	w.handler.OnUpdate(obj)
-}
-
-func (w *watcher) onDelete(obj runtime.Object) {
-	w.handler.OnDelete(obj)
 }
 
 // Start watching pods
@@ -280,11 +265,11 @@ func (w *watcher) process(ctx context.Context) bool {
 		}
 
 		switch entry.state {
-		case "add":
+		case add:
 			w.handler.OnAdd(o)
-		case "update":
+		case update:
 			w.handler.OnUpdate(o)
-		case "delete:":
+		case delete:
 			w.handler.OnDelete(o)
 		}
 

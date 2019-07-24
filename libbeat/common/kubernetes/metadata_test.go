@@ -20,9 +20,9 @@ package kubernetes
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/common"

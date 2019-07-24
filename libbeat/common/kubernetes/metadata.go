@@ -132,7 +132,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 func (g *metaGenerator) PodMetadata(pod *Pod) common.MapStr {
 	podMeta := g.ResourceMetadata(pod)
 
-	safemapstr.Put(podMeta, "pod.uid", pod.GetObjectMeta().GetUID())
+	safemapstr.Put(podMeta, "pod.uid", string(pod.GetObjectMeta().GetUID()))
 	safemapstr.Put(podMeta, "pod.name", pod.GetObjectMeta().GetName())
 	safemapstr.Put(podMeta, "node.name", pod.Spec.NodeName)
 

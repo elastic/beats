@@ -21,8 +21,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -32,12 +33,14 @@ import (
 func TestBuildMetadataEnricher(t *testing.T) {
 	watcher := mockWatcher{}
 	funcs := mockFuncs{}
-	resource := &mockResource{
-		uid:       "mockuid",
-		name:      "enrich",
-		namespace: "default",
-		labels: map[string]string{
-			"label": "value",
+	resource := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			UID:  types.UID("mockuid"),
+			Name: "enrich",
+			Labels: map[string]string{
+				"label": "value",
+			},
+			Namespace: "default",
 		},
 	}
 
@@ -129,20 +132,6 @@ func (f *mockFuncs) delete(m map[string]common.MapStr, obj kubernetes.Resource) 
 func (f *mockFuncs) index(m common.MapStr) string {
 	f.indexed = m
 	return m["name"].(string)
-}
-
-type mockResource struct {
-	name, namespace, uid string
-	labels               map[string]string
-}
-
-func (r *mockResource) GetMetadata() *v1.ObjectMeta {
-	return &v1.ObjectMeta{
-		UID:       types.UID(r.uid),
-		Name:      r.name,
-		Namespace: r.namespace,
-		Labels:    r.labels,
-	}
 }
 
 type mockWatcher struct {

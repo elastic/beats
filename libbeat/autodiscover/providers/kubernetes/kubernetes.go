@@ -48,6 +48,7 @@ type Provider struct {
 	templates template.Mapper
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
+	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -77,8 +78,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
-		return nil, err
+		return nil, fmt.Errorf("kubernetes: Couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates)
@@ -105,20 +105,21 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		appenders: appenders,
 		metagen:   metagen,
 		watcher:   watcher,
+		logger:    logp.NewLogger("kubernetes"),
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			logp.Debug("kubernetes", "Watcher Pod add: %+v", obj)
+			p.logger.Debugf("Watcher Pod add: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		UpdateFunc: func(obj interface{}) {
-			logp.Debug("kubernetes", "Watcher Pod update: %+v", obj)
+			p.logger.Debugf("Watcher Pod update: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "stop")
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		DeleteFunc: func(obj interface{}) {
-			logp.Debug("kubernetes", "Watcher Pod delete: %+v", obj)
+			p.logger.Debugf("Watcher Pod delete: %+v", obj)
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 		},
 	})
@@ -129,7 +130,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 // Start for Runner interface.
 func (p *Provider) Start() {
 	if err := p.watcher.Start(); err != nil {
-		logp.Err("Error starting kubernetes autodiscover provider: %s", err)
+		p.logger.Errorf("Error starting kubernetes autodiscover provider: %s", err)
 	}
 }
 
@@ -276,12 +277,12 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	cname := builder.GetContainerName(container)
 	hints := builder.GenerateHints(annotations, cname, p.config.Prefix)
-	logp.Debug("kubernetes", "Generated hints %+v", hints)
+	p.logger.Debugf("Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
 
-	logp.Debug("kubernetes", "Generated builder event %+v", e)
+	p.logger.Debugf("Generated builder event %+v", e)
 
 	return e
 }
