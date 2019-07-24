@@ -20,9 +20,9 @@ import (
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period    time.Duration `config:"period" validate:"nonzero,required"`
-	Regions   []string      `config:"regions"`
-	AWSConfig awscommon.ConfigAWS
+	Period    time.Duration       `config:"period" validate:"nonzero,required"`
+	Regions   []string            `config:"regions"`
+	AWSConfig awscommon.ConfigAWS `config:",inline"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
@@ -71,6 +71,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
+		// set default region to make initial aws api call
+		awsConfig.Region = "us-west-1"
 		svcEC2 := ec2.New(awsConfig)
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {
