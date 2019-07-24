@@ -43,7 +43,7 @@ type Server struct {
 	Listener     net.Listener
 	wg           sync.WaitGroup
 	done         chan struct{}
-	factory      ClientFactory
+	factory      HandlerFactory
 	log          *logp.Logger
 	tlsConfig    *transport.TLSConfig
 	closer       *closer
@@ -53,7 +53,7 @@ type Server struct {
 // New creates a new tcp server
 func New(
 	config *Config,
-	factory ClientFactory,
+	factory HandlerFactory,
 ) (*Server, error) {
 	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
 	if err != nil {
@@ -61,7 +61,7 @@ func New(
 	}
 
 	if factory == nil {
-		return nil, fmt.Errorf("ClientFactory can't be empty")
+		return nil, fmt.Errorf("HandlerFactory can't be empty")
 	}
 
 	return &Server{
@@ -111,7 +111,7 @@ func (s *Server) run() {
 			}
 		}
 
-		client := s.factory(*s.config)
+		handler := s.factory(*s.config)
 		closer := withCloser(s.closer, conn)
 
 		s.wg.Add(1)
@@ -120,11 +120,11 @@ func (s *Server) run() {
 			defer s.wg.Done()
 			defer closer.Close()
 
-			s.registerClient(client)
-			defer s.unregisterClient(client)
+			s.registerHandler()
+			defer s.unregisterHandler()
 			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount.Load())
 
-			err := client.Handle(closer, conn)
+			err := handler.Handle(closer, conn)
 			if err != nil {
 				s.log.Debugw("client error", "error", err)
 			}
@@ -148,11 +148,11 @@ func (s *Server) Stop() {
 	s.log.Info("TCP server stopped")
 }
 
-func (s *Server) registerClient(client ConnectionHandler) {
+func (s *Server) registerHandler() {
 	s.clientsCount.Inc()
 }
 
-func (s *Server) unregisterClient(client ConnectionHandler) {
+func (s *Server) unregisterHandler() {
 	s.clientsCount.Dec()
 }
 

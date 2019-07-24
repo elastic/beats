@@ -41,8 +41,8 @@ type splitHandler struct {
 	timeout        time.Duration
 }
 
-// ClientFactory returns a ConnectionHandler func
-type ClientFactory func(config Config) ConnectionHandler
+// HandlerFactory returns a ConnectionHandler func
+type HandlerFactory func(config Config) ConnectionHandler
 
 // ConnectionHandler interface provides mechanisms for handling of incoming TCP connections
 type ConnectionHandler interface {
@@ -50,7 +50,7 @@ type ConnectionHandler interface {
 }
 
 // SplitHandlerFactory allows creation of a ConnectionHandler that can do splitting of messages received on a TCP connection.
-func SplitHandlerFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) ClientFactory {
+func SplitHandlerFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
 	return func(config Config) ConnectionHandler {
 		return newSplitHandler(
 			callback,
