@@ -20,7 +20,6 @@
 package stats
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,9 +29,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "memcached")
+	r := compose.EnsureUp(t, "memcached")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -45,9 +44,9 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "memcached")
+	r := compose.EnsureUp(t, "memcached")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -58,28 +57,10 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "memcached",
 		"metricsets": []string{"stats"},
-		"hosts":      []string{getEnvHost() + ":" + getEnvPort()},
+		"hosts":      []string{host},
 	}
-}
-
-func getEnvHost() string {
-	host := os.Getenv("MEMCACHED_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func getEnvPort() string {
-	port := os.Getenv("MEMCACHED_PORT")
-
-	if len(port) == 0 {
-		port = "11211"
-	}
-	return port
 }

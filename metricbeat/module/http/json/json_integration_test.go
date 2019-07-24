@@ -20,7 +20,6 @@
 package json
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,9 +29,9 @@ import (
 )
 
 func TestFetchObject(t *testing.T) {
-	compose.EnsureUp(t, "http")
+	r := compose.EnsureUp(t, "http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("object"))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), "object"))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -43,9 +42,9 @@ func TestFetchObject(t *testing.T) {
 }
 
 func TestFetchArray(t *testing.T) {
-	compose.EnsureUp(t, "http")
+	r := compose.EnsureUp(t, "http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("array"))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), "array"))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -55,15 +54,15 @@ func TestFetchArray(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "http")
+	r := compose.EnsureUp(t, "http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("object"))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), "object"))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig(jsonType string) map[string]interface{} {
+func getConfig(host string, jsonType string) map[string]interface{} {
 	var path string
 	var responseIsArray bool
 	switch jsonType {
@@ -78,27 +77,9 @@ func getConfig(jsonType string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":        "http",
 		"metricsets":    []string{"json"},
-		"hosts":         []string{getEnvHost() + ":" + getEnvPort()},
+		"hosts":         []string{host},
 		"path":          path,
 		"namespace":     "testnamespace",
 		"json.is_array": responseIsArray,
 	}
-}
-
-func getEnvHost() string {
-	host := os.Getenv("HTTP_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func getEnvPort() string {
-	port := os.Getenv("HTTP_PORT")
-
-	if len(port) == 0 {
-		port = "8080"
-	}
-	return port
 }

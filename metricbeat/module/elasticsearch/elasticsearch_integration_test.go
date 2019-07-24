@@ -24,9 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
@@ -63,9 +61,9 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch")
+	r := compose.EnsureUp(t, "elasticsearch")
 
-	host := net.JoinHostPort(getEnvHost(), getEnvPort())
+	host := r.Host()
 	err := createIndex(host)
 	assert.NoError(t, err)
 
@@ -86,7 +84,7 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
 			assert.Empty(t, errs)
@@ -100,9 +98,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "elasticsearch")
+	r := compose.EnsureUp(t, "elasticsearch")
 
-	host := net.JoinHostPort(getEnvHost(), getEnvPort())
+	host := r.Host()
 
 	version, err := getElasticsearchVersion(host)
 	if err != nil {
@@ -112,7 +110,7 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet, host))
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			if err != nil {
 				t.Fatal("write", err)
@@ -121,32 +119,12 @@ func TestData(t *testing.T) {
 	}
 }
 
-// GetEnvHost returns host for Elasticsearch
-func getEnvHost() string {
-	host := os.Getenv("ES_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-// GetEnvPort returns port for Elasticsearch
-func getEnvPort() string {
-	port := os.Getenv("ES_PORT")
-
-	if len(port) == 0 {
-		port = "9200"
-	}
-	return port
-}
-
 // GetConfig returns config for elasticsearch module
-func getConfig(metricset string) map[string]interface{} {
+func getConfig(metricset string, host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":                     elasticsearch.ModuleName,
 		"metricsets":                 []string{metricset},
-		"hosts":                      []string{getEnvHost() + ":" + getEnvPort()},
+		"hosts":                      []string{host},
 		"index_recovery.active_only": false,
 	}
 }

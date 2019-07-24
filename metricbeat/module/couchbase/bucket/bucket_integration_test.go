@@ -30,9 +30,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "couchbase")
+	r := compose.EnsureUp(t, "couchbase")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -43,9 +43,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "couchbase")
+	r := compose.EnsureUp(t, "couchbase")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -57,10 +57,10 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "couchbase",
 		"metricsets": []string{"bucket"},
-		"hosts":      []string{couchbase.GetEnvDSN()},
+		"hosts":      []string{couchbase.GetDSN(host)},
 	}
 }

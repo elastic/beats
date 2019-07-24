@@ -30,7 +30,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	r := compose.EnsureUp(t, "rabbitmq")
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
@@ -39,11 +41,11 @@ func TestData(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	t.Skip("Skipping test as it was not stable. Probably first event is empty.")
-	compose.EnsureUp(t, "rabbitmq")
+	r := compose.EnsureUp(t, "rabbitmq")
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	err := metricSet.Fetch(reporter)
 	assert.NoError(t, err)
 
@@ -51,8 +53,8 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 
-func getConfig() map[string]interface{} {
-	config := mtest.GetIntegrationConfig()
+func getConfig(host string) map[string]interface{} {
+	config := mtest.GetIntegrationConfig(host)
 	config["metricsets"] = []string{"node"}
 	return config
 }

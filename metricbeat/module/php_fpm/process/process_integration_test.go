@@ -20,7 +20,6 @@
 package process
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,9 +29,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "phpfpm")
+	r := compose.EnsureUp(t, "phpfpm")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
@@ -45,28 +44,10 @@ func TestFetch(t *testing.T) {
 
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "php_fpm",
 		"metricsets": []string{"process"},
-		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+		"hosts":      []string{host},
 	}
-}
-
-func GetEnvHost() string {
-	host := os.Getenv("PHPFPM_HOST")
-
-	if len(host) == 0 {
-		host = "127.0.0.1"
-	}
-	return host
-}
-
-func GetEnvPort() string {
-	port := os.Getenv("PHPFPM_PORT")
-
-	if len(port) == 0 {
-		port = "81"
-	}
-	return port
 }
