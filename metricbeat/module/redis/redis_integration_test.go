@@ -31,10 +31,9 @@ import (
 	_ "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-var host = GetRedisEnvHost() + ":" + GetRedisEnvPort()
-
 func TestFetchRedisInfo(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
+	host := r.Host()
 
 	conn, err := rd.Dial("tcp", host)
 	if err != nil {
@@ -69,7 +68,8 @@ func TestFetchRedisInfo(t *testing.T) {
 }
 
 func TestFetchKeys(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
+	host := r.Host()
 
 	conn, err := rd.Dial("tcp", host)
 	if err != nil {
@@ -95,7 +95,8 @@ func TestFetchKeys(t *testing.T) {
 }
 
 func TestFetchKeyInfo(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
+	host := r.Host()
 
 	conn, err := rd.Dial("tcp", host)
 	if err != nil {

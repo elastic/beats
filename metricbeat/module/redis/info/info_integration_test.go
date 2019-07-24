@@ -25,17 +25,14 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/redis"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
-
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, err := mbtest.ReportingFetchV2Error(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
@@ -54,19 +51,19 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "redis")
+	r := compose.EnsureUp(t, "redis")
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"info"},
-		"hosts":      []string{redisHost},
+		"hosts":      []string{host},
 	}
 }
