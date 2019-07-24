@@ -213,6 +213,9 @@ func writeToContainer(ctx context.Context, id, filename, content string) error {
 	return nil
 }
 
+// setupAdvertisedHost adds a file to a container with its address, this can
+// be used in services that need to configure an address to be advertised to
+// clients.
 func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string) error {
 	containers, err := d.containers(ctx, Filter{State: AnyState}, service)
 	if err != nil {
