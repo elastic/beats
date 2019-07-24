@@ -20,17 +20,17 @@ services:
       - 3000
 
   apache:
-    extends:
-      file: ./module/apache/docker-compose.yml
-      service: apache
+    build: ./module/apache/_meta
+    ports:
+      - 80
 
   apache_2_4_12:
-    extends:
-      file: ./module/apache/docker-compose.yml
-      service: apache
     build:
+      context: ./module/apache/_meta
       args:
         APACHE_VERSION: 2.4.12
+    ports:
+      - 80
 
   metricbeat:
     build: ./module/beat/_meta
