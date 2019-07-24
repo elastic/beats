@@ -18,23 +18,40 @@ type lbListener struct {
 
 // toMap converts this lbListener into the form consumed as metadata in the autodiscovery process.
 func (l *lbListener) toMap() common.MapStr {
+	// We fully spell out listener_arn to avoid confusion with the ARN for the whole ELB
+	m := common.MapStr{
+		"listener_arn":       l.listener.ListenerArn,
+		"load_balancer_arn":  *l.lb.LoadBalancerArn,
+		"host":               *l.lb.DNSName,
+		"port":               *l.listener.Port,
+		"protocol":           l.listener.Protocol,
+		"type":               string(l.lb.Type),
+		"scheme":             l.lb.Scheme,
+		"availability_zones": l.azStrings(),
+		"created":            l.lb.CreatedTime,
+		"state":              l.stateMap(),
+		"ip_address_type":    string(l.lb.IpAddressType),
+		"security_groups":    l.lb.SecurityGroups,
+		"vpc_id":             *l.lb.VpcId,
+		"ssl_policy":         l.listener.SslPolicy,
+	}
+
+	return m
+}
+
+func (l *lbListener) toCloudMap() common.MapStr {
 	m := common.MapStr{}
 
-	// We fully spell out listener_arn to avoid confusion with the ARN for the whole ELB
-	m["listener_arn"] = l.listener.ListenerArn
-	m["load_balancer_arn"] = *l.lb.LoadBalancerArn
-	m["host"] = *l.lb.DNSName
-	m["port"] = *l.listener.Port
-	m["protocol"] = l.listener.Protocol
-	m["type"] = string(l.lb.Type)
-	m["scheme"] = l.lb.Scheme
-	m["availability_zones"] = l.azStrings()
-	m["created"] = l.lb.CreatedTime
-	m["state"] = l.stateMap()
-	m["ip_address_type"] = string(l.lb.IpAddressType)
-	m["security_groups"] = l.lb.SecurityGroups
-	m["vpc_id"] = *l.lb.VpcId
-	m["ssl_policy"] = l.listener.SslPolicy
+	var azs []string
+	for _, az := range l.lb.AvailabilityZones {
+		azs = append(azs, *az.ZoneName)
+	}
+	m["availability_zone"] = azs
+	m["provider"] = "aws"
+
+	// The region is just an AZ with the last character removed
+	firstAz := azs[0]
+	m["region"] = firstAz[:len(firstAz)-2]
 
 	return m
 }

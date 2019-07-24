@@ -5,6 +5,7 @@
 package elb
 
 import (
+	"context"
 	"time"
 
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
@@ -65,7 +66,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		clients = append(clients, elasticloadbalancingv2.New(awsCfg))
 	}
 
-	return internalBuilder(uuid, bus, config, newAPIFetcher(clients))
+	return internalBuilder(uuid, bus, config, newAPIFetcher(clients, context.TODO()))
 }
 
 // internalBuilder is mainly intended for testing via mocks and stubs.
@@ -124,6 +125,7 @@ func (p *Provider) onWatcherStart(arn string, lbl *lbListener) {
 		"port":     lblMap["port"],
 		"meta": common.MapStr{
 			"elb_listener": lbl.toMap(),
+			"cloud":        lbl.toCloudMap(),
 		},
 	}
 

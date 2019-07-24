@@ -9,12 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/gofrs/uuid"
-
 	"github.com/pkg/errors"
-
 	"github.com/stretchr/testify/assert"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common/bus"
@@ -105,12 +104,15 @@ func Test_internalBuilder(t *testing.T) {
 	assert.Equal(t, 1, events.len())
 
 	expectedStartEvent := bus.Event{
-		"id":           lbl.arn(),
-		"provider":     uuid,
-		"start":        true,
-		"host":         *lbl.lb.DNSName,
-		"port":         *lbl.listener.Port,
-		"elb_listener": lbl.toMap(),
+		"id":       lbl.arn(),
+		"provider": uuid,
+		"start":    true,
+		"host":     *lbl.lb.DNSName,
+		"port":     *lbl.listener.Port,
+		"meta": common.MapStr{
+			"elb_listener": lbl.toMap(),
+			"cloud":        lbl.toCloudMap(),
+		},
 	}
 
 	require.Equal(t, expectedStartEvent, events.get()[0])

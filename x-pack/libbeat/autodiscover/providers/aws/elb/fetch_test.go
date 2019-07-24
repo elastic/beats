@@ -5,6 +5,7 @@
 package elb
 
 import (
+	"context"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
@@ -13,6 +14,6 @@ import (
 
 func Test_newAPIFetcher(t *testing.T) {
 	client := newMockELBClient(0)
-	fetcher := newAPIFetcher([]elasticloadbalancingv2iface.ClientAPI{client})
+	fetcher := newAPIFetcher([]elasticloadbalancingv2iface.ClientAPI{client}, context.TODO())
 	require.NotNil(t, fetcher)
 }

@@ -6,16 +6,17 @@ package elb
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 	"sync"
+
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/elasticloadbalancingv2iface"
 
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"go.uber.org/multierr"
-
-	"github.com/elastic/beats/libbeat/common/atomic"
 )
+
+const logSelector = "autodiscover-elb-fetch"
 
 // fetcher is an interface that can fetch a list of lbListener (load balancer + listener) objects without pagination being necessary.
 type fetcher interface {
@@ -62,12 +63,13 @@ func (amf *apiMultiFetcher) fetch() ([]*lbListener, error) {
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
 	client elasticloadbalancingv2iface.ClientAPI
+	ctx    context.Context
 }
 
-func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI) fetcher {
+func newAPIFetcher(clients []elasticloadbalancingv2iface.ClientAPI, ctx context.Context) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
-		fetchers[idx] = &apiFetcher{client}
+		fetchers[idx] = &apiFetcher{client, ctx}
 	}
 	return &apiMultiFetcher{fetchers}
 }
@@ -88,15 +90,14 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 	for i := 0; i < 10; i++ {
 		taskPool.Put(nil)
 	}
+
+	ctx, cancel := context.WithCancel(f.ctx)
 	ir := &fetchRequest{
-		elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(req),
-		f.client,
-		atomic.MakeBool(true),
-		[]*lbListener{},
-		[]error{},
-		sync.Mutex{},
-		taskPool,
-		sync.WaitGroup{},
+		paginator: elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(req),
+		client:    f.client,
+		taskPool:  taskPool,
+		context:   ctx,
+		cancel:    cancel,
 	}
 
 	return ir.fetch()
@@ -107,12 +108,13 @@ func (f *apiFetcher) fetch() ([]*lbListener, error) {
 type fetchRequest struct {
 	paginator    elasticloadbalancingv2.DescribeLoadBalancersPaginator
 	client       elasticloadbalancingv2iface.ClientAPI
-	running      atomic.Bool
 	lbListeners  []*lbListener
 	errs         []error
 	resultsLock  sync.Mutex
 	taskPool     sync.Pool
 	pendingTasks sync.WaitGroup
+	context      context.Context
+	cancel       func()
 }
 
 func (p *fetchRequest) fetch() ([]*lbListener, error) {
@@ -136,13 +138,21 @@ func (p *fetchRequest) fetch() ([]*lbListener, error) {
 
 func (p *fetchRequest) fetchAllPages() {
 	// Keep fetching pages unless we're stopped OR there are no pages left
-	for p.running.Load() && p.fetchNextPage() {
-		logp.Debug("autodiscover-elb", "API page fetched")
+Outer:
+	for {
+		select {
+		case <-p.context.Done():
+			logp.Debug(logSelector, "done fetching ELB pages, context cancelled")
+			break Outer
+		default:
+			p.fetchNextPage()
+			logp.Debug(logSelector, "API page fetched")
+		}
 	}
 }
 
 func (p *fetchRequest) fetchNextPage() (more bool) {
-	success := p.paginator.Next(context.TODO())
+	success := p.paginator.Next(p.context)
 
 	if success {
 		for _, lb := range p.paginator.CurrentPage().LoadBalancers {
@@ -175,13 +185,22 @@ func (p *fetchRequest) dispatch(fn func()) {
 func (p *fetchRequest) fetchListeners(lb elasticloadbalancingv2.LoadBalancer) {
 	listenReq := p.client.DescribeListenersRequest(&elasticloadbalancingv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
 	listen := elasticloadbalancingv2.NewDescribeListenersPaginator(listenReq)
-	for listen.Next(context.TODO()) && p.running.Load() {
-		for _, listener := range listen.CurrentPage().Listeners {
-			p.recordGoodResult(&lb, &listener)
-		}
-	}
+
 	if listen.Err() != nil {
 		p.recordErrResult(listen.Err())
+	}
+
+Outer:
+	for listen.Next(p.context) {
+		select {
+		case <-p.context.Done():
+			break Outer
+		default:
+			for _, listener := range listen.CurrentPage().Listeners {
+				p.recordGoodResult(&lb, &listener)
+			}
+		}
+
 	}
 }
 
@@ -198,6 +217,5 @@ func (p *fetchRequest) recordErrResult(err error) {
 
 	p.errs = append(p.errs, err)
 
-	// Try to stop execution early
-	p.running.Store(false)
+	p.cancel()
 }

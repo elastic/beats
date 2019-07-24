@@ -49,6 +49,7 @@ func (w *watcher) forever() {
 		select {
 		case <-w.done:
 			w.ticker.Stop()
+			return
 		case <-w.ticker.C:
 			err := w.once()
 			if err != nil {
@@ -86,6 +87,7 @@ func (w *watcher) once() error {
 		if entryGen == oldGen {
 			if w.onStop != nil {
 				w.onStop(uuid)
+				delete(w.lbListeners, uuid)
 			}
 		}
 	}
