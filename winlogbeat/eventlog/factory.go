@@ -45,28 +45,19 @@ type validator interface {
 func readConfig(
 	c *common.Config,
 	config interface{},
-	validKeys []string,
+	validKeys common.StringSet,
 ) error {
 	if err := c.Unpack(config); err != nil {
 		return fmt.Errorf("failed unpacking config. %v", err)
-	}
-
-	isValidKey := func(key string) bool {
-		for _, validKey := range validKeys {
-			if key == validKey {
-				return true
-			}
-		}
-		return false
 	}
 
 	var errs multierror.Errors
 	if len(validKeys) > 0 {
 		// Check for invalid keys.
 		for _, k := range c.GetFields() {
-			if !isValidKey(k) {
+			if !validKeys.Has(k) {
 				errs = append(errs, fmt.Errorf("invalid event log key '%s' "+
-					"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
+					"found. Valid keys are %s", k, strings.Join(validKeys.ToSlice(), ", ")))
 			}
 		}
 	}
