@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -147,6 +148,7 @@ func TestGenerateHints(t *testing.T) {
 
 	p := Provider{
 		config: cfg,
+		logger: logp.NewLogger("kubernetes"),
 	}
 	for _, test := range tests {
 		assert.Equal(t, p.generateHints(test.event), test.result)
@@ -456,6 +458,7 @@ func TestEmitEvent(t *testing.T) {
 				metagen:   metaGen,
 				templates: mapper,
 				uuid:      UUID,
+				logger:    logp.NewLogger("kubernetes"),
 			}
 
 			listener := p.bus.Subscribe()

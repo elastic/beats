@@ -86,8 +86,6 @@ func tweakOptions(options *metav1.ListOptions, opt WatchOptions) {
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
 func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions) (Watcher, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	var informer cache.SharedInformer
 	var store cache.Store
 	var queue workqueue.RateLimitingInterface
@@ -176,6 +174,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	informer = cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout)
 	store = informer.GetStore()
 	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	w := &watcher{
 		client:   client,
