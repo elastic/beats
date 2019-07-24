@@ -18,15 +18,14 @@
 package kubernetes
 
 import (
-	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
-	"github.com/ericchiang/k8s"
-	"github.com/ericchiang/k8s/apis/core/v1"
-	"github.com/ghodss/yaml"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -36,27 +35,15 @@ const defaultNode = "localhost"
 // GetKubernetesClient returns a kubernetes client. If inCluster is true, it returns an
 // in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
 // it parses the config file to get the config required to build a client.
-func GetKubernetesClient(inCluster bool, kubeConfig string) (client *k8s.Client, err error) {
-	if inCluster == true {
-		client, err = k8s.NewInClusterClient()
-		if err != nil {
-			return nil, fmt.Errorf("Unable to get in cluster configuration: %v", err)
-		}
-	} else {
-		data, err := ioutil.ReadFile(kubeConfig)
-		if err != nil {
-			return nil, fmt.Errorf("read kubeconfig: %v", err)
-		}
+func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
+	cfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
+	}
 
-		// Unmarshal YAML into a Kubernetes config object.
-		var config k8s.Config
-		if err = yaml.Unmarshal(data, &config); err != nil {
-			return nil, fmt.Errorf("unmarshal kubeconfig: %v", err)
-		}
-		client, err = k8s.NewClient(&config)
-		if err != nil {
-			return nil, err
-		}
+	client, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("unable to build kubernetes clientset: %+v", err)
 	}
 
 	return client, nil
@@ -66,7 +53,7 @@ func GetKubernetesClient(inCluster bool, kubeConfig string) (client *k8s.Client,
 // If host is provided in the config use it directly.
 // If beat is deployed in k8s cluster, use hostname of pod which is pod name to query pod meta for node name.
 // If beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
-func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (node string) {
+func DiscoverKubernetesNode(host string, inCluster bool, client kubernetes.Interface) (node string) {
 	if host != "" {
 		logp.Info("kubernetes: Using node %s provided in the config", host)
 		return host
@@ -84,14 +71,13 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 			return defaultNode
 		}
 		logp.Info("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
-		pod := v1.Pod{}
-		err = client.Get(context.TODO(), ns, podName, &pod)
+		pod, err := client.CoreV1().Pods(ns).Get(podName, metav1.GetOptions{})
 		if err != nil {
 			logp.Err("kubernetes: Querying for pod failed with error: %+v", err.Error())
 			return defaultNode
 		}
-		logp.Info("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.GetNodeName())
-		return pod.Spec.GetNodeName()
+		logp.Info("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
+		return pod.Spec.NodeName
 	}
 
 	mid := machineID()
@@ -100,16 +86,15 @@ func DiscoverKubernetesNode(host string, inCluster bool, client *k8s.Client) (no
 		return defaultNode
 	}
 
-	nodes := v1.NodeList{}
-	err := client.List(context.TODO(), k8s.AllNamespaces, &nodes)
+	nodes, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
 	if err != nil {
 		logp.Err("kubernetes: Querying for nodes failed with error: %+v", err.Error())
 		return defaultNode
 	}
 	for _, n := range nodes.Items {
-		if n.GetStatus().GetNodeInfo().GetMachineID() == mid {
-			logp.Info("kubernetes: Using node %s discovered by machine-id matching", n.GetMetadata().GetName())
-			return n.GetMetadata().GetName()
+		if n.Status.NodeInfo.MachineID == mid {
+			logp.Info("kubernetes: Using node %s discovered by machine-id matching", n.GetObjectMeta().GetName())
+			return n.GetObjectMeta().GetName()
 		}
 	}
 

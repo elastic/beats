@@ -97,7 +97,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("Can not initialize kubernetes plugin with zero matcher plugins")
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -125,14 +125,14 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj kubernetes.Resource) {
+		AddFunc: func(obj interface{}) {
 			processor.addPod(obj.(*kubernetes.Pod))
 		},
-		UpdateFunc: func(obj kubernetes.Resource) {
+		UpdateFunc: func(obj interface{}) {
 			processor.removePod(obj.(*kubernetes.Pod))
 			processor.addPod(obj.(*kubernetes.Pod))
 		},
-		DeleteFunc: func(obj kubernetes.Resource) {
+		DeleteFunc: func(obj interface{}) {
 			processor.removePod(obj.(*kubernetes.Pod))
 		},
 	})

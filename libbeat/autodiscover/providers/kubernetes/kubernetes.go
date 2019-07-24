@@ -59,7 +59,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, err
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -108,16 +108,16 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
-		AddFunc: func(obj kubernetes.Resource) {
+		AddFunc: func(obj interface{}) {
 			logp.Debug("kubernetes", "Watcher Pod add: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
-		UpdateFunc: func(obj kubernetes.Resource) {
+		UpdateFunc: func(obj interface{}) {
 			logp.Debug("kubernetes", "Watcher Pod update: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "stop")
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
-		DeleteFunc: func(obj kubernetes.Resource) {
+		DeleteFunc: func(obj interface{}) {
 			logp.Debug("kubernetes", "Watcher Pod delete: %+v", obj)
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 		},
@@ -141,9 +141,9 @@ func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
 }
 
-func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*kubernetes.Container,
-	containerstatuses []*kubernetes.PodContainerStatus) {
-	host := pod.Status.GetPodIP()
+func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
+	containerstatuses []kubernetes.PodContainerStatus) {
+	host := pod.Status.PodIP
 
 	// If the container doesn't exist in the runtime or its network
 	// is not configured, it won't have an IP. Skip it as we cannot
@@ -159,8 +159,8 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
 		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-		containerIDs[c.GetName()] = cid
-		runtimes[c.GetName()] = runtime
+		containerIDs[c.Name] = cid
+		runtimes[c.Name] = runtime
 	}
 
 	// Emit container and port information
@@ -168,22 +168,22 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		// If it doesn't have an ID, container doesn't exist in
 		// the runtime, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
-		cid := containerIDs[c.GetName()]
+		cid := containerIDs[c.Name]
 		if cid == "" && flag != "stop" {
 			continue
 		}
 
 		// This must be an id that doesn't depend on the state of the container
 		// so it works also on `stop` if containers have been already deleted.
-		eventID := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
+		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
 		cmeta := common.MapStr{
 			"id":      cid,
-			"name":    c.GetName(),
-			"image":   c.GetImage(),
-			"runtime": runtimes[c.GetName()],
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.ContainerMetadata(pod, c.GetName())
+		meta := p.metagen.ContainerMetadata(pod, c.Name)
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
@@ -191,7 +191,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 		// Pass annotations to all events so that it can be used in templating and by annotation builders.
 		annotations := common.MapStr{}
-		for k, v := range pod.GetMetadata().Annotations {
+		for k, v := range pod.GetObjectMeta().GetAnnotations() {
 			safemapstr.Put(annotations, k, v)
 		}
 		kubemeta["annotations"] = annotations
@@ -217,7 +217,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 				"id":         eventID,
 				flag:         true,
 				"host":       host,
-				"port":       port.GetContainerPort(),
+				"port":       port.ContainerPort,
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,

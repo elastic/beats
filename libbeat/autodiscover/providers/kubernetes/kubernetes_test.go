@@ -21,10 +21,11 @@ import (
 	"testing"
 	"time"
 
-	v1 "github.com/ericchiang/k8s/apis/core/v1"
-	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -175,29 +176,29 @@ func TestEmitEvent(t *testing.T) {
 		{
 			Message: "Test common pod start",
 			Flag:    "start",
-			Pod: &v1.Pod{
-				Metadata: &metav1.ObjectMeta{
-					Name:        &name,
-					Uid:         &uid,
-					Namespace:   &namespace,
+			Pod: &kubernetes.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: &v1.PodStatus{
-					PodIP: &podIP,
-					ContainerStatuses: []*kubernetes.PodContainerStatus{
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name:        &name,
-							ContainerID: &containerID,
+							Name:        name,
+							ContainerID: containerID,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &node,
-					Containers: []*kubernetes.Container{
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
 						{
-							Image: &containerImage,
-							Name:  &name,
+							Image: containerImage,
+							Name:  name,
 						},
 					},
 				},
@@ -244,27 +245,27 @@ func TestEmitEvent(t *testing.T) {
 			Message: "Test pod without host",
 			Flag:    "start",
 			Pod: &v1.Pod{
-				Metadata: &metav1.ObjectMeta{
-					Name:        &name,
-					Uid:         &uid,
-					Namespace:   &namespace,
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: &v1.PodStatus{
-					ContainerStatuses: []*kubernetes.PodContainerStatus{
+				Status: v1.PodStatus{
+					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name:        &name,
-							ContainerID: &containerID,
+							Name:        name,
+							ContainerID: containerID,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &node,
-					Containers: []*kubernetes.Container{
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
 						{
-							Image: &containerImage,
-							Name:  &name,
+							Image: containerImage,
+							Name:  name,
 						},
 					},
 				},
@@ -275,27 +276,27 @@ func TestEmitEvent(t *testing.T) {
 			Message: "Test pod without container id",
 			Flag:    "start",
 			Pod: &v1.Pod{
-				Metadata: &metav1.ObjectMeta{
-					Name:        &name,
-					Uid:         &uid,
-					Namespace:   &namespace,
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: &v1.PodStatus{
-					PodIP: &podIP,
-					ContainerStatuses: []*kubernetes.PodContainerStatus{
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name: &name,
+							Name: name,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &node,
-					Containers: []*kubernetes.Container{
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
 						{
-							Image: &containerImage,
-							Name:  &name,
+							Image: containerImage,
+							Name:  name,
 						},
 					},
 				},
@@ -306,26 +307,26 @@ func TestEmitEvent(t *testing.T) {
 			Message: "Test stop pod without host",
 			Flag:    "stop",
 			Pod: &v1.Pod{
-				Metadata: &metav1.ObjectMeta{
-					Name:        &name,
-					Uid:         &uid,
-					Namespace:   &namespace,
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: &v1.PodStatus{
-					ContainerStatuses: []*kubernetes.PodContainerStatus{
+				Status: v1.PodStatus{
+					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name: &name,
+							Name: name,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &node,
-					Containers: []*kubernetes.Container{
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
 						{
-							Image: &containerImage,
-							Name:  &name,
+							Image: containerImage,
+							Name:  name,
 						},
 					},
 				},
@@ -372,27 +373,27 @@ func TestEmitEvent(t *testing.T) {
 			Message: "Test stop pod without container id",
 			Flag:    "stop",
 			Pod: &v1.Pod{
-				Metadata: &metav1.ObjectMeta{
-					Name:        &name,
-					Uid:         &uid,
-					Namespace:   &namespace,
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: &v1.PodStatus{
-					PodIP: &podIP,
-					ContainerStatuses: []*kubernetes.PodContainerStatus{
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
 						{
-							Name: &name,
+							Name: name,
 						},
 					},
 				},
-				Spec: &v1.PodSpec{
-					NodeName: &node,
-					Containers: []*kubernetes.Container{
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
 						{
-							Image: &containerImage,
-							Name:  &name,
+							Image: containerImage,
+							Name:  name,
 						},
 					},
 				},

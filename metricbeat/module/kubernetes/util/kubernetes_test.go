@@ -20,8 +20,10 @@ package util
 import (
 	"testing"
 
-	v1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
@@ -104,22 +106,24 @@ type mockFuncs struct {
 }
 
 func (f *mockFuncs) update(m map[string]common.MapStr, obj kubernetes.Resource) {
+	accessor, _ := meta.Accessor(obj)
 	f.updated = obj
 	meta := common.MapStr{
 		"pod": common.MapStr{
-			"name": obj.GetMetadata().GetName(),
-			"uid":  obj.GetMetadata().GetUid(),
+			"name": accessor.GetName(),
+			"uid":  string(accessor.GetUID()),
 		},
 	}
-	for k, v := range obj.GetMetadata().Labels {
+	for k, v := range accessor.GetLabels() {
 		meta[k] = v
 	}
-	m[obj.GetMetadata().GetName()] = meta
+	m[accessor.GetName()] = meta
 }
 
 func (f *mockFuncs) delete(m map[string]common.MapStr, obj kubernetes.Resource) {
+	accessor, _ := meta.Accessor(obj)
 	f.deleted = obj
-	delete(m, obj.GetMetadata().GetName())
+	delete(m, accessor.GetName())
 }
 
 func (f *mockFuncs) index(m common.MapStr) string {
@@ -134,9 +138,9 @@ type mockResource struct {
 
 func (r *mockResource) GetMetadata() *v1.ObjectMeta {
 	return &v1.ObjectMeta{
-		Uid:       &r.uid,
-		Name:      &r.name,
-		Namespace: &r.namespace,
+		UID:       types.UID(r.uid),
+		Name:      r.name,
+		Namespace: r.namespace,
 		Labels:    r.labels,
 	}
 }
