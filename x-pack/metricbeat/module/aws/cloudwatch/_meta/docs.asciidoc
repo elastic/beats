@@ -72,7 +72,7 @@ from EBS, ELB and EC2 without tag information.
   period: 300s
   metricsets:
     - cloudwatch
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EBS
     - namespace: AWS/ELB
     - namespace: AWS/EC2
@@ -87,7 +87,7 @@ from EBS, ELB and EC2 with tags from these services.
   period: 300s
   metricsets:
     - cloudwatch
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EBS
       tags.resource_type_filter: ebs
     - namespace: AWS/ELB
@@ -97,23 +97,26 @@ from EBS, ELB and EC2 with tags from these services.
 ----
 
 With the configuration below, users will be able to collect specific cloudwatch
-metrics. For example CPUUtilization metric from EC2 instance i-123 and NetworkIn
-metric from EC2 instance i-456.
+metrics. For example CPUUtilization metric(average) from EC2 instance i-123 and NetworkIn
+metric(average) from EC2 instance i-456.
 [source,yaml]
 ----
 - module: aws
   period: 300s
   metricsets:
     - cloudwatch
-  cloudwatch_metrics:
+  metrics:
     - namespace: AWS/EC2
-      metricname: CPUUtilization
+      name: ["CPUUtilization"]
+      tags.resource_type_filter: ec2:intance
       dimensions:
         - name: InstanceId
           value: i-123
+      statistic: ["Average"]
     - namespace: AWS/EC2
-      metricname: NetworkIn
+      name: ["NetworkIn"]
       dimensions:
         - name: InstanceId
           value: i-456
+      statistic: ["Average"]
 ----
