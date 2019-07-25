@@ -1,0 +1,65 @@
+#!/usr/bin/env groovy
+pipeline {
+  agent none
+  environment {
+    REPO = 'beats'
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    GITHUB_CHECK_ITS_NAME = 'Integration Tests'
+    ITS_PIPELINE = 'beats/poc-metricbeat-tests-poc-mbp/master'
+  }
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
+    timestamps()
+    ansiColor('xterm')
+    disableResume()
+    durabilityHint('PERFORMANCE_OPTIMIZED')
+  }
+  triggers {
+    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
+  }
+  stages {
+    /**
+     Checkout the code and stash it, to use it on other stages.
+    */
+    stage('Checkout') {
+      agent { label 'linux && immutable' }
+      environment {
+        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+        HOME = "${env.WORKSPACE}"
+        GOPATH = "${env.WORKSPACE}"
+      }
+      options { skipDefaultCheckout() }
+      steps {
+        dir("${BASE_DIR}"){
+            checkout scm
+        }
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        script {
+          env.GO_VERSION = readFile("${BASE_DIR}/.go-version")
+        }
+      }
+    }
+    stage('Test') {
+      steps {
+        echo 'Do the magic as usual.'
+      }
+    }
+    stage('Integration Tests') {
+      agent none
+      when {
+        beforeAgent true
+        changeRequest()
+      }
+      steps {
+        log(level: 'INFO', text: 'Launching Async ITs')
+        build(job: env.ITS_PIPELINE, propagate: false, wait: false,
+              parameters: [string(name: 'PR', value: "${env.GIT_BASE_COMMIT} "),
+                           string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
+                           string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+                           string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
+        githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
+      }
+    }
+  }
+}
