@@ -52,6 +52,19 @@ func TestDefaultSupport_Init(t *testing.T) {
 		}
 	})
 
+	t.Run("with an empty rollover_alias", func(t *testing.T) {
+		_, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":        true,
+				"rollover_alias": "",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
+			},
+		))
+		require.Error(t, err)
+	})
+
 	t.Run("with custom config", func(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
@@ -78,7 +91,6 @@ func TestDefaultSupport_Init(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
 				"enabled":        true,
-				"name":           "test-%{[agent.version]}",
 				"rollover_alias": "alias-%{[agent.version]}",
 				"pattern":        "01",
 				"check_exists":   false,
@@ -100,7 +112,6 @@ func TestDefaultSupport_Init(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
 				"enabled":      true,
-				"name":         "test-%{[agent.version]}",
 				"pattern":      "01",
 				"check_exists": false,
 				"overwrite":    true,

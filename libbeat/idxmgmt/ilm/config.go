@@ -103,7 +103,7 @@ func (m *Mode) Unpack(in string) error {
 
 //Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
-	if &cfg.RolloverAlias == nil && cfg.Mode != ModeDisabled {
+	if cfg.RolloverAlias.IsEmpty() && cfg.Mode != ModeDisabled {
 		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")
 	}
 	return nil
