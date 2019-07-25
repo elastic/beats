@@ -30,8 +30,8 @@ type Config struct {
 
 	// AWS Specific autodiscover fields
 
-	Regions []string `config:"regions" validate:"required"`
-	aws.ConfigAWS
+	Regions   []string      `config:"regions" validate:"required"`
+	AWSConfig aws.ConfigAWS `config:",inline"`
 }
 
 func defaultConfig() *Config {

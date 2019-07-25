@@ -19,13 +19,13 @@ type watcher struct {
 	onStop      func(uuid string)
 	done        chan struct{}
 	ticker      *time.Ticker
-	interval    time.Duration
+	period      time.Duration
 	lbListeners map[string]uint64
 }
 
 func newWatcher(
 	fetcher fetcher,
-	interval time.Duration,
+	period time.Duration,
 	onStart func(uuid string, lblMap *lbListener),
 	onStop func(uuid string)) *watcher {
 	return &watcher{
@@ -33,8 +33,8 @@ func newWatcher(
 		onStart:     onStart,
 		onStop:      onStop,
 		done:        make(chan struct{}),
-		ticker:      time.NewTicker(interval),
-		interval:    interval,
+		ticker:      time.NewTicker(period),
+		period:      period,
 		lbListeners: map[string]uint64{},
 	}
 }
@@ -57,7 +57,6 @@ func (w *watcher) forever() {
 			err := w.once()
 			if err != nil {
 				logp.Err("error while fetching AWS ELBs: %s", err)
-				return
 			}
 		}
 	}
@@ -66,11 +65,12 @@ func (w *watcher) forever() {
 // once executes the watch loop a single time.
 // This is mostly useful for testing.
 func (w *watcher) once() error {
-	ctx, _ := context.WithTimeout(context.Background(), w.interval)
+	ctx, _ := context.WithTimeout(context.Background(), w.period)
 	fetchedLbls, err := w.fetcher.fetch(ctx)
 	if err != nil {
 		return err
 	}
+	logp.Info("fetched %d load balancer listeners from AWS for autodiscovery", len(fetchedLbls))
 
 	oldGen := w.gen
 	w.gen++

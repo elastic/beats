@@ -54,10 +54,10 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	var clients []elasticloadbalancingv2iface.ClientAPI
 	for _, region := range config.Regions {
 		awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
-			AccessKeyID:     config.AccessKeyID,
-			SecretAccessKey: config.SecretAccessKey,
-			SessionToken:    config.SessionToken,
-			ProfileName:     config.ProfileName,
+			AccessKeyID:     config.AWSConfig.AccessKeyID,
+			SecretAccessKey: config.AWSConfig.SecretAccessKey,
+			SessionToken:    config.AWSConfig.SessionToken,
+			ProfileName:     config.AWSConfig.ProfileName,
 		})
 		if err != nil {
 			logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)

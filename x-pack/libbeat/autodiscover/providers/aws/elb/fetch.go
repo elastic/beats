@@ -142,8 +142,11 @@ func (p *fetchRequest) fetchAllPages() {
 			logp.Debug(logSelector, "done fetching ELB pages, context cancelled")
 			return
 		default:
-			p.fetchNextPage()
-			logp.Debug(logSelector, "API page fetched")
+			if !p.fetchNextPage() {
+				logp.Debug(logSelector, "fetched all ELB pages")
+				return
+			}
+			logp.Debug(logSelector, "fetched ELB page")
 		}
 	}
 }
