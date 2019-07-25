@@ -318,7 +318,7 @@ func (h *Harvester) Stop() {
 }
 
 // onMessage processes a new message read from the reader.
-// This results in an state update and possible in an event to be send.
+// This results in a state update and possibly an event would be send.
 // A state update first updates the in memory state held by the prospector,
 // and finally sends the file.State indirectly to the registrar.
 // The events Private field is used to forward the file state update.
