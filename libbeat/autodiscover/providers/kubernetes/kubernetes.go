@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
@@ -53,20 +54,25 @@ type Provider struct {
 // AutodiscoverBuilder builds and returns an autodiscover provider
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The kubernetes autodiscover is beta")
+
+	errWrap := func(err error) error {
+		return errors.Wrap(err, "error setting up kubernetes autodiscover provider")
+	}
+
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	client, err := kubernetes.GetKubernetesClient(config.InCluster, config.KubeConfig)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	metagen, err := kubernetes.NewMetaGenerator(c)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
@@ -78,22 +84,22 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	})
 	if err != nil {
 		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	appenders, err := autodiscover.NewAppenders(config.Appenders)
 	if err != nil {
-		return nil, err
+		return nil, errWrap(err)
 	}
 
 	p := &Provider{
