@@ -3,6 +3,182 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.3.0]]
+=== Beats version 7.3.0
+https://github.com/elastic/beats/compare/v7.2.0...v7.3.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Update to ECS 1.0.1. {pull}12284[12284] {pull}12317[12317]
+- Default of output.kafka.metadata.full is set to false by now. This reduced the amount of metadata to be queried from a kafka cluster. {pull}12738[12738]
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+
+*Filebeat*
+
+- `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix typo in TLS renegotiation configuration and setting the option correctly {issue}10871[10871], {pull}12354[12354]
+- Fix queue.spool.write.flush.events config type. {pull}12080[12080]
+- Fixed Beat ID being reported by GET / API. {pull}12180[12180]
+- Add configurable bulk_flush_frequency in kafka output. {pull}12254[12254]
+- Fixed setting bulk max size in kafka output. {pull}12254[12254]
+- Add host.os.codename to fields.yml. {pull}12261[12261]
+- Fix leak in script processor when using Javascript functions in a processor chain. {pull}12600[12600]
+- Add additional nil pointer checks to Docker client code to deal with vSphere Integrated Containers {pull}12628[12628]
+- Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
+- Escape BOM on JsonReader before trying to decode line {pull}11661[11661]
+- Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
+- Fixed a crash under Windows when fetching processes information. {pull}12833[12833]
+
+*Auditbeat*
+
+- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
+- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
+- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
+- Fix formatting of config files on macOS and Windows. {pull}12148[12148]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Package dataset: Close librpm handle. {pull}12215[12215]
+- Package dataset: Auto-detect package directories. {pull}12289[12289]
+- Package dataset: Improve dpkg parsing. {pull}12325[12325]
+- System module: Start system module without host ID. {pull}12373[12373]
+- Host dataset: Fix reboot detection logic. {pull}12591[12591]
+- Add syscalls used by librpm for the system/package dataset to the default Auditbeat seccomp policy. {issue}12578[12578] {pull}12617[12617]
+- Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
+- Host dataset: Export Host fields to gob encoder. {pull}12940[12940]
+
+*Filebeat*
+
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
+- Skipping unparsable log entries from docker json reader {pull}12268[12268]
+- Parse timezone in PostgreSQL logs as part of the timestamp {pull}12338[12338]
+- Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
+- Fix timezone offset parsing in system/syslog. {pull}12529[12529]
+- When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
+- Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
+
+*Heartbeat*
+
+- Fix duplicated IPs on `mode: all` monitors. {pull}12458[12458]
+
+*Journalbeat*
+
+- Use backoff when no new events are found. {pull}11861[11861]
+- Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716]
+- Preserve host name when reading from remote journal. {pull}12714[12714]
+
+*Metricbeat*
+
+- Check permissions in system socket metricset based on capabilities. {pull}12039[12039]
+- Get process information from sockets owned by current user when system socket metricset is run without privileges. {pull}12039[12039]
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Change some field type from scaled_float to long in aws module. {pull}11982[11982]
+- Fixed RabbitMQ `queue` metricset gathering when `consumer_utilisation` is set empty at the metrics source {pull}12089[12089]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Refactored Windows perfmon metricset: replaced method to retrieve counter paths with PdhExpandWildCardPathW, separated code by responsibility, removed unused functions {pull}12212[12212]
+- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
+- Ignore prometheus metrics when their values are NaN or Inf. {pull}12084[12084] {issue}10849[10849]
+- In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12265[12265]
+- Fix an issue listing all processes when run under Windows as a non-privileged user. {issue}12301[12301] {pull}12475[12475]
+- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
+- When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+- Reuse connections in PostgreSQL metricsets. {issue}12504[12504] {pull}12603[12603]
+- PdhExpandWildCardPathW will not expand counter paths in 32 bit windows systems, workaround will use a different function.{issue}12590[12590]{pull}12622[12622]
+- Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
+- Fixed a socket leak in the postgresql module under Windows when SSL is disabled on the server. {pull}11393[11393]
+- In the elasticsearch/node_stats metricset, if xpack is enabled, make parsing of ES node load average optional as ES on Windows doesn't report load average. {pull}12866[12866]
+- Fix incoherent behaviour in redis key metricset when keyspace is specified both in host URL and key pattern {pull}12913[12913]
+- Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
+- Fix wrong uptime reporting by system/uptime metricset under Windows. {pull}12915[12915]
+
+*Packetbeat*
+
+- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add `convert` processor for converting data types of fields. {issue}8124[8124] {pull}11686[11686]
+- New `extract_array` processor. {pull}11761[11761]
+- Add number of goroutines to reported metrics. {pull}12135[12135]
+- Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
+- Processor `add_cloud_metadata` adds fields `cloud.account.id` and `cloud.image.id` for AWS EC2. {pull}12307[12307]
+- Add `decode_base64_field` processor for decoding base64 field. {pull}11914[11914]
+- Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
+- Add `decompress_gzip_field` processor. {pull}12733[12733]
+- Add `timestamp` processor for parsing time fields. {pull}12699[12699]
+- Add Oracle Tablespaces Dashboard {pull}12736[12736]
+- Add `proxy_disable` output flag to explicitly ignore proxy environment variables. {issue}11713[11713] {pull}12243[12243]
+
+*Auditbeat*
+
+- Process: Add file hash of process executable. {pull}11722[11722]
+- Socket: Add network.transport and network.community_id. {pull}12231[12231]
+- Host: Fill top-level host fields. {pull}12259[12259]
+
+*Filebeat*
+
+- Allow custom default settings with autodiscover (for example, use of CRI paths for logs). {pull}12193[12193]
+- Allow to disable hints based autodiscover default behavior (fetching all logs). {pull}12193[12193]
+- New module `panw` for Palo Alto Networks PAN-OS logs. {pull}11999[11999]
+- Add RabbitMQ module. {pull}12032[12032]
+- Add new `container` input. {pull}12162[12162]
+- Add timeouts on communication with docker daemon. {pull}12310[12310]
+- Add specific date processor to convert timezones so same pipeline can be used when convert_timezone is enabled or disabled. {pull}12253[12253]
+- Add MSSQL module {pull}12079[12079]
+- Add ISO8601 date parsing support for system module. {pull}12568[12568] {pull}12578[12579]
+- Update Kubernetes deployment manifest to use `container` input. {pull}12632[12632]
+- Add support for client addresses with port in Apache error logs {pull}12695[12695]
+- Add `google-pubsub` input type for consuming messages from a Google Cloud Pub/Sub topic subscription. {pull}12746[12746]
+- Add module for ingesting Cisco IOS logs over syslog. {pull}12748[12748]
+- Add module for ingesting Google Cloud VPC flow logs. {pull}12747[12747]
+- Report host metadata for Filebeat logs in Kubernetes. {pull}12790[12790]
+
+*Metricbeat*
+
+- Keep `etcd` followers members from reporting `leader` metricset events {pull}12004[12004]
+- Add overview dashboard to Consul module {pull}10665[10665]
+- New fields were added in the mysql/status metricset. {pull}12227[12227]
+- Add Kubernetes metricset `proxy`. {pull}12312[12312]
+- Always report Pod UID in the `pod` metricset. {pull}12345[12345]
+- Add Vsphere Virtual Machine operating system to `os` field in Vsphere virtualmachine module. {pull}12391[12391]
+- Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
+- Add CockroachDB module. {pull}12467[12467]
+- Add support for metricbeat modules based on existing modules (a.k.a. light modules) {issue}12270[12270] {pull}12465[12465]
+- Add a system/entropy metricset {pull}12450[12450]
+- Add kubernetes metricset `controllermanager` {pull}12409[12409]
+- Allow redis URL format in redis hosts config. {pull}12408[12408]
+- Add tags into ec2 metricset. {issue}[12263]12263 {pull}12372[12372]
+- Add kubernetes metricset `scheduler` {pull}12521[12521]
+- Add Kubernetes scheduler dashboard to Kubernetes module {pull}12749[12749]
+- Add `beat` module. {pull}12181[12181] {pull}12615[12615]
+- Collect tags for cloudwatch metricset in aws module. {issue}[12263]12263 {pull}12480[12480]
+- Add AWS RDS metricset. {pull}11620[11620] {issue}10054[10054]
+- Add Oracle Module {pull}11890[11890]
+- Add Kubernetes proxy dashboard to Kubernetes module {pull}12734[12734]
+- Add Kubernetes controller manager dashboard to Kubernetes module {pull}12744[12744]
+
+*Functionbeat*
+
+- Export automation templates used to create functions. {pull}11923[11923]
+- Configurable Amazon endpoint. {pull}12369[12369]
+
+==== Deprecated
+
+*Filebeat*
+
+- `postgresql.log.timestamp` field is deprecated in favour of `@timestamp`. {pull}12338[12338]
+- `docker` input is deprecated in favour `container`. {pull}12162[12162]
+
 [[release-notes-7.1.1]]
 === Beats version 7.1.1
 https://github.com/elastic/beats/compare/v7.1.0...v7.1.1[View commits]
@@ -818,7 +994,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 
 * Updates to support changes to licensing of security features.
 +
-Some Elastic Stack security features, such as encrypted communications, file and native authentication, and 
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and
 role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
 
 [[release-notes-6.7.2]]
