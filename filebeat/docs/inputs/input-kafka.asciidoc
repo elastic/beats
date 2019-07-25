@@ -1,0 +1,107 @@
+:type: kafka
+
+[id="{beatname_lc}-input-{type}"]
+=== Kafka input
+
+++++
+<titleabbrev>Kafka</titleabbrev>
+++++
+
+Use the `kafka` input to read from topics in a Kafka cluster.
+
+To configure this input, specify a list of <<hosts,`hosts`>> to use for this
+cluster, a list of <<topics,`topics`>> to track, and a <<groupid,`group_id`>>
+to connect with.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: kafka
+  hosts:
+    - kafka-broker-1:9092
+    - kafka-broker-2:9092
+  topics: ["my-topic"]
+  group_id: "filebeat"
+
+----
+
+
+[id="{beatname_lc}-input-{type}-options"]
+==== Configuration options
+
+The `kafka` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+[[hosts]]
+===== `hosts`
+
+A list of Kafka hosts (brokers) for this cluster.
+
+[float]
+[[topics]]
+===== `topics`
+
+A list of topics to read from.
+
+[float]
+[[groupid]]
+===== `group_id`
+
+The Kafka consumer group id.
+
+[float]
+===== `client_id`
+
+The Kafka client id (optional).
+
+[float]
+===== `version`
+
+The version of the Kafka protocol to use (defaults to `"1.0.0"`).
+
+[float]
+===== `initial_offset`
+
+The initial offset to start reading, either "oldest" or "newest". Defaults to
+"oldest".
+
+===== `retry_backoff`
+
+How long to wait before retrying a failed read. Default is 2s.
+
+===== `max_wait_time`
+
+How long to wait for the minimum number of input bytes while reading. Default
+is 250ms.
+
+===== `fetch`
+
+Kafka fetch settings:
+
+*`min`*:: The minimum number of bytes to wait for. Defaults to 1.
+
+*`default`*:: The default number of bytes to read per request. Defaults to 1MB.
+
+*`max`*:: The maximum number of bytes to read per request. Defaults to 0
+(no limit).
+
+===== `rebalance`
+
+Kafka rebalance settings:
+
+*`strategy`*:: Either `"range"` or `"roundrobin"`. Defaults to `"range"`.
+
+*`timeout`*:: How long to wait for an attempted rebalance. Defaults to 60s.
+
+*`max_retries`*:: How many times to retry if rebalancing fails. Defaults to 4.
+
+*`retry_backoff`*:: How long to wait after an unsuccessful rebalance attempt.
+Defaults to 2s.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:
