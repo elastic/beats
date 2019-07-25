@@ -7,7 +7,7 @@ from parameterized import parameterized
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['metricbeat']
+    COMPOSE_SERVICES = ['metricbeat', 'elasticsearch']
     FIELDS = ['beat']
     METRICSETS = ['stats', 'state']
 
