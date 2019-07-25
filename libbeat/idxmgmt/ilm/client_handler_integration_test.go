@@ -164,7 +164,7 @@ func TestESClientHandler_Alias(t *testing.T) {
 		h := newESClientHandler(t)
 
 		b, err := h.HasAlias(alias.Name)
-		assert.NoError(t, err)
+		assert.Equal(t, ilm.ErrInvalidAlias, ilm.ErrReason(err))
 		assert.False(t, b)
 
 		err = h.CreateAlias(alias)
