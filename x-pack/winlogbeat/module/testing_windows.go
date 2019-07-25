@@ -157,6 +157,8 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 // assertEqual asserts that the two objects are deeply equal. If not it will
 // error the test and output a diff of the two objects' JSON representation.
 func assertEqual(t testing.TB, expected, actual interface{}) bool {
+	t.Helper()
+	
 	if reflect.DeepEqual(expected, actual) {
 		return true
 	}
