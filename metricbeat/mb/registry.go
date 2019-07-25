@@ -324,7 +324,7 @@ func (r *Register) Modules() []string {
 		dups[mod] = true
 	}
 
-	modules := make([]string, 0, len(r.modules))
+	modules := make([]string, 0, len(dups))
 	for mod := range dups {
 		modules = append(modules, mod)
 	}
