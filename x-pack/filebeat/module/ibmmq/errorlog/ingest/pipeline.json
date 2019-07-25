@@ -114,12 +114,10 @@
             }
         }
     ],
-    "on_failure": [
-        {
-            "set": {
-                "field": "_index",
-                "value": "failed-{{ _index }}"
-            }
-        }
-    ]
+    "on_failure" : [{
+      "set" : {
+        "field" : "error.message",
+        "value" : "pipeline-entry: {{ _ingest.on_failure_message }}"
+      }
+    }]
 }
