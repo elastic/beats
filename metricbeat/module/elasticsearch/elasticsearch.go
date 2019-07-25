@@ -112,15 +112,17 @@ type NodeInfo struct {
 
 // License contains data about the Elasticsearch license
 type License struct {
-	Status            string    `json:"status"`
-	ID                string    `json:"uid"`
-	Type              string    `json:"type"`
-	IssueDate         time.Time `json:"issue_date"`
-	IssueDateInMillis int       `json:"issue_date_in_millis"`
-	MaxNodes          int       `json:"max_nodes"`
-	IssuedTo          string    `json:"issued_to"`
-	Issuer            string    `json:"issuer"`
-	StartDateInMillis int       `json:"start_date_in_millis"`
+	Status             string     `json:"status"`
+	ID                 string     `json:"uid"`
+	Type               string     `json:"type"`
+	IssueDate          *time.Time `json:"issue_date"`
+	IssueDateInMillis  int        `json:"issue_date_in_millis"`
+	ExpiryDate         *time.Time `json:"expiry_date,omitempty"`
+	ExpiryDateInMillis int        `json:"expiry_date_in_millis,omitempty"`
+	MaxNodes           int        `json:"max_nodes"`
+	IssuedTo           string     `json:"issued_to"`
+	Issuer             string     `json:"issuer"`
+	StartDateInMillis  int        `json:"start_date_in_millis"`
 }
 
 type licenseWrapper struct {
