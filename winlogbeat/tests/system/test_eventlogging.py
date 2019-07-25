@@ -172,7 +172,7 @@ class Test(WriteReadTest):
             ]
         )
         self.start_beat().check_wait(exit_code=1)
-        assert self.log_contains("4 errors: Invalid event log key")
+        assert self.log_contains("4 errors: invalid event log key")
 
     def test_utf16_characters(self):
         """
