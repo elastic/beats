@@ -314,8 +314,16 @@ func (r *Register) Modules() []string {
 		sourceModules, err := source.Modules()
 		if err != nil {
 			logp.L().Errorf("failed to get modules from secondary source: %s", err)
+		} else {
+			for _, module := range sourceModules {
+				if _, ok := dups[module]; ok {
+					continue
+				}
+				dups[module] = true
+				modules = append(modules, module)
+			}
 		}
-		modules = append(modules, sourceModules...)
+
 	}
 
 	// Grab a more comprehensive list from the metricset keys, then reduce and merge
