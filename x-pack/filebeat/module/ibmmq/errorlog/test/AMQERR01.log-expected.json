@@ -1,15 +1,86 @@
 [
     {
-        "@timestamp": "2018-10-11T08:46:25.924Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ7125I",
+        "@timestamp": "2018-10-11T08:39:30.731Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Host-Info :- Windows 10 Professional x64 Edition, Build 17134 (MQ Windows (x64 platform) 64-bit) Installation :- C:\\Program Files\\IBM\\MQ (Installation1) Version :- 9.1.0.0 (p910-L180709.TRIAL) AKTION: Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ6287I",
+        "ibmmq.errorlog.commentinsert": [
+            "Windows 10 Professional x64 Edition, Build 17134 (MQ Windows (x64 platform) 64-bit)",
+            "C:\\\\Program Files\\\\IBM\\\\MQ (Installation1)",
+            "9.1.0.0 (p910-L180709.TRIAL)"
+        ],
+        "ibmmq.errorlog.explanation": "Systeminformationen zu IBM",
+        "ibmmq.errorlog.installation": "Installation1",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 0,
+        "message": "IBM MQ V9.1.0.0 (p910-L180709.TRIAL).",
+        "process.pid": "9884.1",
+        "process.title": "setmqinst.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-11T08:39:30.729Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Sie m\ufffdssen das Betriebssystem erneut starten, um die Aktualisierung fertigzustellen.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ8576I",
+        "ibmmq.errorlog.commentinsert": [
+            "Installation1",
+            "C:\\\\Program Files\\\\IBM\\\\MQ",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Alle Tasks, die zur Festlegung der Installation 'Installation1' als prim\ufffdre Installation erforderlich sind, wurden ausgef\ufffdhrt. Wenn die Installation noch nicht als prim\ufffdre Installation festgelegt wurde, dann wurde auch die Konfiguration der Installation aktualisiert, um die Installation 'Installation1' als prim\ufffdre Installation zu identifizieren. Damit die Aktualisierungen systemweit wirksam werden, m\ufffdssen Sie das Betriebssystem erneut starten.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 849,
+        "message": "'Installation1' (C:\\Program Files\\IBM\\MQ) als prim\ufffdre Installation festgelegt. Sie m\ufffdssen das Betriebssystem erneut starten, um die Aktualisierung fertigzustellen.",
+        "process.pid": "9884.1",
+        "process.title": "setmqinst.exe",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-11T10:46:25.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "90",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "90",
-        "ibmmq.errorlog.errordescription": "There are 90 days left in the trial period for this copy of IBM MQ.",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -17,7 +88,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 2025,
+        "log.offset": 2045,
+        "message": "There are 90 days left in the trial period for this copy of IBM MQ.",
         "process.pid": "16776.1",
         "process.title": "strmqm.exe",
         "service.type": "ibmmq",
@@ -25,15 +97,22 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-11T08:46:26.343Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6776E",
+        "@timestamp": "2018-10-11T10:46:26.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
-        "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ6776E",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -41,7 +120,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 2569,
+        "log.offset": 2589,
+        "message": "Queue manager recovery log not correctly configured for advanced format disk.",
         "process.pid": "8480.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",
@@ -49,17 +129,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-11T08:46:26.346Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6184W",
+        "@timestamp": "2018-10-11T10:46:26.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
+        "ibmmq.errorlog.arithinsert": [
+            "8480",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "8480",
-        "ibmmq.errorlog.commentinsert1": "QM1",
-        "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
+        "ibmmq.errorlog.code": "AMQ6184W",
+        "ibmmq.errorlog.commentinsert": [
+            "QM1",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 8480.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -67,7 +153,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 3932,
+        "log.offset": 3952,
+        "message": "An internal IBM MQ error has occurred on queue manager QM1.",
         "process.pid": "8480.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",
@@ -75,16 +162,122 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-28T14:12:07.685Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ7125I",
+        "@timestamp": "2018-10-17T11:50:15.982Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "84",
+            ""
+        ],
+        "ibmmq.errorlog.arithinsert1": "84",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Dieses Exemplar von IBM MQ wurde nur f\ufffdr einen begrenzten Zeitraum lizenziert.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 5058,
+        "message": "Der Testzeitraum f\ufffdr dieses Exemplar von IBM MQ l\ufffduft in 84 Tag(en) ab.",
+        "process.pid": "39420.1",
+        "process.title": "CRTMQM.EXE",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-17T11:50:18.439Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "84",
+            ""
+        ],
+        "ibmmq.errorlog.arithinsert1": "84",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Dieses Exemplar von IBM MQ wurde nur f\ufffdr einen begrenzten Zeitraum lizenziert.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 5626,
+        "message": "Der Testzeitraum f\ufffdr dieses Exemplar von IBM MQ l\ufffduft in 84 Tag(en) ab.",
+        "process.pid": "34720.1",
+        "process.title": "STRMQM.EXE",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-18T14:13:58.401Z",
+        "event.dataset": "ibmmq.errorlog",
+        "event.module": "ibmmq",
+        "fileset.name": "errorlog",
+        "host.hostname": "FELIX-ELASTIC",
+        "ibmmq.errorlog.action": "Keine.",
+        "ibmmq.errorlog.arithinsert": [
+            "83",
+            ""
+        ],
+        "ibmmq.errorlog.arithinsert1": "83",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.explanation": "Dieses Exemplar von IBM MQ wurde nur f\ufffdr einen begrenzten Zeitraum lizenziert.",
+        "ibmmq.errorlog.installation": "Installation1",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "",
+        "log.offset": 6194,
+        "message": "Der Testzeitraum f\ufffdr dieses Exemplar von IBM MQ l\ufffduft in 83 Tag(en) ab.",
+        "process.pid": "28832.1",
+        "process.title": "STRMQM.EXE",
+        "service.type": "ibmmq",
+        "service.version": "9.1.0.0",
+        "user.name": "felix"
+    },
+    {
+        "@timestamp": "2018-10-28T15:12:07.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "73",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "73",
-        "ibmmq.errorlog.errordescription": "There are 73 days left in the trial period for this copy of IBM MQ.",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -92,7 +285,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 6718,
+        "log.offset": 6762,
+        "message": "There are 73 days left in the trial period for this copy of IBM MQ.",
         "process.pid": "7160.1",
         "process.title": "strmqm.exe",
         "service.type": "ibmmq",
@@ -100,16 +294,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-28T14:12:07.789Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ7125I",
+        "@timestamp": "2018-10-28T15:12:07.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "73",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "73",
-        "ibmmq.errorlog.errordescription": "There are 73 days left in the trial period for this copy of IBM MQ.",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -117,7 +318,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 7261,
+        "log.offset": 7305,
+        "message": "There are 73 days left in the trial period for this copy of IBM MQ.",
         "process.pid": "7144.1",
         "process.title": "strmqm.exe",
         "service.type": "ibmmq",
@@ -125,15 +327,22 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-28T14:12:08.663Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6776E",
+        "@timestamp": "2018-10-28T15:12:08.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
-        "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ6776E",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -141,7 +350,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 7804,
+        "log.offset": 7848,
+        "message": "Queue manager recovery log not correctly configured for advanced format disk.",
         "process.pid": "7360.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",
@@ -149,17 +359,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-28T14:12:08.665Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6184W",
+        "@timestamp": "2018-10-28T15:12:08.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
+        "ibmmq.errorlog.arithinsert": [
+            "7360",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "7360",
-        "ibmmq.errorlog.commentinsert1": "QM1",
-        "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
+        "ibmmq.errorlog.code": "AMQ6184W",
+        "ibmmq.errorlog.commentinsert": [
+            "QM1",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 7360.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -167,7 +383,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 9167,
+        "log.offset": 9211,
+        "message": "An internal IBM MQ error has occurred on queue manager QM1.",
         "process.pid": "7360.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",
@@ -175,16 +392,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:48:52.594Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ7125I",
+        "@timestamp": "2018-10-29T16:48:52.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "71",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "71",
-        "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -192,7 +416,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 10273,
+        "log.offset": 10317,
+        "message": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "process.pid": "7356.1",
         "process.title": "strmqm.exe",
         "service.type": "ibmmq",
@@ -200,16 +425,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:48:52.663Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ7125I",
+        "@timestamp": "2018-10-29T16:48:52.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "71",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "71",
-        "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -217,7 +449,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 10816,
+        "log.offset": 10860,
+        "message": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "process.pid": "7364.1",
         "process.title": "strmqm.exe",
         "service.type": "ibmmq",
@@ -225,15 +458,22 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:48:53.368Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6776E",
+        "@timestamp": "2018-10-29T16:48:53.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
-        "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ6776E",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -241,7 +481,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 11359,
+        "log.offset": 11403,
+        "message": "Queue manager recovery log not correctly configured for advanced format disk.",
         "process.pid": "7660.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",
@@ -249,17 +490,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:48:53.369Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6184W",
+        "@timestamp": "2018-10-29T16:48:53.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
+        "ibmmq.errorlog.arithinsert": [
+            "7660",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "7660",
-        "ibmmq.errorlog.commentinsert1": "QM1",
-        "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
+        "ibmmq.errorlog.code": "AMQ6184W",
+        "ibmmq.errorlog.commentinsert": [
+            "QM1",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 7660.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -267,7 +514,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 12722,
+        "log.offset": 12766,
+        "message": "An internal IBM MQ error has occurred on queue manager QM1.",
         "process.pid": "7660.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",
@@ -275,16 +523,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:49:35.477Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ7125I",
+        "@timestamp": "2018-10-29T16:49:35.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "71",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "71",
-        "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -292,7 +547,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 13828,
+        "log.offset": 13872,
+        "message": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "process.pid": "7032.1",
         "process.title": "strmqm.exe",
         "service.type": "ibmmq",
@@ -300,16 +556,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:49:35.553Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ7125I",
+        "@timestamp": "2018-10-29T16:49:35.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
+        "ibmmq.errorlog.arithinsert": [
+            "71",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "71",
-        "ibmmq.errorlog.errordescription": "There are 71 days left in the trial period for this copy of IBM MQ.",
+        "ibmmq.errorlog.code": "AMQ7125I",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "This copy of IBM MQ is licensed for a limited period only.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -317,7 +580,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 14371,
+        "log.offset": 14415,
+        "message": "There are 71 days left in the trial period for this copy of IBM MQ.",
         "process.pid": "6984.1",
         "process.title": "strmqm.exe",
         "service.type": "ibmmq",
@@ -325,15 +589,22 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:49:36.447Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6776E",
+        "@timestamp": "2018-10-29T16:49:36.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "MQ has only supported placing the recovery log on an advanced format disk since MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to migrate a pre-existing queue manager recovery log to a format suitable for advanced format disks. Any queue manager created on a version of V9.0.4 or higher will have been created with a recovery log suitable for advanced format disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG command, to a format suitable for the current log location.",
-        "ibmmq.errorlog.errordescription": "Queue manager recovery log not correctly configured for advanced format disk.",
+        "ibmmq.errorlog.arithinsert": [
+            "",
+            ""
+        ],
+        "ibmmq.errorlog.code": "AMQ6776E",
+        "ibmmq.errorlog.commentinsert": [
+            "",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "The queue manager recovery log is located on an advanced format disk, however the recovery log is not configured correctly to provide full write integrity with advanced format disks. Advanced format disks require 4KB alignment for reliable writing, but the current queue manager was created at an MQ version that did not yet support advanced format disks and did not enforce 4KB alignment.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -341,7 +612,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 14914,
+        "log.offset": 14958,
+        "message": "Queue manager recovery log not correctly configured for advanced format disk.",
         "process.pid": "6780.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",
@@ -349,17 +621,23 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T15:49:36.448Z",
-        "ecs.version": "1.0.0",
-        "error.id": "AMQ6184W",
+        "@timestamp": "2018-10-29T16:49:36.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.module": "ibmmq",
         "fileset.name": "errorlog",
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
+        "ibmmq.errorlog.arithinsert": [
+            "6780",
+            ""
+        ],
         "ibmmq.errorlog.arithinsert1": "6780",
-        "ibmmq.errorlog.commentinsert1": "QM1",
-        "ibmmq.errorlog.errordescription": "An internal IBM MQ error has occurred on queue manager QM1.",
+        "ibmmq.errorlog.code": "AMQ6184W",
+        "ibmmq.errorlog.commentinsert": [
+            "QM1",
+            "",
+            ""
+        ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 6780.",
         "ibmmq.errorlog.installation": "Installation1",
         "input.type": "log",
@@ -367,7 +645,8 @@
             "multiline"
         ],
         "log.level": "",
-        "log.offset": 16277,
+        "log.offset": 16321,
+        "message": "An internal IBM MQ error has occurred on queue manager QM1.",
         "process.pid": "6780.1",
         "process.title": "amqzxma0.exe",
         "service.type": "ibmmq",

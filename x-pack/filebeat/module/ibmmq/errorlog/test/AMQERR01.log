@@ -8,7 +8,7 @@
                      
 AMQ6287I: IBM MQ V9.1.0.0 (p910-L180709.TRIAL).
 
-ERKLRUNG:
+ERKLï¿½RUNG:
 Systeminformationen zu IBM MQ: 
 Host-Info         :- Windows 10 Professional x64 Edition, Build 17134 (MQ
 Windows (x64 platform) 64-bit) 
@@ -24,21 +24,21 @@ Keine.
                       CommentInsert1(Installation1)
                       CommentInsert2(C:\Program Files\IBM\MQ)
                      
-AMQ8576I: 'Installation1' (C:\Program Files\IBM\MQ) als primÈre Installation
-festgelegt. Sie mÍssen das Betriebssystem erneut starten, um die Aktualisierung
+AMQ8576I: 'Installation1' (C:\Program Files\IBM\MQ) als primï¿½re Installation
+festgelegt. Sie mï¿½ssen das Betriebssystem erneut starten, um die Aktualisierung
 fertigzustellen.
 
-ERKLRUNG:
-Alle Tasks, die zur Festlegung der Installation 'Installation1' als primÈre
-Installation erforderlich sind, wurden ausgefÍhrt. Wenn die Installation noch
-nicht als primÈre Installation festgelegt wurde, dann wurde auch die
+ERKLï¿½RUNG:
+Alle Tasks, die zur Festlegung der Installation 'Installation1' als primï¿½re
+Installation erforderlich sind, wurden ausgefï¿½hrt. Wenn die Installation noch
+nicht als primï¿½re Installation festgelegt wurde, dann wurde auch die
 Konfiguration der Installation aktualisiert, um die Installation
-'Installation1' als primÈre Installation zu identifizieren. 
+'Installation1' als primï¿½re Installation zu identifizieren. 
 
-Damit die Aktualisierungen systemweit wirksam werden, mÍssen Sie das
+Damit die Aktualisierungen systemweit wirksam werden, mï¿½ssen Sie das
 Betriebssystem erneut starten.
 AKTION:
-Sie mÍssen das Betriebssystem erneut starten, um die Aktualisierung
+Sie mï¿½ssen das Betriebssystem erneut starten, um die Aktualisierung
 fertigzustellen. 
 ----- amqiprm0.c : 402 --------------------------------------------------------
 11/10/2018 10:46:25 - Process(16776.1) User(MUSR_MQADMIN) Program(strmqm.exe)
@@ -105,11 +105,11 @@ resolved.
                       Time(2018-10-17T11:50:15.982Z)
                       ArithInsert1(84)
                      
-AMQ7125I: Der Testzeitraum fr dieses Exemplar von IBM MQ l„uft in 84 Tag(en)
+AMQ7125I: Der Testzeitraum fï¿½r dieses Exemplar von IBM MQ lï¿½uft in 84 Tag(en)
 ab.
 
-ERKLRUNG:
-Dieses Exemplar von IBM MQ wurde nur fr einen begrenzten Zeitraum lizenziert.
+ERKLï¿½RUNG:
+Dieses Exemplar von IBM MQ wurde nur fï¿½r einen begrenzten Zeitraum lizenziert.
 AKTION:
 Keine. 
 ----- amqzlic0.c : 435 --------------------------------------------------------
@@ -119,11 +119,11 @@ Keine.
                       Time(2018-10-17T11:50:18.439Z)
                       ArithInsert1(84)
                      
-AMQ7125I: Der Testzeitraum fr dieses Exemplar von IBM MQ l„uft in 84 Tag(en)
+AMQ7125I: Der Testzeitraum fï¿½r dieses Exemplar von IBM MQ lï¿½uft in 84 Tag(en)
 ab.
 
-ERKLRUNG:
-Dieses Exemplar von IBM MQ wurde nur fr einen begrenzten Zeitraum lizenziert.
+ERKLï¿½RUNG:
+Dieses Exemplar von IBM MQ wurde nur fï¿½r einen begrenzten Zeitraum lizenziert.
 AKTION:
 Keine. 
 ----- amqzlic0.c : 435 --------------------------------------------------------
@@ -133,11 +133,11 @@ Keine.
                       Time(2018-10-18T14:13:58.401Z)
                       ArithInsert1(83)
                      
-AMQ7125I: Der Testzeitraum fr dieses Exemplar von IBM MQ l„uft in 83 Tag(en)
+AMQ7125I: Der Testzeitraum fï¿½r dieses Exemplar von IBM MQ lï¿½uft in 83 Tag(en)
 ab.
 
-ERKLRUNG:
-Dieses Exemplar von IBM MQ wurde nur fr einen begrenzten Zeitraum lizenziert.
+ERKLï¿½RUNG:
+Dieses Exemplar von IBM MQ wurde nur fï¿½r einen begrenzten Zeitraum lizenziert.
 AKTION:
 Keine. 
 ----- amqzlic0.c : 435 --------------------------------------------------------

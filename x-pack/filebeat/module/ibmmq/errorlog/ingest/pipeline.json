@@ -45,7 +45,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "Process\\(%{DATA:process.pid}\\) User\\(%{WORD:user.name}\\) Program\\(%{DATA:process.title}\\) Host\\(%{DATA:host.hostname}\\) Installation\\(%{WORD:ibmmq.errorlog.installation}\\) VRMF\\(%{DATA:service.version}\\)( QMgr\\(%{DATA:ibmmq.errorlog.qmgr}\\))?( Time\\(%{TIMESTAMP_ISO8601:@timestamp}\\))?( RemoteHost\\(%{DATA:destination.address}\\))?( ArithInsert1\\(%{DATA:ibmmq.errorlog.arithinsert1}\\))?( ArithInsert2\\(%{DATA:ibmmq.errorlog.arithinsert2}\\))?( CommentInsert1\\(%{DATA:ibmmq.errorlog.commentinsert1}\\))?( CommentInsert2\\(%{DATA:ibmmq.errorlog.commentinsert2}\\))?( CommentInsert3\\(%{DATA:ibmmq.errorlog.commentinsert3}\\))? (?=AMQ[0-9]{4})%{DATA:ibmmq.errorlog.code}((?<=AMQ[0-9]{4}[A-Z])%{DATA:log.level})?: %{DATA:ibmmq.errorlog.errordescription} EXPLANATION: %{DATA:ibmmq.errorlog.explanation} ACTION: %{DATA:ibmmq.errorlog.action}$"
+                    "Process\\(%{DATA:process.pid}\\) User\\(%{WORD:user.name}\\) Program\\(%{DATA:process.title}\\) Host\\(%{DATA:host.hostname}\\) Installation\\(%{WORD:ibmmq.errorlog.installation}\\) VRMF\\(%{DATA:service.version}\\)( QMgr\\(%{DATA:ibmmq.errorlog.qmgr}\\))?( Time\\(%{TIMESTAMP_ISO8601:@timestamp}\\))?( RemoteHost\\(%{DATA:destination.address}\\))?( ArithInsert1\\(%{DATA:ibmmq.errorlog.arithinsert1}\\))?( ArithInsert2\\(%{DATA:ibmmq.errorlog.arithinsert2}\\))?( CommentInsert1\\(%{DATA:ibmmq.errorlog.commentinsert1}\\))?( CommentInsert2\\(%{DATA:ibmmq.errorlog.commentinsert2}\\))?( CommentInsert3\\(%{DATA:ibmmq.errorlog.commentinsert3}\\))? (?=AMQ[0-9]{4})%{DATA:ibmmq.errorlog.code}((?<=AMQ[0-9]{4}[A-Z])%{DATA:log.level})?: %{DATA:ibmmq.errorlog.errordescription} [^\\ ]+:( %{DATA:ibmmq.errorlog.explanation})? [^\\ ]+:( %{DATA:ibmmq.errorlog.action})?$"
                 ]
             }
         },
@@ -53,7 +53,8 @@
             "date": {
                 "field": "log_timestamp",
                 "target_field": "@timestamp",
-                "formats": ["MM/dd/yyyy hh:mm:ss aa", "dd/MM/yyyy HH:mm:ss"]
+                "formats": ["MM/dd/yyyy hh:mm:ss aa", "dd/MM/yyyy HH:mm:ss"],
+                "ignore_failure": true
             }
         },
         {
@@ -64,7 +65,7 @@
                     "{{ibmmq.errorlog.commentinsert2}}",
                     "{{ibmmq.errorlog.commentinsert3}}"
                 ],
-            "ignore_failure" : true
+                "ignore_failure" : true
             }
         },
         {
@@ -74,7 +75,7 @@
                     "{{ibmmq.errorlog.arithinsert1}}",
                     "{{ibmmq.errorlog.arithinsert2}}"
                 ],
-            "ignore_failure" : true
+                "ignore_failure" : true
             }
         },
         {
@@ -88,7 +89,7 @@
                     "ibmmq.errorlog.arithinsert1",
                     "ibmmq.errorlog.arithinsert2"
                 ],
-            "ignore_failure" : true
+                "ignore_failure" : true
             }
         },
         {
