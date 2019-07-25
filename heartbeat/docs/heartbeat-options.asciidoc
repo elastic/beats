@@ -389,6 +389,15 @@ Example configuration:
 The HTTP proxy URL. This setting is optional.
 
 [float]
+[[monitor-http-max-redirects]]
+==== `max_redirects`
+
+The total number of redirections Heartbeat will follow. 
+If you set it to 0 (zero), Heartbeat will receive the redirect response and not follow it.
+
+For example, you can check for a 302 response (`check.response.status: 302`) if you set `max_redirects: 0`
+
+[float]
 [[monitor-http-username]]
 ==== `username`
 
