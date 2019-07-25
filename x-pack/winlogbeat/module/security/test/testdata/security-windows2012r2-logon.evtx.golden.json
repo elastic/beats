@@ -59,7 +59,7 @@
           "id": 536
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1535,
       "task": "Logon",
@@ -126,7 +126,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1538,
       "task": "Logon",
@@ -196,7 +196,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1542,
       "task": "Logon",
@@ -263,7 +263,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1545,
       "task": "Logon",
@@ -330,7 +330,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1547,
       "task": "Logon",
@@ -397,7 +397,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1550,
       "task": "Logon",
@@ -464,7 +464,7 @@
           "id": 548
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1553,
       "task": "Logon",
@@ -531,7 +531,7 @@
           "id": 548
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1556,
       "task": "Logon",
@@ -601,7 +601,7 @@
           "id": 808
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1561,
       "task": "Logon",
@@ -668,7 +668,7 @@
           "id": 548
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1563,
       "task": "Logon",
@@ -738,7 +738,7 @@
           "id": 808
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1567,
       "task": "Logon",
@@ -805,7 +805,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1570,
       "task": "Logon",
@@ -872,7 +872,7 @@
           "id": 1132
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1574,
       "task": "Logon",
@@ -939,7 +939,7 @@
           "id": 1132
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1576,
       "task": "Logon",
@@ -1006,7 +1006,7 @@
           "id": 504
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1578,
       "task": "Logon",
@@ -1073,7 +1073,7 @@
           "id": 1132
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1581,
       "task": "Logon",
@@ -1140,7 +1140,7 @@
           "id": 344
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1583,
       "task": "Logon",
@@ -1210,7 +1210,7 @@
           "id": 2756
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1585,
       "task": "Logon"
