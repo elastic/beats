@@ -203,7 +203,10 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	return w, nil
 }
 
+// enqueue takes the most recent object that was received, figures out the namespace/name of the object
+// and adds it to the work queue for processing.
 func (w *watcher) enqueue(obj interface{}, state string) {
+	// DeletionHandlingMetaNamespaceKeyFunc that we get a key only if the resource's state is not Unknown.
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
 		return
@@ -212,6 +215,7 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	w.queue.Add(&item{key, state})
 }
 
+// AddEventHandler adds a resource handler to process each request that is coming into the watcher
 func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 	w.handler = h
 }
@@ -236,6 +240,7 @@ func (w *watcher) Start() error {
 	return nil
 }
 
+// process gets the top of the work queue and processes the object that is received.
 func (w *watcher) process(ctx context.Context) bool {
 	keyObj, quit := w.queue.Get()
 	if quit {
@@ -256,6 +261,7 @@ func (w *watcher) process(ctx context.Context) bool {
 		key := entry.object.(string)
 
 		o, exists, err := w.store.GetByKey(key)
+		fmt.Println(o)
 		if err != nil {
 			return nil
 		}

@@ -49,6 +49,15 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	return client, nil
 }
 
+// IsInCluster takes a kubeconfig file path as input and deduces if Beats is running in cluster or not.
+func IsInCluster(kubeconfig string) bool {
+	if kubeconfig == "" {
+		return true
+	}
+
+	return false
+}
+
 // DiscoverKubernetesNode figures out the Kubernetes node to use.
 // If host is provided in the config use it directly.
 // If beat is deployed in k8s cluster, use hostname of pod which is pod name to query pod meta for node name.

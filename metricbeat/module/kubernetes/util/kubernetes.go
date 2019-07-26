@@ -90,7 +90,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 
 	// Watch objects in the node only
 	if nodeScope {
-		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
+		options.Node = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 	}
 
 	return kubernetes.NewWatcher(client, resource, options)
