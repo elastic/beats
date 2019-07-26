@@ -146,6 +146,26 @@ class TestCommandSetupIndexManagement(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
+    def test_setup_rollover_alias_with_fieldref(self):
+        """
+        Test setup --index-management when ilm.rollover_alias is configured and using field reference.
+        """
+        aliasFieldRef = "%{[agent.name]}-myalias"
+        self.render_config()
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.cmd,
+                                              "-E", "setup.ilm.rollover_alias=" + aliasFieldRef])
+
+        self.custom_alias = self.beat_name + "-myalias"
+
+        assert exit_code == 0
+        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
+        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
+        self.idxmgmt.assert_alias_created(self.custom_alias)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
     def test_setup_template_name_and_pattern(self):
         """
         Test setup --index-management ignores template.name and template.pattern when ilm is enabled
