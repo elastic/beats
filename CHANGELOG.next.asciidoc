@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add read_buffer configuration option. {pull}11739[11739]
 - `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
+- Fix a race condition in the TCP input when close the client socket. {pull}13038[13038]
 
 *Heartbeat*
 
@@ -39,6 +40,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
+- Add statistic option into cloudwatch metricset. If there is no statistic method specified, default is to collect Average, Sum, Maximum, Minimum and SampleCount. {issue}12370[12370] {pull}12840[12840]
 
 *Packetbeat*
 
@@ -291,6 +293,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Oracle Tablespaces Dashboard {pull}12736[12736]
 - Collect client provided name for rabbitmq connection. {issue}12851[12851] {pull}12852[12852]
 - Add support to load default aws config file to get credentials. {pull}12727[12727] {issue}12708[12708]
+- Add statistic option into cloudwatch metricset. {issue}12370[12370] {pull}12840[12840]
 
 *Packetbeat*
 
@@ -305,6 +308,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for reading from .evtx files. {issue}4450[4450]
 - Add support for event ID 4634 and 4647 to the Security module. {pull}12906[12906]
 - Add `network.community_id` to Sysmon network events (event ID 3). {pull}13034[13034]
+- Add `event.module` to Winlogbeat modules. {pull}13047[13047]
+- Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
 
 ==== Deprecated
 

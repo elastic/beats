@@ -47,7 +47,7 @@ func (r *RunnerFactory) Create(
 	c *common.Config,
 	meta *common.MapStrPointer,
 ) (cfgfile.Runner, error) {
-	connector := channel.ConnectTo(pipeline, r.outlet)
+	connector := r.outlet(pipeline)
 	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), meta)
 	if err != nil {
 		// In case of error with loading state, input is still returned

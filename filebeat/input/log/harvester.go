@@ -48,7 +48,6 @@ import (
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/reader"
 	"github.com/elastic/beats/libbeat/reader/debug"
 	"github.com/elastic/beats/libbeat/reader/multiline"
@@ -99,7 +98,7 @@ type Harvester struct {
 
 	// event/state publishing
 	outletFactory OutletFactory
-	publishState  func(*util.Data) bool
+	publishState  func(file.State) bool
 
 	onTerminate func()
 }
@@ -109,7 +108,7 @@ func NewHarvester(
 	config *common.Config,
 	state file.State,
 	states *file.States,
-	publishState func(*util.Data) bool,
+	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
 
@@ -231,7 +230,6 @@ func (h *Harvester) Run() error {
 	// Closes reader after timeout or when done channel is closed
 	// This routine is also responsible to properly stop the reader
 	go func(source string) {
-
 		closeTimeout := make(<-chan time.Time)
 		// starts close_timeout timer
 		if h.config.CloseTimeout > 0 {
@@ -293,56 +291,8 @@ func (h *Harvester) Run() error {
 		startingOffset := state.Offset
 		state.Offset += int64(message.Bytes)
 
-		// Create state event
-		data := util.NewData()
-		if h.source.HasState() {
-			data.SetState(state)
-		}
-
-		text := string(message.Content)
-
-		// Check if data should be added to event. Only export non empty events.
-		if !message.IsEmpty() && h.shouldExportLine(text) {
-			fields := common.MapStr{
-				"log": common.MapStr{
-					"offset": startingOffset, // Offset here is the offset before the starting char.
-					"file": common.MapStr{
-						"path": state.Source,
-					},
-				},
-			}
-			fields.DeepUpdate(message.Fields)
-
-			// Check if json fields exist
-			var jsonFields common.MapStr
-			if f, ok := fields["json"]; ok {
-				jsonFields = f.(common.MapStr)
-			}
-
-			data.Event = beat.Event{
-				Timestamp: message.Ts,
-			}
-
-			if h.config.JSON != nil && len(jsonFields) > 0 {
-				ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
-				if !ts.IsZero() {
-					// there was a `@timestamp` key in the event, so overwrite
-					// the resulting timestamp
-					data.Event.Timestamp = ts
-				}
-			} else if &text != nil {
-				if fields == nil {
-					fields = common.MapStr{}
-				}
-				fields["message"] = text
-			}
-
-			data.Event.Fields = fields
-		}
-
-		// Always send event to update state, also if lines was skipped
 		// Stop harvester in case of an error
-		if !h.sendEvent(data, forwarder) {
+		if !h.onMessage(forwarder, state, message, startingOffset) {
 			return nil
 		}
 
@@ -367,14 +317,70 @@ func (h *Harvester) Stop() {
 	h.stopLock.Unlock()
 }
 
-// sendEvent sends event to the spooler channel
-// Return false if event was not sent
-func (h *Harvester) sendEvent(data *util.Data, forwarder *harvester.Forwarder) bool {
+// onMessage processes a new message read from the reader.
+// This results in a state update and possibly an event would be send.
+// A state update first updates the in memory state held by the prospector,
+// and finally sends the file.State indirectly to the registrar.
+// The events Private field is used to forward the file state update.
+//
+// onMessage returns 'false' if it was interrupted in the process of sending the event.
+// This normally signals a harvester shutdown.
+func (h *Harvester) onMessage(
+	forwarder *harvester.Forwarder,
+	state file.State,
+	message reader.Message,
+	messageOffset int64,
+) bool {
 	if h.source.HasState() {
-		h.states.Update(data.GetState())
+		h.states.Update(state)
 	}
 
-	err := forwarder.Send(data)
+	text := string(message.Content)
+	if message.IsEmpty() || !h.shouldExportLine(text) {
+		// No data or event is filtered out -> send empty event with state update
+		// only. The call can fail on filebeat shutdown.
+		// The event will be filtered out, but forwarded to the registry as is.
+		err := forwarder.Send(beat.Event{Private: state})
+		return err == nil
+	}
+
+	fields := common.MapStr{
+		"log": common.MapStr{
+			"offset": messageOffset, // Offset here is the offset before the starting char.
+			"file": common.MapStr{
+				"path": state.Source,
+			},
+		},
+	}
+	fields.DeepUpdate(message.Fields)
+
+	// Check if json fields exist
+	var jsonFields common.MapStr
+	if f, ok := fields["json"]; ok {
+		jsonFields = f.(common.MapStr)
+	}
+
+	timestamp := message.Ts
+
+	if h.config.JSON != nil && len(jsonFields) > 0 {
+		ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+		if !ts.IsZero() {
+			// there was a `@timestamp` key in the event, so overwrite
+			// the resulting timestamp
+			timestamp = ts
+		}
+	} else if &text != nil {
+		if fields == nil {
+			fields = common.MapStr{}
+		}
+		fields["message"] = text
+	}
+
+	err := forwarder.Send(beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+		Private:   state,
+	})
 	return err == nil
 }
 
@@ -388,9 +394,7 @@ func (h *Harvester) SendStateUpdate() {
 		return
 	}
 
-	d := util.NewData()
-	d.SetState(h.state)
-	h.publishState(d)
+	h.publishState(h.state)
 
 	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
 	h.states.Update(h.state)

@@ -35,6 +35,7 @@ var security = (function () {
         fields: {
             "event.category": "authentication",
             "event.type": "authentication_success",
+            "event.outcome": "success",
         },
         target: "",
     });
@@ -43,6 +44,7 @@ var security = (function () {
         fields: {
             "event.category": "authentication",
             "event.type": "authentication_failure",
+            "event.outcome": "failure",
         },
         target: "",
     });
@@ -113,6 +115,7 @@ var security = (function () {
             if (processor === undefined) {
                 return;
             }
+            evt.Put("event.module", "security");
             processor(evt);
         },
     };
