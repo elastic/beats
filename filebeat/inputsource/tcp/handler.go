@@ -33,7 +33,6 @@ import (
 
 // splitHandler is a TCP client that has splitting capabilities.
 type splitHandler struct {
-	conn           net.Conn
 	callback       inputsource.NetworkFunc
 	done           chan struct{}
 	metadata       inputsource.NetworkMetadata
@@ -42,19 +41,23 @@ type splitHandler struct {
 	timeout        time.Duration
 }
 
-// ClientFactory returns a ConnectionHandler func
-type ClientFactory func(config Config) ConnectionHandler
+// HandlerFactory returns a ConnectionHandler func
+type HandlerFactory func(config Config) ConnectionHandler
 
 // ConnectionHandler interface provides mechanisms for handling of incoming TCP connections
 type ConnectionHandler interface {
-	Handle(conn net.Conn) error
-	Close()
+	Handle(CloseRef, net.Conn) error
 }
 
 // SplitHandlerFactory allows creation of a ConnectionHandler that can do splitting of messages received on a TCP connection.
-func SplitHandlerFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) ClientFactory {
+func SplitHandlerFactory(callback inputsource.NetworkFunc, splitFunc bufio.SplitFunc) HandlerFactory {
 	return func(config Config) ConnectionHandler {
-		return newSplitHandler(callback, splitFunc, uint64(config.MaxMessageSize), config.Timeout)
+		return newSplitHandler(
+			callback,
+			splitFunc,
+			uint64(config.MaxMessageSize),
+			config.Timeout,
+		)
 	}
 }
 
@@ -76,8 +79,7 @@ func newSplitHandler(
 }
 
 // Handle takes a connection as input and processes data received on it.
-func (c *splitHandler) Handle(conn net.Conn) error {
-	c.conn = conn
+func (c *splitHandler) Handle(closer CloseRef, conn net.Conn) error {
 	c.metadata = inputsource.NetworkMetadata{
 		RemoteAddr: conn.RemoteAddr(),
 		TLS:        extractSSLInformation(conn),
@@ -97,7 +99,7 @@ func (c *splitHandler) Handle(conn net.Conn) error {
 		if err != nil {
 			// we are forcing a Close on the socket, lets ignore any error that could happen.
 			select {
-			case <-c.done:
+			case <-closer.Done():
 				break
 			default:
 			}
@@ -119,12 +121,6 @@ func (c *splitHandler) Handle(conn net.Conn) error {
 	}
 
 	return nil
-}
-
-// Close is used to perform clean up before the client is released.
-func (c *splitHandler) Close() {
-	close(c.done)
-	c.conn.Close()
 }
 
 func extractSSLInformation(c net.Conn) *inputsource.TLSMetadata {

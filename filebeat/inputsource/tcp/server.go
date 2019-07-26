@@ -27,6 +27,7 @@ import (
 
 	"golang.org/x/net/netutil"
 
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
@@ -34,21 +35,21 @@ import (
 
 // Server represent a TCP server
 type Server struct {
-	sync.RWMutex
-	config    *Config
-	Listener  net.Listener
-	clients   map[ConnectionHandler]struct{}
-	wg        sync.WaitGroup
-	done      chan struct{}
-	factory   ClientFactory
-	log       *logp.Logger
-	tlsConfig *transport.TLSConfig
+	config       *Config
+	Listener     net.Listener
+	wg           sync.WaitGroup
+	done         chan struct{}
+	factory      HandlerFactory
+	log          *logp.Logger
+	tlsConfig    *transport.TLSConfig
+	closer       *Closer
+	clientsCount atomic.Int
 }
 
 // New creates a new tcp server
 func New(
 	config *Config,
-	factory ClientFactory,
+	factory HandlerFactory,
 ) (*Server, error) {
 	tlsConfig, err := tlscommon.LoadTLSServerConfig(config.TLS)
 	if err != nil {
@@ -56,16 +57,16 @@ func New(
 	}
 
 	if factory == nil {
-		return nil, fmt.Errorf("ClientFactory can't be empty")
+		return nil, fmt.Errorf("HandlerFactory can't be empty")
 	}
 
 	return &Server{
 		config:    config,
-		clients:   make(map[ConnectionHandler]struct{}, 0),
 		done:      make(chan struct{}),
 		factory:   factory,
 		log:       logp.NewLogger("tcp").With("address", config.Host),
 		tlsConfig: tlsConfig,
+		closer:    NewCloser(nil),
 	}, nil
 }
 
@@ -77,6 +78,7 @@ func (s *Server) Start() error {
 		return err
 	}
 
+	s.closer.callback = func() { s.Listener.Close() }
 	s.log.Info("Started listening for TCP connection")
 
 	s.wg.Add(1)
@@ -97,7 +99,7 @@ func (s *Server) run() {
 		conn, err := s.Listener.Accept()
 		if err != nil {
 			select {
-			case <-s.done:
+			case <-s.closer.Done():
 				return
 			default:
 				s.log.Debugw("Can not accept the connection", "error", err)
@@ -105,19 +107,20 @@ func (s *Server) run() {
 			}
 		}
 
-		client := s.factory(*s.config)
+		handler := s.factory(*s.config)
+		closer := WithCloser(s.closer, func() { conn.Close() })
 
 		s.wg.Add(1)
 		go func() {
 			defer logp.Recover("recovering from a tcp client crash")
 			defer s.wg.Done()
-			defer conn.Close()
+			defer closer.Close()
 
-			s.registerClient(client)
-			defer s.unregisterClient(client)
-			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount())
+			s.registerHandler()
+			defer s.unregisterHandler()
+			s.log.Debugw("New client", "remote_address", conn.RemoteAddr(), "total", s.clientsCount.Load())
 
-			err := client.Handle(conn)
+			err := handler.Handle(closer, conn)
 			if err != nil {
 				s.log.Debugw("client error", "error", err)
 			}
@@ -127,7 +130,7 @@ func (s *Server) run() {
 				"remote_address",
 				conn.RemoteAddr(),
 				"total",
-				s.clientsCount(),
+				s.clientsCount.Load(),
 			)
 		}()
 	}
@@ -136,37 +139,17 @@ func (s *Server) run() {
 // Stop stops accepting new incoming TCP connection and Close any active clients
 func (s *Server) Stop() {
 	s.log.Info("Stopping TCP server")
-	close(s.done)
-	s.Listener.Close()
-	for _, client := range s.allClients() {
-		client.Close()
-	}
+	s.closer.Close()
 	s.wg.Wait()
 	s.log.Info("TCP server stopped")
 }
 
-func (s *Server) registerClient(client ConnectionHandler) {
-	s.Lock()
-	defer s.Unlock()
-	s.clients[client] = struct{}{}
+func (s *Server) registerHandler() {
+	s.clientsCount.Inc()
 }
 
-func (s *Server) unregisterClient(client ConnectionHandler) {
-	s.Lock()
-	defer s.Unlock()
-	delete(s.clients, client)
-}
-
-func (s *Server) allClients() []ConnectionHandler {
-	s.RLock()
-	defer s.RUnlock()
-	currentClients := make([]ConnectionHandler, len(s.clients))
-	idx := 0
-	for client := range s.clients {
-		currentClients[idx] = client
-		idx++
-	}
-	return currentClients
+func (s *Server) unregisterHandler() {
+	s.clientsCount.Dec()
 }
 
 func (s *Server) createServer() (net.Listener, error) {
@@ -190,12 +173,6 @@ func (s *Server) createServer() (net.Listener, error) {
 		return netutil.LimitListener(l, s.config.MaxConnections), nil
 	}
 	return l, nil
-}
-
-func (s *Server) clientsCount() int {
-	s.RLock()
-	defer s.RUnlock()
-	return len(s.clients)
 }
 
 // SplitFunc allows to create a `bufio.SplitFunc` based on a delimiter provided.
