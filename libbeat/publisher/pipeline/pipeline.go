@@ -77,7 +77,7 @@ type Pipeline struct {
 	ackBuilder ackBuilder
 	eventSema  *sema
 
-	// closeReg signal propagation support
+	// closeRef signal propagation support
 	guardStartSigPropagation sync.Once
 	sigNewClient             chan *client
 
