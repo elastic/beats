@@ -193,13 +193,11 @@ func (h *ESClientHandler) CreateAlias(alias Alias) error {
 	// Note: actual aliases are accessible via the index
 	status, res, err := h.client.Request("PUT", "/"+firstIndex, "", nil, body)
 	if status == 400 {
-		hasAlias, err := h.HasAlias(alias.Name)
+		// HasAlias fails if there is an index with the same name, that is
+		// what we want to check here.
+		_, err := h.HasAlias(alias.Name)
 		if err != nil {
 			return err
-		}
-		if !hasAlias {
-			return errf(ErrInvalidAlias,
-				"resource '%v' exists, but it is not an alias", alias.Name)
 		}
 		return errOf(ErrAliasAlreadyExists)
 	} else if err != nil {
