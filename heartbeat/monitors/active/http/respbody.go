@@ -3,11 +3,10 @@ package http
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"net/http"
 	"unicode/utf8"
-
-	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/libbeat/common"
@@ -28,7 +27,10 @@ func handleRespBody(event *beat.Event, resp *http.Response, responseConfig respo
 		sampleMaxBytes = 0
 	}
 
-	sampleStr, bodyBytes, bodyHash := readBody(resp, sampleMaxBytes)
+	sampleStr, bodyBytes, bodyHash, err := readResp(resp, sampleMaxBytes)
+	if err != nil {
+		return err
+	}
 
 	if includeSample {
 		addRespBodyFields(event, sampleStr, bodyBytes, bodyHash)
@@ -53,42 +55,45 @@ func addRespBodyFields(event *beat.Event, sampleStr string, bodyBytes int64, bod
 	}})
 }
 
-// readBody reads the first sampleSize bytes from the httpResponse,
+// readResp reads the first sampleSize bytes from the httpResponse,
 // then closes the body (which closes the connection). It doesn't return any errors
 // but does log them. During an error case the return values will be (nil, -1).
 // The maxBytes params controls how many bytes will be returned in a string, not how many will be read.
 // We always read the full response here since we want to time downloading the full thing.
 // This may return a nil body if the response is not valid UTF-8
-func readBody(resp *http.Response, maxSampleBytes int) (bodySample string, bodySize int64, hashStr string) {
+func readResp(resp *http.Response, maxSampleBytes int) (bodySample string, bodySize int64, hashStr string, err error) {
 	if resp == nil {
-		return "", -1, ""
+		return "", -1, "", fmt.Errorf("cannot readResp of nil HTTP response")
 	}
 
-	hash := sha256.New()
+	respSize, bodySample, hash, err := readPrefixAndHash(resp.Body, maxSampleBytes)
 
+	return bodySample, respSize, hash, err
+}
+
+func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int64, prefix string, hashStr string, err error) {
+	hash := sha256.New()
 	// Function to lazily get the body of the response
 	rawBuf := make([]byte, 1024)
-	sampleBuf := make([]byte, maxSampleBytes)
-	sampleRemainingBytes := maxSampleBytes
-	sampleWriteOffset := 0
-	respSize := int64(0)
-	for {
-		readSize, readErr := resp.Body.Read(rawBuf)
 
-		// Create a truncated buffer to the number of bytes that were read
-		truncBuf := rawBuf[:readSize]
+	// Buffer to hold the prefix output along with tracking info
+	prefixBuf := make([]byte, maxPrefixSize)
+	prefixRemainingBytes := maxPrefixSize
+	prefixWriteOffset := 0
+	for {
+		readSize, readErr := body.Read(rawBuf)
 
 		respSize += int64(readSize)
-		hash.Write(truncBuf)
+		hash.Write(rawBuf[:readSize])
 
-		if sampleRemainingBytes > 0 {
-			if readSize >= sampleRemainingBytes {
-				copy(sampleBuf[sampleWriteOffset:maxSampleBytes-1], truncBuf[:sampleRemainingBytes])
+		if prefixRemainingBytes > 0 {
+			if readSize >= prefixRemainingBytes {
+				copy(prefixBuf[prefixWriteOffset:maxPrefixSize-1], rawBuf[:prefixRemainingBytes])
 			} else {
-				copy(sampleBuf[sampleWriteOffset:sampleWriteOffset+readSize], truncBuf)
+				copy(prefixBuf[prefixWriteOffset:prefixWriteOffset+readSize], rawBuf[:readSize])
 			}
-			sampleRemainingBytes -= readSize
-			sampleWriteOffset += readSize
+			prefixRemainingBytes -= readSize
+			prefixWriteOffset += readSize
 		}
 
 		if readErr == io.EOF {
@@ -96,14 +101,12 @@ func readBody(resp *http.Response, maxSampleBytes int) (bodySample string, bodyS
 		}
 
 		if readErr != nil {
-			logp.Warn("could not read HTTP response body: %s", readErr)
+			return 0, "", "", readErr
 			break
 		}
 	}
-
-	if utf8.Valid(sampleBuf[:sampleWriteOffset]) {
-		bodySample = string(sampleBuf[:sampleWriteOffset])
+	if utf8.Valid(prefixBuf[:prefixWriteOffset]) {
+		prefix = string(prefixBuf[:prefixWriteOffset])
 	}
-
-	return bodySample, respSize, hex.EncodeToString(hash.Sum(nil))
+	return respSize, prefix, hex.EncodeToString(hash.Sum(nil)), nil
 }
