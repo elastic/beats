@@ -36,12 +36,14 @@ type HostInfo interface {
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 300 seconds
 func EnsureUp(t *testing.T, service string) HostInfo {
+	t.Helper()
 	return EnsureUpWithTimeout(t, 60, service)
 }
 
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
 // Wait for `timeout` seconds for health
 func EnsureUpWithTimeout(t *testing.T, timeout int, service string) HostInfo {
+	t.Helper()
 	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
 	// This is useful if the service is already running locally.
 	if noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE")); err == nil && noCompose {
