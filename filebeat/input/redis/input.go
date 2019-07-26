@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/input/file"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -48,7 +49,7 @@ type Input struct {
 }
 
 // NewInput creates a new redis input
-func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
 	config := defaultConfig
@@ -58,14 +59,18 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, err
 	}
 
-	outlet, err := outletFactory(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	p := &Input{
 		started:  false,
-		outlet:   outlet,
+		outlet:   out,
 		config:   config,
 		cfg:      cfg,
 		registry: harvester.NewRegistry(),
