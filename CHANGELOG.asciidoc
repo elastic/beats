@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.3.0[View commits]
 
 - `postgresql.log.timestamp` field is deprecated in favour of `@timestamp`. {pull}12338[12338]
 
+[[release-notes-7.2.1]]
 === Beats version 7.2.1
 https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
 
@@ -1212,6 +1213,60 @@ https://github.com/elastic/beats/compare/v6.8.1...v6.8.2[View commits]
 *Packetbeat*
 
 - Limit memory usage of Redis replication sessions. {issue}12657[12657
+
+[[release-notes-6.8.1]]
+=== Beats version 6.8.1
+https://github.com/elastic/beats/compare/v6.8.0...v6.8.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
+
+*Auditbeat*
+
+- Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+- Process dataset: Fixed a memory leak under Windows. {pull}12100[12100]
+- Login dataset: Fix re-read of utmp files. {pull}12028[12028]
+- Package dataset: Fixed a crash inside librpm after Auditbeat has been running for a while. {issue}12147[12147] {pull}12168[12168]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Package dataset: Auto-detect package directories. {pull}12289[12289]
+- System module: Start system module without host ID. {pull}12373[12373]
+- Host dataset: Fix reboot detection logic. {pull}12591[12591]
+
+*Filebeat*
+
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
+- Fix initialization of the TCP input logger. {pull}11605[11605]
+- Fix goroutine leak caused on initialization failures of log input. {pull}12125[12125]
+- Fix memory leak in Filebeat pipeline acker. {pull}12063[12063]
+- Fix goroutine leak on non-explicit finalization of log input. {pull}12164[12164]
+- When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+
+*Metricbeat*
+
+- Avoid generating hints-based configuration with empty hosts when no exposed port is suitable for the hosts hint. {issue}8264[8264] {pull}12086[12086]
+- Fix direction of incoming IPv6 sockets. {pull}12248[12248]
+- Validate that kibana/status metricset cannot be used when xpack is enabled. {pull}12264[12264]
+- In the kibana/stats metricset, only log error (don't also index it) if xpack is enabled. {pull}12353[12353]
+- The `elasticsearch/index_summary` metricset gracefully handles an empty Elasticsearch cluster when `xpack.enabled: true` is set. {pull}12489[12489] {issue}12487[12487]
+- When TLS is configured for the http metricset and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
+
+*Packetbeat*
+
+- Fixed a memory leak when using process monitoring under Windows. {pull}12100[12100]
+- Improved debug logging efficiency in PGQSL module. {issue}12150[12150]
+
+==== Added
+
+*Auditbeat*
+
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+
+*Metricbeat*
+
+- Add validation for elasticsearch and kibana modules' metricsets when xpack.enabled is set to true. {pull}12386[12386]
 
 [[release-notes-6.8.0]]
 === Beats version 6.8.0
