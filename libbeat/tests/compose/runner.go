@@ -29,16 +29,17 @@ type R interface {
 	WithT(t *testing.T) R
 
 	Host() string
+	HostForPort(int) string
 	Hostname() string
-	Port() string
+	Port(int) string
 
 	Option(string) string
 }
 
 type runnerControl struct {
 	*testing.T
+	*wrapperContainer
 
-	host     string
 	scenario map[string]string
 }
 
@@ -49,21 +50,16 @@ func (r *runnerControl) WithT(t *testing.T) R {
 	return &ctl
 }
 
-// Host returns the host:port the test should use to connect to the service
-func (r *runnerControl) Host() string {
-	return r.host
-}
-
 // Hostname is the address of the host
 func (r *runnerControl) Hostname() string {
-	hostname, _, _ := net.SplitHostPort(r.host)
+	hostname, _, _ := net.SplitHostPort(r.Host())
 	return hostname
 }
 
 // Port is the port of the host
-func (r *runnerControl) Port() string {
-	_, port, _ := net.SplitHostPort(r.host)
-	return port
+func (r *runnerControl) Port(port int) string {
+	_, p, _ := net.SplitHostPort(r.HostForPort(port))
+	return p
 }
 
 // Option returns the value of an option for the current scenario

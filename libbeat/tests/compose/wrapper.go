@@ -54,6 +54,10 @@ type wrapperContainer struct {
 	info types.Container
 }
 
+func (c *wrapperContainer) Name() string {
+	return c.ServiceName()
+}
+
 func (c *wrapperContainer) ServiceName() string {
 	return c.info.Labels[labelComposeService]
 }
@@ -87,7 +91,7 @@ func (c *wrapperContainer) Old() bool {
 // from the host if docker is being run natively. To be used when the tests
 // are run from another container in the same network. It also works when
 // running from the hoist network if the docker daemon runs natively.
-func (c *wrapperContainer) privateHost() string {
+func (c *wrapperContainer) privateHost(port int) string {
 	var ip string
 	for _, net := range c.info.NetworkSettings.Networks {
 		if len(net.IPAddress) > 0 {
@@ -99,9 +103,9 @@ func (c *wrapperContainer) privateHost() string {
 		return ""
 	}
 
-	for _, port := range c.info.Ports {
-		if port.PublicPort != 0 {
-			return net.JoinHostPort(ip, strconv.Itoa(int(port.PrivatePort)))
+	for _, info := range c.info.Ports {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+			return net.JoinHostPort(ip, strconv.Itoa(int(info.PrivatePort)))
 		}
 	}
 	return ""
@@ -109,23 +113,27 @@ func (c *wrapperContainer) privateHost() string {
 
 // exposedHost returns the exposed address in the host, can be used when the
 // test is run from the host network. Recommended when using docker machines.
-func (c *wrapperContainer) exposedHost() string {
-	for _, port := range c.info.Ports {
-		if port.PublicPort != 0 {
-			return net.JoinHostPort("localhost", strconv.Itoa(int(port.PublicPort)))
+func (c *wrapperContainer) exposedHost(port int) string {
+	for _, info := range c.info.Ports {
+		if info.PublicPort != uint16(0) && (port == 0 || info.PrivatePort == uint16(port)) {
+			return net.JoinHostPort("localhost", strconv.Itoa(int(info.PublicPort)))
 		}
 	}
 	return ""
 }
 
 func (c *wrapperContainer) Host() string {
+	return c.HostForPort(0)
+}
+
+func (c *wrapperContainer) HostForPort(port int) string {
 	// TODO: Support multiple networks/ports
 	if runtime.GOOS == "linux" {
-		return c.privateHost()
+		return c.privateHost(port)
 	}
 	// We can use `exposedHost()` in all platforms when we can use host
 	// network in the metricbeat container
-	return c.exposedHost()
+	return c.exposedHost(port)
 }
 
 func (d *wrapperDriver) LockFile() string {

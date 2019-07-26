@@ -74,11 +74,13 @@ type Driver interface {
 
 // ContainerStatus is an interface to obtain the status of a container
 type ContainerStatus interface {
+	Name() string
 	ServiceName() string
 	Healthy() bool
 	Running() bool
 	Old() bool
 	Host() string
+	HostForPort(int) string
 }
 
 // Project is a docker-compose project
@@ -138,7 +140,7 @@ func (c *Project) Wait(seconds int, services ...string) error {
 		}
 
 		for _, s := range servicesStatus {
-			if !s.Healthy {
+			if !s.Healthy() {
 				healthy = false
 				break
 			}
@@ -153,23 +155,23 @@ func (c *Project) Wait(seconds int, services ...string) error {
 	return nil
 }
 
-// Host gets the host and port of a service
-func (c *Project) Host(service string) (string, error) {
+// HostInformation gets the host information of a service
+func (c *Project) HostInformation(service string) (ServiceInfo, error) {
 	servicesStatus, err := c.getServices(service)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if len(servicesStatus) == 0 {
-		return "", errors.New("no container running for service")
+		return nil, errors.New("no container running for service")
 	}
 
 	status, ok := servicesStatus[service]
-	if !ok || status.Host == "" {
-		return "", errors.New("unknown host:port for service")
+	if !ok || status.Host() == "" {
+		return nil, errors.New("unknown host:port for service")
 	}
 
-	return status.Host, nil
+	return status, nil
 }
 
 // Kill a container
@@ -198,12 +200,12 @@ func (c *Project) KillOld(except []string) error {
 
 	for _, s := range servicesStatus {
 		// Ignore the ones we want
-		if contains(except, s.Name) {
+		if contains(except, s.Name()) {
 			continue
 		}
 
-		if s.Old {
-			err = c.Kill(s.Name)
+		if s.Old() {
+			err = c.Kill(s.Name())
 			if err != nil {
 				return err
 			}
@@ -244,22 +246,24 @@ func (c *Project) Unlock() {
 	os.Remove(c.LockFile())
 }
 
-type serviceInfo struct {
-	Name    string
-	Running bool
-	Healthy bool
+// ServiceInfo is an interface for objects that give information about running services
+type ServiceInfo interface {
+	Name() string
+	Running() bool
+	Healthy() bool
 
-	Host string
+	Host() string
+	HostForPort(int) string
 
 	// Has been up for too long?:
-	Old bool
+	Old() bool
 }
 
-func (c *Project) getServices(filter ...string) (map[string]*serviceInfo, error) {
+func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	result := make(map[string]*serviceInfo)
+	result := make(map[string]ServiceInfo)
 	services, err := c.Driver.Ps(context.Background(), filter...)
 	if err != nil {
 		return nil, err
@@ -269,23 +273,11 @@ func (c *Project) getServices(filter ...string) (map[string]*serviceInfo, error)
 		name := c.ServiceName()
 
 		// In case of several (stopped) containers, always prefer info about running ones
-		if result[name] != nil {
-			if result[name].Running {
-				continue
-			}
+		if r := result[name]; r != nil && r.Running() {
+			continue
 		}
 
-		service := &serviceInfo{
-			Name: name,
-		}
-		// fill details:
-		service.Healthy = c.Healthy()
-		service.Running = c.Running()
-		if service.Healthy {
-			service.Old = c.Old()
-		}
-		service.Host = c.Host()
-		result[name] = service
+		result[name] = c
 	}
 
 	return result, nil

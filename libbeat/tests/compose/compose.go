@@ -27,15 +27,21 @@ import (
 	"testing"
 )
 
+// HostInfo exposes information about started scenario
+type HostInfo interface {
+	Host() string
+	HostForPort(int) string
+}
+
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 300 seconds
-func EnsureUp(t *testing.T, service string) R {
+func EnsureUp(t *testing.T, service string) HostInfo {
 	return EnsureUpWithTimeout(t, 60, service)
 }
 
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
 // Wait for `timeout` seconds for health
-func EnsureUpWithTimeout(t *testing.T, timeout int, service string) R {
+func EnsureUpWithTimeout(t *testing.T, timeout int, service string) HostInfo {
 	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
 	// This is useful if the service is already running locally.
 	if noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE")); err == nil && noCompose {
@@ -44,7 +50,7 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, service string) R {
 		if host == "" {
 			t.Fatalf("%s environment variable must be set as the host:port where %s is running", envVar, service)
 		}
-		return &runnerControl{host: host}
+		return &staticHostInfo{host: host}
 	}
 
 	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
@@ -71,12 +77,24 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, service string) R {
 	}
 
 	// Get host information
-	host, err := compose.Host(service)
+	host, err := compose.HostInformation(service)
 	if err != nil {
 		t.Fatalf("getting host for %s", service)
 	}
 
-	return &runnerControl{host: host}
+	return host
+}
+
+type staticHostInfo struct {
+	host string
+}
+
+func (i *staticHostInfo) Host() string {
+	return i.host
+}
+
+func (i *staticHostInfo) HostForPort(int) string {
+	return i.host
 }
 
 func findComposePath() (string, error) {
