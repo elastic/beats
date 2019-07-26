@@ -8,25 +8,21 @@ import (
 	"context"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 )
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period          time.Duration `config:"period" validate:"nonzero,required"`
-	AccessKeyID     string        `config:"access_key_id" validate:"nonzero,required"`
-	SecretAccessKey string        `config:"secret_access_key" validate:"nonzero,required"`
-	SessionToken    string        `config:"session_token"`
-	DefaultRegion   string        `config:"default_region"`
-	Regions         []string      `config:"regions"`
+	Period    time.Duration       `config:"period" validate:"nonzero,required"`
+	Regions   []string            `config:"regions"`
+	AWSConfig awscommon.ConfigAWS `config:",inline"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
@@ -62,20 +58,10 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	awsConfig := defaults.Config()
-	awsCredentials := awssdk.Credentials{
-		AccessKeyID:     config.AccessKeyID,
-		SecretAccessKey: config.SecretAccessKey,
+	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get aws credentials")
 	}
-	if config.SessionToken != "" {
-		awsCredentials.SessionToken = config.SessionToken
-	}
-
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCredentials,
-	}
-
-	awsConfig.Region = config.DefaultRegion
 
 	metricSet := MetricSet{
 		BaseMetricSet: base,
@@ -85,6 +71,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
+		// set default region to make initial aws api call
+		awsConfig.Region = "us-west-1"
 		svcEC2 := ec2.New(awsConfig)
 		completeRegionsList, err := getRegions(svcEC2)
 		if err != nil {

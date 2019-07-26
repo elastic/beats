@@ -14,4 +14,5 @@ ingest_pipeline:
   - ingest/pipeline-plaintext.json
   - ingest/pipeline-http.json
   - ingest/pipeline-tcp.json
+  - ingest/pipeline-geo-as.yml
 input: config/envoyproxy.yml

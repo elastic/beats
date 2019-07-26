@@ -116,6 +116,13 @@ var sysmon = (function () {
 
     var event1 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            "fields": {
+                "event.category": "process",
+                "event.type:": "process_start",
+            },
+            "target": "",
+        })
         .Convert({
             fields: [
                 {from: "winlog.event_data.UtcTime", to: "@timestamp"},
@@ -185,6 +192,7 @@ var sysmon = (function () {
         .Add(addUser)
         .Add(addNetworkDirection)
         .Add(addNetworkType)
+        .CommunityID()
         .Add(removeEmptyEventData)
         .Build();
 
@@ -203,6 +211,13 @@ var sysmon = (function () {
 
     var event5 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            "fields": {
+                "event.category": "process",
+                "event.type:": "process_end",
+            },
+            "target": "",
+        })
         .Convert({
             fields: [
                 {from: "winlog.event_data.UtcTime", to: "@timestamp"},
@@ -573,6 +588,7 @@ var sysmon = (function () {
             if (processor === undefined) {
                 throw "unexpected sysmon event_id";
             }
+            evt.Put("event.module", "sysmon");
             processor(evt);
         },
     };

@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2019-05-03T09:01:09.990Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -18,7 +17,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:09.990Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -32,7 +30,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:09.990Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -46,7 +43,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:09.990Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -60,7 +56,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -74,7 +69,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -88,7 +82,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -105,7 +98,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -119,7 +111,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -133,7 +124,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -147,7 +137,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -161,7 +150,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.010Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -175,7 +163,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:10.200Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -189,7 +176,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:11.930Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",
@@ -203,7 +189,6 @@
     },
     {
         "@timestamp": "2019-05-03T09:01:12.030Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mssql.log",
         "event.module": "mssql",
         "event.timezone": "+00:00",

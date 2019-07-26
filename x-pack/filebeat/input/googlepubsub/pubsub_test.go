@@ -21,7 +21,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -230,7 +229,11 @@ func runTest(t *testing.T, cfg *common.Config, run func(client *pubsub.Client, i
 	eventOutlet := newStubOutlet()
 	defer eventOutlet.Close()
 
-	in, err := NewInput(cfg, eventOutlet.outlet, inputCtx)
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+		return eventOutlet, nil
+	})
+
+	in, err := NewInput(cfg, connector, inputCtx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,10 +260,6 @@ func newStubOutlet() *stubOutleter {
 	o := &stubOutleter{}
 	o.cond = sync.NewCond(o)
 	return o
-}
-
-func (o *stubOutleter) outlet(_ *common.Config, _ *common.MapStrPointer) (channel.Outleter, error) {
-	return o, nil
 }
 
 func (o *stubOutleter) waitForEvents(numEvents int) ([]beat.Event, bool) {
@@ -290,10 +289,10 @@ func (o *stubOutleter) Close() error {
 
 func (o *stubOutleter) Done() <-chan struct{} { return nil }
 
-func (o *stubOutleter) OnEvent(data *util.Data) bool {
+func (o *stubOutleter) OnEvent(event beat.Event) bool {
 	o.Lock()
 	defer o.Unlock()
-	o.Events = append(o.Events, data.Event)
+	o.Events = append(o.Events, event)
 	o.cond.Broadcast()
 	return !o.done
 }
