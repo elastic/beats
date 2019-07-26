@@ -59,7 +59,6 @@ func initProviders() ([]provider.Provider, error) {
 	return providers, nil
 }
 
-// TODO: Add List() subcommand.
 func handler() (*cliHandler, error) {
 	providers, err := initProviders()
 	if err != nil {
@@ -138,7 +137,6 @@ func genPackageCmd() *cobra.Command {
 	return cmd
 }
 
-// TODO
 func genExportFunctionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "function",

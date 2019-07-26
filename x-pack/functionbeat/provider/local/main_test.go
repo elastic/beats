@@ -24,7 +24,6 @@ func init() {
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
-
 	if *systemTest {
 		main()
 	}

@@ -61,8 +61,7 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	params := devtools.DefaultGolangCrossBuildArgs()
-	return devtools.GolangCrossBuild(params)
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -73,7 +72,7 @@ func BuildGoDaemon() error {
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	// Building functionbeat manager
-	err := devtools.CrossBuild(devtools.AddPlatforms("linux/amd64"))
+	err := devtools.CrossBuild()
 	if err != nil {
 		return err
 	}
