@@ -308,6 +308,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for reading from .evtx files. {issue}4450[4450]
 - Add support for event ID 4634 and 4647 to the Security module. {pull}12906[12906]
 - Add `network.community_id` to Sysmon network events (event ID 3). {pull}13034[13034]
+- Add `event.module` to Winlogbeat modules. {pull}13047[13047]
+- Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
 
 ==== Deprecated
 
