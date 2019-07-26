@@ -104,7 +104,7 @@ class ComposeMixin(object):
         host = cls.compose_host(service=service)
 
         content = "SERVICE_HOST=%s" % host
-        info = tarfile.TarInfo(name="compose_env")
+        info = tarfile.TarInfo(name="/run/compose_env")
         info.mode = 0100644
         info.size = len(content)
 
@@ -115,7 +115,7 @@ class ComposeMixin(object):
 
         containers = project.containers(service_names=[service])
         for container in containers:
-            container.client.put_archive(container=container.id, path="/run", data=data.getvalue())
+            container.client.put_archive(container=container.id, path="/", data=data.getvalue())
 
     @classmethod
     def compose_down(cls):
