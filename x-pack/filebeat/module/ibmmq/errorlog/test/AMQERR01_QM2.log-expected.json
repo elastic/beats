@@ -43,7 +43,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "LOGGER-IO",
@@ -110,7 +109,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "LOGGER-IO",
@@ -144,7 +142,6 @@
             "4",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "4",
         "ibmmq.errorlog.code": "AMQ7229I",
         "ibmmq.errorlog.commentinsert": [
             "QM2",
@@ -178,7 +175,6 @@
             "4",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "4",
         "ibmmq.errorlog.code": "AMQ7230I",
         "ibmmq.errorlog.commentinsert": [
             "QM2",
@@ -311,7 +307,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "CHECKPOINT",
@@ -345,7 +340,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "ERROR-LOG",
@@ -379,7 +373,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -413,7 +406,6 @@
             "",
             "2"
         ],
-        "ibmmq.errorlog.arithinsert2": "2",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -447,7 +439,6 @@
             "",
             "3"
         ],
-        "ibmmq.errorlog.arithinsert2": "3",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -481,7 +472,6 @@
             "",
             "4"
         ],
-        "ibmmq.errorlog.arithinsert2": "4",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -515,7 +505,6 @@
             "87",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "87",
         "ibmmq.errorlog.code": "AMQ8048I",
         "ibmmq.errorlog.commentinsert": [
             "0",
@@ -555,7 +544,6 @@
             "",
             "QM2"
         ],
-        "ibmmq.errorlog.commentinsert3": "QM2",
         "ibmmq.errorlog.explanation": "IBM MQ-WS-Manager 'QM2' wurde mit V9.1.0.0 gestartet.",
         "ibmmq.errorlog.installation": "Installation1",
         "ibmmq.errorlog.qmgr": "QM2",
@@ -754,7 +742,6 @@
             "",
             "QM2"
         ],
-        "ibmmq.errorlog.commentinsert3": "QM2",
         "ibmmq.errorlog.explanation": "Der IBM MQ-Warteschlangenmanager 'QM2' wurde beendet.",
         "ibmmq.errorlog.installation": "Installation1",
         "ibmmq.errorlog.qmgr": "QM2",
@@ -782,7 +769,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "LOGGER-IO",
@@ -816,7 +802,6 @@
             "5",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "5",
         "ibmmq.errorlog.code": "AMQ7229I",
         "ibmmq.errorlog.commentinsert": [
             "QM2",
@@ -850,7 +835,6 @@
             "5",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "5",
         "ibmmq.errorlog.code": "AMQ7230I",
         "ibmmq.errorlog.commentinsert": [
             "QM2",
@@ -983,7 +967,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "CHECKPOINT",
@@ -1017,7 +1000,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "ERROR-LOG",
@@ -1051,7 +1033,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -1085,7 +1066,6 @@
             "",
             "2"
         ],
-        "ibmmq.errorlog.arithinsert2": "2",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -1119,7 +1099,6 @@
             "",
             "3"
         ],
-        "ibmmq.errorlog.arithinsert2": "3",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -1153,7 +1132,6 @@
             "",
             "4"
         ],
-        "ibmmq.errorlog.arithinsert2": "4",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "APP-SIGNAL",
@@ -1193,7 +1171,6 @@
             "",
             "QM2"
         ],
-        "ibmmq.errorlog.commentinsert3": "QM2",
         "ibmmq.errorlog.explanation": "IBM MQ queue manager 'QM2' started using V9.1.0.0.",
         "ibmmq.errorlog.installation": "Installation1",
         "ibmmq.errorlog.qmgr": "QM2",
@@ -1221,7 +1198,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "DEFERRED_DELIVERY",
@@ -1255,7 +1231,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "ACTVTRC",
@@ -1289,7 +1264,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "DEFERRED-MSG",
@@ -1323,7 +1297,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "ASYNCQ",
@@ -1357,7 +1330,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "STATISTICS",
@@ -1391,7 +1363,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "EXPIRER",
@@ -1425,7 +1396,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "DUR-SUBS-MGR",
@@ -1492,7 +1462,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "TOPIC-TREE",
@@ -1526,7 +1495,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5052I",
         "ibmmq.errorlog.commentinsert": [
             "QPUBSUB-CTRLR",
@@ -1560,7 +1528,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5037I",
         "ibmmq.errorlog.commentinsert": [
             "MARKINTSCAN",
@@ -1594,7 +1561,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "RESOURCE_MONITOR",
@@ -1628,7 +1594,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "PRESERVED-Q",
@@ -1662,7 +1627,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "Q-DELETION",
@@ -1696,7 +1660,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5052I",
         "ibmmq.errorlog.commentinsert": [
             "QPUBSUB-SUBPT-NLCACHE",
@@ -1730,7 +1693,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5052I",
         "ibmmq.errorlog.commentinsert": [
             "QPUBSUB-QUEUE-NLCACHE",
@@ -1764,7 +1726,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5051I",
         "ibmmq.errorlog.commentinsert": [
             "MULTICAST",
@@ -1798,7 +1759,6 @@
             "",
             "1"
         ],
-        "ibmmq.errorlog.arithinsert2": "1",
         "ibmmq.errorlog.code": "AMQ5052I",
         "ibmmq.errorlog.commentinsert": [
             "PUBSUB-DAEMON",
@@ -1964,7 +1924,6 @@
             "9264",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "9264",
         "ibmmq.errorlog.code": "AMQ5022I",
         "ibmmq.errorlog.commentinsert": [
             "SYSTEM.CHANNEL.INITQ",
@@ -1998,7 +1957,6 @@
             "19060",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "19060",
         "ibmmq.errorlog.code": "AMQ5024I",
         "ibmmq.errorlog.commentinsert": [
             "SYSTEM.CMDSERVER.1",
@@ -2098,7 +2056,6 @@
             "37632",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "37632",
         "ibmmq.errorlog.code": "AMQ5026I",
         "ibmmq.errorlog.commentinsert": [
             "LISTENER.TCP",
@@ -2532,7 +2489,6 @@
             "2162",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "2162",
         "ibmmq.errorlog.code": "AMQ5041I",
         "ibmmq.errorlog.commentinsert": [
             "DEFERRED_DELIVERY",

@@ -74,7 +74,6 @@
             "90",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "90",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -139,7 +138,6 @@
             "8480",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "8480",
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
             "QM1",
@@ -172,7 +170,6 @@
             "84",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "84",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -205,7 +202,6 @@
             "84",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "84",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -238,7 +234,6 @@
             "83",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "83",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -271,7 +266,6 @@
             "73",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "73",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -304,7 +298,6 @@
             "73",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "73",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -369,7 +362,6 @@
             "7360",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "7360",
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
             "QM1",
@@ -402,7 +394,6 @@
             "71",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -435,7 +426,6 @@
             "71",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -500,7 +490,6 @@
             "7660",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "7660",
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
             "QM1",
@@ -533,7 +522,6 @@
             "71",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -566,7 +554,6 @@
             "71",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "71",
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
             "",
@@ -631,7 +618,6 @@
             "6780",
             ""
         ],
-        "ibmmq.errorlog.arithinsert1": "6780",
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
             "QM1",

@@ -83,13 +83,13 @@
                 "field": [
                     "log_timestamp",
                     "message",
+                    "ibmmq.errorlog.arithinsert1",
+                    "ibmmq.errorlog.arithinsert2",
                     "ibmmq.errorlog.commentinsert1",
                     "ibmmq.errorlog.commentinsert2",
-                    "ibmmq.errorlog.commentinsert3",
-                    "ibmmq.errorlog.arithinsert1",
-                    "ibmmq.errorlog.arithinsert2"
+                    "ibmmq.errorlog.commentinsert3"
                 ],
-                "ignore_failure" : true
+                "ignore_missing" : true
             }
         },
         {
