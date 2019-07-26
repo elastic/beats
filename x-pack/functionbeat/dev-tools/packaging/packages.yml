@@ -63,7 +63,7 @@ shared:
   - &functionbeat_binaries
     files:
       pkg/functionbeat-aws:
-        source: 'provider/aws/build/golang-crossbuild/{{.BeatName}}-aws-linux-amd64'
+        source: 'provider/aws/build/golang-crossbuild/aws-linux-amd64'
         mode: 0755
 # specs is a list of named packaging "flavors".
 specs:
