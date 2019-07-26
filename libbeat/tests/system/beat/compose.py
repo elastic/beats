@@ -32,6 +32,9 @@ class ComposeMixin(object):
     # timeout waiting for health (seconds)
     COMPOSE_TIMEOUT = 300
 
+    # add advertised host environment file
+    COMPOSE_ADVERTISED_HOST = False
+
     @classmethod
     def compose_up(cls):
         """
@@ -79,8 +82,9 @@ class ComposeMixin(object):
             if healthy:
                 break
 
-            for service in cls.COMPOSE_SERVICES:
-                cls._setup_advertised_host(project, service)
+            if cls.COMPOSE_ADVERTISED_HOST:
+                for service in cls.COMPOSE_SERVICES:
+                    cls._setup_advertised_host(project, service)
 
             time.sleep(1)
             timeout = time.time() - start > cls.COMPOSE_TIMEOUT
