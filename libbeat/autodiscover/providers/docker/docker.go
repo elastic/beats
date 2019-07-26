@@ -18,6 +18,7 @@
 package docker
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -74,6 +75,9 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, errWrap(err)
+	}
+	if len(mapper) == 0 && !config.Hints.Enabled() {
+		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
 	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)

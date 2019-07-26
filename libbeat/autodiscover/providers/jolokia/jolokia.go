@@ -18,6 +18,8 @@
 package jolokia
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
@@ -69,6 +71,9 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	mapper, err := template.NewConfigMapper(config.Templates)
 	if err != nil {
 		return nil, errWrap(err)
+	}
+	if len(mapper) == 0 {
+		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
 	builders, err := autodiscover.NewBuilders(config.Builders, nil)

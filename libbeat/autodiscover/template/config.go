@@ -18,8 +18,6 @@
 package template
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 	"github.com/elastic/beats/libbeat/conditions"
@@ -45,10 +43,6 @@ type MapperSettings []*struct {
 
 // NewConfigMapper builds a template Mapper from given settings
 func NewConfigMapper(configs MapperSettings) (mapper Mapper, err error) {
-	if len(configs) == 0 {
-		return nil, fmt.Errorf("no configs defined for autodiscover provider")
-	}
-
 	for _, c := range configs {
 		condMap := &ConditionMap{Configs: c.Configs}
 		if c.ConditionConfig != nil {

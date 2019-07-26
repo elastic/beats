@@ -91,6 +91,9 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	if err != nil {
 		return nil, errWrap(err)
 	}
+	if len(mapper) == 0 && !config.Hints.Enabled() {
+		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
+	}
 
 	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
