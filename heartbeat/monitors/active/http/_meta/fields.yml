@@ -13,6 +13,16 @@
           migration: true
           description: >
             Service url used by monitor.
+        - name: response
+          type: group
+          fields:
+            - name: body
+              type: group
+              fields:
+                - name: hash
+                  type: keyword
+                  description: >
+                    Hash of the response body. Can be used to group responses with identical hashes
         - name: rtt
           type: group
           description: >
