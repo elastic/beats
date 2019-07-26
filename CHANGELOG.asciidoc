@@ -34,7 +34,6 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.3.0[View commits]
 - Package dataset: Improve dpkg parsing. {pull}12325[12325]
 - Host dataset: Fix reboot detection logic. {pull}12591[12591]
 - Add syscalls used by librpm for the system/package dataset to the default Auditbeat seccomp policy. {issue}12578[12578] {pull}12617[12617]
-- Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
 - Host dataset: Export Host fields to gob encoder. {pull}12940[12940]
 
 *Filebeat*
@@ -142,7 +141,6 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
 
 *Filebeat*
 
-- Skipping unparsable log entries from docker json reader {pull}12268[12268]
 - Add support for client addresses with port in Apache error logs {pull}12695[12695]
 - Load correct pipelines when system module is configured in modules.d. {pull}12340[12340]
 
@@ -1196,6 +1194,24 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Add support to decode HTTP bodies compressed with `gzip` and `deflate`. {pull}7915[7915]
 - Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 - Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
+
+[[release-notes-6.8.2]]
+=== Beats version 6.8.2
+https://github.com/elastic/beats/compare/v6.8.1...v6.8.2[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Process dataset: Do not show non-root warning on Windows. {pull}12740[12740]
+
+*Filebeat*
+
+- Skipping unparsable log entries from docker json reader {pull}12268[12268]
+
+*Packetbeat*
+
+- Limit memory usage of Redis replication sessions. {issue}12657[12657
 
 [[release-notes-6.8.0]]
 === Beats version 6.8.0
