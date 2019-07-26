@@ -139,10 +139,14 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
+	log := c.logger()
+
 	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
 	// for pending events to be ACKed.
 	c.doClose()
+	log.Debug("client: wait for acker to finish")
 	c.acker.wait()
+	log.Debug("client: acker shut down")
 	return nil
 }
 

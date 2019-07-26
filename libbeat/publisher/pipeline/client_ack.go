@@ -51,9 +51,10 @@ func (p *Pipeline) makeACKer(
 		acker = bld.createEventACKer(canDrop, sema, cb)
 	default:
 		if waitClose <= 0 {
-			return bld.createPipelineACKer(canDrop, sema)
+			acker = bld.createPipelineACKer(canDrop, sema)
+		} else {
+			acker = bld.createCountACKer(canDrop, sema, func(_ int) {})
 		}
-		acker = bld.createCountACKer(canDrop, sema, func(_ int) {})
 	}
 
 	if waitClose <= 0 {

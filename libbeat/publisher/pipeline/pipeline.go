@@ -278,7 +278,9 @@ func (p *Pipeline) Close() error {
 	}
 
 	p.observer.cleanup()
-	close(p.sigNewClient)
+	if p.sigNewClient != nil {
+		close(p.sigNewClient)
+	}
 
 	return nil
 }
@@ -366,7 +368,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	if acker != nil {
 		producerCfg.ACK = acker.ackEvents
 	} else {
-		acker = nilACKer
+		acker = newCloseACKer(nilACKer, client.unlink)
 	}
 
 	client.acker = acker
