@@ -19,13 +19,13 @@ package kafka
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -49,16 +49,21 @@ type kafkaInput struct {
 	kafkaContext  context.Context
 	kafkaCancel   context.CancelFunc // The CancelFunc for kafkaContext
 	log           *logp.Logger
+	runOnce       sync.Once
 }
 
 // NewInput creates a new kafka input
 func NewInput(
 	cfg *common.Config,
-	outletFactory channel.Connector,
+	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
 
-	out, err := outletFactory(cfg, inputContext.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: inputContext.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -105,24 +110,26 @@ func NewInput(
 
 // Run starts the input by scanning for incoming messages and errors.
 func (input *kafkaInput) Run() {
-	// Track errors
-	go func() {
-		for err := range input.consumerGroup.Errors() {
-			input.log.Errorw("Error reading from kafka", "error", err)
-		}
-	}()
-
-	go func() {
-		for {
-			handler := groupHandler{input: input}
-
-			err := input.consumerGroup.Consume(
-				input.kafkaContext, input.config.Topics, handler)
-			if err != nil {
-				input.log.Errorw("Kafka consume error", "error", err)
+	input.runOnce.Do(func() {
+		// Track errors
+		go func() {
+			for err := range input.consumerGroup.Errors() {
+				input.log.Errorw("Error reading from kafka", "error", err)
 			}
-		}
-	}()
+		}()
+
+		go func() {
+			for {
+				handler := groupHandler{input: input}
+
+				err := input.consumerGroup.Consume(
+					input.kafkaContext, input.config.Topics, handler)
+				if err != nil {
+					input.log.Errorw("Kafka consume error", "error", err)
+				}
+			}
+		}()
+	})
 }
 
 // Wait shuts down the Input by cancelling the internal context.
@@ -157,9 +164,8 @@ func (h groupHandler) createEvent(
 	sess sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
-) *util.Data {
-	data := util.NewData()
-	data.Event = beat.Event{
+) beat.Event {
+	event := beat.Event{
 		Timestamp: time.Now(),
 	}
 	eventFields := common.MapStr{
@@ -173,7 +179,7 @@ func (h groupHandler) createEvent(
 	}
 	version, versionOk := h.input.config.Version.Get()
 	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
-		data.Event.Timestamp = message.Timestamp
+		event.Timestamp = message.Timestamp
 		if !message.BlockTimestamp.IsZero() {
 			kafkaMetadata["block_timestamp"] = message.BlockTimestamp
 		}
@@ -182,8 +188,8 @@ func (h groupHandler) createEvent(
 		kafkaMetadata["headers"] = arrayForKafkaHeaders(message.Headers)
 	}
 	eventFields["kafka"] = kafkaMetadata
-	data.Event.Fields = eventFields
-	return data
+	event.Fields = eventFields
+	return event
 }
 
 func (groupHandler) Setup(session sarama.ConsumerGroupSession) error {
