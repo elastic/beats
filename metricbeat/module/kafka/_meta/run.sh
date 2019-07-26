@@ -7,7 +7,7 @@ fi
 # Check if KAFKA_ADVERTISED_HOST is set
 # if not wait to read it from file
 if [ -z "$KAFKA_ADVERTISED_HOST" ]; then
-       echo "KAFKA_ADVERTISED_HOST needed, will wait for it on /var/run/compose_env"
+       echo "SERVICE_HOST needed, will wait for it on /run/compose_env"
        while true; do
                if [ -f /run/compose_env ]; then
                        source /run/compose_env
