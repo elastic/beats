@@ -30,7 +30,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "rabbitmq")
+	r := compose.EnsureUpWithTimeout(t, 120, "rabbitmq")
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")
@@ -40,8 +40,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	t.Skip("Skipping test as it was not stable. Probably first event is empty.")
-	r := compose.EnsureUp(t, "rabbitmq")
+	r := compose.EnsureUpWithTimeout(t, 120, "rabbitmq")
 
 	reporter := &mbtest.CapturingReporterV2{}
 
