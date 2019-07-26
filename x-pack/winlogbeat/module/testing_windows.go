@@ -11,8 +11,12 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
+	"regexp"
+	"strings"
 	"testing"
 
+	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -146,8 +150,31 @@ func testPipeline(t testing.TB, evtx string, pipeline string, p *params) {
 		return
 	}
 	for i, e := range events {
-		assert.EqualValues(t, expected[i], normalize(t, e))
+		assertEqual(t, expected[i], normalize(t, e))
 	}
+}
+
+// assertEqual asserts that the two objects are deeply equal. If not it will
+// error the test and output a diff of the two objects' JSON representation.
+func assertEqual(t testing.TB, expected, actual interface{}) bool {
+	t.Helper()
+
+	if reflect.DeepEqual(expected, actual) {
+		return true
+	}
+
+	expJSON, _ := json.MarshalIndent(expected, "", "  ")
+	actJSON, _ := json.MarshalIndent(actual, "", "  ")
+
+	diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+		A:        difflib.SplitLines(string(expJSON)),
+		B:        difflib.SplitLines(string(actJSON)),
+		FromFile: "Expected",
+		ToFile:   "Actual",
+		Context:  1,
+	})
+	t.Errorf("Expected and actual are different:\n%s", diff)
+	return false
 }
 
 func writeGolden(t testing.TB, source string, events []common.MapStr) {
@@ -179,6 +206,9 @@ func readGolden(t testing.TB, source string) []common.MapStr {
 		t.Fatal(err)
 	}
 
+	for _, e := range events {
+		lowercaseGUIDs(e)
+	}
 	return events
 }
 
@@ -193,12 +223,31 @@ func normalize(t testing.TB, m common.MapStr) common.MapStr {
 		t.Fatal(err)
 	}
 
-	return out
+	// Lowercase the GUIDs in case tests are run Windows < 2019.
+	return lowercaseGUIDs(out)
 }
 
 func filterEvent(m common.MapStr, ignores []string) common.MapStr {
 	for _, f := range ignores {
 		m.Delete(f)
+	}
+	return m
+}
+
+var uppercaseGUIDRegex = regexp.MustCompile(`^{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}}$`)
+
+// lowercaseGUIDs finds string fields that look like GUIDs and converts the hex
+// from uppercase to lowercase. Prior to Windows 2019, GUIDs used uppercase hex
+// (contrary to RFC 4122).
+func lowercaseGUIDs(m common.MapStr) common.MapStr {
+	for k, v := range m.Flatten() {
+		str, ok := v.(string)
+		if !ok {
+			continue
+		}
+		if uppercaseGUIDRegex.MatchString(str) {
+			m.Put(k, strings.ToLower(str))
+		}
 	}
 	return m
 }
