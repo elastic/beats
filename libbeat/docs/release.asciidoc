@@ -9,6 +9,7 @@ This section summarizes the changes in each release. Also read
 upgrade.
 
 * <<release-notes-7.3.0>>
+* <<release-notes-7.2.0>>
 * <<release-notes-7.1.1>>
 * <<release-notes-7.1.0>>
 * <<release-notes-7.0.1>>
