@@ -22,9 +22,11 @@ import (
 	"fmt"
 	"time"
 
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -37,6 +39,10 @@ const (
 	add    = "add"
 	update = "update"
 	delete = "delete"
+)
+
+var (
+	accessor = meta.NewAccessor()
 )
 
 // Watcher watches Kubernetes resources events
@@ -193,10 +199,14 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		DeleteFunc: func(o interface{}) {
 			w.enqueue(o, delete)
 		},
-		// TODO: When we move to one watcher per object model, we should check resource verion of
-		// TODO: the old vs new and avoid reconciliation during relisting.
-		UpdateFunc: func(_, o interface{}) {
-			w.enqueue(o, update)
+		UpdateFunc: func(o, n interface{}) {
+			old, _ := accessor.ResourceVersion(o.(runtime.Object))
+			new, _ := accessor.ResourceVersion(n.(runtime.Object))
+
+			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
+			if old != new {
+				w.enqueue(n, update)
+			}
 		},
 	})
 
@@ -222,20 +232,21 @@ func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 
 // Start watching pods
 func (w *watcher) Start() error {
-	defer utilruntime.HandleCrash()
-	defer w.queue.ShutDown()
-
 	go w.informer.Run(w.ctx.Done())
 
 	if !cache.WaitForCacheSync(w.ctx.Done(), w.informer.HasSynced) {
 		return fmt.Errorf("kubernetes informer unable to sync cache")
 	}
 
-	// TODO: Do we run parallel workers for this? It is useful when we run metricbeat as one instance per cluster
-	go func() {
+	w.logger.Debugf("cache sync done")
+
+	//TODO: Do we run parallel workers for this? It is useful when we run metricbeat as one instance per cluster?
+
+	// Wrap the process function with wait.Until so that if the controller crashes, it starts up again after a second.
+	go wait.Until(func() {
 		for w.process(w.ctx) {
 		}
-	}()
+	}, time.Second*1, w.ctx.Done())
 
 	return nil
 }
@@ -261,7 +272,6 @@ func (w *watcher) process(ctx context.Context) bool {
 		key := entry.object.(string)
 
 		o, exists, err := w.store.GetByKey(key)
-		fmt.Println(o)
 		if err != nil {
 			return nil
 		}
@@ -290,5 +300,6 @@ func (w *watcher) process(ctx context.Context) bool {
 }
 
 func (w *watcher) Stop() {
+	w.queue.ShutDown()
 	w.stop()
 }

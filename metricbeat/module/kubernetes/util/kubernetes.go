@@ -47,7 +47,6 @@ type Enricher interface {
 type kubernetesConfig struct {
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata bool          `config:"add_metadata"`
-	InCluster   bool          `config:"in_cluster"`
 	KubeConfig  string        `config:"kube_config"`
 	Host        string        `config:"host"`
 	SyncPeriod  time.Duration `config:"sync_period"`
@@ -68,7 +67,7 @@ type enricher struct {
 func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
 	config := kubernetesConfig{
 		AddMetadata: true,
-		InCluster:   true,
+		SyncPeriod:  time.Minute * 10,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

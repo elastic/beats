@@ -38,7 +38,7 @@ type Enabled struct {
 func defaultKubernetesEventsConfig() kubeEventsConfig {
 	return kubeEventsConfig{
 		InCluster:        true,
-		SyncPeriod:       1 * time.Second,
+		SyncPeriod:       10 * time.Minute,
 		LabelsDedot:      true,
 		AnnotationsDedot: true,
 	}

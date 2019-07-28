@@ -43,7 +43,7 @@ type Config struct {
 func defaultConfig() *Config {
 	return &Config{
 		InCluster:      true,
-		SyncPeriod:     1 * time.Second,
+		SyncPeriod:     10 * time.Minute,
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
 	}

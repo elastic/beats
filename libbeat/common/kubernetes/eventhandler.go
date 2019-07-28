@@ -31,6 +31,8 @@ package kubernetes
 //      it will get an object of type DeletedFinalStateUnknown. This can
 //      happen if the watch is closed and misses the delete event and we don't
 //      notice the deletion until the subsequent re-list.
+// TODO: allow the On* methods to return an error so that the RateLimited WorkQueue
+// TODO: can requeue the failed event processing.
 type ResourceEventHandler interface {
 	OnAdd(obj interface{})
 	OnUpdate(obj interface{})
