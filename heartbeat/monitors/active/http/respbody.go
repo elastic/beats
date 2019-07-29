@@ -119,7 +119,6 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int64, p
 
 		if readErr != nil {
 			return 0, "", "", readErr
-			break
 		}
 	}
 	if utf8.Valid(prefixBuf[:prefixWriteOffset]) {

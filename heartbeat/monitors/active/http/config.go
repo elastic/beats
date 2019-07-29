@@ -36,7 +36,7 @@ type Config struct {
 	Timeout              time.Duration  `config:"timeout"`
 	MaxRedirects         int            `config:"max_redirects"`
 	Response             responseConfig `config:"response"`
-	TruncateResponseBody string         `config:truncate_response_body`
+	TruncateResponseBody string         `config:"truncate_response_body"`
 
 	Mode monitors.IPSettings `config:",inline"`
 
