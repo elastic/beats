@@ -46,10 +46,19 @@ type kafkaInput struct {
 	rawConfig     *common.Config // The Config given to NewInput
 	outlet        channel.Outleter
 	consumerGroup sarama.ConsumerGroup
+	sessionState  *kafkaSessionState
 	kafkaContext  context.Context
 	kafkaCancel   context.CancelFunc // The CancelFunc for kafkaContext
 	log           *logp.Logger
 	runOnce       sync.Once
+}
+
+// A synchronized wrapper to read and write the kafka session, since it may
+// change while ACKs are still pending.
+type kafkaSessionState struct {
+	session   sarama.ConsumerGroupSession
+	mutex     sync.Mutex     // Hold to access the session field
+	waitGroup sync.WaitGroup // Hold while using the session field
 }
 
 // NewInput creates a new kafka input
@@ -59,9 +68,26 @@ func NewInput(
 	inputContext input.Context,
 ) (input.Input, error) {
 
+	// We create the empty session state first because it must be referenced by
+	// the ACK callback in the connector configuration.
+	sessionState := &kafkaSessionState{}
+
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: inputContext.DynamicFields,
+		},
+		ACKEvents: func(events []interface{}) {
+			sessionState.accessSession(func(session sarama.ConsumerGroupSession) {
+				if session == nil {
+					// The kafka connection is closed and / or is being rebalanced.
+					return
+				}
+				for _, event := range events {
+					if cm, ok := event.(*sarama.ConsumerMessage); ok {
+						session.MarkMessage(cm, "")
+					}
+				}
+			})
 		},
 	})
 	if err != nil {
@@ -100,12 +126,40 @@ func NewInput(
 		rawConfig:     cfg,
 		outlet:        out,
 		consumerGroup: consumerGroup,
+		sessionState:  sessionState,
 		kafkaContext:  kafkaContext,
 		kafkaCancel:   kafkaCancel,
 		log:           logp.NewLogger("kafka input").With("hosts", config.Hosts),
 	}
 
 	return input, nil
+}
+
+// A helper to safely use the current sarama session for the duration of the
+// given callback. Used when ACKing messages outside the body of the main
+// sarama callbacks. The session parameter may be nil if there is no active
+// session.
+func (state *kafkaSessionState) accessSession(
+	fn func(session sarama.ConsumerGroupSession),
+) {
+	state.mutex.Lock()
+	state.waitGroup.Add(1)
+	session := state.session
+	state.mutex.Unlock()
+	defer state.waitGroup.Done()
+	fn(session)
+}
+
+// A helper to safely set the session field after waiting on any pending
+// operations.
+func (state *kafkaSessionState) setSession(sess sarama.ConsumerGroupSession) {
+	state.mutex.Lock()
+	// Once we claim the mutex we still wait for any pending ACKs to be
+	// sent. (These may well fail if the session is ending, but that's better
+	// than calling a stale pointer.)
+	state.waitGroup.Wait()
+	state.session = sess
+	state.mutex.Unlock()
 }
 
 // Run starts the input by scanning for incoming messages and errors.
@@ -135,7 +189,6 @@ func (input *kafkaInput) Run() {
 // Wait shuts down the Input by cancelling the internal context.
 func (input *kafkaInput) Wait() {
 	input.Stop()
-	// TODO: wait on any messages still pending internal delivery
 	// Wait for the consumer group to shut down
 	input.consumerGroup.Close()
 }
@@ -192,11 +245,13 @@ func (h groupHandler) createEvent(
 	return event
 }
 
-func (groupHandler) Setup(session sarama.ConsumerGroupSession) error {
+func (h groupHandler) Setup(session sarama.ConsumerGroupSession) error {
+	h.input.sessionState.setSession(session)
 	return nil
 }
 
-func (groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
+func (h groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
+	h.input.sessionState.setSession(nil)
 	return nil
 }
 
