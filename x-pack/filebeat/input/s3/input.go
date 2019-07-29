@@ -447,7 +447,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Con
 		Timestamp: time.Now(),
 		Fields:    f,
 		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private: s3Context,
+		Private:   s3Context,
 	}
 }
 
