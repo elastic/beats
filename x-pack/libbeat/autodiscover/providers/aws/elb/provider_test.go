@@ -118,9 +118,9 @@ func Test_internalBuilder(t *testing.T) {
 
 	fetcher.setLbls([]*lbListener{})
 
-	// Run twice to ensure that duplicates don't create two stop events
-	provider.watcher.once()
-	provider.watcher.once()
+	// Let run twice to ensure that duplicates don't create two start events
+	// 20ms should be enough to see more than two events since the loop is once per nanosecond
+	time.Sleep(time.Millisecond * 20)
 	events.waitForNumEvents(t, 2, time.Second)
 
 	require.Equal(t, 2, events.len())
