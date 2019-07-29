@@ -10,10 +10,21 @@ You can use the {stack} {monitor-features} to gain insight into the health of
 
 To monitor {beatname_uc}, make sure monitoring is enabled on your {es} cluster,
 then configure the method used to collect {beatname_uc} metrics. You
+ifndef::serverless[]
 can use one of following methods:
+endif::[]
+ifdef::serverless[]
+can use the following method:
+endif::[]
+
+//REVIEWERS: Not sure what we should say for functionbeat users, but I don't
+//think it makes sense to include the metricbeat monitoring section in the
+//functionbeat docs. 
 
 * <<monitoring-internal-collection,Internal collection>>
+ifndef::serverless[]
 * <<monitoring-metricbeat-collection, {metricbeat}>>
+endif::[]
 
 To learn about monitoring in general, see 
 {stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
@@ -22,4 +33,6 @@ To learn about monitoring in general, see
 
 include::monitoring-internal-collection.asciidoc[]
 
+ifndef::serverless[]
 include::monitoring-metricbeat.asciidoc[]
+endif::[]

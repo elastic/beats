@@ -17,8 +17,10 @@
 ++++
 
 The following method involves sending the metrics to the production cluster, 
-which ultimately routes them to the monitoring cluster. For an alternative 
-method, see <<monitoring-metricbeat-collection>>. 
+which ultimately routes them to the monitoring cluster.
+ifndef::serverless[]
+For an alternative method, see <<monitoring-metricbeat-collection>>.
+endif::[]
 
 To learn about monitoring in general, see 
 {stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
