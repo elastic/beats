@@ -203,7 +203,7 @@ func (c *Project) KillOld(except []string) error {
 			continue
 		}
 
-		if s.Old() {
+		if s.Running() && s.Old() {
 			err = c.Kill(s.Name())
 			if err != nil {
 				return err
