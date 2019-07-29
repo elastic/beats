@@ -44,11 +44,10 @@ func init() {
 type kafkaInput struct {
 	config        kafkaInputConfig
 	rawConfig     *common.Config // The Config given to NewInput
+	context       input.Context
 	outlet        channel.Outleter
 	consumerGroup sarama.ConsumerGroup
 	sessionState  *kafkaSessionState
-	kafkaContext  context.Context
-	kafkaCancel   context.CancelFunc // The CancelFunc for kafkaContext
 	log           *logp.Logger
 	runOnce       sync.Once
 }
@@ -109,26 +108,13 @@ func NewInput(
 		return nil, errors.Wrap(err, "initializing kafka consumer group")
 	}
 
-	// Sarama uses standard go contexts to control cancellation, so we need to
-	// wrap our input context channel in that interface.
-	kafkaContext, kafkaCancel := context.WithCancel(context.Background())
-	go func() {
-		select {
-		case <-inputContext.Done:
-			logp.Info("Closing kafka context because input stopped.")
-			kafkaCancel()
-			return
-		}
-	}()
-
 	input := &kafkaInput{
 		config:        config,
 		rawConfig:     cfg,
+		context:       inputContext,
 		outlet:        out,
 		consumerGroup: consumerGroup,
 		sessionState:  sessionState,
-		kafkaContext:  kafkaContext,
-		kafkaCancel:   kafkaCancel,
 		log:           logp.NewLogger("kafka input").With("hosts", config.Hosts),
 	}
 
@@ -176,10 +162,19 @@ func (input *kafkaInput) Run() {
 			for {
 				handler := groupHandler{input: input}
 
+				// Sarama uses standard go contexts to control cancellation, so we need
+				// to wrap our input context channel in that interface.
 				err := input.consumerGroup.Consume(
-					input.kafkaContext, input.config.Topics, handler)
+					doneChannelContext(input.context.Done), input.config.Topics, handler)
 				if err != nil {
 					input.log.Errorw("Kafka consume error", "error", err)
+				}
+
+				// If Consume returned because the context was cancelled, don't resume.
+				select {
+				case <-input.context.Done:
+					return
+				default:
 				}
 			}
 		}()
@@ -195,7 +190,7 @@ func (input *kafkaInput) Wait() {
 
 // Stop shuts down the Input by cancelling the internal context.
 func (input *kafkaInput) Stop() {
-	input.kafkaCancel()
+	close(input.context.Done)
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
@@ -208,6 +203,31 @@ func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
 	}
 	return array
 }
+
+// A barebones implementation of context.Context wrapped around the done
+// channels that are more common in the beats codebase. This could be added
+// as a utility in a shared part of the code, but right now it's a special
+// case for sarama which requires a context.Context, so it's private until
+// there's at least one other use case.
+type channelCtx <-chan struct{}
+
+func doneChannelContext(ch <-chan struct{}) context.Context {
+	return channelCtx(ch)
+}
+
+func (c channelCtx) Deadline() (deadline time.Time, ok bool) { return }
+func (c channelCtx) Done() <-chan struct{} {
+	return (<-chan struct{})(c)
+}
+func (c channelCtx) Err() error {
+	select {
+	case <-c:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+func (c channelCtx) Value(key interface{}) interface{} { return nil }
 
 type groupHandler struct {
 	input *kafkaInput
