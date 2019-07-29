@@ -203,6 +203,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add aws overview dashboard. {issue}11007[11007] {pull}12175[12175]
 - Add `decompress_gzip_field` processor. {pull}12733[12733]
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
+- Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
 
 *Auditbeat*
 
@@ -246,6 +247,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add netflow dashboards based on Logstash netflow. {pull}12857[12857]
 - Parse more fields from Elasticsearch slowlogs. {pull}11939[11939]
 - Update module pipelines to enrich events with autonomous system fields. {pull}13036[13036]
+- Add module for ingesting IBM MQ logs. {pull}8782[8782]
 
 *Heartbeat*
 
@@ -308,6 +310,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for reading from .evtx files. {issue}4450[4450]
 - Add support for event ID 4634 and 4647 to the Security module. {pull}12906[12906]
 - Add `network.community_id` to Sysmon network events (event ID 3). {pull}13034[13034]
+- Add `event.module` to Winlogbeat modules. {pull}13047[13047]
+- Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
 
 ==== Deprecated
 
