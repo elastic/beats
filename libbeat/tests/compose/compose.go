@@ -83,6 +83,8 @@ func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
 
 // HostInfoFromEnv gets the host information to use for the test from environment variables.
 func HostInfoFromEnv(t testing.TB, service string) HostInfo {
+	// If an environment variable with the form <SERVICE>_HOST is used, its value
+	// is used as host instead of starting a new service.
 	envVar := fmt.Sprintf("%s_HOST", strings.ToUpper(service))
 	host := os.Getenv(envVar)
 	if host != "" {
@@ -91,7 +93,8 @@ func HostInfoFromEnv(t testing.TB, service string) HostInfo {
 
 	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
 	// This is useful if the service is already running locally.
-	// If used, an environment variable <SERVICE>_HOST has to be used to specify the host to use.
+	// Kept for historical reasons, now it only complains if the host environment
+	// variable is not set.
 	noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE"))
 	if err == nil && noCompose {
 		t.Fatalf("%s environment variable must be set as the host:port where %s is running", envVar, service)
