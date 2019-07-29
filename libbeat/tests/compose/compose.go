@@ -35,24 +35,18 @@ type HostInfo interface {
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 300 seconds
-func EnsureUp(t *testing.T, service string) HostInfo {
+func EnsureUp(t testing.TB, service string) HostInfo {
 	t.Helper()
 	return EnsureUpWithTimeout(t, 60, service)
 }
 
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
 // Wait for `timeout` seconds for health
-func EnsureUpWithTimeout(t *testing.T, timeout int, service string) HostInfo {
+func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
 	t.Helper()
-	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
-	// This is useful if the service is already running locally.
-	if noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE")); err == nil && noCompose {
-		envVar := fmt.Sprintf("%s_HOST", strings.ToUpper(service))
-		host := os.Getenv(envVar)
-		if host == "" {
-			t.Fatalf("%s environment variable must be set as the host:port where %s is running", envVar, service)
-		}
-		return &staticHostInfo{host: host}
+
+	if hostInfo := HostInfoFromEnv(t, service); hostInfo != nil {
+		return hostInfo
 	}
 
 	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
@@ -85,6 +79,25 @@ func EnsureUpWithTimeout(t *testing.T, timeout int, service string) HostInfo {
 	}
 
 	return host
+}
+
+// HostInfoFromEnv gets the host information to use for the test from environment variables.
+func HostInfoFromEnv(t testing.TB, service string) HostInfo {
+	envVar := fmt.Sprintf("%s_HOST", strings.ToUpper(service))
+	host := os.Getenv(envVar)
+	if host != "" {
+		return &staticHostInfo{host: host}
+	}
+
+	// The NO_COMPOSE env variables makes it possible to skip the starting of the environment.
+	// This is useful if the service is already running locally.
+	// If used, an environment variable <SERVICE>_HOST has to be used to specify the host to use.
+	noCompose, err := strconv.ParseBool(os.Getenv("NO_COMPOSE"))
+	if err == nil && noCompose {
+		t.Fatalf("%s environment variable must be set as the host:port where %s is running", envVar, service)
+	}
+
+	return nil
 }
 
 type staticHostInfo struct {
