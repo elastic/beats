@@ -70,7 +70,7 @@ func (w *watcher) once() error {
 	if err != nil {
 		return err
 	}
-	logp.Info("fetched %d load balancer listeners from AWS for autodiscovery", len(fetchedLbls))
+	logp.Debug("autodiscover-elb-listeners", "fetched %d load balancer listeners from AWS for autodiscovery", len(fetchedLbls))
 
 	oldGen := w.gen
 	w.gen++
