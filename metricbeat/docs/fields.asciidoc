@@ -5371,6 +5371,16 @@ Memory metrics.
 
 
 
+*`docker.memory.stats.*`*::
++
+--
+Raw memory stats from the cgroups memory.stat interface
+
+
+type: object
+
+--
+
 [float]
 === commit
 
