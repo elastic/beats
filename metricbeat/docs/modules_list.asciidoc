@@ -16,6 +16,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]  
 |<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>> beta[]  
+|<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
+|<<metricbeat-metricset-beat-stats,stats>>   
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
@@ -189,6 +192,7 @@ This file is generated! See scripts/docs_collector.py
 include::modules/aerospike.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/aws.asciidoc[]
+include::modules/beat.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
 include::modules/consul.asciidoc[]
