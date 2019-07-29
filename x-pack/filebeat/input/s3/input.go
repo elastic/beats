@@ -17,6 +17,7 @@ import (
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -194,6 +195,9 @@ func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int6
 
 		output, err := req.Send(p.context)
 		if err != nil {
+			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+				continue
+			}
 			p.logger.Error("failed to receive message from SQS:", err)
 			time.Sleep(time.Duration(waitTimeSecond) * time.Second)
 			continue
@@ -443,7 +447,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Con
 		Timestamp: time.Now(),
 		Fields:    f,
 		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private:   s3Context,
+		Private: s3Context,
 	}
 }
 
