@@ -1,4 +1,4 @@
-- name: state_cronjob
+- name: cronjob
   type: group
   description: >
     kubernetes cronjob metrics

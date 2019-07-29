@@ -16051,13 +16051,13 @@ format: bytes
 --
 
 [float]
-=== state_cronjob
+=== cronjob
 
 kubernetes cronjob metrics
 
 
 
-*`kubernetes.state_cronjob.name`*::
+*`kubernetes.cronjob.name`*::
 +
 --
 Cronjob name
@@ -16066,7 +16066,7 @@ type: keyword
 
 --
 
-*`kubernetes.state_cronjob.namespace`*::
+*`kubernetes.cronjob.namespace`*::
 +
 --
 Cronjob namespace
@@ -16075,7 +16075,7 @@ type: keyword
 
 --
 
-*`kubernetes.state_cronjob.schedule`*::
+*`kubernetes.cronjob.schedule`*::
 +
 --
 Cronjob schedule
@@ -16084,7 +16084,7 @@ type: keyword
 
 --
 
-*`kubernetes.state_cronjob.concurrency`*::
+*`kubernetes.cronjob.concurrency`*::
 +
 --
 Concurrency policy
@@ -16093,7 +16093,7 @@ type: keyword
 
 --
 
-*`kubernetes.state_cronjob.active.count`*::
+*`kubernetes.cronjob.active.count`*::
 +
 --
 Number of active pods for the cronjob
@@ -16102,7 +16102,7 @@ type: long
 
 --
 
-*`kubernetes.state_cronjob.is_suspended`*::
+*`kubernetes.cronjob.is_suspended`*::
 +
 --
 Whether the cronjob is suspended
@@ -16111,7 +16111,7 @@ type: boolean
 
 --
 
-*`kubernetes.state_cronjob.created.sec`*::
+*`kubernetes.cronjob.created.sec`*::
 +
 --
 Epoch seconds since the cronjob was created
@@ -16120,7 +16120,7 @@ type: double
 
 --
 
-*`kubernetes.state_cronjob.lastschedule.sec`*::
+*`kubernetes.cronjob.lastschedule.sec`*::
 +
 --
 Epoch seconds for last cronjob run
@@ -16129,7 +16129,7 @@ type: double
 
 --
 
-*`kubernetes.state_cronjob.nextschedule.sec`*::
+*`kubernetes.cronjob.nextschedule.sec`*::
 +
 --
 Epoch seconds for next cronjob run
@@ -16138,7 +16138,7 @@ type: double
 
 --
 
-*`kubernetes.state_cronjob.deadline.sec`*::
+*`kubernetes.cronjob.deadline.sec`*::
 +
 --
 Deadline seconds after schedule for considering failed

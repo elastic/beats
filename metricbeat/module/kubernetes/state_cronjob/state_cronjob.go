@@ -36,7 +36,6 @@ var (
 
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			// "kube_cronjob_labels":          p.NeedTypeForThis("cronjob.labels", "label_run"),
 			"kube_cronjob_info":                           p.InfoMetric(),
 			"kube_cronjob_created":                        p.Metric("created.sec"),
 			"kube_cronjob_status_active":                  p.Metric("active.count"),
@@ -45,13 +44,13 @@ var (
 			"kube_cronjob_spec_suspend":                   p.BooleanMetric("is_suspended"),
 			"kube_cronjob_spec_starting_deadline_seconds": p.Metric("deadline.sec"),
 		},
-
 		Labels: map[string]p.LabelMap{
 			"cronjob":            p.KeyLabel("name"),
 			"namespace":          p.KeyLabel("namespace"),
 			"schedule":           p.KeyLabel("schedule"),
 			"concurrency_policy": p.KeyLabel("concurrency"),
 		},
+		Namespace: "kubernetes.cronjob",
 	}
 )
 
