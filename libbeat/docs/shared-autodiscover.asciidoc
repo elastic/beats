@@ -293,7 +293,7 @@ These are the available fields during within config templating. The `elb_listene
   * elb_listener.vpc_id
   * elb_listener.ssl_policy
 
-include::../../{beatname_lc}/docs/autodiscover-elb-config.asciidoc[]
+include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
 
 endif::autodiscoverAWSELB[]
 
