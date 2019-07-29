@@ -66,7 +66,7 @@ func (c *wrapperContainer) Running() bool {
 	return c.info.State == "running"
 }
 
-var statusOldRe = regexp.MustCompile(`(\d+) (minutes|hours)`)
+var statusOldRe = regexp.MustCompile(`(\d+) (minute|hour)s?`)
 
 func (c *wrapperContainer) Old() bool {
 	match := statusOldRe.FindStringSubmatch(c.info.Status)
@@ -76,7 +76,7 @@ func (c *wrapperContainer) Old() bool {
 	n, _ := strconv.Atoi(match[1])
 	unit := match[2]
 	switch unit {
-	case "minutes":
+	case "minute":
 		return n > 5
 	default:
 		return true
