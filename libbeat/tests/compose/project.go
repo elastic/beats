@@ -251,11 +251,11 @@ type ServiceInfo interface {
 	Running() bool
 	Healthy() bool
 
-	Host() string
-	HostForPort(int) string
-
 	// Has been up for too long?:
 	Old() bool
+
+	Host() string
+	HostForPort(int) string
 }
 
 func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) {
