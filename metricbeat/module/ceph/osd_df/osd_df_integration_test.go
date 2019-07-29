@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build integration,linux
+
 package osd_df
 
 import (
