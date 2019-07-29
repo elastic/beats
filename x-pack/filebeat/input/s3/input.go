@@ -93,6 +93,13 @@ type sqsMessage struct {
 	} `json:"Records"`
 }
 
+type s3Context struct {
+	mux  sync.Mutex
+	refs int
+	err  error // first error witnessed or multi error
+	errC chan error
+}
+
 // channelContext implements context.Context by wrapping a channel
 type channelContext struct {
 	done <-chan struct{}
@@ -123,6 +130,13 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: context.DynamicFields,
+		},
+		ACKEvents: func(privates []interface{}) {
+			for _, private := range privates {
+				if s3Context, ok := private.(*s3Context); ok {
+					s3Context.done()
+				}
+			}
 		},
 	})
 	if err != nil {
@@ -223,19 +237,19 @@ func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTim
 
 func (p *Input) processMessage(svcS3 *s3.Client, message sqs.Message, wg *sync.WaitGroup, errC chan error) {
 	defer wg.Done()
-	defer close(errC)
 
 	s3Infos, err := handleSQSMessage(message)
 	if err != nil {
-		p.logger.Error(errors.Wrap(err, "handelMessage failed"))
+		p.logger.Error(errors.Wrap(err, "handleMessage failed"))
 		return
 	}
 
 	// read from s3 object and create event for each log line
-	err = p.handleS3Objects(svcS3, s3Infos)
+	err = p.handleS3Objects(svcS3, s3Infos, errC)
 	if err != nil {
-		errC <- errors.Wrap(err, "handleS3Objects failed")
-		p.logger.Error(errors.Wrap(err, "handleS3Objects failed"))
+		err = errors.Wrap(err, "handleS3Objects failed")
+		errC <- err
+		p.logger.Error(err)
 	}
 }
 
@@ -253,6 +267,7 @@ func (p *Input) processorKeepAlive(svcSQS *sqs.Client, message sqs.Message, queu
 				}
 				p.logger.Warnf("Message visibility timeout updated to %v", visibilityTimeout)
 			} else {
+				p.logger.Debug("ACK done, deleting message from SQS")
 				// only delete sqs message when errC is closed with no error
 				err := p.deleteMessage(queueURL, *message.ReceiptHandle, svcSQS)
 				if err != nil {
@@ -314,7 +329,11 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	return s3Infos, nil
 }
 
-func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info) error {
+func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) error {
+	s3Context := &s3Context{
+		errC: errC,
+	}
+
 	for _, s3Info := range s3Infos {
 		objectHash := s3ObjectHash(s3Info)
 
@@ -335,9 +354,12 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info) error {
 				if err == io.EOF {
 					// create event for last line
 					offset += len([]byte(log))
-					err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
+					event := createEvent(log, offset, s3Info, objectHash, s3Context)
+					err = p.forwardEvent(event)
 					if err != nil {
-						return errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+						err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+						s3Context.Fail(err)
+						return err
 					}
 					return nil
 				}
@@ -346,9 +368,12 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info) error {
 
 			// create event per log line
 			offset += len([]byte(log))
-			err = p.forwardEvent(createEvent(log, offset, s3Info, objectHash))
+			event := createEvent(log, offset, s3Info, objectHash, s3Context)
+			err = p.forwardEvent(event)
 			if err != nil {
-				return errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+				err = errors.Wrapf(err, "forwardEvent failed for %v", s3Info.key)
+				s3Context.Fail(err)
+				return err
 			}
 		}
 	}
@@ -392,7 +417,7 @@ func (p *Input) deleteMessage(queueURL string, messagesReceiptHandle string, svc
 	return nil
 }
 
-func createEvent(log string, offset int, s3Info s3Info, objectHash string) beat.Event {
+func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Context *s3Context) beat.Event {
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
@@ -412,10 +437,13 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string) beat.
 			"region":   s3Info.region,
 		},
 	}
+
+	s3Context.Inc()
 	return beat.Event{
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
+		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
+		Private:   s3Context,
 	}
 }
 
@@ -429,4 +457,28 @@ func s3ObjectHash(s3Info s3Info) string {
 	h.Write([]byte(s3Info.arn + s3Info.key))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
+}
+
+func (c *s3Context) Fail(err error) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
+	// only care about the last error for now
+	// TODO: add "Typed" error to error for context
+	c.err = err
+	c.done()
+}
+
+func (c *s3Context) done() {
+	c.refs--
+	if c.refs == 0 {
+		c.errC <- c.err
+		close(c.errC)
+	}
+}
+
+func (c *s3Context) Inc() {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	c.refs++
 }

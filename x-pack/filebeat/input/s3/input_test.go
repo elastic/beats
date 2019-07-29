@@ -127,6 +127,12 @@ func TestBufferedIORead(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
+	errC := make(chan error)
+	s3Context := &s3Context{
+		refs: 1,
+		errC: errC,
+	}
+
 	mockSvc := &MockS3Client{}
 	s3Info := s3Info{
 		name:   "test-s3-ks",
@@ -138,19 +144,19 @@ func TestCreateEvent(t *testing.T) {
 
 	reader, err := p.bufferedIORead(mockSvc, s3Info)
 	assert.NoError(t, err)
-	var events []*beat.Event
+	var events []beat.Event
 	for {
 		log, err := reader.ReadString('\n')
 		if log == "" {
 			break
 		}
 		if err == io.EOF {
-			event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash)
+			event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash, s3Context)
 			events = append(events, event)
 			break
 		}
 
-		event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash)
+		event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash, s3Context)
 		events = append(events, event)
 	}
 
@@ -179,6 +185,8 @@ func TestCreateEvent(t *testing.T) {
 	message2, err := events[1].Fields.GetValue("message")
 	assert.NoError(t, err)
 	assert.Equal(t, s3LogString2, message2.(string))
+
+	s3Context.done()
 }
 
 func TestConstructObjectURL(t *testing.T) {
