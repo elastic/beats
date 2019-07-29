@@ -101,6 +101,7 @@ func WithNamespace(namespace string) MetricSetOption {
 // Register contains the factory functions for creating new Modules and new
 // MetricSets. Registers are thread safe for concurrent usage.
 type Register struct {
+	log *logp.Logger
 	// Lock to control concurrent read/writes
 	lock sync.RWMutex
 	// A map of module name to ModuleFactory.
@@ -125,6 +126,7 @@ type ModulesSource interface {
 // NewRegister creates and returns a new Register.
 func NewRegister() *Register {
 	return &Register{
+		log:        logp.NewLogger("registry"),
 		modules:    make(map[string]ModuleFactory, initialSize),
 		metricSets: make(map[string]map[string]MetricSetRegistration, initialSize),
 	}
@@ -153,7 +155,7 @@ func (r *Register) AddModule(name string, factory ModuleFactory) error {
 	}
 
 	r.modules[name] = factory
-	logp.Info("Module registered: %s", name)
+	r.log.Infof("Module registered: %s", name)
 	return nil
 }
 
@@ -214,7 +216,7 @@ func (r *Register) addMetricSet(module, name string, factory MetricSetFactory, o
 	}
 
 	r.metricSets[module][name] = msInfo
-	logp.Info("MetricSet registered: %s/%s", module, name)
+	r.log.Infof("MetricSet registered: %s/%s", module, name)
 	return nil
 }
 
@@ -280,7 +282,7 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 		exists = true
 		sourceDefaults, err := source.DefaultMetricSets(module)
 		if err != nil {
-			logp.L().Errorf("failed to get default metric sets for module '%s' from secondary source: %s", module, err)
+			r.log.Errorf("failed to get default metric sets for module '%s' from secondary source: %s", module, err)
 		} else if len(sourceDefaults) > 0 {
 			defaults = append(defaults, sourceDefaults...)
 		}
@@ -311,7 +313,7 @@ func (r *Register) Modules() []string {
 	if source := r.secondarySource; source != nil {
 		sourceModules, err := source.Modules()
 		if err != nil {
-			logp.L().Errorf("failed to get modules from secondary source: %s", err)
+			r.log.Errorf("failed to get modules from secondary source: %s", err)
 		} else {
 			for _, module := range sourceModules {
 				dups[module] = true
@@ -352,7 +354,7 @@ func (r *Register) MetricSets(module string) []string {
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
 		sourceMetricSets, err := source.MetricSets(module)
 		if err != nil {
-			logp.L().Errorf("failed to get metricsets from secondary source: %", err)
+			r.log.Errorf("failed to get metricsets from secondary source: %", err)
 		}
 		metricsets = append(metricsets, sourceMetricSets...)
 	}
