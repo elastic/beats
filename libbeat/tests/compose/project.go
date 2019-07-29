@@ -70,6 +70,8 @@ type Driver interface {
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
 
 	LockFile() string
+
+	Close() error
 }
 
 // ContainerStatus is an interface to obtain the status of a container
@@ -95,12 +97,13 @@ func NewProject(name string, files []string) (*Project, error) {
 	if name == "" {
 		name = filepath.Base(filepath.Dir(files[0]))
 	}
-	return &Project{
-		&wrapperDriver{
-			Name:  name,
-			Files: files,
-		},
-	}, nil
+	driver, err := NewWrapperDriver()
+	if err != nil {
+		return nil, err
+	}
+	driver.Name = name
+	driver.Files = files
+	return &Project{Driver: driver}, nil
 }
 
 // Start the container, unless it's running already
@@ -143,6 +146,10 @@ func (c *Project) Wait(seconds int, services ...string) error {
 				healthy = false
 				break
 			}
+		}
+
+		if healthy {
+			break
 		}
 
 		time.Sleep(1 * time.Second)

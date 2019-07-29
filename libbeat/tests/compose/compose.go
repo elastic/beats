@@ -53,6 +53,7 @@ func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer compose.Close()
 
 	// Kill no longer used containers
 	err = compose.KillOld([]string{service})

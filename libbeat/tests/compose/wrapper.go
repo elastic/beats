@@ -48,6 +48,16 @@ type wrapperDriver struct {
 	Files []string
 
 	Environment []string
+
+	client *client.Client
+}
+
+func NewWrapperDriver() (*wrapperDriver, error) {
+	c, err := client.NewEnvClient()
+	if err != nil {
+		return nil, err
+	}
+	return &wrapperDriver{client: c}, nil
 }
 
 type wrapperContainer struct {
@@ -135,6 +145,10 @@ func (d *wrapperDriver) LockFile() string {
 	return d.Files[0] + ".lock"
 }
 
+func (d *wrapperDriver) Close() error {
+	return errors.Wrap(d.client.Close(), "failed to close wrapper driver")
+}
+
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
 	var args []string
 	args = append(args, "--no-ansi", "--project-name", d.Name)
@@ -185,7 +199,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	}
 }
 
-func writeToContainer(ctx context.Context, id, filename, content string) error {
+func writeToContainer(ctx context.Context, cli *client.Client, id, filename, content string) error {
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
 	now := time.Now()
@@ -207,12 +221,6 @@ func writeToContainer(ctx context.Context, id, filename, content string) error {
 	if err := tw.Close(); err != nil {
 		return errors.Wrap(err, "failed to close tar")
 	}
-
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return errors.Wrap(err, "failed to start docker client")
-	}
-	defer cli.Close()
 
 	opts := types.CopyToContainerOptions{}
 	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
@@ -238,7 +246,7 @@ func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string)
 		w := &wrapperContainer{info: c}
 		content := fmt.Sprintf("SERVICE_HOST=%s", w.Host())
 
-		err := writeToContainer(ctx, c.ID, "/run/compose_env", content)
+		err := writeToContainer(ctx, d.client, c.ID, "/run/compose_env", content)
 		if err != nil {
 			return err
 		}
@@ -287,12 +295,6 @@ func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, fi
 }
 
 func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]types.Container, error) {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to start docker client")
-	}
-	defer cli.Close()
-
 	var serviceFilters []filters.Args
 	if len(filter) == 0 {
 		f := makeFilter(d.Name, "", projectFilter)
@@ -306,7 +308,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 	var containers []types.Container
 	for _, f := range serviceFilters {
-		c, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		c, err := d.client.ContainerList(ctx, types.ContainerListOptions{
 			All:     true,
 			Filters: f,
 		})
