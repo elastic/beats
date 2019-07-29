@@ -74,7 +74,6 @@ type Driver interface {
 
 // ContainerStatus is an interface to obtain the status of a container
 type ContainerStatus interface {
-	Name() string
 	ServiceName() string
 	Healthy() bool
 	Running() bool
@@ -277,10 +276,20 @@ func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) 
 			continue
 		}
 
-		result[name] = c
+		result[name] = &containerServiceInfo{c}
 	}
 
 	return result, nil
+}
+
+// containerServiceInfo wrapps a container status to provide information
+// about the service implemented by the container
+type containerServiceInfo struct {
+	ContainerStatus
+}
+
+func (i *containerServiceInfo) Name() string {
+	return i.ContainerStatus.ServiceName()
 }
 
 func contains(list []string, item string) bool {

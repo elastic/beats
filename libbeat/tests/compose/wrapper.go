@@ -54,10 +54,6 @@ type wrapperContainer struct {
 	info types.Container
 }
 
-func (c *wrapperContainer) Name() string {
-	return c.ServiceName()
-}
-
 func (c *wrapperContainer) ServiceName() string {
 	return c.info.Labels[labelComposeService]
 }
