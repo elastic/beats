@@ -3617,6 +3617,18 @@ alias to: url.full
 
 --
 
+
+
+*`http.response.body.hash`*::
++
+--
+Hash of the response body. Can be used to group responses with identical hashes
+
+
+type: keyword
+
+--
+
 [float]
 === rtt
 
