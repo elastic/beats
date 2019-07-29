@@ -82,20 +82,19 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*lbListener, error) {
 
 	req := f.client.DescribeLoadBalancersRequest(&elasticloadbalancingv2.DescribeLoadBalancersInput{PageSize: &pageSize})
 
-	// Limit concurrency against the AWS API by creating a pool of objects
-	// This is hard coded for now. The concurrency limit of 10 was set semi-arbitrarily.
-	taskPool := sync.Pool{}
-	for i := 0; i < 10; i++ {
-		taskPool.Put(nil)
-	}
-
 	ctx, cancel := context.WithCancel(ctx)
 	ir := &fetchRequest{
 		paginator: elasticloadbalancingv2.NewDescribeLoadBalancersPaginator(req),
 		client:    f.client,
-		taskPool:  taskPool,
+		taskPool:  sync.Pool{},
 		context:   ctx,
 		cancel:    cancel,
+	}
+
+	// Limit concurrency against the AWS API by creating a pool of objects
+	// This is hard coded for now. The concurrency limit of 10 was set semi-arbitrarily.
+	for i := 0; i < 10; i++ {
+		ir.taskPool.Put(nil)
 	}
 
 	return ir.fetch()

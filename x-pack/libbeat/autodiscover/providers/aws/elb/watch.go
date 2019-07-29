@@ -65,7 +65,9 @@ func (w *watcher) forever() {
 // once executes the watch loop a single time.
 // This is mostly useful for testing.
 func (w *watcher) once() error {
-	ctx, _ := context.WithTimeout(context.Background(), w.period)
+	ctx, cancelCtx := context.WithTimeout(context.Background(), w.period)
+	defer cancelCtx() // Always cancel to avoid leak
+
 	fetchedLbls, err := w.fetcher.fetch(ctx)
 	if err != nil {
 		return err
