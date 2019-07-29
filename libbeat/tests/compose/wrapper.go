@@ -123,7 +123,6 @@ func (c *wrapperContainer) Host() string {
 }
 
 func (c *wrapperContainer) HostForPort(port int) string {
-	// TODO: Support multiple networks/ports
 	if runtime.GOOS == "linux" {
 		return c.privateHost(port)
 	}
