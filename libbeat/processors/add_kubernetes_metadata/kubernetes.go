@@ -18,7 +18,6 @@
 package add_kubernetes_metadata
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -61,11 +60,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
 	}
 
-	err = validate(config)
-	if err != nil {
-		return nil, err
-	}
-
 	//Load default indexer configs
 	if config.DefaultIndexers.Enabled == true {
 		Indexing.RLock()
@@ -102,7 +96,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		return nil, err
 	}
 
-	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
+	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 
 	logp.Debug("kubernetes", "Using host: %s", config.Host)
 	logp.Debug("kubernetes", "Initializing watcher")
@@ -178,11 +172,4 @@ func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {
 
 func (*kubernetesAnnotator) String() string {
 	return "add_kubernetes_metadata"
-}
-
-func validate(config kubeAnnotatorConfig) error {
-	if !config.InCluster && config.KubeConfig == "" {
-		return errors.New("`kube_config` path can't be empty when in_cluster is set to false")
-	}
-	return nil
 }
