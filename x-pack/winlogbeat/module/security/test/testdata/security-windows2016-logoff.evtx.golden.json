@@ -4,7 +4,8 @@
     "event": {
       "action": "Logoff",
       "code": 4634,
-      "kind": "event"
+      "kind": "event",
+      "module": "security"
     },
     "log": {
       "level": "information"
@@ -37,7 +38,7 @@
           "id": 540
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 485,
       "task": "Logoff"
@@ -48,7 +49,8 @@
     "event": {
       "action": "Logoff",
       "code": 4634,
-      "kind": "event"
+      "kind": "event",
+      "module": "security"
     },
     "log": {
       "level": "information"
@@ -81,7 +83,7 @@
           "id": 820
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 747,
       "task": "Logoff"

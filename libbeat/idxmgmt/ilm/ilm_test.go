@@ -52,6 +52,19 @@ func TestDefaultSupport_Init(t *testing.T) {
 		}
 	})
 
+	t.Run("with an empty rollover_alias", func(t *testing.T) {
+		_, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":        true,
+				"rollover_alias": "",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
+			},
+		))
+		require.Error(t, err)
+	})
+
 	t.Run("with custom config", func(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
@@ -72,6 +85,47 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(ModeEnabled, s.Mode())
 		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
 		assert.Equal(Alias{Name: "alias", Pattern: "01"}, s.Alias())
+	})
+
+	t.Run("with custom alias config with fieldref", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":        true,
+				"rollover_alias": "alias-%{[agent.version]}",
+				"pattern":        "01",
+				"check_exists":   false,
+				"overwrite":      true,
+			},
+		))
+		require.NoError(t, err)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "alias-9.9.9", Pattern: "01"}, s.Alias())
+	})
+
+	t.Run("with default alias", func(t *testing.T) {
+		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
+			map[string]interface{}{
+				"enabled":      true,
+				"pattern":      "01",
+				"check_exists": false,
+				"overwrite":    true,
+			},
+		))
+		require.NoError(t, err)
+
+		s := tmp.(*stdSupport)
+		assert := assert.New(t)
+		assert.Equal(true, s.overwrite)
+		assert.Equal(false, s.checkExists)
+		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "test-9.9.9", Pattern: "01"}, s.Alias())
 	})
 
 	t.Run("load external policy", func(t *testing.T) {

@@ -13,6 +13,8 @@ spec:
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
         image: docker.elastic.co/beats/filebeat:%VERSION%
