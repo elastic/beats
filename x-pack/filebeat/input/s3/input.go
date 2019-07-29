@@ -23,9 +23,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -113,7 +111,7 @@ func (c *channelContext) Err() error {
 func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new s3 input
-func NewInput(cfg *common.Config, outletFactory channel.Connector, context input.Context) (input.Input, error) {
+func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Beta("s3 input type is used")
 	logger := logp.NewLogger(inputName)
 
@@ -122,7 +120,11 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
 
-	outlet, err := outletFactory(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +136,7 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 
 	closeChannel := make(chan struct{})
 	p := &Input{
-		outlet:    outlet,
+		outlet:    out,
 		config:    config,
 		awsConfig: awsConfig,
 		logger:    logger,
@@ -368,12 +370,10 @@ func (p *Input) bufferedIORead(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Rea
 	return bufio.NewReader(resp.Body), nil
 }
 
-func (p *Input) forwardEvent(event *beat.Event) error {
-	forwarder := harvester.NewForwarder(p.outlet)
-	d := &util.Data{Event: *event}
-	err := forwarder.Send(d)
-	if err != nil {
-		return errors.Wrap(err, "forwarder send failed")
+func (p *Input) forwardEvent(event beat.Event) error {
+	ok := p.outlet.OnEvent(event)
+	if !ok {
+		return errors.New("input outlet closed")
 	}
 	return nil
 }
@@ -392,7 +392,7 @@ func (p *Input) deleteMessage(queueURL string, messagesReceiptHandle string, svc
 	return nil
 }
 
-func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat.Event {
+func createEvent(log string, offset int, s3Info s3Info, objectHash string) beat.Event {
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
@@ -412,7 +412,7 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string) *beat
 			"region":   s3Info.region,
 		},
 	}
-	return &beat.Event{
+	return beat.Event{
 		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
 		Timestamp: time.Now(),
 		Fields:    f,
