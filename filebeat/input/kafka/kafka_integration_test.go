@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// + build integration
 
 package kafka
 
@@ -33,7 +33,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	_ "github.com/elastic/beats/libbeat/outputs/codec/format"
@@ -53,17 +52,17 @@ type eventCapturer struct {
 	closed    bool
 	c         chan struct{}
 	closeOnce sync.Once
-	events    chan *util.Data
+	events    chan beat.Event
 }
 
-func NewEventCapturer(events chan *util.Data) channel.Outleter {
+func NewEventCapturer(events chan beat.Event) channel.Outleter {
 	return &eventCapturer{
 		c:      make(chan struct{}),
 		events: events,
 	}
 }
 
-func (o *eventCapturer) OnEvent(event *util.Data) bool {
+func (o *eventCapturer) OnEvent(event beat.Event) bool {
 	o.events <- event
 	return true
 }
@@ -129,13 +128,13 @@ func TestInput(t *testing.T) {
 	})
 
 	// Route input events through our capturer instead of sending through ES.
-	events := make(chan *util.Data, 100)
+	events := make(chan beat.Event, 100)
 	defer close(events)
 	capturer := NewEventCapturer(events)
 	defer capturer.Close()
-	connector := func(*common.Config, *common.MapStrPointer) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(capturer), nil
-	}
+	})
 
 	input, err := NewInput(config, connector, context)
 	if err != nil {
@@ -149,13 +148,13 @@ func TestInput(t *testing.T) {
 	for _, m := range messages {
 		select {
 		case event := <-events:
-			text, err := event.GetEvent().Fields.GetValue("message")
+			text, err := event.Fields.GetValue("message")
 			if err != nil {
 				t.Fatal(err)
 			}
 			assert.Equal(t, text, m.message)
 
-			checkMatchingHeaders(t, event.GetEvent(), m.headers)
+			checkMatchingHeaders(t, event, m.headers)
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
