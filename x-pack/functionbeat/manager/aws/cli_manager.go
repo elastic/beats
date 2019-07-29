@@ -23,7 +23,7 @@ import (
 const (
 	// AWS lambda currently support go 1.x as a runtime.
 	runtime     = "go1.x"
-	handlerName = "functionbeat"
+	handlerName = "functionbeat-aws"
 )
 
 // AWSLambdaFunction add 'dependsOn' as a serializable parameters,  goformation doesn't currently
