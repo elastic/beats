@@ -19,11 +19,11 @@ package config
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 
 	"github.com/elastic/fleet/x-pack/pkg/core/remoteconfig/grpc"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -49,7 +49,7 @@ func (s *Server) Config(ctx context.Context, req *grpc.ConfigRequest) (*grpc.Con
 	cfgString := req.GetConfig()
 
 	var configMap map[string]interface{}
-	if err := json.Unmarshal([]byte(cfgString), &configMap); err != nil {
+	if err := yaml.Unmarshal([]byte(cfgString), &configMap); err != nil {
 		return &grpc.ConfigResponse{}, err
 	}
 
