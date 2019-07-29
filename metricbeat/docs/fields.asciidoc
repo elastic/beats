@@ -860,7 +860,7 @@ type: keyword
 
 --
 
-*`aws.cloudwatch.metrics.*`*::
+*`aws.cloudwatch.metrics.*.*`*::
 +
 --
 Metrics that returned from Cloudwatch api query.

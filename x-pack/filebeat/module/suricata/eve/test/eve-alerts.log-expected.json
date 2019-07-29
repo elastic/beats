@@ -1,6 +1,8 @@
 [
     {
         "@timestamp": "2018-10-03T14:42:44.836Z",
+        "destination.as.number": 15133,
+        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.bytes": 1654,
         "destination.domain": "example.net",
         "destination.geo.city_name": "Norwell",
@@ -63,6 +65,8 @@
     },
     {
         "@timestamp": "2018-10-03T16:16:26.711Z",
+        "destination.as.number": 15133,
+        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.bytes": 1654,
         "destination.domain": "example.net",
         "destination.geo.city_name": "Norwell",
@@ -125,6 +129,8 @@
     },
     {
         "@timestamp": "2018-10-03T16:44:50.813Z",
+        "destination.as.number": 15133,
+        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.bytes": 1654,
         "destination.domain": "example.net",
         "destination.geo.city_name": "Norwell",
@@ -187,6 +193,8 @@
     },
     {
         "@timestamp": "2018-10-03T16:45:09.267Z",
+        "destination.as.number": 15133,
+        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.bytes": 1654,
         "destination.domain": "example.org",
         "destination.geo.city_name": "Norwell",
@@ -249,6 +257,8 @@
     },
     {
         "@timestamp": "2018-10-03T16:45:34.481Z",
+        "destination.as.number": 15133,
+        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.bytes": 1654,
         "destination.domain": "example.org",
         "destination.geo.city_name": "Norwell",
@@ -311,6 +321,8 @@
     },
     {
         "@timestamp": "2018-10-03T17:02:38.900Z",
+        "destination.as.number": 15133,
+        "destination.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
         "destination.bytes": 1654,
         "destination.domain": "example.org",
         "destination.geo.city_name": "Norwell",
@@ -373,6 +385,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.009Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 1654,
         "destination.domain": "security.ubuntu.com",
         "destination.geo.city_name": "London",
@@ -435,6 +449,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.168Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 417,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -497,6 +513,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.288Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 3445,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -559,6 +577,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.289Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 90543,
         "destination.domain": "security.ubuntu.com",
         "destination.geo.city_name": "London",
@@ -621,6 +641,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.356Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 145014,
         "destination.domain": "security.ubuntu.com",
         "destination.geo.city_name": "London",
@@ -683,6 +705,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.456Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 330525,
         "destination.domain": "security.ubuntu.com",
         "destination.geo.city_name": "London",
@@ -745,6 +769,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.747Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 96554,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -807,6 +833,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:34:59.953Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 174843,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -869,6 +897,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:35:00.250Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 376452,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -931,6 +961,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:35:00.401Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 468170,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -993,6 +1025,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:35:00.776Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 880323,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -1055,6 +1089,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:35:00.897Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 884342,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -1117,6 +1153,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:35:01.362Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 1467603,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
@@ -1178,6 +1216,8 @@
     },
     {
         "@timestamp": "2018-10-04T09:35:01.575Z",
+        "destination.as.number": 41231,
+        "destination.as.organization.name": "Canonical Group Limited",
         "destination.bytes": 1618380,
         "destination.domain": "archive.ubuntu.com",
         "destination.geo.city_name": "Boston",
