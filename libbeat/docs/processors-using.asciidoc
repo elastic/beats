@@ -884,8 +884,9 @@ processor to drop the field and then rename the field.
 -------
 processors:
 - decode_base64_field:
-    from: "field1"
-    to: "field2"
+    field:
+      from: "field1"
+      to: "field2"
     ignore_missing: false
     fail_on_error: true
 -------
@@ -918,8 +919,9 @@ processor to drop the field and then rename the field.
 -------
 processors:
 - decompress_gzip_field:
-    from: "field1"
-    to: "field2"
+    field:
+      from: "field1"
+      to: "field2"
     ignore_missing: false
     fail_on_error: true
 -------
