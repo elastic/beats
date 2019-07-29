@@ -97,7 +97,7 @@ func NewProject(name string, files []string) (*Project, error) {
 	if name == "" {
 		name = filepath.Base(filepath.Dir(files[0]))
 	}
-	driver, err := NewWrapperDriver()
+	driver, err := newWrapperDriver()
 	if err != nil {
 		return nil, err
 	}

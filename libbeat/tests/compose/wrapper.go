@@ -52,7 +52,7 @@ type wrapperDriver struct {
 	client *client.Client
 }
 
-func NewWrapperDriver() (*wrapperDriver, error) {
+func newWrapperDriver() (*wrapperDriver, error) {
 	c, err := client.NewEnvClient()
 	if err != nil {
 		return nil, err
