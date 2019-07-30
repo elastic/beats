@@ -81,8 +81,8 @@ func parseSingle(b []byte) (statsdMetric, error) {
 
 }
 
-// Parse will parse a statsd metric into its components
-func Parse(b []byte) ([]statsdMetric, error) {
+// parse will parse a statsd metric into its components
+func parse(b []byte) ([]statsdMetric, error) {
 	metrics := []statsdMetric{}
 	for _, rawMetric := range bytes.Split(b, []byte("\n")) {
 		if len(rawMetric) > 0 {
@@ -96,7 +96,7 @@ func Parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func NewMetricProcessor(reservoirSize int) *metricProcessor {
+func newMetricProcessor(reservoirSize int) *metricProcessor {
 	return &metricProcessor{
 		registry:      metrics.NewRegistry(),
 		reservoirSize: reservoirSize,
@@ -161,7 +161,7 @@ func (p *metricProcessor) Process(event server.Event) error {
 		return errors.New("Request has no data")
 	}
 
-	metrics, err := Parse(b)
+	metrics, err := parse(b)
 	if err != nil {
 		return err
 	}
@@ -175,9 +175,9 @@ func (p *metricProcessor) Process(event server.Event) error {
 	return nil
 }
 
-func (m *metricProcessor) GetAll() common.MapStr {
+func (p *metricProcessor) GetAll() common.MapStr {
 	fields := common.MapStr{}
-	for k, v := range m.registry.GetAll() {
+	for k, v := range p.registry.GetAll() {
 		metric := common.MapStr{}
 		for mk, mv := range v {
 			metric[mk] = mv

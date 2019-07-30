@@ -134,7 +134,7 @@ func TestParseMetrics(t *testing.T) {
 			err:      errInvalidPacket,
 		},
 	} {
-		actual, err := Parse([]byte(test.input))
+		actual, err := parse([]byte(test.input))
 		assert.Equal(t, test.err, err, test.input)
 		assert.Equal(t, test.expected, actual, test.input)
 	}

@@ -66,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	processor := NewMetricProcessor(config.ReservoirSize)
+	processor := newMetricProcessor(config.ReservoirSize)
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
