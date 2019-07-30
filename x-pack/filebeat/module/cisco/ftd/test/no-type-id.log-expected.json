@@ -1,0 +1,122 @@
+[
+    {
+        "@timestamp": "2018-01-11T01:00:27.000Z",
+        "cisco.ftd.message_id": "430001",
+        "cisco.ftd.security.ApplicationProtocol": "http",
+        "cisco.ftd.security.Client": "webserver",
+        "cisco.ftd.security.DstIP": "10.8.12.47",
+        "cisco.ftd.security.Message": "Intrusion attempt",
+        "cisco.ftd.security.SrcIP": "10.1.123.45",
+        "destination.ip": "10.8.12.47",
+        "event.action": "intrusion-detected",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "beats",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 0,
+        "log.original": "ApplicationProtocol: http, Client: webserver, DstIP: 10.8.12.47, SrcIP: 10.1.123.45, Message: Intrusion attempt",
+        "message": "Intrusion attempt",
+        "network.application": "webserver",
+        "network.protocol": "http",
+        "process.name": "ftd",
+        "process.pid": 1234,
+        "service.type": "cisco",
+        "source.ip": "10.1.123.45",
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2018-01-11T01:00:27.000Z",
+        "cisco.ftd.message_id": "430001",
+        "cisco.ftd.security.HTTPResponse": "404",
+        "cisco.ftd.security.Message": "Some message here (1:36330:2).",
+        "event.action": "intrusion-detected",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "beats",
+        "http.response.status_code": "404",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 150,
+        "log.original": "HTTPResponse: 404, Message: Some message here (1:36330:2).",
+        "message": "Some message here (1:36330:2).",
+        "process.name": "ftd",
+        "process.pid": 1234,
+        "service.type": "cisco",
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2018-01-11T01:00:27.000Z",
+        "cisco.ftd.message_id": "430002",
+        "cisco.ftd.security.HTTPResponse": "404",
+        "cisco.ftd.security.Message": "Some message here (1:36330:2)",
+        "event.action": "connection-started",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "beats",
+        "http.response.status_code": "404",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 247,
+        "log.original": "HTTPResponse: 404, Message: Some message here (1:36330:2), Empty: ,FileCount:, IngressZone:",
+        "message": "Some message here (1:36330:2)",
+        "process.name": "ftd",
+        "process.pid": 1234,
+        "service.type": "cisco",
+        "tags": [
+            "cisco-ftd"
+        ]
+    },
+    {
+        "@timestamp": "2018-01-11T01:00:27.000Z",
+        "cisco.ftd.message_id": "430005",
+        "cisco.ftd.security.DstIP": "192.168.3.33",
+        "cisco.ftd.security.DstPort": "64311",
+        "cisco.ftd.security.HTTPResponse": "404",
+        "cisco.ftd.security.Message": [
+            "This one has a type id",
+            "And two messages"
+        ],
+        "cisco.ftd.security.SrcIP": "127.0.0.1",
+        "cisco.ftd.security.SrcPort": "512",
+        "destination.ip": "192.168.3.33",
+        "destination.port": 64311,
+        "event.action": "malware-detected",
+        "event.dataset": "cisco.ftd",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "event.timezone": "+00:00",
+        "fileset.name": "ftd",
+        "host.hostname": "beats",
+        "http.response.status_code": "404",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 377,
+        "log.original": "%ASA-3-430005 Message: This one has a type id, HTTPResponse: 404, Message: And two messages, SrcIP: 127.0.0.1, DstIP: 192.168.3.33, SrcPort: 512, DstPort: 64311",
+        "message": [
+            "This one has a type id",
+            "And two messages"
+        ],
+        "process.name": "ftd",
+        "process.pid": 1234,
+        "service.type": "cisco",
+        "source.ip": "127.0.0.1",
+        "source.port": 512,
+        "tags": [
+            "cisco-ftd"
+        ]
+    }
+]
