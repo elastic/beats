@@ -43,7 +43,7 @@ const (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "kafka")
+	r := compose.EnsureUpWithTimeout(t, 120, "kafka")
 
 	generateKafkaData(t, r.Host(), "metricbeat-generate-data")
 

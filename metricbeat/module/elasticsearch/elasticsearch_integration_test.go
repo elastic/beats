@@ -283,7 +283,7 @@ func createCCRStats(host string) error {
 		return checkCCRStatsExists(host)
 	}
 
-	exists, err := waitForSuccess(checkCCRStats, 300, 5)
+	exists, err := waitForSuccess(checkCCRStats, 500*time.Millisecond, 10)
 	if err != nil {
 		return errors.Wrap(err, "error checking if CCR stats exist")
 	}
@@ -429,7 +429,7 @@ func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error)
 
 type checkSuccessFunction func() (bool, error)
 
-func waitForSuccess(f checkSuccessFunction, retryIntervalMs time.Duration, numAttempts int) (bool, error) {
+func waitForSuccess(f checkSuccessFunction, retryInterval time.Duration, numAttempts int) (bool, error) {
 	for numAttempts > 0 {
 		success, err := f()
 		if err != nil {
@@ -440,7 +440,7 @@ func waitForSuccess(f checkSuccessFunction, retryIntervalMs time.Duration, numAt
 			return success, nil
 		}
 
-		time.Sleep(retryIntervalMs * time.Millisecond)
+		time.Sleep(retryInterval)
 		numAttempts--
 	}
 

@@ -40,7 +40,7 @@ const (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "kafka")
+	r := compose.EnsureUpWithTimeout(t, 120, "kafka")
 
 	c, err := startConsumer(t, r.Host(), "metricbeat-test")
 	if err != nil {
