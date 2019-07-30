@@ -282,7 +282,7 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 		exists = true
 		sourceDefaults, err := source.DefaultMetricSets(module)
 		if err != nil {
-			r.log.Errorf("failed to get default metric sets for module '%s' from secondary source: %s", module, err)
+			r.log.Errorf("Failed to get default metric sets for module '%s' from secondary source: %s", module, err)
 		} else if len(sourceDefaults) > 0 {
 			defaults = append(defaults, sourceDefaults...)
 		}
@@ -313,7 +313,7 @@ func (r *Register) Modules() []string {
 	if source := r.secondarySource; source != nil {
 		sourceModules, err := source.Modules()
 		if err != nil {
-			r.log.Errorf("failed to get modules from secondary source: %s", err)
+			r.log.Errorf("Failed to get modules from secondary source: %s", err)
 		} else {
 			for _, module := range sourceModules {
 				dups[module] = true
@@ -354,7 +354,7 @@ func (r *Register) MetricSets(module string) []string {
 	if source := r.secondarySource; source != nil && source.HasModule(module) {
 		sourceMetricSets, err := source.MetricSets(module)
 		if err != nil {
-			r.log.Errorf("failed to get metricsets from secondary source: %", err)
+			r.log.Errorf("Failed to get metricsets from secondary source: %s", err)
 		}
 		metricsets = append(metricsets, sourceMetricSets...)
 	}
