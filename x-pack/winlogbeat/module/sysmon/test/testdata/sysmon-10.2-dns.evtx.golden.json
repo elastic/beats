@@ -28,7 +28,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -96,7 +97,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -165,7 +167,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -238,7 +241,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -306,7 +310,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -381,7 +386,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -445,7 +451,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -518,7 +525,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -578,7 +586,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -654,7 +663,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -762,7 +772,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -826,7 +837,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -894,7 +906,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -967,7 +980,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1027,7 +1041,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1101,7 +1116,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1169,7 +1185,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1237,7 +1254,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1332,7 +1350,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1407,7 +1426,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1527,7 +1547,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1635,7 +1656,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1748,7 +1770,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1826,7 +1849,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -1941,7 +1965,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2059,7 +2084,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2123,7 +2149,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2232,7 +2259,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2300,7 +2328,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2409,7 +2438,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2473,7 +2503,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2537,7 +2568,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2640,7 +2672,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2732,7 +2765,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2796,7 +2830,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -2895,7 +2930,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3009,7 +3045,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3124,7 +3161,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3188,7 +3226,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3302,7 +3341,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3410,7 +3450,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3474,7 +3515,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3534,7 +3576,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3611,7 +3654,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3715,7 +3759,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3823,7 +3868,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -3895,7 +3941,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4010,7 +4057,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4083,7 +4131,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4176,7 +4225,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4244,7 +4294,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4308,7 +4359,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4356,7 +4408,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4404,7 +4457,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4513,7 +4567,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4586,7 +4641,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4650,7 +4706,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4759,7 +4816,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4832,7 +4890,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -4941,7 +5000,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5005,7 +5065,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5084,7 +5145,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5163,7 +5225,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5228,7 +5291,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5337,7 +5401,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5452,7 +5517,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5567,7 +5633,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5676,7 +5743,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5749,7 +5817,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5828,7 +5897,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -5892,7 +5962,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6001,7 +6072,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6120,7 +6192,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6228,7 +6301,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6296,7 +6370,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6410,7 +6485,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6478,7 +6554,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6592,7 +6669,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6701,7 +6779,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6788,7 +6867,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6903,7 +6983,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -6992,7 +7073,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7052,7 +7134,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7161,7 +7244,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7240,7 +7324,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7300,7 +7385,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7409,7 +7495,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7519,7 +7606,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7608,7 +7696,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7717,7 +7806,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7815,7 +7905,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -7913,7 +8004,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8032,7 +8124,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8142,7 +8235,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8245,7 +8339,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8354,7 +8449,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8463,7 +8559,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8531,7 +8628,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8638,7 +8736,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8706,7 +8805,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8785,7 +8885,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8854,7 +8955,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8923,7 +9025,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -8991,7 +9094,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9060,7 +9164,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9124,7 +9229,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9197,7 +9303,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9265,7 +9372,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9337,7 +9445,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9405,7 +9514,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9473,7 +9583,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9541,7 +9652,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9656,7 +9768,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9735,7 +9848,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9805,7 +9919,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9915,7 +10030,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -9975,7 +10091,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10043,7 +10160,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10157,7 +10275,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10221,7 +10340,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10289,7 +10409,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10401,7 +10522,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10519,7 +10641,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10587,7 +10710,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10701,7 +10825,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10816,7 +10941,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -10926,7 +11052,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11031,7 +11158,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11146,7 +11274,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11470,7 +11599,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11599,7 +11729,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11663,7 +11794,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11735,7 +11867,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11783,7 +11916,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11851,7 +11985,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -11966,7 +12101,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12081,7 +12217,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12149,7 +12286,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12258,7 +12396,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12367,7 +12506,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12475,7 +12615,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12572,7 +12713,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12640,7 +12782,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12708,7 +12851,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12817,7 +12961,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -12897,7 +13042,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13012,7 +13158,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13076,7 +13223,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13144,7 +13292,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13208,7 +13357,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13256,7 +13406,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13304,7 +13455,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13352,7 +13504,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13424,7 +13577,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13488,7 +13642,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
@@ -13586,7 +13741,8 @@
     },
     "event": {
       "code": 22,
-      "kind": "event"
+      "kind": "event",
+      "module": "sysmon"
     },
     "log": {
       "level": "information"
