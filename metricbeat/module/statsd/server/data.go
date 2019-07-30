@@ -32,7 +32,8 @@ import (
 var errInvalidPacket = errors.New("invalid statsd packet")
 
 type metricProcessor struct {
-	registry metrics.Registry
+	registry      metrics.Registry
+	reservoirSize int
 }
 
 type statsdMetric struct {
@@ -95,9 +96,10 @@ func Parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func NewMetricProcessor() *metricProcessor {
+func NewMetricProcessor(reservoirSize int) *metricProcessor {
 	return &metricProcessor{
-		registry: metrics.NewRegistry(),
+		registry:      metrics.NewRegistry(),
+		reservoirSize: reservoirSize,
 	}
 }
 
@@ -135,7 +137,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		}
 		c.Update(time.Millisecond * time.Duration(v))
 	case "h": // TODO: can these be floats?
-		c := metrics.GetOrRegisterHistogram(m.name, p.registry, metrics.NewExpDecaySample(100, 2))
+		c := metrics.GetOrRegisterHistogram(m.name, p.registry, metrics.NewUniformSample(p.reservoirSize))
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
 			return err

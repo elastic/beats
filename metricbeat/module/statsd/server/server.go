@@ -28,8 +28,17 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("statsd", "server", New); err != nil {
-		panic(err)
+	mb.Registry.MustAddMetricSet("statsd", "server", New, mb.DefaultMetricSet())
+}
+
+// Config for the statsd server metricset.
+type Config struct {
+	ReservoirSize int `config:"reservoirSize"`
+}
+
+func defaultConfig() Config {
+	return Config{
+		ReservoirSize: 1000,
 	}
 }
 
@@ -47,12 +56,17 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	config := defaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	svc, err := udp.NewUdpServer(base)
 	if err != nil {
 		return nil, err
 	}
 
-	processor := NewMetricProcessor()
+	processor := NewMetricProcessor(config.ReservoirSize)
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
