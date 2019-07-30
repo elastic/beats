@@ -1,0 +1,5 @@
+- name: s3_server_access_log
+  type: group
+  description: >
+    Fields for AWS S3 server access logs.
+  fields:
