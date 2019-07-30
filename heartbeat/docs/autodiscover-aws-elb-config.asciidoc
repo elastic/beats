@@ -21,9 +21,10 @@ heartbeat.autodiscover:
         timeout: 1s
 -------------------------------------------------------------------------------------
 
-This configuration launches a `tcp` monitor for all ELBs that have a declared port (TODO: come up with a better condition).
+This configuration launches a `tcp` monitor for all ELBs that have a declared port.
 
-This autodiscover provider takes our standard AWS credentials options. Please see <<aws-credentials-config>> for more details.
+This autodiscover provider takes our standard AWS credentials options.
+Please see aws-credentials-config for more details.
 
 [id="aws-credentials-config"]
 include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
