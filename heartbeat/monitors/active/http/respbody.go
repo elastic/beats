@@ -105,12 +105,14 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int64, p
 
 		if prefixRemainingBytes > 0 {
 			if readSize >= prefixRemainingBytes {
-				copy(prefixBuf[prefixWriteOffset:maxPrefixSize-1], rawBuf[:prefixRemainingBytes])
+				copy(prefixBuf[prefixWriteOffset:maxPrefixSize], rawBuf[:prefixRemainingBytes])
+				prefixWriteOffset += prefixRemainingBytes
+				prefixRemainingBytes = 0
 			} else {
 				copy(prefixBuf[prefixWriteOffset:prefixWriteOffset+readSize], rawBuf[:readSize])
+				prefixWriteOffset += readSize
+				prefixRemainingBytes -= readSize
 			}
-			prefixRemainingBytes -= readSize
-			prefixWriteOffset += readSize
 		}
 
 		if readErr == io.EOF {
@@ -121,6 +123,8 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int64, p
 			return 0, "", "", readErr
 		}
 	}
+
+	// We discard the body if it is not valid UTF-8
 	if utf8.Valid(prefixBuf[:prefixWriteOffset]) {
 		prefix = string(prefixBuf[:prefixWriteOffset])
 	}
