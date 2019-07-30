@@ -18,11 +18,14 @@
 package compose
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -95,7 +98,47 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
-	return d.cmd(ctx, "up", args...).Run()
+	var stdout, stderr bytes.Buffer
+	defer io.Copy(os.Stdout, &stdout)
+	defer io.Copy(os.Stderr, &stderr)
+	for {
+		// Up can fail if we have reached some system limit, specially
+		// number of networks, retry while the context is not done
+		cmd := d.cmd(ctx, "up", args...)
+		cmd.Stdout = &stdout
+		cmd.Stderr = &stderr
+
+		err := cmd.Run()
+		if err == nil {
+			return nil
+		}
+		if err := fatalError(&stderr); err != nil {
+			return errors.Wrapf(err, "docker-compose up failed for service %s", service)
+		}
+
+		select {
+		case <-time.After(time.Second):
+		case <-ctx.Done():
+			return err
+		}
+	}
+}
+
+var recoverableErrors = []string{
+	`could not find an available, non-overlapping IPv4 address pool`,
+}
+
+// fatalError parses the error message and check if it is caused by an unrecoverable error or not.
+// It considers recoverable errors the ones caused by resources exhaustion.
+// Parsing the error message is not nice, but it is the only way to clasify docker compose errors.
+func fatalError(message *bytes.Buffer) error {
+	data := message.String()
+	for _, errorMsg := range recoverableErrors {
+		if strings.Contains(data, errorMsg) {
+			return nil
+		}
+	}
+	return errors.New(data)
 }
 
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {
