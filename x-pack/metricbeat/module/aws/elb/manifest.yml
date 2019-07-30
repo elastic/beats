@@ -3,5 +3,5 @@ input:
   module: aws
   metricset: cloudwatch
   defaults:
-    cloudwatch_metrics:
+    metrics:
       - namespace: AWS/ELB

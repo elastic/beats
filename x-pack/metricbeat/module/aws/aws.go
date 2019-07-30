@@ -119,7 +119,6 @@ func InitEvent(metricsetName string, regionName string) mb.Event {
 	event.MetricSetFields = common.MapStr{}
 	event.ModuleFields = common.MapStr{}
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {
 		event.RootFields.Put("cloud.region", regionName)
