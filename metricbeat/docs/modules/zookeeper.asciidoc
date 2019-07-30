@@ -21,6 +21,11 @@ The Zookeeper module comes with a predefined dashboard:
 
 image::./images/metricbeat-zookeeper.png[]
 
+== Default Metricsets
+The following Metricsets are default:
+
+- server
+- mntr
 
 [float]
 === Example configuration

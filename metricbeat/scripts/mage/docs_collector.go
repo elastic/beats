@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -27,6 +28,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
@@ -52,6 +54,7 @@ type metricsetData struct {
 	Link       string
 	Release    string
 	DataExists bool
+	IsDefault  bool
 }
 
 func writeTemplate(filename string, t *template.Template, args interface{}) error {
@@ -118,6 +121,21 @@ func testIfDocsInDir(moduleDir string) bool {
 		return false
 	}
 	return true
+}
+
+// compile and run the seprate go script to generate a list of default metricsets.
+// This is done so a compile-time issue in metricbeat doesn't break the docs build
+func getDefaultMetricsets() (map[string][]string, error) {
+	rawMap, err := sh.OutCmd("go", "run", mage.OSSBeatDir("scripts/msetlists/main.go"))()
+	if err != nil {
+		return nil, err
+	}
+	var msetMap = make(map[string][]string)
+	err = json.Unmarshal([]byte(rawMap), &msetMap)
+	if err != nil {
+		return nil, err
+	}
+	return msetMap, nil
 }
 
 // loadModuleFields loads the module-specific fields.yml file
@@ -195,7 +213,7 @@ func getConfigfile(modulePath string) (string, error) {
 }
 
 // gatherMetricsets gathers all the metricsets for a given module
-func gatherMetricsets(modulePath string, moduleName string) ([]metricsetData, error) {
+func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []string) ([]metricsetData, error) {
 	metricsetList, err := filepath.Glob(filepath.Join(modulePath, "/*"))
 	if err != nil {
 		return nil, err
@@ -225,12 +243,21 @@ func gatherMetricsets(modulePath string, moduleName string) ([]metricsetData, er
 			hasData = true
 		}
 
+		var isDefault = false
+		for _, defaultMsName := range defaultMetricSets {
+			if defaultMsName == metricsetName {
+				isDefault = true
+				break
+			}
+		}
+
 		ms := metricsetData{
 			Path:       metricset,
 			Title:      metricsetName,
 			Release:    release,
 			Link:       link,
 			DataExists: hasData,
+			IsDefault:  isDefault,
 		}
 
 		metricsets = append(metricsets, ms)
@@ -242,6 +269,10 @@ func gatherMetricsets(modulePath string, moduleName string) ([]metricsetData, er
 
 // gatherData gathers all the data we need to construct the docs that end up in metricbeat/docs
 func gatherData(modules []string) ([]moduleData, error) {
+	defmset, err := getDefaultMetricsets()
+	if err != nil {
+		return nil, errors.Wrap(err, "Error getting default metricsets")
+	}
 	moduleList := make([]moduleData, 0)
 	//iterate over all the modules, checking to make sure we have an asciidoc file
 	for _, module := range modules {
@@ -267,7 +298,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 			return moduleList, err
 		}
 
-		metricsets, err := gatherMetricsets(module, moduleName)
+		metricsets, err := gatherMetricsets(module, moduleName, defmset[moduleName])
 		if err != nil {
 			return moduleList, err
 		}
