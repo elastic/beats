@@ -227,7 +227,7 @@ In any case, this feature is controlled with two properties:
 There are multiple ways of setting these properties, and they can vary from
 application to application, please refer to the documentation of your
 application to find the more suitable way to set them in your case.
- 
+
 Jolokia Discovery is based on UDP multicast requests. Agents join the multicast
 group 239.192.48.84, port 24884, and discovery is done by sending queries to
 this group. You have to take into account that UDP traffic between Metricbeat
@@ -294,6 +294,11 @@ These are the available fields during within config templating. The `elb_listene
   * elb_listener.ssl_policy
 
 include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
+
+This autodiscover provider takes our standard AWS credentials options, see <<aws-credentials-config>> for more information.
+
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 endif::autodiscoverAWSELB[]
 
