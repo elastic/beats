@@ -3921,18 +3921,6 @@ type: keyword
 
 --
 
-*`dns.question.length`*::
-+
---
-The length of the name being queried (in bytes). This is useful to detect data exfiltration via DNS queries.
-
-
-type: long
-
-example: 42
-
---
-
 *`dns.answers`*::
 +
 --

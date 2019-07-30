@@ -37,13 +37,6 @@
       description: >
         The name being queried.
 
-    - name: dns.question.length
-      type: long
-      description: >
-        The length of the name being queried (in bytes).
-        This is useful to detect data exfiltration via DNS queries.
-      example: 42
-
     - name: dns.answers
       type: object
       description: >
