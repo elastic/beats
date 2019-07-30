@@ -59,6 +59,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-statsd>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
@@ -26015,6 +26016,28 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-statsd]]
+== Statsd fields
+
+Statsd module
+
+
+
+*`statsd.*`*::
++
+--
+Statsd metric - name: server
+  type: group
+  description: >
+    server
+  release: ga
+  fields:
+
+
+type: object
 
 --
 

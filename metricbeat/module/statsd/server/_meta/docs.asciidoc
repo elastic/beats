@@ -1,0 +1,11 @@
+This is the server metricset of the module stats.
+
+Events sent to the stats endpoint will be put by default under the `statsd` prefix.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+- module: statsd
+  metricsets: ["server"]
+  host: "localhost"
+  port: "8125"
+------------------------------------------------------------------------------

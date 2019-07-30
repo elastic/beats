@@ -1,0 +1,9 @@
+# Module: statsd
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-statsd.html
+
+- module: statsd
+  metricsets:
+   - server
+  host: "localhost"
+  port: "8125"
+  enabled: false

@@ -1,0 +1,6 @@
+- module: statsd
+  metricsets:
+   - server
+  host: "localhost"
+  port: "8125"
+  enabled: false
