@@ -141,6 +141,7 @@ users who need to monitor {beatname_uc}:
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
 
+ifndef::serverless[]
 ===== {metricbeat} collection
 
 For <<monitoring-metricbeat-collection,{metricbeat} collection>>, {security}
@@ -179,6 +180,7 @@ information.
 |`monitoring_user`
 |Use *Stack Monitoring* in {kib} to monitor {beatname_uc}
 |====
+endif::serverless[]
 
 [[privileges-to-publish-events]]
 ==== Grant privileges and roles needed for publishing
