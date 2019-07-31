@@ -92,7 +92,6 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 				MetricSetFields: m.processor.GetAll(),
 				Namespace:       "statsd",
 			}
-
 			reporter.Event(event)
 		case msg := <-m.server.GetEvents():
 			err := m.processor.Process(msg)

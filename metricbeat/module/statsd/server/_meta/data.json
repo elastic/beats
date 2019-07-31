@@ -1,19 +1,35 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "service": {
+        "type": "statsd"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"http",
-        "name":"server",
-        "rtt":44269
-    },
-    "http":{
-        "server":{
-            "test_metric": 5,
-        }
-    },
-    "type":"metricsets"
+    "statsd": {
+        "metric1_value": 1,
+        "metric2_count": 2,
+        "metric3_count": 3,
+        "metric4_15m_rate": 0,
+        "metric4_1m_rate": 0,
+        "metric4_5m_rate": 0,
+        "metric4_75p": 4,
+        "metric4_95p": 4,
+        "metric4_99_9p": 4,
+        "metric4_99p": 4,
+        "metric4_count": 3,
+        "metric4_max": 4,
+        "metric4_mean": 4,
+        "metric4_mean_rate": 330178.29627999116,
+        "metric4_median": 4,
+        "metric4_min": 4,
+        "metric4_stddev": 0,
+        "metric5_75p": 5,
+        "metric5_95p": 5,
+        "metric5_99_9p": 5,
+        "metric5_99p": 5,
+        "metric5_count": 1,
+        "metric5_max": 5,
+        "metric5_mean": 5,
+        "metric5_median": 5,
+        "metric5_min": 5,
+        "metric5_stddev": 0
+    }
 }

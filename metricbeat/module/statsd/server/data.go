@@ -136,7 +136,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		if err != nil {
 			return err
 		}
-		c.Update(time.Millisecond * time.Duration(v))
+		c.Update(time.Duration(v))
 	case "h": // TODO: can these be floats?
 		c := metrics.GetOrRegisterHistogram(m.name, p.registry, metrics.NewUniformSample(p.reservoirSize))
 		v, err := strconv.ParseInt(m.value, 10, 64)
@@ -189,7 +189,8 @@ func (p *metricProcessor) GetAll() common.MapStr {
 
 	flattened := common.MapStr{}
 	for k, v := range fields.Flatten() {
-		flattened[strings.Replace(k, ".", "_", -1)] = strings.Replace(v.(string), ".", "_", -1)
+		// replace . with _ and % with p
+		flattened[strings.Replace(strings.Replace(k, ".", "_", -1), "%", "p", -1)] = v
 	}
 	return flattened
 }
