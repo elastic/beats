@@ -19,24 +19,7 @@ pipeline {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
   }
   stages {
-    /**
-     Checkout the code and stash it, to use it on other stages.
-    */
-    stage('Checkout') {
-      agent { label 'linux && immutable' }
-      options { skipDefaultCheckout() }
-      steps {
-        dir("${BASE_DIR}"){
-            checkout scm
-        }
-        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
-        script {
-          env.GO_VERSION = readFile("${BASE_DIR}/.go-version")
-        }
-        sh 'env | sort'
-      }
-    }
-    stage('Test') {
+    stage('Initializing'){
       agent { label 'linux && immutable' }
       options { skipDefaultCheckout() }
       environment {
@@ -44,9 +27,22 @@ pipeline {
         HOME = "${env.WORKSPACE}"
         GOPATH = "${env.WORKSPACE}"
       }
-      steps {
-        echo 'Do the magic as usual.'
-        sh 'env | sort'
+      stages {
+        stage('Checkout') {
+          steps {
+            gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+            stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+            script {
+              env.GO_VERSION = readFile("${BASE_DIR}/.go-version")
+            }
+          }
+        }
+        stage('Tests') {
+          steps {
+            echo 'Do the magic as usual.'
+            sh 'env | sort'
+          }
+        }
       }
     }
     stage('Integration Tests') {
