@@ -5,6 +5,8 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-statsd-server]]
 === Statsd server metricset
 
+beta[]
+
 include::../../../module/statsd/server/_meta/docs.asciidoc[]
 
 

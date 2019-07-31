@@ -3,7 +3,6 @@
   description: >
     Statsd module
   release: beta
-  settings: ["ssl", "http"]
   fields:
     - name: statsd.*
       type: object

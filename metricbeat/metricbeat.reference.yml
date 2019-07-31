@@ -717,12 +717,10 @@ metricbeat.modules:
 
 #-------------------------------- Statsd Module --------------------------------
 - module: statsd
-  metricsets:
-   - server
   host: "localhost"
   port: "8125"
   enabled: false
-  #reservoirSize: 1000
+  #reservoir_size: 1000
 
 #------------------------------- Traefik Module -------------------------------
 - module: traefik

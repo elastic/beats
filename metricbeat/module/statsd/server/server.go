@@ -33,7 +33,7 @@ func init() {
 
 // Config for the statsd server metricset.
 type Config struct {
-	ReservoirSize int `config:"reservoirSize"`
+	ReservoirSize int `config:"reservoir_size"`
 }
 
 func defaultConfig() Config {

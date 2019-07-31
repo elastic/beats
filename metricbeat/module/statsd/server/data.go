@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/pkg/errors"
 	"github.com/rcrowley/go-metrics"
@@ -144,6 +145,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		}
 		c.Update(v)
 	default:
+		logp.NewLogger("statsd").Debugf("metric type '%s' is not supported", m.metricType)
 		// ignore others
 		// no support for sets, for example
 	}
@@ -187,7 +189,7 @@ func (p *metricProcessor) GetAll() common.MapStr {
 
 	flattened := common.MapStr{}
 	for k, v := range fields.Flatten() {
-		flattened[strings.Replace(k, ".", "_", -1)] = v
+		flattened[strings.Replace(k, ".", "_", -1)] = strings.Replace(v.(string), ".", "_", -1)
 	}
 	return flattened
 }

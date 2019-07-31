@@ -137,5 +137,13 @@ func TestParseMetrics(t *testing.T) {
 		actual, err := parse([]byte(test.input))
 		assert.Equal(t, test.err, err, test.input)
 		assert.Equal(t, test.expected, actual, test.input)
+
+		processor := newMetricProcessor(1000)
+		for _, e := range actual {
+			err := processor.processSingle(e)
+			if err != nil {
+				assert.Error(t, err)
+			}
+		}
 	}
 }

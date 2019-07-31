@@ -26033,7 +26033,7 @@ Statsd metric - name: server
   type: group
   description: >
     server
-  release: ga
+  release: beta
   fields:
 
 

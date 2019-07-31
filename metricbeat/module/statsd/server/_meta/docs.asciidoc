@@ -8,5 +8,5 @@ Events sent to the stats endpoint will be put by default under the `statsd` pref
   metricsets: ["server"]
   host: "localhost"
   port: "8125"
-  #reservoirSize: 1000
+  #reservoir_size: 1000
 ------------------------------------------------------------------------------

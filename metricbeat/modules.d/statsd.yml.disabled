@@ -2,9 +2,7 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-statsd.html
 
 - module: statsd
-  metricsets:
-   - server
   host: "localhost"
   port: "8125"
   enabled: false
-  #reservoirSize: 1000
+  #reservoir_size: 1000
