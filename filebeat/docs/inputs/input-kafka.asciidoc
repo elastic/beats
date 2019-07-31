@@ -9,9 +9,9 @@
 
 Use the `kafka` input to read from topics in a Kafka cluster.
 
-To configure this input, specify a list of <<hosts,`hosts`>> to use for this
-cluster, a list of <<topics,`topics`>> to track, and a <<groupid,`group_id`>>
-to connect with.
+To configure this input, specify a list of one or more <<hosts,`hosts`>> in the
+cluster to bootstrap the connection with, a list of <<topics,`topics`>> to
+track, and a <<groupid,`group_id`>> for the connection.
 
 Example configuration:
 
@@ -38,7 +38,7 @@ The `kafka` input supports the following configuration options plus the
 [[hosts]]
 ===== `hosts`
 
-A list of Kafka hosts (brokers) for this cluster.
+A list of Kafka bootstrapping hosts (brokers) for this cluster.
 
 [float]
 [[topics]]
