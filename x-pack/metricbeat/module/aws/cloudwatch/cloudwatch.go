@@ -364,6 +364,10 @@ func statisticLookup(stat string) (string, bool) {
 		"SampleCount": "count",
 	}
 	statMethod, ok := statisticLookupTable[stat]
+	if !ok {
+		ok = strings.HasPrefix(stat, "p")
+		statMethod = stat
+	}
 	return statMethod, ok
 }
 
