@@ -73,8 +73,7 @@ func parseSingle(b []byte) (statsdMetric, error) {
 
 	s.name = string(nameSplit[0])
 	s.value = string(nameSplit[1])
-
-	s.metricType = strings.Trim(string(parts[1]), "\n")
+	s.metricType = string(parts[1])
 
 	if len(parts) > 2 {
 		s.tags = string(parts[2])

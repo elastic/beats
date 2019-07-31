@@ -61,6 +61,14 @@ func TestParseMetrics(t *testing.T) {
 			}},
 		},
 		{
+			input: "decrement-counter:-15|c",
+			expected: []statsdMetric{{
+				name:       "decrement-counter",
+				metricType: "c",
+				value:      "-15",
+			}},
+		},
+		{
 			input: "timer1:1.2|ms",
 			expected: []statsdMetric{{
 				name:       "timer1",
