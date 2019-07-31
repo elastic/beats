@@ -19,11 +19,9 @@
 
   # Enriching parameters:
   #add_metadata: true
-  #in_cluster: true
   #labels.dedot: true
   #annotations.dedot: true
   # When used outside the cluster:
-  #in_cluster: false
   #host: node_name
   #kube_config: ~/.kube/config
 
@@ -39,7 +37,6 @@
 #  period: 10s
 #  hosts: ["kube-state-metrics:8080"]
 #  add_metadata: true
-#  in_cluster: true
 
 # Kubernetes events
 #- module: kubernetes

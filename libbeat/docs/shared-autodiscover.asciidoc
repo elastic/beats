@@ -179,8 +179,6 @@ contain variables from the autodiscover event. They can be accessed under data n
 
 The `kubernetes` autodiscover provider has the following configuration settings:
 
-`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
-  by default.
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
   cannot be accurately detected, as when running {beatname_lc} in host network
   mode.
