@@ -217,7 +217,7 @@ func (d *Provider) startContainer(event bus.Event) {
 	}
 
 	if stopper, ok := d.stoppers[container.ID]; ok {
-		d.logger.Debugf("Container %s is restarting, pending stop aborted", container.ID)
+		d.logger.Debugf("Container %s is restarting, aborting pending stop", container.ID)
 		stopper.Stop()
 		delete(d.stoppers, container.ID)
 		return
@@ -229,6 +229,11 @@ func (d *Provider) startContainer(event bus.Event) {
 func (d *Provider) scheduleStopContainer(event bus.Event) {
 	container, meta := d.generateMetaDocker(event)
 	if container == nil || meta == nil {
+		return
+	}
+
+	if d.config.CleanupTimeout <= 0 {
+		d.stopContainer(container, meta)
 		return
 	}
 
