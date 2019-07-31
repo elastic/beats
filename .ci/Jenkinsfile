@@ -30,10 +30,10 @@ pipeline {
       stages {
         stage('Checkout') {
           steps {
-            gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+            gitCheckout(basedir: env.BASE_DIR, githubNotifyFirstTimeContributor: false)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
             script {
-              env.GO_VERSION = readFile("${BASE_DIR}/.go-version")
+              env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
             }
           }
         }
