@@ -153,16 +153,16 @@ func TestParseMetrics(t *testing.T) {
 	}
 }
 
-type testUdpEvent struct {
+type testUDPEvent struct {
 	event common.MapStr
 	meta  server.Meta
 }
 
-func (u *testUdpEvent) GetEvent() common.MapStr {
+func (u *testUDPEvent) GetEvent() common.MapStr {
 	return u.event
 }
 
-func (u *testUdpEvent) GetMeta() server.Meta {
+func (u *testUDPEvent) GetMeta() server.Meta {
 	return u.meta
 }
 
@@ -177,7 +177,7 @@ func TestData(t *testing.T) {
 	}
 
 	for _, d := range testData {
-		udpEvent := &testUdpEvent{
+		udpEvent := &testUDPEvent{
 			event: common.MapStr{
 				server.EventDataKey: []byte(d),
 			},
