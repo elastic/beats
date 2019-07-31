@@ -10,7 +10,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -65,6 +64,7 @@ type Input struct {
 	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
 	context    *channelContext
 	workerWg   sync.WaitGroup // Waits on s3 worker goroutine.
+	stopOnce   sync.Once
 }
 
 type s3Info struct {
@@ -167,7 +167,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 // Run runs the input
 func (p *Input) Run() {
 	p.workerOnce.Do(func() {
-		p.workerWg.Add(1)
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
@@ -179,6 +178,7 @@ func (p *Input) Run() {
 		svcSQS := sqs.New(awsConfig)
 		svcS3 := s3.New(awsConfig)
 
+		p.workerWg.Add(1)
 		go p.run(svcSQS, svcS3, visibilityTimeout)
 	})
 }
@@ -220,16 +220,18 @@ func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int6
 
 // Stop stops the s3 input
 func (p *Input) Stop() {
-	defer p.outlet.Close()
-	close(p.close)
-	p.context.Done()
-	p.workerWg.Wait()
-	p.logger.Info("Stopping s3 input")
+	p.stopOnce.Do(func() {
+		defer p.outlet.Close()
+		close(p.close)
+		p.context.Done()
+		p.logger.Info("Stopping s3 input")
+	})
 }
 
 // Wait stops the s3 input.
 func (p *Input) Wait() {
 	p.Stop()
+	p.workerWg.Wait()
 }
 
 func (p *Input) processor(queueURL string, messages []sqs.Message, visibilityTimeout int64, svcS3 *s3.Client, svcSQS *sqs.Client) {
@@ -345,6 +347,7 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 		refs: 1,
 		errC: errC,
 	}
+	defer s3Context.done()
 
 	for _, s3Info := range s3Infos {
 		objectHash := s3ObjectHash(s3Info)
@@ -390,7 +393,6 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 		}
 	}
 
-	s3Context.done()
 	return nil
 }
 
@@ -438,9 +440,6 @@ func (p *Input) deleteMessage(queueURL string, messagesReceiptHandle string, svc
 }
 
 func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Context *s3Context) beat.Event {
-	s3Context.Inc()
-	defer s3Context.done()
-
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
@@ -465,8 +464,8 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Con
 	return beat.Event{
 		Timestamp: time.Now(),
 		Fields:    f,
-		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private:   s3Context,
+		// Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
+		Private: s3Context,
 	}
 }
 

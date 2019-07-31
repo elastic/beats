@@ -77,7 +77,30 @@ optional configuration. Please use `Example configuration 2` as an example. If
 `credential_profile_name` is not specified, then `s3` input will consume
 credentials from shared AWS credentials file with `default` profile name.
 
+Please see <<aws-credentials-config>> for more details about how to configure aws
+credentials.
+
+=== S3 and SQS setup
+Enable bucket notification: any new object creation in S3 bucket will also
+create a notification through SQS. Please see
+https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
+for more details.
+
+=== manual testing
+1. Upload fake log files into the S3 bucket that has SQS notification enabled.
+2. Check from SQS if there are N messages received.
+3. Start filebeat with `./filebeat -e` and check Kibana if there are events reported
+with messages from the example logs. Depends on the number of log lines in each
+fake log file, check if the number of events match the number of log lines total
+from all log files.
+4. Check SQS if messages are deleted successfully.
+5. Interrupt the s3 input process by killing filebeat during processing new S3 logs,
+check if messages in SQS are in flight instead of deleted.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 :type!:

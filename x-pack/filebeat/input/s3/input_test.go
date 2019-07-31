@@ -105,8 +105,7 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestNewS3BucketReader(t *testing.T) {
-	p := Input{}
-	reader, err := newS3BucketReader(mockSvc, info, p.context)
+	reader, err := newS3BucketReader(mockSvc, info, &channelContext{})
 	assert.NoError(t, err)
 	for i := 0; i < 3; i++ {
 		switch i {
@@ -127,7 +126,6 @@ func TestNewS3BucketReader(t *testing.T) {
 }
 
 func TestCreateEvent(t *testing.T) {
-	p := Input{}
 	errC := make(chan error)
 	s3Context := &s3Context{
 		refs: 1,
@@ -143,7 +141,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	s3ObjectHash := s3ObjectHash(s3Info)
 
-	reader, err := newS3BucketReader(mockSvc, s3Info, p.context)
+	reader, err := newS3BucketReader(mockSvc, s3Info, &channelContext{})
 	assert.NoError(t, err)
 	var events []beat.Event
 	for {
