@@ -38,6 +38,7 @@ pipeline {
         script {
           env.GO_VERSION = readFile("${BASE_DIR}/.go-version")
         }
+        sh 'env | sort'
       }
     }
     stage('Test') {
