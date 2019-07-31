@@ -26029,7 +26029,7 @@ Statsd module
 *`statsd.*`*::
 +
 --
-Statsd metric - release: beta
+Statsd metrics - release: beta
 
 
 type: object
