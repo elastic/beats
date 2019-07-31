@@ -1,6 +1,12 @@
-- name: server
-  type: group
+- key: statsd
+  title: "Statsd"
   description: >
-    server
+    Statsd module
   release: beta
   fields:
+    - name: statsd.*
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        Statsd metric
