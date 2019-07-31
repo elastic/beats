@@ -17,10 +17,6 @@ ifdef::serverless[]
 can use the following method:
 endif::[]
 
-//REVIEWERS: Not sure what we should say for functionbeat users, but I don't
-//think it makes sense to include the metricbeat monitoring section in the
-//functionbeat docs. 
-
 * <<monitoring-internal-collection,Internal collection>>
 ifndef::serverless[]
 * <<monitoring-metricbeat-collection, {metricbeat} collection>>

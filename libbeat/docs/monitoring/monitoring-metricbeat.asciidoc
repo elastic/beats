@@ -159,7 +159,6 @@ To monitor multiple {beats} agents, specify a list of hosts, for example:
 hosts: ["http://localhost:5066","http://localhost:5067","http://localhost:5068"]
 ----------------------------------
 
-//REVIEWERS: Didn't test the following. Is this true? 
 If you configured {beatname_uc} to use encrypted communications, you must access
 it via HTTPS. For example, use a `hosts` setting like `https://localhost:5066`.
 // end::configure-beat-module[]
