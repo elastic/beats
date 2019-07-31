@@ -87,7 +87,7 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *Config, fetcher fetche
 		return nil, err
 	}
 
-	return &Provider{
+	p := &Provider{
 		fetcher:   fetcher,
 		period:    config.Period,
 		config:    config,
@@ -96,17 +96,20 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *Config, fetcher fetche
 		appenders: appenders,
 		templates: &mapper,
 		uuid:      uuid,
-	}, nil
-}
+	}
 
-// Start the autodiscover process.
-func (p *Provider) Start() {
 	p.watcher = newWatcher(
 		p.fetcher,
 		p.period,
 		p.onWatcherStart,
 		p.onWatcherStop,
 	)
+
+	return p, nil
+}
+
+// Start the autodiscover process.
+func (p *Provider) Start() {
 	p.watcher.start()
 }
 

@@ -96,9 +96,10 @@ func Test_internalBuilder(t *testing.T) {
 	}()
 
 	// Let run twice to ensure that duplicates don't create two start events
-	// 20ms should be enough to see more than two events since the loop is once per nanosecond
-	time.Sleep(time.Millisecond * 50)
-	events.waitForNumEvents(t, 1, 5*time.Second)
+	// Since we're turning a list of assets into a list of changes the second once() call should be a noop
+	provider.watcher.once()
+	provider.watcher.once()
+	events.waitForNumEvents(t, 1, time.Second)
 
 	assert.Equal(t, 1, events.len())
 
@@ -118,10 +119,10 @@ func Test_internalBuilder(t *testing.T) {
 
 	fetcher.setLbls([]*lbListener{})
 
-	// Let run twice to ensure that duplicates don't create two start events
-	// 20ms should be enough to see more than two events since the loop is once per nanosecond
-	time.Sleep(time.Millisecond * 50)
-	events.waitForNumEvents(t, 2, 5*time.Second)
+	// Let run twice to ensure that duplicates don't cause an issue
+	provider.watcher.once()
+	provider.watcher.once()
+	events.waitForNumEvents(t, 2, time.Second)
 
 	require.Equal(t, 2, events.len())
 
@@ -137,7 +138,9 @@ func Test_internalBuilder(t *testing.T) {
 	preErrorEventCount := events.len()
 	fetcher.setError(errors.New("oops"))
 
-	time.Sleep(time.Millisecond * 50)
+	// Let run twice to ensure that duplicates don't cause an issue
+	provider.watcher.once()
+	provider.watcher.once()
 
 	assert.Equal(t, preErrorEventCount, events.len())
 }
