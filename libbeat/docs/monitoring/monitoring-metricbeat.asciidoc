@@ -3,7 +3,7 @@
 == Collect {beatname_uc} monitoring data with {metricbeat}
 [subs="attributes"]
 ++++
-<titleabbrev>Use {metricbeat}</titleabbrev>
+<titleabbrev>{metricbeat} collection</titleabbrev>
 ++++
 
 In 7.3 and later, you can use {metricbeat} to collect data about {beatname_uc} 
@@ -11,35 +11,20 @@ and ship it to the monitoring cluster, rather than routing it through the
 production cluster as described in <<monitoring-internal-collection>>.
 
 ifeval::["{beatname_lc}"=="metricbeat"]
-Because you'll be using {metricbeat} itself to monitor {beatname_uc}, you'll
-need to decide whether you want to run more than one instance of {metricbeat} or
-have {beatname_uc} monitor itself. You have a couple options:
-
-* Run two instances of {beatname_uc}: a main instance that collects metrics
-from the system and services running on the server, and a second instance that
+Because you'll be using {metricbeat} to _monitor_ {beatname_uc}, you'll need to
+run two instances of {beatname_uc}: a main instance that collects metrics from
+the system and services running on the server, and a second instance that
 collects metrics from {beatname_uc} only. Using a separate instance as a
 monitoring agent allows you to send monitoring data to a dedicated monitoring
 cluster. If the main agent goes down, the monitoring agent remains active.
-+
+
 If you're running {beatname_uc} as a service, this approach requires extra work
 because you need to run two instances of the same installed  service
-concurrently.
-
-* Configure your existing {beatname_uc} installation to collect monitoring data
-about itself. With this approach, you won't be able to send monitoring data to a
-dedicated monitoring cluster because you must send it to the production cluster
-specified in the {es} output configuration. If the {beatname_uc} instance
-goes down, the flow of monitoring data stops.
-
-//REVIEWERS: The second option (having Metricbeat monitor itself) does not
-//work, but I'm wondering if it's related to an existing bug with the UUID.
-//The .monitoring index does contain data; it just doesn't appear under stack
-//monitoring.
-
-If neither approach appeals to you, use
+concurrently. If you don't want to run two instances concurrently, use
 <<monitoring-internal-collection,internal collection>> instead of using
 {metricbeat}.
 endif::[]
+
 To learn about monitoring in general, see 
 {stack-ov}/xpack-monitoring.html[Monitoring the {stack}].
 
@@ -120,11 +105,9 @@ separate monitoring instance,
 different path. If necessary, set `path.config`, `path.data`, and `path.log`
 to point to the correct directories. See <<directory-layout>> for the default
 locations.
-* If you're using {metricbeat} to monitor itself, stop {metricbeat} and apply
-the following steps to your existing installation.
 endif::[]
 
-. Enable the beat-xpack module in {metricbeat}. +
+. Enable the `beat-xpack` module in {metricbeat}. +
 endif::[]
 +
 --
@@ -143,7 +126,7 @@ For more information, see
 // end::enable-beat-module[]
 --
 
-. Configure the beat-xpack module in {metricbeat}. +
+. Configure the `beat-xpack` module in {metricbeat}. +
 +
 --
 // tag::configure-beat-module[]
@@ -161,6 +144,10 @@ The `modules.d/beat-xpack.yml` file contains the following settings:
   #password: "secret"
   xpack.enabled: true
 ----------------------------------
+ 
+Set the `hosts`, `username`, and `password` settings as required by your
+environment. For other module settings, it's recommended that you accept the
+defaults.
 
 By default, the module collects {beatname_uc} monitoring data from
 `localhost:5066`. If you exposed the metrics on a different host or port when
@@ -196,9 +183,9 @@ file.
 --
 // tag::disable-system-module[]
 By default, the {metricbeat-ref}/metricbeat-module-system.html[system module] is
-enabled. The information it collects, however, is not shown on the *Monitoring*
-page in {kib}. Unless you want to use that information for other purposes, run
-the following command:
+enabled. The information it collects, however, is not shown on the
+*Stack Monitoring* page in {kib}. Unless you want to use that information for
+*other purposes, run the following command:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -247,13 +234,11 @@ successfully:
 .. Create a user on the monitoring cluster that has the 
 `remote_monitoring_agent` {stack-ov}/built-in-roles.html[built-in role]. 
 Alternatively, use the `remote_monitoring_user` 
-{stack-ov}/built-in-users.html[built-in user].
-
-//REVIEWERS: the `remote_monitoring_agent` role does not have the privileges
-// required to create metricbeat indices if ILM is enabled. Should we tell users
-// to disable ILM when Metricbeat is used to collect Beats metrics? (edited) 
-// Or do we need to ask to have the ILM-related privileges added to the
-// `remote_monitoring_agent` role?
+{stack-ov}/built-in-users.html[built-in user]. 
++
+TIP: If you're using index lifecycle management, the remote monitoring user
+requires additional privileges to create and read indices. For more
+information, see <<feature-roles>>.
 
 .. Add the `username` and `password` settings to the {es} output information in 
 the {metricbeat} configuration file.

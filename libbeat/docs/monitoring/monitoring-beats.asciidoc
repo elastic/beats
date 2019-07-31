@@ -23,7 +23,7 @@ endif::[]
 
 * <<monitoring-internal-collection,Internal collection>>
 ifndef::serverless[]
-* <<monitoring-metricbeat-collection, {metricbeat}>>
+* <<monitoring-metricbeat-collection, {metricbeat} collection>>
 endif::[]
 
 To learn about monitoring in general, see 

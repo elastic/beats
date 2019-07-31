@@ -13,7 +13,7 @@
 [[monitoring-internal-collection]]
 == Collect {beatname_uc} monitoring data with internal collectors
 ++++
-<titleabbrev>Use internal collection</titleabbrev>
+<titleabbrev>Internal collection</titleabbrev>
 ++++
 
 The following method involves sending the metrics to the production cluster, 
