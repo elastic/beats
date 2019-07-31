@@ -42,8 +42,8 @@ type kafkaInputConfig struct {
 	InitialOffset initialOffset     `config:"initial_offset"`
 	RetryBackoff  time.Duration     `config:"retry_backoff" validate:"min=0"`
 	MaxWaitTime   time.Duration     `config:"max_wait_time"`
-	Fetch         *kafkaFetch       `config:"fetch"`
-	Rebalance     *kafkaRebalance   `config:"rebalance"`
+	Fetch         kafkaFetch        `config:"fetch"`
+	Rebalance     kafkaRebalance    `config:"rebalance"`
 	TLS           *tlscommon.Config `config:"ssl"`
 	Username      string            `config:"username"`
 	Password      string            `config:"password"`
@@ -96,12 +96,12 @@ func defaultConfig() kafkaInputConfig {
 		ClientID:      "filebeat",
 		RetryBackoff:  2 * time.Second,
 		MaxWaitTime:   250 * time.Millisecond,
-		Fetch: &kafkaFetch{
+		Fetch: kafkaFetch{
 			Min:     1,
 			Default: (1 << 20), // 1 MB
 			Max:     0,
 		},
-		Rebalance: &kafkaRebalance{
+		Rebalance: kafkaRebalance{
 			Strategy:     rebalanceStrategyRange,
 			Timeout:      60 * time.Second,
 			MaxRetries:   4,

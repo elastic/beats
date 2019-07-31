@@ -43,7 +43,6 @@ func init() {
 // Input contains the input and its config
 type kafkaInput struct {
 	config        kafkaInputConfig
-	rawConfig     *common.Config // The Config given to NewInput
 	context       input.Context
 	outlet        channel.Outleter
 	consumerGroup sarama.ConsumerGroup
@@ -110,7 +109,6 @@ func NewInput(
 
 	input := &kafkaInput{
 		config:        config,
-		rawConfig:     cfg,
 		context:       inputContext,
 		outlet:        out,
 		consumerGroup: consumerGroup,
@@ -205,10 +203,9 @@ func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
 }
 
 // A barebones implementation of context.Context wrapped around the done
-// channels that are more common in the beats codebase. This could be added
-// as a utility in a shared part of the code, but right now it's a special
-// case for sarama which requires a context.Context, so it's private until
-// there's at least one other use case.
+// channels that are more common in the beats codebase.
+// TODO(faec): Generalize this to a common utility in a shared library
+// (https://github.com/elastic/beats/issues/13125).
 type channelCtx <-chan struct{}
 
 func doneChannelContext(ch <-chan struct{}) context.Context {
@@ -279,7 +276,6 @@ func (h groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim saram
 	for msg := range claim.Messages() {
 		event := h.createEvent(sess, claim, msg)
 		h.input.outlet.OnEvent(event)
-		sess.MarkMessage(msg, "")
 	}
 	return nil
 }
