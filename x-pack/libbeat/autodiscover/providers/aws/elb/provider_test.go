@@ -74,8 +74,6 @@ func Test_internalBuilder(t *testing.T) {
 	provider, err := internalBuilder(uuid, pBus, cfg, fetcher)
 	require.NoError(t, err)
 
-	provider.Start()
-
 	startListener := pBus.Subscribe("start")
 	stopListener := pBus.Subscribe("stop")
 	listenerDone := make(chan struct{})
