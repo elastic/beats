@@ -186,9 +186,12 @@ func (input *kafkaInput) Wait() {
 	input.consumerGroup.Close()
 }
 
-// Stop shuts down the Input by cancelling the internal context.
+// Stop closes the input's outlet on close. We don't need to shutdown the
+// kafka consumer group explicitly, because it listens to the original input
+// done channel passed in by input.Runner, and that channel is already closed
+// as part of the shutdown process in Runner.Stop().
 func (input *kafkaInput) Stop() {
-	close(input.context.Done)
+	input.outlet.Close()
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
