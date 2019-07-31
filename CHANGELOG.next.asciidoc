@@ -40,7 +40,6 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix connections leak in redis module {pull}12914[12914] {pull}12950[12950]
 - Print errors that were being omitted in vSphere metricsets {pull}12816[12816]
 
 *Packetbeat*
