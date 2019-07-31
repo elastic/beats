@@ -20,12 +20,13 @@ package server
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestParseMetrics(t *testing.T) {

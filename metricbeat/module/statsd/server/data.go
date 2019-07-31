@@ -23,11 +23,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+	"github.com/rcrowley/go-metrics"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/server"
-	"github.com/pkg/errors"
-	"github.com/rcrowley/go-metrics"
 )
 
 var errInvalidPacket = errors.New("invalid statsd packet")
