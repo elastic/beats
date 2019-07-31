@@ -7,10 +7,8 @@ heartbeat.autodiscover:
   - type: aws_elb
     period: 1m
     regions: ["us-east-1", "us-east-2"]
-    # If you don't wish to use env vars or shared credentials files explicitly put credentials here.
-    #access_key_id: my-access-key
-    #secret_access_key: my-secret-access-key
-    #session_token: my-session-token
+    access_key_id: my-access-key
+    secret_access_key: my-secret-access-key
     templates:
     - condition:
         equals.port: 8080
