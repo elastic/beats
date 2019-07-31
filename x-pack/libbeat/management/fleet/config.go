@@ -5,23 +5,19 @@
 package fleet
 
 import (
-	"time"
-
 	xmanagement "github.com/elastic/beats/x-pack/libbeat/management"
 )
 
 // Config for central management
 type Config struct {
-	// true when enrolled
-	Enabled bool `config:"enabled" yaml:"enabled"`
-
+	Fleet     *FleetConfig                        `config:"fleet" yaml:"fleet"`
 	Blacklist xmanagement.ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
 }
 
-// EventReporterConfig configuration of the events reporter.
-type EventReporterConfig struct {
-	Period       time.Duration `config:"period" yaml:"period"`
-	MaxBatchSize int           `config:"max_batch_size" yaml:"max_batch_size" validate:"nonzero,positive"`
+// FleetConfig configuration of the fleet.
+type FleetConfig struct {
+	// true when enrolled
+	Enabled bool `config:"enabled" yaml:"enabled"`
 }
 
 func defaultConfig() *Config {

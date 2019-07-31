@@ -10,6 +10,8 @@
 *beat/build
 *beat/logs
 *beat/data
+**/elastic/build
+*.vscode
 
 # Files
 .DS_Store

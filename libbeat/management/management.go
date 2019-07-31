@@ -59,6 +59,13 @@ func Register(name string, fn FactoryFunc, stability feature.Stability) {
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
 func Factory() FactoryFunc {
+	fleetFeat, err := feature.GlobalRegistry().Lookup(Namespace, "x-pack-fleet")
+	if err == nil {
+		if factory, ok := fleetFeat.Factory().(FactoryFunc); ok {
+			return factory
+		}
+	}
+
 	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
 	if err != nil {
 		return nilFactory
