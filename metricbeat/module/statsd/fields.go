@@ -32,5 +32,5 @@ func init() {
 // AssetStatsd returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/statsd.
 func AssetStatsd() string {
-	return "eJyMkEEOgyAQRfec4oeliT0Ai16iBzAo04YWhci48PZNUKxRTPp3/PkZ/rwaH5oVImuORgBs2ZGCfCRDCsBQ7EYb2PpB4S4AYBmi92ZyJICRHOlICi2xFsDTkjNRpWyNQfeUf7hVyQR4DqTg2zd1vFrLo1kmxk9t2n2YNL0OwQ6vNSYruWYKNfdViUfbbe7x6qzz9VkX60s0so5UsvZ0foWKlLZeZ1pZ19QKiUt6f5x5pvkNAAD//7cenLs="
+	return "eJxsjkEOwiAQRfec4odlk3oAFl7CAzS0fM0oLaRMF729CUVjGpe8/8K8Hi/uDkW9lmAAFY10sLcKrAECy7RKVkmLw9UAwDFiTmGLNMDKSF/oMFK9Ae7CGIqrbo/Fz/xcuHQVArpnOqTxyUkbOh7DsYS0jfXv0zLMPmdZHk2znW3On8zfVOoq05f2p+R3AAAA//8h806M"
 }
