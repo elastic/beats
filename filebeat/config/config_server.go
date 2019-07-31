@@ -20,10 +20,11 @@ package config
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/fleet/x-pack/pkg/core/remoteconfig/grpc"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -48,9 +49,15 @@ func NewConfigServer(configChan chan<- map[string]interface{}) *Server {
 func (s *Server) Config(ctx context.Context, req *grpc.ConfigRequest) (*grpc.ConfigResponse, error) {
 	cfgString := req.GetConfig()
 
-	var configMap map[string]interface{}
-	if err := yaml.Unmarshal([]byte(cfgString), &configMap); err != nil {
-		return &grpc.ConfigResponse{}, err
+	var configMap common.MapStr
+	uconfig, err := common.NewConfigFrom(cfgString)
+	if err != nil {
+		return &grpc.ConfigResponse{}, fmt.Errorf("Config blocks unsuccessfully generated: %+v", err)
+	}
+
+	err = uconfig.Unpack(&configMap)
+	if err != nil {
+		return &grpc.ConfigResponse{}, fmt.Errorf("Config blocks unsuccessfully generated: %+v", err)
 	}
 
 	select {

@@ -147,13 +147,20 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	go fb.startGrpcServer(b)
+
+	return fb, nil
+}
+
+func (fb *Filebeat) startGrpcServer(b *beat.Beat) {
+	logp.Info("initiating config manager")
 	if cm, ok := b.ConfigManager.(fleet.ConfigManager); ok {
 		s := cfg.NewConfigServer(cm.ConfigChan())
 		if err := server.NewGrpcServer(os.Stdin, s); err != nil {
-			return nil, err
+			panic(err)
 		}
+		logp.Info("initiated config manager")
 	}
-	return fb, nil
 }
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.

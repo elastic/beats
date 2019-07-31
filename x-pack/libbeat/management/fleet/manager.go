@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/libbeat/feature"
 
 	"github.com/gofrs/uuid"
 
@@ -31,6 +32,10 @@ var errEmptyAccessToken = errors.New("access_token is empty, you must re-enroll 
 // using which manager is informed about config changes
 type ConfigManager interface {
 	ConfigChan() chan<- map[string]interface{}
+}
+
+func init() {
+	management.Register("x-pack-fleet", NewFleetManager, feature.Beta)
 }
 
 // Manager handles internal config updates. By retrieving
@@ -64,7 +69,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 	var cache *xmanagement.Cache
 	var blacklist *xmanagement.ConfigBlacklist
 
-	if c.Enabled {
+	if c.Fleet.Enabled {
 		var err error
 
 		// Initialize configs blacklist
@@ -96,7 +101,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 
 // Enabled returns true if config management is enabled
 func (cm *Manager) Enabled() bool {
-	return cm.config.Enabled
+	return cm.config.Fleet.Enabled
 }
 
 // ConfigChan returns a channel used to communicate configuration changes.
@@ -109,6 +114,7 @@ func (cm *Manager) Start() {
 	if !cm.Enabled() {
 		return
 	}
+
 	cfgwarn.Beta("Central management is enabled")
 	cm.logger.Info("Starting central management service")
 
@@ -245,6 +251,7 @@ func (cm *Manager) reload(t string, blocks []*api.ConfigBlock) *xmanagement.Erro
 
 	return nil
 }
+
 func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 	blocks := map[string][]*api.ConfigBlock{}
 
@@ -255,11 +262,11 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 			continue
 		}
 
-		block, ok := iBlock.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("failed to parse config to config blog, value with key %s is not a map[string]interface{}: %+v", regName, iBlock)
+		rawBlock := map[string]interface{}{
+			regName: iBlock,
 		}
-		blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: block})
+
+		blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: rawBlock})
 	}
 
 	// keep the ordering consistent while grouping the items.
