@@ -259,11 +259,19 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 			continue
 		}
 
-		rawBlock := map[string]interface{}{
-			regName: iBlock,
-		}
+		// rawBlock := map[string]interface{}{
+		// 	regName: iBlock,
+		// }
 
-		blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: rawBlock})
+		if mapBlock, ok := iBlock.(map[string]interface{}); ok {
+			blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: mapBlock})
+		} else if arrayBlock, ok := iBlock.([]interface{}); ok {
+			for _, item := range arrayBlock {
+				if mapBlock, ok := item.(map[string]interface{}); ok {
+					blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: mapBlock})
+				}
+			}
+		}
 	}
 
 	// keep the ordering consistent while grouping the items.
