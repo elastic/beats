@@ -64,6 +64,7 @@ type Input struct {
 	close      chan struct{}
 	workerOnce sync.Once // Guarantees that the worker goroutine is only started once.
 	context    *channelContext
+	workerWg   sync.WaitGroup // Waits on s3 worker goroutine.
 }
 
 type s3Info struct {
@@ -166,6 +167,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 // Run runs the input
 func (p *Input) Run() {
 	p.workerOnce.Do(func() {
+		p.workerWg.Add(1)
 		visibilityTimeout := int64(p.config.VisibilityTimeout.Seconds())
 		regionName, err := getRegionFromQueueURL(p.config.QueueURL)
 		if err != nil {
@@ -183,6 +185,7 @@ func (p *Input) Run() {
 
 func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int64) {
 	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
+	defer p.workerWg.Done()
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 	for p.context.Err() == nil {
 		// receive messages from sqs
@@ -219,6 +222,8 @@ func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int6
 func (p *Input) Stop() {
 	defer p.outlet.Close()
 	close(p.close)
+	p.context.Done()
+	p.workerWg.Wait()
 	p.logger.Info("Stopping s3 input")
 }
 
@@ -340,7 +345,6 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 		refs: 1,
 		errC: errC,
 	}
-	defer s3Context.done()
 
 	for _, s3Info := range s3Infos {
 		objectHash := s3ObjectHash(s3Info)
@@ -385,6 +389,8 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 			}
 		}
 	}
+
+	s3Context.done()
 	return nil
 }
 
@@ -397,6 +403,9 @@ func newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info, context *channelCon
 
 	resp, err := req.Send(context)
 	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+			return nil, nil
+		}
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
 
@@ -420,6 +429,9 @@ func (p *Input) deleteMessage(queueURL string, messagesReceiptHandle string, svc
 	req := svcSQS.DeleteMessageRequest(deleteMessageInput)
 	_, err := req.Send(p.context)
 	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+			return nil
+		}
 		return errors.Wrap(err, "DeleteMessageRequest failed")
 	}
 	return nil
