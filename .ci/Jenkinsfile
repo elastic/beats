@@ -24,11 +24,6 @@ pipeline {
     */
     stage('Checkout') {
       agent { label 'linux && immutable' }
-      environment {
-        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
-        HOME = "${env.WORKSPACE}"
-        GOPATH = "${env.WORKSPACE}"
-      }
       options { skipDefaultCheckout() }
       steps {
         dir("${BASE_DIR}"){
@@ -42,8 +37,16 @@ pipeline {
       }
     }
     stage('Test') {
+      agent { label 'linux && immutable' }
+      options { skipDefaultCheckout() }
+      environment {
+        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+        HOME = "${env.WORKSPACE}"
+        GOPATH = "${env.WORKSPACE}"
+      }
       steps {
         echo 'Do the magic as usual.'
+        sh 'env | sort'
       }
     }
     stage('Integration Tests') {
