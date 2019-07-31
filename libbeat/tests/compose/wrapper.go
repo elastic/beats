@@ -183,20 +183,11 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 		args = append(args, service)
 	}
 
-	for {
-		// It can fail if we have reached some system limit, specially
-		// number of networks, retry while the context is not done
-		err := d.cmd(ctx, "up", args...).Run()
-		if err == nil {
-			return d.setupAdvertisedHost(ctx, service)
-		}
-
-		select {
-		case <-time.After(time.Second):
-		case <-ctx.Done():
-			return err
-		}
+	err := d.cmd(ctx, "up", args...).Run()
+	if err != nil {
+		return err
 	}
+	return d.setupAdvertisedHost(ctx, service)
 }
 
 func writeToContainer(ctx context.Context, cli *client.Client, id, filename, content string) error {
