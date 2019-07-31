@@ -62,7 +62,7 @@ func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
 	}
 
 	// Start container
-	err = compose.Start(service, RecreateOnUp(false))
+	err = compose.Start(service)
 	if err != nil {
 		t.Fatal("failed to start service", service, err)
 	}
