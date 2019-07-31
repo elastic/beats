@@ -182,7 +182,7 @@ func (p *Input) Run() {
 }
 
 func (p *Input) run(svcSQS *sqs.Client, svcS3 *s3.Client, visibilityTimeout int64) {
-	defer p.logger.Infof("S3 input worker for '%v' has stopped.", p.config.QueueURL)
+	defer p.logger.Infof("s3 input worker for '%v' has stopped.", p.config.QueueURL)
 	p.logger.Infof("s3 input worker has started. with queueURL: %v", p.config.QueueURL)
 	for p.context.Err() == nil {
 		// receive messages from sqs
@@ -340,14 +340,15 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 		refs: 1,
 		errC: errC,
 	}
+	defer s3Context.done()
 
 	for _, s3Info := range s3Infos {
 		objectHash := s3ObjectHash(s3Info)
 
 		// read from s3 object
-		reader, err := p.bufferedIORead(svc, s3Info)
+		reader, err := newS3BucketReader(svc, s3Info, p.context)
 		if err != nil {
-			return errors.Wrap(err, "bufferedIORead failed")
+			return errors.Wrap(err, "newS3BucketReader failed")
 		}
 
 		offset := 0
@@ -387,14 +388,14 @@ func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC ch
 	return nil
 }
 
-func (p *Input) bufferedIORead(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Reader, error) {
+func newS3BucketReader(svc s3iface.ClientAPI, s3Info s3Info, context *channelContext) (*bufio.Reader, error) {
 	s3GetObjectInput := &s3.GetObjectInput{
 		Bucket: awssdk.String(s3Info.name),
 		Key:    awssdk.String(s3Info.key),
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
-	resp, err := req.Send(p.context)
+	resp, err := req.Send(context)
 	if err != nil {
 		return nil, errors.Wrapf(err, "s3 get object request failed %v", s3Info.key)
 	}
@@ -425,6 +426,9 @@ func (p *Input) deleteMessage(queueURL string, messagesReceiptHandle string, svc
 }
 
 func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Context *s3Context) beat.Event {
+	s3Context.Inc()
+	defer s3Context.done()
+
 	f := common.MapStr{
 		"message": log,
 		"log": common.MapStr{
@@ -478,7 +482,7 @@ func (c *s3Context) Fail(err error) {
 
 func (c *s3Context) done() {
 	c.refs--
-	if c.refs == 1 {
+	if c.refs == 0 {
 		c.errC <- c.err
 		close(c.errC)
 	}
