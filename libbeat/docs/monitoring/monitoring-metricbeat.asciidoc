@@ -184,7 +184,7 @@ file.
 By default, the {metricbeat-ref}/metricbeat-module-system.html[system module] is
 enabled. The information it collects, however, is not shown on the
 *Stack Monitoring* page in {kib}. Unless you want to use that information for
-*other purposes, run the following command:
+other purposes, run the following command:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------

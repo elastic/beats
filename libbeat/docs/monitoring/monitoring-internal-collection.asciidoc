@@ -64,6 +64,14 @@ monitoring:
 <1> This setting identifies the hosts and port numbers of {es} nodes
 that are part of the monitoring cluster.
 
+ifndef::serverless[]
+. <<{beatname_lc}-starting,Start {beatname_uc}>>.
+endif::serverless[]
+
+ifdef::serverless[]
+. <<{beatname_lc}-deploying,Deploy {beatname_uc}>>.
+endif::serverless[]
+
 . {kibana-ref}/monitoring-data.html[View the monitoring data in {kib}]. 
 
 
