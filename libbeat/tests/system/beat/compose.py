@@ -8,10 +8,6 @@ import StringIO
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
-# TODO: To be removed when env files are removed from docker compose
-OVERRIDE_HOST = os.environ.get('OVERRIDE_HOST', False)
-
-
 if INTEGRATION_TESTS:
     from compose.cli.command import get_project
     from compose.service import BuildAction
@@ -168,11 +164,9 @@ class ComposeMixin(object):
         if service is None:
             service = cls.COMPOSE_SERVICES[0]
 
-        # TODO: Remove condition when env files are removed from docker compose
-        if OVERRIDE_HOST:
-            host_env = os.environ.get(service.upper() + "_HOST")
-            if host_env:
-                return host_env
+        host_env = os.environ.get(service.upper() + "_HOST")
+        if host_env:
+            return host_env
 
         container = cls.compose_project().containers(service_names=[service])[0]
         info = container.inspect()
