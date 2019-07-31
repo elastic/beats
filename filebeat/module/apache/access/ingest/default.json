@@ -5,13 +5,13 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "%{IP_OR_HOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"(?:%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}|-)?\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:http.response.body.bytes:long}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:user_agent.original}\")?",
-                    "%{IP_OR_HOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"-\" %{NUMBER:http.response.status_code:long} -",
-                    "\\[%{HTTPDATE:apache.access.time}\\] %{IP_OR_HOST:source.address} %{DATA:apache.access.ssl.protocol} %{DATA:apache.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.body.bytes:long}"
+                    "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"(?:%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}|-)?\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:http.response.body.bytes:long}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:user_agent.original}\")?",
+                    "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"-\" %{NUMBER:http.response.status_code:long} -",
+                    "\\[%{HTTPDATE:apache.access.time}\\] %{IPORHOST:source.address} %{DATA:apache.access.ssl.protocol} %{DATA:apache.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.body.bytes:long}"
                 ],
                 "pattern_definitions": {
                     "HOSTNAME": "\\b(?:[0-9A-Za-z][_0-9A-Za-z-]{0,62})(?:\\.(?:[0-9A-Za-z][_0-9A-Za-z-]{0,62}))*(\\.?|\\b)",
-                    "IP_OR_HOST": "(?:%{IP}|%{HOSTNAME})"
+                    "IPORHOST": "(?:%{IP}|%{HOSTNAME})"
                 },
                 "ignore_missing": true
             }
