@@ -143,7 +143,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
 |<<metricbeat-metricset-postgresql-statement,statement>>   
-|<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
 |<<metricbeat-module-rabbitmq,RabbitMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   
