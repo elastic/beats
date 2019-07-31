@@ -108,13 +108,18 @@ func NewInput(
 		meta = nil
 	}
 
+	states := context.States
+	if states == nil {
+		states = file.NewStates()
+	}
+
 	p := &Input{
 		config:      defaultConfig,
 		cfg:         cfg,
 		harvesters:  harvester.NewRegistry(),
 		outlet:      out,
 		stateOutlet: stateOut,
-		states:      file.NewStates(),
+		states:      states,
 		done:        context.Done,
 		meta:        meta,
 	}
@@ -140,7 +145,7 @@ func NewInput(
 		return nil, fmt.Errorf("each input must have at least one path defined")
 	}
 
-	err = p.loadStates(context.States)
+	err = p.loadStates(states.GetStates())
 	if err != nil {
 		return nil, err
 	}

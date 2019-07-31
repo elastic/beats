@@ -128,8 +128,8 @@ func (r *Registrar) Init() error {
 }
 
 // GetStates return the registrar states
-func (r *Registrar) GetStates() []file.State {
-	return r.states.GetStates()
+func (r *Registrar) GetStates() *file.States {
+	return r.states
 }
 
 // loadStates fetches the previous reading state from the configure RegistryFile file

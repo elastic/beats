@@ -62,7 +62,7 @@ func New(
 	conf *common.Config,
 	outlet channel.Connector,
 	beatDone chan struct{},
-	states []file.State,
+	states *file.States,
 	dynFields *common.MapStrPointer,
 ) (*Runner, error) {
 	input := &Runner{

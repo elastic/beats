@@ -27,7 +27,7 @@ import (
 )
 
 type Context struct {
-	States        []file.State
+	States        *file.States
 	Done          chan struct{}
 	BeatDone      chan struct{}
 	DynamicFields *common.MapStrPointer

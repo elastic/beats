@@ -111,7 +111,7 @@ func (c *Crawler) Start(
 func (c *Crawler) startInput(
 	pipeline beat.Pipeline,
 	config *common.Config,
-	states []file.State,
+	states *file.States,
 ) error {
 	if !config.Enabled() {
 		return nil
