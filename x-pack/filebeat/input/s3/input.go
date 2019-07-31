@@ -44,6 +44,8 @@ var (
 	// sooner than WaitTimeSeconds. If no messages are available and the wait time
 	// expires, the call returns successfully with an empty list of messages.
 	waitTimeSecond int64 = 10
+
+	errOutletClosed = errors.New("input outlet closed")
 )
 
 func init() {
@@ -335,6 +337,7 @@ func handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 
 func (p *Input) handleS3Objects(svc s3iface.ClientAPI, s3Infos []s3Info, errC chan error) error {
 	s3Context := &s3Context{
+		refs: 1,
 		errC: errC,
 	}
 
@@ -402,7 +405,7 @@ func (p *Input) bufferedIORead(svc s3iface.ClientAPI, s3Info s3Info) (*bufio.Rea
 func (p *Input) forwardEvent(event beat.Event) error {
 	ok := p.outlet.OnEvent(event)
 	if !ok {
-		return errors.New("input outlet closed")
+		return errOutletClosed
 	}
 	return nil
 }
@@ -475,7 +478,7 @@ func (c *s3Context) Fail(err error) {
 
 func (c *s3Context) done() {
 	c.refs--
-	if c.refs == 0 {
+	if c.refs == 1 {
 		c.errC <- c.err
 		close(c.errC)
 	}
