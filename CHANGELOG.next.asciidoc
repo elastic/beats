@@ -118,6 +118,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - When TLS is configured for the TCP input and a `certificate_authorities` is configured we now default to `required` for the `client_authentication`. {pull}12584[12584]
 - Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
 - Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
+- Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 
 *Heartbeat*
 
@@ -297,6 +298,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to load default aws config file to get credentials. {pull}12727[12727] {issue}12708[12708]
 - Add statistic option into cloudwatch metricset. {issue}12370[12370] {pull}12840[12840]
 - Add support for kubernetes cronjobs {pull}13001[13001]
+- Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
 
 *Packetbeat*
 
@@ -313,6 +315,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `network.community_id` to Sysmon network events (event ID 3). {pull}13034[13034]
 - Add `event.module` to Winlogbeat modules. {pull}13047[13047]
 - Add `event.category: process` and `event.type: process_start/process_end` to Sysmon process events (event ID 1 and 5). {pull}13047[13047]
+- Add support for event ID 4672 to the Security module. {pull}12975[12975]
+- Add support for event ID 22 (DNS query) to the Sysmon module. {pull}12960[12960]
 
 ==== Deprecated
 

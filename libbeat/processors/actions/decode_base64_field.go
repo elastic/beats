@@ -41,9 +41,9 @@ type decodeBase64Field struct {
 }
 
 type base64Config struct {
-	fromTo        `config:"field"`
-	IgnoreMissing bool `config:"ignore_missing"`
-	FailOnError   bool `config:"fail_on_error"`
+	Field         fromTo `config:"field"`
+	IgnoreMissing bool   `config:"ignore_missing"`
+	FailOnError   bool   `config:"fail_on_error"`
 }
 
 var (
@@ -84,7 +84,7 @@ func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
 		backup = event.Fields.Clone()
 	}
 
-	err := f.decodeField(f.config.From, f.config.To, event.Fields)
+	err := f.decodeField(f.config.Field.From, f.config.Field.To, event.Fields)
 	if err != nil && f.config.FailOnError {
 		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %v", err)
 		f.log.Debug("decode base64", errMsg.Error())
@@ -97,7 +97,7 @@ func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (f decodeBase64Field) String() string {
-	return fmt.Sprintf("%s=%+v", processorName, f.config.fromTo)
+	return fmt.Sprintf("%s=%+v", processorName, f.config.Field)
 }
 
 func (f *decodeBase64Field) decodeField(from string, to string, fields common.MapStr) error {
