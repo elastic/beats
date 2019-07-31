@@ -83,5 +83,18 @@ func (m *MetricSet) getClusterUUID() (string, error) {
 		return "", errors.Wrap(err, "could not get state information")
 	}
 
-	return state.Outputs.Elasticsearch.ClusterUUID, nil
+	if state.Output.Name != "elasticsearch" {
+		return "", nil
+	}
+
+	clusterUUID := state.Outputs.Elasticsearch.ClusterUUID
+	if clusterUUID == "" {
+		// Output is ES but cluster UUID could not be determined. No point sending monitoring
+		// data with empty cluster UUID since it will not be associated with the correct ES
+		// production cluster. Log error instead.
+		return "", beat.ErrClusterUUID
+	}
+
+	return clusterUUID, nil
+
 }
