@@ -169,6 +169,7 @@ information.
 |`remote_monitoring_agent`
 |Send monitoring data to the monitoring cluster
 |====
+
 . Assign the following role to users who will view the monitoring data in
 {kib}:
 
