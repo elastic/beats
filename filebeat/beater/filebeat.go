@@ -23,11 +23,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/x-pack/libbeat/management/fleet"
-
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/fleet/x-pack/pkg/core/plugin/server"
-
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -36,11 +31,14 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/x-pack/libbeat/management/fleet"
+	"github.com/elastic/fleet/x-pack/pkg/core/plugin/server"
 
 	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
 	"github.com/elastic/beats/filebeat/channel"
@@ -153,13 +151,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 }
 
 func (fb *Filebeat) startGrpcServer(b *beat.Beat) {
-	logp.Info("initiating config manager")
 	if cm, ok := b.ConfigManager.(fleet.ConfigManager); ok {
+		logp.Info("initiating fleet config manager")
 		s := cfg.NewConfigServer(cm.ConfigChan())
 		if err := server.NewGrpcServer(os.Stdin, s); err != nil {
 			panic(err)
 		}
-		logp.Info("initiated config manager")
 	}
 }
 
