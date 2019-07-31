@@ -3,45 +3,17 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "LoadBalancerName": "tf-lb-20171218185946539900000004"
+                "AvailabilityZone": "us-east-1b",
+                "LoadBalancerName": "DockerReg-EcsElast-1UFCSV3UVE46A"
             },
             "namespace": "AWS/ELB"
         },
         "metrics": {
-            "EstimatedALBActiveConnectionCount": {
-                "avg": 2.5,
-                "count": 8,
-                "max": 3,
-                "min": 2,
-                "sum": 20
+            "HealthyHostCount": {
+                "avg": 2
             },
-            "EstimatedALBConsumedLCUs": {
-                "avg": 0.000015000000000000002,
-                "count": 8,
-                "max": 0.00002,
-                "min": 0.00001,
-                "sum": 0.00012000000000000002
-            },
-            "EstimatedALBNewConnectionCount": {
-                "avg": 0,
-                "count": 8,
-                "max": 0,
-                "min": 0,
-                "sum": 0
-            },
-            "EstimatedProcessedBytes": {
-                "avg": 223.5,
-                "count": 8,
-                "max": 262,
-                "min": 160,
-                "sum": 1788
-            },
-            "HTTPCode_ELB_5XX": {
-                "avg": 1,
-                "count": 1,
-                "max": 0,
-                "min": 0,
-                "sum": 1
+            "UnHealthyHostCount": {
+                "avg": 0
             }
         }
     },
@@ -58,6 +30,6 @@
         "name": "elb"
     },
     "service": {
-        "type": "cloudwatch"
+        "type": "aws"
     }
 }

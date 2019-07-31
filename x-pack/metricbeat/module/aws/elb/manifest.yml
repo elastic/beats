@@ -5,3 +5,5 @@ input:
   defaults:
     metrics:
       - namespace: AWS/ELB
+        statistic: ["Average"]
+        tags.resource_type_filter: elasticloadbalancing

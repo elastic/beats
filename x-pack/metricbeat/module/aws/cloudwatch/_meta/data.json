@@ -3,244 +3,230 @@
     "aws": {
         "cloudwatch": {
             "dimensions": {
-                "EngineName": "aurora"
+                "DBInstanceIdentifier": "test1"
             },
             "namespace": "AWS/RDS"
         },
         "metrics": {
             "ActiveTransactions": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "AuroraBinlogReplicaLag": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "AuroraReplicaLag": {
-                "avg": 17.599,
+                "avg": 17.945199999999996,
                 "count": 5,
-                "max": 20.689,
-                "min": 7.07,
-                "sum": 87.995
-            },
-            "AuroraReplicaLagMaximum": {
-                "avg": 17.786400032043456,
-                "count": 5,
-                "max": 21.135000228881836,
-                "min": 7.133999824523926,
-                "sum": 88.93200016021729
-            },
-            "AuroraReplicaLagMinimum": {
-                "avg": 17.786400032043456,
-                "count": 5,
-                "max": 21.135000228881836,
-                "min": 7.133999824523926,
-                "sum": 88.93200016021729
+                "max": 20.299,
+                "min": 9.026,
+                "sum": 89.72599999999998
             },
             "BinLogDiskUsage": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "BlockedTransactions": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "BufferCacheHitRatio": {
                 "avg": 100,
-                "count": 10,
+                "count": 5,
                 "max": 100,
                 "min": 100,
-                "sum": 1000
+                "sum": 500
             },
             "CPUUtilization": {
-                "avg": 3.4,
-                "count": 10,
-                "max": 4,
+                "avg": 3,
+                "count": 5,
+                "max": 3,
                 "min": 3,
-                "sum": 34
+                "sum": 15
             },
             "CommitLatency": {
-                "avg": 3.4960766666666663,
-                "count": 10,
-                "max": 8.171666666666667,
+                "avg": 0,
+                "count": 5,
+                "max": 0,
                 "min": 0,
-                "sum": 34.960766666666665
+                "sum": 0
             },
             "CommitThroughput": {
-                "avg": 0.24996426101010413,
-                "count": 10,
-                "max": 0.5003752814610959,
+                "avg": 0,
+                "count": 5,
+                "max": 0,
                 "min": 0,
-                "sum": 2.4996426101010414
+                "sum": 0
             },
             "DDLLatency": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "DDLThroughput": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "DMLLatency": {
-                "avg": 0.08182999999999999,
-                "count": 10,
-                "max": 0.16573333333333334,
+                "avg": 0,
+                "count": 5,
+                "max": 0,
                 "min": 0,
-                "sum": 0.8182999999999999
+                "sum": 0
             },
             "DMLThroughput": {
-                "avg": 0.24996426101010413,
-                "count": 10,
-                "max": 0.5003752814610959,
+                "avg": 0,
+                "count": 5,
+                "max": 0,
                 "min": 0,
-                "sum": 2.4996426101010414
+                "sum": 0
             },
             "DatabaseConnections": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "Deadlocks": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "DeleteLatency": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "DeleteThroughput": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "EngineUptime": {
-                "avg": 2820198,
-                "count": 10,
-                "max": 2820583,
-                "min": 2819813,
-                "sum": 28201980
+                "avg": 2888753,
+                "count": 5,
+                "max": 2888873,
+                "min": 2888633,
+                "sum": 14443765
             },
             "FreeLocalStorage": {
-                "avg": 32045225164.8,
-                "count": 10,
-                "max": 32952999936,
-                "min": 31137382400,
-                "sum": 320452251648
+                "avg": 32949542912,
+                "count": 5,
+                "max": 32949567488,
+                "min": 32949518336,
+                "sum": 164747714560
             },
             "FreeableMemory": {
-                "avg": 4595537510.4,
-                "count": 10,
-                "max": 4721700864,
-                "min": 4469288960,
-                "sum": 45955375104
+                "avg": 4717250969.6,
+                "count": 5,
+                "max": 4717965312,
+                "min": 4716732416,
+                "sum": 23586254848
             },
             "InsertLatency": {
-                "avg": 0.08182999999999999,
-                "count": 10,
-                "max": 0.16573333333333334,
+                "avg": 0,
+                "count": 5,
+                "max": 0,
                 "min": 0,
-                "sum": 0.8182999999999999
+                "sum": 0
             },
             "InsertThroughput": {
-                "avg": 0.24996426101010413,
-                "max": 0.5003752814610959,
+                "avg": 0,
+                "count": 5,
+                "max": 0,
                 "min": 0,
-                "sum": 2.4996426101010414
+                "sum": 0
             },
             "LoginFailures": {
                 "avg": 0,
-                "count": 10,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "NetworkReceiveThroughput": {
-                "avg": 0.840001168086164,
-                "count": 10,
-                "max": 1.4000233337222288,
-                "min": 0.6999533364442371,
-                "sum": 8.40001168086164
+                "avg": 0.6999860014776844,
+                "count": 5,
+                "max": 0.700023334111137,
+                "min": 0.6999416715273727,
+                "sum": 3.499930007388422
             },
             "NetworkThroughput": {
-                "avg": 1.680002336172328,
-                "count": 10,
-                "max": 2.8000466674444575,
-                "min": 1.3999066728884741,
-                "sum": 16.80002336172328
+                "avg": 1.3999720029553688,
+                "count": 5,
+                "max": 1.400046668222274,
+                "min": 1.3998833430547455,
+                "sum": 6.999860014776844
             },
             "NetworkTransmitThroughput": {
-                "avg": 0.840001168086164,
-                "count": 10,
-                "max": 1.4000233337222288,
-                "min": 0.6999533364442371,
-                "sum": 8.40001168086164
+                "avg": 0.6999860014776844,
+                "count": 5,
+                "max": 0.700023334111137,
+                "min": 0.6999416715273727,
+                "sum": 3.499930007388422
             },
             "Queries": {
-                "avg": 7.5099053576199,
-                "count": 10,
-                "max": 8.985130359405215,
-                "min": 6.0335344511483715,
-                "sum": 75.099053576199
+                "avg": 6.169305601785825,
+                "count": 5,
+                "max": 6.380462125376914,
+                "min": 6.031523876170482,
+                "sum": 30.846528008929127
             },
             "ResultSetCacheHitRatio": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "SelectLatency": {
-                "avg": 0.20052193393758158,
-                "count": 10,
-                "max": 0.2230939597315436,
-                "min": 0.17563186813186812,
-                "sum": 2.0052193393758158
+                "avg": 0.2314997785623484,
+                "count": 5,
+                "max": 0.2420805369127517,
+                "min": 0.2227225806451613,
+                "sum": 1.157498892811742
             },
             "SelectThroughput": {
-                "avg": 2.8148287472596003,
-                "count": 10,
-                "max": 3.152364273204904,
-                "min": 2.483250558314723,
-                "sum": 28.148287472596003
+                "avg": 2.529737853689286,
+                "count": 5,
+                "max": 2.600086669555652,
+                "min": 2.4822990420658058,
+                "sum": 12.648689268446429
             },
             "UpdateLatency": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
             },
             "UpdateThroughput": {
                 "avg": 0,
-                "count": 10,
+                "count": 5,
                 "max": 0,
                 "min": 0,
                 "sum": 0
@@ -260,6 +246,6 @@
         "name": "cloudwatch"
     },
     "service": {
-        "type": "cloudwatch"
+        "type": "aws"
     }
 }
