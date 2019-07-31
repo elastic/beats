@@ -7,7 +7,7 @@
 
     - name: winlog.logon
       type: group
-      description: Windows status code returned for the DNS query.
+      description: Data related to a Windows logon.
       fields:
         - name: type
           type: keyword

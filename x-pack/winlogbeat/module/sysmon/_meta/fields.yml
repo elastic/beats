@@ -1,7 +1,7 @@
 - key: sysmon
   title: "Sysmon module"
   description: >
-    These are the event fields specific to Sysmon.
+    These are the event fields specific to the Sysmon module.
   release: beta
   fields:
 
@@ -39,6 +39,6 @@
     - name: dns.grouped.ip
       type: ip
       description: >
-        Array containing all IPs seen in `answers.data`.
+        Array containing all IPs seen in `dns.answers.data`.
 
 

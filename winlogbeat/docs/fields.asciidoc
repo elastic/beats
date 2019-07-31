@@ -3883,7 +3883,7 @@ These are the event fields specific to the module for the Security log.
 [float]
 === winlog.logon
 
-Windows status code returned for the DNS query.
+Data related to a Windows logon.
 
 
 *`winlog.logon.type`*::
@@ -3941,7 +3941,7 @@ type: keyword
 [[exported-fields-sysmon]]
 == Sysmon module fields
 
-These are the event fields specific to Sysmon.
+These are the event fields specific to the Sysmon module.
 
 
 
@@ -4007,7 +4007,7 @@ example: 3
 *`dns.grouped.ip`*::
 +
 --
-Array containing all IPs seen in `answers.data`.
+Array containing all IPs seen in `dns.answers.data`.
 
 
 type: ip
