@@ -80,18 +80,19 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 
 	// Start event watcher
 	m.server.Start()
-
+	reportPeriod := time.After(period)
 	for {
 		select {
 		case <-reporter.Done():
 			m.server.Stop()
 			return
-		case <-time.After(period):
+		case <-reportPeriod:
+			reportPeriod = time.After(period)
 			event := mb.Event{
 				MetricSetFields: m.processor.GetAll(),
+				Namespace:       "statsd",
 			}
 
-			event.Namespace = "statsd"
 			reporter.Event(event)
 		case msg := <-m.server.GetEvents():
 			err := m.processor.Process(msg)
