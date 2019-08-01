@@ -315,5 +315,26 @@
         "process.pid": 5502,
         "service.type": "postgresql",
         "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2019-05-06T19:00:04.511Z",
+        "event.dataset": "postgresql.log",
+        "event.duration": 753000,
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 4266,
+        "message": "2019-05-06 19:00:04.511 UTC [913763] elastic@opbeans LOG:  duration: 0.753 ms  statement: SELECT p.id, p.sku, p.name, p.stock, t.name AS type_name FROM products p LEFT JOIN product_types t ON p.type_id=t.id\n    FROM orders JOIN customers ON orders.customer_id=customers.id\n    FROM products JOIN product_types ON type_id=product_types.id",
+        "postgresql.log.database": "opbeans",
+        "postgresql.log.query": "SELECT p.id, p.sku, p.name, p.stock, t.name AS type_name FROM products p LEFT JOIN product_types t ON p.type_id=t.id\n    FROM orders JOIN customers ON orders.customer_id=customers.id\n    FROM products JOIN product_types ON type_id=product_types.id",
+        "postgresql.log.timestamp": "2019-05-06 19:00:04.511 UTC",
+        "process.pid": 913763,
+        "service.type": "postgresql",
+        "user.name": "elastic"
     }
 ]

@@ -177,9 +177,17 @@ func createIndex(host string) error {
 	return nil
 }
 
-// createIndex creates and elasticsearch index in case it does not exit yet
+// enableTrialLicense creates and elasticsearch index in case it does not exit yet
 func enableTrialLicense(host string, version *common.Version) error {
 	client := &http.Client{}
+
+	enabled, err := checkTrialLicenseEnabled(host, version)
+	if err != nil {
+		return err
+	}
+	if enabled {
+		return nil
+	}
 
 	var enableXPackURL string
 	if version.Major < 7 {
@@ -208,6 +216,42 @@ func enableTrialLicense(host string, version *common.Version) error {
 	}
 
 	return nil
+}
+
+// checkTrialLicenseEnabled creates and elasticsearch index in case it does not exit yet
+func checkTrialLicenseEnabled(host string, version *common.Version) (bool, error) {
+	var licenseURL string
+	if version.Major < 7 {
+		licenseURL = "/_xpack/license"
+	} else {
+		licenseURL = "/_license"
+	}
+
+	resp, err := http.Get("http://" + host + licenseURL)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	var data struct {
+		License struct {
+			Status string `json:"status"`
+			Type   string `json:"type"`
+		} `json:"license"`
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return false, err
+	}
+
+	active := data.License.Status == "active"
+	isTrial := data.License.Type == "trial"
+	return active && isTrial, nil
 }
 
 func createMLJob(host string, version *common.Version) error {
