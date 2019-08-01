@@ -174,8 +174,8 @@ func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
 	array := []interface{}{}
 	for _, header := range headers {
 		array = append(array, common.MapStr{
-			"key":   header.Key,
-			"value": header.Value,
+			"key":   string(header.Key),
+			"value": string(header.Value),
 		})
 	}
 	return array

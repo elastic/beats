@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// + build integration
 
 package kafka
 
@@ -208,8 +208,8 @@ func checkMatchingHeaders(
 		}
 		key, _ := headerMap.GetValue("key")
 		value, _ := headerMap.GetValue("value")
-		assert.Equal(t, expected[i].Key, key)
-		assert.Equal(t, expected[i].Value, value)
+		assert.Equal(t, string(expected[i].Key), key)
+		assert.Equal(t, string(expected[i].Value), value)
 	}
 }
 
