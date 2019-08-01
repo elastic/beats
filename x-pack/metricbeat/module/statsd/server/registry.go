@@ -24,31 +24,31 @@ type metric struct {
 	metric     interface{}
 }
 
-type Registry struct {
+type registry struct {
 	metrics       map[string]map[string]*metric
 	reservoirSize int
 	ttl           time.Duration
 	lastReport    time.Time
 }
 
-type SetMetric struct {
+type setMetric struct {
 	set map[string]struct{}
 }
 
-func (s *SetMetric) Add(val string) {
+func (s *setMetric) Add(val string) {
 	s.set[val] = struct{}{}
 }
 
-func (s *SetMetric) Reset() {
+func (s *setMetric) Reset() {
 	s.set = map[string]struct{}{}
 }
 
-func (s *SetMetric) Count() int {
+func (s *setMetric) Count() int {
 	return len(s.set)
 }
 
-func NewSetMetric() *SetMetric {
-	s := SetMetric{}
+func newSetMetric() *setMetric {
+	s := setMetric{}
 	s.Reset()
 	return &s
 }
@@ -58,7 +58,7 @@ type metricsGroup struct {
 	metrics common.MapStr
 }
 
-func (r *Registry) getMetric(metric interface{}) map[string]interface{} {
+func (r *registry) getMetric(metric interface{}) map[string]interface{} {
 	values := map[string]interface{}{}
 	switch m := metric.(type) {
 	case metrics.Counter:
@@ -95,14 +95,14 @@ func (r *Registry) getMetric(metric interface{}) map[string]interface{} {
 		values["5m_rate"] = t.Rate5()
 		values["15m_rate"] = t.Rate15()
 		values["mean_rate"] = t.RateMean()
-	case *SetMetric:
+	case *setMetric:
 		values["count"] = m.Count()
 		m.Reset()
 	}
 	return values
 }
 
-func (r *Registry) GetAll() []metricsGroup {
+func (r *registry) GetAll() []metricsGroup {
 	var tags map[string]string
 	now := time.Now()
 	cutOff := now.Add(-r.ttl)
@@ -145,13 +145,13 @@ func (r *Registry) GetAll() []metricsGroup {
 	return tagGroups
 }
 
-func (r *Registry) Delete(name string, tags map[string]string) {
+func (r *registry) Delete(name string, tags map[string]string) {
 	if group, ok := r.metrics[r.metricHash(tags)]; ok {
 		delete(group, name)
 	}
 }
 
-func (r *Registry) getOrNew(name string, tags map[string]string, new func() interface{}) interface{} {
+func (r *registry) getOrNew(name string, tags map[string]string, new func() interface{}) interface{} {
 	tagsKey := r.metricHash(tags)
 	tc, ok := r.metrics[tagsKey]
 	if !ok {
@@ -182,7 +182,7 @@ func (r *Registry) getOrNew(name string, tags map[string]string, new func() inte
 	return c.metric
 }
 
-func (r *Registry) GetOrNewCounter(name string, tags map[string]string) metrics.Counter {
+func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.Counter {
 	maybeCounter := r.getOrNew(name, tags, func() interface{} { return metrics.NewCounter() })
 	counter, ok := maybeCounter.(metrics.Counter)
 	if ok {
@@ -198,7 +198,7 @@ func (r *Registry) GetOrNewCounter(name string, tags map[string]string) metrics.
 
 }
 
-func (r *Registry) GetOrNewTimer(name string, tags map[string]string) metrics.Timer {
+func (r *registry) GetOrNewTimer(name string, tags map[string]string) metrics.Timer {
 	timer, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewTimer() }).(metrics.Timer)
 	if ok {
 		return timer
@@ -211,7 +211,7 @@ func (r *Registry) GetOrNewTimer(name string, tags map[string]string) metrics.Ti
 	return r.GetOrNewTimer(name, tags)
 }
 
-func (r *Registry) GetOrNewGauge64(name string, tags map[string]string) metrics.GaugeFloat64 {
+func (r *registry) GetOrNewGauge64(name string, tags map[string]string) metrics.GaugeFloat64 {
 	gauge, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewGaugeFloat64() }).(metrics.GaugeFloat64)
 	if ok {
 		return gauge
@@ -224,7 +224,7 @@ func (r *Registry) GetOrNewGauge64(name string, tags map[string]string) metrics.
 	return r.GetOrNewGauge64(name, tags)
 }
 
-func (r *Registry) GetOrNewHistogram(name string, tags map[string]string) metrics.Histogram {
+func (r *registry) GetOrNewHistogram(name string, tags map[string]string) metrics.Histogram {
 	histogram, ok := r.getOrNew(name, tags, func() interface{} { return metrics.NewHistogram(metrics.NewUniformSample(r.reservoirSize)) }).(metrics.Histogram)
 	if ok {
 		return histogram
@@ -237,8 +237,8 @@ func (r *Registry) GetOrNewHistogram(name string, tags map[string]string) metric
 	return r.GetOrNewHistogram(name, tags)
 }
 
-func (r *Registry) GetOrNewSet(name string, tags map[string]string) *SetMetric {
-	setmetric, ok := r.getOrNew(name, tags, func() interface{} { return NewSetMetric() }).(*SetMetric)
+func (r *registry) GetOrNewSet(name string, tags map[string]string) *setMetric {
+	setmetric, ok := r.getOrNew(name, tags, func() interface{} { return newSetMetric() }).(*setMetric)
 	if ok {
 		return setmetric
 	}
@@ -250,7 +250,7 @@ func (r *Registry) GetOrNewSet(name string, tags map[string]string) *SetMetric {
 	return r.GetOrNewSet(name, tags)
 }
 
-func (r *Registry) metricHash(tags map[string]string) string {
+func (r *registry) metricHash(tags map[string]string) string {
 	b, err := json.Marshal(tags)
 	if err != nil { // shouldn't happen on a map[string]string
 		panic(err)

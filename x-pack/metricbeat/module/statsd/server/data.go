@@ -19,7 +19,7 @@ import (
 var errInvalidPacket = errors.New("invalid statsd packet")
 
 type metricProcessor struct {
-	registry      *Registry
+	registry      *registry
 	reservoirSize int
 }
 
@@ -101,7 +101,7 @@ func parse(b []byte) ([]statsdMetric, error) {
 
 func newMetricProcessor(reservoirSize int, ttl time.Duration) *metricProcessor {
 	return &metricProcessor{
-		registry:      &Registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
+		registry:      &registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
 		reservoirSize: reservoirSize,
 	}
 }
