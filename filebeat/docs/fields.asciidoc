@@ -7379,7 +7379,7 @@ type: date
 *`kafka.headers`*::
 +
 --
-The array of kafka headers, each an object containing subfields "key" and "value".
+The array of kafka headers, each an object containing string subfields "key" and "value".
 
 
 type: array
