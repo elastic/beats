@@ -66,7 +66,9 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 
 	if c.Enabled {
 		cfgwarn.Deprecate("8.0.0", "Central Management is no longer under development and has been deprecated. We are working hard to deliver a new and more comprehensive solution and look forward to sharing it with you")
+	}
 
+	if c.Enabled && c.Mode == ModeCentralManagement {
 		var err error
 
 		if err = validateConfig(c); err != nil {
@@ -117,7 +119,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 
 // Enabled returns true if config management is enabled
 func (cm *ConfigManager) Enabled() bool {
-	return cm.config.Enabled
+	return cm.config.Enabled && cm.config.Mode == ModeCentralManagement
 }
 
 // Start the config manager

@@ -66,7 +66,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 	var cache *xmanagement.Cache
 	var blacklist *xmanagement.ConfigBlacklist
 
-	if c.Fleet.Enabled {
+	if c.Enabled && c.Mode == xmanagement.ModeFleet {
 		var err error
 
 		// Initialize configs blacklist
@@ -98,7 +98,7 @@ func NewFleetManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uu
 
 // Enabled returns true if config management is enabled
 func (cm *Manager) Enabled() bool {
-	return cm.config.Fleet.Enabled
+	return cm.config.Enabled && cm.config.Mode == xmanagement.ModeFleet
 }
 
 // ConfigChan returns a channel used to communicate configuration changes.
@@ -258,10 +258,6 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (api.ConfigBlocks, error) {
 		if err != nil {
 			continue
 		}
-
-		// rawBlock := map[string]interface{}{
-		// 	regName: iBlock,
-		// }
 
 		if mapBlock, ok := iBlock.(map[string]interface{}); ok {
 			blocks[regName] = append(blocks[regName], &api.ConfigBlock{Raw: mapBlock})

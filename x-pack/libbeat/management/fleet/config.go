@@ -10,18 +10,14 @@ import (
 
 // Config for central management
 type Config struct {
-	Fleet     *FleetConfig                        `config:"fleet" yaml:"fleet"`
+	Enabled   bool                                `config:"enabled" yaml:"enabled"`
+	Mode      string                              `config:"mode" yaml:"mode"`
 	Blacklist xmanagement.ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
-}
-
-// FleetConfig configuration of the fleet.
-type FleetConfig struct {
-	// true when enrolled
-	Enabled bool `config:"enabled" yaml:"enabled"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
+		Mode: xmanagement.ModeCentralManagement,
 		Blacklist: xmanagement.ConfigBlacklistSettings{
 			Patterns: map[string]string{
 				"output": "console|file",

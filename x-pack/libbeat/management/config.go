@@ -68,10 +68,19 @@ const ManagedConfigTemplate = `
 #monitoring.elasticsearch:
 `
 
+const (
+	ModeCentralManagement = "cm"
+	ModeFleet             = "fleet"
+)
+
 // Config for central management
 type Config struct {
 	// true when enrolled
 	Enabled bool `config:"enabled" yaml:"enabled"`
+
+	// Mode specifies whether beat uses Central Management or Fleet.
+	// Options: [cm, fleet]
+	Mode string `config:"mode" yaml:"mode"`
 
 	// Poll configs period
 	Period time.Duration `config:"period" yaml:"period"`
@@ -93,6 +102,7 @@ type EventReporterConfig struct {
 
 func defaultConfig() *Config {
 	return &Config{
+		Mode:   ModeCentralManagement,
 		Period: 60 * time.Second,
 		EventsReporter: EventReporterConfig{
 			Period:       30 * time.Second,

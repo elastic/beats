@@ -34,6 +34,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/fleet/x-pack/pkg/core/plugin/server"
 
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
@@ -630,7 +631,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.ID)
+	b.ConfigManager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.Register, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}
@@ -638,6 +639,8 @@ func (b *Beat) configure(settings Settings) error {
 	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
 	}
+
+	go startGrpcServer(b)
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
 		runtime.GOMAXPROCS(maxProcs)
@@ -1077,4 +1080,18 @@ func setUmaskWithSettings(settings Settings) error {
 		return setUmask(*settings.Umask)
 	}
 	return setUmask(0027) // 0640 for files | 0750 for dirs
+}
+
+type fleetConfigManager interface {
+	ConfigChan() chan<- map[string]interface{}
+}
+
+func startGrpcServer(b *Beat) {
+	if cm, ok := b.ConfigManager.(fleetConfigManager); ok {
+		logp.Info("initiating fleet config manager")
+		s := NewConfigServer(cm.ConfigChan())
+		if err := server.NewGrpcServer(os.Stdin, s); err != nil {
+			panic(err)
+		}
+	}
 }
