@@ -98,7 +98,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Ceph] Cluster Overview",
+        "title": "[Metricbeat] Ceph Cluster Overview",
         "version": 1
       },
       "id": "c93f2c30-b473-11e9-a579-f5c0a5d81340",
@@ -138,8 +138,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-02T10:47:51.959Z",
-      "version": "WzU3MywxXQ=="
+      "updated_at": "2019-08-01T15:57:38.813Z",
+      "version": "WzU0NiwxXQ=="
     },
     {
       "attributes": {
@@ -153,7 +153,7 @@
             }
           }
         },
-        "title": "Cluster Disk Stats [Metricbeat Ceph] ECS",
+        "title": "[Metricbeat Ceph] Cluster Disk Stats",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -249,7 +249,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Cluster Disk Stats [Metricbeat Ceph] ECS",
+          "title": "[Metricbeat Ceph] Cluster Disk Stats",
           "type": "metrics"
         }
       },
@@ -259,8 +259,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T10:56:16.795Z",
-      "version": "WzYwMCwxXQ=="
+      "updated_at": "2019-08-01T15:45:19.469Z",
+      "version": "WzUzMSwxXQ=="
     },
     {
       "attributes": {
@@ -274,7 +274,7 @@
             }
           }
         },
-        "title": "Throughput [Metricbeat Ceph] ECS",
+        "title": "[Metricbeat Ceph] Throughput",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -343,7 +343,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Throughput [Metricbeat Ceph] ECS",
+          "title": "[Metricbeat Ceph] Throughput",
           "type": "metrics"
         }
       },
@@ -353,8 +353,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T10:54:20.715Z",
-      "version": "WzU5NiwxXQ=="
+      "updated_at": "2019-08-01T14:49:16.164Z",
+      "version": "WzUxMSwxXQ=="
     },
     {
       "attributes": {
@@ -368,7 +368,7 @@
             }
           }
         },
-        "title": "IOPS [Metricbeat Ceph] ECS",
+        "title": "[Metricbeat Ceph] IOPS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -437,7 +437,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "IOPS [Metricbeat Ceph] ECS",
+          "title": "[Metricbeat Ceph] IOPS",
           "type": "metrics"
         }
       },
@@ -447,8 +447,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T10:54:00.152Z",
-      "version": "WzU5MiwxXQ=="
+      "updated_at": "2019-08-01T14:46:54.556Z",
+      "version": "WzUxMCwxXQ=="
     },
     {
       "attributes": {
@@ -462,7 +462,7 @@
             }
           }
         },
-        "title": "OSD Disk Usage [Metricbeat Ceph] ECS",
+        "title": "[Metricbeat Ceph] OSD Disk Usage",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -479,19 +479,10 @@
             },
             "gauge_color_rules": [
               {
-                "gauge": "rgba(226,115,0,1)",
-                "id": "e681d700-b46b-11e9-9bdc-15c69a730d82",
-                "operator": "gte",
-                "value": 70
-              },
-              {
-                "gauge": "rgba(247,58,26,1)",
-                "id": "61b552b0-b513-11e9-81ce-0379c4621e40",
-                "value": 90
+                "id": "e681d700-b46b-11e9-9bdc-15c69a730d82"
               }
             ],
             "gauge_inner_width": 10,
-            "gauge_max": "",
             "gauge_style": "half",
             "gauge_width": 10,
             "id": "e17a9bc0-b46b-11e9-9a02-5de45d117640",
@@ -526,7 +517,7 @@
             "time_field": "@timestamp",
             "type": "gauge"
           },
-          "title": "OSD Disk Usage [Metricbeat Ceph] ECS",
+          "title": "[Metricbeat Ceph] OSD Disk Usage",
           "type": "metrics"
         }
       },
@@ -536,8 +527,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T10:52:20.880Z",
-      "version": "WzU3NCwxXQ=="
+      "updated_at": "2019-08-01T14:54:17.685Z",
+      "version": "WzUxNSwxXQ=="
     },
     {
       "attributes": {
@@ -551,7 +542,7 @@
             }
           }
         },
-        "title": "Pools [Metricbeat Ceph] ECS",
+        "title": "[Metricbeat Ceph] Pools",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -616,7 +607,7 @@
             "time_field": "@timestamp",
             "type": "metric"
           },
-          "title": "Pools [Metricbeat Ceph] ECS",
+          "title": "[Metricbeat Ceph] Pools",
           "type": "metrics"
         }
       },
@@ -626,8 +617,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T10:53:11.179Z",
-      "version": "WzU4MSwxXQ=="
+      "updated_at": "2019-08-01T15:22:50.121Z",
+      "version": "WzUxOSwxXQ=="
     },
     {
       "attributes": {
@@ -641,7 +632,7 @@
             }
           }
         },
-        "title": "Pool Objects [Metricbeat Ceph] ECS",
+        "title": "[Metricbeat Ceph] Pool Objects",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -699,7 +690,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Pool Objects [Metricbeat Ceph] ECS",
+          "title": "[Metricbeat Ceph] Pool Objects",
           "type": "metrics"
         }
       },
@@ -709,8 +700,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-02T10:53:35.220Z",
-      "version": "WzU4NiwxXQ=="
+      "updated_at": "2019-08-01T15:46:22.612Z",
+      "version": "WzUzMiwxXQ=="
     }
   ],
   "version": "7.3.0"
