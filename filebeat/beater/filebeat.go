@@ -20,7 +20,6 @@ package beater
 import (
 	"flag"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -37,8 +36,6 @@ import (
 	"github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
-	"github.com/elastic/beats/x-pack/libbeat/management/fleet"
-	"github.com/elastic/fleet/x-pack/pkg/core/plugin/server"
 
 	fbautodiscover "github.com/elastic/beats/filebeat/autodiscover"
 	"github.com/elastic/beats/filebeat/channel"
@@ -145,19 +142,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	go fb.startGrpcServer(b)
-
 	return fb, nil
-}
-
-func (fb *Filebeat) startGrpcServer(b *beat.Beat) {
-	if cm, ok := b.ConfigManager.(fleet.ConfigManager); ok {
-		logp.Info("initiating fleet config manager")
-		s := cfg.NewConfigServer(cm.ConfigChan())
-		if err := server.NewGrpcServer(os.Stdin, s); err != nil {
-			panic(err)
-		}
-	}
 }
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.

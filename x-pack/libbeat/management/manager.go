@@ -64,7 +64,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	var cache *Cache
 	var blacklist *ConfigBlacklist
 
-	if c.Enabled {
+	if c.Enabled && c.Mode == ModeCentralManagement {
 		var err error
 
 		if err = validateConfig(c); err != nil {
@@ -115,7 +115,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 
 // Enabled returns true if config management is enabled
 func (cm *ConfigManager) Enabled() bool {
-	return cm.config.Enabled
+	return cm.config.Enabled && cm.config.Mode == ModeCentralManagement
 }
 
 // Start the config manager

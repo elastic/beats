@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package config
+package instance
 
 import (
 	"context"
@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	defaultTimeout = 5 * time.Second
+	defaultTimeout = 15 * time.Second
 )
 
 // Server is a server for handling communication between
