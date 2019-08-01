@@ -6,7 +6,7 @@
   fields:
     - name: statsd.*
       type: object
-      object_type: double
+      object_type: float
       object_type_mapping_type: "*"
       description: >
         Statsd metrics
