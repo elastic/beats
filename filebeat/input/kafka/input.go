@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/kafka"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/pkg/errors"
@@ -43,10 +44,10 @@ func init() {
 // Input contains the input and its config
 type kafkaInput struct {
 	config        kafkaInputConfig
+	saramaConfig  *sarama.Config
 	context       input.Context
 	outlet        channel.Outleter
 	consumerGroup sarama.ConsumerGroup
-	sessionState  *kafkaSessionState
 	log           *logp.Logger
 	runOnce       sync.Once
 }
@@ -101,19 +102,13 @@ func NewInput(
 	if err != nil {
 		return nil, errors.Wrap(err, "initializing Sarama config")
 	}
-	consumerGroup, err :=
-		sarama.NewConsumerGroup(config.Hosts, config.GroupID, saramaConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "initializing kafka consumer group")
-	}
 
 	input := &kafkaInput{
-		config:        config,
-		context:       inputContext,
-		outlet:        out,
-		consumerGroup: consumerGroup,
-		sessionState:  sessionState,
-		log:           logp.NewLogger("kafka input").With("hosts", config.Hosts),
+		config:       config,
+		saramaConfig: saramaConfig,
+		context:      inputContext,
+		outlet:       out,
+		log:          logp.NewLogger("kafka input").With("hosts", config.Hosts),
 	}
 
 	return input, nil
@@ -146,33 +141,52 @@ func (state *kafkaSessionState) setSession(sess sarama.ConsumerGroupSession) {
 	state.mutex.Unlock()
 }
 
+func (input *kafkaInput) runConsumerGroup() {
+	// Sarama uses standard go contexts to control cancellation, so we need
+	// to wrap our input context channel in that interface.
+	context := doneChannelContext(input.context.Done)
+	handler := &groupHandler{
+		version: input.config.Version,
+		outlet:  input.outlet,
+	}
+
+	// Create a consumer group and listen to its error channel.
+	consumerGroup, err :=
+		sarama.NewConsumerGroup(
+			input.config.Hosts, input.config.GroupID, input.saramaConfig)
+	if err != nil {
+		input.log.Errorw(
+			"Error initializing kafka consumer group", "error", err)
+		return
+	}
+	go func() {
+		for err := range consumerGroup.Errors() {
+			input.log.Errorw("Error reading from kafka", "error", err)
+		}
+	}()
+
+	err = consumerGroup.Consume(context, input.config.Topics, handler)
+	if err != nil {
+		input.log.Errorw("Kafka consume error", "error", err)
+	}
+}
+
 // Run starts the input by scanning for incoming messages and errors.
 func (input *kafkaInput) Run() {
 	input.runOnce.Do(func() {
-		// Track errors
-		go func() {
-			for err := range input.consumerGroup.Errors() {
-				input.log.Errorw("Error reading from kafka", "error", err)
-			}
-		}()
-
 		go func() {
 			for {
-				handler := groupHandler{input: input}
+				// Try to start the consumer group event loop: create a consumer
+				// group client (wbich connects to the kafka cluster) and call
+				// Consume (which starts an asynchronous consumer).
+				input.runConsumerGroup()
 
-				// Sarama uses standard go contexts to control cancellation, so we need
-				// to wrap our input context channel in that interface.
-				err := input.consumerGroup.Consume(
-					doneChannelContext(input.context.Done), input.config.Topics, handler)
-				if err != nil {
-					input.log.Errorw("Kafka consume error", "error", err)
-				}
-
-				// If Consume returned because the context was cancelled, don't resume.
+				// If runConsumerGroup returns, then either input.context.Done has
+				// been closed (in which case we should shut down)
 				select {
 				case <-input.context.Done:
 					return
-				default:
+				case <-time.After(input.config.InitRetryBackoff):
 				}
 			}
 		}()
@@ -230,10 +244,13 @@ func (c channelCtx) Err() error {
 func (c channelCtx) Value(key interface{}) interface{} { return nil }
 
 type groupHandler struct {
-	input *kafkaInput
+	sync.Mutex
+	version kafka.Version
+	state   kafkaSessionState
+	outlet  channel.Outleter
 }
 
-func (h groupHandler) createEvent(
+func (h *groupHandler) createEvent(
 	sess sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
@@ -250,7 +267,7 @@ func (h groupHandler) createEvent(
 		"offset":    message.Offset,
 		"key":       message.Key,
 	}
-	version, versionOk := h.input.config.Version.Get()
+	version, versionOk := h.version.Get()
 	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
 		event.Timestamp = message.Timestamp
 		if !message.BlockTimestamp.IsZero() {
@@ -266,19 +283,19 @@ func (h groupHandler) createEvent(
 }
 
 func (h groupHandler) Setup(session sarama.ConsumerGroupSession) error {
-	h.input.sessionState.setSession(session)
+	h.state.setSession(session)
 	return nil
 }
 
 func (h groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
-	h.input.sessionState.setSession(nil)
+	h.state.setSession(nil)
 	return nil
 }
 
 func (h groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		event := h.createEvent(sess, claim, msg)
-		h.input.outlet.OnEvent(event)
+		h.outlet.OnEvent(event)
 	}
 	return nil
 }

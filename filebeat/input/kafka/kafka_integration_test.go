@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// + build integration
 
 package kafka
 
@@ -117,7 +117,8 @@ func TestInput(t *testing.T) {
 		},
 	}
 	for _, m := range messages {
-		writeToKafkaTopic(t, testTopic, m.message, m.headers, time.Second*20)
+		fmt.Printf("Would have sent %v\n", m)
+		//(t, testTopic, m.message, m.headers, time.Second*20)
 	}
 
 	// Setup the input config

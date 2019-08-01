@@ -34,19 +34,20 @@ import (
 
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
-	Hosts         []string          `config:"hosts" validate:"required"`
-	Topics        []string          `config:"topics" validate:"required"`
-	GroupID       string            `config:"group_id" validate:"required"`
-	ClientID      string            `config:"client_id"`
-	Version       kafka.Version     `config:"version"`
-	InitialOffset initialOffset     `config:"initial_offset"`
-	RetryBackoff  time.Duration     `config:"retry_backoff" validate:"min=0"`
-	MaxWaitTime   time.Duration     `config:"max_wait_time"`
-	Fetch         kafkaFetch        `config:"fetch"`
-	Rebalance     kafkaRebalance    `config:"rebalance"`
-	TLS           *tlscommon.Config `config:"ssl"`
-	Username      string            `config:"username"`
-	Password      string            `config:"password"`
+	Hosts               []string          `config:"hosts" validate:"required"`
+	Topics              []string          `config:"topics" validate:"required"`
+	GroupID             string            `config:"group_id" validate:"required"`
+	ClientID            string            `config:"client_id"`
+	Version             kafka.Version     `config:"version"`
+	InitialOffset       initialOffset     `config:"initial_offset"`
+	InitRetryBackoff    time.Duration     `config:"init_retry_backoff" validate:"min=0"`
+	ConsumeRetryBackoff time.Duration     `config:"consume_retry_backoff" validate:"min=0"`
+	MaxWaitTime         time.Duration     `config:"max_wait_time"`
+	Fetch               kafkaFetch        `config:"fetch"`
+	Rebalance           kafkaRebalance    `config:"rebalance"`
+	TLS                 *tlscommon.Config `config:"ssl"`
+	Username            string            `config:"username"`
+	Password            string            `config:"password"`
 }
 
 type kafkaFetch struct {
@@ -91,11 +92,12 @@ var (
 // were chosen to match sarama's defaults.
 func defaultConfig() kafkaInputConfig {
 	return kafkaInputConfig{
-		Version:       kafka.Version("1.0.0"),
-		InitialOffset: initialOffsetOldest,
-		ClientID:      "filebeat",
-		RetryBackoff:  2 * time.Second,
-		MaxWaitTime:   250 * time.Millisecond,
+		Version:             kafka.Version("1.0.0"),
+		InitialOffset:       initialOffsetOldest,
+		ClientID:            "filebeat",
+		InitRetryBackoff:    30 * time.Second,
+		ConsumeRetryBackoff: 2 * time.Second,
+		MaxWaitTime:         250 * time.Millisecond,
 		Fetch: kafkaFetch{
 			Min:     1,
 			Default: (1 << 20), // 1 MB
@@ -137,7 +139,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 
 	k.Consumer.Return.Errors = true
 	k.Consumer.Offsets.Initial = config.InitialOffset.asSaramaOffset()
-	k.Consumer.Retry.Backoff = config.RetryBackoff
+	k.Consumer.Retry.Backoff = config.ConsumeRetryBackoff
 	k.Consumer.MaxWaitTime = config.MaxWaitTime
 
 	k.Consumer.Fetch.Min = config.Fetch.Min
