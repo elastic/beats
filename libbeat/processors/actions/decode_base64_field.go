@@ -66,7 +66,7 @@ func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
 
 	return &decodeBase64Field{
 		config: config,
-		log: logp.NewLogger(processorName),
+		log:    logp.NewLogger(processorName),
 	}, nil
 }
 
