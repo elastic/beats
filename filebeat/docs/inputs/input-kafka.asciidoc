@@ -68,7 +68,12 @@ The version of the Kafka protocol to use (defaults to `"1.0.0"`).
 The initial offset to start reading, either "oldest" or "newest". Defaults to
 "oldest".
 
-===== `retry_backoff`
+===== `connect_backoff`
+
+How long to wait before trying to reconnect to the kafka cluster after a
+fatal error. Default is 30s.
+
+===== `consume_backoff`
 
 How long to wait before retrying a failed read. Default is 2s.
 
