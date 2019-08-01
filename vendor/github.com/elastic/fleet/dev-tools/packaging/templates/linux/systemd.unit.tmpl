@@ -1,0 +1,19 @@
+[Unit]
+Description={{.Description}}
+Documentation={{.URL}}
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+{{ if ne .BeatUser "root" -}}
+User={{ .BeatUser }}
+Group={{ .BeatUser }}
+{{- end }}
+Environment="BEAT_LOG_OPTS=-e"
+Environment="BEAT_CONFIG_OPTS=-c /etc/{{.BeatName}}/{{.BeatName}}.yml"
+Environment="BEAT_PATH_OPTS=-path.home /usr/share/{{.BeatName}} -path.config /etc/{{.BeatName}} -path.data /var/lib/{{.BeatName}} -path.logs /var/log/{{.BeatName}}"
+ExecStart=/usr/share/{{.BeatName}}/bin/{{.BeatName}} $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

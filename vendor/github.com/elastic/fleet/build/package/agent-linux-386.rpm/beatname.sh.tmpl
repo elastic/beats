@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Script to run Agent in foreground with the same path settings that
+# the init script / systemd unit file would do.
+
+exec /usr/share/agent/bin/agent \
+  -path.home /usr/share/agent \
+  -path.config /etc/agent \
+  -path.data /var/lib/agent \
+  -path.logs /var/log/agent \
+  "$@"

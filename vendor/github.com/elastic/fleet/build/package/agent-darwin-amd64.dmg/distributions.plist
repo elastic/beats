@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <pkg-ref id="co.elastic.beats.agent"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64"/>
+    <volume-check>
+        <allowed-os-versions>
+            <os-version min="10.8"/>
+        </allowed-os-versions>
+    </volume-check>
+    <choices-outline>
+        <line choice="default">
+            <line choice="co.elastic.beats.agent"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="co.elastic.beats.agent" visible="false">
+        <pkg-ref id="co.elastic.beats.agent"/>
+        <pkg-ref id="co.elastic.beats.preference-pane"/>
+    </choice>
+    <pkg-ref id="co.elastic.beats.agent" version="8.0.0" auth="Root" onConclusion="none">internal-agent-8.0.0-darwin-x86_64.pkg</pkg-ref>
+    <readme file="README.html" />
+    <license file="LICENSE.txt" />
+    <title>Agent 8.0.0</title>
+    <pkg-ref id="co.elastic.beats.preference-pane" version="8.0.0" auth="Root" onConclusion="none">BeatsPrefPane.pkg</pkg-ref>
+</installer-gui-script>
