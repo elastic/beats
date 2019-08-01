@@ -35,9 +35,8 @@ const (
 )
 
 type decodeBase64Field struct {
-	log *logp.Logger
-
 	config base64Config
+	log    *logp.Logger
 }
 
 type base64Config struct {
