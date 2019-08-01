@@ -77,15 +77,16 @@ func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
 		backup = event.Fields.Clone()
 	}
 
-	err := f.decodeField(f.config.Field.From, f.config.Field.To, event.Fields)
-	if err != nil && f.config.FailOnError {
+	err := f.decodeField(event)
+	if err != nil {
 		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %v", err)
-		f.log.Debug("decode base64", errMsg.Error())
-		event.Fields = backup
-		_, _ = event.PutValue("error.message", errMsg.Error())
-		return event, err
+		f.log.Debug(errMsg.Error())
+		if f.config.FailOnError {
+			event.Fields = backup
+			event.PutValue("error.message", errMsg.Error())
+			return event, err
+		}
 	}
-
 	return event, nil
 }
 
@@ -93,39 +94,38 @@ func (f decodeBase64Field) String() string {
 	return fmt.Sprintf("%s=%+v", processorName, f.config.Field)
 }
 
-func (f *decodeBase64Field) decodeField(from string, to string, fields common.MapStr) error {
-	value, err := fields.GetValue(from)
+func (f *decodeBase64Field) decodeField(event *beat.Event) error {
+	value, err := event.GetValue(f.config.Field.From)
 	if err != nil {
-		// Ignore ErrKeyNotFound errors
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %v", from, err)
+		return fmt.Errorf("could not fetch base64 value for key: %s, Error: %v", f.config.Field.From, err)
 	}
 
-	text, ok := value.(string)
-	if !ok {
+	base64String, isString := value.(string)
+	if !isString {
 		return fmt.Errorf("invalid type for `from`, expecting a string received %T", value)
 	}
 
-	decodedData, err := base64.StdEncoding.DecodeString(text)
+	decodedData, err := base64.StdEncoding.DecodeString(base64String)
 	if err != nil {
-		return fmt.Errorf("error trying to unmarshal %s: %v", text, err)
+		return fmt.Errorf("error trying to decode %s: %v", base64String, err)
 	}
 
-	field := to
+	target := f.config.Field.To
 	// If to is empty
-	if to == "" || from == to {
+	if f.config.Field.To == "" || f.config.Field.From == f.config.Field.To {
 		// Deletion must happen first to support cases where a becomes a.b
-		if err = fields.Delete(from); err != nil {
-			return fmt.Errorf("could not delete key: %s,  %+v", from, err)
+		if err = event.Delete(f.config.Field.From); err != nil {
+			return fmt.Errorf("could not delete key: %s,  %+v", f.config.Field.From, err)
 		}
 
-		field = from
+		target = f.config.Field.From
 	}
 
-	if _, err = fields.Put(field, string(decodedData)); err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", decodedData, field, err)
+	if _, err = event.Put(field, string(decodedData)); err != nil {
+		return fmt.Errorf("could not put value: %s: %v, %v", decodedData, target, err)
 	}
 
 	return nil
