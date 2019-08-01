@@ -29,6 +29,7 @@
             },
             "panelIndex": "2",
             "panelRefName": "panel_0",
+            "title": "HTTP 5XX Errors",
             "version": "7.2.0"
           },
           {
@@ -42,6 +43,7 @@
             },
             "panelIndex": "3",
             "panelRefName": "panel_1",
+            "title": "Request Count",
             "version": "7.2.0"
           },
           {
@@ -55,6 +57,7 @@
             },
             "panelIndex": "4",
             "panelRefName": "panel_2",
+            "title": "Unhealthy Host Count",
             "version": "7.2.0"
           },
           {
@@ -68,6 +71,7 @@
             },
             "panelIndex": "5",
             "panelRefName": "panel_3",
+            "title": "Healthy Host Count",
             "version": "7.2.0"
           },
           {
@@ -81,6 +85,7 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_4",
+            "title": "Latency in Seconds",
             "version": "7.2.0"
           },
           {
@@ -94,6 +99,7 @@
             },
             "panelIndex": "7",
             "panelRefName": "panel_5",
+            "title": "HTTP Backend 4XX Errors",
             "version": "7.2.0"
           },
           {
@@ -107,6 +113,7 @@
             },
             "panelIndex": "8",
             "panelRefName": "panel_6",
+            "title": "Backend Connection Errors",
             "version": "7.2.0"
           },
           {
@@ -133,6 +140,7 @@
             },
             "panelIndex": "10",
             "panelRefName": "panel_8",
+            "title": "HTTP Backend 2XX",
             "version": "7.2.0"
           }
         ],
@@ -192,8 +200,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-31T20:08:03.666Z",
-      "version": "WzYxNiw4XQ=="
+      "updated_at": "2019-08-01T15:09:06.696Z",
+      "version": "WzYzNSw4XQ=="
     },
     {
       "attributes": {
@@ -207,7 +215,7 @@
             }
           }
         },
-        "title": "AWS ELB HTTP 5XX Errors by ELB",
+        "title": "AWS ELB HTTP 5XX Errors",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -248,11 +256,11 @@
                 "fill": 0,
                 "formatter": "number",
                 "id": "35d3cbc1-b3c6-11e9-bf3f-29d51aa3d971",
-                "label": "HTTP 5XX Errors by ELB",
+                "label": "HTTP 5XX Errors",
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HTTPCode_ELB_5XX.avg",
+                    "field": "aws.metrics.HTTPCode_ELB_5XX.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -272,7 +280,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB HTTP 5XX Errors by ELB",
+          "title": "AWS ELB HTTP 5XX Errors",
           "type": "metrics"
         }
       },
@@ -282,8 +290,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T19:43:55.147Z",
-      "version": "WzYxMiw4XQ=="
+      "updated_at": "2019-08-01T15:05:12.590Z",
+      "version": "WzYzNCw4XQ=="
     },
     {
       "attributes": {
@@ -338,11 +346,11 @@
                 "fill": 0,
                 "formatter": "number",
                 "id": "35d3cbc1-b3c6-11e9-bf3f-29d51aa3d971",
-                "label": "Latency in seconds",
+                "label": "Request Count",
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.RequestCount.avg",
+                    "field": "aws.metrics.RequestCount.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -372,8 +380,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T19:43:31.086Z",
-      "version": "WzYxMSw4XQ=="
+      "updated_at": "2019-08-01T14:52:01.873Z",
+      "version": "WzYyNyw4XQ=="
     },
     {
       "attributes": {
@@ -436,7 +444,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.UnHealthyHostCount.avg",
+                    "field": "aws.metrics.UnHealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "sum"
                   }
@@ -466,8 +474,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T20:13:36.549Z",
-      "version": "WzYxNyw4XQ=="
+      "updated_at": "2019-08-01T14:45:36.956Z",
+      "version": "WzYyMCw4XQ=="
     },
     {
       "attributes": {
@@ -530,7 +538,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HealthyHostCount.avg",
+                    "field": "aws.metrics.HealthyHostCount.max",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "sum"
                   }
@@ -560,8 +568,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T20:14:22.631Z",
-      "version": "WzYxOCw4XQ=="
+      "updated_at": "2019-08-01T14:45:51.650Z",
+      "version": "WzYyMSw4XQ=="
     },
     {
       "attributes": {
@@ -575,7 +583,7 @@
             }
           }
         },
-        "title": "AWS ELB Latency",
+        "title": "AWS ELB Latency in Seconds",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -614,7 +622,7 @@
                 "chart_type": "line",
                 "color": "#3185FC",
                 "fill": 0,
-                "formatter": "number",
+                "formatter": "s,s,3",
                 "id": "35d3cbc1-b3c6-11e9-bf3f-29d51aa3d971",
                 "label": "Latency in seconds",
                 "line_width": 2,
@@ -640,7 +648,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB Latency",
+          "title": "AWS ELB Latency in Seconds",
           "type": "metrics"
         }
       },
@@ -650,8 +658,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T19:44:55.583Z",
-      "version": "WzYxMyw4XQ=="
+      "updated_at": "2019-08-01T14:56:51.554Z",
+      "version": "WzYyOSw4XQ=="
     },
     {
       "attributes": {
@@ -665,7 +673,7 @@
             }
           }
         },
-        "title": "AWS ELB HTTP Backend 4XX Errors by AZ",
+        "title": "AWS ELB HTTP Backend 4XX Errors",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -706,11 +714,11 @@
                 "fill": "0",
                 "formatter": "number",
                 "id": "35d3cbc1-b3c6-11e9-bf3f-29d51aa3d971",
-                "label": "HTTP Backend 4XX Errors by AZ",
+                "label": "HTTP Backend 4XX Errors",
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HTTPCode_Backend_4XX.avg",
+                    "field": "aws.metrics.HTTPCode_Backend_4XX.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -720,7 +728,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "aws.cloudwatch.dimensions.AvailabilityZone",
+                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -730,7 +738,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB HTTP Backend 4XX Errors by AZ",
+          "title": "AWS ELB HTTP Backend 4XX Errors",
           "type": "metrics"
         }
       },
@@ -740,8 +748,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T19:50:39.072Z",
-      "version": "WzYxNCw4XQ=="
+      "updated_at": "2019-08-01T14:59:02.526Z",
+      "version": "WzYzMCw4XQ=="
     },
     {
       "attributes": {
@@ -755,7 +763,7 @@
             }
           }
         },
-        "title": "AWS ELB Backend Connection Errors by AZ",
+        "title": "AWS ELB Backend Connection Errors",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -796,11 +804,11 @@
                 "fill": "00",
                 "formatter": "number",
                 "id": "35d3cbc1-b3c6-11e9-bf3f-29d51aa3d971",
-                "label": "Backend Connection Errors by AZ",
+                "label": "Backend Connection Errors",
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.BackendConnectionErrors.avg",
+                    "field": "aws.metrics.BackendConnectionErrors.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -811,7 +819,7 @@
                 "split_mode": "terms",
                 "stacked": "none",
                 "steps": 0,
-                "terms_field": "aws.cloudwatch.dimensions.AvailabilityZone",
+                "terms_field": "aws.cloudwatch.dimensions.LoadBalancerName",
                 "terms_order_by": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                 "value_template": "{{value}}"
               }
@@ -821,7 +829,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB Backend Connection Errors by AZ",
+          "title": "AWS ELB Backend Connection Errors",
           "type": "metrics"
         }
       },
@@ -831,8 +839,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T19:39:53.858Z",
-      "version": "WzYwOSw4XQ=="
+      "updated_at": "2019-08-01T15:04:22.272Z",
+      "version": "WzYzMiw4XQ=="
     },
     {
       "attributes": {
@@ -904,7 +912,7 @@
             }
           }
         },
-        "title": "AWS ELB HTTP Backend 2XX by ELB",
+        "title": "AWS ELB HTTP Backend 2XX",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -949,7 +957,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "aws.metrics.HTTPCode_Backend_2XX.avg",
+                    "field": "aws.metrics.HTTPCode_Backend_2XX.sum",
                     "id": "35d3cbc2-b3c6-11e9-bf3f-29d51aa3d971",
                     "type": "avg"
                   }
@@ -969,7 +977,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB HTTP Backend 2XX by ELB",
+          "title": "AWS ELB HTTP Backend 2XX",
           "type": "metrics"
         }
       },
@@ -979,8 +987,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-31T20:02:28.165Z",
-      "version": "WzYxNSw4XQ=="
+      "updated_at": "2019-08-01T15:04:30.991Z",
+      "version": "WzYzMyw4XQ=="
     }
   ],
   "version": "7.2.0"

@@ -13,6 +13,13 @@ tag:getResources
 ----
 
 [float]
+=== Dashboard
+
+The aws elb metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-elb-overview.png[]
+
+[float]
 === Configuration example
 [source,yaml]
 ----
@@ -27,3 +34,30 @@ tag:getResources
   # This module uses the aws cloudwatch metricset, all
   # the options for this metricset are also available here.
 ----
+
+[float]
+=== Metrics
+Elastic Load Balancing publishes data points to Amazon CloudWatch for your load
+balancers and back-end instances. Please see more details for each metric in
+https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-cloudwatch-metrics.html[elb-cloudwatch-metric].
+
+|===
+|Metric Name|Statistic Method
+|BackendConnectionErrors | Sum
+|HealthyHostCount | Maximum
+|HTTPCode_Backend_2XX | Sum
+|HTTPCode_Backend_3XX | Sum
+|HTTPCode_Backend_4XX | Sum
+|HTTPCode_Backend_5XX | Sum
+|HTTPCode_ELB_4XX | Sum
+|HTTPCode_ELB_5XX | Sum
+|Latency | Average
+|RequestCount | Sum
+|SpilloverCount | Sum
+|SurgeQueueLength | Maximum
+|UnHealthyHostCount | Maximum
+|EstimatedALBActiveConnectionCount | Average
+|EstimatedALBConsumedLCUs | Average
+|EstimatedALBNewConnectionCount | Average
+|EstimatedProcessedBytes | Average
+|===
