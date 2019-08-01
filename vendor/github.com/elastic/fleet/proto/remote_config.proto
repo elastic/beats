@@ -1,0 +1,15 @@
+
+syntax = "proto3";
+package remoteconfig;
+
+message ConfigRequest {
+    string config = 1;
+}
+
+message ConfigResponse {
+}
+
+
+service Configurator {
+    rpc Config(ConfigRequest) returns (ConfigResponse) {}
+}

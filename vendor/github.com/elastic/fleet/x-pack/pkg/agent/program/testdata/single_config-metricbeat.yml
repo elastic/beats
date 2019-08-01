@@ -1,0 +1,9 @@
+metricbeat:
+  inputs:
+  - type: docker
+  - type: apache
+output:
+  elasticsearch:
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme

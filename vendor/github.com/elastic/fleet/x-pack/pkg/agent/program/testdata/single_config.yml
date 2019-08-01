@@ -1,0 +1,16 @@
+inputs:
+  - type: metric/docker
+  - type: metric/apache
+  - type: event/file
+    paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+management:
+  host: "localhost"
+config:
+  reload: 123
+output:
+  elasticsearch:
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme

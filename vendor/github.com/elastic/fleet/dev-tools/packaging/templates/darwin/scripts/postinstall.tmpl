@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+BEAT_NAME="{{.BeatName}}"
+VERSION="{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}"
+SCRIPT="postinstall"
+INSTALL_DIR="{{.install_path}}/{{.BeatVendor}}/{{.BeatName}}"
+IDENTIFIER="{{.identifier}}"
+
+log() {
+    LEVEL="$1"; shift
+    syslog -s -l "$LEVEL" "$BEAT_NAME $SCRIPT: $@"
+}
+
+die() {
+    log ERROR "Failed: $@"
+}
+
+log WARN "identifier: $IDENTIFIER"
+log WARN "version: $VERSION"
+log WARN "install_dir: $INSTALL_DIR"
+
+DAEMON_PLIST="/Library/LaunchDaemons/$IDENTIFIER.plist"
+launchctl unload -w "$DAEMON_PLIST"
+rm -f "$DAEMON_PLIST"
+ln -s "$INSTALL_DIR/$IDENTIFIER.plist" "$DAEMON_PLIST" || die "Unable to create $DAEMON_PLIST symlink"
+launchctl load -w "$DAEMON_PLIST" || die "Unable to install launchctl daemon $DAEMON_PLIST"
