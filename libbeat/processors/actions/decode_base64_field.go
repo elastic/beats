@@ -45,13 +45,6 @@ type base64Config struct {
 	FailOnError   bool   `config:"fail_on_error"`
 }
 
-var (
-	defaultBase64Config = base64Config{
-		IgnoreMissing: false,
-		FailOnError:   true,
-	}
-)
-
 func init() {
 	processors.RegisterPlugin(processorName,
 		checks.ConfigChecked(NewDecodeBase64Field,
@@ -61,7 +54,10 @@ func init() {
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
 func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
-	config := defaultBase64Config
+	config := base64Config{
+		IgnoreMissing: false,
+		FailOnError:   true,
+	}
 
 	log := logp.NewLogger(processorName)
 
