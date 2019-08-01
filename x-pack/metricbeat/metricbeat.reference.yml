@@ -812,6 +812,7 @@ metricbeat.modules:
   enabled: false
   #reservoir_size: 1000
   #ttl: "30s"
+
 #------------------------------- Traefik Module -------------------------------
 - module: traefik
   metricsets: ["health"]
