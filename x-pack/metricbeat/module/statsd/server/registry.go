@@ -31,6 +31,28 @@ type Registry struct {
 	lastReport    time.Time
 }
 
+type SetMetric struct {
+	set map[string]struct{}
+}
+
+func (s *SetMetric) Add(val string) {
+	s.set[val] = struct{}{}
+}
+
+func (s *SetMetric) Reset() {
+	s.set = map[string]struct{}{}
+}
+
+func (s *SetMetric) Count() int {
+	return len(s.set)
+}
+
+func NewSetMetric() *SetMetric {
+	s := SetMetric{}
+	s.Reset()
+	return &s
+}
+
 type metricsGroup struct {
 	tags    map[string]string
 	metrics common.MapStr
@@ -73,6 +95,9 @@ func (r *Registry) getMetric(metric interface{}) map[string]interface{} {
 		values["5m_rate"] = t.Rate5()
 		values["15m_rate"] = t.Rate15()
 		values["mean_rate"] = t.RateMean()
+	case *SetMetric:
+		values["count"] = m.Count()
+		m.Reset()
 	}
 	return values
 }
@@ -154,7 +179,7 @@ func (r *Registry) getOrNew(name string, tags map[string]string, new func() inte
 
 	c.lastSeen = time.Now()
 
-	return c
+	return c.metric
 }
 
 func (r *Registry) GetOrNewCounter(name string, tags map[string]string) metrics.Counter {
@@ -210,6 +235,19 @@ func (r *Registry) GetOrNewHistogram(name string, tags map[string]string) metric
 	logger.With("name", name).Warn("metric changed type")
 	r.Delete(name, tags)
 	return r.GetOrNewHistogram(name, tags)
+}
+
+func (r *Registry) GetOrNewSet(name string, tags map[string]string) *SetMetric {
+	setmetric, ok := r.getOrNew(name, tags, func() interface{} { return NewSetMetric() }).(*SetMetric)
+	if ok {
+		return setmetric
+	}
+	// type was changed
+	// we can try to support the situation where a new version of the app has changed a type in
+	// a metric by deleting the old one and creating a new one
+	logger.With("name", name).Warn("metric changed type")
+	r.Delete(name, tags)
+	return r.GetOrNewSet(name, tags)
 }
 
 func (r *Registry) metricHash(tags map[string]string) string {

@@ -8,23 +8,23 @@
         "type": "statsd"
     },
     "statsd": {
-        "metric1": {
+        "metric01": {
             "value": 1
         },
-        "metric2": {
+        "metric02": {
             "count": 2
         },
-        "metric3": {
+        "metric03": {
             "count": 3
         },
-        "metric4": {
+        "metric04": {
             "15m_rate": 0,
             "1m_rate": 0,
             "5m_rate": 0,
             "count": 1,
             "max": 4,
             "mean": 4,
-            "mean_rate": 86422.95393656555,
+            "mean_rate": 78665.82756450598,
             "median": 4,
             "min": 4,
             "p75": 4,
@@ -33,7 +33,7 @@
             "p99_9": 4,
             "stddev": 0
         },
-        "metric5": {
+        "metric05": {
             "count": 1,
             "max": 0,
             "mean": 0,
@@ -45,7 +45,7 @@
             "p99_9": 0,
             "stddev": 0
         },
-        "metric6": {
+        "metric06": {
             "count": 1,
             "max": 0,
             "mean": 0,
@@ -57,14 +57,14 @@
             "p99_9": 0,
             "stddev": 0
         },
-        "metric7": {
+        "metric07": {
             "15m_rate": 0,
             "1m_rate": 0,
             "5m_rate": 0,
             "count": 1,
             "max": 7,
             "mean": 7,
-            "mean_rate": 137797.988149373,
+            "mean_rate": 134156.15776764153,
             "median": 7,
             "min": 7,
             "p75": 7,
@@ -73,7 +73,10 @@
             "p99_9": 7,
             "stddev": 0
         },
-        "metric8": {
+        "metric08": {
+            "count": 1
+        },
+        "metric09": {
             "count": 1,
             "max": 0,
             "mean": 0,
@@ -85,7 +88,7 @@
             "p99_9": 0,
             "stddev": 0
         },
-        "metric9_with_dots": {
+        "metric10_with_dots": {
             "count": 1,
             "max": 0,
             "mean": 0,

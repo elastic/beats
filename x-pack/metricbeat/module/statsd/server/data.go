@@ -146,6 +146,9 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 			return err
 		}
 		c.Update(v)
+	case "s":
+		c := p.registry.GetOrNewSet(m.name, m.tags)
+		c.Add(m.value)
 	default:
 		logp.NewLogger("statsd").Debugf("metric type '%s' is not supported", m.metricType)
 		// ignore others

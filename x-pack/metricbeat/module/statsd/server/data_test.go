@@ -80,6 +80,14 @@ func TestParseMetrics(t *testing.T) {
 			}},
 		},
 		{
+			input: "set1:hello|s",
+			expected: []statsdMetric{{
+				name:       "set1",
+				metricType: "s",
+				value:      "hello",
+			}},
+		},
+		{
 			input: "lf-ended-meter1:1.5|m\n",
 			expected: []statsdMetric{{
 				name:       "lf-ended-meter1",
@@ -242,7 +250,7 @@ func TestTagsGrouping(t *testing.T) {
 func TestTagsCleanup(t *testing.T) {
 	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
 	testData := []string{
-		"metric1:1.0|g|#k1:v1,k2:v2",
+		"metric1:1|c|#k1:v1,k2:v2",
 
 		"metric2:3|c|@0.1|#k1:v2,k2:v3",
 	}
@@ -253,7 +261,7 @@ func TestTagsCleanup(t *testing.T) {
 	assert.Len(t, ms.getEvents(), 2)
 
 	testData = []string{
-		"metric1:2.0|g|#k1:v1,k2:v2",
+		"metric1:+2|c|#k1:v1,k2:v2",
 	}
 	// refresh metrics1
 	process(t, testData, ms)
@@ -263,21 +271,38 @@ func TestTagsCleanup(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{"metric1": map[string]interface{}{"value": 2.0}})
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{"metric1": map[string]interface{}{"count": int64(3)}})
+}
+
+func TestSetReset(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
+	testData := []string{
+		"metric1:hello|s|#k1:v1,k2:v2",
+		"metric1:again|s|#k1:v1,k2:v2",
+	}
+	process(t, testData, ms)
+	events := ms.getEvents()
+	require.Len(t, events, 1)
+
+	assert.Equal(t, 2, events[0].MetricSetFields["metric1"].(map[string]interface{})["count"])
+
+	events = ms.getEvents()
+	assert.Equal(t, 0, events[0].MetricSetFields["metric1"].(map[string]interface{})["count"])
 }
 
 func TestData(t *testing.T) {
 	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
 	testData := []string{
-		"metric1:1.0|g|#k1:v1,k2:v2",
-		"metric2:2|c|#k1:v1,k2:v2",
-		"metric3:3|c|@0.1|#k1:v1,k2:v2",
-		"metric4:4|ms|#k1:v1,k2:v2",
-		"metric5:5|h|#k1:v1,k2:v2",
-		"metric6:6|h|#k1:v1,k2:v2",
-		"metric7:7|ms|#k1:v1,k2:v2",
-		"metric8,k1=v1,k2=v2:8|h",
-		"metric9.with.dots,k1=v1,k2=v2:9|h",
+		"metric01:1.0|g|#k1:v1,k2:v2",
+		"metric02:2|c|#k1:v1,k2:v2",
+		"metric03:3|c|@0.1|#k1:v1,k2:v2",
+		"metric04:4|ms|#k1:v1,k2:v2",
+		"metric05:5|h|#k1:v1,k2:v2",
+		"metric06:6|h|#k1:v1,k2:v2",
+		"metric07:7|ms|#k1:v1,k2:v2",
+		"metric08:seven|s|#k1:v1,k2:v2",
+		"metric09,k1=v1,k2=v2:8|h",
+		"metric10.with.dots,k1=v1,k2=v2:9|h",
 	}
 	process(t, testData, ms)
 
