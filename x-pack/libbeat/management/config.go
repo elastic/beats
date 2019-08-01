@@ -69,8 +69,11 @@ const ManagedConfigTemplate = `
 `
 
 const (
+	// ModeCentralManagement is a default CM mode, using existing processes
 	ModeCentralManagement = "cm"
-	ModeFleet             = "fleet"
+
+	// ModeFleet is a management mode where fleet is used to retrieve configurations
+	ModeFleet = "fleet"
 )
 
 // Config for central management
