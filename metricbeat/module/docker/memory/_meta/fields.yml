@@ -4,6 +4,12 @@
     Memory metrics.
   release: ga
   fields:
+    - name: stats.*
+      type: object
+      object_type: long
+      object_type_mapping_type: "*"
+      description: >
+        Raw memory stats from the cgroups memory.stat interface
     - name: commit
       type: group
       description: >

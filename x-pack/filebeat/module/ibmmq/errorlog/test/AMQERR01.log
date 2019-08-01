@@ -1,0 +1,356 @@
+11.10.2018 10:39:30 - Process(9884.1) User(felix) Program(setmqinst.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-11T08:39:30.731Z)
+                      CommentInsert1(Windows 10 Professional x64 Edition, Build 17134 (MQ Windows (x64 platform) 64-bit))
+                      CommentInsert2(C:\Program Files\IBM\MQ (Installation1))
+                      CommentInsert3(9.1.0.0 (p910-L180709.TRIAL))
+                     
+AMQ6287I: IBM MQ V9.1.0.0 (p910-L180709.TRIAL).
+
+ERKL�RUNG:
+Systeminformationen zu IBM MQ: 
+Host-Info         :- Windows 10 Professional x64 Edition, Build 17134 (MQ
+Windows (x64 platform) 64-bit) 
+Installation      :- C:\Program Files\IBM\MQ (Installation1) 
+Version           :- 9.1.0.0 (p910-L180709.TRIAL)
+AKTION:
+Keine. 
+----- amqxeida.c : 6278 -------------------------------------------------------
+11.10.2018 10:39:30 - Process(9884.1) User(felix) Program(setmqinst.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-11T08:39:30.729Z)
+                      CommentInsert1(Installation1)
+                      CommentInsert2(C:\Program Files\IBM\MQ)
+                     
+AMQ8576I: 'Installation1' (C:\Program Files\IBM\MQ) als prim�re Installation
+festgelegt. Sie m�ssen das Betriebssystem erneut starten, um die Aktualisierung
+fertigzustellen.
+
+ERKL�RUNG:
+Alle Tasks, die zur Festlegung der Installation 'Installation1' als prim�re
+Installation erforderlich sind, wurden ausgef�hrt. Wenn die Installation noch
+nicht als prim�re Installation festgelegt wurde, dann wurde auch die
+Konfiguration der Installation aktualisiert, um die Installation
+'Installation1' als prim�re Installation zu identifizieren. 
+
+Damit die Aktualisierungen systemweit wirksam werden, m�ssen Sie das
+Betriebssystem erneut starten.
+AKTION:
+Sie m�ssen das Betriebssystem erneut starten, um die Aktualisierung
+fertigzustellen. 
+----- amqiprm0.c : 402 --------------------------------------------------------
+11/10/2018 10:46:25 - Process(16776.1) User(MUSR_MQADMIN) Program(strmqm.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-11T08:46:25.924Z)
+                      ArithInsert1(90)
+                     
+AMQ7125I: There are 90 days left in the trial period for this copy of IBM MQ.
+
+EXPLANATION:
+This copy of IBM MQ is licensed for a limited period only.
+ACTION:
+None. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+11/10/2018 10:46:26 - Process(8480.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-11T08:46:26.343Z)
+                     
+AMQ6776E: Queue manager recovery log not correctly configured for advanced
+format disk.
+
+EXPLANATION:
+The queue manager recovery log is located on an advanced format disk, however
+the recovery log is not configured correctly to provide full write integrity
+with advanced format disks. Advanced format disks require 4KB alignment for
+reliable writing, but the current queue manager was created at an MQ version
+that did not yet support advanced format disks and did not enforce 4KB
+alignment.
+ACTION:
+MQ has only supported placing the recovery log on an advanced format disk since
+MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to
+migrate a pre-existing queue manager recovery log to a format suitable for
+advanced format disks. Any queue manager created on a version of V9.0.4 or
+higher will have been created with a recovery log suitable for advanced format
+disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG
+command, to a format suitable for the current log location. 
+----- amqxfdcp.c : 832 --------------------------------------------------------
+11/10/2018 10:46:26 - Process(8480.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-11T08:46:26.346Z)
+                      ArithInsert1(8480)
+                      CommentInsert1(QM1)
+                     
+AMQ6184W: An internal IBM MQ error has occurred on queue manager QM1.
+
+EXPLANATION:
+An error has been detected, and the IBM MQ error recording routine has been
+called. The failing process is process 8480.
+ACTION:
+Use the standard facilities supplied with your system to record the problem
+identifier and to save any generated output files. Use either the MQ Support
+site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support
+Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a
+solution is already available.  If you are unable to find a match, contact your
+IBM support center.  Do not discard these files until the problem has been
+resolved. 
+----- amqxfdcp.c : 874 --------------------------------------------------------
+17.10.2018 13:50:15 - Process(39420.1) User(felix) Program(CRTMQM.EXE)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-17T11:50:15.982Z)
+                      ArithInsert1(84)
+                     
+AMQ7125I: Der Testzeitraum f�r dieses Exemplar von IBM MQ l�uft in 84 Tag(en)
+ab.
+
+ERKL�RUNG:
+Dieses Exemplar von IBM MQ wurde nur f�r einen begrenzten Zeitraum lizenziert.
+AKTION:
+Keine. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+17.10.2018 13:50:18 - Process(34720.1) User(felix) Program(STRMQM.EXE)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-17T11:50:18.439Z)
+                      ArithInsert1(84)
+                     
+AMQ7125I: Der Testzeitraum f�r dieses Exemplar von IBM MQ l�uft in 84 Tag(en)
+ab.
+
+ERKL�RUNG:
+Dieses Exemplar von IBM MQ wurde nur f�r einen begrenzten Zeitraum lizenziert.
+AKTION:
+Keine. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+18.10.2018 16:13:58 - Process(28832.1) User(felix) Program(STRMQM.EXE)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-18T14:13:58.401Z)
+                      ArithInsert1(83)
+                     
+AMQ7125I: Der Testzeitraum f�r dieses Exemplar von IBM MQ l�uft in 83 Tag(en)
+ab.
+
+ERKL�RUNG:
+Dieses Exemplar von IBM MQ wurde nur f�r einen begrenzten Zeitraum lizenziert.
+AKTION:
+Keine. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+28/10/2018 15:12:07 - Process(7160.1) User(MUSR_MQADMIN) Program(strmqm.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-28T14:12:07.685Z)
+                      ArithInsert1(73)
+                     
+AMQ7125I: There are 73 days left in the trial period for this copy of IBM MQ.
+
+EXPLANATION:
+This copy of IBM MQ is licensed for a limited period only.
+ACTION:
+None. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+28/10/2018 15:12:07 - Process(7144.1) User(MUSR_MQADMIN) Program(strmqm.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-28T14:12:07.789Z)
+                      ArithInsert1(73)
+                     
+AMQ7125I: There are 73 days left in the trial period for this copy of IBM MQ.
+
+EXPLANATION:
+This copy of IBM MQ is licensed for a limited period only.
+ACTION:
+None. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+28/10/2018 15:12:08 - Process(7360.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-28T14:12:08.663Z)
+                     
+AMQ6776E: Queue manager recovery log not correctly configured for advanced
+format disk.
+
+EXPLANATION:
+The queue manager recovery log is located on an advanced format disk, however
+the recovery log is not configured correctly to provide full write integrity
+with advanced format disks. Advanced format disks require 4KB alignment for
+reliable writing, but the current queue manager was created at an MQ version
+that did not yet support advanced format disks and did not enforce 4KB
+alignment.
+ACTION:
+MQ has only supported placing the recovery log on an advanced format disk since
+MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to
+migrate a pre-existing queue manager recovery log to a format suitable for
+advanced format disks. Any queue manager created on a version of V9.0.4 or
+higher will have been created with a recovery log suitable for advanced format
+disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG
+command, to a format suitable for the current log location. 
+----- amqxfdcp.c : 832 --------------------------------------------------------
+28/10/2018 15:12:08 - Process(7360.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-28T14:12:08.665Z)
+                      ArithInsert1(7360)
+                      CommentInsert1(QM1)
+                     
+AMQ6184W: An internal IBM MQ error has occurred on queue manager QM1.
+
+EXPLANATION:
+An error has been detected, and the IBM MQ error recording routine has been
+called. The failing process is process 7360.
+ACTION:
+Use the standard facilities supplied with your system to record the problem
+identifier and to save any generated output files. Use either the MQ Support
+site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support
+Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a
+solution is already available.  If you are unable to find a match, contact your
+IBM support center.  Do not discard these files until the problem has been
+resolved. 
+----- amqxfdcp.c : 874 --------------------------------------------------------
+29/10/2018 16:48:52 - Process(7356.1) User(MUSR_MQADMIN) Program(strmqm.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:48:52.594Z)
+                      ArithInsert1(71)
+                     
+AMQ7125I: There are 71 days left in the trial period for this copy of IBM MQ.
+
+EXPLANATION:
+This copy of IBM MQ is licensed for a limited period only.
+ACTION:
+None. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+29/10/2018 16:48:52 - Process(7364.1) User(MUSR_MQADMIN) Program(strmqm.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:48:52.663Z)
+                      ArithInsert1(71)
+                     
+AMQ7125I: There are 71 days left in the trial period for this copy of IBM MQ.
+
+EXPLANATION:
+This copy of IBM MQ is licensed for a limited period only.
+ACTION:
+None. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+29/10/2018 16:48:53 - Process(7660.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:48:53.368Z)
+                     
+AMQ6776E: Queue manager recovery log not correctly configured for advanced
+format disk.
+
+EXPLANATION:
+The queue manager recovery log is located on an advanced format disk, however
+the recovery log is not configured correctly to provide full write integrity
+with advanced format disks. Advanced format disks require 4KB alignment for
+reliable writing, but the current queue manager was created at an MQ version
+that did not yet support advanced format disks and did not enforce 4KB
+alignment.
+ACTION:
+MQ has only supported placing the recovery log on an advanced format disk since
+MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to
+migrate a pre-existing queue manager recovery log to a format suitable for
+advanced format disks. Any queue manager created on a version of V9.0.4 or
+higher will have been created with a recovery log suitable for advanced format
+disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG
+command, to a format suitable for the current log location. 
+----- amqxfdcp.c : 832 --------------------------------------------------------
+29/10/2018 16:48:53 - Process(7660.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:48:53.369Z)
+                      ArithInsert1(7660)
+                      CommentInsert1(QM1)
+                     
+AMQ6184W: An internal IBM MQ error has occurred on queue manager QM1.
+
+EXPLANATION:
+An error has been detected, and the IBM MQ error recording routine has been
+called. The failing process is process 7660.
+ACTION:
+Use the standard facilities supplied with your system to record the problem
+identifier and to save any generated output files. Use either the MQ Support
+site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support
+Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a
+solution is already available.  If you are unable to find a match, contact your
+IBM support center.  Do not discard these files until the problem has been
+resolved. 
+----- amqxfdcp.c : 874 --------------------------------------------------------
+29/10/2018 16:49:35 - Process(7032.1) User(MUSR_MQADMIN) Program(strmqm.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:49:35.477Z)
+                      ArithInsert1(71)
+                     
+AMQ7125I: There are 71 days left in the trial period for this copy of IBM MQ.
+
+EXPLANATION:
+This copy of IBM MQ is licensed for a limited period only.
+ACTION:
+None. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+29/10/2018 16:49:35 - Process(6984.1) User(MUSR_MQADMIN) Program(strmqm.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:49:35.553Z)
+                      ArithInsert1(71)
+                     
+AMQ7125I: There are 71 days left in the trial period for this copy of IBM MQ.
+
+EXPLANATION:
+This copy of IBM MQ is licensed for a limited period only.
+ACTION:
+None. 
+----- amqzlic0.c : 435 --------------------------------------------------------
+29/10/2018 16:49:36 - Process(6780.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:49:36.447Z)
+                     
+AMQ6776E: Queue manager recovery log not correctly configured for advanced
+format disk.
+
+EXPLANATION:
+The queue manager recovery log is located on an advanced format disk, however
+the recovery log is not configured correctly to provide full write integrity
+with advanced format disks. Advanced format disks require 4KB alignment for
+reliable writing, but the current queue manager was created at an MQ version
+that did not yet support advanced format disks and did not enforce 4KB
+alignment.
+ACTION:
+MQ has only supported placing the recovery log on an advanced format disk since
+MQ V9.0.4. MQ V9.0.4 introduced the MIGMQLOG command that can be used to
+migrate a pre-existing queue manager recovery log to a format suitable for
+advanced format disks. Any queue manager created on a version of V9.0.4 or
+higher will have been created with a recovery log suitable for advanced format
+disks. Investigate migrating the queue manager recovery log, using the MIGMQLOG
+command, to a format suitable for the current log location. 
+----- amqxfdcp.c : 832 --------------------------------------------------------
+29/10/2018 16:49:36 - Process(6780.1) User(MUSR_MQADMIN) Program(amqzxma0.exe)
+                      Host(FELIX-ELASTIC) Installation(Installation1)
+                      VRMF(9.1.0.0)
+                      Time(2018-10-29T15:49:36.448Z)
+                      ArithInsert1(6780)
+                      CommentInsert1(QM1)
+                     
+AMQ6184W: An internal IBM MQ error has occurred on queue manager QM1.
+
+EXPLANATION:
+An error has been detected, and the IBM MQ error recording routine has been
+called. The failing process is process 6780.
+ACTION:
+Use the standard facilities supplied with your system to record the problem
+identifier and to save any generated output files. Use either the MQ Support
+site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support
+Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a
+solution is already available.  If you are unable to find a match, contact your
+IBM support center.  Do not discard these files until the problem has been
+resolved. 
+----- amqxfdcp.c : 874 --------------------------------------------------------
