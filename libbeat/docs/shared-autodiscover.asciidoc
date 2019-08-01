@@ -295,7 +295,7 @@ These are the available fields during within config templating. The `elb_listene
 
 include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
 
-This autodiscover provider takes our standard AWS credentials options, see <<aws-credentials-config>> below for more information.
+This autodiscover provider takes our standard <<aws-credentials-config,AWS credentials options>>.
 
 [id="aws-credentials-config"]
 include::../../x-pack/libbeat/docs/aws-credentials-config.asciidoc[]
