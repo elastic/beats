@@ -43,6 +43,7 @@ type kafkaInputConfig struct {
 	ConnectBackoff time.Duration     `config:"connect_backoff" validate:"min=0"`
 	ConsumeBackoff time.Duration     `config:"consume_backoff" validate:"min=0"`
 	MaxWaitTime    time.Duration     `config:"max_wait_time"`
+	IsolationLevel isolationLevel    `config:"isolation_level"`
 	Fetch          kafkaFetch        `config:"fetch"`
 	Rebalance      kafkaRebalance    `config:"rebalance"`
 	TLS            *tlscommon.Config `config:"ssl"`
@@ -77,6 +78,13 @@ const (
 	rebalanceStrategyRoundRobin
 )
 
+type isolationLevel int
+
+const (
+	isolationLevelReadUncommitted = iota
+	isolationLevelReadCommitted
+)
+
 var (
 	initialOffsets = map[string]initialOffset{
 		"oldest": initialOffsetOldest,
@@ -85,6 +93,10 @@ var (
 	rebalanceStrategies = map[string]rebalanceStrategy{
 		"range":      rebalanceStrategyRange,
 		"roundrobin": rebalanceStrategyRoundRobin,
+	}
+	isolationLevels = map[string]isolationLevel{
+		"read_uncommitted": isolationLevelReadUncommitted,
+		"read_committed":   isolationLevelReadCommitted,
 	}
 )
 
@@ -98,6 +110,7 @@ func defaultConfig() kafkaInputConfig {
 		ConnectBackoff: 30 * time.Second,
 		ConsumeBackoff: 2 * time.Second,
 		MaxWaitTime:    250 * time.Millisecond,
+		IsolationLevel: isolationLevelReadUncommitted,
 		Fetch: kafkaFetch{
 			Min:     1,
 			Default: (1 << 20), // 1 MB
@@ -141,6 +154,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	k.Consumer.Offsets.Initial = config.InitialOffset.asSaramaOffset()
 	k.Consumer.Retry.Backoff = config.ConsumeBackoff
 	k.Consumer.MaxWaitTime = config.MaxWaitTime
+	k.Consumer.IsolationLevel = config.IsolationLevel.asSaramaIsolationLevel()
 
 	k.Consumer.Fetch.Min = config.Fetch.Min
 	k.Consumer.Fetch.Default = config.Fetch.Default
@@ -218,5 +232,21 @@ func (st *rebalanceStrategy) Unpack(value string) error {
 		return fmt.Errorf("invalid rebalance strategy '%s'", value)
 	}
 	*st = strategy
+	return nil
+}
+
+func (is isolationLevel) asSaramaIsolationLevel() sarama.IsolationLevel {
+	return map[isolationLevel]sarama.IsolationLevel{
+		isolationLevelReadUncommitted: sarama.ReadUncommitted,
+		isolationLevelReadCommitted:   sarama.ReadCommitted,
+	}[is]
+}
+
+func (is *isolationLevel) Unpack(value string) error {
+	isolationLevel, ok := isolationLevels[value]
+	if !ok {
+		return fmt.Errorf("invalid isolation level '%s'", value)
+	}
+	*is = isolationLevel
 	return nil
 }
