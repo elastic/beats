@@ -59,16 +59,14 @@ func NewDecodeBase64Field(c *common.Config) (processors.Processor, error) {
 		FailOnError:   true,
 	}
 
-	log := logp.NewLogger(processorName)
-
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the %s configuration: %s", processorName, err)
 	}
 
 	return &decodeBase64Field{
-		log:    log,
 		config: config,
+		log: logp.NewLogger(processorName),
 	}, nil
 }
 
@@ -102,7 +100,7 @@ func (f *decodeBase64Field) decodeField(from string, to string, fields common.Ma
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %v", from, err)
 	}
 
 	text, ok := value.(string)
