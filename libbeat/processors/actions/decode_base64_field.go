@@ -124,7 +124,7 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 		target = f.config.Field.From
 	}
 
-	if _, err = event.Put(target, string(decodedData)); err != nil {
+	if _, err = event.PutValue(target, string(decodedData)); err != nil {
 		return fmt.Errorf("could not put value: %s: %v, %v", decodedData, target, err)
 	}
 
