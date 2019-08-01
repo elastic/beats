@@ -7,11 +7,9 @@ package server
 import (
 	"bytes"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -21,7 +19,7 @@ import (
 var errInvalidPacket = errors.New("invalid statsd packet")
 
 type metricProcessor struct {
-	registry      metrics.Registry
+	registry      *Registry
 	reservoirSize int
 }
 
@@ -30,12 +28,24 @@ type statsdMetric struct {
 	metricType string
 	sampleRate string
 	value      string
-	tags       string
+	tags       map[string]string
+}
+
+func splitTags(rawTags []byte, kvSep []byte) map[string]string {
+	tags := map[string]string{}
+	for _, kv := range bytes.Split(rawTags, []byte(",")) {
+		kvSplit := bytes.SplitN(kv, kvSep, 2)
+		if len(kvSplit) != 2 {
+			continue
+		}
+		tags[string(kvSplit[0])] = string(kvSplit[1])
+	}
+	return tags
 }
 
 func parseSingle(b []byte) (statsdMetric, error) {
-	// format: <metric name>:<value>|<type>[|@samplerate][|tags]
-
+	// format: <metric name>:<value>|<type>[|@samplerate][|#<k>:<v>,<k>:<v>]
+	// alternative: <metric name>[,<k>=<v>,<k>=<v>]:<value>|<type>[|@samplerate]
 	s := statsdMetric{}
 
 	parts := bytes.SplitN(b, []byte("|"), 4)
@@ -53,20 +63,25 @@ func parseSingle(b []byte) (statsdMetric, error) {
 		}
 	}
 
+	if len(parts) > 2 && len(parts[2]) > 0 && parts[2][0] == '#' {
+		s.tags = splitTags(parts[2][1:], []byte(":"))
+	}
+
 	nameSplit := bytes.SplitN(parts[0], []byte{':'}, 2)
 	if len(nameSplit) != 2 {
 		return s, errInvalidPacket
 	}
 
-	s.name = string(nameSplit[0])
+	nameTagsSplit := bytes.SplitN(nameSplit[0], []byte(","), 2)
+	s.name = string(nameTagsSplit[0])
+	if len(nameTagsSplit) > 1 {
+		s.tags = splitTags(nameTagsSplit[1], []byte("="))
+	}
+
 	s.value = string(nameSplit[1])
 	s.metricType = string(parts[1])
 
-	if len(parts) > 2 {
-		s.tags = string(parts[2])
-	}
 	return s, nil
-
 }
 
 // parse will parse a statsd metric into its components
@@ -84,9 +99,9 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func newMetricProcessor(reservoirSize int) *metricProcessor {
+func newMetricProcessor(reservoirSize int, ttl time.Duration) *metricProcessor {
 	return &metricProcessor{
-		registry:      metrics.NewRegistry(),
+		registry:      &Registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
 		reservoirSize: reservoirSize,
 	}
 }
@@ -98,7 +113,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 
 	switch m.metricType {
 	case "c":
-		c := metrics.GetOrRegisterCounter(m.name, p.registry)
+		c := p.registry.GetOrNewCounter(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
 			return err
@@ -111,21 +126,21 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 			c.Inc(v)
 		}
 	case "g":
-		c := metrics.GetOrRegisterGaugeFloat64(m.name, p.registry)
+		c := p.registry.GetOrNewGauge64(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
 			return err
 		}
 		c.Update(v)
 	case "ms":
-		c := metrics.GetOrRegisterTimer(m.name, p.registry)
+		c := p.registry.GetOrNewTimer(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
 			return err
 		}
 		c.Update(time.Duration(v))
 	case "h": // TODO: can these be floats?
-		c := metrics.GetOrRegisterHistogram(m.name, p.registry, metrics.NewUniformSample(p.reservoirSize))
+		c := p.registry.GetOrNewHistogram(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
 			return err
@@ -164,20 +179,10 @@ func (p *metricProcessor) Process(event server.Event) error {
 	return nil
 }
 
-func (p *metricProcessor) GetAll() common.MapStr {
-	fields := common.MapStr{}
-	for k, v := range p.registry.GetAll() {
-		metric := common.MapStr{}
-		for mk, mv := range v {
-			metric[mk] = mv
-		}
-		fields[k] = metric
-	}
+func (p *metricProcessor) sanitizeName(name string) string {
+	return common.DeDot(name)
+}
 
-	flattened := common.MapStr{}
-	for k, v := range fields.Flatten() {
-		// replace . with _ and % with p
-		flattened[strings.Replace(strings.Replace(k, ".", "_", -1), "%", "p", -1)] = v
-	}
-	return flattened
+func (p *metricProcessor) GetAll() []metricsGroup {
+	return p.registry.GetAll()
 }

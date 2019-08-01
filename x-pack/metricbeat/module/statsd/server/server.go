@@ -7,6 +7,7 @@ package server
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	serverhelper "github.com/elastic/beats/metricbeat/helper/server"
 	"github.com/elastic/beats/metricbeat/helper/server/udp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -20,12 +21,14 @@ func init() {
 
 // Config for the statsd server metricset.
 type Config struct {
-	ReservoirSize int `config:"reservoir_size"`
+	ReservoirSize int           `config:"reservoir_size"`
+	TTL           time.Duration `config:"ttl"`
 }
 
 func defaultConfig() Config {
 	return Config{
 		ReservoirSize: 1000,
+		TTL:           time.Second * 30,
 	}
 }
 
@@ -53,12 +56,37 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	processor := newMetricProcessor(config.ReservoirSize)
+	processor := newMetricProcessor(config.ReservoirSize, config.TTL)
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
 		processor:     processor,
 	}, nil
+}
+
+func (m *MetricSet) getEvents() []*mb.Event {
+	groups := m.processor.GetAll()
+	events := make([]*mb.Event, len(groups))
+
+	for idx, tagGroup := range groups {
+
+		mapstrTags := common.MapStr{}
+		for k, v := range tagGroup.tags {
+			mapstrTags[k] = v
+		}
+
+		sanitizedMetrics := common.MapStr{}
+		for k, v := range tagGroup.metrics {
+			sanitizedMetrics[common.DeDot(k)] = v
+		}
+
+		events[idx] = &mb.Event{
+			MetricSetFields: sanitizedMetrics,
+			RootFields:      common.MapStr{"labels": mapstrTags},
+			Namespace:       "statsd",
+		}
+	}
+	return events
 }
 
 // Run method provides the module with a reporter with which events can be reported.
@@ -75,11 +103,9 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			return
 		case <-reportPeriod:
 			reportPeriod = time.After(period)
-			event := mb.Event{
-				MetricSetFields: m.processor.GetAll(),
-				Namespace:       "statsd",
+			for _, e := range m.getEvents() {
+				reporter.Event(*e)
 			}
-			reporter.Event(event)
 		case msg := <-m.server.GetEvents():
 			err := m.processor.Process(msg)
 			if err != nil {
