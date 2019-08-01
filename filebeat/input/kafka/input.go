@@ -242,7 +242,7 @@ func (h *groupHandler) createEvent(
 		"topic":     claim.Topic(),
 		"partition": claim.Partition(),
 		"offset":    message.Offset,
-		"key":       message.Key,
+		"key":       string(message.Key),
 	}
 	version, versionOk := h.version.Get()
 	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
