@@ -10,14 +10,6 @@ https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].
 
 
 [float]
-=== Dashboard
-
-The Prometheus module comes with a predefined dashboard for Prometheus specific metrics. For example:
-
-image::./images/metricbeat-prometheus-overview.png[]
-
-
-[float]
 === Example configuration
 
 The Prometheus module supports the standard configuration options that are described

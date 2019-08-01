@@ -29,7 +29,7 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
-            "title": "HTTP Requests Total",
+            "title": "HTTP Requests",
             "version": "7.3.0"
           },
           {
@@ -182,8 +182,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-07-30T20:26:52.713Z",
-      "version": "WzQxNSwxXQ=="
+      "updated_at": "2019-08-01T10:16:47.003Z",
+      "version": "WzUwNywxXQ=="
     },
     {
       "attributes": {
@@ -197,7 +197,7 @@
             }
           }
         },
-        "title": "[Metricbeat] Prometheus HTTP Requests Total",
+        "title": "[Metricbeat] Prometheus HTTP Requests",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -223,13 +223,19 @@
                 "fill": 0,
                 "formatter": "number",
                 "id": "b2579fe1-b2e6-11e9-96a9-535735f478e7",
-                "label": "HTTP Requests Total",
+                "label": "HTTP Requests",
                 "line_width": 2,
                 "metrics": [
                   {
                     "field": "prometheus.metrics.prometheus_http_requests_total",
                     "id": "b2579fe2-b2e6-11e9-96a9-535735f478e7",
                     "type": "max"
+                  },
+                  {
+                    "field": "b2579fe2-b2e6-11e9-96a9-535735f478e7",
+                    "id": "4ff83340-b445-11e9-88c2-81f27aea5920",
+                    "type": "derivative",
+                    "unit": "1s"
                   }
                 ],
                 "point_size": 0,
@@ -246,7 +252,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat] Prometheus HTTP Requests Total",
+          "title": "[Metricbeat] Prometheus HTTP Requests",
           "type": "metrics"
         }
       },
@@ -256,8 +262,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-07-30T16:30:47.169Z",
-      "version": "WzM2MCwxXQ=="
+      "updated_at": "2019-08-01T10:16:22.004Z",
+      "version": "WzUwMCwxXQ=="
     },
     {
       "attributes": {
