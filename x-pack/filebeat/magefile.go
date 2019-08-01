@@ -130,7 +130,7 @@ func Update() {
 }
 
 func includeList() error {
-	return devtools.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
+	return devtools.GenerateIncludeListGo([]string{"input/*", "processors/*"}, []string{"module"})
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
