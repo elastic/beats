@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// + build integration
+// +build integration
 
 package kafka
 
@@ -117,8 +117,7 @@ func TestInput(t *testing.T) {
 		},
 	}
 	for _, m := range messages {
-		fmt.Printf("Would have sent %v\n", m)
-		//(t, testTopic, m.message, m.headers, time.Second*20)
+		writeToKafkaTopic(t, testTopic, m.message, m.headers, time.Second*20)
 	}
 
 	// Setup the input config
@@ -159,6 +158,21 @@ func TestInput(t *testing.T) {
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
+	}
+
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	close(context.Done)
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
 	}
 }
 

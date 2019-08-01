@@ -43,21 +43,13 @@ func init() {
 
 // Input contains the input and its config
 type kafkaInput struct {
-	config        kafkaInputConfig
-	saramaConfig  *sarama.Config
-	context       input.Context
-	outlet        channel.Outleter
-	consumerGroup sarama.ConsumerGroup
-	log           *logp.Logger
-	runOnce       sync.Once
-}
-
-// A synchronized wrapper to read and write the kafka session, since it may
-// change while ACKs are still pending.
-type kafkaSessionState struct {
-	session   sarama.ConsumerGroupSession
-	mutex     sync.Mutex     // Hold to access the session field
-	waitGroup sync.WaitGroup // Hold while using the session field
+	config          kafkaInputConfig
+	saramaConfig    *sarama.Config
+	context         input.Context
+	outlet          channel.Outleter
+	saramaWaitGroup sync.WaitGroup // indicates a sarama consumer group is active
+	log             *logp.Logger
+	runOnce         sync.Once
 }
 
 // NewInput creates a new kafka input
@@ -67,26 +59,16 @@ func NewInput(
 	inputContext input.Context,
 ) (input.Input, error) {
 
-	// We create the empty session state first because it must be referenced by
-	// the ACK callback in the connector configuration.
-	sessionState := &kafkaSessionState{}
-
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: inputContext.DynamicFields,
 		},
 		ACKEvents: func(events []interface{}) {
-			sessionState.accessSession(func(session sarama.ConsumerGroupSession) {
-				if session == nil {
-					// The kafka connection is closed and / or is being rebalanced.
-					return
+			for _, event := range events {
+				if meta, ok := event.(eventMeta); ok {
+					meta.handler.ack(meta.message)
 				}
-				for _, event := range events {
-					if cm, ok := event.(*sarama.ConsumerMessage); ok {
-						session.MarkMessage(cm, "")
-					}
-				}
-			})
+			}
 		},
 	})
 	if err != nil {
@@ -114,33 +96,6 @@ func NewInput(
 	return input, nil
 }
 
-// A helper to safely use the current sarama session for the duration of the
-// given callback. Used when ACKing messages outside the body of the main
-// sarama callbacks. The session parameter may be nil if there is no active
-// session.
-func (state *kafkaSessionState) accessSession(
-	fn func(session sarama.ConsumerGroupSession),
-) {
-	state.mutex.Lock()
-	state.waitGroup.Add(1)
-	session := state.session
-	state.mutex.Unlock()
-	defer state.waitGroup.Done()
-	fn(session)
-}
-
-// A helper to safely set the session field after waiting on any pending
-// operations.
-func (state *kafkaSessionState) setSession(sess sarama.ConsumerGroupSession) {
-	state.mutex.Lock()
-	// Once we claim the mutex we still wait for any pending ACKs to be
-	// sent. (These may well fail if the session is ending, but that's better
-	// than calling a stale pointer.)
-	state.waitGroup.Wait()
-	state.session = sess
-	state.mutex.Unlock()
-}
-
 func (input *kafkaInput) runConsumerGroup() {
 	// Sarama uses standard go contexts to control cancellation, so we need
 	// to wrap our input context channel in that interface.
@@ -150,7 +105,7 @@ func (input *kafkaInput) runConsumerGroup() {
 		outlet:  input.outlet,
 	}
 
-	// Create a consumer group and listen to its error channel.
+	// Create a consumer group and make sure it's closed before we return.
 	consumerGroup, err :=
 		sarama.NewConsumerGroup(
 			input.config.Hosts, input.config.GroupID, input.saramaConfig)
@@ -159,6 +114,13 @@ func (input *kafkaInput) runConsumerGroup() {
 			"Error initializing kafka consumer group", "error", err)
 		return
 	}
+	input.saramaWaitGroup.Add(1)
+	defer func() {
+		consumerGroup.Close()
+		input.saramaWaitGroup.Done()
+	}()
+
+	// Listen asynchronously to any errors during the consume process
 	go func() {
 		for err := range consumerGroup.Errors() {
 			input.log.Errorw("Error reading from kafka", "error", err)
@@ -196,8 +158,8 @@ func (input *kafkaInput) Run() {
 // Wait shuts down the Input by cancelling the internal context.
 func (input *kafkaInput) Wait() {
 	input.Stop()
-	// Wait for the consumer group to shut down
-	input.consumerGroup.Close()
+	// Wait for sarama to shut down
+	input.saramaWaitGroup.Wait()
 }
 
 // Stop closes the input's outlet on close. We don't need to shutdown the
@@ -243,11 +205,22 @@ func (c channelCtx) Err() error {
 }
 func (c channelCtx) Value(key interface{}) interface{} { return nil }
 
+// The group handler for the sarama consumer group interface. In addition to
+// providing the basic consumption callbacks needed by sarama, groupHandler is
+// also currently responsible for marshalling kafka messages into beat.Event,
+// and passing ACKs from the output channel back to the kafka cluster.
 type groupHandler struct {
 	sync.Mutex
 	version kafka.Version
-	state   kafkaSessionState
+	session sarama.ConsumerGroupSession
 	outlet  channel.Outleter
+}
+
+// The metadata attached to incoming events so they can be ACKed once they've
+// been successfully sent.
+type eventMeta struct {
+	handler *groupHandler
+	message *sarama.ConsumerMessage
 }
 
 func (h *groupHandler) createEvent(
@@ -257,6 +230,10 @@ func (h *groupHandler) createEvent(
 ) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now(),
+		Private: eventMeta{
+			handler: h,
+			message: message,
+		},
 	}
 	eventFields := common.MapStr{
 		"message": string(message.Value),
@@ -282,17 +259,31 @@ func (h *groupHandler) createEvent(
 	return event
 }
 
-func (h groupHandler) Setup(session sarama.ConsumerGroupSession) error {
-	h.state.setSession(session)
+func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
+	h.Lock()
+	h.session = session
+	h.Unlock()
 	return nil
 }
 
-func (h groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
-	h.state.setSession(nil)
+func (h *groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
+	h.Lock()
+	h.session = nil
+	h.Unlock()
 	return nil
 }
 
-func (h groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+// ack informs the kafka cluster that this message has been consumed. Called
+// from the input's ACKEvents handler.
+func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
+	h.Lock()
+	if h.session != nil {
+		h.session.MarkMessage(message, "")
+	}
+	h.Unlock()
+}
+
+func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		event := h.createEvent(sess, claim, msg)
 		h.outlet.OnEvent(event)
