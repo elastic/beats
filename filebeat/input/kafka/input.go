@@ -144,11 +144,12 @@ func (input *kafkaInput) Run() {
 				input.runConsumerGroup()
 
 				// If runConsumerGroup returns, then either input.context.Done has
-				// been closed (in which case we should shut down)
+				// been closed (in which case we should shut down) or there was an
+				// error, and we should try running it again after the backoff interval.
 				select {
 				case <-input.context.Done:
 					return
-				case <-time.After(input.config.InitRetryBackoff):
+				case <-time.After(input.config.ConnectBackoff):
 				}
 			}
 		}()
