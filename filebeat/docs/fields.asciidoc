@@ -12635,6 +12635,15 @@ example: SELECT * FROM users;
 
 --
 
+*`postgresql.log.error.code`*::
++
+--
+Error code returned by Postgres (if any)
+
+type: long
+
+--
+
 *`postgresql.log.timezone`*::
 +
 --

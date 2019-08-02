@@ -6,7 +6,7 @@
         "field": "message",
         "ignore_missing": true,
         "patterns": [
-            "^%{DATETIME:postgresql.log.timestamp} \\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.core_id:long})?\\] ((\\[%{USERNAME:user.name}\\]@\\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?%{WORD:log.level}:  (?:%{NUMBER:error.code:long}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms  statement: %{GREEDYDATA:postgresql.log.query}|%{GREEDYDATA:message})"
+            "^%{DATETIME:postgresql.log.timestamp} \\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.core_id:long})?\\] ((\\[%{USERNAME:user.name}\\]@\\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?%{WORD:log.level}:  (?:%{NUMBER:postgresql.log.error.code:long}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms  statement: %{GREEDYDATA:postgresql.log.query}|%{GREEDYDATA:message})"
         ],
         "pattern_definitions": {
           "DATETIME": "[-0-9]+ %{TIME} %{WORD:event.timezone}",
