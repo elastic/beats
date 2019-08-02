@@ -194,6 +194,7 @@ var (
 	dashboardTitleRegexp     = regexp.MustCompile(`^\[([^\s]+) (.+)\].+$`)
 )
 
+// CheckFormat checks the format of a dashboard
 func (d *Dashboard) CheckFormat(module string) error {
 	for _, o := range d.Objects {
 		switch o.Type {
