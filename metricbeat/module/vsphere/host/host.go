@@ -82,7 +82,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -91,7 +90,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in NewClient")
 	}
 
-	defer client.Logout(ctx)
+	defer func() {
+		if err := client.Logout(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to logout from vshphere"))
+		}
+	}()
 
 	c := client.Client
 
@@ -103,7 +106,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in CreateContainerView")
 	}
 
-	defer v.Destroy(ctx)
+	defer func() {
+		if err := v.Destroy(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
+		}
+	}()
 
 	// Retrieve summary property for all hosts.
 	var hst []mo.HostSystem

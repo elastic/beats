@@ -95,7 +95,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in NewClient")
 	}
 
-	defer client.Logout(ctx)
+	defer func() {
+		if err := client.Logout(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to logout from vshphere"))
+		}
+	}()
 
 	c := client.Client
 
@@ -117,7 +121,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in CreateContainerView")
 	}
 
-	defer v.Destroy(ctx)
+	defer func() {
+		if err := v.Destroy(ctx); err != nil {
+			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
+		}
+	}()
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
@@ -161,7 +169,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		if vm.Summary.Vm != nil {
-			networkNames, err := getNetworkNames(c, vm.Summary.Vm.Reference())
+			networkNames, err := getNetworkNames(ctx, c, vm.Summary.Vm.Reference())
 			if err != nil {
 				m.Logger().Debug(err.Error())
 			} else {
@@ -194,8 +202,8 @@ func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap 
 	return outputFields
 }
 
-func getNetworkNames(c *vim25.Client, ref types.ManagedObjectReference) ([]string, error) {
-	ctx, cancel := context.WithCancel(context.Background())
+func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) ([]string, error) {
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	var outputNetworkNames []string
