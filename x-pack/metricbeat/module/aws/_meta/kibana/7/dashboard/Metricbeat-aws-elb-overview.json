@@ -215,7 +215,7 @@
             }
           }
         },
-        "title": "AWS ELB HTTP 5XX Errors",
+        "title": "HTTP 5XX Errors [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -280,7 +280,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB HTTP 5XX Errors",
+          "title": "HTTP 5XX Errors [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -290,8 +290,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T15:05:12.590Z",
-      "version": "WzYzNCw4XQ=="
+      "updated_at": "2019-08-02T18:37:04.544Z",
+      "version": "WzY0NSw5XQ=="
     },
     {
       "attributes": {
@@ -305,7 +305,7 @@
             }
           }
         },
-        "title": "AWS ELB Request Count",
+        "title": "Request Count [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -370,7 +370,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB Request Count",
+          "title": "Request Count [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -380,8 +380,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T14:52:01.873Z",
-      "version": "WzYyNyw4XQ=="
+      "updated_at": "2019-08-02T18:24:52.316Z",
+      "version": "WzY0MCw5XQ=="
     },
     {
       "attributes": {
@@ -395,7 +395,7 @@
             }
           }
         },
-        "title": "AWS ELB Unhealthy Host Count",
+        "title": "Unhealthy Host Count [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -464,7 +464,7 @@
             "time_field": "@timestamp",
             "type": "metric"
           },
-          "title": "AWS ELB Unhealthy Host Count",
+          "title": "Unhealthy Host Count [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -474,8 +474,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T14:45:36.956Z",
-      "version": "WzYyMCw4XQ=="
+      "updated_at": "2019-08-02T18:24:16.077Z",
+      "version": "WzYzOCw5XQ=="
     },
     {
       "attributes": {
@@ -489,7 +489,7 @@
             }
           }
         },
-        "title": "AWS ELB Healthy Host Count",
+        "title": "Healthy Host Count [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -558,7 +558,7 @@
             "time_field": "@timestamp",
             "type": "metric"
           },
-          "title": "AWS ELB Healthy Host Count",
+          "title": "Healthy Host Count [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -568,8 +568,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T14:45:51.650Z",
-      "version": "WzYyMSw4XQ=="
+      "updated_at": "2019-08-02T18:24:30.551Z",
+      "version": "WzYzOSw5XQ=="
     },
     {
       "attributes": {
@@ -583,7 +583,7 @@
             }
           }
         },
-        "title": "AWS ELB Latency in Seconds",
+        "title": "Latency in Seconds [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -648,7 +648,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB Latency in Seconds",
+          "title": "Latency in Seconds [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -658,8 +658,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T14:56:51.554Z",
-      "version": "WzYyOSw4XQ=="
+      "updated_at": "2019-08-02T18:36:49.424Z",
+      "version": "WzY0Myw5XQ=="
     },
     {
       "attributes": {
@@ -673,7 +673,7 @@
             }
           }
         },
-        "title": "AWS ELB HTTP Backend 4XX Errors",
+        "title": "HTTP Backend 4XX Errors [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -738,7 +738,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB HTTP Backend 4XX Errors",
+          "title": "HTTP Backend 4XX Errors [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -748,8 +748,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T14:59:02.526Z",
-      "version": "WzYzMCw4XQ=="
+      "updated_at": "2019-08-02T18:28:25.630Z",
+      "version": "WzY0Miw5XQ=="
     },
     {
       "attributes": {
@@ -763,7 +763,7 @@
             }
           }
         },
-        "title": "AWS ELB Backend Connection Errors",
+        "title": "Backend Connection Errors [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -829,7 +829,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB Backend Connection Errors",
+          "title": "Backend Connection Errors [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -839,8 +839,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T15:04:22.272Z",
-      "version": "WzYzMiw4XQ=="
+      "updated_at": "2019-08-02T18:28:18.932Z",
+      "version": "WzY0MSw5XQ=="
     },
     {
       "attributes": {
@@ -912,7 +912,7 @@
             }
           }
         },
-        "title": "AWS ELB HTTP Backend 2XX",
+        "title": "HTTP Backend 2XX [AWS ELB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -977,7 +977,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS ELB HTTP Backend 2XX",
+          "title": "HTTP Backend 2XX [AWS ELB]",
           "type": "metrics"
         }
       },
@@ -987,8 +987,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-01T15:04:30.991Z",
-      "version": "WzYzMyw4XQ=="
+      "updated_at": "2019-08-02T18:36:56.883Z",
+      "version": "WzY0NCw5XQ=="
     }
   ],
   "version": "7.2.0"
