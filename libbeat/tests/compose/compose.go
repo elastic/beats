@@ -29,8 +29,15 @@ import (
 
 // HostInfo exposes information about started scenario
 type HostInfo interface {
+	// Host returns an address as host:port that can be used to connect to
+	// a running service.
 	Host() string
-	HostForPort(int) string
+
+	// HostForPort returns an address as host:port that can be used to
+	// connect to a running service that has multiple exposed ports. The
+	// address returned is the one that can be used to connect to the
+	// indicated exposed port.
+	HostForPort(port int) string
 }
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
