@@ -1,5 +1,7 @@
 [role="xpack"]
 
+:libbeat-xpack-dir: ../../../../x-pack/libbeat
+
 :type: s3
 
 [id="{beatname_lc}-input-{type}"]
@@ -30,9 +32,9 @@ Example configuration 1:
 {beatname_lc}.inputs:
 - type: s3
   queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:"”}'
+  access_key_id: '$\{AWS_ACCESS_KEY_ID:"fake-access-key"\}'
+  secret_access_key: '$\{AWS_SECRET_ACCESS_KEY:"fake-secret-key"\}'
+  session_token: '$\{AWS_SESSION_TOKEN:"fake-session-token"\}'
 ----
 
 Example configuration 2:
@@ -80,6 +82,7 @@ credentials from shared AWS credentials file with `default` profile name.
 Please see <<aws-credentials-config>> for more details about how to configure aws
 credentials.
 
+[float]
 === S3 and SQS setup
 Enable bucket notification: any new object creation in S3 bucket will also
 create a notification through SQS. Please see
