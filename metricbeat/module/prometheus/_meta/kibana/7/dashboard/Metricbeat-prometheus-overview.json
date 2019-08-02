@@ -132,7 +132,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat] Prometheus Overview",
+        "title": "[Metricbeat Prometheus] Overview",
         "version": 1
       },
       "id": "6a9b80c0-b2ed-11e9-9a23-67ee28886a4b",
@@ -182,8 +182,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-01T10:16:47.003Z",
-      "version": "WzUwNywxXQ=="
+      "updated_at": "2019-08-02T10:59:13.474Z",
+      "version": "WzYxMCwxXQ=="
     },
     {
       "attributes": {
