@@ -18,9 +18,12 @@
 package mage
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/magefile/mage/mg"
@@ -48,7 +51,7 @@ func Format() {
 	if BeatProjectType != CommunityProject {
 		mg.Deps(AddLicenseHeaders)
 	}
-	mg.Deps(GoImports, PythonAutopep8)
+	mg.Deps(GoImports, PythonAutopep8, DashboardsFormat)
 }
 
 // GoImports executes goimports against all .go files in and below the CWD. It
@@ -131,4 +134,100 @@ func AddLicenseHeaders() error {
 	}
 
 	return sh.RunV("go-licenser", "-license", license)
+}
+
+// DashboardsFormat checks the format of dashboards
+func DashboardsFormat() error {
+	dashboardSubDir := "/_meta/kibana/7/dashboard/"
+	dashboardFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+		return strings.Contains(filepath.ToSlash(path), dashboardSubDir)
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to find dashboards")
+	}
+
+	hasErrors := false
+	for _, file := range dashboardFiles {
+		d, err := ioutil.ReadFile(file)
+		if err != nil {
+			return errors.Wrapf(err, "failed to read dashboard file %s", file)
+		}
+		var dashboard Dashboard
+		err = json.Unmarshal(d, &dashboard)
+		if err != nil {
+			return errors.Wrapf(err, "failed to parse dashboard from %s", file)
+		}
+
+		module := moduleNameFromDashboard(file)
+		err = dashboard.CheckFormat(module)
+		if err != nil {
+			hasErrors = true
+			fmt.Printf("%s: %v\n", file, err)
+		}
+	}
+
+	if hasErrors {
+		return errors.New("there are format errors in dashboards")
+	}
+	return nil
+}
+
+func moduleNameFromDashboard(path string) string {
+	moduleDir := filepath.Clean(filepath.Join(filepath.Dir(path), "../../../.."))
+	return filepath.Base(moduleDir)
+}
+
+// Dashboard is a dashboard
+type Dashboard struct {
+	Version string `json:"version"`
+	Objects []struct {
+		Type       string `json:"type"`
+		Attributes struct {
+			Description string `json:"description"`
+			Title       string `json:"title"`
+		} `json:"attributes"`
+	} `json:"objects"`
+}
+
+var (
+	visualizationTitleRegexp = regexp.MustCompile(`^.+\[(.+) (.+)\]( ECS)?$`)
+	dashboardTitleRegexp     = regexp.MustCompile(`^\[(.+) (.+)\].+$`)
+)
+
+func (d *Dashboard) CheckFormat(module string) error {
+	for _, o := range d.Objects {
+		switch o.Type {
+		case "dashboard":
+			if o.Attributes.Description == "" {
+				return errors.Errorf("empty description on dashboard '%s'", o.Attributes.Title)
+			}
+			if err := checkTitle(dashboardTitleRegexp, o.Attributes.Title, module); err != nil {
+				return errors.Wrapf(err, "expected title with format '[%s Module] Some title', found '%s'", BeatName, o.Attributes.Title)
+			}
+		case "visualization":
+			if err := checkTitle(visualizationTitleRegexp, o.Attributes.Title, module); err != nil {
+				return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", BeatName, o.Attributes.Title)
+			}
+		}
+	}
+	return nil
+}
+
+func checkTitle(re *regexp.Regexp, title string, module string) error {
+	match := re.FindStringSubmatch(title)
+	if len(match) < 3 {
+		return errors.New("title doesn't match pattern")
+	}
+	beatTitle := strings.Title(BeatName)
+	if match[1] != beatTitle {
+		return errors.Errorf("expected: '%s', found: '%s'", beatTitle, match[1])
+	}
+
+	// Compare case insensitive, and consider spaces as underscores in module names in titles
+	expectedModule := strings.ToLower(module)
+	foundModule := strings.ToLower(match[2])
+	if expectedModule != foundModule {
+		return errors.Errorf("expected module name (%s), found '%s'", module, match[2])
+	}
+	return nil
 }
