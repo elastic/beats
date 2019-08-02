@@ -21,7 +21,10 @@ start/stop events. This ensures you don't need to worry about state, but only de
 [float]
 ===== Docker
 
-The Docker autodiscover provider watches for Docker containers to start and stop. These are the available fields on every
+The Docker autodiscover provider watches for Docker containers to start and stop.
+
+
+These are the available fields during within config templating. The `docker.*` fields will be available on each emitted event.
 event:
 
   * host
@@ -113,8 +116,9 @@ endif::[]
 [float]
 ===== Kubernetes
 
-The Kubernetes autodiscover provider watches for Kubernetes pods to start, update, and stop. These are the available fields on every
-event:
+The Kubernetes autodiscover provider watches for Kubernetes pods to start, update, and stop.
+
+These are the available fields during within config templating. The `kubernetes.*` fields will be available on each emitted event.
 
   * host
   * port (if exposed)
@@ -175,8 +179,6 @@ contain variables from the autodiscover event. They can be accessed under data n
 
 The `kubernetes` autodiscover provider has the following configuration settings:
 
-`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
-  by default.
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
   cannot be accurately detected, as when running {beatname_lc} in host network
   mode.
@@ -223,7 +225,7 @@ In any case, this feature is controlled with two properties:
 There are multiple ways of setting these properties, and they can vary from
 application to application, please refer to the documentation of your
 application to find the more suitable way to set them in your case.
- 
+
 Jolokia Discovery is based on UDP multicast requests. Agents join the multicast
 group 239.192.48.84, port 24884, and discovery is done by sending queries to
 this group. You have to take into account that UDP traffic between Metricbeat
@@ -231,7 +233,7 @@ and the Jolokia agents has to be allowed. Also notice that this multicast
 address is in the 239.0.0.0/8 range, that is reserved for private use within an
 organization, so it can only be used in private networks.
 
-These are the available fields on every event:
+These are the available fields during within config templating. The `jolokia.*` fields will be available on each emitted event.
 
   * jolokia.agent.id
   * jolokia.agent.version
@@ -256,6 +258,48 @@ the ones used for discovery probes, they have these settings:
 
 include::../../{beatname_lc}/docs/autodiscover-jolokia-config.asciidoc[]
 endif::autodiscoverJolokia[]
+
+ifdef::autodiscoverAWSELB[]
+[float]
+===== Amazon ELBs
+
+*Note: This provider is experimental*
+
+The Amazon ELB autodiscover provider discovers https://aws.amazon.com/elasticloadbalancing/[ELBs] and their listeners. This is useful when you don't want to connect
+directly to a service, but rather to the ELB fronting a pool of services.
+
+This provider will yield one config block per ELB Listener. So, if you have one ELB exposing both ports 80 and 443, it
+will generate two configs, one for each port. Keep in mind that the beat will de-duplicate configs. So, if the generated
+configs are the same only one will actually run.
+
+This provider will load AWS credentials using the standard AWS environment variables and shared credentials files see https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html[Best Practices for Managing AWS Access Keys] for more information. If you do not wish to use these, you may explicitly set the `access_key_id` and `secret_access_key` variables.
+
+These are the available fields during within config templating. The `elb_listener.*` fields will be available on each emitted event.
+
+  * host
+  * port
+  * elb_listener.listener_arn
+  * elb_listener.load_balancer_arn
+  * elb_listener.protocol
+  * elb_listener.type
+  * elb_listener.scheme
+  * elb_listener.availability_zones
+  * elb_listener.created
+  * elb_listener.state
+  * elb_listener.ip_address_type
+  * elb_listener.security_groups
+  * elb_listener.vpc_id
+  * elb_listener.ssl_policy
+
+include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
+
+This autodiscover provider takes our standard <<aws-credentials-config,AWS credentials options>>.
+
+[id="aws-credentials-config"]
+include::../../x-pack/libbeat/docs/aws-credentials-config.asciidoc[]
+
+endif::autodiscoverAWSELB[]
+
 
 ifdef::autodiscoverHints[]
 [[configuration-autodiscover-hints]]

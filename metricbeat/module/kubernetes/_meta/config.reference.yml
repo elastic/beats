@@ -17,7 +17,6 @@
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config
@@ -37,7 +36,6 @@
 
   # Enriching parameters:
   add_metadata: true
-  in_cluster: true
   # When used outside the cluster:
   #host: node_name
   #kube_config: ~/.kube/config

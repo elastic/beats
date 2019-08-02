@@ -890,8 +890,9 @@ processor to drop the field and then rename the field.
 -------
 processors:
 - decode_base64_field:
-    from: "field1"
-    to: "field2"
+    field:
+      from: "field1"
+      to: "field2"
     ignore_missing: false
     fail_on_error: true
 -------
@@ -924,8 +925,9 @@ processor to drop the field and then rename the field.
 -------
 processors:
 - decompress_gzip_field:
-    from: "field1"
-    to: "field2"
+    field:
+      from: "field1"
+      to: "field2"
     ignore_missing: false
     fail_on_error: true
 -------
@@ -1226,7 +1228,6 @@ Kubernetes.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: true
 -------------------------------------------------------------------------------
 
 The configuration below enables the processor on a Beat running as a process on
@@ -1236,7 +1237,6 @@ the Kubernetes node.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: false
     host: <hostname>
     kube_config: ${HOME}/.kube/config
 -------------------------------------------------------------------------------
@@ -1248,7 +1248,6 @@ enables ones that the user is interested in.
 -------------------------------------------------------------------------------
 processors:
 - add_kubernetes_metadata:
-    in_cluster: false
     host: <hostname>
     kube_config: ~/.kube/config
     default_indexers.enabled: false
@@ -1262,8 +1261,6 @@ processors:
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
 
-`in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
-by default.
 `host`:: (Optional) Identify the node where {beatname_lc} is running in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.

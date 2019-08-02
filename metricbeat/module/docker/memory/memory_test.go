@@ -79,6 +79,9 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 		},
 	}
 	expectedFields := common.MapStr{
+		"stats": map[string]uint64{
+			"total_rss": 5,
+		},
 		"fail": common.MapStr{
 			"count": memorystats.MemoryStats.Failcnt,
 		},

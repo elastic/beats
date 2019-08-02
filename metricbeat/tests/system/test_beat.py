@@ -7,7 +7,7 @@ from parameterized import parameterized
 
 class Test(metricbeat.BaseTest):
 
-    COMPOSE_SERVICES = ['metricbeat']
+    COMPOSE_SERVICES = ['metricbeat', 'elasticsearch']
     FIELDS = ['beat']
     METRICSETS = ['stats', 'state']
 
@@ -33,6 +33,13 @@ class Test(metricbeat.BaseTest):
                 "xpack.enabled": "true"
             }
         }])
+
+        # Give the monitored Metricbeat instance enough time to collect metrics and index them
+        # into Elasticsearch, so it may establish the connection to Elasticsearch and determine
+        # it's cluster UUID in the process. Otherwise, the monitoring Metricbeat instance will
+        # show errors in its log about not being able to determine the Elasticsearch cluster UUID
+        # to be associated with the monitored Metricbeat instance.
+        time.sleep(30)
 
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)

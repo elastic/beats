@@ -19,6 +19,7 @@ package beat
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 
 	"github.com/pkg/errors"
@@ -74,6 +75,13 @@ func validateXPackMetricsets(base mb.BaseModule) error {
 // ModuleName is the name of this module.
 const ModuleName = "beat"
 
+var (
+	// ErrClusterUUID is the error to be returned when the monitored beat is using the Elasticsearch output but hasn't
+	// yet connected or is having trouble connecting to that Elasticsearch, so the cluster UUID cannot be
+	// determined
+	ErrClusterUUID = fmt.Errorf("monitored beat is using Elasticsearch output but cluster UUID cannot be determined")
+)
+
 // Info construct contains the relevant data from the Beat's / endpoint
 type Info struct {
 	UUID     string `json:"uuid"`
@@ -85,6 +93,9 @@ type Info struct {
 
 // State construct contains the relevant data from the Beat's /state endpoint
 type State struct {
+	Output struct {
+		Name string `json:"name"`
+	} `json:"output"`
 	Outputs struct {
 		Elasticsearch struct {
 			ClusterUUID string `json:"cluster_uuid"`
