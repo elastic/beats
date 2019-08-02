@@ -4,5 +4,5 @@ var:
   - name: input
     default: s3
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline: ingest/pipeline.json
 input: config/config.yml

@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
+* <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
@@ -986,6 +987,26 @@ type: alias
 alias to: destination.address
 
 --
+
+[[exported-fields-aws]]
+== AWS fields
+
+Module for handling logs from AWS.
+
+
+
+[float]
+=== aws
+
+Fields from AWS logs.
+
+
+
+[float]
+=== s3_server_access_log
+
+Fields for AWS S3 server access logs.
+
 
 [[exported-fields-aws]]
 == aws fields
