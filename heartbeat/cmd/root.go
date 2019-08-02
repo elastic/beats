@@ -18,6 +18,7 @@
 package cmd
 
 import (
+	"fmt"
 	// register default heartbeat monitors
 	"github.com/elastic/beats/heartbeat/beater"
 	_ "github.com/elastic/beats/heartbeat/monitors/defaults"
@@ -49,6 +50,9 @@ func init() {
  * ILM Policy
 `
 	setup.ResetFlags()
+	setup.Flags().Bool(cmd.IndexManagementKey, false, "Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
+	setup.Flags().MarkDeprecated(cmd.TemplateKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
+	setup.Flags().MarkDeprecated(cmd.ILMPolicyKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
 	setup.Flags().Bool(cmd.TemplateKey, false, "Setup index template")
 	setup.Flags().Bool(cmd.ILMPolicyKey, false, "Setup ILM policy")
 }

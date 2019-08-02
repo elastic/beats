@@ -26,12 +26,12 @@ func (s ConfigSource) String() string {
 }
 
 const (
-	SourceUnknown              ConfigSource = 0
-	SourceTopic                ConfigSource = 1
-	SourceDynamicBroker        ConfigSource = 2
-	SourceDynamicDefaultBroker ConfigSource = 3
-	SourceStaticBroker         ConfigSource = 4
-	SourceDefault              ConfigSource = 5
+	SourceUnknown ConfigSource = iota
+	SourceTopic
+	SourceDynamicBroker
+	SourceDynamicDefaultBroker
+	SourceStaticBroker
+	SourceDefault
 )
 
 type DescribeConfigsResponse struct {

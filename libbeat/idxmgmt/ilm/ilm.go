@@ -104,8 +104,13 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}
 
+	rolloverAlias, err := applyStaticFmtstr(info, &cfg.RolloverAlias)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read the ilm rollover alias")
+	}
+
 	alias := Alias{
-		Name:    cfg.RolloverAlias,
+		Name:    rolloverAlias,
 		Pattern: cfg.Pattern,
 	}
 

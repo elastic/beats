@@ -31,6 +31,8 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
 	for clusterUUID, pipelines := range clusterToPipelinesMap {
 		for _, pipeline := range pipelines {
+			removeClusterUUIDsFromPipeline(pipeline)
+
 			// Rename key: graph -> representation
 			pipeline.Representation = pipeline.Graph
 			pipeline.Graph = nil
@@ -106,4 +108,15 @@ func getUserDefinedPipelines(pipelines []logstash.PipelineState) []logstash.Pipe
 		}
 	}
 	return userDefinedPipelines
+}
+
+func removeClusterUUIDsFromPipeline(pipeline logstash.PipelineState) {
+	for _, vertex := range pipeline.Graph.Graph.Vertices {
+		_, exists := vertex["cluster_uuid"]
+		if !exists {
+			continue
+		}
+
+		delete(vertex, "cluster_uuid")
+	}
 }

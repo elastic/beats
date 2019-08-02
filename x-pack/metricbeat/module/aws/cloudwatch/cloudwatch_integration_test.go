@@ -49,6 +49,6 @@ func addCloudwatchMetricsToConfig(config map[string]interface{}) map[string]inte
 	cloudwatchMetric := map[string]interface{}{}
 	cloudwatchMetric["namespace"] = "AWS/RDS"
 	cloudwatchMetricsConfig = append(cloudwatchMetricsConfig, cloudwatchMetric)
-	config["cloudwatch_metrics"] = cloudwatchMetricsConfig
+	config["metrics"] = cloudwatchMetricsConfig
 	return config
 }

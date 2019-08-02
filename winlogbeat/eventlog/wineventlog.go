@@ -47,9 +47,9 @@ const (
 	winEventLogAPIName = "wineventlog"
 )
 
-var winEventLogConfigKeys = append(commonConfigKeys, "batch_read_size",
-	"ignore_older", "include_xml", "event_id", "forwarded", "level", "provider",
-	"no_more_events")
+var winEventLogConfigKeys = common.MakeStringSet(append(commonConfigKeys,
+	"batch_read_size", "ignore_older", "include_xml", "event_id", "forwarded",
+	"level", "provider", "no_more_events")...)
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
