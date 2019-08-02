@@ -25,26 +25,13 @@ does not go back to the queue in the middle of the processing. If there are
 errors happening during the processing of the s3 object, then the process will be
 stopped and the sqs message will be returned back to the queue.
 
-Example configuration 1:
-
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: s3
   queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
-  access_key_id: '$\{AWS_ACCESS_KEY_ID:"fake-access-key"\}'
-  secret_access_key: '$\{AWS_SECRET_ACCESS_KEY:"fake-secret-key"\}'
-  session_token: '$\{AWS_SESSION_TOKEN:"fake-session-token"\}'
-----
-
-Example configuration 2:
-
-["source","yaml",subs="attributes"]
-----
-{beatname_lc}.inputs:
-- type: s3
-  queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
-  credential_profile_name: test-s3-input
+  access_key_id: my-access-key
+  secret_access_key: my-secret-access-key
 ----
 
 The `s3` input supports the following configuration options plus the
@@ -68,19 +55,8 @@ is 0 seconds. The maximum is 12 hours.
 [float]
 ==== `aws credentials`
 
-In order to make AWS API calls, `s3` input requires AWS credentials. Users can
-either put the values into the configuration for `access_key_id`,
-`secret_access_key` and/or `session_token`, or use environment variable
-`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and/or `AWS_SESSION_TOKEN` instead.
-Please use `Example configuration 1` as an example.
-
-Or shared AWS credentials file can be used with `credential_profile_name` as an
-optional configuration. Please use `Example configuration 2` as an example. If
-`credential_profile_name` is not specified, then `s3` input will consume
-credentials from shared AWS credentials file with `default` profile name.
-
-Please see <<aws-credentials-config>> for more details about how to configure aws
-credentials.
+In order to make AWS API calls, `s3` input requires AWS credentials.Please see
+ <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
 === S3 and SQS setup
@@ -93,6 +69,6 @@ for more details.
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 [id="aws-credentials-config"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+include::../filebeat-s3-input-config.asciidoc
 
 :type!:
