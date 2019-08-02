@@ -19,9 +19,6 @@ import (
 	// Register the includes.
 	_ "github.com/elastic/beats/x-pack/metricbeat/include"
 
-	// Register fleet
-	_ "github.com/elastic/beats/x-pack/libbeat/management/fleet"
-
 	// Import OSS modules.
 	_ "github.com/elastic/beats/metricbeat/include"
 	_ "github.com/elastic/beats/metricbeat/include/fields"

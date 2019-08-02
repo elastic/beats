@@ -10,7 +10,12 @@ import (
 
 	// register central management
 	"github.com/elastic/beats/x-pack/libbeat/licenser"
+
+	// Register Central Management
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
+
+	// Register fleet
+	_ "github.com/elastic/beats/x-pack/libbeat/management/fleet"
 
 	// register autodiscover providers
 	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/elb"
