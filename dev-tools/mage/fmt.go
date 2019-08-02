@@ -138,7 +138,7 @@ func AddLicenseHeaders() error {
 
 // DashboardsFormat checks the format of dashboards
 func DashboardsFormat() error {
-	dashboardSubDir := "/_meta/kibana/7/dashboard/"
+	dashboardSubDir := "/_meta/kibana/"
 	dashboardFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
 		return strings.Contains(filepath.ToSlash(path), dashboardSubDir)
 	})
