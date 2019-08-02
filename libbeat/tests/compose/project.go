@@ -19,10 +19,13 @@ package compose
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -144,7 +147,7 @@ func (c *Project) Wait(seconds int, services ...string) error {
 	}
 
 	if !healthy {
-		return errors.New("Timeout waiting for services to be healthy")
+		return errors.New("timeout waiting for services to be healthy")
 	}
 	return nil
 }
@@ -192,28 +195,72 @@ func (c *Project) KillOld(except []string) error {
 
 // Lock acquires the lock (300s) timeout
 // Normally it should only be seconds that the lock is used, but in some cases it can take longer.
+// Pid is written to the lock file, and it is used to check if process holding the process is still
+// alive to avoid deadlocks on unexpected finalizations.
 func (c *Project) Lock() {
 	timeout := time.Now().Add(300 * time.Second)
 	infoShown := false
 	for time.Now().Before(timeout) {
-		file, err := os.OpenFile(c.LockFile(), os.O_CREATE|os.O_EXCL, 0500)
-		file.Close()
-		if err != nil {
-			if !infoShown {
-				logp.Info("docker-compose.yml is locked, waiting")
-				infoShown = true
+		if acquireLock(c.LockFile()) {
+			if infoShown {
+				logp.Info("%s lock acquired", c.LockFile())
 			}
-			time.Sleep(1 * time.Second)
-			continue
+			return
 		}
-		if infoShown {
-			logp.Info("docker-compose.yml lock acquired")
+
+		if stalledLock(c.LockFile()) {
+			if err := os.Remove(c.LockFile()); err == nil {
+				logp.Info("Stalled lockfile %s removed", c.LockFile())
+				continue
+			}
 		}
-		return
+
+		if !infoShown {
+			logp.Info("%s is locked, waiting", c.LockFile())
+			infoShown = true
+		}
+		time.Sleep(1 * time.Second)
 	}
 
 	// This should rarely happen as we lock for start only, less than a second
-	panic(errors.New("Timeout waiting for lock, please remove docker-compose.yml.lock"))
+	panic(errors.New("Timeout waiting for lock"))
+}
+
+func acquireLock(path string) bool {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0700)
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	_, err = fmt.Fprintf(file, "%d", os.Getpid())
+	if err != nil {
+		panic(errors.Wrap(err, "Failed to write pid to lock file"))
+	}
+	return true
+}
+
+// stalledLock checks if process holding the lock is still alive
+func stalledLock(path string) bool {
+	file, err := os.OpenFile(path, os.O_RDONLY, 0500)
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	var pid int
+	fmt.Fscanf(file, "%d", &pid)
+
+	return !processExists(pid)
+}
+
+func processExists(pid int) bool {
+	process, err := os.FindProcess(pid)
+	if process == nil || err != nil {
+		return false
+	}
+
+	return process.Signal(syscall.Signal(0)) == nil
 }
 
 // Unlock releases the project lock
