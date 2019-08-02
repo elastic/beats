@@ -5,7 +5,7 @@ pipeline {
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
-    ITS_PIPELINE = 'beats/poc-metricbeat-tests-poc-mbp/PR-1'
+    ITS_PIPELINE = 'beats/poc-metricbeat-tests-poc-mbp/master'
   }
   options {
     timeout(time: 1, unit: 'HOURS')
