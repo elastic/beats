@@ -20,6 +20,14 @@ The etcd module is tested with etcd 3.2 and 3.3.
 
 
 [float]
+=== Dashboard
+
+The Ceph module comes with a predefined dashboard showing Ceph cluster related metrics. For example:
+
+image::./images/ceph-overview-dashboard.png[]
+
+
+[float]
 === Example configuration
 
 The Etcd module supports the standard configuration options that are described
