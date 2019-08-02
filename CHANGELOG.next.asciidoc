@@ -34,6 +34,8 @@ https://github.com/elastic/beats/compare/v7.2.0...7.2[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
+
 *Heartbeat*
 
 *Journalbeat*
