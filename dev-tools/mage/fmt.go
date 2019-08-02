@@ -190,8 +190,8 @@ type Dashboard struct {
 }
 
 var (
-	visualizationTitleRegexp = regexp.MustCompile(`^.+\[(.+) (.+)\]( ECS)?$`)
-	dashboardTitleRegexp     = regexp.MustCompile(`^\[(.+) (.+)\].+$`)
+	visualizationTitleRegexp = regexp.MustCompile(`^.+\[([^\s]+) (.+)\]( ECS)?$`)
+	dashboardTitleRegexp     = regexp.MustCompile(`^\[([^\s]+) (.+)\].+$`)
 )
 
 func (d *Dashboard) CheckFormat(module string) error {
@@ -202,11 +202,11 @@ func (d *Dashboard) CheckFormat(module string) error {
 				return errors.Errorf("empty description on dashboard '%s'", o.Attributes.Title)
 			}
 			if err := checkTitle(dashboardTitleRegexp, o.Attributes.Title, module); err != nil {
-				return errors.Wrapf(err, "expected title with format '[%s Module] Some title', found '%s'", BeatName, o.Attributes.Title)
+				return errors.Wrapf(err, "expected title with format '[%s Module] Some title', found '%s'", strings.Title(BeatName), o.Attributes.Title)
 			}
 		case "visualization":
 			if err := checkTitle(visualizationTitleRegexp, o.Attributes.Title, module); err != nil {
-				return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", BeatName, o.Attributes.Title)
+				return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", strings.Title(BeatName), o.Attributes.Title)
 			}
 		}
 	}
@@ -225,7 +225,7 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 
 	// Compare case insensitive, and consider spaces as underscores in module names in titles
 	expectedModule := strings.ToLower(module)
-	foundModule := strings.ToLower(match[2])
+	foundModule := strings.ReplaceAll(strings.ToLower(match[2]), " ", "_")
 	if expectedModule != foundModule {
 		return errors.Errorf("expected module name (%s), found '%s'", module, match[2])
 	}
