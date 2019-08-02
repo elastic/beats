@@ -187,7 +187,10 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	if err != nil {
 		return err
 	}
-	return d.setupAdvertisedHost(ctx, service)
+	if opts.SetupAdvertisedHostEnvFile {
+		return d.setupAdvertisedHost(ctx, service)
+	}
+	return nil
 }
 
 func writeToContainer(ctx context.Context, cli *client.Client, id, filename, content string) error {

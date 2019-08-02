@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 // HostInfo exposes information about started scenario
@@ -42,14 +43,7 @@ type HostInfo interface {
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 300 seconds
-func EnsureUp(t testing.TB, service string) HostInfo {
-	t.Helper()
-	return EnsureUpWithTimeout(t, 60, service)
-}
-
-// EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
-// Wait for `timeout` seconds for health
-func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
+func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	t.Helper()
 
 	if hostInfo := HostInfoFromEnv(t, service); hostInfo != nil {
@@ -68,14 +62,25 @@ func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
 		t.Fatal(err)
 	}
 
+	upOptions := UpOptions{
+		Timeout: 60 * time.Second,
+		Create: CreateOptions{
+			Build:         true,
+			ForceRecreate: true,
+		},
+	}
+	for _, option := range options {
+		option(&upOptions)
+	}
+
 	// Start container
-	err = compose.Start(service)
+	err = compose.Start(service, upOptions)
 	if err != nil {
 		t.Fatal("failed to start service", service, err)
 	}
 
 	// Wait for health
-	err = compose.Wait(timeout, service)
+	err = compose.Wait(upOptions.Timeout, service)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,6 +92,12 @@ func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
 	}
 
 	return host
+}
+
+// EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
+// Wait for `timeout` seconds for health
+func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
+	return EnsureUp(t, service, UpWithTimeout(time.Duration(timeout)*time.Second))
 }
 
 // HostInfoFromEnv gets the host information to use for the test from environment variables.

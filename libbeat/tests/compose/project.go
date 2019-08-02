@@ -35,7 +35,26 @@ type CreateOptions struct {
 
 // UpOptions are the options when containers are started
 type UpOptions struct {
-	Create CreateOptions
+	Timeout time.Duration
+	Create  CreateOptions
+
+	// Set to true if it should inform the container of the host it should
+	// use to advertise itself to clients
+	SetupAdvertisedHostEnvFile bool
+}
+
+// UpOption is a modifier for UpOptions
+type UpOption func(*UpOptions)
+
+// UpWithTimeout sets a timeout for waiting for a healthy service
+func UpWithTimeout(timeout time.Duration) UpOption {
+	return func(options *UpOptions) { options.Timeout = timeout }
+}
+
+// UpWithAdvertisedHostEnvFile adds the /run/compose_env file with the
+// host to use to advertise to client as the `SERVICE_HOST` variable
+func UpWithAdvertisedHostEnvFile(options *UpOptions) {
+	options.SetupAdvertisedHostEnvFile = true
 }
 
 // Filter options for services
@@ -97,7 +116,7 @@ func NewProject(name string, files []string) (*Project, error) {
 }
 
 // Start the container, unless it's running already
-func (c *Project) Start(service string) error {
+func (c *Project) Start(service string, options UpOptions) error {
 	servicesStatus, err := c.getServices(service)
 	if err != nil {
 		return err
@@ -113,20 +132,13 @@ func (c *Project) Start(service string) error {
 	c.Lock()
 	defer c.Unlock()
 
-	options := UpOptions{
-		Create: CreateOptions{
-			Build:         true,
-			ForceRecreate: true,
-		},
-	}
-
 	return c.Driver.Up(context.Background(), options, service)
 }
 
 // Wait ensures all wanted services are healthy. Wait loop (60s timeout)
-func (c *Project) Wait(seconds int, services ...string) error {
+func (c *Project) Wait(seconds time.Duration, services ...string) error {
 	healthy := false
-	timeout := time.Now().Add(time.Duration(seconds) * time.Second)
+	timeout := time.Now().Add(seconds)
 	for !healthy && time.Now().Before(timeout) {
 		healthy = true
 
