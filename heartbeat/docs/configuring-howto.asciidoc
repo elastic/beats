@@ -75,9 +75,7 @@ include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
 include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
 :standalone!:
 
-:autodiscoverAWSELB:
 include::{libbeat-dir}/docs/shared-autodiscover.asciidoc[]
-:autodiscoverAWSELB!:
 
 :standalone:
 include::{libbeat-dir}/docs/yaml.asciidoc[]

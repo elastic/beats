@@ -11,9 +11,6 @@ import (
 	// register central management
 	"github.com/elastic/beats/x-pack/libbeat/licenser"
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
-
-	// register autodiscover providers
-	_ "github.com/elastic/beats/x-pack/libbeat/autodiscover/providers/aws/elb"
 )
 
 const licenseDebugK = "license"
