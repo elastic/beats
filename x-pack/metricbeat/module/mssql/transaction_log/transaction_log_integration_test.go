@@ -19,9 +19,9 @@ import (
 
 func TestFetch(t *testing.T) {
 	logp.TestingSetup()
-	r := compose.EnsureUp(t, "mssql")
+	service := compose.EnsureUp(t, "mssql")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(r.Host(), "transaction_log"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(service.Host(), "transaction_log"))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

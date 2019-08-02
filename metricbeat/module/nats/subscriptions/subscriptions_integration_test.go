@@ -27,9 +27,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	err := mbtest.WriteEventsReporterV2Error(metricSet, t, "./test_data.json")
 	if err != nil {
 		t.Fatal("write", err)
@@ -37,11 +37,11 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats")
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])

@@ -29,9 +29,9 @@ import (
 )
 
 func TestFetchTCP(t *testing.T) {
-	r := compose.EnsureUp(t, "uwsgi_tcp")
+	service := compose.EnsureUp(t, "uwsgi_tcp")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("tcp", r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("tcp", service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -44,9 +44,9 @@ func TestFetchTCP(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "uwsgi_http")
+	service := compose.EnsureUp(t, "uwsgi_http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http", r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http", service.Host()))
 
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
@@ -54,9 +54,9 @@ func TestData(t *testing.T) {
 }
 
 func TestFetchHTTP(t *testing.T) {
-	r := compose.EnsureUp(t, "uwsgi_http")
+	service := compose.EnsureUp(t, "uwsgi_http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http", r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http", service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

@@ -40,15 +40,15 @@ const (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUpWithTimeout(t, 120, "kafka")
+	service := compose.EnsureUpWithTimeout(t, 120, "kafka")
 
-	c, err := startConsumer(t, r.Host(), "metricbeat-test")
+	c, err := startConsumer(t, service.Host(), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
 	defer c.Close()
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	for retries := 0; retries < 3; retries++ {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
@@ -60,15 +60,15 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka")
 
-	c, err := startConsumer(t, r.Host(), "metricbeat-test")
+	c, err := startConsumer(t, service.Host(), "metricbeat-test")
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
 	}
 	defer c.Close()
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	var data []mb.Event
 	var errors []error

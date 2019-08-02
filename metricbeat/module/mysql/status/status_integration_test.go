@@ -31,9 +31,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "mysql")
+	service := compose.EnsureUp(t, "mysql")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), false))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), false))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
@@ -56,9 +56,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchRaw(t *testing.T) {
-	r := compose.EnsureUp(t, "mysql")
+	service := compose.EnsureUp(t, "mysql")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), true))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), true))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
@@ -83,9 +83,9 @@ func TestFetchRaw(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "mysql")
+	service := compose.EnsureUp(t, "mysql")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), false))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), false))
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	if err != nil {

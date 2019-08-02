@@ -37,11 +37,11 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUpWithTimeout(t, 300, "logstash")
+	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
-			config := logstash.GetConfig(metricSet, r.Host())
+			config := logstash.GetConfig(metricSet, service.Host())
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
 			events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -57,11 +57,11 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "logstash")
+	service := compose.EnsureUp(t, "logstash")
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
-			config := logstash.GetConfig(metricSet, r.Host())
+			config := logstash.GetConfig(metricSet, service.Host())
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
 			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			if err != nil {

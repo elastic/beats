@@ -29,9 +29,9 @@ func init() {
 }
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "cockroachdb")
+	service := compose.EnsureUp(t, "cockroachdb")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

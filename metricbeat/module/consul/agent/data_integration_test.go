@@ -30,9 +30,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "consul")
+	service := compose.EnsureUp(t, "consul")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, consul.GetConfig([]string{"agent"}, r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, consul.GetConfig([]string{"agent"}, service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}

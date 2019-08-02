@@ -29,9 +29,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "golang")
+	service := compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
 	if !assert.NoError(t, err) {
@@ -40,9 +40,9 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "golang")
+	service := compose.EnsureUp(t, "golang")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {

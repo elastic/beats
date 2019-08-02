@@ -29,9 +29,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "munin")
+	service := compose.EnsureUp(t, "munin")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
@@ -44,9 +44,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "munin")
+	service := compose.EnsureUp(t, "munin")
 
-	config := getConfig(r.Host())
+	config := getConfig(service.Host())
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {

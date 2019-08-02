@@ -40,11 +40,11 @@ func makeBadRequest(host string) error {
 }
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "traefik")
+	service := compose.EnsureUp(t, "traefik")
 
-	makeBadRequest(r.Host())
+	makeBadRequest(service.Host())
 
-	config := mtest.GetConfig("health", r.Host())
+	config := mtest.GetConfig("health", service.Host())
 	ms := mbtest.NewReportingMetricSetV2Error(t, config)
 	reporter := &mbtest.CapturingReporterV2{}
 

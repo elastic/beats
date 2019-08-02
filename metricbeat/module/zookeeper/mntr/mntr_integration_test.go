@@ -30,9 +30,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "zookeeper")
+	service := compose.EnsureUp(t, "zookeeper")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
@@ -58,9 +58,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "zookeeper")
+	service := compose.EnsureUp(t, "zookeeper")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)

@@ -29,9 +29,9 @@ import (
 )
 
 func TestFetchObject(t *testing.T) {
-	r := compose.EnsureUp(t, "http")
+	service := compose.EnsureUp(t, "http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), "object"))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), "object"))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -42,9 +42,9 @@ func TestFetchObject(t *testing.T) {
 }
 
 func TestFetchArray(t *testing.T) {
-	r := compose.EnsureUp(t, "http")
+	service := compose.EnsureUp(t, "http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), "array"))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), "array"))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -54,9 +54,9 @@ func TestFetchArray(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "http")
+	service := compose.EnsureUp(t, "http")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host(), "object"))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), "object"))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}

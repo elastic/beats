@@ -29,9 +29,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "phpfpm")
+	service := compose.EnsureUp(t, "phpfpm")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)

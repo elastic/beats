@@ -16,9 +16,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "coredns")
+	service := compose.EnsureUp(t, "coredns")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

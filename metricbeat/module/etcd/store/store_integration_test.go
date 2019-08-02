@@ -31,9 +31,9 @@ import (
 
 func TestFetch(t *testing.T) {
 	logp.TestingSetup()
-	r := compose.EnsureUp(t, "etcd")
+	service := compose.EnsureUp(t, "etcd")
 
-	ms := mbtest.NewFetcher(t, getConfig(r.Host()))
+	ms := mbtest.NewFetcher(t, getConfig(service.Host()))
 	events, errs := ms.FetchEvents()
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -42,9 +42,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "etcd")
+	service := compose.EnsureUp(t, "etcd")
 
-	f := mbtest.NewFetcher(t, getConfig(r.Host()))
+	f := mbtest.NewFetcher(t, getConfig(service.Host()))
 	f.WriteEvents(t, "")
 }
 

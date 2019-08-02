@@ -27,9 +27,9 @@ import (
 )
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUpWithTimeout(t, 120, "ceph")
+	service := compose.EnsureUpWithTimeout(t, 120, "ceph")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)

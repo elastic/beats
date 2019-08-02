@@ -32,11 +32,11 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
 
-	addEntry(t, r.Host(), "foo", 1)
+	addEntry(t, service.Host(), "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig(r.Host()))
+	ms := mbtest.NewFetcher(t, getConfig(service.Host()))
 	events, err := ms.FetchEvents()
 	if err != nil {
 		t.Fatal("fetch", err)
@@ -47,16 +47,16 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
 
-	addEntry(t, r.Host(), "foo", 1)
+	addEntry(t, service.Host(), "foo", 1)
 
-	ms := mbtest.NewFetcher(t, getConfig(r.Host()))
+	ms := mbtest.NewFetcher(t, getConfig(service.Host()))
 	ms.WriteEvents(t, "")
 }
 
 func TestFetchMultipleKeyspaces(t *testing.T) {
-	r := compose.EnsureUp(t, "redis")
+	service := compose.EnsureUp(t, "redis")
 
 	expectedKeyspaces := map[string]uint{
 		"foo": 0,
@@ -66,10 +66,10 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 	expectedEvents := len(expectedKeyspaces)
 
 	for name, keyspace := range expectedKeyspaces {
-		addEntry(t, r.Host(), name, keyspace)
+		addEntry(t, service.Host(), name, keyspace)
 	}
 
-	config := getConfig(r.Host())
+	config := getConfig(service.Host())
 	config["key.patterns"] = []map[string]interface{}{
 		{
 			"pattern":  "foo",

@@ -29,9 +29,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "haproxy")
+	service := compose.EnsureUp(t, "haproxy")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.HostForPort(14567)))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(14567)))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	assert.Empty(t, errs)
@@ -45,9 +45,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "haproxy")
+	service := compose.EnsureUp(t, "haproxy")
 
-	config := getConfig(r.HostForPort(14567))
+	config := getConfig(service.HostForPort(14567))
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {

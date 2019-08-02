@@ -29,9 +29,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "jolokia")
+	service := compose.EnsureUp(t, "jolokia")
 
-	for _, config := range getConfigs(r.Host()) {
+	for _, config := range getConfigs(service.Host()) {
 		f := mbtest.NewReportingMetricSetV2Error(t, config)
 		events, errs := mbtest.ReportingFetchV2Error(f)
 		assert.Empty(t, errs)
@@ -41,9 +41,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "jolokia")
+	service := compose.EnsureUp(t, "jolokia")
 
-	for _, config := range getConfigs(r.Host()) {
+	for _, config := range getConfigs(service.Host()) {
 		f := mbtest.NewReportingMetricSetV2Error(t, config)
 		events, errs := mbtest.ReportingFetchV2Error(f)
 		assert.Empty(t, errs)
