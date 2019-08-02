@@ -300,9 +300,33 @@ func (r *Register) Modules() []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	modules := make([]string, 0, len(r.modules))
+	var dups = map[string]bool{}
+
+	// For the sake of compatibility, grab modules the old way as well, right from the modules map
 	for module := range r.modules {
-		modules = append(modules, module)
+		dups[module] = true
+	}
+
+	// List also modules from secondary sources
+	if source := r.secondarySource; source != nil {
+		sourceModules, err := source.Modules()
+		if err != nil {
+			logp.L().Errorf("failed to get modules from secondary source: %s", err)
+		} else {
+			for _, module := range sourceModules {
+				dups[module] = true
+			}
+		}
+	}
+
+	// Grab a more comprehensive list from the metricset keys, then reduce and merge
+	for mod := range r.metricSets {
+		dups[mod] = true
+	}
+
+	modules := make([]string, 0, len(dups))
+	for mod := range dups {
+		modules = append(modules, mod)
 	}
 
 	return modules

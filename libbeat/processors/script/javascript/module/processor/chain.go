@@ -98,9 +98,7 @@ func (b *chainBuilder) Build(call goja.FunctionCall) goja.Value {
 	}
 
 	p := &beatProcessor{b.runtime, &b.chain}
-	o := b.runtime.NewObject()
-	o.Set("Run", p.Run)
-	return o
+	return b.runtime.ToValue(p)
 }
 
 type gojaCall interface {
