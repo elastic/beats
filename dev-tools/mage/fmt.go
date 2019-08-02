@@ -140,7 +140,7 @@ func AddLicenseHeaders() error {
 func DashboardsFormat() error {
 	dashboardSubDir := "/_meta/kibana/"
 	dashboardFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
-		return strings.Contains(filepath.ToSlash(path), dashboardSubDir)
+		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to find dashboards")
@@ -159,10 +159,13 @@ func DashboardsFormat() error {
 		}
 
 		module := moduleNameFromDashboard(file)
-		err = dashboard.CheckFormat(module)
-		if err != nil {
+		errs := dashboard.CheckFormat(module)
+		if len(errs) > 0 {
 			hasErrors = true
-			fmt.Printf("%s: %v\n", file, err)
+			fmt.Printf(">> Dashboard format - %s:\n", file)
+			for _, err := range errs {
+				fmt.Println("  ", err)
+			}
 		}
 	}
 
@@ -179,14 +182,16 @@ func moduleNameFromDashboard(path string) string {
 
 // Dashboard is a dashboard
 type Dashboard struct {
-	Version string `json:"version"`
-	Objects []struct {
-		Type       string `json:"type"`
-		Attributes struct {
-			Description string `json:"description"`
-			Title       string `json:"title"`
-		} `json:"attributes"`
-	} `json:"objects"`
+	Version string            `json:"version"`
+	Objects []dashboardObject `json:"objects"`
+}
+
+type dashboardObject struct {
+	Type       string `json:"type"`
+	Attributes struct {
+		Description string `json:"description"`
+		Title       string `json:"title"`
+	} `json:"attributes"`
 }
 
 var (
@@ -195,8 +200,8 @@ var (
 )
 
 // CheckFormat checks the format of a dashboard
-func (d *Dashboard) CheckFormat(module string) error {
-	for _, o := range d.Objects {
+func (d *Dashboard) CheckFormat(module string) []error {
+	checkObject := func(o *dashboardObject) error {
 		switch o.Type {
 		case "dashboard":
 			if o.Attributes.Description == "" {
@@ -210,8 +215,15 @@ func (d *Dashboard) CheckFormat(module string) error {
 				return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", strings.Title(BeatName), o.Attributes.Title)
 			}
 		}
+		return nil
 	}
-	return nil
+	var errs []error
+	for _, o := range d.Objects {
+		if err := checkObject(&o); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs
 }
 
 func checkTitle(re *regexp.Regexp, title string, module string) error {
@@ -224,9 +236,10 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 		return errors.Errorf("expected: '%s', found: '%s'", beatTitle, match[1])
 	}
 
-	// Compare case insensitive, and consider spaces as underscores in module names in titles
-	expectedModule := strings.ToLower(module)
-	foundModule := strings.ReplaceAll(strings.ToLower(match[2]), " ", "_")
+	// Compare case insensitive, and ignore spaces and underscores in module names
+	replacer := strings.NewReplacer("_", "", " ", "")
+	expectedModule := replacer.Replace(strings.ToLower(module))
+	foundModule := replacer.Replace(strings.ToLower(match[2]))
 	if expectedModule != foundModule {
 		return errors.Errorf("expected module name (%s), found '%s'", module, match[2])
 	}
