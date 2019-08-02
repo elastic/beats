@@ -23,6 +23,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -105,6 +107,19 @@ type Register struct {
 	modules map[string]ModuleFactory
 	// A map of module name to nested map of MetricSet name to MetricSetRegistration.
 	metricSets map[string]map[string]MetricSetRegistration
+	// Additional source of non-registered modules
+	secondarySource ModulesSource
+}
+
+// ModulesSource contains a source of non-registered modules
+type ModulesSource interface {
+	Modules() ([]string, error)
+	HasModule(module string) bool
+	MetricSets(module string) ([]string, error)
+	DefaultMetricSets(module string) ([]string, error)
+	HasMetricSet(module, name string) bool
+	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
+	String() string
 }
 
 // NewRegister creates and returns a new Register.
@@ -222,16 +237,23 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 	name = strings.ToLower(name)
 
 	metricSets, exists := r.metricSets[module]
-	if !exists {
-		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' is not registered, module not found", module, name)
+	if exists {
+		registration, exists := metricSets[name]
+		if exists {
+			return registration, nil
+		}
 	}
 
-	registration, exists := metricSets[name]
-	if !exists {
-		return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' is not registered, metricset not found", module, name)
+	// Fallback to secondary source if module is not registered
+	if source := r.secondarySource; source != nil && source.HasMetricSet(module, name) {
+		registration, err := source.MetricSetRegistration(r, module, name)
+		if err != nil {
+			return MetricSetRegistration{}, errors.Wrapf(err, "failed to obtain registration for non-registered metricset '%s/%s'", module, name)
+		}
+		return registration, nil
 	}
 
-	return registration, nil
+	return MetricSetRegistration{}, fmt.Errorf("metricset '%s/%s' not found", module, name)
 }
 
 // DefaultMetricSets returns the names of the default MetricSets for a module.
@@ -243,18 +265,30 @@ func (r *Register) DefaultMetricSets(module string) ([]string, error) {
 
 	module = strings.ToLower(module)
 
-	metricSets, exists := r.metricSets[module]
-	if !exists {
-		return nil, fmt.Errorf("module '%s' not found", module)
-	}
-
 	var defaults []string
-	for _, reg := range metricSets {
-		if reg.IsDefault {
-			defaults = append(defaults, reg.Name)
+	metricSets, exists := r.metricSets[module]
+	if exists {
+		for _, reg := range metricSets {
+			if reg.IsDefault {
+				defaults = append(defaults, reg.Name)
+			}
 		}
 	}
 
+	// List also default metrics from secondary sources
+	if source := r.secondarySource; source != nil && source.HasModule(module) {
+		exists = true
+		sourceDefaults, err := source.DefaultMetricSets(module)
+		if err != nil {
+			logp.Error(errors.Wrapf(err, "failed to get default metric sets for module '%s' from secondary source", module))
+		} else if len(sourceDefaults) > 0 {
+			defaults = append(defaults, sourceDefaults...)
+		}
+	}
+
+	if !exists {
+		return nil, fmt.Errorf("module '%s' not found", module)
+	}
 	if len(defaults) == 0 {
 		return nil, fmt.Errorf("no default metricset exists for module '%s'", module)
 	}
@@ -266,9 +300,33 @@ func (r *Register) Modules() []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	modules := make([]string, 0, len(r.modules))
+	var dups = map[string]bool{}
+
+	// For the sake of compatibility, grab modules the old way as well, right from the modules map
 	for module := range r.modules {
-		modules = append(modules, module)
+		dups[module] = true
+	}
+
+	// List also modules from secondary sources
+	if source := r.secondarySource; source != nil {
+		sourceModules, err := source.Modules()
+		if err != nil {
+			logp.L().Errorf("failed to get modules from secondary source: %s", err)
+		} else {
+			for _, module := range sourceModules {
+				dups[module] = true
+			}
+		}
+	}
+
+	// Grab a more comprehensive list from the metricset keys, then reduce and merge
+	for mod := range r.metricSets {
+		dups[mod] = true
+	}
+
+	modules := make([]string, 0, len(dups))
+	for mod := range dups {
+		modules = append(modules, mod)
 	}
 
 	return modules
@@ -279,9 +337,10 @@ func (r *Register) MetricSets(module string) []string {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 
-	var metricsets []string
+	module = strings.ToLower(module)
 
-	sets, ok := r.metricSets[strings.ToLower(module)]
+	var metricsets []string
+	sets, ok := r.metricSets[module]
 	if ok {
 		metricsets = make([]string, 0, len(sets))
 		for name := range sets {
@@ -289,7 +348,24 @@ func (r *Register) MetricSets(module string) []string {
 		}
 	}
 
+	// List also metric sets from secondary sources
+	if source := r.secondarySource; source != nil && source.HasModule(module) {
+		sourceMetricSets, err := source.MetricSets(module)
+		if err != nil {
+			logp.Error(errors.Wrap(err, "failed to get metricsets from secondary source"))
+		}
+		metricsets = append(metricsets, sourceMetricSets...)
+	}
+
 	return metricsets
+}
+
+// SetSecondarySource sets an additional source of modules
+func (r *Register) SetSecondarySource(source ModulesSource) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+
+	r.secondarySource = source
 }
 
 // String return a string representation of the registered ModuleFactory's and
@@ -302,7 +378,6 @@ func (r *Register) String() string {
 	for module := range r.modules {
 		modules = append(modules, module)
 	}
-	sort.Strings(modules)
 
 	var metricSets []string
 	for module, m := range r.metricSets {
@@ -310,8 +385,14 @@ func (r *Register) String() string {
 			metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
 		}
 	}
-	sort.Strings(metricSets)
 
-	return fmt.Sprintf("Register [ModuleFactory:[%s], MetricSetFactory:[%s]]",
-		strings.Join(modules, ", "), strings.Join(metricSets, ", "))
+	var secondarySource string
+	if source := r.secondarySource; source != nil {
+		secondarySource = ", " + source.String()
+	}
+
+	sort.Strings(modules)
+	sort.Strings(metricSets)
+	return fmt.Sprintf("Register [ModuleFactory:[%s], MetricSetFactory:[%s]%s]",
+		strings.Join(modules, ", "), strings.Join(metricSets, ", "), secondarySource)
 }

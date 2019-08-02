@@ -35,7 +35,7 @@ func TestDockerJSON(t *testing.T) {
 		partial         bool
 		format          string
 		criflags        bool
-		expectedError   bool
+		expectedError   error
 		expectedMessage reader.Message
 	}{
 		{
@@ -53,16 +53,27 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong JSON",
 			input:         [][]byte{[]byte(`this is not JSON`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 16,
+			},
+		},
+		{
+			name:   "0 length message",
+			input:  [][]byte{[]byte(`{"log":"","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`)},
+			stream: "all",
+			expectedMessage: reader.Message{
+				Content: []byte(""),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   68,
 			},
 		},
 		{
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 37,
 			},
@@ -71,7 +82,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`{this is not JSON nor CRI`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 25,
 			},
@@ -80,7 +91,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Missing time",
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 82,
 			},
@@ -207,7 +218,7 @@ func TestDockerJSON(t *testing.T) {
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
 			format:        "cri",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 82,
 			},
@@ -217,7 +228,7 @@ func TestDockerJSON(t *testing.T) {
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
 			stream:        "all",
 			format:        "docker",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 115,
 			},
@@ -289,11 +300,34 @@ func TestDockerJSON(t *testing.T) {
 				[]byte(`{"log":"shutdown...\n","stream`),
 			},
 			stream:        "stdout",
-			expectedError: true,
+			expectedError: reader.ErrLineUnparsable,
 			expectedMessage: reader.Message{
 				Bytes: 139,
 			},
 			partial: true,
+		},
+		{
+			name: "Docker AttributesSplit lines",
+			input: [][]byte{
+				[]byte(`{"log":"hello\n","stream":"stdout","attrs":{"KEY1":"value1","KEY2":"value2"},"time":"2017-11-09T13:27:36.277747246Z"}`),
+			},
+			stream:  "stdout",
+			partial: true,
+			expectedMessage: reader.Message{
+				Content: []byte("hello\n"),
+				Fields:  common.MapStr{"docker": common.MapStr{"attrs": map[string]string{"KEY1": "value1", "KEY2": "value2"}}, "stream": "stdout"},
+				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   117,
+			},
+		},
+		{
+			name:          "Corrupted log message line",
+			input:         [][]byte{[]byte(`36.276 # User requested shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`)},
+			stream:        "all",
+			expectedError: reader.ErrLineUnparsable,
+			expectedMessage: reader.Message{
+				Bytes: 97,
+			},
 		},
 	}
 
@@ -303,8 +337,9 @@ func TestDockerJSON(t *testing.T) {
 			json := New(r, test.stream, test.partial, test.format, test.criflags)
 			message, err := json.Next()
 
-			if test.expectedError {
+			if test.expectedError != nil {
 				assert.Error(t, err)
+				assert.Equal(t, test.expectedError, err)
 			} else {
 				assert.NoError(t, err)
 			}

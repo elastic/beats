@@ -3,6 +3,87 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.1.1]]
+=== Beats version 7.1.1
+https://github.com/elastic/beats/compare/v7.1.0...v7.1.1[View commits]
+
+No changes in this release.
+
+[[release-notes-7.1.0]]
+=== Beats version 7.1.0
+https://github.com/elastic/beats/compare/v7.0.0...v7.1.0[View commits]
+
+* Updates to support changes to licensing of security features.
++
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and
+role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
+
+[[release-notes-7.0.1]]
+=== Beats version 7.0.1
+https://github.com/elastic/beats/compare/v7.0.0...v7.0.1[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Change cloud.provider from ec2 to aws and from gce to gcp in add_cloud_metadata to align with ECS. {issue}10775[10775] {pull}11687[11687]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix formatting for `event.duration`, "human readable" was not working well for this. {pull}11675[11675]
+- Fix initialization of the TCP input logger. {pull}11605[11605]
+
+*Auditbeat*
+
+- Package dataset: Log error when Homebrew is not installed. {pull}11667[11667]
+
+*Heartbeat*
+
+- Fix NPE on some monitor configuration errors. {pull}11910[11910]
+
+*Metricbeat*
+
+- Change `add_cloud_metadata` processor to not overwrite `cloud` field when it already exist in the event. {pull}11612[11612] {issue}11305[11305]
+
+==== Added
+
+*Auditbeat*
+
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
+
+==== Deprecated
+
+*Metricbeat*
+
+- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
+
+include::libbeat/docs/release-notes/7.0.0.asciidoc[]
+
+[[release-notes-7.0.0-ga]]
+=== Beats version 7.0.0-GA
+https://github.com/elastic/beats/compare/v7.0.0-rc2...v7.0.0[View commits]
+
+The list below covers the changes between 7.0.0-rc2 and 7.0.0 GA only.
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Fix ILM policy always being overwritten. {pull}11671[11671]
+- Fix template always being overwritten. {pull}11671[11671]
+
+*Auditbeat*
+
+- Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+
+*Filebeat*
+
+- Fix `add_docker_metadata` source matching, using `log.file.path` field now. {pull}11577[11577]
+
 [[release-notes-7.0.0-rc2]]
 === Beats version 7.0.0-rc2
 https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD diff]
@@ -23,11 +104,21 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD 
 *Affecting all Beats*
 
 - Fixed OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
+- Allow 'ilm.rollover_alias' to expand global fields like `agent.version`. {issue}12233[12233]
+
+*Auditbeat*
+
+- Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
 
 *Filebeat*
 
 - Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 - Fix panic in add_kubernetes_metadata processor when key `log` does not exist. {issue}11543[11543] {pull}11549[11549]
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
+
+*Metricbeat*
+
+- Add _bucket to histogram metrics in Prometheus Collector {pull}11578[11578]
 
 ==== Added
 
@@ -486,7 +577,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the 
 
 - Mark Functionbeat  as GA. {pull}10564[10564]
 
-
 [[release-notes-7.0.0-alpha2]]
 === Beats version 7.0.0-alpha2
 https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the HEAD diff]
@@ -723,6 +813,49 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Add support to decode HTTP bodies compressed with `gzip` and `deflate`. {pull}7915[7915]
 - Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 - Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
+
+[[release-notes-6.8.0]]
+=== Beats version 6.8.0
+
+* Updates to support changes to licensing of security features.
++
+Some Elastic Stack security features, such as encrypted communications, file and native authentication, and 
+role-based access control, are now available in more subscription levels. For details, see https://www.elastic.co/subscriptions.
+
+[[release-notes-6.7.2]]
+=== Beats version 6.7.2
+https://github.com/elastic/beats/compare/v6.7.1...v6.7.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Relax validation of the X-Pack license UID value. {issue}11640[11640]
+- Fix a parsing error with the X-Pack license check on 32-bit system. {issue}11650[11650]
+- Fix OS family classification in `add_host_metadata` for Amazon Linux, Raspbian, and RedHat Linux. {issue}9134[9134] {pull}11494[11494]
+- Fix false positives reported in the `host.containerized` field added by `add_host_metadata`. {pull}11494[11494]
+- Fix the add_host_metadata's `host.id` field on older Linux versions. {pull}11494[11494]
+
+*Auditbeat*
+
+- Package dataset: dlopen versioned librpm shared objects. {pull}11565[11565]
+- Package dataset: Nullify Librpm's rpmsqEnable. {pull}11628[11628]
+
+*Filebeat*
+
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
+- Fix initialization of the TCP input logger. {pull}11605[11605]
+
+*Metricbeat*
+
+- Prevent the docker/memory metricset from processing invalid events before container start {pull}11676[11676]
+
+==== Added
+
+*Auditbeat*
+
+- Add support to the system package dataset for the SUSE OS family. {pull}11634[11634]
 
 [[release-notes-6.7.1]]
 === Beats version 6.7.1

@@ -25,12 +25,63 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 )
+
+func init() {
+	// Register the ModuleFactory function for this module.
+	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
+		panic(err)
+	}
+}
+
+// NewModule creates a new module after performing validation.
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	if err := validateXPackMetricsets(base); err != nil {
+		return nil, err
+	}
+
+	return &base, nil
+}
+
+// Validate that correct metricsets have been specified if xpack.enabled = true.
+func validateXPackMetricsets(base mb.BaseModule) error {
+	config := struct {
+		Metricsets   []string `config:"metricsets"`
+		XPackEnabled bool     `config:"xpack.enabled"`
+	}{}
+	if err := base.UnpackConfig(&config); err != nil {
+		return err
+	}
+
+	// Nothing to validate if xpack.enabled != true
+	if !config.XPackEnabled {
+		return nil
+	}
+
+	expectedXPackMetricsets := []string{
+		"ccr",
+		"cluster_stats",
+		"index",
+		"index_recovery",
+		"index_summary",
+		"ml_job",
+		"node_stats",
+		"shard",
+	}
+
+	if !common.MakeStringSet(config.Metricsets...).Equals(common.MakeStringSet(expectedXPackMetricsets...)) {
+		return errors.Errorf("The %v module with xpack.enabled: true must have metricsets: %v", ModuleName, expectedXPackMetricsets)
+	}
+
+	return nil
+}
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
 var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
@@ -213,6 +264,12 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 	// First, check the cache
 	license := licenseCache.get()
 
+	// License found in cache, return it
+	if license != nil {
+		return license, nil
+	}
+
+	// License not found in cache, fetch it from Elasticsearch
 	info, err := GetInfo(http, resetURI)
 	if err != nil {
 		return nil, err
@@ -224,24 +281,22 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 		licensePath = "_license"
 	}
 
-	// Not cached, fetch license from Elasticsearch
-	if license == nil {
-		content, err := fetchPath(http, resetURI, licensePath, "")
-		if err != nil {
-			return nil, err
-		}
-
-		var data licenseWrapper
-		err = json.Unmarshal(content, &data)
-		if err != nil {
-			return nil, err
-		}
-
-		// Cache license for a minute
-		licenseCache.set(&data.License, time.Minute)
+	content, err := fetchPath(http, resetURI, licensePath, "")
+	if err != nil {
+		return nil, err
 	}
 
-	return licenseCache.get(), nil
+	var data licenseWrapper
+	err = json.Unmarshal(content, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	// Cache license for a minute
+	license = &data.License
+	licenseCache.set(license, time.Minute)
+
+	return license, nil
 }
 
 // GetClusterState returns cluster state information.
@@ -301,6 +356,27 @@ func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
 	var stackUsage map[string]interface{}
 	err = json.Unmarshal(content, &stackUsage)
 	return stackUsage, err
+}
+
+// IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
+func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
+	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
+	if err != nil {
+		return false, err
+	}
+
+	var response map[string]map[string]map[string]map[string]bool
+	err = json.Unmarshal(content, &response)
+	if err != nil {
+		return false, err
+	}
+
+	for _, nodeInfo := range response["nodes"] {
+		mlockall := nodeInfo["process"]["mlockall"]
+		return mlockall, nil
+	}
+
+	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
 }
 
 // PassThruField copies the field at the given path from the given source data object into

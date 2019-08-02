@@ -1,8 +1,29 @@
 ################### Beat Configuration #########################
+{% if local %}
 functionbeat.provider.local:
     functions:
       - type: stdin
         enabled: true
+{% endif %}
+
+{% if cloudwatch %}
+functionbeat.provider.aws.endpoint: {{ cloudwatch.endpoint | default("s3.amazonaws.com") }}
+functionbeat.provider.aws.deploy_bucket: {{ cloudwatch.bucket | default("functionbeat-deploy") }}
+functionbeat.provider.aws.functions:
+  - name: {{ cloudwatch.name }}
+    enabled: true
+    type: cloudwatch_logs
+    description: "lambda function for cloudwatch logs"
+    {% if cloudwatch.role %}role: {{ cloudwatch.role }}{% endif %}
+    {% if cloudwatch.virtual_private_cloud %}
+    virtual_private_cloud:
+      security_group_ids: {{ cloudwatch.virtual_private_cloud.security_group_ids }}
+      subnet_ids: {{ cloudwatch.virtual_private_cloud.subnet_ids }}
+    {% endif %}
+
+    triggers:
+      - log_group_name: {{ cloudwatch.log_group | default("/aws/lambda/functionbeat-cloudwatch") }}
+{% endif %}
 
 ############################# Output ##########################################
 

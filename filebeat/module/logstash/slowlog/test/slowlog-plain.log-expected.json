@@ -1,10 +1,10 @@
 [
     {
         "@timestamp": "2017-10-30T09:57:58.243Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "logstash.slowlog",
         "event.duration": 3027675106,
         "event.module": "logstash",
+        "event.timezone": "+00:00",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",

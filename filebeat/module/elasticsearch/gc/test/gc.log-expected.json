@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-06-13T07:44:22.647Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -16,7 +15,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:22.647Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "heap",
@@ -33,7 +31,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:22.725Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -48,7 +45,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:22.725Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -63,7 +59,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:22.813Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -78,7 +73,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:22.813Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -93,7 +87,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:22.836Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -108,7 +101,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:22.836Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -123,7 +115,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.016Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -138,7 +129,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.017Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -153,7 +143,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.059Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -168,7 +157,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.060Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -183,7 +171,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.072Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -198,7 +185,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.072Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -213,7 +199,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.105Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -228,7 +213,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.105Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -243,7 +227,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.245Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -258,7 +241,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.245Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -273,7 +255,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.526Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -288,7 +269,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.526Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -303,7 +283,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.550Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -318,7 +297,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.551Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -333,7 +311,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.768Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -348,7 +325,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.768Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -363,7 +339,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.804Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -378,7 +353,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.804Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -393,7 +367,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.820Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -408,7 +381,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.820Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -423,7 +395,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.838Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -438,7 +409,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.838Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -453,7 +423,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.868Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -468,7 +437,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:23.868Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -483,7 +451,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.091Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -498,7 +465,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.092Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -513,7 +479,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.112Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -528,7 +493,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.112Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -543,7 +507,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.126Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -558,7 +521,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.126Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -573,7 +535,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.210Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -588,7 +549,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.210Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -603,7 +563,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.330Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -618,7 +577,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.330Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "start"
@@ -634,7 +592,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.330Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "task"
@@ -650,7 +607,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "age"
@@ -666,7 +622,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "age"
@@ -682,7 +637,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "age"
@@ -698,7 +652,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "heap"
@@ -716,7 +669,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "heap"
@@ -732,7 +684,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "metaspace"
@@ -748,7 +699,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -763,7 +713,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -779,7 +728,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.343Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -794,7 +742,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.344Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -809,7 +756,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.344Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "start"
@@ -825,7 +771,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.346Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -840,7 +785,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.347Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -856,7 +800,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.347Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -871,7 +814,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.347Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -886,7 +828,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.347Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "task"
@@ -902,7 +843,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.348Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -917,7 +857,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.348Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -933,7 +872,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.348Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -948,7 +886,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.350Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -963,7 +900,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.350Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -979,7 +915,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.350Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -994,7 +929,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.595Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1009,7 +943,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.595Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1024,7 +957,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.595Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -1039,7 +971,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.595Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -1055,7 +986,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.595Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1070,7 +1000,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.595Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "start"
@@ -1086,7 +1015,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -1101,7 +1029,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -1117,7 +1044,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1132,7 +1058,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -1147,7 +1072,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -1162,7 +1086,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -1178,7 +1101,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.618Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -1193,7 +1115,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.619Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc"
         ],
@@ -1208,7 +1129,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.619Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "cpu"
@@ -1224,7 +1144,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.619Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.old_gen.size_kb": "699072",
         "elasticsearch.gc.old_gen.used_kb": "0",
         "elasticsearch.gc.tags": [
@@ -1242,7 +1161,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.763Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1257,7 +1175,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.763Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1272,7 +1189,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.777Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1287,7 +1203,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.777Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1302,7 +1217,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.784Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1317,7 +1231,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.784Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1332,7 +1245,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.808Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1347,7 +1259,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:24.808Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1362,7 +1273,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.072Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1377,7 +1287,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.074Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1392,7 +1301,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.139Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "safepoint"
         ],
@@ -1407,7 +1315,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.139Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "start"
@@ -1423,7 +1330,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.139Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "task"
@@ -1439,7 +1345,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "age"
@@ -1455,7 +1360,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "age"
@@ -1471,7 +1375,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "age"
@@ -1487,7 +1390,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "age"
@@ -1503,7 +1405,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "heap"
@@ -1521,7 +1422,6 @@
     },
     {
         "@timestamp": "2018-06-13T07:44:25.167Z",
-        "ecs.version": "1.0.0",
         "elasticsearch.gc.tags": [
             "gc",
             "heap"

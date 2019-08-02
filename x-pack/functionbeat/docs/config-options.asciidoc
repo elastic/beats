@@ -22,6 +22,7 @@ the events to {es}.
 
 ["source","sh",subs="attributes"]
 ----
+{beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 {beatname_lc}.provider.aws.functions:
   - name: cloudwatch
@@ -55,6 +56,12 @@ to deploy.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
+
+[float]
+[id="{beatname_lc}-endpoint"]
+==== `provider.aws.endpoint`
+
+AWS endpoint to use in the URL template to load functions.
 
 [float]
 [id="{beatname_lc}-deploy-bucket"]

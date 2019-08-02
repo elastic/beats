@@ -4,6 +4,7 @@
     Fields from the PostgreSQL log files.
   fields:
     - name: timestamp
+      deprecated: 7.3.0
       description: >
         The timestamp from the log line.
     - name: core_id

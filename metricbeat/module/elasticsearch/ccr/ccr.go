@@ -18,7 +18,6 @@
 package ccr
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -83,7 +82,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if ccrUnavailableMessage != "" {
 		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
 			m.lastCCRLicenseMessageTimestamp = time.Now()
-			return fmt.Errorf(ccrUnavailableMessage)
+			m.Logger().Warn(ccrUnavailableMessage)
 		}
 		return nil
 	}

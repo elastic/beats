@@ -1,14 +1,11 @@
 # Module: rabbitmq
 # Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-rabbitmq.html
 
-#- module: rabbitmq
+- module: rabbitmq
   # All logs
-  #log:
-    #enabled: true
+  log:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths: ["/var/log/rabbitmq/rabbit@localhost.log*"]
-
-    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
-    #var.convert_timezone: false

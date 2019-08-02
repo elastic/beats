@@ -22,7 +22,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 	"github.com/elastic/beats/dev-tools/mage/target/test"
 )
 
@@ -53,8 +53,8 @@ func WhitelistEnvVar(key ...string) {
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
-	mage.AddIntegTestUsage()
-	defer mage.StopIntegTestEnv()
+	devtools.AddIntegTestUsage()
+	defer devtools.StopIntegTestEnv()
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
@@ -62,21 +62,21 @@ func IntegTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	if !mage.IsInIntegTestEnv() {
+	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(goTestDeps...)
 	}
-	return mage.RunIntegTest("goIntegTest", func() error {
-		return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	return devtools.RunIntegTest("goIntegTest", func() error {
+		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
 	}, whitelistedEnvVars...)
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
-	if !mage.IsInIntegTestEnv() {
+	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(pythonTestDeps...)
 	}
-	return mage.RunIntegTest("pythonIntegTest", func() error {
-		mg.Deps(mage.BuildSystemTestBinary)
-		return mage.PythonNoseTest(mage.DefaultPythonTestIntegrationArgs())
+	return devtools.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(devtools.BuildSystemTestBinary)
+		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	}, whitelistedEnvVars...)
 }

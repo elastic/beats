@@ -2,14 +2,16 @@
 hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.logs`. As soon as
 the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
 it. Hints tell {beatname_uc} how to get logs for the given container. By default logs will be retrieved
-from the container using the `docker` input. You can use hints to modify this behavior. This is the full
+from the container using the `container` input. You can use hints to modify this behavior. This is the full
 list of supported hints:
 
 [float]
-===== `co.elastic.logs/disable`
+===== `co.elastic.logs/enabled`
 
-Filebeat gets logs from all containers by default, you can set this hint to `true` to ignore
-the output of the container. Filebeat won't read or send logs from it.
+Filebeat gets logs from all containers by default, you can set this hint to `false` to ignore
+the output of the container. Filebeat won't read or send logs from it. If default config is
+disabled, you can use this annotation to enable log retrieval only for containers with this
+set to `true`.
 
 [float]
 ===== `co.elastic.logs/multiline.*`
@@ -94,7 +96,7 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-Autodiscover provides a way to control whether log harvesting is by default disabled for the pods/containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
+You can configure the default config that will be launched when a new container is seen, like this:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -102,15 +104,22 @@ filebeat.autodiscover:
   providers:
     - type: kubernetes
       hints.enabled: true
-      default.disable: true
+      hints.default_config:
+        type: container
+        paths:
+          - /var/log/container/*-${container.id}.log  # CRI path
 -------------------------------------------------------------------------------------
 
-Then, for the pods/containers that log harvesting should be enabled, you can annotate with hint:
+You can also disable default settings entirely, so only Pods annotated like `co.elastic.logs/enabled: true`
+will be retrieved:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-annotations:
-  co.elastic.logs/disable: false
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      hints.default_config.enabled: false
 -------------------------------------------------------------------------------------
 
 You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} inputs or modules:
@@ -156,8 +165,7 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-Autodiscover provides a way to control whether log harvesting is by default disabled for the 
-containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
+You can configure the default config that will be launched when a new container is seen, like this:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -165,15 +173,22 @@ filebeat.autodiscover:
   providers:
     - type: docker
       hints.enabled: true
-      default.disable: true
+      hints.default_config:
+        type: container
+        paths:
+          - /var/log/container/*-${container.id}.log  # CRI path
 -------------------------------------------------------------------------------------
 
-Then, for the containers that log harvesting should be enabled, you can label Docker containers with:
+You can also disable default settings entirely, so only containers labeled with `co.elastic.logs/enabled: true`
+will be retrieved:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-annotations:
-  co.elastic.logs/disable: false
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      hints.default_config.enabled: false
 -------------------------------------------------------------------------------------
 
 You can label Docker containers with useful info to spin up {beatname_uc} inputs, for example:

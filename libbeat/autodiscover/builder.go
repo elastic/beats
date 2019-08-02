@@ -99,21 +99,18 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	return configs
 }
 
-// NewBuilders instances the given list of builders. If hintsEnabled is true it will
-// just enable the hints builder
-func NewBuilders(bConfigs []*common.Config, hintsEnabled bool) (Builders, error) {
+// NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
+// for simplified mode (single 'hints' builder)
+func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, error) {
 	var builders Builders
-	if hintsEnabled {
+	if hintsCfg.Enabled() {
 		if len(bConfigs) > 0 {
 			return nil, errors.New("hints.enabled is incompatible with manually defining builders")
 		}
 
-		hints, err := common.NewConfigFrom(map[string]string{"type": "hints"})
-		if err != nil {
-			return nil, err
-		}
-
-		bConfigs = append(bConfigs, hints)
+		// pass rest of hints settings to the builder
+		hintsCfg.SetString("type", -1, "hints")
+		bConfigs = append(bConfigs, hintsCfg)
 	}
 
 	for _, bcfg := range bConfigs {

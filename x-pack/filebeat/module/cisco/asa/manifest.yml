@@ -12,8 +12,6 @@ var:
     default: 9001
   - name: input
     default: syslog
-  - name: convert_timezone
-    default: false
   - name: log_level
     default: 7
     # if ES < 6.1.0, this flag switches to false automatically when evaluating the

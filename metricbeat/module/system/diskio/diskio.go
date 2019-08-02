@@ -58,11 +58,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches disk IO metrics from the OS.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := IOCounters(m.includeDevices...)
 	if err != nil {
-		r.Error(errors.Wrap(err, "disk io counters"))
-		return
+		return errors.Wrap(err, "disk io counters")
 	}
 
 	// Sample the current cpu counter
@@ -128,8 +127,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			event["serial_number"] = counters.SerialNumber
 		}
 
-		r.Event(mb.Event{
+		isOpen := r.Event(mb.Event{
 			MetricSetFields: event,
 		})
+		if !isOpen {
+			return nil
+		}
 	}
+
+	return nil
 }

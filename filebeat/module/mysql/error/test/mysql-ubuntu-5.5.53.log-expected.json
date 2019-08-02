@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -13,7 +12,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -25,7 +23,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -36,7 +33,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -47,7 +43,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -58,7 +53,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -69,7 +63,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -79,7 +72,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -89,7 +81,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -100,7 +91,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -110,7 +100,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -121,7 +110,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -131,7 +119,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -141,7 +128,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -152,7 +138,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -162,7 +147,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -172,7 +156,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -182,7 +165,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -192,7 +174,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -202,7 +183,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -212,7 +192,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -222,7 +201,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -233,7 +211,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:50.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -244,7 +221,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:51.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -255,7 +231,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:51.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -266,7 +241,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -277,7 +251,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -289,7 +262,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -301,7 +273,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -312,7 +283,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -323,7 +293,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -334,7 +303,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -345,7 +313,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -356,7 +323,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -367,7 +333,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:52.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -378,7 +343,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -388,7 +352,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -399,7 +362,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -411,7 +373,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -422,7 +383,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -433,7 +393,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -445,7 +404,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -457,7 +415,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -469,7 +426,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -480,7 +436,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -491,7 +446,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -502,7 +456,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -513,7 +466,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -524,7 +476,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -535,7 +486,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:53.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -546,7 +496,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:54.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -557,7 +506,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:54.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -568,7 +516,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -580,7 +527,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -591,7 +537,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -602,7 +547,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -614,7 +558,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -626,7 +569,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -638,7 +580,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -649,7 +590,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -660,7 +600,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -671,7 +610,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -682,7 +620,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:56.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -693,7 +630,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -704,7 +640,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -715,7 +650,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -726,7 +660,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -738,7 +671,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -750,7 +682,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -762,7 +693,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -774,7 +704,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:18:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -785,7 +714,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -796,7 +724,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -808,7 +735,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -820,7 +746,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -831,7 +756,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -842,7 +766,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -854,7 +777,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -866,7 +788,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -878,7 +799,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -889,7 +809,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -900,7 +819,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -911,7 +829,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -922,7 +839,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -933,7 +849,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -944,7 +859,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:57.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -955,7 +869,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -966,7 +879,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -978,7 +890,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -990,7 +901,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1002,7 +912,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1014,7 +923,6 @@
     },
     {
         "@timestamp": "2016-12-09T14:37:58.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1025,7 +933,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1035,7 +942,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1045,7 +951,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1055,7 +960,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1065,7 +969,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1075,7 +978,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1085,7 +987,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
@@ -1095,7 +996,6 @@
         "service.type": "mysql"
     },
     {
-        "ecs.version": "1.0.0",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",

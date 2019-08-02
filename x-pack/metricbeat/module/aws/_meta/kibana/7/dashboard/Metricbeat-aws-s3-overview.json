@@ -111,7 +111,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat AWS] S3 Overview ECS",
+        "title": "[Metricbeat AWS] S3 Overview",
         "version": 1
       },
       "id": "a096b830-4762-11e9-8062-c98a86cb6f94",

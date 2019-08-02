@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -19,7 +20,7 @@ const notFound = "NotFound"
 
 type opEnsureBucket struct {
 	log        *logp.Logger
-	svc        *s3.S3
+	svc        *s3.Client
 	bucketName string
 }
 
@@ -32,7 +33,7 @@ func (o *opEnsureBucket) Execute(_ executionContext) error {
 
 	check := &s3.HeadBucketInput{Bucket: aws.String(o.bucketName)}
 	reqCheck := o.svc.HeadBucketRequest(check)
-	_, err := reqCheck.Send()
+	_, err := reqCheck.Send(context.TODO())
 	if err == nil {
 		// The bucket exists and we have permission to access it.
 		return nil
@@ -43,7 +44,7 @@ func (o *opEnsureBucket) Execute(_ executionContext) error {
 			// bucket do not exist let's create it.
 			input := &s3.CreateBucketInput{Bucket: aws.String(o.bucketName)}
 			req := o.svc.CreateBucketRequest(input)
-			resp, err := req.Send()
+			resp, err := req.Send(context.TODO())
 			if err != nil {
 				o.log.Debugf("Could not create bucket, resp: %v", resp)
 				return err

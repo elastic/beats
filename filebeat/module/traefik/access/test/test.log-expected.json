@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2017-10-02T20:22:07.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 2000000,
         "event.module": "traefik",
@@ -30,7 +29,6 @@
     },
     {
         "@timestamp": "2017-10-02T20:22:08.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 3000000,
         "event.module": "traefik",
@@ -44,6 +42,8 @@
         "log.offset": 280,
         "service.type": "traefik",
         "source.address": "85.181.35.98",
+        "source.as.number": 6805,
+        "source.as.organization.name": "Telefonica Germany",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
@@ -66,7 +66,6 @@
     },
     {
         "@timestamp": "2018-02-28T17:30:33.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 247000000,
         "event.module": "traefik",
@@ -79,6 +78,8 @@
         "log.offset": 553,
         "service.type": "traefik",
         "source.address": "70.29.80.15",
+        "source.as.number": 577,
+        "source.as.organization.name": "Bell Canada",
         "source.geo.city_name": "Ottawa",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "CA",
@@ -103,7 +104,6 @@
     },
     {
         "@timestamp": "2018-11-29T15:03:51.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 0,
         "event.module": "traefik",
@@ -131,7 +131,6 @@
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 13000000,
         "event.module": "traefik",
@@ -144,6 +143,8 @@
         "log.offset": 931,
         "service.type": "traefik",
         "source.address": "94.254.131.115",
+        "source.as.number": 39603,
+        "source.as.organization.name": "Play",
         "source.geo.city_name": "Warsaw",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PL",
@@ -165,7 +166,6 @@
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.duration": 8000000,
         "event.module": "traefik",
@@ -178,6 +178,8 @@
         "log.offset": 1267,
         "service.type": "traefik",
         "source.address": "89.64.35.193",
+        "source.as.number": 6830,
+        "source.as.organization.name": "Liberty Global Operations B.V.",
         "source.geo.city_name": "Katowice",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PL",
@@ -199,7 +201,6 @@
     },
     {
         "@timestamp": "2000-10-10T20:55:36.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "traefik.access",
         "event.module": "traefik",
         "fileset.name": "access",

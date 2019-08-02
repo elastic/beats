@@ -1,5 +1,0 @@
-dashboards:
-  - id: 772964e0-7591-11e9-aacf-79a3704914a0
-    file: Filebeat-palo-alto-threat-overview.json
-  - id: e40ba240-7572-11e9-976e-65a8f47cc4c1
-    file: Filebeat-palo-alto-network-overview.json

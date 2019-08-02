@@ -63,11 +63,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches CPU metrics from the OS.
-func (m *MetricSet) Fetch(r mb.ReporterV2) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	sample, err := m.cpu.Sample()
 	if err != nil {
-		r.Error(errors.Wrap(err, "failed to fetch CPU times"))
-		return
+		return errors.Wrap(err, "failed to fetch CPU times")
 	}
 
 	event := common.MapStr{"cores": cpu.NumCores}
@@ -112,4 +111,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	r.Event(mb.Event{
 		MetricSetFields: event,
 	})
+
+	return nil
 }

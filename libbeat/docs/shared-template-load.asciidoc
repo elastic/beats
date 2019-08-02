@@ -64,13 +64,19 @@ If you disable automatic template loading, you need to
 <<load-template-manually,load the template manually>>.
 
 * **Change the index name**
+ifndef::no_ilm[]
 +
-By default, {beatname_uc} writes events to indices named
+TIP: If you're sending events to a cluster that supports index lifecycle
+management, see <<ilm>> to learn how to change the index name.
+endif::no_ilm[]
++
+{beatname_uc} uses time series indices, by default, when index lifecycle
+management is disabled or unsupported. The indices are named
 +{beatname_lc}-{version}-yyyy.MM.dd+, where `yyyy.MM.dd` is the date when the
 events were indexed. To use a different name, you set the
-<<index-option-es,`index`>> option in the Elasticsearch output. The value
-that you specify should include the root name of the index plus version and
-date information. You also need to configure the `setup.template.name` and
+<<index-option-es,`index`>> option in the Elasticsearch output. The value that
+you specify should include the root name of the index plus version and date
+information. You also need to configure the `setup.template.name` and
 `setup.template.pattern` options to match the new name. For example:
 +
 ["source","sh",subs="attributes,callouts"]
@@ -131,17 +137,15 @@ ifdef::only-elasticsearch[]
 :disable_logstash:
 endif::only-elasticsearch[]
 
-ifeval::["{requires-sudo}"=="yes"]
-
+ifdef::requires-sudo[]
 include::./shared-note-sudo.asciidoc[]
-
-endif::[]
+endif::requires-sudo[]
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*
 ["source","sh",subs="attributes"]
 ----
-{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 endif::deb_os,rpm_os[]
 
@@ -150,7 +154,14 @@ ifdef::mac_os[]
 
 ["source","sh",subs="attributes"]
 ----
-./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+./{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 endif::mac_os[]
 
@@ -159,7 +170,7 @@ ifdef::linux_os[]
 
 ["source","sh",subs="attributes"]
 ----
-./{beatname_lc} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+./{beatname_lc} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 endif::linux_os[]
 
@@ -169,7 +180,7 @@ ifdef::docker_platform[]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run {dockerimage} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 endif::docker_platform[]
 
@@ -186,7 +197,7 @@ and run:
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-PS > .{backslash}{beatname_lc}.exe setup --template{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+PS > .{backslash}{beatname_lc}.exe setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 endif::win_os[]
 
@@ -266,6 +277,13 @@ ifdef::mac_os[]
 ["source","sh",subs="attributes"]
 ----
 ./{beatname_lc} export template > {beatname_lc}.template.json
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} export template > {beatname_lc}.template.json
 ----
 endif::mac_os[]
 

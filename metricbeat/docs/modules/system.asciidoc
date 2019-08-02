@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-system]]
@@ -116,6 +116,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-diskio,diskio>>
 
+* <<metricbeat-metricset-system-entropy,entropy>>
+
 * <<metricbeat-metricset-system-filesystem,filesystem>>
 
 * <<metricbeat-metricset-system-fsstat,fsstat>>
@@ -143,6 +145,8 @@ include::system/core.asciidoc[]
 include::system/cpu.asciidoc[]
 
 include::system/diskio.asciidoc[]
+
+include::system/entropy.asciidoc[]
 
 include::system/filesystem.asciidoc[]
 

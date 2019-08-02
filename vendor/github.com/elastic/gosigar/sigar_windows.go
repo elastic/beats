@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -24,11 +23,6 @@ var (
 	// 2003 and XP where PROCESS_QUERY_LIMITED_INFORMATION is unknown. For all newer
 	// OS versions it is set to PROCESS_QUERY_LIMITED_INFORMATION.
 	processQueryLimitedInfoAccess = windows.PROCESS_QUERY_LIMITED_INFORMATION
-
-	// bootTime is the time when the OS was last booted. This value may be nil
-	// on operating systems that do not support the WMI query used to obtain it.
-	bootTime     *time.Time
-	bootTimeLock sync.Mutex
 )
 
 func init() {
@@ -63,19 +57,11 @@ func (self *Uptime) Get() error {
 	if !version.IsWindowsVistaOrGreater() {
 		return ErrNotImplemented{runtime.GOOS}
 	}
-
-	bootTimeLock.Lock()
-	defer bootTimeLock.Unlock()
-	if bootTime == nil {
-		uptime, err := windows.GetTickCount64()
-		if err != nil {
-			return errors.Wrap(err, "failed to get boot time using win32 api")
-		}
-		var boot = time.Unix(int64(uptime), 0)
-		bootTime = &boot
+	uptimeMs, err := windows.GetTickCount64()
+	if err != nil {
+		return errors.Wrap(err, "failed to get boot time using GetTickCount64 api")
 	}
-
-	self.Length = time.Since(*bootTime).Seconds()
+	self.Length = float64(time.Duration(uptimeMs)*time.Millisecond) / float64(time.Second)
 	return nil
 }
 
@@ -194,10 +180,11 @@ func (self *ProcState) Get(pid int) error {
 		errs = append(errs, errors.Wrap(err, "getParentPid failed"))
 	}
 
-	self.Username, err = getProcCredName(pid)
-	if err != nil {
-		errs = append(errs, errors.Wrap(err, "getProcCredName failed"))
-	}
+	// getProcCredName will often fail when run as a non-admin user. This is
+	// caused by strict ACL of the process token belonging to other users.
+	// Instead of failing completely, ignore this error and still return most
+	// data with an empty Username.
+	self.Username, _ = getProcCredName(pid)
 
 	if len(errs) > 0 {
 		errStrs := make([]string, 0, len(errs))
@@ -274,17 +261,13 @@ func getProcCredName(pid int) (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, "OpenProcessToken failed for pid=%v", pid)
 	}
+	// Close token to prevent handle leaks.
+	defer token.Close()
 
 	// Find the token user.
 	tokenUser, err := token.GetTokenUser()
 	if err != nil {
 		return "", errors.Wrapf(err, "GetTokenInformation failed for pid=%v", pid)
-	}
-
-	// Close token to prevent handle leaks.
-	err = token.Close()
-	if err != nil {
-		return "", errors.Wrapf(err, "failed while closing process token handle for pid=%v", pid)
 	}
 
 	// Look up domain account by SID.

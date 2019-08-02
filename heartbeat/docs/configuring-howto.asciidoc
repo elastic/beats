@@ -47,6 +47,8 @@ include::./heartbeat-options.asciidoc[]
 
 include::./heartbeat-general-options.asciidoc[]
 
+include::./heartbeat-observer-options.asciidoc[]
+
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
@@ -73,7 +75,9 @@ include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
 include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
 :standalone!:
 
+:autodiscoverAWSELB:
 include::{libbeat-dir}/docs/shared-autodiscover.asciidoc[]
+:autodiscoverAWSELB!:
 
 :standalone:
 include::{libbeat-dir}/docs/yaml.asciidoc[]

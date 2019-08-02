@@ -103,3 +103,50 @@
       type: alias
       path: event.created
       migration: true
+
+    - name: docker.attrs
+      type: object
+      object_type: keyword
+      description: >
+        docker.attrs contains labels and environment variables written by docker's JSON File logging driver.
+        These fields are only available when they are configured in the logging driver options.
+
+    - name: event.code
+      type: keyword
+      description: >
+        The code for the log message.
+
+    - name: icmp.code
+      type: keyword
+      description: >
+        ICMP code.
+
+    - name: icmp.type
+      type: keyword
+      description: >
+        ICMP type.
+
+    - name: igmp.type
+      type: keyword
+      description: >
+        IGMP type.
+
+    - name: source.as.number
+      type: long
+      description: >
+        Autonomous system number.
+
+    - name: destination.as.number
+      type: long
+      description: >
+        Autonomous system number.
+
+    - name: source.as.organization.name
+      type: keyword
+      description: >
+        Name of organization associated with the autonomous system.
+
+    - name: destination.as.organization.name
+      type: keyword
+      description: >
+        Name of organization associated with the autonomous system.

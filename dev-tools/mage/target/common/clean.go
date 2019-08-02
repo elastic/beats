@@ -17,9 +17,9 @@
 
 package common
 
-import "github.com/elastic/beats/dev-tools/mage"
+import devtools "github.com/elastic/beats/dev-tools/mage"
 
 // Clean cleans all generated files and build artifacts.
 func Clean() error {
-	return mage.Clean()
+	return devtools.Clean()
 }

@@ -1,0 +1,20 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "system.entropy",
+        "duration": 115000,
+        "module": "system"
+    },
+    "metricset": {
+        "name": "entropy"
+    },
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "entropy": {
+            "available_bits": 2801,
+            "pct": 0.683837890625
+        }
+    }
+}

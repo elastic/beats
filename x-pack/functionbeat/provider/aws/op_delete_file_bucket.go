@@ -5,6 +5,8 @@
 package aws
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
@@ -13,7 +15,7 @@ import (
 
 type opDeleteFileBucket struct {
 	log        *logp.Logger
-	svc        *s3.S3
+	svc        *s3.Client
 	bucketName string
 	path       string
 }
@@ -39,7 +41,7 @@ func (o *opDeleteFileBucket) Execute(_ executionContext) error {
 	}
 
 	req := o.svc.DeleteObjectRequest(input)
-	resp, err := req.Send()
+	resp, err := req.Send(context.TODO())
 
 	if err != nil {
 		o.log.Debugf("Could not remove object to S3, resp: %v", resp)

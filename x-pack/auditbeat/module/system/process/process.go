@@ -170,7 +170,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms.log.Debug("No state timestamp found")
 	}
 
-	if os.Geteuid() != 0 {
+	if runtime.GOOS != "windows" && os.Geteuid() != 0 {
 		ms.log.Warn("Running as non-root user, will likely not report all processes.")
 	}
 
@@ -361,7 +361,9 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 		event.RootFields.Put("error.message", process.Error.Error())
 	}
 
-	event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
+	if ms.HostID() != "" {
+		event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
+	}
 
 	return event
 }

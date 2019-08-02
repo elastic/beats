@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -33,7 +35,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
@@ -71,4 +73,8 @@ func getConfig(url string) map[string]interface{} {
 		"metricsets": []string{"connection"},
 		"hosts":      []string{url},
 	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "rabbitmq", "connection")
 }

@@ -63,7 +63,6 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	t.Skip("flaky")
 	compose.EnsureUp(t, "elasticsearch")
 
 	host := net.JoinHostPort(getEnvHost(), getEnvPort())
@@ -87,8 +86,8 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			events, errs := mbtest.ReportingFetchV2(f)
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			events, errs := mbtest.ReportingFetchV2Error(f)
 
 			assert.Empty(t, errs)
 			if !assert.NotEmpty(t, events) {
@@ -101,7 +100,6 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	t.Skip("flaky")
 	compose.EnsureUp(t, "elasticsearch")
 
 	host := net.JoinHostPort(getEnvHost(), getEnvPort())
@@ -114,8 +112,8 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
+			err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 			if err != nil {
 				t.Fatal("write", err)
 			}
@@ -179,9 +177,17 @@ func createIndex(host string) error {
 	return nil
 }
 
-// createIndex creates and elasticsearch index in case it does not exit yet
+// enableTrialLicense creates and elasticsearch index in case it does not exit yet
 func enableTrialLicense(host string, version *common.Version) error {
 	client := &http.Client{}
+
+	enabled, err := checkTrialLicenseEnabled(host, version)
+	if err != nil {
+		return err
+	}
+	if enabled {
+		return nil
+	}
 
 	var enableXPackURL string
 	if version.Major < 7 {
@@ -210,6 +216,42 @@ func enableTrialLicense(host string, version *common.Version) error {
 	}
 
 	return nil
+}
+
+// checkTrialLicenseEnabled creates and elasticsearch index in case it does not exit yet
+func checkTrialLicenseEnabled(host string, version *common.Version) (bool, error) {
+	var licenseURL string
+	if version.Major < 7 {
+		licenseURL = "/_xpack/license"
+	} else {
+		licenseURL = "/_license"
+	}
+
+	resp, err := http.Get("http://" + host + licenseURL)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	var data struct {
+		License struct {
+			Status string `json:"status"`
+			Type   string `json:"type"`
+		} `json:"license"`
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return false, err
+	}
+
+	active := data.License.Status == "active"
+	isTrial := data.License.Type == "trial"
+	return active && isTrial, nil
 }
 
 func createMLJob(host string, version *common.Version) error {
@@ -263,7 +305,7 @@ func createCCRStats(host string) error {
 		return checkCCRStatsExists(host)
 	}
 
-	exists, err := waitForSuccess(checkCCRStats, 200, 5)
+	exists, err := waitForSuccess(checkCCRStats, 300, 5)
 	if err != nil {
 		return errors.Wrap(err, "error checking if CCR stats exist")
 	}

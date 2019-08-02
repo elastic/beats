@@ -5,6 +5,7 @@
 package ec2
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -210,8 +211,12 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
 				}
 
+				// Add tags
+				tags := instanceOutput[instanceID].Tags
+				for _, tag := range tags {
+					events[instanceID].ModuleFields.Put("tags."+*tag.Key, *tag.Value)
+				}
 			}
-
 		}
 	}
 
@@ -234,7 +239,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 	return events, nil
 }
 
-func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
+func getInstancesPerRegion(svc ec2iface.ClientAPI) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {
 	instancesOutputs = map[string]ec2.Instance{}
 	output := ec2.DescribeInstancesOutput{NextToken: nil}
 	init := true
@@ -242,7 +247,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		init = false
 		describeInstanceInput := &ec2.DescribeInstancesInput{}
 		req := svc.DescribeInstancesRequest(describeInstanceInput)
-		output, err := req.Send()
+		output, err := req.Send(context.Background())
 		if err != nil {
 			err = errors.Wrap(err, "Error DescribeInstances")
 			return nil, nil, err

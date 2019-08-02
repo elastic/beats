@@ -5,6 +5,7 @@
 package sqs
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -127,11 +128,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
+func getQueueUrls(svc sqsiface.ClientAPI) ([]string, error) {
 	// ListQueues
 	listQueuesInput := &sqs.ListQueuesInput{}
 	req := svc.ListQueuesRequest(listQueuesInput)
-	output, err := req.Send()
+	output, err := req.Send(context.TODO())
 	if err != nil {
 		err = errors.Wrap(err, "Error DescribeInstances")
 		return nil, err
@@ -149,7 +150,7 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.D
 }
 
 func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
-	statistic := "Average"
+	statistic := "Sum"
 	periodInSec := int64(period.Seconds())
 	id := "sqs" + strconv.Itoa(index)
 	metricDims := metric.Dimensions

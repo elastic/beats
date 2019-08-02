@@ -97,6 +97,7 @@ events from CloudWatch Logs and forwards the events to {es}.
 
 ["source","sh",subs="attributes"]
 -------------------------------------------------------------------------------------
+{beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 {beatname_lc}.provider.aws.functions:
   - name: cloudwatch

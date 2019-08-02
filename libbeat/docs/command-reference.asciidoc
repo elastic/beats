@@ -17,11 +17,11 @@
 :deploy-command-short-desc: Deploys the specified function to your serverless environment
 
 ifndef::no_dashboards[]
-:export-command-short-desc: Exports the configuration, index template, or a dashboard to stdout
+:export-command-short-desc: Exports the configuration, index template, ILM policy, or a dashboard to stdout
 endif::no_dashboards[]
 
 ifdef::no_dashboards[]
-:export-command-short-desc: Exports the configuration or index template to stdout
+:export-command-short-desc: Exports the configuration, index template, or ILM policy to stdout
 endif::no_dashboards[]
 
 :help-command-short-desc: Shows help for any command
@@ -32,15 +32,15 @@ endif::no_dashboards[]
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 
 ifdef::has_ml_jobs[]
-:setup-command-short-desc: Sets up the initial environment, including the index template, {kib} dashboards (when available), and machine learning jobs (when available)
+:setup-command-short-desc: Sets up the initial environment, including the index template, ILM policy and write alias, {kib} dashboards (when available), and machine learning jobs (when available)
 endif::[]
 
 ifdef::no_dashboards[]
-:setup-command-short-desc: Sets up the initial environment, including the ES index template
+:setup-command-short-desc: Sets up the initial environment, including the ES index template, and ILM policy and write alias
 endif::no_dashboards[]
 
 ifndef::has_ml_jobs,no_dashboards[]
-:setup-command-short-desc: Sets up the initial environment, including the index template and {kib} dashboards (when available)
+:setup-command-short-desc: Sets up the initial environment, including the index template, ILM policy and write alias, and {kib} dashboards (when available)
 endif::[]
 
 :update-command-short-desc: Updates the specified function
@@ -78,6 +78,11 @@ Use `sudo` to run the following commands if:
 
 =========================
 endif::[]
+
+Some of the features described here require an Elastic license. For
+more information, see https://www.elastic.co/subscriptions and
+{stack-ov}/license-management.html[License Management].
+
 
 [options="header"]
 |=======================
@@ -145,13 +150,13 @@ endif::[]
 ifndef::no_dashboards[]
 {export-command-short-desc}. You can use this
 command to quickly view your configuration, see the contents of the index
-template, or export a dashboard from {kib}.
+template and the ILM policy, or export a dashboard from {kib}.
 endif::no_dashboards[]
 
 ifdef::no_dashboards[]
 {export-command-short-desc}. You can use this
 command to quickly view your configuration or see the contents of the index
-template.
+template or the ILM policy.
 endif::no_dashboards[]
 
 *SYNOPSIS*
@@ -194,17 +199,22 @@ endif::no_dashboards[]
 
 [[template-subcommand]]*`template`*::
 Exports the index template to stdout. You can specify the `--es.version` and
-`--index` flags to further define what gets exported.
+`--index` flags to further define what gets exported. Furthermore you can export
+the template to a file instead of `stdout` by defining a directory via `--dir`.
 
 [[ilm-policy-subcommand]]
 *`ilm-policy`*::
-Exports ILM policy to stdout.
+Exports the index lifecycle management policy to stdout. You can specify the
+`--es.version` and a `--dir` to which the policy should be exported as a
+file rather than exporting to `stdout`.
 
 *FLAGS*
 
 *`--es.version VERSION`*::
 When used with <<template-subcommand,`template`>>, exports an index
 template that is compatible with the specified version.
+When used with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy
+if the specified ES version is enabled for ILM.
 
 *`-h, --help`*::
 Shows help for the `export` command.
@@ -213,6 +223,10 @@ Shows help for the `export` command.
 When used with <<template-subcommand,`template`>>, sets the base name to use for
 the index template. If this flag is not specified, the default base name is
 +{beatname_lc}+.
+
+*`--dir DIRNAME`*::
+Define a directory to which the template and ILM policy should be exported to
+as files instead of printing them to `stdout`.
 
 ifndef::no_dashboards[]
 *`--id DASHBOARD_ID`*::
@@ -582,6 +596,10 @@ Or:
 {setup-command-short-desc}
 
 * The index template ensures that fields are mapped correctly in Elasticsearch.
+If index lifecycle management is enabled it also ensures that the defined ILM policy
+and write alias are connected to the indices matching the index template.
+The ILM policy takes care of the lifecycle of an index, when to do a rollover,
+when to move an index from the hot phase to the next phase etc.
 
 ifndef::no_dashboards[]
 * The {kib} dashboards make it easier for you to visualize {beatname_uc} data
@@ -634,8 +652,19 @@ enabled modules in the +{beatname_lc}.yml+ file. If you used the
 directory, also specify the `--modules` flag.
 endif::[]
 
+*`--index-management`*::
+Sets up components related to Elasticsearch index management including
+template, ILM policy, and write alias (if supported and configured).
+
 *`--template`*::
+deprecated[7.2]
 Sets up the index template only.
+It is recommended to use `--index-management` instead.
+
+*`--ilm-policy`*::
+deprecated[7.2]
+Sets up the index lifecycle management policy.
+It is recommended to use `--index-management` instead.
 
 {global-flags}
 
@@ -648,7 +677,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 {beatname_lc} setup --machine-learning
 {beatname_lc} setup --pipelines
 {beatname_lc} setup --pipelines --modules system,nginx,mysql <1>
-{beatname_lc} setup --template
+{beatname_lc} setup --index-management
 -----
 <1> If you used the <<modules-command,`modules`>> command to enable modules in
 the `modules.d` directory, also specify the `--modules` flag to indicate which
@@ -662,14 +691,14 @@ ifndef::no_dashboards[]
 -----
 {beatname_lc} setup --dashboards
 {beatname_lc} setup --machine-learning
-{beatname_lc} setup --template
+{beatname_lc} setup --index-management
 -----
 endif::no_dashboards[]
 ifdef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} setup --machine-learning
-{beatname_lc} setup --template
+{beatname_lc} setup --index-management
 -----
 endif::no_dashboards[]
 

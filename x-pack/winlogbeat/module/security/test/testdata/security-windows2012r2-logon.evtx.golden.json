@@ -6,6 +6,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -40,13 +42,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -54,7 +63,7 @@
           "id": 536
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1535,
       "task": "Logon",
@@ -68,6 +77,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -102,13 +113,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -116,7 +134,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1538,
       "task": "Logon",
@@ -130,6 +148,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -167,13 +187,23 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x1008e",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x1008e"
+        ],
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -181,7 +211,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1542,
       "task": "Logon",
@@ -195,6 +225,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -229,13 +261,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -243,7 +282,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1545,
       "task": "Logon",
@@ -257,6 +296,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -291,13 +332,23 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x129f1",
+        "TargetUserName": "ANONYMOUS LOGON",
+        "TargetUserSid": "S-1-5-7",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x129f1"
+        ],
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -305,7 +356,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1547,
       "task": "Logon",
@@ -319,6 +370,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -353,13 +406,23 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x28d31",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x28d31"
+        ],
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -367,7 +430,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1550,
       "task": "Logon",
@@ -381,6 +444,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -415,13 +480,23 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x29f0f",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x29f0f"
+        ],
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -429,7 +504,7 @@
           "id": 548
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1553,
       "task": "Logon",
@@ -443,6 +518,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -477,13 +554,23 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x2a362",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x2a362"
+        ],
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -491,7 +578,7 @@
           "id": 548
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1556,
       "task": "Logon",
@@ -505,6 +592,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -542,13 +631,23 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x324f8",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x0",
+          "0x324f8"
+        ],
+        "type": "Network"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -556,7 +655,7 @@
           "id": 808
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1561,
       "task": "Logon",
@@ -570,6 +669,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -604,13 +705,23 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "Window Manager",
         "TargetLogonId": "0x33444",
+        "TargetUserName": "DWM-2",
+        "TargetUserSid": "S-1-5-90-2",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x33444"
+        ],
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -618,7 +729,7 @@
           "id": 548
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1563,
       "task": "Logon",
@@ -632,6 +743,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -669,13 +782,23 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x3444f",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x3444f"
+        ],
+        "type": "RemoteInteractive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -683,7 +806,7 @@
           "id": 808
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1567,
       "task": "Logon",
@@ -697,6 +820,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -731,13 +856,23 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "Window Manager",
         "TargetLogonId": "0x357fd",
+        "TargetUserName": "DWM-3",
+        "TargetUserSid": "S-1-5-90-3",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": [
+          "0x3e7",
+          "0x357fd"
+        ],
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -745,7 +880,7 @@
           "id": 556
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1570,
       "task": "Logon",
@@ -759,6 +894,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -793,13 +930,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -807,7 +951,7 @@
           "id": 1132
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1574,
       "task": "Logon",
@@ -821,6 +965,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -855,13 +1001,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -869,7 +1022,7 @@
           "id": 1132
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1576,
       "task": "Logon",
@@ -883,6 +1036,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -917,13 +1072,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -931,7 +1093,7 @@
           "id": 504
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1578,
       "task": "Logon",
@@ -945,6 +1107,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -979,13 +1143,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -993,7 +1164,7 @@
           "id": 1132
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1581,
       "task": "Logon",
@@ -1007,6 +1178,8 @@
       "category": "authentication",
       "code": 4624,
       "kind": "event",
+      "module": "security",
+      "outcome": "success",
       "type": "authentication_success"
     },
     "log": {
@@ -1041,13 +1214,20 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
       "keywords": [
         "Audit Success"
       ],
+      "logon": {
+        "id": "0x3e7",
+        "type": "Service"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1055,7 +1235,7 @@
           "id": 344
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1583,
       "task": "Logon",
@@ -1069,7 +1249,9 @@
       "category": "authentication",
       "code": 4625,
       "kind": "event",
-      "type": "authentication_failed"
+      "module": "security",
+      "outcome": "failure",
+      "type": "authentication_failure"
     },
     "log": {
       "level": "information"
@@ -1107,12 +1289,24 @@
         "SubjectLogonId": "0x1008e",
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetUserName": "bosch",
+        "TargetUserSid": "S-1-0-0",
         "TransmittedServices": "-"
       },
       "event_id": 4625,
       "keywords": [
         "Audit Failure"
       ],
+      "logon": {
+        "failure": {
+          "reason": "Unknown user name or bad password.",
+          "status": "This is either due to a bad username or authentication information",
+          "sub_status": "User logon with misspelled or bad user account"
+        },
+        "id": "0x1008e",
+        "type": "Interactive"
+      },
       "opcode": "Info",
       "process": {
         "pid": 516,
@@ -1120,7 +1314,7 @@
           "id": 2756
         }
       },
-      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 1585,
       "task": "Logon"

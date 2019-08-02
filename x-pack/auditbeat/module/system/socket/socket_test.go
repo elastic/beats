@@ -49,9 +49,18 @@ func TestData(t *testing.T) {
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
+func TestSocket(t *testing.T) {
+	s := testSocket()
+
+	assert.Equal(t, uint64(0xee1186910755e9b1), s.Hash())
+	assert.Equal(t, "fIj66YRoGyoe8dML", s.entityID("fa8a1edd06864f47ba4cad5d0f5ca134"))
+	assert.Equal(t, "1:IXrg9Y06W7zrkqBlE30jpC/mzjo=", s.communityID())
+}
+
 func testSocket() *Socket {
 	return &Socket{
 		Family:      linux.AF_INET,
+		Protocol:    tcp,
 		LocalIP:     net.IPv4(10, 0, 2, 15),
 		LocalPort:   22,
 		RemoteIP:    net.IPv4(10, 0, 2, 2),
@@ -107,7 +116,13 @@ func TestOutbound(t *testing.T) {
 	checkFieldValue(t, event.RootFields, "process.name", "socket.test")
 	checkFieldValue(t, event.RootFields, "user.id", os.Geteuid())
 	checkFieldValue(t, event.RootFields, "network.direction", sock.Outbound.String())
+	checkFieldValue(t, event.RootFields, "network.transport", "tcp")
 	checkFieldValue(t, event.RootFields, "destination.port", 80)
+
+	communityID, err := event.RootFields.GetValue("network.community_id")
+	if assert.NoError(t, err) {
+		assert.NotEmpty(t, communityID)
+	}
 }
 
 func TestListening(t *testing.T) {
@@ -153,6 +168,7 @@ func TestListening(t *testing.T) {
 	checkFieldValue(t, event.RootFields, "process.name", "socket.test")
 	checkFieldValue(t, event.RootFields, "user.id", os.Geteuid())
 	checkFieldValue(t, event.RootFields, "network.direction", sock.Listening.String())
+	checkFieldValue(t, event.RootFields, "network.transport", "tcp")
 }
 
 func TestLocalhost(t *testing.T) {
@@ -203,6 +219,7 @@ func TestLocalhost(t *testing.T) {
 	checkFieldValue(t, event.RootFields, "process.name", "socket.test")
 	checkFieldValue(t, event.RootFields, "user.id", os.Geteuid())
 	checkFieldValue(t, event.RootFields, "network.direction", sock.Listening.String())
+	checkFieldValue(t, event.RootFields, "network.transport", "tcp")
 	checkFieldValue(t, event.RootFields, "destination.ip", "127.0.0.1")
 }
 

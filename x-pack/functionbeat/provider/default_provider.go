@@ -15,16 +15,21 @@ import (
 
 // DefaultProvider implements the minimal required to retrieve and start functions.
 type DefaultProvider struct {
-	rawConfig      *common.Config
-	config         *config.ProviderConfig
-	registry       *Registry
-	name           string
-	log            *logp.Logger
-	managerFactory CLIManagerFactory
+	rawConfig       *common.Config
+	config          *config.ProviderConfig
+	registry        *Registry
+	name            string
+	log             *logp.Logger
+	managerFactory  CLIManagerFactory
+	templateFactory TemplateBuilderFactory
 }
 
 // NewDefaultProvider returns factory methods to handle generic provider.
-func NewDefaultProvider(name string, manager CLIManagerFactory) func(*logp.Logger, *Registry, *common.Config) (Provider, error) {
+func NewDefaultProvider(
+	name string,
+	manager CLIManagerFactory,
+	templater TemplateBuilderFactory,
+) func(*logp.Logger, *Registry, *common.Config) (Provider, error) {
 	return func(log *logp.Logger, registry *Registry, cfg *common.Config) (Provider, error) {
 		c := &config.ProviderConfig{}
 		err := cfg.Unpack(c)
@@ -37,12 +42,13 @@ func NewDefaultProvider(name string, manager CLIManagerFactory) func(*logp.Logge
 		}
 
 		return &DefaultProvider{
-			rawConfig:      cfg,
-			config:         c,
-			registry:       registry,
-			name:           name,
-			log:            log,
-			managerFactory: manager,
+			rawConfig:       cfg,
+			config:          c,
+			registry:        registry,
+			name:            name,
+			log:             log,
+			managerFactory:  manager,
+			templateFactory: templater,
 		}, nil
 	}
 }
@@ -68,6 +74,11 @@ func (d *DefaultProvider) CLIManager() (CLIManager, error) {
 	return d.managerFactory(nil, d.rawConfig, d)
 }
 
+// TemplateBuilder returns a TemplateBuilder returns a the type responsible to generate templates.
+func (d *DefaultProvider) TemplateBuilder() (TemplateBuilder, error) {
+	return d.templateFactory(d.log, d.rawConfig, d)
+}
+
 // nullCLI is used when a provider doesn't implement the CLI to manager functions on the service provider.
 type nullCLI struct{}
 
@@ -79,3 +90,15 @@ func NewNullCli(_ *logp.Logger, _ *common.Config, _ Provider) (CLIManager, error
 func (*nullCLI) Deploy(_ string) error { return fmt.Errorf("deploy not implemented") }
 func (*nullCLI) Update(_ string) error { return fmt.Errorf("update not implemented") }
 func (*nullCLI) Remove(_ string) error { return fmt.Errorf("remove not implemented") }
+
+// nullTemplateBuilder is used when a provider does not implement a template builder functionality.
+type nullTemplateBuilder struct{}
+
+// NewNullTemplateBuilder returns a NOOP TemplateBuilder.
+func NewNullTemplateBuilder(_ *logp.Logger, _ *common.Config, _ Provider) (TemplateBuilder, error) {
+	return (*nullTemplateBuilder)(nil), nil
+}
+
+func (*nullTemplateBuilder) RawTemplate(_ string) (string, error) {
+	return "", fmt.Errorf("raw temaplate not implemented")
+}

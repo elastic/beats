@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2016-12-26T14:16:28.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -19,7 +18,6 @@
     },
     {
         "@timestamp": "2016-12-26T14:16:29.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -37,7 +35,6 @@
     },
     {
         "@timestamp": "2016-12-26T14:16:48.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -51,7 +48,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:23:35.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -63,6 +59,8 @@
         "log.offset": 181,
         "service.type": "apache",
         "source.address": "77.179.66.156",
+        "source.as.number": 6805,
+        "source.as.organization.name": "Telefonica Germany",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
         "source.geo.location.lat": 51.2993,
@@ -73,7 +71,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:23:41.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -85,6 +82,8 @@
         "log.offset": 252,
         "service.type": "apache",
         "source.address": "77.179.66.156",
+        "source.as.number": 6805,
+        "source.as.organization.name": "Telefonica Germany",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
         "source.geo.location.lat": 51.2993,
@@ -95,7 +94,6 @@
     },
     {
         "@timestamp": "2016-12-26T16:23:45.000Z",
-        "ecs.version": "1.0.0",
         "event.dataset": "apache.access",
         "event.module": "apache",
         "fileset.name": "access",
@@ -107,6 +105,8 @@
         "log.offset": 332,
         "service.type": "apache",
         "source.address": "77.179.66.156",
+        "source.as.number": 6805,
+        "source.as.organization.name": "Telefonica Germany",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
         "source.geo.location.lat": 51.2993,

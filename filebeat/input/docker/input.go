@@ -68,7 +68,7 @@ func NewInput(
 	}
 
 	if len(ids) == 0 {
-		return nil, errors.New("Docker input requires at least one entry under 'containers.ids''")
+		return nil, errors.New("Docker input requires at least one entry under 'containers.ids' or 'containers.paths'")
 	}
 
 	for idx, containerID := range ids {

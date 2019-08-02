@@ -76,6 +76,7 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 		default:
 			return nil, errNoTimestamp
 		}
+		return nil, nil
 	} else if subKey, ok := metadataKey(key); ok {
 		if subKey == "" {
 			switch meta := v.(type) {
@@ -122,4 +123,11 @@ func metadataKey(key string) (string, bool) {
 		return subKey[1:], true
 	}
 	return "", false
+}
+
+// SetErrorWithOption sets jsonErr value in the event fields according to addErrKey value.
+func (e *Event) SetErrorWithOption(jsonErr common.MapStr, addErrKey bool) {
+	if addErrKey {
+		e.Fields["error"] = jsonErr
+	}
 }

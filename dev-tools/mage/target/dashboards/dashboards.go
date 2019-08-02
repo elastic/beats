@@ -21,7 +21,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
 var (
@@ -50,15 +50,16 @@ func (Dashboards) Import() error {
 	if buildDep == nil || collectDashboardsDep == nil {
 		return errors.New("dashboard.RegisterImportDeps() must be called")
 	}
-	return mage.ImportDashboards(buildDep, collectDashboardsDep)
+	return devtools.ImportDashboards(buildDep, collectDashboardsDep)
 }
 
 // Export exports a dashboard from Kibana and writes it into the correct
 // directory.
 //
 // Required environment variables:
-// - MODULE: Name of the module
-// - ID:     Dashboard ID
+// - KIBANA_URL: URL of Kibana
+// - MODULE:     Name of the module
+// - ID:         Dashboard ID
 func (Dashboards) Export() error {
-	return mage.ExportDashboard()
+	return devtools.ExportDashboard()
 }
