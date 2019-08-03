@@ -215,7 +215,7 @@
             }
           }
         },
-        "title": "HTTP 5XX Errors [AWS ELB]",
+        "title": "ELB HTTP 5XX Errors [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -280,7 +280,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "HTTP 5XX Errors [AWS ELB]",
+          "title": "ELB HTTP 5XX Errors [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -305,7 +305,7 @@
             }
           }
         },
-        "title": "Request Count [AWS ELB]",
+        "title": "ELB Request Count [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -370,7 +370,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Request Count [AWS ELB]",
+          "title": "ELB Request Count [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -395,7 +395,7 @@
             }
           }
         },
-        "title": "Unhealthy Host Count [AWS ELB]",
+        "title": "ELB Unhealthy Host Count [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -464,7 +464,7 @@
             "time_field": "@timestamp",
             "type": "metric"
           },
-          "title": "Unhealthy Host Count [AWS ELB]",
+          "title": "ELB Unhealthy Host Count [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -489,7 +489,7 @@
             }
           }
         },
-        "title": "Healthy Host Count [AWS ELB]",
+        "title": "ELB Healthy Host Count [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -558,7 +558,7 @@
             "time_field": "@timestamp",
             "type": "metric"
           },
-          "title": "Healthy Host Count [AWS ELB]",
+          "title": "ELB Healthy Host Count [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -583,7 +583,7 @@
             }
           }
         },
-        "title": "Latency in Seconds [AWS ELB]",
+        "title": "ELB Latency in Seconds [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -648,7 +648,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Latency in Seconds [AWS ELB]",
+          "title": "ELB Latency in Seconds [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -673,7 +673,7 @@
             }
           }
         },
-        "title": "HTTP Backend 4XX Errors [AWS ELB]",
+        "title": "ELB HTTP Backend 4XX Errors [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -738,7 +738,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "HTTP Backend 4XX Errors [AWS ELB]",
+          "title": "ELB HTTP Backend 4XX Errors [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -763,7 +763,7 @@
             }
           }
         },
-        "title": "Backend Connection Errors [AWS ELB]",
+        "title": "ELB Backend Connection Errors [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -829,7 +829,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Backend Connection Errors [AWS ELB]",
+          "title": "ELB Backend Connection Errors [Metricbeat AWS]",
           "type": "metrics"
         }
       },
@@ -912,7 +912,7 @@
             }
           }
         },
-        "title": "HTTP Backend 2XX [AWS ELB]",
+        "title": "ELB HTTP Backend 2XX [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -977,7 +977,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "HTTP Backend 2XX [AWS ELB]",
+          "title": "ELB HTTP Backend 2XX [Metricbeat AWS]",
           "type": "metrics"
         }
       },
