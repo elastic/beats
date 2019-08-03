@@ -4,7 +4,13 @@
     Statsd module
   release: beta
   fields:
-    - name: statsd.*
+    - name: statsd.*.count
+      type: object
+      object_type: long
+      object_type_mapping_type: "long"
+      description: >
+        Statsd counters
+    - name: statsd.*.*
       type: object
       object_type: float
       object_type_mapping_type: "*"

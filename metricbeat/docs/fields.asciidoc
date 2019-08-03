@@ -26026,7 +26026,17 @@ Statsd module
 
 
 
-*`statsd.*`*::
+*`statsd.*.count`*::
++
+--
+Statsd metrics
+
+
+type: object
+
+--
+
+*`statsd.*.*`*::
 +
 --
 Statsd metrics - release: beta
