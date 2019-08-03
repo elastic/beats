@@ -26029,7 +26029,7 @@ Statsd module
 *`statsd.*.count`*::
 +
 --
-Statsd metrics
+Statsd counters
 
 
 type: object
