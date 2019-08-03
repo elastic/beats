@@ -6,7 +6,6 @@ package elb
 
 import (
 	"context"
-	"time"
 
 	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
 
@@ -28,8 +27,6 @@ func init() {
 
 // Provider implements autodiscover provider for aws ELBs.
 type Provider struct {
-	fetcher       fetcher
-	period        time.Duration
 	config        *Config
 	bus           bus.Bus
 	builders      autodiscover.Builders
@@ -87,26 +84,27 @@ func internalBuilder(uuid uuid.UUID, bus bus.Bus, config *Config, fetcher fetche
 		return nil, err
 	}
 
-	return &Provider{
-		fetcher:   fetcher,
-		period:    config.Period,
+	p := &Provider{
 		config:    config,
 		bus:       bus,
 		builders:  builders,
 		appenders: appenders,
 		templates: &mapper,
 		uuid:      uuid,
-	}, nil
+	}
+
+	p.watcher = newWatcher(
+		fetcher,
+		config.Period,
+		p.onWatcherStart,
+		p.onWatcherStop,
+	)
+
+	return p, nil
 }
 
 // Start the autodiscover process.
 func (p *Provider) Start() {
-	p.watcher = newWatcher(
-		p.fetcher,
-		p.period,
-		p.onWatcherStart,
-		p.onWatcherStop,
-	)
 	p.watcher.start()
 }
 

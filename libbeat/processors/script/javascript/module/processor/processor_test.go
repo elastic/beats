@@ -365,8 +365,13 @@ var chain = new processor.Chain()
     })
     .Build();
 
+var chainOfChains = new processor.Chain()
+    .Add(chain)
+    .AddFields({fields: {foo: "bar"}})
+	.Build();
+
 function process(evt) {
-	chain.Run(evt);
+	chainOfChains.Run(evt);
 }
 `
 
@@ -385,4 +390,6 @@ function process(evt) {
 	assert.NoError(t, err)
 	v, _ := evt.GetValue("hello")
 	assert.Equal(t, "world", v)
+	v, _ = evt.GetValue("fields.foo")
+	assert.Equal(t, "bar", v)
 }

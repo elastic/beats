@@ -1,5 +1,145 @@
 # Changelog
 
+#### Version 1.23.1 (2019-07-22)
+
+Bug Fixes:
+- Fix fetch delete bug record
+  ([1425](https://github.com/Shopify/sarama/pull/1425)).
+- Handle SASL/OAUTHBEARER token rejection
+  ([1428](https://github.com/Shopify/sarama/pull/1428)).
+
+#### Version 1.23.0 (2019-07-02)
+
+New Features:
+- Add support for Kafka 2.3.0
+  ([1418](https://github.com/Shopify/sarama/pull/1418)).
+- Add support for ListConsumerGroupOffsets v2
+  ([1374](https://github.com/Shopify/sarama/pull/1374)).
+- Add support for DeleteConsumerGroup
+  ([1417](https://github.com/Shopify/sarama/pull/1417)).
+- Add support for SASLVersion configuration
+  ([1410](https://github.com/Shopify/sarama/pull/1410)).
+- Add kerberos support
+  ([1366](https://github.com/Shopify/sarama/pull/1366)).
+
+Improvements:
+- Improve sasl_scram_client example
+  ([1406](https://github.com/Shopify/sarama/pull/1406)).
+- Fix shutdown and race-condition in consumer-group example
+  ([1404](https://github.com/Shopify/sarama/pull/1404)).
+- Add support for error codes 77—81
+  ([1397](https://github.com/Shopify/sarama/pull/1397)).
+- Pool internal objects allocated per message
+  ([1385](https://github.com/Shopify/sarama/pull/1385)).
+- Reduce packet decoder allocations
+  ([1373](https://github.com/Shopify/sarama/pull/1373)).
+- Support timeout when fetching metadata
+  ([1359](https://github.com/Shopify/sarama/pull/1359)).
+
+Bug Fixes:
+- Fix fetch size integer overflow
+  ([1376](https://github.com/Shopify/sarama/pull/1376)).
+- Handle and log throttled FetchResponses
+  ([1383](https://github.com/Shopify/sarama/pull/1383)).
+- Refactor misspelled word Resouce to Resource
+  ([1368](https://github.com/Shopify/sarama/pull/1368)).
+
+#### Version 1.22.1 (2019-04-29)
+
+Improvements:
+- Use zstd 1.3.8
+  ([1350](https://github.com/Shopify/sarama/pull/1350)).
+- Add support for SaslHandshakeRequest v1
+  ([1354](https://github.com/Shopify/sarama/pull/1354)).
+
+Bug Fixes:
+- Fix V5 MetadataRequest nullable topics array
+  ([1353](https://github.com/Shopify/sarama/pull/1353)).
+- Use a different SCRAM client for each broker connection
+  ([1349](https://github.com/Shopify/sarama/pull/1349)).
+- Fix AllowAutoTopicCreation for MetadataRequest greater than v3
+  ([1344](https://github.com/Shopify/sarama/pull/1344)).
+
+#### Version 1.22.0 (2019-04-09)
+
+New Features:
+- Add Offline Replicas Operation to Client
+  ([1318](https://github.com/Shopify/sarama/pull/1318)).
+- Allow using proxy when connecting to broker
+  ([1326](https://github.com/Shopify/sarama/pull/1326)).
+- Implement ReadCommitted
+  ([1307](https://github.com/Shopify/sarama/pull/1307)).
+- Add support for Kafka 2.2.0
+  ([1331](https://github.com/Shopify/sarama/pull/1331)).
+- Add SASL SCRAM-SHA-512 and SCRAM-SHA-256 mechanismes
+  ([1331](https://github.com/Shopify/sarama/pull/1295)).
+
+Improvements:
+- Unregister all broker metrics on broker stop
+  ([1232](https://github.com/Shopify/sarama/pull/1232)).
+- Add SCRAM authentication example
+  ([1303](https://github.com/Shopify/sarama/pull/1303)).
+- Add consumergroup examples
+  ([1304](https://github.com/Shopify/sarama/pull/1304)).
+- Expose consumer batch size metric
+  ([1296](https://github.com/Shopify/sarama/pull/1296)).
+- Add TLS options to console producer and consumer
+  ([1300](https://github.com/Shopify/sarama/pull/1300)).
+- Reduce client close bookkeeping
+  ([1297](https://github.com/Shopify/sarama/pull/1297)).
+- Satisfy error interface in create responses
+  ([1154](https://github.com/Shopify/sarama/pull/1154)).
+- Please lint gods
+  ([1346](https://github.com/Shopify/sarama/pull/1346)).
+
+Bug Fixes:
+- Fix multi consumer group instance crash
+  ([1338](https://github.com/Shopify/sarama/pull/1338)).
+- Update lz4 to latest version
+  ([1347](https://github.com/Shopify/sarama/pull/1347)).
+- Retry ErrNotCoordinatorForConsumer in new consumergroup session
+  ([1231](https://github.com/Shopify/sarama/pull/1231)).
+- Fix cleanup error handler
+  ([1332](https://github.com/Shopify/sarama/pull/1332)).
+- Fix rate condition in PartitionConsumer
+  ([1156](https://github.com/Shopify/sarama/pull/1156)).
+
+#### Version 1.21.0 (2019-02-24)
+
+New Features:
+- Add CreateAclRequest, DescribeAclRequest, DeleteAclRequest
+  ([1236](https://github.com/Shopify/sarama/pull/1236)).
+- Add DescribeTopic, DescribeConsumerGroup, ListConsumerGroups, ListConsumerGroupOffsets admin requests
+  ([1178](https://github.com/Shopify/sarama/pull/1178)).
+- Implement SASL/OAUTHBEARER
+  ([1240](https://github.com/Shopify/sarama/pull/1240)).
+
+Improvements:
+- Add Go mod support
+  ([1282](https://github.com/Shopify/sarama/pull/1282)).
+- Add error codes 73—76
+  ([1239](https://github.com/Shopify/sarama/pull/1239)).
+- Add retry backoff function
+  ([1160](https://github.com/Shopify/sarama/pull/1160)).
+- Maintain metadata in the producer even when retries are disabled
+  ([1189](https://github.com/Shopify/sarama/pull/1189)).
+- Include ReplicaAssignment in ListTopics
+  ([1274](https://github.com/Shopify/sarama/pull/1274)).
+- Add producer performance tool
+  ([1222](https://github.com/Shopify/sarama/pull/1222)).
+- Add support LogAppend timestamps
+  ([1258](https://github.com/Shopify/sarama/pull/1258)).
+
+Bug Fixes:
+- Fix potential deadlock when a heartbeat request fails
+  ([1286](https://github.com/Shopify/sarama/pull/1286)).
+- Fix consuming compacted topic
+  ([1227](https://github.com/Shopify/sarama/pull/1227)).
+- Set correct Kafka version for DescribeConfigsRequest v1
+  ([1277](https://github.com/Shopify/sarama/pull/1277)).
+- Update kafka test version
+  ([1273](https://github.com/Shopify/sarama/pull/1273)).
+
 #### Version 1.20.1 (2019-01-10)
 
 New Features:

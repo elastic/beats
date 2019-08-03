@@ -42,7 +42,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -50,6 +53,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -109,7 +113,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -117,6 +124,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -179,7 +187,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x1008e",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -187,6 +198,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x3e7",
+          "0x1008e"
+        ],
         "type": "Interactive"
       },
       "opcode": "Info",
@@ -246,7 +261,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -254,6 +272,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -313,7 +332,10 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x129f1",
+        "TargetUserName": "ANONYMOUS LOGON",
+        "TargetUserSid": "S-1-5-7",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -321,6 +343,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x0",
+          "0x129f1"
+        ],
         "type": "Network"
       },
       "opcode": "Info",
@@ -380,7 +406,10 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x28d31",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -388,6 +417,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x0",
+          "0x28d31"
+        ],
         "type": "Network"
       },
       "opcode": "Info",
@@ -447,7 +480,10 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x29f0f",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -455,6 +491,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x0",
+          "0x29f0f"
+        ],
         "type": "Network"
       },
       "opcode": "Info",
@@ -514,7 +554,10 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x2a362",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -522,6 +565,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x0",
+          "0x2a362"
+        ],
         "type": "Network"
       },
       "opcode": "Info",
@@ -584,7 +631,10 @@
         "SubjectLogonId": "0x0",
         "SubjectUserName": "-",
         "SubjectUserSid": "S-1-0-0",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x324f8",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -592,6 +642,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x0",
+          "0x324f8"
+        ],
         "type": "Network"
       },
       "opcode": "Info",
@@ -651,7 +705,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "Window Manager",
         "TargetLogonId": "0x33444",
+        "TargetUserName": "DWM-2",
+        "TargetUserSid": "S-1-5-90-2",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -659,6 +716,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x3e7",
+          "0x33444"
+        ],
         "type": "Interactive"
       },
       "opcode": "Info",
@@ -721,7 +782,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "VAGRANT-2012-R2",
         "TargetLogonId": "0x3444f",
+        "TargetUserName": "vagrant",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -729,6 +793,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x3e7",
+          "0x3444f"
+        ],
         "type": "RemoteInteractive"
       },
       "opcode": "Info",
@@ -788,7 +856,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "Window Manager",
         "TargetLogonId": "0x357fd",
+        "TargetUserName": "DWM-3",
+        "TargetUserSid": "S-1-5-90-3",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -796,6 +867,10 @@
         "Audit Success"
       ],
       "logon": {
+        "id": [
+          "0x3e7",
+          "0x357fd"
+        ],
         "type": "Interactive"
       },
       "opcode": "Info",
@@ -855,7 +930,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -863,6 +941,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -922,7 +1001,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -930,6 +1012,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -989,7 +1072,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -997,6 +1083,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -1056,7 +1143,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -1064,6 +1154,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -1123,7 +1214,10 @@
         "SubjectLogonId": "0x3e7",
         "SubjectUserName": "VAGRANT-2012-R2$",
         "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "NT AUTHORITY",
         "TargetLogonId": "0x3e7",
+        "TargetUserName": "SYSTEM",
+        "TargetUserSid": "S-1-5-18",
         "TransmittedServices": "-"
       },
       "event_id": 4624,
@@ -1131,6 +1225,7 @@
         "Audit Success"
       ],
       "logon": {
+        "id": "0x3e7",
         "type": "Service"
       },
       "opcode": "Info",
@@ -1194,6 +1289,9 @@
         "SubjectLogonId": "0x1008e",
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetDomainName": "VAGRANT-2012-R2",
+        "TargetUserName": "bosch",
+        "TargetUserSid": "S-1-0-0",
         "TransmittedServices": "-"
       },
       "event_id": 4625,
@@ -1201,6 +1299,12 @@
         "Audit Failure"
       ],
       "logon": {
+        "failure": {
+          "reason": "Unknown user name or bad password.",
+          "status": "This is either due to a bad username or authentication information",
+          "sub_status": "User logon with misspelled or bad user account"
+        },
+        "id": "0x1008e",
         "type": "Interactive"
       },
       "opcode": "Info",
