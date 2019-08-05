@@ -247,7 +247,6 @@ dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
 endif::no_dashboards[]
 
-ifndef::apm-server[]
 ifndef::no_ilm[]
 The `index` setting is ignored when index lifecycle management is enabled. If
 you’re sending events to a cluster that supports index lifecycle management, see
