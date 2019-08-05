@@ -300,6 +300,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to load default aws config file to get credentials. {pull}12727[12727] {issue}12708[12708]
 - Add statistic option into cloudwatch metricset. {issue}12370[12370] {pull}12840[12840]
 - Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
+- Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
 
 *Packetbeat*
 
