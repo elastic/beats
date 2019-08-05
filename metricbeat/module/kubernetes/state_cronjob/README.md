@@ -50,11 +50,21 @@ https://github.com/kubernetes/kube-state-metrics/blob/release-1.7/docs/cronjob-m
 
 Instructions for `Linux` and `Kind`. If you are using any other environment and need to adapt these instructions, please, update accordingly.
 
-TODO
+Deploy metricbeat pre-baked pod as recommended by the docs.
 
+Kubernetes YAML chunk should look like:
 
+```yaml
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - state_cronjob
+  period: 10s
+  hosts: ["kube-state-metrics:8080"]
+  in_cluster: true
+```
 
-
+Deploy kube-state-metrics. You can find the manifests [here](https://github.com/kubernetes/kube-state-metrics/tree/release-1.7/kubernetes)
 
 
 
