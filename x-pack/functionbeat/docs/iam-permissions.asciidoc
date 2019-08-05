@@ -1,0 +1,129 @@
+[[iam-permissions]]
+[role="xpack"]
+=== IAM permissions required for {beatname_uc} deployment
+
+++++
+<titleabbrev>IAM permissions required for deployment</titleabbrev>
+++++
+
+The role used to deploy {beatname_uc} to AWS must have the minimum privileges
+required to deploy and run the Lambda function. 
+
+The following sections show example policies that grant the required
+permissions.
+ 
+
+[[iam-permissions-cloudwatch]]
+==== CloudWatch logs
+
+The following policy grants the permissions required to deploy and run a Lambda
+function that collects events from CloudWatch logs.
+
+[source,yaml]
+----
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:DeleteStack",
+                "cloudformation:DescribeStacks",
+                "cloudformation:DescribeStackEvents",
+                "cloudformation:DescribeStackResources",
+                "cloudformation:GetTemplate",
+                "cloudformation:UpdateStack",
+                "cloudformation:ValidateTemplate",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DeleteRolePolicy",
+                "iam:GetRole",
+                "iam:GetRolePolicy",
+                "iam:PassRole",
+                "iam:PutRolePolicy",
+                "lambda:AddPermission",
+                "lambda:CreateFunction",
+                "lambda:DeleteFunction",
+                "lambda:GetFunction",
+                "lambda:GetFunctionConfiguration",
+                "lambda:PutFunctionConcurrency",
+                "lambda:RemovePermission",
+                "lambda:UpdateFunctionCode",
+                "lambda:UpdateFunctionConfiguration",
+                "logs:CreateLogGroup",
+                "logs:DeleteLogGroup",
+                "logs:DeleteSubscriptionFilter",
+                "logs:DescribeLogGroups",
+                "logs:PutSubscriptionFilter",
+                "s3:CreateBucket",
+                "s3:DeleteObject",
+                "s3:ListBucket",
+                "s3:PutObject",
+                "s3:GetObject"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+----
+
+[[iam-permissions-sqs-kinesis]]
+==== SQS and Kinesis
+
+The following policy grants the permissions required to deploy and run a Lambda
+function that reads from SQS queues or Kinesis data streams.
+
+//REVIEWERS: I verified that the following policy works for sqs, but not
+//kinesis. Please confirm that it works on kinesis.  
+
+[source,yaml]
+----
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:DeleteStack",
+                "cloudformation:DescribeStacks",
+                "cloudformation:DescribeStackEvents",
+                "cloudformation:DescribeStackResources",
+                "cloudformation:GetTemplate",
+                "cloudformation:UpdateStack",
+                "cloudformation:ValidateTemplate",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DeleteRolePolicy",
+                "iam:GetRole",
+                "iam:GetRolePolicy",
+                "iam:PassRole",
+                "iam:PutRolePolicy",
+                "lambda:AddPermission",
+                "lambda:CreateFunction",
+                "lambda:CreateEventSourceMapping",
+                "lambda:DeleteFunction",
+                "lambda:DeleteEventSourceMapping",
+                "lambda:GetEventSourceMapping",
+                "lambda:GetFunction",
+                "lambda:GetFunctionConfiguration",
+                "lambda:PutFunctionConcurrency",
+                "lambda:RemovePermission",
+                "lambda:UpdateFunctionCode",
+                "lambda:UpdateFunctionConfiguration",
+                "logs:DescribeLogGroups",
+                "logs:CreateLogGroup",
+                "s3:CreateBucket",
+                "s3:DeleteObject",
+                "s3:ListBucket",
+                "s3:PutObject",
+                "s3:GetObject"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+----
