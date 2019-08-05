@@ -46,7 +46,7 @@ var (
 		},
 		Labels: map[string]p.LabelMap{
 			"cronjob":            p.KeyLabel("name"),
-			"namespace":          p.KeyLabel("namespace"),
+			"namespace":          p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 			"schedule":           p.KeyLabel("schedule"),
 			"concurrency_policy": p.KeyLabel("concurrency"),
 		},
