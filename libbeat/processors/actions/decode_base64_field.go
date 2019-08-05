@@ -49,7 +49,7 @@ func init() {
 	processors.RegisterPlugin(processorName,
 		checks.ConfigChecked(NewDecodeBase64Field,
 			checks.RequireFields("field"),
-			checks.AllowedFields("field", "ignore_missing", "fail_on_error")))
+			checks.AllowedFields("field", "when", "ignore_missing", "fail_on_error")))
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
