@@ -13,8 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -188,12 +186,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, period time.Duration, index
 }
 
 func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	// Cloud fields in ECS
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
-	event.RootFields.Put("cloud.provider", "aws")
+	event = aws.InitEvent(regionName)
 
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})

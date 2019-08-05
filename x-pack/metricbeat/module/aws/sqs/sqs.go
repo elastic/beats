@@ -16,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -176,10 +175,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 }
 
 func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.region", regionName)
+	event = aws.InitEvent(regionName)
 
 	// AWS sqs metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
