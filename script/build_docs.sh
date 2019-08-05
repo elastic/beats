@@ -36,5 +36,5 @@ do
     params="$params --resource=${resource_dir}"
   fi
 
-  $docs_dir/build_docs.pl $params --doc "$index" -out "$dest_dir"
+  $docs_dir/build_docs $params --doc "$index" --out "$dest_dir"
 done
