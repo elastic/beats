@@ -103,8 +103,8 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 		return fmt.Errorf("could not fetch base64 value for key: %s, Error: %v", f.config.Field.From, err)
 	}
 
-	base64String, isString := value.(string)
-	if !isString {
+	base64String, ok := value.(string)
+	if !ok {
 		return fmt.Errorf("invalid type for `from`, expecting a string received %T", value)
 	}
 
