@@ -116,11 +116,6 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 	target := f.config.Field.To
 	// If to is empty
 	if f.config.Field.To == "" || f.config.Field.From == f.config.Field.To {
-		// Deletion must happen first to support cases where a becomes a.b
-		if err = event.Delete(f.config.Field.From); err != nil {
-			return fmt.Errorf("could not delete key: %s,  %+v", f.config.Field.From, err)
-		}
-
 		target = f.config.Field.From
 	}
 
