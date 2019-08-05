@@ -227,7 +227,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	metricSetFieldResults := map[string]map[string]interface{}{}
 
 	for dbInstanceArn := range dbInstanceMap {
-		events[dbInstanceArn] = aws.InitEvent(metricsetName, regionName)
+		events[dbInstanceArn] = aws.InitEvent(regionName)
 		metricSetFieldResults[dbInstanceArn] = map[string]interface{}{}
 	}
 
