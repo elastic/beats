@@ -205,6 +205,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `decompress_gzip_field` processor. {pull}12733[12733]
 - Add `timestamp` processor for parsing time fields. {pull}12699[12699]
 - Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
+- Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
 
 *Auditbeat*
 
@@ -249,6 +250,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Parse more fields from Elasticsearch slowlogs. {pull}11939[11939]
 - Update module pipelines to enrich events with autonomous system fields. {pull}13036[13036]
 - Add module for ingesting IBM MQ logs. {pull}8782[8782]
+- Add S3 input to retrieve logs from AWS S3 buckets. {pull}12640[12640] {issue}12582[12582]
 
 *Heartbeat*
 
@@ -299,6 +301,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add statistic option into cloudwatch metricset. {issue}12370[12370] {pull}12840[12840]
 - Add support for kubernetes cronjobs {pull}13001[13001]
 - Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
+- Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
 
 *Packetbeat*
 
