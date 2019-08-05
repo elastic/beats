@@ -443,6 +443,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	b.ConfigManager.Start()
 	defer b.ConfigManager.Stop()
 
+	go startGrpcServer(b)
+
 	return beater.Run(&b.Beat)
 }
 
@@ -639,8 +641,6 @@ func (b *Beat) configure(settings Settings) error {
 	if err := b.ConfigManager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
 	}
-
-	go startGrpcServer(b)
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
 		runtime.GOMAXPROCS(maxProcs)
