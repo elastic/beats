@@ -24,15 +24,14 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/nginx"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "nginx")
+	service := compose.EnsureUp(t, "nginx")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -47,24 +46,18 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "nginx")
+	service := compose.EnsureUp(t, "nginx")
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
-
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "nginx",
 		"metricsets": []string{"stubstatus"},
-		"hosts":      []string{nginx.GetNginxEnvHost()},
+		"hosts":      []string{host},
 	}
 }
