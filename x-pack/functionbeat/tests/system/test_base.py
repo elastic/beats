@@ -6,7 +6,6 @@ import unittest
 
 
 class Test(BaseTest):
-
     @unittest.skip("temporarily disabled")
     def test_base(self):
         """
@@ -96,16 +95,25 @@ class Test(BaseTest):
         assert exit_code != 0
 
     def _generate_dummy_binary_for_template_checksum(self):
-        if os.path.exists("pkg/functionbeat"):
-            return
+        fnbeat_pkg = os.path.join("pkg", "functionbeat")
+        fnbeat_aws_pkg = os.path.join("pkg", "functionbeat-aws")
+        bins_to_gen = [fnbeat_pkg, fnbeat_aws_pkg]
 
-        os.mkdir("pkg")
-        with open("pkg/functionbeat", "wb") as f:
-            f.write("my dummy functionbeat binary")
+        if not os.path.exists("pkg"):
+            os.mkdir("pkg")
+
+        for fb in bins_to_gen:
+            if os.path.exists(fb):
+                continue
+            with open(fb, "wb") as f:
+                f.write("my dummy functionbeat binary\n")
 
     def _get_generated_function_template(self):
         logs = self.get_log_lines()
-        function_template_lines = logs[:-2]
+        skipped_lines = -1
+        if os.sys.platform.startswith("win"):
+            skipped_lines = -2
+        function_template_lines = logs[:skipped_lines]
         raw_function_temaplate = "".join(function_template_lines)
         function_template = json.loads(raw_function_temaplate)
         return function_template
