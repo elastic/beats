@@ -63,6 +63,9 @@ func TLSLayer(cfg *transport.TLSConfig, to time.Duration) Layer {
 			event.PutValue("tls.rtt.handshake", look.RTT(timer.duration()))
 
 			addCertMetdata(event.Fields, tlsConn.ConnectionState().VerifiedChains)
+			
+			event.PutValue("tls.certificate_common_name", tlsConn.ConnectionState().PeerCertificates[0].Subject.CommonName)
+                        event.PutValue("tls.certificate_issuer_common_name", tlsConn.ConnectionState().PeerCertificates[0].Issuer.CommonName)
 
 			return conn, nil
 		}), nil
@@ -89,6 +92,9 @@ func addCertMetdata(fields common.MapStr, chains [][]*x509.Certificate) {
 
 	// We need the zero date later
 	var zeroTime time.Time
+	
+	// Traverse the cert chains and return the root CA
+        var chainIssuer string
 
 	// Here we compute the minimal bounds during which this certificate chain is valid
 	// To do this correctly, we take the maximum NotBefore and the minimum NotAfter.
@@ -103,6 +109,8 @@ func addCertMetdata(fields common.MapStr, chains [][]*x509.Certificate) {
 			if cert.NotAfter != zeroTime && (chainNotValidAfter == nil || chainNotValidAfter.After(cert.NotAfter)) {
 				chainNotValidAfter = &cert.NotAfter
 			}
+			
+			chainIssuer = cert.Issuer.CommonName
 		}
 	}
 
@@ -111,4 +119,6 @@ func addCertMetdata(fields common.MapStr, chains [][]*x509.Certificate) {
 	if chainNotValidAfter != nil {
 		fields.Put("tls.certificate_not_valid_after", *chainNotValidAfter)
 	}
+	
+	fields.Put("tls.certificate_root_common_name", chainIssuer)
 }
