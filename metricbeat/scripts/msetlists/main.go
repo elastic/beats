@@ -21,25 +21,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 
 	_ "github.com/elastic/beats/metricbeat/include"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/scripts/msetlists/gather"
 )
 
 func main() {
 
-	// List all registered modules and metricsets.
-	var defaultMap = make(map[string][]string)
-	for _, mod := range mb.Registry.Modules() {
-		metricSets, err := mb.Registry.DefaultMetricSets(mod)
-		if err != nil && !strings.Contains(err.Error(), "no default metricset for") {
-			continue
-		}
-		defaultMap[mod] = metricSets
-	}
+	msList := gather.DefaultMetricsets()
 
-	raw, err := json.MarshalIndent(defaultMap, "", "  ")
+	raw, err := json.MarshalIndent(msList, "", "  ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error Marshalling json: %s\n", err)
 		os.Exit(1)
