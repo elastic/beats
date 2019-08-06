@@ -24,7 +24,6 @@ import (
 )
 
 func init() {
-
 	mb.Registry.MustAddMetricSet("kubernetes", "state_cronjob",
 		NewCronJobMetricSet,
 		mb.WithHostParser(p.HostParser))
@@ -84,7 +83,6 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
 	}
 
 	for _, event := range events {
-
 		var moduleFieldsMapStr common.MapStr
 		moduleFields, ok := event[mb.ModuleDataKey]
 		if ok {
