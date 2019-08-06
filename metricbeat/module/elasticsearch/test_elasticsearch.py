@@ -32,7 +32,6 @@ class Test(metricbeat.BaseTest):
             self.license_url = "/_license"
             self.ml_anomaly_detectors_url = "/_ml/anomaly_detectors"
 
-        self.start_trial()
         self.es.indices.create(index='test_index', ignore=400)
 
     def tearDown(self):
@@ -166,19 +165,6 @@ class Test(metricbeat.BaseTest):
         self.es.transport.perform_request('POST', '/rats/_ccr/pause_follow')
         self.es.indices.close('rats')
         self.es.transport.perform_request('POST', '/rats/_ccr/unfollow')
-
-    def start_trial(self):
-        # Check if trial is already enabled
-        response = self.es.transport.perform_request('GET', self.license_url)
-        if response["license"]["type"] == "trial":
-            return
-
-        # Enable xpack trial
-        try:
-            self.es.transport.perform_request('POST', self.license_url + "/start_trial?acknowledge=true")
-        except:
-            e = sys.exc_info()[0]
-            print "Trial already enabled. Error: {}".format(e)
 
     def check_skip(self, metricset):
         if metricset != "ccr":

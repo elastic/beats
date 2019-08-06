@@ -79,6 +79,7 @@ services:
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
       - "xpack.security.enabled=false"
+      - "xpack.license.self_generated.type=trial"
     ports:
       - 9200
 
