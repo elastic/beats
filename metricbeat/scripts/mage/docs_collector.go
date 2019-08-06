@@ -126,16 +126,29 @@ func testIfDocsInDir(moduleDir string) bool {
 // compile and run the seprate go script to generate a list of default metricsets.
 // This is done so a compile-time issue in metricbeat doesn't break the docs build
 func getDefaultMetricsets() (map[string][]string, error) {
-	rawMap, err := sh.OutCmd("go", "run", mage.OSSBeatDir("scripts/msetlists/main.go"))()
-	if err != nil {
-		return nil, err
+
+	runpaths := []string{
+		mage.OSSBeatDir("scripts/msetlists/main.go"),
+		mage.XPackBeatDir("scripts/msetlists/main.go"),
 	}
-	var msetMap = make(map[string][]string)
-	err = json.Unmarshal([]byte(rawMap), &msetMap)
-	if err != nil {
-		return nil, err
+
+	var masterMap = make(map[string][]string)
+	for _, dir := range runpaths {
+		rawMap, err := sh.OutCmd("go", "run", dir)()
+		if err != nil {
+			return nil, err
+		}
+		var msetMap = make(map[string][]string)
+		err = json.Unmarshal([]byte(rawMap), &msetMap)
+		if err != nil {
+			return nil, err
+		}
+		for k, v := range msetMap {
+			masterMap[k] = v
+		}
 	}
-	return msetMap, nil
+
+	return masterMap, nil
 }
 
 // loadModuleFields loads the module-specific fields.yml file

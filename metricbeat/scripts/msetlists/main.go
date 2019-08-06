@@ -23,17 +23,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/paths"
 	_ "github.com/elastic/beats/metricbeat/include"
 	"github.com/elastic/beats/metricbeat/mb"
-	_ "github.com/elastic/beats/x-pack/metricbeat/include"
-	xpackmb "github.com/elastic/beats/x-pack/metricbeat/mb"
 )
 
 func main() {
-	path := paths.Resolve(paths.Home, "../x-pack/metricbeat/module")
-	lm := xpackmb.NewLightModulesSource(path)
-	mb.Registry.SetSecondarySource(lm)
 
 	// List all registered modules and metricsets.
 	var defaultMap = make(map[string][]string)
