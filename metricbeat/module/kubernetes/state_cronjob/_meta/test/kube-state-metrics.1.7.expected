@@ -12,14 +12,12 @@
 				"sec": 1563559712
 			},
 			"is_suspended": false,
+			"last_schedule": {
+				"sec": 1563561180
+			},
 			"name": "hello",
-			"schedule": {
-				"last": {
-					"sec": 1563561180
-				},
-				"next": {
-					"sec": 1563561240
-				}
+			"next_schedule": {
+				"sec": 1563561240
 			}
 		},
 		"Index": "",
@@ -45,14 +43,12 @@
 				"sec": 1563559848
 			},
 			"is_suspended": false,
+			"last_schedule": {
+				"sec": 1563561180
+			},
 			"name": "bye",
-			"schedule": {
-				"last": {
-					"sec": 1563561180
-				},
-				"next": {
-					"sec": 1563561240
-				}
+			"next_schedule": {
+				"sec": 1563561240
 			}
 		},
 		"Index": "",

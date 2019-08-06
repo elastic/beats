@@ -16127,7 +16127,7 @@ type: double
 
 --
 
-*`kubernetes.cronjob.schedule.last.sec`*::
+*`kubernetes.cronjob.last_schedule.sec`*::
 +
 --
 Epoch seconds for last cronjob run
@@ -16136,7 +16136,7 @@ type: double
 
 --
 
-*`kubernetes.cronjob.schedule.next.sec`*::
+*`kubernetes.cronjob.next_schedule.sec`*::
 +
 --
 Epoch seconds for next cronjob run

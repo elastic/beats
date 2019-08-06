@@ -11,17 +11,15 @@
                     "count": 1
                 },
                 "created": {
-                    "sec": 1563559848
+                    "sec": 1563559712
                 },
                 "is_suspended": false,
-                "name": "bye",
-                "schedule": {
-                    "last": {
-                        "sec": 1563561180
-                    },
-                    "next": {
-                        "sec": 1563561240
-                    }
+                "last_schedule": {
+                    "sec": 1563561180
+                },
+                "name": "hello",
+                "next_schedule": {
+                    "sec": 1563561240
                 }
             },
             "namespace": "default"
@@ -46,17 +44,15 @@
                     "count": 1
                 },
                 "created": {
-                    "sec": 1563559712
+                    "sec": 1563559848
                 },
                 "is_suspended": false,
-                "name": "hello",
-                "schedule": {
-                    "last": {
-                        "sec": 1563561180
-                    },
-                    "next": {
-                        "sec": 1563561240
-                    }
+                "last_schedule": {
+                    "sec": 1563561180
+                },
+                "name": "bye",
+                "next_schedule": {
+                    "sec": 1563561240
                 }
             },
             "namespace": "default"

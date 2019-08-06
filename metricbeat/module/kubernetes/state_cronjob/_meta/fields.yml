@@ -22,10 +22,10 @@
     - name: created.sec
       type: double
       description: Epoch seconds since the cronjob was created
-    - name: schedule.last.sec
+    - name: last_schedule.sec
       type: double
       description: Epoch seconds for last cronjob run
-    - name: schedule.next.sec
+    - name: next_schedule.sec
       type: double
       description: Epoch seconds for next cronjob run
     - name: deadline.sec
