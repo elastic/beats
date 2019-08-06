@@ -48,8 +48,9 @@ type config struct {
 }
 
 type Settings struct {
-	DefaultUsername string
-	Format          Format
+	DefaultUsername     string
+	Format              Format
+	OverrideClusterUUID string
 }
 
 type Reporter interface {

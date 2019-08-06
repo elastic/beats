@@ -1060,6 +1060,13 @@ logging.files:
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
 
+# If output.elasticsearch is enabled, monitoring data for this Functionbeat instance
+# will be associated with the Elasticsearch cluster referenced by output.elasticsearch in
+# the Stack Monitoring UI. However, if a different output is enabled, the monitoring data will
+# show up under a Standalone Cluster in the UI. If you want the monitoring data to be associated
+# with a specific Elasticsearch cluster in the UI, specify that cluster's UUID here.
+#monitoring.override_cluster_uuid:
+
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
 # Note that the settings should point to your Elasticsearch *monitoring* cluster.

@@ -97,7 +97,16 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 		return monitoringCfg, &report.Settings{Format: report.FormatXPackMonitoringBulk}, nil
 	case beatCfg.Monitoring.Enabled():
 		monitoringCfg := beatCfg.Monitoring
-		return monitoringCfg, &report.Settings{Format: report.FormatBulk}, nil
+
+		var overrideClusterUUID string
+		if monitoringCfg.HasField("override_cluster_uuid") {
+			var err error
+			overrideClusterUUID, err = monitoringCfg.String("override_cluster_uuid", -1)
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+		return monitoringCfg, &report.Settings{Format: report.FormatBulk, OverrideClusterUUID: overrideClusterUUID}, nil
 	default:
 		return nil, nil, nil
 	}

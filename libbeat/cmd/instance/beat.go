@@ -392,8 +392,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	if monitoringCfg.Enabled() {
 		settings := report.Settings{
-			DefaultUsername: settings.Monitoring.DefaultUsername,
-			Format:          reporterSettings.Format,
+			DefaultUsername:     settings.Monitoring.DefaultUsername,
+			Format:              reporterSettings.Format,
+			OverrideClusterUUID: reporterSettings.OverrideClusterUUID,
 		}
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {

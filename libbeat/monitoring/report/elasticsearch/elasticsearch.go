@@ -109,6 +109,10 @@ func defaultConfig(settings report.Settings) config {
 		c.Format = settings.Format
 	}
 
+	if settings.OverrideClusterUUID != "" {
+		c.OverrideClusterUUID = settings.OverrideClusterUUID
+	}
+
 	return c
 }
 
@@ -261,12 +265,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod)
+	go r.snapshotLoop("state", "state", c.StatePeriod, c.OverrideClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.OverrideClusterUUID)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, overrideClusterUUID string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -305,7 +309,12 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
 		}
 
-		clusterUUID := getClusterUUID()
+		var clusterUUID string
+		if overrideClusterUUID != "" {
+			clusterUUID = overrideClusterUUID
+		} else {
+			clusterUUID = getClusterUUID()
+		}
 		if clusterUUID != "" {
 			meta.Put("cluster_uuid", clusterUUID)
 		}
