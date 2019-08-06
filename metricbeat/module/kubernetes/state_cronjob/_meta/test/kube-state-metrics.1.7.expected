@@ -1,22 +1,25 @@
 [
 	{
 		"RootFields": null,
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
 		"MetricSetFields": {
 			"active": {
 				"count": 1
 			},
 			"created": {
-				"sec": 1563559848
+				"sec": 1563559712
 			},
 			"is_suspended": false,
-			"lastschedule": {
-				"sec": 1563561180
-			},
-			"name": "bye",
-			"namespace": "default",
-			"nextschedule": {
-				"sec": 1563561240
+			"name": "hello",
+			"schedule": {
+				"last": {
+					"sec": 1563561180
+				},
+				"next": {
+					"sec": 1563561240
+				}
 			}
 		},
 		"Index": "",
@@ -31,22 +34,25 @@
 	},
 	{
 		"RootFields": null,
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
 		"MetricSetFields": {
 			"active": {
 				"count": 1
 			},
 			"created": {
-				"sec": 1563559712
+				"sec": 1563559848
 			},
 			"is_suspended": false,
-			"lastschedule": {
-				"sec": 1563561180
-			},
-			"name": "hello",
-			"namespace": "default",
-			"nextschedule": {
-				"sec": 1563561240
+			"name": "bye",
+			"schedule": {
+				"last": {
+					"sec": 1563561180
+				},
+				"next": {
+					"sec": 1563561240
+				}
 			}
 		},
 		"Index": "",

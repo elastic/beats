@@ -7,9 +7,6 @@
     - name: name
       type: keyword
       description: Cronjob name
-    - name: namespace
-      type: keyword
-      description: Cronjob namespace
     - name: schedule
       type: keyword
       description: Cronjob schedule
@@ -25,10 +22,10 @@
     - name: created.sec
       type: double
       description: Epoch seconds since the cronjob was created
-    - name: lastschedule.sec
+    - name: schedule.last.sec
       type: double
       description: Epoch seconds for last cronjob run
-    - name: nextschedule.sec
+    - name: schedule.next.sec
       type: double
       description: Epoch seconds for next cronjob run
     - name: deadline.sec

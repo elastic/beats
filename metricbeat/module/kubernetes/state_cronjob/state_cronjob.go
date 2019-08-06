@@ -18,46 +18,92 @@
 package state_cronjob
 
 import (
+	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-)
-
-const (
-	defaultScheme = "http"
-	defaultPath   = "/metrics"
-)
-
-var (
-	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		DefaultPath:   defaultPath,
-	}.Build()
-
-	mapping = &p.MetricsMapping{
-		Metrics: map[string]p.MetricMap{
-			"kube_cronjob_info":                           p.InfoMetric(),
-			"kube_cronjob_created":                        p.Metric("created.sec"),
-			"kube_cronjob_status_active":                  p.Metric("active.count"),
-			"kube_cronjob_status_last_schedule_time":      p.Metric("lastschedule.sec"),
-			"kube_cronjob_next_schedule_time":             p.Metric("nextschedule.sec"),
-			"kube_cronjob_spec_suspend":                   p.BooleanMetric("is_suspended"),
-			"kube_cronjob_spec_starting_deadline_seconds": p.Metric("deadline.sec"),
-		},
-		Labels: map[string]p.LabelMap{
-			"cronjob":            p.KeyLabel("name"),
-			"namespace":          p.KeyLabel(mb.ModuleDataKey + ".namespace"),
-			"schedule":           p.KeyLabel("schedule"),
-			"concurrency_policy": p.KeyLabel("concurrency"),
-		},
-		Namespace: "kubernetes.cronjob",
-	}
 )
 
 func init() {
 
 	mb.Registry.MustAddMetricSet("kubernetes", "state_cronjob",
-		p.MetricSetBuilder(mapping),
+		NewCronJobMetricSet,
 		mb.WithHostParser(p.HostParser))
+}
 
+// CronJobMetricSet uses a prometheus based MetricSet that looks for
+// mb.ModuleDataKey prefixed fields and puts then at the module level
+//
+// Copying the code from other kube state metrics, this should be improved to
+// avoid all these ugly tricks
+type CronJobMetricSet struct {
+	mb.BaseMetricSet
+	prometheus p.Prometheus
+	mapping    *p.MetricsMapping
+}
+
+// NewCronJobMetricSet returns a prometheus based metricset for CronJobs
+func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	prometheus, err := p.NewPrometheusClient(base)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CronJobMetricSet{
+		BaseMetricSet: base,
+		prometheus:    prometheus,
+		mapping: &p.MetricsMapping{
+			Metrics: map[string]p.MetricMap{
+				"kube_cronjob_info":                           p.InfoMetric(),
+				"kube_cronjob_created":                        p.Metric("created.sec"),
+				"kube_cronjob_status_active":                  p.Metric("active.count"),
+				"kube_cronjob_status_last_schedule_time":      p.Metric("schedule.last.sec"),
+				"kube_cronjob_next_schedule_time":             p.Metric("schedule.next.sec"),
+				"kube_cronjob_spec_suspend":                   p.BooleanMetric("is_suspended"),
+				"kube_cronjob_spec_starting_deadline_seconds": p.Metric("deadline.sec"),
+			},
+			Labels: map[string]p.LabelMap{
+				"cronjob":            p.KeyLabel("name"),
+				"namespace":          p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+				"schedule":           p.KeyLabel("schedule"),
+				"concurrency_policy": p.KeyLabel("concurrency"),
+			},
+		},
+	}, nil
+}
+
+// Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
+// module rooted fields at the event that gets reported
+//
+// Copied from other kube state metrics.
+func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
+	events, err := m.prometheus.GetProcessedMetrics(m.mapping)
+	if err != nil {
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
+	}
+
+	for _, event := range events {
+
+		var moduleFieldsMapStr common.MapStr
+		moduleFields, ok := event[mb.ModuleDataKey]
+		if ok {
+			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
+			if !ok {
+				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
+			}
+		}
+		delete(event, mb.ModuleDataKey)
+
+		if reported := reporter.Event(mb.Event{
+			MetricSetFields: event,
+			ModuleFields:    moduleFieldsMapStr,
+			Namespace:       "kubernetes.cronjob",
+		}); !reported {
+			m.Logger().Debug("error trying to emit event")
+			return
+		}
+	}
+
+	return
 }

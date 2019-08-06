@@ -16082,15 +16082,6 @@ type: keyword
 
 --
 
-*`kubernetes.cronjob.namespace`*::
-+
---
-Cronjob namespace
-
-type: keyword
-
---
-
 *`kubernetes.cronjob.schedule`*::
 +
 --
@@ -16136,7 +16127,7 @@ type: double
 
 --
 
-*`kubernetes.cronjob.lastschedule.sec`*::
+*`kubernetes.cronjob.schedule.last.sec`*::
 +
 --
 Epoch seconds for last cronjob run
@@ -16145,7 +16136,7 @@ type: double
 
 --
 
-*`kubernetes.cronjob.nextschedule.sec`*::
+*`kubernetes.cronjob.schedule.next.sec`*::
 +
 --
 Epoch seconds for next cronjob run

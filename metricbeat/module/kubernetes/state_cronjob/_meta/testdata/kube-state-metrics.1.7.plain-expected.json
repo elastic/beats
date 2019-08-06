@@ -14,15 +14,17 @@
                     "sec": 1563559848
                 },
                 "is_suspended": false,
-                "lastschedule": {
-                    "sec": 1563561180
-                },
                 "name": "bye",
-                "namespace": "default",
-                "nextschedule": {
-                    "sec": 1563561240
+                "schedule": {
+                    "last": {
+                        "sec": 1563561180
+                    },
+                    "next": {
+                        "sec": 1563561240
+                    }
                 }
-            }
+            },
+            "namespace": "default"
         },
         "metricset": {
             "name": "state_cronjob"
@@ -47,15 +49,17 @@
                     "sec": 1563559712
                 },
                 "is_suspended": false,
-                "lastschedule": {
-                    "sec": 1563561180
-                },
                 "name": "hello",
-                "namespace": "default",
-                "nextschedule": {
-                    "sec": 1563561240
+                "schedule": {
+                    "last": {
+                        "sec": 1563561180
+                    },
+                    "next": {
+                        "sec": 1563561240
+                    }
                 }
-            }
+            },
+            "namespace": "default"
         },
         "metricset": {
             "name": "state_cronjob"
