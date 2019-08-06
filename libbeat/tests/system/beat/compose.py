@@ -1,14 +1,12 @@
 from __future__ import absolute_import
 import os
 import sys
+import tarfile
 import time
+import StringIO
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
-
-# TODO: To be removed when env files are removed from docker compose
-OVERRIDE_HOST = os.environ.get('OVERRIDE_HOST', False)
-
 
 if INTEGRATION_TESTS:
     from compose.cli.command import get_project
@@ -29,6 +27,9 @@ class ComposeMixin(object):
 
     # timeout waiting for health (seconds)
     COMPOSE_TIMEOUT = 300
+
+    # add advertised host environment file
+    COMPOSE_ADVERTISED_HOST = False
 
     @classmethod
     def compose_up(cls):
@@ -77,6 +78,10 @@ class ComposeMixin(object):
             if healthy:
                 break
 
+            if cls.COMPOSE_ADVERTISED_HOST:
+                for service in cls.COMPOSE_SERVICES:
+                    cls._setup_advertised_host(project, service)
+
             time.sleep(1)
             timeout = time.time() - start > cls.COMPOSE_TIMEOUT
             if timeout:
@@ -87,6 +92,30 @@ class ComposeMixin(object):
                     "Timeout while waiting for healthy "
                     "docker-compose services: %s" %
                     ','.join(cls.COMPOSE_SERVICES))
+
+    @classmethod
+    def _setup_advertised_host(cls, project, service):
+        """
+        There are services like kafka that announce an advertised address
+        to clients, who should reconnect to this address. This method
+        sends the proper address to use to the container by adding a
+        environment file with the SERVICE_HOST variable set to this value.
+        """
+        host = cls.compose_host(service=service)
+
+        content = "SERVICE_HOST=%s" % host
+        info = tarfile.TarInfo(name="/run/compose_env")
+        info.mode = 0100644
+        info.size = len(content)
+
+        data = StringIO.StringIO()
+        tar = tarfile.TarFile(fileobj=data, mode='w')
+        tar.addfile(info, StringIO.StringIO(content))
+        tar.close()
+
+        containers = project.containers(service_names=[service])
+        for container in containers:
+            container.client.put_archive(container=container.id, path="/", data=data.getvalue())
 
     @classmethod
     def compose_down(cls):
@@ -135,11 +164,9 @@ class ComposeMixin(object):
         if service is None:
             service = cls.COMPOSE_SERVICES[0]
 
-        # TODO: Remove condition when env files are removed from docker compose
-        if OVERRIDE_HOST:
-            host_env = os.environ.get(service.upper() + "_HOST")
-            if host_env:
-                return host_env
+        host_env = os.environ.get(service.upper() + "_HOST")
+        if host_env:
+            return host_env
 
         container = cls.compose_project().containers(service_names=[service])[0]
         info = container.inspect()

@@ -37,10 +37,10 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "metricbeat")
+	service := compose.EnsureUp(t, "metricbeat")
 
 	for _, metricSet := range metricSets {
-		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet))
+		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet, service.Host()))
 		events, errs := mbtest.ReportingFetchV2Error(f)
 
 		assert.Empty(t, errs)
@@ -54,10 +54,10 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "metricbeat")
+	service := compose.EnsureUp(t, "metricbeat")
 
 	for _, metricSet := range metricSets {
-		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet))
+		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet, service.Host()))
 		err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
 		if err != nil {
 			t.Fatal("write", err)
