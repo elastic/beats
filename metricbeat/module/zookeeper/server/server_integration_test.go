@@ -22,11 +22,9 @@ package server
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/module/zookeeper"
-
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -34,9 +32,9 @@ import (
 func TestFetch(t *testing.T) {
 	logp.TestingSetup()
 
-	compose.EnsureUp(t, "zookeeper")
+	service := compose.EnsureUp(t, "zookeeper")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -59,17 +57,18 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	service := compose.EnsureUp(t, "zookeeper")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "zookeeper",
 		"metricsets": []string{"server"},
-		"hosts":      []string{zookeeper.GetZookeeperEnvHost() + ":" + zookeeper.GetZookeeperEnvPort()},
+		"hosts":      []string{host},
 	}
 }
