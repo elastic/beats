@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Netflow conversation partners",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -153,7 +153,7 @@
             }
           }
         },
-        "title": "[Filebeat Netflow] Conversation Partners",
+        "title": "Conversation Partners [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -235,7 +235,7 @@
             },
             "totalFunc": "sum"
           },
-          "title": "[Filebeat Netflow] Conversation Partners",
+          "title": "Conversation Partners [Filebeat Netflow]",
           "type": "table"
         }
       },
