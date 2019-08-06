@@ -218,7 +218,7 @@ for more information about the environment variables.
 ===== `index`
 
 ifndef::apm-server[]
-The index name to write events to. The default is
+The index name to write events to when you're using daily indices. The default is
 +"{beatname_lc}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
@@ -246,6 +246,12 @@ If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
 endif::no_dashboards[]
+
+ifndef::no_ilm[]
+The `index` setting is ignored when index lifecycle management is enabled. If
+you’re sending events to a cluster that supports index lifecycle management, see
+<<ilm>> to learn how to change the index name.
+endif::no_ilm[]
 
 You can set the index dynamically by using a format string to access any event
 field. For example, this configuration uses a custom field, `fields.log_type`,
