@@ -38,6 +38,15 @@
         - name: certificate_not_valid_after
           type: date
           description: Latest time at which the connection's certificates are valid.
+        - name: certificate_root_common_name
+          type: string
+          description: Common Name of certificate root certificate authority.
+        - name: certificate_issuer_common_name
+          type: string
+          description: Common Name of certificate issuer.
+        - name: certificate_common_name
+          type: string
+          description: Common Name of certificate. Useful in identifying wildcards.
         - name: rtt
           type: group
           description: >
