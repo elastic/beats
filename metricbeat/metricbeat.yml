@@ -139,7 +139,6 @@ processors:
 
 # Set to true to enable the monitoring reporter.
 #monitoring.enabled: false
-monitoring.enabled: true
 
 # If output.elasticsearch is enabled, monitoring data for this Metricbeat instance
 # will be associated with the Elasticsearch cluster referenced by output.elasticsearch in
@@ -147,7 +146,6 @@ monitoring.enabled: true
 # show up under a Standalone Cluster in the UI. If you want the monitoring data to be associated
 # with a specific Elasticsearch cluster in the UI, specify that cluster's UUID here.
 #monitoring.override_cluster_uuid:
-monitoring.override_cluster_uuid: foobar
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
