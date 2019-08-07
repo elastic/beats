@@ -141,6 +141,7 @@ func (f *Field) validateType() error {
 	case "":
 		// Module keys, not used as fields
 	default:
+		// There are more types, not being used by beats, to be added if needed
 		return fmt.Errorf("unexpected type '%s' for field '%s'", f.Type, f.Name)
 	}
 	return nil
