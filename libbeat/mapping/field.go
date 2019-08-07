@@ -80,24 +80,6 @@ type Field struct {
 	Path      string
 }
 
-var (
-	fieldDataTypes = []string{
-		// strings
-		"text", "keyword",
-
-		// numbers
-		"long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float",
-
-		// dates
-		"date", "date_nanos",
-
-		// boolean
-		"boolean",
-	}
-
-	formatters = map[string][]string{}
-)
-
 // ObjectTypeCfg defines type and configuration of object attributes
 type ObjectTypeCfg struct {
 	ObjectType            string `config:"object_type"`
