@@ -186,8 +186,17 @@ class ComposeMixin(object):
         return cls._exposed_host(info, port)
 
     @classmethod
+    def compose_project_name(cls):
+        def positivehash(x):
+            return hash(x) % ((sys.maxsize+1) * 2)
+
+        return "%s_%X" % (
+                os.path.basename(cls.find_compose_path()),
+                positivehash(frozenset(cls.COMPOSE_BUILD_ARGS.items())))
+
+    @classmethod
     def compose_project(cls):
-        return get_project(cls.find_compose_path(), project_name=os.environ.get('DOCKER_COMPOSE_PROJECT_NAME'))
+        return get_project(cls.find_compose_path(), project_name=cls.compose_project_name())
 
     @classmethod
     def find_compose_path(cls):
