@@ -15,27 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package gather
+package main
 
 import (
-	"strings"
+	"encoding/json"
+	"fmt"
+	"os"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	_ "github.com/elastic/beats/metricbeat/include"
+	"github.com/elastic/beats/metricbeat/scripts/msetlists"
 )
 
-// DefaultMetricsets returns a JSON array of all registered default metricsets
-// It depends upon the calling library to actually import or register the metricsets.
-func DefaultMetricsets() map[string][]string {
-	// List all registered modules and metricsets.
-	var defaultMap = make(map[string][]string)
-	for _, mod := range mb.Registry.Modules() {
-		metricSets, err := mb.Registry.DefaultMetricSets(mod)
-		if err != nil && !strings.Contains(err.Error(), "no default metricset for") {
-			continue
-		}
-		defaultMap[mod] = metricSets
+func main() {
+	msList := msetlists.DefaultMetricsets()
+
+	raw, err := json.MarshalIndent(msList, "", "  ")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error Marshalling json: %s\n", err)
+		os.Exit(1)
 	}
 
-	return defaultMap
-
+	fmt.Printf("%s\n", string(raw))
 }
