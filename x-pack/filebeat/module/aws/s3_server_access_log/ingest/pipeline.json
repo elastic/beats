@@ -18,14 +18,13 @@
                 "ACCESSLOG8": "(?:-|%{WORD:aws.s3_server_access_log.authentication_type}) (?:-|%{S3ID:aws.s3_server_access_log.host_header}) (?:-|%{S3VERSION:aws.s3_server_access_log.tls_version})",
                 "S3REQUESTID": "[a-zA-Z0-9]+",
                 "S3OPERATION": "%{WORD}.%{WORD}.%{WORD}",
-                "S3REQUESTER": "[a-zA-Z0-9\\/_\\.\\-%:]+",
+                "S3REQUESTER": "[a-zA-Z0-9\\/_\\.\\-%:@]+",
                 "S3KEY": "[a-zA-Z0-9\\/_\\.\\-%]+",
                 "S3ID": "[a-zA-Z0-9\\/_\\.\\-%+=]+",
                 "S3VERSION": "[a-zA-Z0-9.]+"
             }
           }
         },
-
         {
             "date": {
                 "field": "aws.s3_server_access_log.time",
