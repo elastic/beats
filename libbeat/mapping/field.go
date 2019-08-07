@@ -143,41 +143,49 @@ func (f *Field) Validate() error {
 func (f *Field) validateType() error {
 	switch strings.ToLower(f.Type) {
 	case "text", "keyword":
-		switch strings.ToLower(f.Format) {
-		case "", "string", "url":
-		default:
-			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
-		}
+		return errors.Wrapf(validateFormat(f.Format, "string"), "field %s", f.Name)
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
-		switch strings.ToLower(f.Format) {
-		case "", "string", "url", "bytes", "duration", "number", "percent", "color":
-		default:
-			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
-		}
+		return errors.Wrapf(validateFormat(f.Format, "number"), "field %s", f.Name)
 	case "date", "date_nanos":
-		switch strings.ToLower(f.Format) {
-		case "", "string", "url", "date":
-		default:
-			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
-		}
+		return errors.Wrapf(validateFormat(f.Format, "date"), "field %s", f.Name)
 	case "geo_point":
-		switch strings.ToLower(f.Format) {
-		case "", "string":
-		default:
-			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
-		}
+		return validateFormat(f.Format, "geo_point")
 	case "boolean", "binary", "ip", "alias", "array":
-		switch strings.ToLower(f.Format) {
-		case "":
-		default:
-			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
+		if f.Format != "" {
+			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
 		}
 	case "object", "group":
+		// No check for them yet
 	case "":
+		// Module keys, not used as fields
 	default:
 		return fmt.Errorf("unexpected type '%s' for field '%s'", f.Type, f.Name)
 	}
 	return nil
+}
+
+var validFormats = map[string][]string{
+	"string":    []string{"string", "url"},
+	"number":    []string{"string", "url", "bytes", "duration", "number", "percent", "color"},
+	"date":      []string{"string", "url", "date"},
+	"geo_point": []string{"geo_point"},
+	"none":      []string{},
+}
+
+func validateFormat(format, group string) error {
+	if format == "" {
+		return nil
+	}
+	groupFormats, ok := validFormats[group]
+	if !ok {
+		panic("unexpected type group " + group)
+	}
+	for _, expected := range groupFormats {
+		if expected == format {
+			return nil
+		}
+	}
+	return fmt.Errorf("unexpected format for %s type, expected one of: %s", group, strings.Join(groupFormats, ", "))
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {
