@@ -5,12 +5,3 @@ services:
     build: ./_meta
     ports:
       - 80
-
-  apache_2_4_12:
-    build:
-      context: ./_meta
-      args:
-        APACHE_VERSION: 2.4.12
-    ports:
-      - 80
-

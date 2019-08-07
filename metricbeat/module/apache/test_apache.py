@@ -86,7 +86,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
 
 class ApacheOldStatusTest(ApacheStatusTest):
 
-    COMPOSE_SERVICES = ['apache_2_4_12']
+    COMPOSE_BUILD_ARGS = {'APACHE_VERSION': '2.4.12'}
 
     def verify_fields(self, evt):
         self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())

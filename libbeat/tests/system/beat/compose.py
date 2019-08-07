@@ -22,6 +22,9 @@ class ComposeMixin(object):
     # List of required services to run INTEGRATION_TESTS
     COMPOSE_SERVICES = []
 
+    # Additional build arguments for docker compose build
+    COMPOSE_BUILD_ARGS = {}
+
     # timeout waiting for health (seconds)
     COMPOSE_TIMEOUT = 300
 
@@ -48,10 +51,13 @@ class ComposeMixin(object):
             return container.inspect()['State']['Health']['Status'] == 'healthy'
 
         project = cls.compose_project()
+        project.build(
+            service_names=cls.COMPOSE_SERVICES,
+            build_args=cls.COMPOSE_BUILD_ARGS)
         project.up(
             strategy=ConvergenceStrategy.always,
             service_names=cls.COMPOSE_SERVICES,
-            do_build=BuildAction.force,
+            do_build=BuildAction.skip,
             timeout=30)
 
         # Wait for them to be healthy
