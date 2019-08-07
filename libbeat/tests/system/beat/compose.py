@@ -130,9 +130,9 @@ class ComposeMixin(object):
 
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
             if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
-              cls.compose_project().down(remove_image_type=None, include_volumes=True)
+                cls.compose_project().down(remove_image_type=None, include_volumes=True)
             else:
-              cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
+                cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
     def get_hosts(cls):
@@ -208,5 +208,5 @@ class ComposeMixin(object):
             if os.path.exists(os.path.join(class_dir, "docker-compose.yml")):
                 return class_dir
             class_dir, current = os.path.split(class_dir)
-            if current == '': # We have reached root
+            if current == '':  # We have reached root
                 raise Exception("failed to find a docker-compose.yml file")
