@@ -41,6 +41,11 @@
                 "field": "aws.s3_server_access_log.time",
                 "ignore_failure": true
             }
+        },
+        {
+            "remove": {
+                "field": "message"
+            }
         }
     ],
     "on_failure": [
