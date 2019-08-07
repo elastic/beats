@@ -136,7 +136,7 @@ func (f *Field) validateType() error {
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
 		}
-	case "object", "group":
+	case "object", "group", "nested":
 		// No check for them yet
 	case "":
 		// Module keys, not used as fields
