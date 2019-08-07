@@ -22,9 +22,6 @@ class ComposeMixin(object):
     # List of required services to run INTEGRATION_TESTS
     COMPOSE_SERVICES = []
 
-    # docker-compose.yml dir path
-    COMPOSE_PROJECT_DIR = '.'
-
     # timeout waiting for health (seconds)
     COMPOSE_TIMEOUT = 300
 
@@ -184,4 +181,14 @@ class ComposeMixin(object):
 
     @classmethod
     def compose_project(cls):
-        return get_project(cls.COMPOSE_PROJECT_DIR, project_name=os.environ.get('DOCKER_COMPOSE_PROJECT_NAME'))
+        return get_project(cls.find_compose_path(), project_name=os.environ.get('DOCKER_COMPOSE_PROJECT_NAME'))
+
+    @classmethod
+    def find_compose_path(cls):
+        class_dir = os.path.abspath(os.path.dirname(sys.modules[cls.__module__].__file__))
+        while True:
+            if os.path.exists(os.path.join(class_dir, "docker-compose.yml")):
+                return class_dir
+            class_dir, current = os.path.split(class_dir)
+            if current == '': # We have reached root
+                raise Exception("failed to find a docker-compose.yml file")

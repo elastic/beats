@@ -1,9 +1,12 @@
 import os
-import metricbeat
 import unittest
 from nose.plugins.attrib import attr
 import urllib2
 import time
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
+import metricbeat
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
