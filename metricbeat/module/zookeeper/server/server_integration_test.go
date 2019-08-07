@@ -48,7 +48,7 @@ func TestFetch(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 
 		// Check values
-		assert.Equal(t, "02/06/2016 03:18 GMT", metricsetFields["version_date"])
+		assert.Equal(t, "2019-05-03T12:07:00Z", metricsetFields["version_date"])
 
 		received := metricsetFields["received"].(int64)
 		assert.True(t, received >= 0)

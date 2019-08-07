@@ -19,15 +19,14 @@ package server
 
 import (
 	"bytes"
-	"testing"
-
 	"github.com/stretchr/testify/assert"
+	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var srvrTestInput = `Zookeeper version: 3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03, built on 06/29/2018 04:05 GMT
+var srvrTestInput = `Zookeeper version: 3.5.5-390fe37ea45dee01bf87dc1c042b5e3dcce88653, built on 05/03/2019 12:07 GMT
 Latency min/avg/max: 1/2/3
 Received: 46
 Sent: 45
@@ -46,8 +45,8 @@ func TestParser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, "06/29/2018 04:05 GMT", mapStr["version_date"])
-	assert.Equal(t, "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03", versionID)
+	assert.Equal(t, "2019-05-03T12:07:00Z", mapStr["version_date"])
+	assert.Equal(t, "3.5.5-390fe37ea45dee01bf87dc1c042b5e3dcce88653", versionID)
 
 	latency := mapStr["latency"].(common.MapStr)
 	assert.Equal(t, int64(1), latency["min"])
