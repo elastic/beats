@@ -129,6 +129,7 @@ class ComposeMixin(object):
             return
 
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
+            # Use down own per-module scenarios to release network pools too
             if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
                 cls.compose_project().down(remove_image_type=None, include_volumes=True)
             else:
