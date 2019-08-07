@@ -1,13 +1,52 @@
 {
-  "description": "Pipeline to parse s3 server access logs",
-  "processors": [
-    {
-      "grok": {
-        "field": "message",
-        "patterns": [
-          "%{BASE16NUM:s3_bucket_owner} %{HOSTNAME:s3_bucket} %{TIMESTAMP_ISO8601:timestamp} %{IP:s3_remote_ip} %{BASE16NUM:s3_requester} %{BASE16NUM:s3_request_id}"
-        ]
-      }
-    }
-  ]
+    "description": "Pipeline to parse s3 server access logs",
+    "processors": [
+        {
+          "grok": {
+            "field": "message",
+            "patterns": [
+                "%{ACCESSLOG1} %{ACCESSLOG2} %{ACCESSLOG3} %{ACCESSLOG4} %{ACCESSLOG5} %{ACCESSLOG6} %{ACCESSLOG7} %{ACCESSLOG8}"
+            ],
+            "pattern_definitions": {
+                "ACCESSLOG1": "%{BASE16NUM:aws.s3_server_access_log.bucket_owner} %{HOSTNAME:aws.s3_server_access_log.bucket} \\[%{HTTPDATE:aws.s3_server_access_log.time}\\]",
+                "ACCESSLOG2": "%{IP:aws.s3_server_access_log.remote_ip} (?:-|%{BASE16NUM:aws.s3_server_access_log.requester}) %{BASE16NUM:aws.s3_server_access_log.request_id}",
+                "ACCESSLOG3": "%{S3OPERATION:aws.s3_server_access_log.operation} (?:-|%{S3KEY:aws.s3_server_access_log.key}) \"%{DATA:aws.s3_server_access_log.request_uri}\"",
+                "ACCESSLOG4": "%{NUMBER:aws.s3_server_access_log.http_status:long} (?:-|%{WORD:aws.s3_server_access_log.error_code}) %{NUMBER:aws.s3_server_access_log.bytes_sent:long}",
+                "ACCESSLOG5": "(?:-|%{NUMBER:aws.s3_server_access_log.object_size:long}) (?:-|%{NUMBER:aws.s3_server_access_log.total_time:long}) (?:-|%{NUMBER:aws.s3_server_access_log.turn_around_time:long})",
+                "ACCESSLOG6": "(\"(-|%{DATA:aws.s3_server_access_log.referrer})\") (\"(-|%{DATA:aws.s3_server_access_log.user_agent})\") (?:-|%{S3KEY:aws.s3_server_access_log.version_id})",
+                "ACCESSLOG7": "(?:-|%{S3ID:aws.s3_server_access_log.host_id}) (?:-|%{S3VERSION:aws.s3_server_access_log.signature_version}) (?:-|%{S3KEY:aws.s3_server_access_log.cipher_suite})",
+                "ACCESSLOG8": "(?:-|%{WORD:aws.s3_server_access_log.authentication_type}) (?:-|%{S3ID:aws.s3_server_access_log.host_header}) (?:-|%{S3VERSION:aws.s3_server_access_log.tls_version})",
+                "S3OPERATION": "%{WORD}.%{WORD}.%{WORD}",
+                "S3KEY": "[a-zA-Z0-9\\/_\\.\\-%]+",
+                "S3ID": "[a-zA-Z0-9\\/_\\.\\-%+=]+",
+                "S3VERSION": "[a-zA-Z0-9.]+"
+            }
+          }
+        },
+
+        {
+            "date": {
+                "field": "aws.s3_server_access_log.time",
+                "target_field": "@timestamp",
+                "formats": [
+                    "dd/MMM/yyyy:H:m:s Z"
+                ],
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "aws.s3_server_access_log.time",
+                "ignore_failure": true
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
 }

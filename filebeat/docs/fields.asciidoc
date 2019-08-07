@@ -1008,6 +1008,21 @@ Fields from AWS logs.
 Fields for AWS S3 server access logs.
 
 
+
+*`aws.s3_server_access_log.s3_bucket_owner`*::
++
+--
+type: keyword
+
+--
+
+*`aws.s3_server_access_log.s3_bucket`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-aws]]
 == aws fields
 
