@@ -131,7 +131,7 @@ func (f *Field) validateType() error {
 	case "date", "date_nanos":
 		return errors.Wrapf(validateFormat(f.Format, "date"), "field %s", f.Name)
 	case "geo_point":
-		return validateFormat(f.Format, "geo_point")
+		return errors.Wrapf(validateFormat(f.Format, "geo_point"), "field %s", f.Name)
 	case "boolean", "binary", "ip", "alias", "array":
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
