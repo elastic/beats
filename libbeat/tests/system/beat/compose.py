@@ -129,7 +129,10 @@ class ComposeMixin(object):
             return
 
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
-            cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
+            if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
+              cls.compose_project().down(remove_image_type=None, include_volumes=True)
+            else:
+              cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
 
     @classmethod
     def get_hosts(cls):
@@ -187,12 +190,12 @@ class ComposeMixin(object):
 
     @classmethod
     def compose_project_name(cls):
+        basename = os.path.basename(cls.find_compose_path())
+
         def positivehash(x):
             return hash(x) % ((sys.maxsize+1) * 2)
 
-        return "%s_%X" % (
-                os.path.basename(cls.find_compose_path()),
-                positivehash(frozenset(cls.COMPOSE_BUILD_ARGS.items())))
+        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_BUILD_ARGS.items())))
 
     @classmethod
     def compose_project(cls):
