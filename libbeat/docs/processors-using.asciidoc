@@ -1353,8 +1353,6 @@ forget metadata for a container, 60s by default.
 [[add-host-metadata]]
 === Add Host metadata
 
-beta[]
-
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
