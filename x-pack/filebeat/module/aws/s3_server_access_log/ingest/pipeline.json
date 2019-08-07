@@ -9,7 +9,7 @@
             ],
             "pattern_definitions": {
                 "ACCESSLOG1": "%{BASE16NUM:aws.s3_server_access_log.bucket_owner} %{HOSTNAME:aws.s3_server_access_log.bucket} \\[%{HTTPDATE:aws.s3_server_access_log.time}\\]",
-                "ACCESSLOG2": "%{IP:aws.s3_server_access_log.remote_ip} (?:-|%{BASE16NUM:aws.s3_server_access_log.requester}) %{S3REQUESTID:aws.s3_server_access_log.request_id}",
+                "ACCESSLOG2": "%{IP:aws.s3_server_access_log.remote_ip} (?:-|%{S3REQUESTER:aws.s3_server_access_log.requester}) %{S3REQUESTID:aws.s3_server_access_log.request_id}",
                 "ACCESSLOG3": "%{S3OPERATION:aws.s3_server_access_log.operation} (?:-|%{S3KEY:aws.s3_server_access_log.key}) \"%{DATA:aws.s3_server_access_log.request_uri}\"",
                 "ACCESSLOG4": "%{NUMBER:aws.s3_server_access_log.http_status:long} (?:-|%{WORD:aws.s3_server_access_log.error_code}) (?:-|%{NUMBER:aws.s3_server_access_log.bytes_sent:long})",
                 "ACCESSLOG5": "(?:-|%{NUMBER:aws.s3_server_access_log.object_size:long}) (?:-|%{NUMBER:aws.s3_server_access_log.total_time:long}) (?:-|%{NUMBER:aws.s3_server_access_log.turn_around_time:long})",
@@ -18,6 +18,7 @@
                 "ACCESSLOG8": "(?:-|%{WORD:aws.s3_server_access_log.authentication_type}) (?:-|%{S3ID:aws.s3_server_access_log.host_header}) (?:-|%{S3VERSION:aws.s3_server_access_log.tls_version})",
                 "S3REQUESTID": "[a-zA-Z0-9]+",
                 "S3OPERATION": "%{WORD}.%{WORD}.%{WORD}",
+                "S3REQUESTER": "[a-zA-Z0-9\\/_\\.\\-%:]+",
                 "S3KEY": "[a-zA-Z0-9\\/_\\.\\-%]+",
                 "S3ID": "[a-zA-Z0-9\\/_\\.\\-%+=]+",
                 "S3VERSION": "[a-zA-Z0-9.]+"
