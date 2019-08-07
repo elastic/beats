@@ -16,7 +16,6 @@
       The state of the process (Idle, Running, etc)
   - name: start_time
     type: date
-    format: epoch_second
     description: >
       The date and time the process has started
   - name: start_since

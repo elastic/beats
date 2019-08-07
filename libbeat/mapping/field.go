@@ -80,6 +80,24 @@ type Field struct {
 	Path      string
 }
 
+var (
+	fieldDataTypes = []string{
+		// strings
+		"text", "keyword",
+
+		// numbers
+		"long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float",
+
+		// dates
+		"date", "date_nanos",
+
+		// boolean
+		"boolean",
+	}
+
+	formatters = map[string][]string{}
+)
+
 // ObjectTypeCfg defines type and configuration of object attributes
 type ObjectTypeCfg struct {
 	ObjectType            string `config:"object_type"`
@@ -110,11 +128,54 @@ func (d *DynamicType) Unpack(s string) error {
 
 // Validate ensures objectTypeParams are not mixed with top level objectType configuration
 func (f *Field) Validate() error {
+	if err := f.validateType(); err != nil {
+		return err
+	}
 	if len(f.ObjectTypeParams) == 0 {
 		return nil
 	}
 	if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
 		return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
+	}
+	return nil
+}
+
+func (f *Field) validateType() error {
+	switch strings.ToLower(f.Type) {
+	case "text", "keyword":
+		switch strings.ToLower(f.Format) {
+		case "", "string", "url":
+		default:
+			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
+		}
+	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
+		switch strings.ToLower(f.Format) {
+		case "", "string", "url", "bytes", "duration", "number", "percent", "color":
+		default:
+			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
+		}
+	case "date", "date_nanos":
+		switch strings.ToLower(f.Format) {
+		case "", "string", "url", "date":
+		default:
+			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
+		}
+	case "geo_point":
+		switch strings.ToLower(f.Format) {
+		case "", "string":
+		default:
+			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
+		}
+	case "boolean", "binary", "ip", "alias", "array":
+		switch strings.ToLower(f.Format) {
+		case "":
+		default:
+			return fmt.Errorf("unexpected format '%s' for field '%s'", f.Format, f.Name)
+		}
+	case "object", "group":
+	case "":
+	default:
+		return fmt.Errorf("unexpected type '%s' for field '%s'", f.Type, f.Name)
 	}
 	return nil
 }
