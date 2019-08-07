@@ -5,3 +5,10 @@ the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api]. The de
 === Compatibility
 
 The Ceph module is tested with Ceph Jewel (10.2.10).
+
+[float]
+=== Dashboard
+
+The Ceph module comes with a predefined dashboard showing Ceph cluster related metrics. For example:
+
+image::./images/ceph-overview-dashboard.png[]
