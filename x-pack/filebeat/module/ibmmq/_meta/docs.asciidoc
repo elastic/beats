@@ -2,7 +2,9 @@
 
 == IBM MQ module
 
-This is the ibmmq module.
+beta[]
+
+The `ibmmq` module collects and parses the queue manager error logs from IBM MQ in the standard format.
 
 include::../include/what-happens.asciidoc[]
 
