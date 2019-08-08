@@ -36,13 +36,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if len(config.Resources) == 0 {
 		return nil, errors.New("no metrics defined")
 	}
-	var monitorClient Client
-	monitorClient.New(config)
-	monitorClient.InitResources()
+	monitorClient, err := NewClient(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "error initializing the monitor client")
+	}
+	err = monitorClient.InitResources()
+	if err != nil {
+		return nil, errors.Wrap(err, "error initializing the monitor client")
+	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		client:        &monitorClient,
+		client:        monitorClient,
 	}, nil
 }
 
@@ -58,7 +63,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return nil
 	}
-	eventsMapping(report, m.client.resources.metrics)
+	eventsMapping(report, m.client.resourceConfig.metrics)
 
 	return nil
 }

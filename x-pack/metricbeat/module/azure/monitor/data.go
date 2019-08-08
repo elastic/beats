@@ -9,6 +9,9 @@ import (
 
 func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 	for _, metric := range metrics {
+		if len(metric.values) == 0 {
+			continue
+		}
 		metricList := common.MapStr{}
 
 		for _, value := range metric.values {
@@ -29,7 +32,7 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 				metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "count"), value.count)
 			}
 		}
-		event := &mb.Event{
+		event := mb.Event{
 			MetricSetFields: common.MapStr{
 				"resource": common.MapStr{
 					"name":     metric.resource.Name,
@@ -46,7 +49,7 @@ func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 				event.MetricSetFields.Put(fmt.Sprintf("dimensions.%s", dimension.name), dimension.value)
 			}
 		}
-		report.Event(*event)
+		report.Event(event)
 	}
 	return nil
 }

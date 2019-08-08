@@ -40,20 +40,16 @@ type Config struct {
 
 // MetricConfig contains metric specific configuration.
 type ResourceConfig struct {
-	Id        string            `config:"resource_id"`
-	Group     string            `config:"resource_group"`
-	Namespace []NamespaceConfig `config:"namespaces"`
-	Type      string            `config:"resource_type"`
-	Query     string            `config:"resource_query"`
-}
-
-type NamespaceConfig struct {
-	Name    string         `config:"name"`
+	Id      string         `config:"resource_id"`
+	Group   string         `config:"resource_group"`
 	Metrics []MetricConfig `config:"metrics"`
+	Type    string         `config:"resource_type"`
+	Query   string         `config:"resource_query"`
 }
 
 type MetricConfig struct {
 	Name         []string          `config:"name"`
+	Namespace    string            `config:"namespace"`
 	Aggregations []string          `config:"aggregations"`
 	Dimensions   []DimensionConfig `config:"dimensions"`
 }
