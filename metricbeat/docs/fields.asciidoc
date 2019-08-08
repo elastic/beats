@@ -881,6 +881,12 @@ type: object
 --
 
 [float]
+=== ebs
+
+`ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
+
+
+[float]
 === ec2
 
 `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
