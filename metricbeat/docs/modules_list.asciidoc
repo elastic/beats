@@ -38,7 +38,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
 |<<metricbeat-metricset-couchbase-node,node>>   
-|<<metricbeat-module-couchdb,couchdb>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-couchdb,couchdb>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-couchdb-server,server>> beta[]  
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .9+| .9+|  |<<metricbeat-metricset-docker-container,container>>   
