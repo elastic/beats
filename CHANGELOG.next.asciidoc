@@ -254,6 +254,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update module pipelines to enrich events with autonomous system fields. {pull}13036[13036]
 - Add module for ingesting IBM MQ logs. {pull}8782[8782]
 - Add S3 input to retrieve logs from AWS S3 buckets. {pull}12640[12640] {issue}12582[12582]
+- Add aws module s3access metricset. {pull}13170[13170] {issue}12880[12880]
 
 *Heartbeat*
 
