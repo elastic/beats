@@ -20,12 +20,13 @@ package server
 import (
 	"bufio"
 	"encoding/binary"
-	"github.com/pkg/errors"
 	"io"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
