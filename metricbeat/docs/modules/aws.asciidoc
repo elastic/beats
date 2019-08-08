@@ -161,6 +161,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
 
+* <<metricbeat-metricset-aws-ebs,ebs>>
+
 * <<metricbeat-metricset-aws-ec2,ec2>>
 
 * <<metricbeat-metricset-aws-elb,elb>>
@@ -174,6 +176,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-aws-sqs,sqs>>
 
 include::aws/cloudwatch.asciidoc[]
+
+include::aws/ebs.asciidoc[]
 
 include::aws/ec2.asciidoc[]
 
