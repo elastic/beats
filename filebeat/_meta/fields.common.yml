@@ -150,3 +150,45 @@
       type: keyword
       description: >
         Name of organization associated with the autonomous system.
+
+    - name: kafka
+      type: group
+      fields:
+        - name: topic
+          type: keyword
+          description: >
+            Kafka topic
+
+        - name: partition
+          type: long
+          description: >
+            Kafka partition number
+
+        - name: offset
+          type: long
+          description: >
+            Kafka offset of this message
+
+        - name: key
+          type: keyword
+          description: >
+            Kafka key, corresponding to the Kafka value stored in the message
+
+        - name: block_timestamp
+          type: date
+          description: >
+            Kafka outer (compressed) block timestamp
+
+        - name: headers
+          type: nested
+          description: >
+            Kafka headers for this message.
+          fields:
+            - name: key
+              type: keyword
+              description: >
+                The key for a kafka header
+            - name: value
+              type: keyword
+              description: >
+                The value for a kafka header

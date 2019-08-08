@@ -31,7 +31,6 @@ grouped in the following categories:
 * <<exported-fields-iptables>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kafka>>
-* <<exported-fields-kafka-input>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
@@ -7319,73 +7318,6 @@ type: text
 
 --
 
-[[exported-fields-kafka-input]]
-== Kafka Input fields
-
-Kafka metadata added by the kafka input
-
-
-
-*`kafka.topic`*::
-+
---
-Kafka topic
-
-
-type: keyword
-
---
-
-*`kafka.partition`*::
-+
---
-Kafka partition number
-
-
-type: long
-
---
-
-*`kafka.offset`*::
-+
---
-Kafka offset of this message
-
-
-type: long
-
---
-
-*`kafka.key`*::
-+
---
-Kafka key, corresponding to the Kafka value stored in the message
-
-
-type: keyword
-
---
-
-*`kafka.block_timestamp`*::
-+
---
-Kafka outer (compressed) block timestamp
-
-
-type: date
-
---
-
-*`kafka.headers`*::
-+
---
-The array of kafka headers, each an object containing string subfields "key" and "value".
-
-
-type: array
-
---
-
 [[exported-fields-kibana]]
 == kibana fields
 
@@ -7892,6 +7824,67 @@ Name of organization associated with the autonomous system.
 
 
 type: keyword
+
+--
+
+
+*`kafka.topic`*::
++
+--
+Kafka topic
+
+
+type: keyword
+
+--
+
+*`kafka.partition`*::
++
+--
+Kafka partition number
+
+
+type: long
+
+--
+
+*`kafka.offset`*::
++
+--
+Kafka offset of this message
+
+
+type: long
+
+--
+
+*`kafka.key`*::
++
+--
+Kafka key, corresponding to the Kafka value stored in the message
+
+
+type: keyword
+
+--
+
+*`kafka.block_timestamp`*::
++
+--
+Kafka outer (compressed) block timestamp
+
+
+type: date
+
+--
+
+*`kafka.headers`*::
++
+--
+Kafka headers for this message.
+
+
+type: nested
 
 --
 
