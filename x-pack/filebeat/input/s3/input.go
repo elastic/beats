@@ -10,6 +10,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -464,8 +465,8 @@ func createEvent(log string, offset int, s3Info s3Info, objectHash string, s3Con
 	return beat.Event{
 		Timestamp: time.Now(),
 		Fields:    f,
-		// Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
-		Private: s3Context,
+		Meta:      common.MapStr{"id": objectHash + "-" + fmt.Sprintf("%012d", offset)},
+		Private:   s3Context,
 	}
 }
 
