@@ -1,4 +1,4 @@
-- name: s3_server_access_log
+- name: s3access
   type: group
   description: >
     Fields for AWS S3 server access logs.

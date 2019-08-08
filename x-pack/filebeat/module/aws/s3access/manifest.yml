@@ -1,8 +1,8 @@
-module_version: "1.0"
+module_version: 1.0
 
 var:
   - name: input
     default: s3
 
 ingest_pipeline: ingest/pipeline.json
-input: config/config.yml
+input: config/{{.input}}.yml

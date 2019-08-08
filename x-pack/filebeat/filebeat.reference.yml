@@ -78,7 +78,7 @@ filebeat.modules:
 
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
-  s3_server_access_log:
+  s3access:
     enabled: true
 
     # AWS SQS queue url

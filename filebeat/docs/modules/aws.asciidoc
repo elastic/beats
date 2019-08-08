@@ -15,14 +15,14 @@ beta[]
 This is a module for aws logs. It supports reading s3 server access logs from S3.
 
 [float]
-==== `s3_server_access_log` fileset settings
+==== `s3access` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
 - module: aws
-  s3_server_access_log:
+  s3access:
     enabled: true
     var.queue_url: https://sqs.us-west-1.amazonaws.com/123/queue-name
     var.credential_profile_name: fb-aws
