@@ -16067,6 +16067,94 @@ format: bytes
 --
 
 [float]
+=== cronjob
+
+kubernetes cronjob metrics
+
+
+
+*`kubernetes.cronjob.name`*::
++
+--
+Cronjob name
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.schedule`*::
++
+--
+Cronjob schedule
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.concurrency`*::
++
+--
+Concurrency policy
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.active.count`*::
++
+--
+Number of active pods for the cronjob
+
+type: long
+
+--
+
+*`kubernetes.cronjob.is_suspended`*::
++
+--
+Whether the cronjob is suspended
+
+type: boolean
+
+--
+
+*`kubernetes.cronjob.created.sec`*::
++
+--
+Epoch seconds since the cronjob was created
+
+type: double
+
+--
+
+*`kubernetes.cronjob.last_schedule.sec`*::
++
+--
+Epoch seconds for last cronjob run
+
+type: double
+
+--
+
+*`kubernetes.cronjob.next_schedule.sec`*::
++
+--
+Epoch seconds for next cronjob run
+
+type: double
+
+--
+
+*`kubernetes.cronjob.deadline.sec`*::
++
+--
+Deadline seconds after schedule for considering failed
+
+type: long
+
+--
+
+[float]
 === deployment
 
 kubernetes deployment metrics
