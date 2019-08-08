@@ -108,6 +108,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/proxy"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/scheduler"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_container"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_cronjob"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_deployment"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_pod"
