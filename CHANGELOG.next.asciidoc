@@ -41,6 +41,9 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Journalbeat*
 
+- Use backoff when no new events are found. {pull}11861[11861]
+- Iterate over journal correctly, so no duplicate entries are sent. {pull}12716[12716]
+
 *Metricbeat*
 
 *Packetbeat*
