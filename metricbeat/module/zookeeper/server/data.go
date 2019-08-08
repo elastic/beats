@@ -59,8 +59,9 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (common.MapStr, string, error) 
 	date, err := time.Parse("01/02/2006 03:04 GMT", dateString)
 	if err != nil {
 		logger.Debugf("error trying to parse date '%s'", dateString)
+	} else {
+		output.Put("version_date", date.Format(time.RFC3339))
 	}
-	output.Put("version_date", date.Format(time.RFC3339))
 
 	for scanner.Scan() {
 		line := scanner.Text()
