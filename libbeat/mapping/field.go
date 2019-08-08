@@ -125,13 +125,13 @@ func (f *Field) Validate() error {
 func (f *Field) validateType() error {
 	switch strings.ToLower(f.Type) {
 	case "text", "keyword":
-		return errors.Wrapf(validateFormat(f.Format, "string"), "field %s", f.Name)
+		return errors.Wrapf(stringType.validate(f.Format), "field %s", f.Name)
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
-		return errors.Wrapf(validateFormat(f.Format, "number"), "field %s", f.Name)
+		return errors.Wrapf(numberType.validate(f.Format), "field %s", f.Name)
 	case "date", "date_nanos":
-		return errors.Wrapf(validateFormat(f.Format, "date"), "field %s", f.Name)
+		return errors.Wrapf(dateType.validate(f.Format), "field %s", f.Name)
 	case "geo_point":
-		return errors.Wrapf(validateFormat(f.Format, "geo_point"), "field %s", f.Name)
+		return errors.Wrapf(geoPointType.validate(f.Format), "field %s", f.Name)
 	case "boolean", "binary", "ip", "alias", "array":
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
@@ -147,28 +147,28 @@ func (f *Field) validateType() error {
 	return nil
 }
 
-var validFormats = map[string][]string{
-	"string":    []string{"string", "url"},
-	"number":    []string{"string", "url", "bytes", "duration", "number", "percent", "color"},
-	"date":      []string{"string", "url", "date"},
-	"geo_point": []string{"geo_point"},
-	"none":      []string{},
+type fieldTypeGroup struct {
+	name    string
+	formats []string
 }
 
-func validateFormat(format, group string) error {
+var (
+	stringType   = fieldTypeGroup{"string", []string{"string", "url"}}
+	numberType   = fieldTypeGroup{"number", []string{"string", "url", "bytes", "duration", "number", "percent", "color"}}
+	dateType     = fieldTypeGroup{"date", []string{"string", "url", "date"}}
+	geoPointType = fieldTypeGroup{"geo_point", []string{"geo_point"}}
+)
+
+func (g *fieldTypeGroup) validate(format string) error {
 	if format == "" {
 		return nil
 	}
-	groupFormats, ok := validFormats[group]
-	if !ok {
-		panic("unexpected type group " + group)
-	}
-	for _, expected := range groupFormats {
+	for _, expected := range g.formats {
 		if expected == format {
 			return nil
 		}
 	}
-	return fmt.Errorf("unexpected format for %s type, expected one of: %s", group, strings.Join(groupFormats, ", "))
+	return fmt.Errorf("unexpected format for %s type, expected one of: %s", g.name, strings.Join(g.formats, ", "))
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {
