@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package monitor
 
 import (
@@ -7,6 +11,7 @@ import (
 	"strings"
 )
 
+// eventsMapping will map metric values to beats events
 func eventsMapping(report mb.ReporterV2, metrics []Metric) error {
 	for _, metric := range metrics {
 		if len(metric.values) == 0 {

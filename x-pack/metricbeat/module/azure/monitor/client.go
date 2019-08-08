@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package monitor
 
 import (
@@ -15,7 +19,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// MonitorClient represents local client which will use the azure sdk go metricsclient
+// Client represents the azure client which will make use of the azure sdk go metrics related clients
 type Client struct {
 	metricsClient          *insights.MetricsClient
 	metricDefinitionClient *insights.MetricDefinitionsClient
@@ -25,6 +29,7 @@ type Client struct {
 	log                    *logp.Logger
 }
 
+// ResourceConfiguration represents the resource related configuration entered by the user
 type ResourceConfiguration struct {
 	metrics         []Metric
 	refreshInterval time.Duration
@@ -34,6 +39,7 @@ type ResourceConfiguration struct {
 	}
 }
 
+// Resource will contain the main azure resource details
 type Resource struct {
 	Id       string
 	Name     string
@@ -41,6 +47,7 @@ type Resource struct {
 	Type     string
 }
 
+// Metric will contain the main azure metric details
 type Metric struct {
 	resource     Resource
 	namespace    string
@@ -51,11 +58,13 @@ type Metric struct {
 	timeGrain    string
 }
 
+// Dimension represents the azure metric dimension details
 type Dimension struct {
 	name  string
 	value string
 }
 
+// MetricValue represents the azure metric values
 type MetricValue struct {
 	name      string
 	average   *float64
@@ -68,14 +77,14 @@ type MetricValue struct {
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config azure.Config) (*Client, error) {
-	clientConfig := auth.NewClientCredentialsConfig(config.ClientId, config.ClientSecret, config.TenantId)
+	clientConfig := auth.NewClientCredentialsConfig(config.ClientID, config.ClientSecret, config.TenantID)
 	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
 		return nil, err
 	}
-	metricsClient := insights.NewMetricsClient(config.SubscriptionId)
-	metricsDefinitionClient := insights.NewMetricDefinitionsClient(config.SubscriptionId)
-	resourceClient := resources.NewClient(config.SubscriptionId)
+	metricsClient := insights.NewMetricsClient(config.SubscriptionID)
+	metricsDefinitionClient := insights.NewMetricDefinitionsClient(config.SubscriptionID)
+	resourceClient := resources.NewClient(config.SubscriptionID)
 	metricsClient.Authorizer = authorizer
 	metricsDefinitionClient.Authorizer = authorizer
 	resourceClient.Authorizer = authorizer
@@ -98,11 +107,11 @@ func (client *Client) InitResources() error {
 	var metrics []Metric
 	for _, resource := range client.config.Resources {
 		//check for all options to identify resources : resourceid, resource group and resource query
-		if resource.Id != "" {
+		if resource.ID != "" {
 			for _, metric := range resource.Metrics {
-				re, err := client.resourceClient.GetByID(context.Background(), resource.Id)
+				re, err := client.resourceClient.GetByID(context.Background(), resource.ID)
 				if err != nil {
-					client.log.Errorf(" error while retrieving resource by id  %s : %s", resource.Id, err)
+					client.log.Errorf(" error while retrieving resource by id  %s : %s", resource.ID, err)
 				} else {
 					met, err := client.mapMetric(metric, re)
 					if err != nil {
@@ -151,6 +160,7 @@ func (client *Client) InitResources() error {
 	return nil
 }
 
+// mapMetric should validate and map the metric related configuration to relevant azure monitor api parameters
 func (client *Client) mapMetric(metric azure.MetricConfig, resource resources.GenericResource) (Metric, error) {
 	var dim []Dimension
 	var supportedMetricNames []string

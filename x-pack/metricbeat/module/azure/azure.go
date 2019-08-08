@@ -1,23 +1,6 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
-/*
-Package mysql is Metricbeat module for MySQL server.
-*/
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 package azure
 
@@ -29,24 +12,25 @@ import (
 
 // Config options
 type Config struct {
-	ClientId            string           `config:"client_id"    validate:"required"`
+	ClientID            string           `config:"client_id"    validate:"required"`
 	ClientSecret        string           `config:"client_secret" validate:"required"`
-	TenantId            string           `config:"tenant_id" validate:"required"`
-	SubscriptionId      string           `config:"subscription_id" validate:"required"`
+	TenantID            string           `config:"tenant_id" validate:"required"`
+	SubscriptionID      string           `config:"subscription_id" validate:"required"`
 	Period              time.Duration    `config:"period"`
 	Resources           []ResourceConfig `config:"resources"`
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
 }
 
-// MetricConfig contains metric specific configuration.
+// ResourceConfig contains resource and metric list specific configuration.
 type ResourceConfig struct {
-	Id      string         `config:"resource_id"`
+	ID      string         `config:"resource_id"`
 	Group   string         `config:"resource_group"`
 	Metrics []MetricConfig `config:"metrics"`
 	Type    string         `config:"resource_type"`
 	Query   string         `config:"resource_query"`
 }
 
+// MetricConfig contains metric specific configuration.
 type MetricConfig struct {
 	Name         []string          `config:"name"`
 	Namespace    string            `config:"namespace"`
@@ -54,6 +38,7 @@ type MetricConfig struct {
 	Dimensions   []DimensionConfig `config:"dimensions"`
 }
 
+// DimensionConfig contains dimensions specific configuration.
 type DimensionConfig struct {
 	Name  string `config:"name"`
 	Value string `config:"value"`
