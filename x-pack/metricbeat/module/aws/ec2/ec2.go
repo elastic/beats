@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
@@ -42,6 +44,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
+	CalculateRate bool `config:"calculate_rate"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -62,8 +65,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		base.Logger().Info(err)
 	}
 
+	config := struct {
+		CalculateRate bool `config:"calculate_rate"`
+	}{}
+
+	err = base.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+	}
+
 	return &MetricSet{
-		MetricSet: metricSet,
+		MetricSet:     metricSet,
+		CalculateRate: config.CalculateRate,
 	}, nil
 }
 
@@ -160,6 +173,9 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 		metricSetFieldResults[instanceID] = map[string]interface{}{}
 	}
 
+	// monitoring state for each instance
+	monitoringStates := map[string]string{}
+
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(getMetricDataResults)
 	if !timestamp.IsZero() {
@@ -192,6 +208,8 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				if err != nil {
 					return events, errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
 				}
+
+				monitoringStates[instanceID] = monitoringState
 
 				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
 				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
@@ -227,6 +245,10 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 				return events, errors.Wrap(err, "EventMapping failed")
 			}
 
+			if m.CalculateRate {
+				calculateRate(resultMetricsetFields, monitoringStates[instanceID])
+			}
+
 			events[instanceID].MetricSetFields.Update(resultMetricsetFields)
 			if len(events[instanceID].MetricSetFields) < 5 {
 				m.Logger().Info("Missing Cloudwatch data, this is expected for non-running instances" +
@@ -237,6 +259,49 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 	}
 
 	return events, nil
+}
+
+func calculateRate(resultMetricsetFields common.MapStr, monitoringState string) {
+	var period = 300.0
+	if monitoringState != "disabled" {
+		period = 60.0
+	}
+
+	networkIn, err := resultMetricsetFields.GetValue("network.in.bytes")
+	if err == nil && networkIn != nil {
+		networkInRate := networkIn.(float64) / period
+		resultMetricsetFields.Put("network.in.bytes_per_sec", networkInRate)
+	}
+
+	networkOut, err := resultMetricsetFields.GetValue("network.out.bytes")
+	if err == nil && networkOut != nil {
+		networkOutRate := networkOut.(float64) / period
+		resultMetricsetFields.Put("network.out.bytes_per_sec", networkOutRate)
+	}
+
+	diskReadBytes, err := resultMetricsetFields.GetValue("diskio.read.bytes")
+	if err == nil && networkOut != nil {
+		diskReadBytesRate := diskReadBytes.(float64) / period
+		resultMetricsetFields.Put("diskio.read.bytes_per_sec", diskReadBytesRate)
+	}
+
+	diskWriteBytes, err := resultMetricsetFields.GetValue("diskio.write.bytes")
+	if err == nil && networkOut != nil {
+		diskWriteBytesRate := diskWriteBytes.(float64) / period
+		resultMetricsetFields.Put("diskio.write.bytes_per_sec", diskWriteBytesRate)
+	}
+
+	diskReadOps, err := resultMetricsetFields.GetValue("diskio.read.count")
+	if err == nil && networkOut != nil {
+		diskReadOpsRate := diskReadOps.(float64) / period
+		resultMetricsetFields.Put("diskio.read.count_per_sec", diskReadOpsRate)
+	}
+
+	diskWriteOps, err := resultMetricsetFields.GetValue("diskio.write.count")
+	if err == nil && networkOut != nil {
+		diskWriteOpsRate := diskWriteOps.(float64) / period
+		resultMetricsetFields.Put("diskio.write.count_per_sec", diskWriteOpsRate)
+	}
 }
 
 func getInstancesPerRegion(svc ec2iface.ClientAPI) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {

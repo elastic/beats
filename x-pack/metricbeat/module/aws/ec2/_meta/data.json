@@ -3,41 +3,45 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 144,
-                "credit_usage": 0.005335,
+                "credit_balance": 576,
+                "credit_usage": 0.194305,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.0989071038248902
+                    "pct": 2.0499999999883576
                 }
             },
             "diskio": {
                 "read": {
                     "bytes": 0,
-                    "count": 0
+                    "bytes_per_sec": 0,
+                    "count": 0,
+                    "count_per_sec": 0
                 },
                 "write": {
                     "bytes": 0,
-                    "count": 0
+                    "bytes_per_sec": 0,
+                    "count": 0,
+                    "count_per_sec": 0
                 }
             },
             "instance": {
                 "core": {
-                    "count": 1
+                    "count": 2
                 },
                 "image": {
-                    "id": "ami-05b3bcf7f311194b3"
+                    "id": "ami-f920cd94"
                 },
                 "monitoring": {
                     "state": "disabled"
                 },
                 "private": {
-                    "dns_name": "ip-172-31-10-23.ap-southeast-1.compute.internal",
-                    "ip": "172.31.10.23"
+                    "dns_name": "ip-10-0-0-148.ec2.internal",
+                    "ip": "10.0.0.148"
                 },
                 "public": {
-                    "dns_name": "ec2-18-136-198-93.ap-southeast-1.compute.amazonaws.com",
-                    "ip": "18.136.198.93"
+                    "dns_name": "ec2-54-226-109-162.compute-1.amazonaws.com",
+                    "ip": "54.226.109.162"
                 },
                 "state": {
                     "code": 16,
@@ -47,12 +51,14 @@
             },
             "network": {
                 "in": {
-                    "bytes": 85.2,
-                    "packets": 1.4
+                    "bytes": 1297480,
+                    "bytes_per_sec": 4324.933333333333,
+                    "packets": 2734.8
                 },
                 "out": {
-                    "bytes": 108.8,
-                    "packets": 2
+                    "bytes": 395706.4,
+                    "bytes_per_sec": 1319.0213333333334,
+                    "packets": 2672.8
                 }
             },
             "status": {
@@ -60,18 +66,22 @@
                 "check_failed_instance": 0,
                 "check_failed_system": 0
             }
+        },
+        "tags": {
+            "Cost": "$614.01",
+            "Name": "container-registry-test-ui.elastic.co"
         }
     },
     "cloud": {
-        "availability_zone": "ap-southeast-1b",
+        "availability_zone": "us-east-1b",
         "instance": {
-            "id": "i-0c68eeb552231a8d0"
+            "id": "i-77f84332"
         },
         "machine": {
-            "type": "t2.micro"
+            "type": "t2.medium"
         },
         "provider": "aws",
-        "region": "ap-southeast-1"
+        "region": "us-east-1"
     },
     "event": {
         "dataset": "aws.ec2",

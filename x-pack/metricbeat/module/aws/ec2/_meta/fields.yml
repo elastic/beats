@@ -37,29 +37,53 @@
       format: bytes
       description: >
         The number of bytes received on all network interfaces by the instance.
+    - name: network.in.bytes_per_sec
+      type: long
+      description: >
+        Network received rate bytes per second, calculated with dividing network.in.bytes by 300 or by 60(detailed monitoring).
     - name: network.out.bytes
       type: long
       format: bytes
       description: >
         The number of bytes sent out on all network interfaces by the instance.
+    - name: network.out.bytes_per_sec
+      type: long
+      description: >
+        Network sent out rate bytes per second, calculated with dividing network.out.bytes by 300 or by 60(detailed monitoring).
     - name: diskio.read.bytes
       type: long
       format: bytes
       description: >
         Bytes read from all instance store volumes available to the instance.
+    - name: diskio.read.bytes_per_sec
+      type: long
+      description: >
+        Instance store volumes read rate bytes per second, calculated with dividing diskio.read.bytes by 300 or by 60(detailed monitoring).
     - name: diskio.write.bytes
       type: long
       format: bytes
       description: >
         Bytes written to all instance store volumes available to the instance.
+    - name: diskio.write.bytes_per_sec
+      type: long
+      description: >
+        Instance store volumes write rate bytes per second, calculated with dividing diskio.write.bytes by 300 or by 60(detailed monitoring).
     - name: diskio.read.ops
       type: long
       description: >
         Completed read operations from all instance store volumes available to the instance in a specified period of time.
+    - name: diskio.read.ops_per_sec
+      type: long
+      description: >
+        Read operations count per second, calculated with dividing diskio.read.ops by 300 or by 60(detailed monitoring).
     - name: diskio.write.ops
       type: long
       description: >
         Completed write operations to all instance store volumes available to the instance in a specified period of time.
+    - name: diskio.write.ops_per_sec
+      type: long
+      description: >
+        Write operations count per second, calculated with dividing diskio.write.ops by 300 or by 60(detailed monitoring).
     - name: status.check_failed
       type: long
       description: >

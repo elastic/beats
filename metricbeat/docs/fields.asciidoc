@@ -976,6 +976,16 @@ format: bytes
 
 --
 
+*`aws.ec2.network.in.bytes_per_sec`*::
++
+--
+Network received rate bytes per second, calculated with dividing network.in.bytes by 300 or by 60(detailed monitoring).
+
+
+type: long
+
+--
+
 *`aws.ec2.network.out.bytes`*::
 +
 --
@@ -985,6 +995,16 @@ The number of bytes sent out on all network interfaces by the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.network.out.bytes_per_sec`*::
++
+--
+Network sent out rate bytes per second, calculated with dividing network.out.bytes by 300 or by 60(detailed monitoring).
+
+
+type: long
 
 --
 
@@ -1000,6 +1020,16 @@ format: bytes
 
 --
 
+*`aws.ec2.diskio.read.bytes_per_sec`*::
++
+--
+Instance store volumes read rate bytes per second, calculated with dividing diskio.read.bytes by 300 or by 60(detailed monitoring).
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.bytes`*::
 +
 --
@@ -1009,6 +1039,16 @@ Bytes written to all instance store volumes available to the instance.
 type: long
 
 format: bytes
+
+--
+
+*`aws.ec2.diskio.write.bytes_per_sec`*::
++
+--
+Instance store volumes write rate bytes per second, calculated with dividing diskio.write.bytes by 300 or by 60(detailed monitoring).
+
+
+type: long
 
 --
 
@@ -1022,10 +1062,30 @@ type: long
 
 --
 
+*`aws.ec2.diskio.read.ops_per_sec`*::
++
+--
+Read operations count per second, calculated with dividing diskio.read.ops by 300 or by 60(detailed monitoring).
+
+
+type: long
+
+--
+
 *`aws.ec2.diskio.write.ops`*::
 +
 --
 Completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+
+type: long
+
+--
+
+*`aws.ec2.diskio.write.ops_per_sec`*::
++
+--
+Write operations count per second, calculated with dividing diskio.write.ops by 300 or by 60(detailed monitoring).
 
 
 type: long
