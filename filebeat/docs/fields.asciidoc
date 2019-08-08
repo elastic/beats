@@ -15,7 +15,6 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-aws>>
-* <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
@@ -50,6 +49,7 @@ grouped in the following categories:
 * <<exported-fields-process>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-s3>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
@@ -1233,40 +1233,6 @@ type: keyword
 +
 --
 The Transport Layer Security (TLS) version negotiated by the client.
-
-
-type: keyword
-
---
-
-[[exported-fields-aws]]
-== aws fields
-
-AWS fields from s3 input.
-
-
-
-[float]
-=== s3
-
-S3 related information.
-
-
-
-*`s3.bucket_name`*::
-+
---
-Name of the S3 bucket that this log retrieved from.
-
-
-type: keyword
-
---
-
-*`s3.object_key`*::
-+
---
-Name of the S3 object that this log retrieved from.
 
 
 type: keyword
@@ -13132,6 +13098,33 @@ type: keyword
 +
 --
 The arguments with which the command was called.
+
+
+type: keyword
+
+--
+
+[[exported-fields-s3]]
+== s3 fields
+
+S3 fields from s3 input.
+
+
+
+*`bucket_name`*::
++
+--
+Name of the S3 bucket that this log retrieved from.
+
+
+type: keyword
+
+--
+
+*`object_key`*::
++
+--
+Name of the S3 object that this log retrieved from.
 
 
 type: keyword

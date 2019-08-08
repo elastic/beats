@@ -1,5 +1,5 @@
-# Module: awscloud
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-awscloud.html
+# Module: aws
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-aws.html
 
 - module: aws
   s3_server_access_log:
