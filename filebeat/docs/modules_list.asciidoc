@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-modules-overview>>
   * <<filebeat-module-apache>>
   * <<filebeat-module-auditd>>
-  * <<filebeat-module-aws>>
+  * <<filebeat-module-awscloud>>
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-elasticsearch>>
@@ -42,7 +42,7 @@ This file is generated! See scripts/docs_collector.py
 include::modules-overview.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/auditd.asciidoc[]
-include::modules/aws.asciidoc[]
+include::modules/awscloud.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
