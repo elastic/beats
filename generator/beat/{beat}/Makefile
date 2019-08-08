@@ -25,7 +25,7 @@ pre-setup: copy-vendor git-init
 .PHONY: copy-vendor
 copy-vendor:
 	mkdir -p vendor/github.com/elastic/beats
-	git archive --remote ${BEAT_GOPATH}/src/github.com/elastic/beats master | tar -x --exclude=x-pack -C vendor/github.com/elastic/beats
+	git archive --remote ${BEAT_GOPATH}/src/github.com/elastic/beats HEAD | tar -x --exclude=x-pack -C vendor/github.com/elastic/beats
 	mkdir -p vendor/github.com/magefile
 	cp -R vendor/github.com/elastic/beats/vendor/github.com/magefile/mage vendor/github.com/magefile
 

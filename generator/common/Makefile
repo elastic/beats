@@ -28,7 +28,7 @@ test: prepare-test
 prepare-test:: python-env
 	# Makes sure to use current version of beats for testing
 	rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
-	git clone -s ${PWD}/../../ --branch master ${BUILD_DIR}/src/github.com/elastic/beats/
+	git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
 
 	rm -fr ${BEAT_PATH}
 	mkdir -p ${BEAT_PATH}
