@@ -30,7 +30,7 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Volume Write Ops",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -44,7 +44,7 @@
             "panelIndex": "2",
             "panelRefName": "panel_1",
             "title": "Volume Read Ops",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -58,7 +58,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_2",
             "title": "Volume Write Bytes",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -72,7 +72,7 @@
             "panelIndex": "4",
             "panelRefName": "panel_3",
             "title": "Volume Read Bytes",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -86,7 +86,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_4",
             "title": "Volume Queue Length",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -100,7 +100,7 @@
             "panelIndex": "6",
             "panelRefName": "panel_5",
             "title": "Volume Total Write Time",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -114,7 +114,7 @@
             "panelIndex": "7",
             "panelRefName": "panel_6",
             "title": "Volume Total Read Time",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -128,7 +128,7 @@
             "panelIndex": "8",
             "panelRefName": "panel_7",
             "title": "Volume Idle Time",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -142,7 +142,7 @@
             "panelIndex": "9",
             "panelRefName": "panel_8",
             "title": "EBS Volume ID Filter",
-            "version": "7.2.0"
+            "version": "7.3.0"
           },
           {
             "embeddableConfig": {},
@@ -155,7 +155,7 @@
             },
             "panelIndex": "10",
             "panelRefName": "panel_9",
-            "version": "7.2.0"
+            "version": "7.3.0"
           }
         ],
         "timeRestore": false,
@@ -164,7 +164,7 @@
       },
       "id": "44ce4680-b7ba-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "dashboard": "7.0.0"
+        "dashboard": "7.3.0"
       },
       "references": [
         {
@@ -219,8 +219,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-05T21:43:29.620Z",
-      "version": "WzY3NiwxMV0="
+      "updated_at": "2019-08-07T23:07:01.848Z",
+      "version": "WzI1MiwxXQ=="
     },
     {
       "attributes": {
@@ -285,12 +285,12 @@
       },
       "id": "f6831f30-b7b6-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:40:15.986Z",
-      "version": "WzY2NiwxMV0="
+      "updated_at": "2019-08-07T23:07:01.848Z",
+      "version": "WzI1MywxXQ=="
     },
     {
       "attributes": {
@@ -355,12 +355,12 @@
       },
       "id": "bb3a6cd0-b7b6-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:40:07.264Z",
-      "version": "WzY2NSwxMV0="
+      "updated_at": "2019-08-07T23:07:01.848Z",
+      "version": "WzI1NCwxXQ=="
     },
     {
       "attributes": {
@@ -425,12 +425,12 @@
       },
       "id": "c0e32d50-b7b8-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:39:43.166Z",
-      "version": "WzY2NCwxMV0="
+      "updated_at": "2019-08-07T23:07:01.848Z",
+      "version": "WzI1NSwxXQ=="
     },
     {
       "attributes": {
@@ -495,12 +495,12 @@
       },
       "id": "b00c4390-b7b8-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:40:22.767Z",
-      "version": "WzY2NywxMV0="
+      "updated_at": "2019-08-07T23:07:01.848Z",
+      "version": "WzI1NiwxXQ=="
     },
     {
       "attributes": {
@@ -565,12 +565,12 @@
       },
       "id": "fe0581b0-b7b8-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:41:17.515Z",
-      "version": "WzY2OCwxMV0="
+      "updated_at": "2019-08-07T23:07:01.848Z",
+      "version": "WzI1NywxXQ=="
     },
     {
       "attributes": {
@@ -610,7 +610,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeTotalWriteTime.avg",
+                    "field": "aws.metrics.VolumeTotalWriteTime.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -635,12 +635,12 @@
       },
       "id": "25384bf0-b7b9-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:42:23.279Z",
-      "version": "WzY3MCwxMV0="
+      "updated_at": "2019-08-07T23:35:39.480Z",
+      "version": "WzU4MiwxXQ=="
     },
     {
       "attributes": {
@@ -680,7 +680,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeTotalReadTime.avg",
+                    "field": "aws.metrics.VolumeTotalReadTime.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -705,12 +705,12 @@
       },
       "id": "12eff7e0-b7b9-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:43:12.139Z",
-      "version": "WzY3MSwxMV0="
+      "updated_at": "2019-08-07T23:58:30.205Z",
+      "version": "WzU4NSwxXQ=="
     },
     {
       "attributes": {
@@ -731,6 +731,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
@@ -740,17 +741,19 @@
             "interval": "5m",
             "series": [
               {
+                "axis_min": "0",
                 "axis_position": "right",
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": "0",
-                "formatter": "s,s,3",
+                "formatter": "s,s,1",
+                "hide_in_legend": 0,
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Volume Idle Time",
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "aws.metrics.VolumeIdleTime.avg",
+                    "field": "aws.metrics.VolumeIdleTime.sum",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "avg"
                   }
@@ -775,12 +778,12 @@
       },
       "id": "67f43080-b7b9-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:44:15.240Z",
-      "version": "WzY3MiwxMV0="
+      "updated_at": "2019-08-07T23:45:56.417Z",
+      "version": "WzU4NCwxXQ=="
     },
     {
       "attributes": {
@@ -827,7 +830,7 @@
       },
       "id": "d045d120-b7b9-11e9-8349-f15f850c5cd0",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [
         {
@@ -837,8 +840,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-08-05T19:47:10.257Z",
-      "version": "WzY3MywxMV0="
+      "updated_at": "2019-08-07T23:07:01.848Z",
+      "version": "WzI2MSwxXQ=="
     },
     {
       "attributes": {
@@ -885,7 +888,7 @@
       },
       "id": "b5308940-7347-11e9-816b-07687310a99a",
       "migrationVersion": {
-        "visualization": "7.2.0"
+        "visualization": "7.3.0"
       },
       "references": [
         {
@@ -895,9 +898,9 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-07-23T20:30:59.432Z",
-      "version": "WzMwMSwzXQ=="
+      "updated_at": "2019-08-07T23:07:05.935Z",
+      "version": "WzMwMywxXQ=="
     }
   ],
-  "version": "7.2.0"
+  "version": "7.3.0"
 }
