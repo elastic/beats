@@ -44,7 +44,7 @@ file to override the default paths for IBM MQ errorlog:
 include::../include/config-option-intro.asciidoc[]
 
 [float]
-==== `errorlog` log fileset settings
+==== `errorlog` fileset settings
 
 include::../include/var-paths.asciidoc[]
 
