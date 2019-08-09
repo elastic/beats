@@ -19,6 +19,8 @@ package kafka
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -171,13 +173,19 @@ func (input *kafkaInput) Stop() {
 	input.outlet.Close()
 }
 
-func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []interface{} {
-	array := []interface{}{}
+func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
+	array := []string{}
 	for _, header := range headers {
-		array = append(array, common.MapStr{
-			"key":   string(header.Key),
-			"value": string(header.Value),
-		})
+		// Rather than indexing headers in the same object structure Kafka does
+		// (which would give maximal fidelity, but would be effectively unsearchable
+		// in elasticsearch and kibana) we compromise by serializing them all as
+		// strings in the form "<key>: <value>". For this we need to mask
+		// occurrences of ":" in the original key, which we expect to be uncommon.
+		// We may consider another approach in the future when it's more clear what
+		// the most common use cases are.
+		key := strings.ReplaceAll(string(header.Key), ":", "_")
+		value := string(header.Value)
+		array = append(array, fmt.Sprintf("%s: %s", key, value))
 	}
 	return array
 }

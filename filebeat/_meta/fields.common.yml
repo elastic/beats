@@ -180,15 +180,7 @@
             Kafka outer (compressed) block timestamp
 
         - name: headers
-          type: nested
+          type: array
           description: >
-            Kafka headers for this message.
-          fields:
-            - name: key
-              type: keyword
-              description: >
-                The key for a kafka header
-            - name: value
-              type: keyword
-              description: >
-                The value for a kafka header
+            An array of Kafka header strings for this message, in the form
+            "<key>: <value>".
