@@ -111,13 +111,12 @@ func (d *DynamicType) Unpack(s string) error {
 // Validate ensures objectTypeParams are not mixed with top level objectType configuration
 func (f *Field) Validate() error {
 	if err := f.validateType(); err != nil {
-		return err
+		return errors.Wrapf(err, "incorrect type configuration for field '%s'", f.Name)
 	}
-	if len(f.ObjectTypeParams) == 0 {
-		return nil
-	}
-	if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
-		return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
+	if len(f.ObjectTypeParams) > 0 {
+		if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
+			return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
+		}
 	}
 	return nil
 }
@@ -125,13 +124,13 @@ func (f *Field) Validate() error {
 func (f *Field) validateType() error {
 	switch strings.ToLower(f.Type) {
 	case "text", "keyword":
-		return errors.Wrapf(stringType.validate(f.Format), "field %s", f.Name)
+		return stringType.validate(f.Format)
 	case "long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float":
-		return errors.Wrapf(numberType.validate(f.Format), "field %s", f.Name)
+		return numberType.validate(f.Format)
 	case "date", "date_nanos":
-		return errors.Wrapf(dateType.validate(f.Format), "field %s", f.Name)
+		return dateType.validate(f.Format)
 	case "geo_point":
-		return errors.Wrapf(geoPointType.validate(f.Format), "field %s", f.Name)
+		return geoPointType.validate(f.Format)
 	case "boolean", "binary", "ip", "alias", "array":
 		if f.Format != "" {
 			return fmt.Errorf("no format expected for field %s, found: %s", f.Name, f.Format)
@@ -148,8 +147,13 @@ func (f *Field) validateType() error {
 }
 
 type fieldTypeGroup struct {
-	name    string
-	formats []string
+	name string
+
+	// formatters used in Kibana, taken from https://www.elastic.co/guide/en/kibana/7.3/managing-fields.html
+	// Value shown in Kibana docs and UI is not always the same as the
+	// internal value, e.g. `percent` appears as `Percentage` in docs
+	// and UI. We have to use here the internal value.
+	formatters []string
 }
 
 var (
@@ -159,16 +163,16 @@ var (
 	geoPointType = fieldTypeGroup{"geo_point", []string{"geo_point"}}
 )
 
-func (g *fieldTypeGroup) validate(format string) error {
-	if format == "" {
+func (g *fieldTypeGroup) validate(formatter string) error {
+	if formatter == "" {
 		return nil
 	}
-	for _, expected := range g.formats {
-		if expected == format {
+	for _, expected := range g.formatters {
+		if expected == formatter {
 			return nil
 		}
 	}
-	return fmt.Errorf("unexpected format for %s type, expected one of: %s", g.name, strings.Join(g.formats, ", "))
+	return fmt.Errorf("unexpected formatter for %s type, expected one of: %s", g.name, strings.Join(g.formatters, ", "))
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {
