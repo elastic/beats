@@ -187,8 +187,7 @@ func GoVet() error {
 	return errors.Wrap(err, "failed running go vet, please fix the issues reported")
 }
 
-// CheckLicenseHeaders checks license headers in .go files. It applies the
-// appropriate license header based on the value of devtools.BeatLicense.
+// CheckLicenseHeaders checks license headers in .go files.
 func CheckLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Checking for missing headers")
 
