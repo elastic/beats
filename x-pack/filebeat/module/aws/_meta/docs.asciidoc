@@ -1,13 +1,24 @@
 [role="xpack"]
 
 :modulename: aws
-:has-dashboards: false
+:has-dashboards: true
 
 == AWS module
 
 beta[]
 
-This is a module for aws logs. It supports reading s3 server access logs from S3.
+This is a module for aws logs. It uses filebeat s3 input to get log files from
+AWS S3 buckets with SQS notification. This module supports reading s3 server
+access logs with `s3access` fileset. Server access logging provides detailed
+records for the requests that are made to a bucket.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for `s3access` fileset:
+
+[role="screenshot"]
+image::./images/filebeat-aws-s3access-overview.png[]
 
 [float]
 ==== `s3access` fileset settings
