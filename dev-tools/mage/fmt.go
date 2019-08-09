@@ -35,9 +35,6 @@ var (
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.
 	GoImportsLocalPrefix = "github.com/elastic"
-
-	// GoLicenserImportPath controls the import path used to install go-licenser.
-	GoLicenserImportPath = "github.com/elastic/go-licenser"
 )
 
 // Format adds license headers, formats .go files with goimports, and formats
