@@ -29,6 +29,7 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
+            "title": "HTTP Status Codes",
             "version": "7.3.0"
           },
           {
@@ -42,6 +43,7 @@
             },
             "panelIndex": "2",
             "panelRefName": "panel_1",
+            "title": "HTTP Request Methods",
             "version": "7.3.0"
           },
           {
@@ -55,6 +57,7 @@
             },
             "panelIndex": "3",
             "panelRefName": "panel_2",
+            "title": "Open Databases",
             "version": "7.3.0"
           },
           {
@@ -68,6 +71,7 @@
             },
             "panelIndex": "4",
             "panelRefName": "panel_3",
+            "title": "Database Read/Writes",
             "version": "7.3.0"
           },
           {
@@ -81,6 +85,7 @@
             },
             "panelIndex": "5",
             "panelRefName": "panel_4",
+            "title": "Auth Cache Hit/Miss",
             "version": "7.3.0"
           },
           {
@@ -94,6 +99,7 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_5",
+            "title": "Number of HTTP Requests",
             "version": "7.3.0"
           },
           {
@@ -107,6 +113,7 @@
             },
             "panelIndex": "7",
             "panelRefName": "panel_6",
+            "title": "Number of View Reads",
             "version": "7.3.0"
           }
         ],
@@ -156,8 +163,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-09T10:32:16.298Z",
-      "version": "WzExNDEsMV0="
+      "updated_at": "2019-08-09T15:30:31.126Z",
+      "version": "WzEzNTMsMV0="
     },
     {
       "attributes": {
