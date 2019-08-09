@@ -46,13 +46,13 @@ func init() {
 
 // Input contains the input and its config
 type kafkaInput struct {
-	config            kafkaInputConfig
-	saramaConfig      *sarama.Config
-	context           input.Context
-	outlet            channel.Outleter
-	saramaWaitGroup   sync.WaitGroup // indicates a sarama consumer group is active
-	log               *logp.Logger
-	runOnce, stopOnce sync.Once
+	config          kafkaInputConfig
+	saramaConfig    *sarama.Config
+	context         input.Context
+	outlet          channel.Outleter
+	saramaWaitGroup sync.WaitGroup // indicates a sarama consumer group is active
+	log             *logp.Logger
+	runOnce         sync.Once
 }
 
 // NewInput creates a new kafka input
@@ -73,6 +73,7 @@ func NewInput(
 				}
 			}
 		},
+		CloseRef: doneChannelContext(inputContext.Done),
 	})
 	if err != nil {
 		return nil, err
@@ -174,21 +175,21 @@ func (input *kafkaInput) Run() {
 	})
 }
 
-// Wait shuts down the Input by cancelling the internal context.
+// Stop doesn't need to do anything because the kafka consumer group and the
+// input's outlet both have a context based on input.context.Done and will
+// shut themselves down, since the done channel is already closed as part of
+// the shutdown process in Runner.Stop().
+func (input *kafkaInput) Stop() {
+}
+
+// Wait should shut down the input and wait for it to complete, however (see
+// Stop above) we don't need to take actions to shut down as long as the
+// input.config.Done channel is closed, so we just make a (currently no-op)
+// call to Stop() and then wait for sarama to signal completion.
 func (input *kafkaInput) Wait() {
 	input.Stop()
 	// Wait for sarama to shut down
 	input.saramaWaitGroup.Wait()
-}
-
-// Stop closes the input's outlet on close. We don't need to shutdown the
-// kafka consumer group explicitly, because it listens to the original input
-// done channel passed in by input.Runner, and that channel is already closed
-// as part of the shutdown process in Runner.Stop().
-func (input *kafkaInput) Stop() {
-	input.stopOnce.Do(func() {
-		input.outlet.Close()
-	})
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
