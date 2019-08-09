@@ -19,7 +19,7 @@ package gotool
 
 type goGet func(opts ...ArgOpt) error
 
-// Test runs `go get` and provides optionals for adding command line arguments.
+// Get runs `go get` and provides optionals for adding command line arguments.
 var Get goGet = runGoGet
 
 func runGoGet(opts ...ArgOpt) error {

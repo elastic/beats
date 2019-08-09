@@ -112,8 +112,8 @@ func AddLicenseHeaders() error {
 	)
 }
 
-// AddLicenseHeaders adds ASL2 headers to .go files outside of x-pack and
-// add Elastic headers to .go files in x-pack.
+// CheckLicenseHeaders checks ASL2 headers in .go files outside of x-pack and
+// checks Elastic headers in .go files in x-pack.
 func CheckLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Checking for missing headers")
 

@@ -30,6 +30,7 @@ var (
 	GoLicenserImportPath = "github.com/elastic/go-licenser"
 )
 
+// InstallVendored uses go get to install a command from its vendored source
 func InstallVendored(importPath string) error {
 	beatDir, err := ElasticBeatsDir()
 	if err != nil {
@@ -42,6 +43,7 @@ func InstallVendored(importPath string) error {
 	)
 }
 
+// InstallGoLicenser target installs go-licenser
 func InstallGoLicenser() error {
 	return InstallVendored(GoLicenserImportPath)
 }
