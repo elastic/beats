@@ -210,8 +210,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-07T11:48:08.889Z",
-      "version": "WzgzMywxXQ=="
+      "updated_at": "2019-08-09T11:43:20.413Z",
+      "version": "WzEyMjUsMV0="
     },
     {
       "attributes": {
@@ -225,7 +225,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Query Latency",
+        "title": "Query Latency [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -287,7 +287,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Query Latency",
+          "title": "Query Latency [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -297,8 +297,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T17:03:21.056Z",
-      "version": "WzcyNywxXQ=="
+      "updated_at": "2019-08-09T11:40:30.561Z",
+      "version": "WzExNjcsMV0="
     },
     {
       "attributes": {
@@ -312,7 +312,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Database Transactions",
+        "title": "Database Transactions [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -403,7 +403,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Database Transactions",
+          "title": "Database Transactions [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -413,8 +413,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T17:01:04.115Z",
-      "version": "WzcxMywxXQ=="
+      "updated_at": "2019-08-09T11:40:44.158Z",
+      "version": "WzExNzMsMV0="
     },
     {
       "attributes": {
@@ -428,7 +428,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Fileblock IO",
+        "title": "Fileblock IO [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -519,7 +519,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Fileblock IO",
+          "title": "Fileblock IO [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -529,8 +529,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T17:22:12.782Z",
-      "version": "Wzc2MCwxXQ=="
+      "updated_at": "2019-08-09T11:41:16.761Z",
+      "version": "WzExODgsMV0="
     },
     {
       "attributes": {
@@ -544,7 +544,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Rows Fetched/Returned",
+        "title": "Rows Fetched/Returned [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -667,7 +667,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Rows Fetched/Returned",
+          "title": "Rows Fetched/Returned [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -677,8 +677,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T10:42:57.261Z",
-      "version": "Wzc3NiwxXQ=="
+      "updated_at": "2019-08-09T11:40:15.889Z",
+      "version": "WzExNTgsMV0="
     },
     {
       "attributes": {
@@ -692,7 +692,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Rows Inserted/Deleted/Updated",
+        "title": "Rows Inserted/Deleted/Updated [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -816,7 +816,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Rows Inserted/Deleted/Updated",
+          "title": "Rows Inserted/Deleted/Updated [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -826,8 +826,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T16:00:21.087Z",
-      "version": "WzYzNiwxXQ=="
+      "updated_at": "2019-08-09T11:41:36.559Z",
+      "version": "WzExOTYsMV0="
     },
     {
       "attributes": {
@@ -841,7 +841,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Conflict/Deadlock Rates",
+        "title": "Conflict/Deadlock Rates [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -932,7 +932,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Conflict/Deadlock Rates",
+          "title": "Conflict/Deadlock Rates [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -942,8 +942,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-05T16:03:38.191Z",
-      "version": "WzYzNywxXQ=="
+      "updated_at": "2019-08-09T11:42:02.764Z",
+      "version": "WzEyMDQsMV0="
     },
     {
       "attributes": {
@@ -957,7 +957,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Database Filter",
+        "title": "Database Filter [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -984,7 +984,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": true
           },
-          "title": "[Metricbeat PostgreSQL] Database Filter",
+          "title": "Database Filter [Metricbeat PostgreSQL] ECS",
           "type": "input_control_vis"
         }
       },
@@ -1000,8 +1000,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-08-05T17:08:39.475Z",
-      "version": "Wzc0NCwxXQ=="
+      "updated_at": "2019-08-09T11:39:56.460Z",
+      "version": "WzExNTEsMV0="
     },
     {
       "attributes": {
@@ -1015,7 +1015,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Query Calls Count",
+        "title": "Query Calls Count [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1072,7 +1072,7 @@
             "time_field": "@timestamp",
             "type": "top_n"
           },
-          "title": "[Metricbeat PostgreSQL] Query Calls Count",
+          "title": "Query Calls Count [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -1082,8 +1082,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T11:34:43.759Z",
-      "version": "WzgxOSwxXQ=="
+      "updated_at": "2019-08-09T11:40:59.993Z",
+      "version": "WzExODAsMV0="
     },
     {
       "attributes": {
@@ -1097,7 +1097,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Local block cache stats",
+        "title": "Local block cache stats [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1190,7 +1190,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Local block cache stats",
+          "title": "Local block cache stats [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -1200,8 +1200,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T11:46:53.063Z",
-      "version": "WzgyNywxXQ=="
+      "updated_at": "2019-08-09T11:42:18.557Z",
+      "version": "WzEyMTAsMV0="
     },
     {
       "attributes": {
@@ -1215,7 +1215,7 @@
             }
           }
         },
-        "title": "[Metricbeat PostgreSQL] Shared block cache stats",
+        "title": "Shared block cache stats [Metricbeat PostgreSQL] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1306,7 +1306,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "[Metricbeat PostgreSQL] Shared block cache stats",
+          "title": "Shared block cache stats [Metricbeat PostgreSQL] ECS",
           "type": "metrics"
         }
       },
@@ -1316,8 +1316,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-08-07T11:45:42.574Z",
-      "version": "WzgyNiwxXQ=="
+      "updated_at": "2019-08-09T11:42:42.659Z",
+      "version": "WzEyMTksMV0="
     }
   ],
   "version": "7.3.0"
