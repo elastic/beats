@@ -116,7 +116,12 @@ func PythonAutopep8() error {
 func AddLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	if err := sh.Run("go", "get", GoLicenserImportPath); err != nil {
+	beatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+
+	if err := sh.Run("go", "get", filepath.Join(beatsDir, "vendor", GoLicenserImportPath)); err != nil {
 		return err
 	}
 
