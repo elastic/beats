@@ -29,6 +29,7 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
+            "title": "Bucket RAM Used",
             "version": "7.3.0"
           },
           {
@@ -42,6 +43,7 @@
             },
             "panelIndex": "2",
             "panelRefName": "panel_1",
+            "title": "Buckets Disk Used",
             "version": "7.3.0"
           },
           {
@@ -55,6 +57,7 @@
             },
             "panelIndex": "3",
             "panelRefName": "panel_2",
+            "title": "Node CPU Utilization",
             "version": "7.3.0"
           },
           {
@@ -68,6 +71,7 @@
             },
             "panelIndex": "4",
             "panelRefName": "panel_3",
+            "title": "Buckets Operations Per Second",
             "version": "7.3.0"
           },
           {
@@ -81,6 +85,7 @@
             },
             "panelIndex": "5",
             "panelRefName": "panel_4",
+            "title": "Operations per Node",
             "version": "7.3.0"
           },
           {
@@ -94,6 +99,7 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_5",
+            "title": "Cluster HDD Usage",
             "version": "7.3.0"
           },
           {
@@ -107,6 +113,7 @@
             },
             "panelIndex": "7",
             "panelRefName": "panel_6",
+            "title": "Cluster RAM",
             "version": "7.3.0"
           },
           {
@@ -120,6 +127,7 @@
             },
             "panelIndex": "8",
             "panelRefName": "panel_7",
+            "title": "Bucket Item Count",
             "version": "7.3.0"
           },
           {
@@ -133,6 +141,7 @@
             },
             "panelIndex": "9",
             "panelRefName": "panel_8",
+            "title": "Document Replicas",
             "version": "7.3.0"
           },
           {
@@ -146,6 +155,7 @@
             },
             "panelIndex": "10",
             "panelRefName": "panel_9",
+            "title": "Disk space used by docs",
             "version": "7.3.0"
           },
           {
@@ -159,6 +169,7 @@
             },
             "panelIndex": "11",
             "panelRefName": "panel_10",
+            "title": "Disk Fetches",
             "version": "7.3.0"
           }
         ],
@@ -228,8 +239,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-08-09T10:22:39.115Z",
-      "version": "WzEwODIsMV0="
+      "updated_at": "2019-08-09T15:27:49.989Z",
+      "version": "WzEzNDcsMV0="
     },
     {
       "attributes": {
