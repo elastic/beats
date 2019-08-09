@@ -505,6 +505,9 @@ func (h *Harvester) getState() file.State {
 
 	// refreshes the values in State with the values from the harvester itself
 	state.FileStateOS = file_helper.GetOSState(h.state.Fileinfo)
+	if h.config.IgnoreDeviceID {
+		state.FileStateOS.Device = 0
+	}
 	return state
 }
 

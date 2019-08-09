@@ -54,6 +54,7 @@ var (
 		ScanSort:       "",
 		ScanOrder:      "asc",
 		RecursiveGlob:  true,
+		IgnoreDeviceID: false,
 
 		// Harvester
 		BufferSize:     16 * humanize.KiByte,
@@ -91,6 +92,7 @@ type config struct {
 	Symlinks       bool            `config:"symlinks"`
 	TailFiles      bool            `config:"tail_files"`
 	RecursiveGlob  bool            `config:"recursive_glob.enabled"`
+	IgnoreDeviceID bool            `config:"ignore_device_id"`
 
 	// Harvester
 	BufferSize int    `config:"harvester_buffer_size"`

@@ -43,15 +43,19 @@ type State struct {
 }
 
 // NewState creates a new file state
-func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]string) State {
+func NewState(fileInfo os.FileInfo, path string, t string, meta map[string]string, ignoreDeviceID bool) State {
 	if len(meta) == 0 {
 		meta = nil
+	}
+	fileStateOS := file.GetOSState(fileInfo)
+	if ignoreDeviceID {
+		fileStateOS.Device = 0
 	}
 	return State{
 		Fileinfo:    fileInfo,
 		Source:      path,
 		Finished:    false,
-		FileStateOS: file.GetOSState(fileInfo),
+		FileStateOS: fileStateOS,
 		Timestamp:   time.Now(),
 		TTL:         -1, // By default, state does have an infinite ttl
 		Type:        t,

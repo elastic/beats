@@ -227,7 +227,8 @@ func (p *Input) Run() {
 				}
 			} else {
 				// Check if existing source on disk and state are the same. Remove if not the case.
-				newState := file.NewState(stat, state.Source, p.config.Type, p.meta)
+				newState := file.NewState(stat, state.Source, p.config.Type, p.meta, p.config.IgnoreDeviceID)
+				// Could be done in `IsSame` as well, if the signature of file.NewState should stay untouched: newState.FileStateOS.Device = 0
 				if !newState.FileStateOS.IsSame(state.FileStateOS) {
 					p.removeState(state)
 					logp.Debug("input", "Remove state for file as file removed or renamed: %s", state.Source)
@@ -420,7 +421,7 @@ func getFileState(path string, info os.FileInfo, p *Input) (file.State, error) {
 	}
 	logp.Debug("input", "Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
-	newState := file.NewState(info, absolutePath, p.config.Type, p.meta)
+	newState := file.NewState(info, absolutePath, p.config.Type, p.meta, p.config.IgnoreDeviceID)
 	return newState, nil
 }
 
