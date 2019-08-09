@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/common/kafka"
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -139,6 +140,13 @@ func (input *kafkaInput) runConsumerGroup() {
 func (input *kafkaInput) Run() {
 	input.runOnce.Do(func() {
 		go func() {
+
+			// If the consumer fails to connect, we use exponential backoff with
+			// jitter up to 8 * the initial backoff interval.
+			backoff := backoff.NewEqualJitterBackoff(
+				input.context.Done,
+				input.config.ConnectBackoff,
+				8*input.config.ConnectBackoff)
 			for {
 				// Try to start the consumer group event loop: create a consumer
 				// group client (wbich connects to the kafka cluster) and call
@@ -148,10 +156,18 @@ func (input *kafkaInput) Run() {
 				// If runConsumerGroup returns, then either input.context.Done has
 				// been closed (in which case we should shut down) or there was an
 				// error, and we should try running it again after the backoff interval.
+				waitChan := make(chan struct{})
+				go func() {
+					defer close(waitChan)
+					backoff.Wait()
+				}()
+
 				select {
 				case <-input.context.Done:
+					// We are shutting down, return
 					return
-				case <-time.After(input.config.ConnectBackoff):
+				case <-waitChan:
+					// We are still running after the backoff delay, try again
 				}
 			}
 		}()
