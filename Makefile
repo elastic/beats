@@ -98,11 +98,11 @@ check: python-env
 	@git diff-index --exit-code HEAD --
 
 .PHONY: check-headers
-check-headers:
+check-headers: mage
 	@mage checkLicenseHeaders
 
 .PHONY: add-headers
-add-headers:
+add-headers: mage
 	@mage addLicenseHeaders
 
 # Corrects spelling errors

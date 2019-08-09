@@ -130,13 +130,13 @@ check: check-headers python-env prepare-tests ## @build Checks project and sourc
 	@${FIND} -name "*.yml" -perm ${PERM_EXEC} -exec false {} + || (echo "YAML files should not be executable" && false)
 
 .PHONY: $(.OVER)check-headers
-$(.OVER)check-headers:
+$(.OVER)check-headers: mage
 ifndef CHECK_HEADERS_DISABLED
 	@mage checkLicenseHeaders
 endif
 
 .PHONY: $(.OVER)add-headers
-$(.OVER)add-headers:
+$(.OVER)add-headers: mage
 ifndef CHECK_HEADERS_DISABLED
 	@mage addLicenseHeaders
 endif
