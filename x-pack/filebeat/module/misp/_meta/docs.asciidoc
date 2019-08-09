@@ -1,0 +1,10 @@
+[role="xpack"]
+
+:modulename: misp
+:has-dashboards: false
+
+== MISP
+
+beta[]
+
+This is a module for MISP. It supports reading threat information from MISP.
