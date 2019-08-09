@@ -4,3 +4,11 @@ The Aerospike module uses the http://www.aerospike.com/docs/reference/info[Info 
 === Compatibility
 
 The Aerospike metricsets were tested with Aerospike 3.9 and are expected to work with all versions >= 3.9.
+
+
+[float]
+=== Dashboard
+
+The Couchbase module comes with a predefined dashboard for Couchbase cluster, node, bucket specific stats. For example:
+
+image::./images/metricbeat-aerospike-overview.png[]

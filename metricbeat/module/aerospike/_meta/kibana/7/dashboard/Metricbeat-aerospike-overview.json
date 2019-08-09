@@ -1,0 +1,190 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 6,
+              "i": "1",
+              "w": 9,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "version": "7.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 6,
+              "i": "2",
+              "w": 9,
+              "x": 0,
+              "y": 6
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "version": "7.3.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Aerospike] Database Overview ",
+        "version": 1
+      },
+      "id": "b15668d0-bac3-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "dashboard": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "72523510-bac3-11e9-a579-f5c0a5d81340",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "8c173130-bac3-11e9-a579-f5c0a5d81340",
+          "name": "panel_1",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-08-09T16:38:14.285Z",
+      "version": "WzEzNzgsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Namespace Filter [Metricbeat Aerospike] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "aerospike.namespace.name",
+                "id": "1565367993423",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "namespace",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": false,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": true
+          },
+          "title": "Namespace Filter [Metricbeat Aerospike] ECS",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "72523510-bac3-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-08-09T16:36:43.172Z",
+      "version": "WzEzNzIsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Node Filter [Metricbeat Aerospike] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "aerospike.namespace.node.host",
+                "id": "1565367993423",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "node",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": false,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": true,
+            "useTimeFilter": true
+          },
+          "title": "Node Filter [Metricbeat Aerospike] ECS",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "8c173130-bac3-11e9-a579-f5c0a5d81340",
+      "migrationVersion": {
+        "visualization": "7.3.0"
+      },
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-08-09T16:37:05.074Z",
+      "version": "WzEzNzUsMV0="
+    }
+  ],
+  "version": "7.3.0"
+}
