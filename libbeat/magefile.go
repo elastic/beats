@@ -22,6 +22,8 @@ package main
 import (
 	"context"
 
+	"github.com/magefile/mage/mg"
+
 	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
@@ -57,4 +59,14 @@ func GoTestIntegration(ctx context.Context) error {
 // Config generates example and reference configuration for libbeat.
 func Config() error {
 	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
+}
+
+// AddLicenseHeaders adds license headers
+func AddLicenseHeaders() {
+	mg.Deps(devtools.AddLicenseHeaders)
+}
+
+// CheckLicenseHeaders checks license headers
+func CheckLicenseHeaders() {
+	mg.Deps(devtools.CheckLicenseHeaders)
 }

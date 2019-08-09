@@ -132,15 +132,13 @@ check: check-headers python-env prepare-tests ## @build Checks project and sourc
 .PHONY: $(.OVER)check-headers
 $(.OVER)check-headers:
 ifndef CHECK_HEADERS_DISABLED
-	@go get -u github.com/elastic/go-licenser
-	@go-licenser -d -license ${LICENSE}
+	@mage checkLicenseHeaders
 endif
 
 .PHONY: $(.OVER)add-headers
 $(.OVER)add-headers:
 ifndef CHECK_HEADERS_DISABLED
-	@go get github.com/elastic/go-licenser
-	@go-licenser -license ${LICENSE}
+	@mage addLicenseHeaders
 endif
 
 .PHONY: fmt

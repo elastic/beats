@@ -26,6 +26,8 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 )
 
 var (
@@ -113,9 +115,7 @@ func PythonAutopep8() error {
 func AddLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	if err := sh.Run("go", "get", GoLicenserImportPath); err != nil {
-		return err
-	}
+	mg.Deps(InstallGoLicenser)
 
 	var license string
 	switch BeatLicense {
@@ -127,5 +127,6 @@ func AddLicenseHeaders() error {
 		return errors.Errorf("unknown license type %v", BeatLicense)
 	}
 
-	return sh.RunV("go-licenser", "-license", license)
+	licenser := gotool.Licenser
+	return licenser(licenser.License(license))
 }

@@ -32,6 +32,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/dev-tools/mage/gotool"
 	"github.com/elastic/beats/libbeat/processors/dissect"
 )
 
@@ -184,4 +185,25 @@ func CheckYAMLNotExecutable() error {
 func GoVet() error {
 	err := sh.RunV("go", "vet", "./...")
 	return errors.Wrap(err, "failed running go vet, please fix the issues reported")
+}
+
+// CheckLicenseHeaders checks license headers in .go files. It applies the
+// appropriate license header based on the value of devtools.BeatLicense.
+func CheckLicenseHeaders() error {
+	fmt.Println(">> fmt - go-licenser: Checking for missing headers")
+
+	mg.Deps(InstallGoLicenser)
+
+	var license string
+	switch BeatLicense {
+	case "ASL2", "ASL 2.0":
+		license = "ASL2"
+	case "Elastic", "Elastic License":
+		license = "Elastic"
+	default:
+		return errors.Errorf("unknown license type %v", BeatLicense)
+	}
+
+	licenser := gotool.Licenser
+	return licenser(licenser.Check(), licenser.License(license))
 }

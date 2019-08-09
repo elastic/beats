@@ -144,3 +144,13 @@ func customizePackaging() {
 func Config() error {
 	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
 }
+
+// AddLicenseHeaders adds license headers
+func AddLicenseHeaders() {
+	mg.Deps(devtools.AddLicenseHeaders)
+}
+
+// CheckLicenseHeaders checks license headers
+func CheckLicenseHeaders() {
+	mg.Deps(devtools.CheckLicenseHeaders)
+}

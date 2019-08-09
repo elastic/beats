@@ -205,3 +205,13 @@ func PythonIntegTest(ctx context.Context) error {
 		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
 	})
 }
+
+// AddLicenseHeaders adds license headers
+func AddLicenseHeaders() {
+	mg.Deps(devtools.AddLicenseHeaders)
+}
+
+// CheckLicenseHeaders checks license headers
+func CheckLicenseHeaders() {
+	mg.Deps(devtools.CheckLicenseHeaders)
+}
