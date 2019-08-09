@@ -45,13 +45,13 @@ func init() {
 
 // Input contains the input and its config
 type kafkaInput struct {
-	config          kafkaInputConfig
-	saramaConfig    *sarama.Config
-	context         input.Context
-	outlet          channel.Outleter
-	saramaWaitGroup sync.WaitGroup // indicates a sarama consumer group is active
-	log             *logp.Logger
-	runOnce         sync.Once
+	config            kafkaInputConfig
+	saramaConfig      *sarama.Config
+	context           input.Context
+	outlet            channel.Outleter
+	saramaWaitGroup   sync.WaitGroup // indicates a sarama consumer group is active
+	log               *logp.Logger
+	runOnce, stopOnce sync.Once
 }
 
 // NewInput creates a new kafka input
@@ -170,7 +170,9 @@ func (input *kafkaInput) Wait() {
 // done channel passed in by input.Runner, and that channel is already closed
 // as part of the shutdown process in Runner.Stop().
 func (input *kafkaInput) Stop() {
-	input.outlet.Close()
+	input.stopOnce.Do(func() {
+		input.outlet.Close()
+	})
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
@@ -237,34 +239,36 @@ func (h *groupHandler) createEvent(
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
 ) beat.Event {
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Private: eventMeta{
-			handler: h,
-			message: message,
-		},
-	}
-	eventFields := common.MapStr{
-		"message": string(message.Value),
-	}
-	kafkaMetadata := common.MapStr{
+	timestamp := time.Now()
+	kafkaFields := common.MapStr{
 		"topic":     claim.Topic(),
 		"partition": claim.Partition(),
 		"offset":    message.Offset,
 		"key":       string(message.Key),
 	}
+
 	version, versionOk := h.version.Get()
 	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
-		event.Timestamp = message.Timestamp
+		timestamp = message.Timestamp
 		if !message.BlockTimestamp.IsZero() {
-			kafkaMetadata["block_timestamp"] = message.BlockTimestamp
+			kafkaFields["block_timestamp"] = message.BlockTimestamp
 		}
 	}
 	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
-		kafkaMetadata["headers"] = arrayForKafkaHeaders(message.Headers)
+		kafkaFields["headers"] = arrayForKafkaHeaders(message.Headers)
 	}
-	eventFields["kafka"] = kafkaMetadata
-	event.Fields = eventFields
+	event := beat.Event{
+		Timestamp: timestamp,
+		Fields: common.MapStr{
+			"message": string(message.Value),
+			"kafka":   kafkaFields,
+		},
+		Private: eventMeta{
+			handler: h,
+			message: message,
+		},
+	}
+
 	return event
 }
 
@@ -286,10 +290,10 @@ func (h *groupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 // from the input's ACKEvents handler.
 func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 	h.Lock()
+	defer h.Unlock()
 	if h.session != nil {
 		h.session.MarkMessage(message, "")
 	}
-	h.Unlock()
 }
 
 func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {

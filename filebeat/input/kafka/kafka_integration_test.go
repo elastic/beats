@@ -121,7 +121,7 @@ func TestInput(t *testing.T) {
 	}
 
 	// Setup the input config
-	config, _ := common.NewConfigFrom(common.MapStr{
+	config, _ := common.MustNewConfigFrom(common.MapStr{
 		"hosts":    getTestKafkaHost(),
 		"topics":   []string{testTopic},
 		"group_id": "filebeat",
