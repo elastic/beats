@@ -45,6 +45,7 @@ COVERAGE_DIR?=${BUILD_DIR}/coverage
 COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
+GO_LICENSER_REPO?=github.com/elastic/beats/vendor/github.com/elastic/go-licenser
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-i -ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
 GOIMPORTS=goimports
@@ -132,14 +133,14 @@ check: check-headers python-env prepare-tests ## @build Checks project and sourc
 .PHONY: $(.OVER)check-headers
 $(.OVER)check-headers:
 ifndef CHECK_HEADERS_DISABLED
-	@go get -u github.com/elastic/go-licenser
+	@go get -u $(GO_LICENSER_REPO)
 	@go-licenser -d -license ${LICENSE}
 endif
 
 .PHONY: $(.OVER)add-headers
 $(.OVER)add-headers:
 ifndef CHECK_HEADERS_DISABLED
-	@go get github.com/elastic/go-licenser
+	@go get -u $(GO_LICENSER_REPO)
 	@go-licenser -license ${LICENSE}
 endif
 

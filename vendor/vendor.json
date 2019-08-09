@@ -980,6 +980,22 @@
 			"versionExact": "v0.4.0"
 		},
 		{
+			"checksumSHA1": "qM65VcezrEdAS7HdzRAh3RGnwWw=",
+			"path": "github.com/elastic/go-licenser",
+			"revision": "2b2abd4ee9b58025ebd0630d7621cfd7619f58ac",
+			"revisionTime": "2018-08-30T07:58:35Z",
+			"version": "0.2.0",
+			"versionExact": "0.2.0"
+		},
+		{
+			"checksumSHA1": "R/WGo2p8J0KsCMu8nrbemg+iqIw=",
+			"path": "github.com/elastic/go-licenser/licensing",
+			"revision": "2b2abd4ee9b58025ebd0630d7621cfd7619f58ac",
+			"revisionTime": "2018-08-30T07:58:35Z",
+			"version": "0.2.0",
+			"versionExact": "0.2.0"
+		},
+		{
 			"checksumSHA1": "c54eehjtxPjBUbM4aQuDPgc7G9Q=",
 			"path": "github.com/elastic/go-lookslike",
 			"revision": "807124eb9fc6684949aa99744577175fd6bac4fd",
