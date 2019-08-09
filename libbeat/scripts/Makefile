@@ -133,14 +133,14 @@ check: check-headers python-env prepare-tests ## @build Checks project and sourc
 .PHONY: $(.OVER)check-headers
 $(.OVER)check-headers:
 ifndef CHECK_HEADERS_DISABLED
-	@go get -u $(GO_LICENSER_REPO)
+	@go get $(GO_LICENSER_REPO)
 	@go-licenser -d -license ${LICENSE}
 endif
 
 .PHONY: $(.OVER)add-headers
 $(.OVER)add-headers:
 ifndef CHECK_HEADERS_DISABLED
-	@go get -u $(GO_LICENSER_REPO)
+	@go get $(GO_LICENSER_REPO)
 	@go-licenser -license ${LICENSE}
 endif
 
