@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add new dashboard for Prometheus server stats {pull}13126[13126]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
@@ -83,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 - ILM: Use GET instead of HEAD when checking for alias to expose detailed error message. {pull}12886[12886]
 - Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
+- Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
 
 *Auditbeat*
 
@@ -300,8 +302,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Collect client provided name for rabbitmq connection. {issue}12851[12851] {pull}12852[12852]
 - Add support to load default aws config file to get credentials. {pull}12727[12727] {issue}12708[12708]
 - Add statistic option into cloudwatch metricset. {issue}12370[12370] {pull}12840[12840]
+- Add support for kubernetes cronjobs {pull}13001[13001]
 - Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
 - Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
+- Add AWS ebs metricset. {pull}13167[13167] {issue}11699[11699]
 
 *Packetbeat*
 

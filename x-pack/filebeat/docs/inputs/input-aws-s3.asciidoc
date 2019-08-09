@@ -69,6 +69,6 @@ for more details.
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 [id="aws-credentials-config"]
-include::../filebeat-s3-input-config.asciidoc
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 :type!:

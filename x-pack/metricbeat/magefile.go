@@ -28,6 +28,12 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
+}
+
 // Build builds the Beat binary.
 func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
@@ -84,7 +90,7 @@ func TestPackages() error {
 		devtools.WithModules(),
 
 		// To be increased or removed when more light modules are added
-		devtools.MinModules(2))
+		devtools.MinModules(3))
 }
 
 // Fields generates a fields.yml and fields.go for each module.
