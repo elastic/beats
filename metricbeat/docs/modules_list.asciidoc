@@ -10,8 +10,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.6+| .6+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>> beta[]  
+.8+| .8+|  |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>> beta[]  
+|<<metricbeat-metricset-aws-ebs,ebs>> beta[]  
 |<<metricbeat-metricset-aws-ec2,ec2>>   
+|<<metricbeat-metricset-aws-elb,elb>> beta[]  
 |<<metricbeat-metricset-aws-rds,rds>> beta[]  
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]  
 |<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
@@ -89,7 +91,7 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.16+| .16+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.17+| .17+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>> beta[]  
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -98,6 +100,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-proxy,proxy>> beta[]  
 |<<metricbeat-metricset-kubernetes-scheduler,scheduler>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_container,state_container>>   
+|<<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
@@ -143,7 +146,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
 |<<metricbeat-metricset-postgresql-statement,statement>>   
-|<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
 |<<metricbeat-module-rabbitmq,RabbitMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   

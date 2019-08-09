@@ -103,7 +103,7 @@ func (r *DescribeConfigsRequest) version() int16 {
 func (r *DescribeConfigsRequest) requiredVersion() KafkaVersion {
 	switch r.Version {
 	case 1:
-		return V1_0_0_0
+		return V1_1_0_0
 	case 2:
 		return V2_0_0_0
 	default:

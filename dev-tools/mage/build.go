@@ -33,6 +33,7 @@ import (
 // "go build" is invoked.
 type BuildArgs struct {
 	Name       string // Name of binary. (On Windows '.exe' is appended.)
+	InputFiles []string
 	OutputDir  string
 	CGO        bool
 	Static     bool
@@ -141,6 +142,10 @@ func Build(params BuildArgs) error {
 	if len(ldflags) > 0 {
 		args = append(args, "-ldflags")
 		args = append(args, MustExpand(strings.Join(ldflags, " ")))
+	}
+
+	if len(params.InputFiles) > 0 {
+		args = append(args, params.InputFiles...)
 	}
 
 	log.Println("Adding build environment vars:", env)

@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
+* <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
@@ -983,6 +984,40 @@ alias to: source.address
 type: alias
 
 alias to: destination.address
+
+--
+
+[[exported-fields-aws]]
+== aws fields
+
+AWS fields from s3 input.
+
+
+
+[float]
+=== s3
+
+S3 related information.
+
+
+
+*`s3.bucket_name`*::
++
+--
+Name of the S3 bucket that this log retrieved from.
+
+
+type: keyword
+
+--
+
+*`s3.object_key`*::
++
+--
+Name of the S3 object that this log retrieved from.
+
+
+type: keyword
 
 --
 
@@ -12632,6 +12667,15 @@ example: mydb
 Query statement.
 
 example: SELECT * FROM users;
+
+--
+
+*`postgresql.log.error.code`*::
++
+--
+Error code returned by Postgres (if any)
+
+type: long
 
 --
 
