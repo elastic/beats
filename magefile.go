@@ -96,7 +96,7 @@ func Fmt() {
 func addLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	if err := sh.Run("go", "get", devtools.GoLicenserImportPath); err != nil {
+	if err := devtools.GoGet(devtools.GoLicenserImportPath); err != nil {
 		return err
 	}
 

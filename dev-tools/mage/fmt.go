@@ -30,7 +30,7 @@ import (
 
 var (
 	// GoImportsImportPath controls the import path used to install goimports.
-	GoImportsImportPath = "github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports"
+	GoImportsImportPath = "golang.org/x/tools/cmd/goimports"
 
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.
@@ -65,7 +65,7 @@ func GoImports() error {
 	}
 
 	fmt.Println(">> fmt - goimports: Formatting Go code")
-	if err := sh.Run("go", "get", GoImportsImportPath); err != nil {
+	if err := GoGet(GoImportsImportPath); err != nil {
 		return err
 	}
 
@@ -116,12 +116,7 @@ func PythonAutopep8() error {
 func AddLicenseHeaders() error {
 	fmt.Println(">> fmt - go-licenser: Adding missing headers")
 
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
-	if err := sh.Run("go", "get", filepath.Join(beatsDir, "vendor", GoLicenserImportPath)); err != nil {
+	if err := GoGet(GoLicenserImportPath); err != nil {
 		return err
 	}
 
