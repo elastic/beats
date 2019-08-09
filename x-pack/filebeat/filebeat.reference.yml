@@ -327,6 +327,13 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#--------------------------------- MISP Module ---------------------------------
+- module: misp
+  threat:
+    enabled: true
+
+    var.server_name: httpbin.org
+    var.url: "https://httpbin.org/"
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
   # Logs
