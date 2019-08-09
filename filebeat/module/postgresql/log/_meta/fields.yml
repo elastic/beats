@@ -20,6 +20,10 @@
       description:
         Query statement.
 
+    - name: error.code
+      type: long
+      description: Error code returned by Postgres (if any)
+
     - name: timezone
       type: alias
       path: event.timezone
