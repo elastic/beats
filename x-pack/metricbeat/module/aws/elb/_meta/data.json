@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "cloudwatch": {
+            "dimensions": {
+                "AvailabilityZone": "us-east-1b",
+                "LoadBalancerName": "DockerReg-EcsElast-1UFCSV3UVE46A"
+            },
+            "namespace": "AWS/ELB"
+        },
+        "metrics": {
+            "HealthyHostCount": {
+                "avg": 2
+            },
+            "UnHealthyHostCount": {
+                "avg": 0
+            }
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.elb",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "elb"
+    },
+    "service": {
+        "type": "aws"
+    }
+}

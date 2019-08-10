@@ -32,9 +32,7 @@ var (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-	)
+	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -227,7 +225,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	metricSetFieldResults := map[string]map[string]interface{}{}
 
 	for dbInstanceArn := range dbInstanceMap {
-		events[dbInstanceArn] = aws.InitEvent(metricsetName, regionName)
+		events[dbInstanceArn] = aws.InitEvent(regionName)
 		metricSetFieldResults[dbInstanceArn] = map[string]interface{}{}
 	}
 

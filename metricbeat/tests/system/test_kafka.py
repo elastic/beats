@@ -7,6 +7,8 @@ from nose.plugins.skip import SkipTest
 
 class KafkaTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['kafka']
+    COMPOSE_ADVERTISED_HOST = True
+
     VERSION = "2.0.0"
 
     PRODUCER_USERNAME = "producer"
