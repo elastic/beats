@@ -1,0 +1,224 @@
+{
+  "description": "Pipeline for normalizing Zeek x509.log",
+  "processors": [
+    {
+      "set": {
+        "field": "event.created",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.x509.ts",
+        "formats": ["UNIX"]
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.x509.ts"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "certificate.exponent",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "certificate.serial",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "certificate.version",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "san.dns",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "san.uri",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "san.email",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "san.ip",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "san.other_fields",
+        "path": "zeek.x509"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.x509.certificate.valid.from",
+        "target_field": "zeek.x509.certificate.valid.from",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.x509.certificate?.valid?.from != null"
+      }
+    },
+    {
+      "date": {
+        "field": "zeek.x509.certificate.valid.until",
+        "target_field": "zeek.x509.certificate.valid.until",
+        "formats": ["UNIX"],
+        "if": "ctx.zeek.x509.certificate?.valid?.until != null"
+      }
+    },
+
+    {
+      "gsub": {
+        "field": "zeek.x509.certificate.iss",
+        "pattern": "\\\\,",
+        "replacement": "",
+        "ignore_missing": true
+      }
+    },
+    {
+      "kv": {
+        "field": "zeek.x509.certificate.iss",
+        "field_split": ",",
+        "value_split": "=",
+        "target_field": "zeek.x509.certificate.issuer",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.x509.certificate.iss",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.issuer.C",
+        "target_field": "zeek.x509.certificate.issuer.country",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.issuer.CN",
+        "target_field": "zeek.x509.certificate.issuer.common_name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.issuer.L",
+        "target_field": "zeek.x509.certificate.issuer.locality",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.issuer.O",
+        "target_field": "zeek.x509.certificate.issuer.organization",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.issuer.OU",
+        "target_field": "zeek.x509.certificate.issuer.organizational_unit",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.issuer.ST",
+        "target_field": "zeek.x509.certificate.issuer.state",
+        "ignore_missing": true
+      }
+    },
+
+    {
+      "gsub": {
+        "field": "zeek.x509.certificate.sub",
+        "pattern": "\\\\,",
+        "replacement": "",
+        "ignore_missing": true
+      }
+    },
+    {
+      "kv": {
+        "field": "zeek.x509.certificate.sub",
+        "field_split": ",",
+        "value_split": "=",
+        "target_field": "zeek.x509.certificate.subject",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "zeek.x509.certificate.sub",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.subject.C",
+        "target_field": "zeek.x509.certificate.subject.country",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.subject.CN",
+        "target_field": "zeek.x509.certificate.subject.common_name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.subject.L",
+        "target_field": "zeek.x509.certificate.subject.locality",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.subject.O",
+        "target_field": "zeek.x509.certificate.subject.organization",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.subject.OU",
+        "target_field": "zeek.x509.certificate.subject.organizational_unit",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "zeek.x509.certificate.subject.ST",
+        "target_field": "zeek.x509.certificate.subject.state",
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}
