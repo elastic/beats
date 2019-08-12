@@ -42,7 +42,6 @@ var (
 		"x-pack/auditbeat",
 		"x-pack/filebeat",
 		"x-pack/metricbeat",
-		"x-pack/functionbeat",
 	}
 )
 
