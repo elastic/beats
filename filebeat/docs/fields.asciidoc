@@ -7881,10 +7881,10 @@ type: date
 *`kafka.headers`*::
 +
 --
-Kafka headers for this message.
+An array of Kafka header strings for this message, in the form "<key>: <value>".
 
 
-type: nested
+type: array
 
 --
 

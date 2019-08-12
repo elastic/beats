@@ -62,6 +62,11 @@ func NewInput(
 	inputContext input.Context,
 ) (input.Input, error) {
 
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, errors.Wrap(err, "reading kafka input config")
+	}
+
 	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
 			DynamicFields: inputContext.DynamicFields,
@@ -73,15 +78,11 @@ func NewInput(
 				}
 			}
 		},
-		CloseRef: doneChannelContext(inputContext.Done),
+		CloseRef:  doneChannelContext(inputContext.Done),
+		WaitClose: config.WaitClose,
 	})
 	if err != nil {
 		return nil, err
-	}
-
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading kafka input config")
 	}
 
 	saramaConfig, err := newSaramaConfig(config)

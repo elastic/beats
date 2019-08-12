@@ -42,6 +42,7 @@ type kafkaInputConfig struct {
 	InitialOffset  initialOffset     `config:"initial_offset"`
 	ConnectBackoff time.Duration     `config:"connect_backoff" validate:"min=0"`
 	ConsumeBackoff time.Duration     `config:"consume_backoff" validate:"min=0"`
+	WaitClose      time.Duration     `config:"wait_close" validate:"min=0"`
 	MaxWaitTime    time.Duration     `config:"max_wait_time"`
 	IsolationLevel isolationLevel    `config:"isolation_level"`
 	Fetch          kafkaFetch        `config:"fetch"`
@@ -109,6 +110,7 @@ func defaultConfig() kafkaInputConfig {
 		ClientID:       "filebeat",
 		ConnectBackoff: 30 * time.Second,
 		ConsumeBackoff: 2 * time.Second,
+		WaitClose:      2 * time.Second,
 		MaxWaitTime:    250 * time.Millisecond,
 		IsolationLevel: isolationLevelReadUncommitted,
 		Fetch: kafkaFetch{

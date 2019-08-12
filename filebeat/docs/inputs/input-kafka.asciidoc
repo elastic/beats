@@ -82,6 +82,11 @@ How long to wait before retrying a failed read. Default is 2s.
 How long to wait for the minimum number of input bytes while reading. Default
 is 250ms.
 
+===== `wait_close`
+
+When shutting down, how long to wait for in-flight messages to be delivered
+and acknowledged.
+
 ===== `isolation_level`
 
 This configures the Kafka group isolation level:
