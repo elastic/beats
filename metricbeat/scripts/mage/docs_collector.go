@@ -135,7 +135,7 @@ func getDefaultMetricsets() (map[string][]string, error) {
 	for _, dir := range runpaths {
 		rawMap, err := sh.OutCmd("go", "run", dir)()
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "Error running subcommand to get metricsets")
 		}
 		var msetMap = make(map[string][]string)
 		err = json.Unmarshal([]byte(rawMap), &msetMap)
@@ -283,7 +283,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 func gatherData(modules []string) ([]moduleData, error) {
 	defmset, err := getDefaultMetricsets()
 	if err != nil {
-		return nil, errors.Wrap(err, "Error getting default metricsets")
+		return nil, errors.Wrap(err, "error getting default metricsets")
 	}
 	moduleList := make([]moduleData, 0)
 	//iterate over all the modules, checking to make sure we have an asciidoc file

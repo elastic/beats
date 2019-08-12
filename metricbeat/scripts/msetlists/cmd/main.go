@@ -31,7 +31,7 @@ func main() {
 
 	raw, err := json.MarshalIndent(msList, "", "  ")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error Marshalling json: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Error Marshalling json: %s\n", err)
 		os.Exit(1)
 	}
 
