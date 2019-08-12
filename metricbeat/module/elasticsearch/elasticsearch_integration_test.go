@@ -99,6 +99,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
 	defer service.Down()
 

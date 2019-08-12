@@ -56,6 +56,7 @@ func TestFetchArray(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 func TestData(t *testing.T) {
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "http")
 	defer service.Down()
 

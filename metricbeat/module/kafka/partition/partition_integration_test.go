@@ -43,6 +43,7 @@ const (
 )
 
 func TestData(t *testing.T) {
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(120*time.Second),
 		compose.UpWithAdvertisedHostEnvFile,
@@ -59,7 +60,10 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
-	service := compose.EnsureUp(t, "kafka")
+	service := compose.EnsureUp(t, "kafka",
+		compose.UpWithTimeout(120*time.Second),
+		compose.UpWithAdvertisedHostEnvFile,
+	)
 	defer service.Down()
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))

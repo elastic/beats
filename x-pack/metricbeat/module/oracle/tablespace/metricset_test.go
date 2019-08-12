@@ -18,6 +18,7 @@ import (
 
 func TestData(t *testing.T) {
 	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "oracle")
 	defer service.Down()
 

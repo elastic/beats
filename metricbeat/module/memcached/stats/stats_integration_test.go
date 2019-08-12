@@ -29,6 +29,7 @@ import (
 )
 
 func TestData(t *testing.T) {
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "memcached")
 	defer service.Down()
 

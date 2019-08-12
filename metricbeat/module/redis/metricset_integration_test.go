@@ -38,9 +38,9 @@ const (
 
 func TestPasswords(t *testing.T) {
 	t.Skip("Changing password affects other tests, see https://github.com/elastic/beats/issues/10955")
-
 	service := compose.EnsureUp(t, "redis")
 	defer service.Down()
+
 	host := service.Host()
 
 	registry := mb.NewRegister()

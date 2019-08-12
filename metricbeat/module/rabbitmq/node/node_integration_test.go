@@ -31,6 +31,7 @@ import (
 
 func TestData(t *testing.T) {
 	t.Skip("Skipping test as it was not stable. Probably first event is empty.")
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUpWithTimeout(t, 120, "rabbitmq")
 	defer service.Down()
 

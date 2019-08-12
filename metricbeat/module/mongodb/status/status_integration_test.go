@@ -57,6 +57,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "mongodb")
 	defer service.Down()
 

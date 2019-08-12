@@ -45,6 +45,7 @@ func TestFetchTCP(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "uwsgi_http")
 	defer service.Down()
 

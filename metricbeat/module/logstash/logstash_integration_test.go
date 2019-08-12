@@ -58,7 +58,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUp(t, "logstash")
+	mbtest.SkipIfNoData(t)
+	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 	defer service.Down()
 
 	for _, metricSet := range metricSets {

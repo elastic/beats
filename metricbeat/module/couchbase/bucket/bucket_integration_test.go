@@ -44,6 +44,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "couchbase")
 	defer service.Down()
 
