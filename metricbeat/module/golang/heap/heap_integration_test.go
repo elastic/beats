@@ -30,6 +30,7 @@ import (
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "golang")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 
@@ -41,6 +42,7 @@ func TestData(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "golang")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 

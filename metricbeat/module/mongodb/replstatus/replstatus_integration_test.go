@@ -35,6 +35,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "mongodb")
+	defer service.Down()
 
 	err := initiateReplicaSet(t, service.Host())
 	if !assert.NoError(t, err) {
@@ -76,6 +77,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "mongodb")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {

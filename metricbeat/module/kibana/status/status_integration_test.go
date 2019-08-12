@@ -31,6 +31,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, mtest.GetConfig("status", service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)

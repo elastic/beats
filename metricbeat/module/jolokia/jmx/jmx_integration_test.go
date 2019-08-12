@@ -30,6 +30,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "jolokia")
+	defer service.Down()
 
 	for _, config := range getConfigs(service.Host()) {
 		f := mbtest.NewReportingMetricSetV2Error(t, config)
@@ -42,6 +43,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "jolokia")
+	defer service.Down()
 
 	for _, config := range getConfigs(service.Host()) {
 		f := mbtest.NewReportingMetricSetV2Error(t, config)

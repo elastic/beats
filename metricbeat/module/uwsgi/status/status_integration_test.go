@@ -30,6 +30,7 @@ import (
 
 func TestFetchTCP(t *testing.T) {
 	service := compose.EnsureUp(t, "uwsgi_tcp")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("tcp", service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -45,6 +46,7 @@ func TestFetchTCP(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "uwsgi_http")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http", service.Host()))
 
@@ -55,6 +57,7 @@ func TestData(t *testing.T) {
 
 func TestFetchHTTP(t *testing.T) {
 	service := compose.EnsureUp(t, "uwsgi_http")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http", service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)

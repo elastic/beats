@@ -30,6 +30,7 @@ import (
 
 func TestFetchObject(t *testing.T) {
 	service := compose.EnsureUp(t, "http")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), "object"))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -43,6 +44,7 @@ func TestFetchObject(t *testing.T) {
 
 func TestFetchArray(t *testing.T) {
 	service := compose.EnsureUp(t, "http")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), "array"))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -55,6 +57,7 @@ func TestFetchArray(t *testing.T) {
 }
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "http")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), "object"))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {

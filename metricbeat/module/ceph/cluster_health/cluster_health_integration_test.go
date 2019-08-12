@@ -28,6 +28,7 @@ import (
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 120, "ceph")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 

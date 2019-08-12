@@ -38,6 +38,7 @@ var metricSets = []string{
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "metricbeat")
+	defer service.Down()
 
 	for _, metricSet := range metricSets {
 		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet, service.Host()))
@@ -55,6 +56,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "metricbeat")
+	defer service.Down()
 
 	for _, metricSet := range metricSets {
 		f := mbtest.NewReportingMetricSetV2Error(t, beat.GetConfig(metricSet, service.Host()))

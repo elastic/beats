@@ -25,6 +25,7 @@ type keyAssertion struct {
 func TestFetch(t *testing.T) {
 	logp.TestingSetup()
 	service := compose.EnsureUp(t, "mssql")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(service.Host(), "performance"))
 	events, errs := mbtest.ReportingFetchV2(f)

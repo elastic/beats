@@ -33,6 +33,7 @@ import (
 
 func TestFetchRedisInfo(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
+	defer service.Down()
 	host := service.Host()
 
 	conn, err := rd.Dial("tcp", host)
@@ -69,6 +70,7 @@ func TestFetchRedisInfo(t *testing.T) {
 
 func TestFetchKeys(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
+	defer service.Down()
 	host := service.Host()
 
 	conn, err := rd.Dial("tcp", host)
@@ -96,6 +98,7 @@ func TestFetchKeys(t *testing.T) {
 
 func TestFetchKeyInfo(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
+	defer service.Down()
 	host := service.Host()
 
 	conn, err := rd.Dial("tcp", host)

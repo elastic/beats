@@ -62,6 +62,7 @@ var metricSets = []string{
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
+	defer service.Down()
 
 	host := service.Host()
 	err := createIndex(host)
@@ -99,6 +100,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "elasticsearch")
+	defer service.Down()
 
 	host := service.Host()
 

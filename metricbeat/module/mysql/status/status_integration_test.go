@@ -32,6 +32,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), false))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -57,6 +58,7 @@ func TestFetch(t *testing.T) {
 
 func TestFetchRaw(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), true))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -84,6 +86,7 @@ func TestFetchRaw(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host(), false))
 

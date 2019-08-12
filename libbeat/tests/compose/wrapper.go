@@ -262,6 +262,10 @@ func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string)
 	return d.cmd(ctx, "kill", args...).Run()
 }
 
+func (d *wrapperDriver) Down(ctx context.Context) error {
+	return d.cmd(ctx, "down", "-v", "--rmi=local").Run()
+}
+
 func (d *wrapperDriver) Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error) {
 	containers, err := d.containers(ctx, Filter{State: AnyState}, filter...)
 	if err != nil {

@@ -29,7 +29,8 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	r := compose.EnsureUp(t, "mongodb")
+	service := compose.EnsureUp(t, "mongodb")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -50,7 +51,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	r := compose.EnsureUp(t, "mongodb")
+	service := compose.EnsureUp(t, "mongodb")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(r.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {

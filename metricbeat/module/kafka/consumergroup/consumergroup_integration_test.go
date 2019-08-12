@@ -44,6 +44,7 @@ func TestData(t *testing.T) {
 		compose.UpWithTimeout(120*time.Second),
 		compose.UpWithAdvertisedHostEnvFile,
 	)
+	defer service.Down()
 
 	c, err := startConsumer(t, service.Host(), "metricbeat-test")
 	if err != nil {
@@ -64,6 +65,7 @@ func TestData(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "kafka")
+	defer service.Down()
 
 	c, err := startConsumer(t, service.Host(), "metricbeat-test")
 	if err != nil {

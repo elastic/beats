@@ -30,6 +30,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "nginx")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -47,6 +48,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "nginx")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {

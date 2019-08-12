@@ -17,6 +17,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "coredns")
+	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)

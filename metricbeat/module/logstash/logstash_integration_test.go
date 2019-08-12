@@ -38,6 +38,7 @@ var metricSets = []string{
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
+	defer service.Down()
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
@@ -58,6 +59,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "logstash")
+	defer service.Down()
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {

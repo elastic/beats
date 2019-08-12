@@ -33,6 +33,7 @@ func TestFetch(t *testing.T) {
 	logp.TestingSetup()
 
 	service := compose.EnsureUp(t, "etcd")
+	defer service.Down()
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
 	events, errs := m.FetchEvents()
@@ -45,6 +46,7 @@ func TestFetch(t *testing.T) {
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "etcd")
+	defer service.Down()
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
 	m.WriteEvents(t, "")
