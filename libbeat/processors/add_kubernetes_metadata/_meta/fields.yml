@@ -28,8 +28,10 @@
           description: >
             Kubernetes node name
 
-        - name: labels
+        - name: labels.*
           type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
           description: >
             Kubernetes labels map
 
