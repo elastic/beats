@@ -154,21 +154,13 @@ func (input *kafkaInput) Run() {
 				// Consume (which starts an asynchronous consumer).
 				input.runConsumerGroup()
 
-				// If runConsumerGroup returns, then either input.context.Done has
-				// been closed (in which case we should shut down) or there was an
-				// error, and we should try running it again after the backoff interval.
-				waitChan := make(chan struct{})
-				go func() {
-					defer close(waitChan)
-					backoff.Wait()
-				}()
+				// If runConsumerGroup returns, we wait for the backoff interval.
+				backoff.Wait()
 
+				// Check the Done channel before we try again.
 				select {
 				case <-input.context.Done:
-					// We are shutting down, return
 					return
-				case <-waitChan:
-					// We are still running after the backoff delay, try again
 				}
 			}
 		}()
