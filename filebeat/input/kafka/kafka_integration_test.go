@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
+// + build integration
 
 package kafka
 
@@ -24,6 +24,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -121,7 +122,7 @@ func TestInput(t *testing.T) {
 	}
 
 	// Setup the input config
-	config, _ := common.MustNewConfigFrom(common.MapStr{
+	config := common.MustNewConfigFrom(common.MapStr{
 		"hosts":    getTestKafkaHost(),
 		"topics":   []string{testTopic},
 		"group_id": "filebeat",
@@ -194,20 +195,21 @@ func checkMatchingHeaders(
 		t.Error(err)
 		return
 	}
-	headerArray, ok := headers.([]interface{})
+	headerArray, ok := headers.([]string)
 	if !ok {
-		t.Error("event.Fields.kafka.headers isn't a []interface{}")
+		t.Error("event.Fields.kafka.headers isn't a []string")
 		return
 	}
 	assert.Equal(t, len(expected), len(headerArray))
 	for i := 0; i < len(expected); i++ {
-		headerMap, ok := headerArray[i].(common.MapStr)
-		if !ok {
-			t.Errorf("event.Fields.kafka.headers[%v] isn't a MapStr", i)
+		splitIndex := strings.Index(headerArray[i], ": ")
+		if splitIndex == -1 {
+			t.Errorf(
+				"event.Fields.kafka.headers[%v] doesn't have form 'key: value'", i)
 			continue
 		}
-		key, _ := headerMap.GetValue("key")
-		value, _ := headerMap.GetValue("value")
+		key := headerArray[i][:splitIndex]
+		value := headerArray[i][splitIndex+2:]
 		assert.Equal(t, string(expected[i].Key), key)
 		assert.Equal(t, string(expected[i].Value), value)
 	}
