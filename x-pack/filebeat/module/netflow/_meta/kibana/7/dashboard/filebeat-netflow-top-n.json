@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Netflow Top N flows",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
