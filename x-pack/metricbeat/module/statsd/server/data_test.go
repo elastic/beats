@@ -177,7 +177,6 @@ func TestParseMetrics(t *testing.T) {
 			err := processor.processSingle(e)
 
 			assert.NoError(t, err)
-
 		}
 	}
 }
@@ -195,7 +194,7 @@ func (u *testUDPEvent) GetMeta() server.Meta {
 	return u.meta
 }
 
-func process(t *testing.T, packets []string, ms *MetricSet) {
+func process(t testing.TB, packets []string, ms *MetricSet) {
 	for _, d := range packets {
 		udpEvent := &testUDPEvent{
 			event: common.MapStr{

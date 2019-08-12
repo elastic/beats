@@ -8,10 +8,10 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/rcrowley/go-metrics"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/rcrowley/go-metrics"
 )
 
 var logger = logp.NewLogger("statd")

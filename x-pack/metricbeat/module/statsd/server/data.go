@@ -11,7 +11,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/server"
 )
@@ -36,6 +35,7 @@ func splitTags(rawTags []byte, kvSep []byte) map[string]string {
 	for _, kv := range bytes.Split(rawTags, []byte(",")) {
 		kvSplit := bytes.SplitN(kv, kvSep, 2)
 		if len(kvSplit) != 2 {
+			logger.Warnf("could not parse tags")
 			continue
 		}
 		tags[string(kvSplit[0])] = string(kvSplit[1])
@@ -116,7 +116,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewCounter(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to process counter `%s` with value `%s`", m.name, m.value)
 		}
 		// inc/dec or set
 		if m.value[0] == '+' || m.value[0] == '-' {
@@ -129,30 +129,28 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewGauge64(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to process gauge `%s` with value `%s`", m.name, m.value)
 		}
 		c.Update(v)
 	case "ms":
 		c := p.registry.GetOrNewTimer(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to process timer `%s` with value `%s`", m.name, m.value)
 		}
 		c.Update(time.Duration(v))
 	case "h": // TODO: can these be floats?
 		c := p.registry.GetOrNewHistogram(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to process histogram `%s` with value `%s`", m.name, m.value)
 		}
 		c.Update(v)
 	case "s":
 		c := p.registry.GetOrNewSet(m.name, m.tags)
 		c.Add(m.value)
 	default:
-		logp.NewLogger("statsd").Debugf("metric type '%s' is not supported", m.metricType)
-		// ignore others
-		// no support for sets, for example
+		logp.NewLogger("statsd").Debugf("metric type `%s` is not supported", m.metricType)
 	}
 	return nil
 }
@@ -160,12 +158,12 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 func (p *metricProcessor) Process(event server.Event) error {
 	bytesRaw, ok := event.GetEvent()[server.EventDataKey]
 	if !ok {
-		return errors.New("Unable to retrieve response bytes")
+		return errors.New("unable to retrieve event bytes")
 	}
 
 	b, _ := bytesRaw.([]byte)
 	if len(b) == 0 {
-		return errors.New("Request has no data")
+		return errors.New("packet has no data")
 	}
 
 	metrics, err := parse(b)
@@ -180,10 +178,6 @@ func (p *metricProcessor) Process(event server.Event) error {
 	}
 
 	return nil
-}
-
-func (p *metricProcessor) sanitizeName(name string) string {
-	return common.DeDot(name)
 }
 
 func (p *metricProcessor) GetAll() []metricsGroup {

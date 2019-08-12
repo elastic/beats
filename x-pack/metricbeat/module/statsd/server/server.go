@@ -95,14 +95,14 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 
 	// Start event watcher
 	m.server.Start()
-	reportPeriod := time.After(period)
+	defer m.server.Stop()
+
+	reportPeriod := time.NewTicker(period)
 	for {
 		select {
 		case <-reporter.Done():
-			m.server.Stop()
 			return
-		case <-reportPeriod:
-			reportPeriod = time.After(period)
+		case <-reportPeriod.C:
 			for _, e := range m.getEvents() {
 				reporter.Event(*e)
 			}

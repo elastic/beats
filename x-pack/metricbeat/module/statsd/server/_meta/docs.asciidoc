@@ -1,4 +1,4 @@
-This is the server metricset of the module stats.
+This is the server metricset of the statsd module.
 
 Events sent to the stats endpoint will be put by default under the `statsd` prefix.
 
