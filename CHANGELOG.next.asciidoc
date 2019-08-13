@@ -132,6 +132,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
 - Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
 - Fix incorrect references to index patterns in AWS and CoreDNS dashboards. {pull}13303[13303]
+- Fix multiline pattern in Postgres which was too permissive. {issue}12078[12078] {pull}13069[13069]
+- Change iis url.path grok pattern from URIPATH to NOTSPACE. {issue}12710[12710] {pull}13225[13225]
 
 *Heartbeat*
 
