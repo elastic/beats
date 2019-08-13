@@ -113,7 +113,7 @@ reachable:
 ----
 
 [[key-features]]
-=== Key metricbeat features
+=== Key Metricbeat features
 
 Metricbeat has some key features that are critical to how it works:
 
