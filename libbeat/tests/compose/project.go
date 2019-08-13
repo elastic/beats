@@ -92,7 +92,6 @@ type ContainerStatus interface {
 	ServiceName() string
 	Healthy() bool
 	Running() bool
-	Old() bool
 	Host() string
 	HostForPort(int) string
 }
@@ -290,9 +289,6 @@ type ServiceInfo interface {
 	Name() string
 	Running() bool
 	Healthy() bool
-
-	// Has been up for too long?:
-	Old() bool
 
 	Host() string
 	HostForPort(int) string
