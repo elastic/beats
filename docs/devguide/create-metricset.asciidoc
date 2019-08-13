@@ -177,8 +177,8 @@ https://godoc.org/github.com/elastic/beats/libbeat/common#MapStr[MapStr API docs
 ===== Multi Fetching
 
 `Event` can be called multiple times inside of the `Fetch` method for metricsets that might expose multiple events.
-`Event` returns a bool that indicates if the metricset is already closed and no further events can be processed, 
-in which case `Fetch` should return immediately. If there is an error while processing one of many events, 
+`Event` returns a bool that indicates if the metricset is already closed and no further events can be processed,
+in which case `Fetch` should return immediately. If there is an error while processing one of many events,
 it can be published using the `mb.ReporterV2.Error` method, as opposed to returning an error value.
 
 [float]
@@ -275,4 +275,3 @@ documentation.
 ==== What to Do Next
 This topic provides basic steps for creating a metricset. For more details about metricsets
 and how to extend your metricset further, see <<metricset-details>>.
-
