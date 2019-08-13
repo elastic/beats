@@ -12,7 +12,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 DiskIO Write Bytes",
+                "title": "EC2 DiskIO Write Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -91,7 +91,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Status Check Failed",
+                "title": "EC2 Status Check Failed [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -172,7 +172,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Network In Bytes",
+                "title": "EC2 Network In Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -251,7 +251,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Network Out Bytes",
+                "title": "EC2 Network Out Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -330,7 +330,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 DiskIO Read Bytes",
+                "title": "EC2 DiskIO Read Bytes [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -409,7 +409,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 CPU Utilization",
+                "title": "EC2 CPU Utilization [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -488,7 +488,7 @@
                         }
                     }
                 },
-                "title": "AWS Filters",
+                "title": "Filters [Metricbeat AWS]",
                 "uiStateJSON": {},
                 "version": 1,
                 "visState": {
@@ -567,7 +567,7 @@
                         }
                     }
                 },
-                "title": "AWS EC2 Instance State",
+                "title": "EC2 Instance State [Metricbeat AWS]",
                 "uiStateJSON": {
                     "vis": {
                         "colors": {

@@ -27,13 +27,10 @@ test: prepare-test
 .PHONY: prepare-test
 prepare-test:: python-env
 	# Makes sure to use current version of beats for testing
-	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
-	rsync -a \
-	  --include=vendor/github.com/magefile/mage/build \
-	  --exclude=build/ \
-	  --exclude=.git/ \
-	  ${PWD}/../../* ${BUILD_DIR}/src/github.com/elastic/beats/
+	rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
+	git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
 
+	rm -fr ${BEAT_PATH}
 	mkdir -p ${BEAT_PATH}
 	export GOPATH=${PWD}/build ; \
 	. ${PYTHON_ENV}/bin/activate && \

@@ -59,6 +59,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-statsd>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
@@ -26115,6 +26116,33 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-statsd]]
+== Statsd fields
+
+Statsd module
+
+
+
+*`statsd.*.count`*::
++
+--
+Statsd counters
+
+
+type: object
+
+--
+
+*`statsd.*.*`*::
++
+--
+Statsd metrics - release: beta
+
+
+type: object
 
 --
 

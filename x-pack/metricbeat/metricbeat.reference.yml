@@ -804,6 +804,14 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
+#-------------------------------- Statsd Module --------------------------------
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #reservoir_size: 1000
+  #ttl: "30s"
+
 #------------------------------- Traefik Module -------------------------------
 - module: traefik
   metricsets: ["health"]
