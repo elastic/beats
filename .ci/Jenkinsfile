@@ -4,8 +4,8 @@ pipeline {
   environment {
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
-    GITHUB_CHECK_ITS_NAME = 'Integration Tests'
-    ITS_PIPELINE = 'beats/poc-metricbeat-functional-tests'
+    GITHUB_CHECK_NAME = 'Functional Tests'
+    PIPELINE = 'beats/poc-metricbeat-functional-tests'
   }
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -53,14 +53,14 @@ pipeline {
       }
       steps {
         log(level: 'INFO', text: 'Launching Async ITs')
-        build(job: env.ITS_PIPELINE, propagate: false, wait: false,
+        build(job: env.PIPELINE, propagate: false, wait: false,
               parameters: [string(name: 'GO_VERSION', value: "${env.GO_VERSION}"),
                            string(name: 'MODULE', value: 'all'),
                            string(name: 'PR', value: "${env.GIT_BASE_COMMIT}"),
-                           string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
+                           string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_NAME),
                            string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
                            string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
-        githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
+        githubNotify(context: "${env.GITHUB_CHECK_NAME}", description: "${env.GITHUB_CHECK_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.PIPELINE.replaceAll('/','+')}")
       }
     }
   }
