@@ -9,7 +9,7 @@ pipeline {
   }
   options {
     timeout(time: 1, unit: 'HOURS')
-    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
+    buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '20'))
     timestamps()
     ansiColor('xterm')
     disableResume()
@@ -31,21 +31,14 @@ pipeline {
         stage('Checkout') {
           steps {
             gitCheckout(basedir: env.BASE_DIR, githubNotifyFirstTimeContributor: false)
-            stash allowEmpty: true, name: 'source', useDefaultExcludes: false
             script {
               env.GO_VERSION = readFile("${BASE_DIR}/.go-version").trim()
             }
           }
         }
-        stage('Tests') {
-          steps {
-            echo 'Do the magic as usual.'
-            sh 'env | sort'
-          }
-        }
       }
     }
-    stage('Integration Tests') {
+    stage(GITHUB_CHECK_NAME) {
       agent none
       when {
         beforeAgent true
@@ -56,7 +49,6 @@ pipeline {
         build(job: env.PIPELINE, propagate: false, wait: false,
               parameters: [string(name: 'GO_VERSION', value: "${env.GO_VERSION}"),
                            string(name: 'MODULE', value: 'all'),
-                           string(name: 'PR', value: "${env.GIT_BASE_COMMIT}"),
                            string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_NAME),
                            string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
                            string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
