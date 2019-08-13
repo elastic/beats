@@ -1,0 +1,6 @@
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #reservoir_size: 1000
+  #ttl: "30s"
