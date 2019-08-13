@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix of docker json parser for missing "log" jsonkey in docker container's log {issue}11464[11464]
 - Fix `@timestamp` being duplicated in events if `@timestamp` is set in a
   processor (or by any code utilizing `PutValue()` on a `beat.Event`).
+- Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
 
 *Auditbeat*
 
