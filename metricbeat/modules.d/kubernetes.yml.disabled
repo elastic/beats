@@ -34,6 +34,7 @@
 #    - state_statefulset
 #    - state_pod
 #    - state_container
+#    - state_cronjob
 #  period: 10s
 #  hosts: ["kube-state-metrics:8080"]
 #  add_metadata: true

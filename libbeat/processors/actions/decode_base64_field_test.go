@@ -102,7 +102,7 @@ func TestDecodeBase64Run(t *testing.T) {
 			Output: common.MapStr{
 				"field1": "bad data",
 				"error": common.MapStr{
-					"message": "failed to decode base64 fields in processor: error trying to unmarshal bad data: illegal base64 data at input byte 3",
+					"message": "failed to decode base64 fields in processor: error trying to decode bad data: illegal base64 data at input byte 3",
 				},
 			},
 			error: true,
@@ -139,7 +139,7 @@ func TestDecodeBase64Run(t *testing.T) {
 			Output: common.MapStr{
 				"field1": "Y29ycmVjdCBkYXRh",
 				"error": common.MapStr{
-					"message": "failed to decode base64 fields in processor: could not fetch value for key: field2, Error: key not found",
+					"message": "failed to decode base64 fields in processor: could not fetch base64 value for key: field2, Error: key not found",
 				},
 			},
 			error: true,

@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "",
+        "description": "Netflow flow records",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -88,7 +88,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat Netflow] Flow Records",
+        "title": "[Filebeat Netflow] Flow records",
         "uiStateJSON": {
           "P-3": {
             "vis": {
@@ -150,7 +150,7 @@
             }
           }
         },
-        "title": "[Filebeat Netflow] Flow Records",
+        "title": "Flow Records [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "legendOpen": true
@@ -267,7 +267,7 @@
               }
             ]
           },
-          "title": "[Filebeat Netflow] Flow Records",
+          "title": "Flow Records [Filebeat Netflow]",
           "type": "histogram"
         }
       },
@@ -301,7 +301,7 @@
             }
           }
         },
-        "title": "[Filebeat Netflow] Flow Records",
+        "title": "Flow Records [Filebeat Netflow]",
         "uiStateJSON": {
           "vis": {
             "defaultColors": {
@@ -367,7 +367,7 @@
             "handleNoResults": true,
             "type": "gauge"
           },
-          "title": "[Filebeat Netflow] Flow Records",
+          "title": "Flow Records [Filebeat Netflow]",
           "type": "metric"
         }
       },
@@ -453,7 +453,7 @@
           "@timestamp",
           "desc"
         ],
-        "title": "[Filebeat Netflow] Flow Records",
+        "title": "Flow Records [Filebeat Netflow]",
         "version": 1
       },
       "id": "a34c6611-79d8-4b50-ae3f-8b328d28e24a",

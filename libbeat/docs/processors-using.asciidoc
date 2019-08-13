@@ -215,7 +215,6 @@ ifdef::has_decode_csv_fields_processor[]
  * <<decode-csv-fields,`decode_csv_fields`>>
 endif::[]
  * <<decode-json-fields,`decode_json_fields`>>
- * <<decode-base64-field,`decode_base64_field`>>
  * <<decompress-gzip-field,`decompress_gzip_field`>>
  * <<dissect, `dissect`>>
  * <<processor-dns, `dns`>>
@@ -1353,8 +1352,6 @@ forget metadata for a container, 60s by default.
 
 [[add-host-metadata]]
 === Add Host metadata
-
-beta[]
 
 [source,yaml]
 -------------------------------------------------------------------------------

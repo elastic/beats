@@ -156,7 +156,7 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 	events := map[string]mb.Event{}
 	metricSetFieldResults := map[string]map[string]interface{}{}
 	for instanceID := range instanceOutput {
-		events[instanceID] = aws.InitEvent(metricsetName, regionName)
+		events[instanceID] = aws.InitEvent(regionName)
 		metricSetFieldResults[instanceID] = map[string]interface{}{}
 	}
 

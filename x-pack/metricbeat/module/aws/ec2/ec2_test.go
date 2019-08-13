@@ -127,7 +127,6 @@ func TestGetInstanceIDs(t *testing.T) {
 func TestCreateCloudWatchEvents(t *testing.T) {
 	expectedEvent := mb.Event{
 		RootFields: common.MapStr{
-			"service": common.MapStr{"name": "ec2"},
 			"cloud": common.MapStr{
 				"region":            regionName,
 				"provider":          "aws",
