@@ -59,6 +59,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-statsd>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
@@ -879,6 +880,12 @@ Cloudwatch metric dimensions.
 type: object
 
 --
+
+[float]
+=== ebs
+
+`ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
+
 
 [float]
 === ec2
@@ -26106,6 +26113,33 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-statsd]]
+== Statsd fields
+
+Statsd module
+
+
+
+*`statsd.*.count`*::
++
+--
+Statsd counters
+
+
+type: object
+
+--
+
+*`statsd.*.*`*::
++
+--
+Statsd metrics - release: beta
+
+
+type: object
 
 --
 

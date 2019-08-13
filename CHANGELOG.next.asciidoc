@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Add new dashboard for Prometheus server stats {pull}13126[13126]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 - system/raid metricset now uses /sys/block instead of /proc/mdstat for data. {pull}11613[11613]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
@@ -121,6 +122,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
 - Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
+- Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
 
 *Heartbeat*
 
@@ -305,6 +307,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for kubernetes cronjobs {pull}13001[13001]
 - Add cgroup memory stats to docker/memory metricset {pull}12916[12916]
 - Add AWS elb metricset. {pull}12952[12952] {issue}11701[11701]
+- Add AWS ebs metricset. {pull}13167[13167] {issue}11699[11699]
 
 *Packetbeat*
 
