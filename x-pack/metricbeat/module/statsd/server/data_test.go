@@ -249,9 +249,9 @@ func TestTagsGrouping(t *testing.T) {
 func TestTagsCleanup(t *testing.T) {
 	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd", "ttl": "1s"}).(*MetricSet)
 	testData := []string{
-		"metric1:1|c|#k1:v1,k2:v2",
+		"metric1:1|g|#k1:v1,k2:v2",
 
-		"metric2:3|c|@0.1|#k1:v2,k2:v3",
+		"metric2:3|g|@0.1|#k1:v2,k2:v3",
 	}
 	process(t, testData, ms)
 	time.Sleep(1000 * time.Millisecond)
@@ -260,7 +260,7 @@ func TestTagsCleanup(t *testing.T) {
 	assert.Len(t, ms.getEvents(), 2)
 
 	testData = []string{
-		"metric1:+2|c|#k1:v1,k2:v2",
+		"metric1:+2|g|#k1:v1,k2:v2",
 	}
 	// refresh metrics1
 	process(t, testData, ms)
@@ -270,7 +270,7 @@ func TestTagsCleanup(t *testing.T) {
 	events := ms.getEvents()
 	assert.Len(t, events, 1)
 
-	assert.Equal(t, events[0].MetricSetFields, common.MapStr{"metric1": map[string]interface{}{"count": int64(3)}})
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{"metric1": map[string]interface{}{"value": float64(3)}})
 }
 
 func TestSetReset(t *testing.T) {
