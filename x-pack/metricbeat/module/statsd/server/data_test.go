@@ -311,3 +311,50 @@ func TestData(t *testing.T) {
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
 }
+
+func TestGaugeDeltas(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1.0|g|#k1:v1,k2:v2",
+		"metric01:-2.0|g|#k1:v1,k2:v2",
+	}
+	process(t, testData, ms)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"value": -1.0},
+	})
+
+	// same value reported again
+	events = ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"value": -1.0},
+	})
+}
+func TestCounter(t *testing.T) {
+	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
+	testData := []string{
+		"metric01:1|c|#k1:v1,k2:v2",
+		"metric01:2|c|#k1:v1,k2:v2",
+	}
+	process(t, testData, ms)
+
+	events := ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(3)},
+	})
+
+	// reset
+	events = ms.getEvents()
+	assert.Len(t, events, 1)
+
+	assert.Equal(t, events[0].MetricSetFields, common.MapStr{
+		"metric01": map[string]interface{}{"count": int64(0)},
+	})
+}
