@@ -32,6 +32,17 @@ services:
     ports:
       - 80
 
+  appsearch:
+    build:
+      context: ./module/appsearch/_meta
+    depends_on:
+      - elasticsearch
+    environment:
+      - "elasticsearch.host=http://elasticsearch:9200"
+      - "allow_es_settings_modification=true"
+    ports:
+      - 3002:3002
+
   metricbeat:
     build: ./module/beat/_meta
     ports:

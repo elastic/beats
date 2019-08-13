@@ -30,6 +30,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/aerospike/namespace"
 	_ "github.com/elastic/beats/metricbeat/module/apache"
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
+	_ "github.com/elastic/beats/metricbeat/module/appsearch"
+	_ "github.com/elastic/beats/metricbeat/module/appsearch/stats"
 	_ "github.com/elastic/beats/metricbeat/module/beat"
 	_ "github.com/elastic/beats/metricbeat/module/beat/state"
 	_ "github.com/elastic/beats/metricbeat/module/beat/stats"

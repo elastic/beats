@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
+* <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
@@ -815,6 +816,278 @@ type: long
 +
 --
 Total.
+
+
+type: long
+
+--
+
+[[exported-fields-appsearch]]
+== appsearch fields
+
+appsearch module
+
+
+
+[float]
+=== appsearch
+
+
+
+
+[float]
+=== stats
+
+App Search stats
+
+
+
+[float]
+=== jvm
+
+JVM stats
+
+
+
+[float]
+=== memory_usage
+
+Memory usage
+
+
+
+*`appsearch.stats.jvm.memory_usage.heap_init.bytes`*::
++
+--
+Heap init used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_used.bytes`*::
++
+--
+Head used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_committed.bytes`*::
++
+--
+Commited heap to the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.heap_max.bytes`*::
++
+--
+Max heap used by the JVM in bytes
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.non_heap_init.bytes`*::
++
+--
+Non-Heap initial memory used by the JVM in bytes.
+
+
+type: long
+
+--
+
+*`appsearch.stats.jvm.memory_usage.non_heap_committed.bytes`*::
++
+--
+Non-Heap commited memory used by the JVM in bytes.
+
+
+type: long
+
+--
+
+[float]
+=== queues
+
+Worker queues
+
+
+
+*`appsearch.stats.queues.analytics_events.count`*::
++
+--
+Number of pending jobs in the `analytics_events` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.document_destroyer.count`*::
++
+--
+Number of pending jobs in the `document_destroyer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.engine_destroyer.count`*::
++
+--
+Number of pending jobs in the `engine_destroyer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.index_adder.count`*::
++
+--
+Number of pending jobs in the `index_adder` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.indexed_doc_remover.count`*::
++
+--
+Number of pending jobs in the `indexed_doc_remover` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.mailer.count`*::
++
+--
+Number of pending jobs in the `mailer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.refresh_document_counts.count`*::
++
+--
+Number of pending jobs in the `refresh_document_counts` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.reindexer.count`*::
++
+--
+Number of pending jobs in the `reindexer` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.schema_updater.count`*::
++
+--
+Number of pending jobs in the `schema_updater` queue.
+
+
+type: long
+
+--
+
+*`appsearch.stats.queues.failed.count`*::
++
+--
+Number of failed jobs waiting to be retried.
+
+
+type: long
+
+--
+
+[float]
+=== requests
+
+Request metrics
+
+
+
+*`appsearch.stats.requests.count`*::
++
+--
+Number of recent completed requests
+
+
+type: long
+
+--
+
+[float]
+=== api.duration
+
+API response time metrics
+
+
+
+*`appsearch.stats.requests.api.duration.avg.ms`*::
++
+--
+Average response time in milliseconds
+
+
+type: long
+
+--
+
+*`appsearch.stats.requests.api.duration.max.ms`*::
++
+--
+Max response time in milliseconds
+
+
+type: long
+
+--
+
+[float]
+=== web.duration
+
+Dashboard response time metrics
+
+
+
+*`appsearch.stats.requests.web.duration.avg.ms`*::
++
+--
+Average response time in milliseconds
+
+
+type: long
+
+--
+
+*`appsearch.stats.requests.web.duration.mean.ms`*::
++
+--
+Max response time in milliseconds
 
 
 type: long
