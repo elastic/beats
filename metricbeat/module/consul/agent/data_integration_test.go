@@ -30,9 +30,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "consul")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, consul.GetConfig([]string{"agent"}, service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {

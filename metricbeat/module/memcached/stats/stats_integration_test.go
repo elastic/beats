@@ -29,9 +29,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "memcached")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -47,7 +45,6 @@ func TestData(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "memcached")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)

@@ -37,15 +37,12 @@ var (
 	dataFlag = flag.Bool("data", false, "Write updated data.json files")
 )
 
-// SkipIfNoData skips tests if the `-data` flag is not set
-func SkipIfNoData(t testing.TB) {
-	t.Skip("skip data generation tests")
-}
-
 // WriteEvent fetches a single event writes the output to a ./_meta/data.json
 // file.
 func WriteEvent(f mb.EventFetcher, t testing.TB) error {
-	SkipIfNoData(t)
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
 
 	event, err := f.Fetch()
 	if err != nil {
@@ -67,7 +64,9 @@ func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
 // WriteEventsCond fetches events and writes the first event that matches the condition
 // to a ./_meta/data.json file.
 func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr) bool) error {
-	SkipIfNoData(t)
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
 
 	events, err := f.Fetch()
 	if err != nil {
@@ -109,7 +108,9 @@ func WriteEventsReporterV2WithContext(f mb.ReportingMetricSetV2WithContext, t te
 // WriteEventsReporterV2Cond fetches events and writes the first event that matches
 // the condition to a file.
 func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path string, cond func(common.MapStr) bool) error {
-	SkipIfNoData(t)
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
 
 	events, errs := ReportingFetchV2(f)
 	if len(errs) > 0 {
@@ -122,7 +123,9 @@ func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path str
 // WriteEventsReporterV2ErrorCond fetches events and writes the first event that matches
 // the condition to a file.
 func WriteEventsReporterV2ErrorCond(f mb.ReportingMetricSetV2Error, t testing.TB, path string, cond func(common.MapStr) bool) error {
-	SkipIfNoData(t)
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
 
 	events, errs := ReportingFetchV2Error(f)
 	if len(errs) > 0 {
@@ -135,7 +138,9 @@ func WriteEventsReporterV2ErrorCond(f mb.ReportingMetricSetV2Error, t testing.TB
 // WriteEventsReporterV2WithContextCond fetches events and writes the first event that matches
 // the condition to a file.
 func WriteEventsReporterV2WithContextCond(f mb.ReportingMetricSetV2WithContext, t testing.TB, path string, cond func(common.MapStr) bool) error {
-	SkipIfNoData(t)
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
 
 	events, errs := ReportingFetchV2WithContext(f)
 	if len(errs) > 0 {

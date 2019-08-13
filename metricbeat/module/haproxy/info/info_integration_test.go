@@ -30,7 +30,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "haproxy")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(14567)))
 	events, errs := mbtest.ReportingFetchV2Error(f)
@@ -46,9 +45,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "haproxy")
-	defer service.Down()
 
 	config := getConfig(service.HostForPort(14567))
 	f := mbtest.NewReportingMetricSetV2Error(t, config)

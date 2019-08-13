@@ -78,7 +78,6 @@ const (
 // Driver is the interface of docker compose implementations
 type Driver interface {
 	Up(ctx context.Context, opts UpOptions, service string) error
-	Down(ctx context.Context) error
 	Kill(ctx context.Context, signal string, service string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
 
@@ -92,6 +91,7 @@ type ContainerStatus interface {
 	ServiceName() string
 	Healthy() bool
 	Running() bool
+	Old() bool
 	Host() string
 	HostForPort(int) string
 }
@@ -201,12 +201,37 @@ func (c *Project) Kill(service string) error {
 	return c.Driver.Kill(context.Background(), "KILL", service)
 }
 
-// Down removes all resources of a project
-func (c *Project) Down() error {
-	c.Lock()
-	defer c.Unlock()
+// KillOld kills old containers
+func (c *Project) KillOld(except []string) error {
+	// Do not kill ourselves ;)
+	except = append(except, "beat")
 
-	return c.Driver.Down(context.Background())
+	// These services take very long to start up and stop. If they are stopped
+	// it can happen that an other package tries to start them at the same time
+	// which leads to a conflict. We need a better solution long term but that should
+	// solve the problem for now.
+	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes")
+
+	servicesStatus, err := c.getServices()
+	if err != nil {
+		return err
+	}
+
+	for _, s := range servicesStatus {
+		// Ignore the ones we want
+		if contains(except, s.Name()) {
+			continue
+		}
+
+		if s.Running() && s.Old() {
+			err = c.Kill(s.Name())
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // Lock acquires the lock (300s) timeout
@@ -289,6 +314,9 @@ type ServiceInfo interface {
 	Name() string
 	Running() bool
 	Healthy() bool
+
+	// Has been up for too long?:
+	Old() bool
 
 	Host() string
 	HostForPort(int) string

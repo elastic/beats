@@ -37,7 +37,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
-	defer service.Down()
 
 	config := mtest.GetConfig("stats", service.Host())
 	host := config["hosts"].([]string)[0]
@@ -68,9 +67,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
-	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
-	defer service.Down()
+	service := compose.EnsureUp(t, "kibana")
 
 	config := mtest.GetConfig("stats", service.Host())
 	host := config["hosts"].([]string)[0]

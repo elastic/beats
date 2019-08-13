@@ -18,11 +18,9 @@ import (
 
 func TestData(t *testing.T) {
 	t.Skip("Skip until a proper Docker image is setup for Metricbeat")
-	mbtest.SkipIfNoData(t)
-	service := compose.EnsureUp(t, "oracle")
-	defer service.Down()
+	r := compose.EnsureUp(t, "oracle")
 
-	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(service.Host()))
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(r.Host()))
 
 	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
 		t.Fatal("write", err)

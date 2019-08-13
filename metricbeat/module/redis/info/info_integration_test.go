@@ -31,7 +31,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
-	defer service.Down()
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, err := mbtest.ReportingFetchV2Error(ms)
@@ -52,9 +51,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "redis")
-	defer service.Down()
 
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	err := mbtest.WriteEventsReporterV2Error(ms, t, "")

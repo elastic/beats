@@ -27,9 +27,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "nats")
-	defer service.Down()
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	err := mbtest.WriteEventsReporterV2Error(metricSet, t, "./test_data.json")
@@ -40,7 +38,6 @@ func TestData(t *testing.T) {
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "nats")
-	defer service.Down()
 
 	reporter := &mbtest.CapturingReporterV2{}
 

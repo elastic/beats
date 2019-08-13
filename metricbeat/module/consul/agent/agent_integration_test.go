@@ -38,7 +38,6 @@ func TestFetch(t *testing.T) {
 	logp.TestingSetup()
 
 	service := compose.EnsureUp(t, "consul")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, consul.GetConfig([]string{"agent"}, service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)

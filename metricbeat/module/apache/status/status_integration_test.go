@@ -30,7 +30,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "apache")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)

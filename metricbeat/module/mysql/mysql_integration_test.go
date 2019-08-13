@@ -30,7 +30,6 @@ import (
 
 func TestNewDB(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
-	defer service.Down()
 
 	db, err := NewDB(GetMySQLEnvDSN(service.Host()))
 	assert.NoError(t, err)

@@ -33,7 +33,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
-	defer service.Down()
 
 	addEntry(t, service.Host(), "foo", 1)
 
@@ -48,9 +47,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "redis")
-	defer service.Down()
 
 	addEntry(t, service.Host(), "foo", 1)
 
@@ -60,7 +57,6 @@ func TestData(t *testing.T) {
 
 func TestFetchMultipleKeyspaces(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
-	defer service.Down()
 
 	expectedKeyspaces := map[string]uint{
 		"foo": 0,

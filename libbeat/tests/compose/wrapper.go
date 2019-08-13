@@ -26,6 +26,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -73,6 +74,23 @@ func (c *wrapperContainer) Healthy() bool {
 
 func (c *wrapperContainer) Running() bool {
 	return c.info.State == "running"
+}
+
+var statusOldRe = regexp.MustCompile(`(\d+) (minute|hour)s?`)
+
+func (c *wrapperContainer) Old() bool {
+	match := statusOldRe.FindStringSubmatch(c.info.Status)
+	if len(match) < 3 {
+		return false
+	}
+	n, _ := strconv.Atoi(match[1])
+	unit := match[2]
+	switch unit {
+	case "minute":
+		return n > 3
+	default:
+		return true
+	}
 }
 
 // privateHost returns the address of the container, it should be reachable
@@ -242,10 +260,6 @@ func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string)
 	}
 
 	return d.cmd(ctx, "kill", args...).Run()
-}
-
-func (d *wrapperDriver) Down(ctx context.Context) error {
-	return d.cmd(ctx, "down", "-v", "--rmi=none").Run()
 }
 
 func (d *wrapperDriver) Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error) {

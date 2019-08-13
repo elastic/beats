@@ -27,9 +27,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUpWithTimeout(t, 120, "ceph")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 

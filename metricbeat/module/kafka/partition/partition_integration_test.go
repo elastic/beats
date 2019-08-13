@@ -43,12 +43,10 @@ const (
 )
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(120*time.Second),
 		compose.UpWithAdvertisedHostEnvFile,
 	)
-	defer service.Down()
 
 	generateKafkaData(t, service.Host(), "metricbeat-generate-data")
 
@@ -60,11 +58,7 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
-	service := compose.EnsureUp(t, "kafka",
-		compose.UpWithTimeout(120*time.Second),
-		compose.UpWithAdvertisedHostEnvFile,
-	)
-	defer service.Down()
+	service := compose.EnsureUp(t, "kafka")
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 

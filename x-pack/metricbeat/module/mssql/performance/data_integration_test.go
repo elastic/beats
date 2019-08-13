@@ -10,16 +10,14 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
 )
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
-	service := compose.EnsureUp(t, "mssql")
-	defer service.Down()
+	t.Skip("Skipping `data.json` generation test")
 
 	_, config, err := getHostURI()
 	if err != nil {
@@ -27,6 +25,12 @@ func TestData(t *testing.T) {
 	}
 
 	f := mbtest.NewReportingMetricSetV2(t, config)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+
 	if err = mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}

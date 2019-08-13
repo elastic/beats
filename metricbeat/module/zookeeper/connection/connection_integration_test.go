@@ -27,9 +27,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "zookeeper")
-	defer service.Down()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {

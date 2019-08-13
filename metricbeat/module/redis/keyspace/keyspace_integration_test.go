@@ -32,7 +32,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "redis")
-	defer service.Down()
 
 	addEntry(t, service.Host())
 
@@ -57,9 +56,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	mbtest.SkipIfNoData(t)
 	service := compose.EnsureUp(t, "redis")
-	defer service.Down()
 
 	addEntry(t, service.Host())
 

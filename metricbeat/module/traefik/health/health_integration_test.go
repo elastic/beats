@@ -41,7 +41,6 @@ func makeBadRequest(host string) error {
 
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUp(t, "traefik")
-	defer service.Down()
 
 	makeBadRequest(service.Host())
 

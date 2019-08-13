@@ -20,7 +20,6 @@ package compose
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -42,28 +41,26 @@ type HostInfo interface {
 	HostForPort(port int) string
 }
 
-// ServiceControl controls and provides information of running services
-type ServiceControl interface {
-	HostInfo
-
-	// Stops the service and cleans up used resources
-	Down() error
-}
-
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
 // with a default timeout of 300 seconds
-func EnsureUp(t testing.TB, service string, options ...UpOption) ServiceControl {
+func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	t.Helper()
 
-	if hostInfo := ServiceControlFromEnv(t, service); hostInfo != nil {
+	if hostInfo := HostInfoFromEnv(t, service); hostInfo != nil {
 		return hostInfo
 	}
 
-	compose, err := getComposeProject()
+	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer compose.Close()
+
+	// Kill no longer used containers
+	err = compose.KillOld([]string{service})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	upOptions := UpOptions{
 		Timeout: 60 * time.Second,
@@ -94,20 +91,17 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) ServiceControl 
 		t.Fatalf("getting host for %s", service)
 	}
 
-	return &serviceController{
-		HostInfo: host,
-		Project:  compose,
-	}
+	return host
 }
 
 // EnsureUpWithTimeout starts all the requested services (must be defined in docker-compose.yml)
 // Wait for `timeout` seconds for health
-func EnsureUpWithTimeout(t testing.TB, timeout int, service string) ServiceControl {
+func EnsureUpWithTimeout(t testing.TB, timeout int, service string) HostInfo {
 	return EnsureUp(t, service, UpWithTimeout(time.Duration(timeout)*time.Second))
 }
 
-// ServiceControlFromEnv gets the host information to use for the test from environment variables.
-func ServiceControlFromEnv(t testing.TB, service string) ServiceControl {
+// HostInfoFromEnv gets the host information to use for the test from environment variables.
+func HostInfoFromEnv(t testing.TB, service string) HostInfo {
 	// If an environment variable with the form <SERVICE>_HOST is used, its value
 	// is used as host instead of starting a new service.
 	envVar := fmt.Sprintf("%s_HOST", strings.ToUpper(service))
@@ -128,12 +122,6 @@ func ServiceControlFromEnv(t testing.TB, service string) ServiceControl {
 	return nil
 }
 
-// serviceController implements service control interface for a HostInfo
-type serviceController struct {
-	HostInfo
-	*Project
-}
-
 type staticHostInfo struct {
 	host string
 }
@@ -144,10 +132,6 @@ func (i *staticHostInfo) Host() string {
 
 func (i *staticHostInfo) HostForPort(int) string {
 	return i.host
-}
-
-func (i *staticHostInfo) Down() error {
-	return nil
 }
 
 func findComposePath() (string, error) {
@@ -171,19 +155,11 @@ func findComposePath() (string, error) {
 	return "", errors.New("docker-compose.yml not found")
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
-func getComposeProject() (*Project, error) {
+func getComposeProject(name string) (*Project, error) {
 	path, err := findComposePath()
 	if err != nil {
 		return nil, err
 	}
-
-	seq := make([]byte, 8)
-	rand.Read(seq)
-	name := fmt.Sprintf("%s_%x", filepath.Base(filepath.Dir(path)), seq)
 
 	return NewProject(
 		name,
