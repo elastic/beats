@@ -1278,7 +1278,11 @@ logging.files:
 # the Stack Monitoring UI. However, if a different output is enabled, the monitoring data will
 # show up under a Standalone Cluster in the UI. If you want the monitoring data to be associated
 # with a specific Elasticsearch cluster in the UI, specify that cluster's UUID here.
-#monitoring.override_cluster_uuid:
+
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Auditbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
 # Elasticsearch output are accepted here as well.
