@@ -66,7 +66,7 @@ type metricSetWrapper struct {
 	module *Wrapper // Parent Module.
 	stats  *stats   // stats for this MetricSet.
 
-	periodic bool // Set to true if it is a periodic fetcher
+	periodic bool // Set to true if this metricset is a periodic fetcher
 }
 
 // stats bundles common metricset stats.

@@ -111,15 +111,24 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 
 // AddMetricSetInfo is an EventModifier that adds information about the
 // MetricSet that generated the event. It will always add the metricset and
-// module names. And it will add the host, namespace, and rtt (round-trip time
-// in microseconds) values if they are non-zero values.
+// module names. And it will add the host, period, and duration (round-trip
+// time in microseconds) values if they are non-zero values.
 //
+//   {
+//     "event": {
+//       "dataset": "apache.status",
+//       "duration": 115,
+//       "module": "apache"
+//     },
+//     "service": {
+//       "address": "127.0.0.1",
+//     },
 //     "metricset": {
-//       "host": "apache",
-//       "module": "apache",
 //       "name": "status",
-//       "rtt": 115
+//       "period": 10000000
 //     }
+//   }
+//
 func AddMetricSetInfo(module, metricset string, event *Event) {
 	if event.Namespace == "" {
 		event.Namespace = fmt.Sprintf("%s.%s", module, metricset)
