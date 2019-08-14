@@ -120,6 +120,11 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(devtools.Format, Update, devtools.Check)
+}
+
 // MockedTests runs the HTTP tests using the mocked data inside each {module}/{metricset}/testdata folder.
 // Use MODULE={module_name} to run only mocked tests with a single module.
 // Use GENERATE=true or GENERATE=1 to regenerate JSON files.
