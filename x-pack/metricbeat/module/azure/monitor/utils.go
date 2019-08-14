@@ -31,9 +31,9 @@ func filterMetrics(selectedRange []string, allRange []insights.MetricDefinition)
 
 // filterAggregations will filter out any unsupported aggregations based on the metrics selected
 func filterAggregations(selectedRange []string, metrics []insights.MetricDefinition) ([]string, []string) {
-	var supported []string
 	var unsupported []string
 	for _, metric := range metrics {
+		var supported []string
 		for _, agg := range *metric.SupportedAggregationTypes {
 			supported = append(supported, string(agg))
 		}
@@ -64,16 +64,21 @@ func filter(src []string) (res []string) {
 }
 
 // intersections is a helper method, will compare 2 slices and return their intersection and difference records
-func intersections(section1, section2 []string) (intersection []string, difference []string) {
-	str1 := strings.Join(filter(section1), " ")
-	for _, s := range filter(section2) {
+func intersections(supported, selected []string) ([]string, []string) {
+	if len(selected) == 0 {
+		return supported, nil
+	}
+	var intersection []string
+	var difference []string
+	str1 := strings.Join(filter(supported), " ")
+	for _, s := range filter(selected) {
 		if strings.Contains(str1, s) {
 			intersection = append(intersection, s)
 		} else {
 			difference = append(difference, s)
 		}
 	}
-	return
+	return intersection, difference
 }
 
 // getMetricDefinitionsByNames is a helper method, will compare 2 slices and return their intersection
