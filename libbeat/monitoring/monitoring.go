@@ -98,15 +98,15 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 	case beatCfg.Monitoring.Enabled():
 		monitoringCfg := beatCfg.Monitoring
 
-		var overrideClusterUUID string
-		if monitoringCfg.HasField("override_cluster_uuid") {
+		var clusterUUID string
+		if monitoringCfg.HasField("cluster_uuid") {
 			var err error
-			overrideClusterUUID, err = monitoringCfg.String("override_cluster_uuid", -1)
+			clusterUUID, err = monitoringCfg.String("cluster_uuid", -1)
 			if err != nil {
 				return nil, nil, err
 			}
 		}
-		return monitoringCfg, &report.Settings{Format: report.FormatBulk, OverrideClusterUUID: overrideClusterUUID}, nil
+		return monitoringCfg, &report.Settings{Format: report.FormatBulk, ClusterUUID: clusterUUID}, nil
 	default:
 		return nil, nil, nil
 	}
