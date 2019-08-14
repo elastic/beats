@@ -97,16 +97,13 @@ func SelectConfig(beatCfg BeatConfig) (*common.Config, *report.Settings, error) 
 		return monitoringCfg, &report.Settings{Format: report.FormatXPackMonitoringBulk}, nil
 	case beatCfg.Monitoring.Enabled():
 		monitoringCfg := beatCfg.Monitoring
-
-		var clusterUUID string
-		if monitoringCfg.HasField("cluster_uuid") {
-			var err error
-			clusterUUID, err = monitoringCfg.String("cluster_uuid", -1)
-			if err != nil {
-				return nil, nil, err
-			}
+		var info struct {
+			ClusterUUID string `config:"cluster_uuid"`
 		}
-		return monitoringCfg, &report.Settings{Format: report.FormatBulk, ClusterUUID: clusterUUID}, nil
+		if err := monitoringCfg.Unpack(&info); err != nil {
+			return nil, nil, err
+		}
+		return monitoringCfg, &report.Settings{Format: report.FormatBulk, ClusterUUID: info.ClusterUUID}, nil
 	default:
 		return nil, nil, nil
 	}
