@@ -9,7 +9,7 @@
   subscription_id: ''
   refresh_list_interval: 120s
   resources:
-  - resource_id: "subscriptions/xxxxxx/resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/obsapimanagement"
+  - resource_id: "subscriptions/xxxxx/resourceGroups/obs-infrastructure/providers/Microsoft.ApiManagement/service/obsapimanagement11"
     metrics:
     - name: "Requests"
       namespace: "Microsoft.ApiManagement/service"

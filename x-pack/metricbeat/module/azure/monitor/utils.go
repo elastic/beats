@@ -11,11 +11,11 @@ import (
 )
 
 // filterMetrics will filter out any unsupported metrics based on the namespace selected
-func filterMetrics(selectedRange []string, allRange insights.MetricDefinitionCollection) ([]string, []string) {
+func filterMetrics(selectedRange []string, allRange []insights.MetricDefinition) ([]string, []string) {
 	var inRange []string
 	var notInRange []string
 	var allMetrics []string
-	for _, definition := range *allRange.Value {
+	for _, definition := range allRange {
 		allMetrics = append(allMetrics, *definition.Name.Value)
 	}
 	for _, name := range selectedRange {
@@ -77,9 +77,9 @@ func intersections(section1, section2 []string) (intersection []string, differen
 }
 
 // getMetricDefinitionsByNames is a helper method, will compare 2 slices and return their intersection
-func getMetricDefinitionsByNames(metricDefs insights.MetricDefinitionCollection, names []string) []insights.MetricDefinition {
+func getMetricDefinitionsByNames(metricDefs []insights.MetricDefinition, names []string) []insights.MetricDefinition {
 	var metrics []insights.MetricDefinition
-	for _, def := range *metricDefs.Value {
+	for _, def := range metricDefs {
 		for _, supportedName := range names {
 			if *def.Name.Value == supportedName {
 				metrics = append(metrics, def)
