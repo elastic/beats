@@ -1,0 +1,3 @@
+dashboards:
+    - id: Metricbeat-Stan-Dashboard
+      file: Metricbeat-stan-overview.json

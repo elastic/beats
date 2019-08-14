@@ -1,0 +1,13 @@
+# Module: stan
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.2/metricbeat-module-stan.html
+
+- module: stan
+  metricsets: ["stats", "subscriptions", "channels"]
+  period: 60s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/varz"
+  #connections.metrics_path: "/connz"
+  #routes.metrics_path: "/routez"
+  #subscriptions.metrics_path: "/subsz"
+  #clients.metrics_path: "/streaming/clientsz"
+  #channels.metrics_path: "/streaming/channelsz"

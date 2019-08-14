@@ -1,0 +1,23 @@
+{
+    "@timestamp":"2019-07-30T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"stan",
+        "name":"stats",
+        "rtt":44269
+    },
+    "nats":{
+        "stats":{
+            "clients": 52,
+            "subscriptions": 109,
+            "channels": 55,
+            "msgs": 101,
+            "bytes": 27473416
+        }
+    },
+    "type":"metricsets"
+}

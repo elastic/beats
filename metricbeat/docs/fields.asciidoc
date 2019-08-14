@@ -63,6 +63,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-statsd>>
+* <<exported-fields-stan>>
 * <<exported-fields-system>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
@@ -24818,7 +24819,7 @@ type: long
 *`mysql.status.handler.read.last`*::
 +
 --
-The number of requests to read the last key in an index. 
+The number of requests to read the last key in an index.
 
 
 type: long
@@ -24848,7 +24849,7 @@ type: long
 *`mysql.status.handler.read.rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position. 
+The number of requests to read a row based on a fixed position.
 
 
 type: long
@@ -24858,7 +24859,7 @@ type: long
 *`mysql.status.handler.read.rnd_next`*::
 +
 --
-The number of requests to read the next row in the data file. 
+The number of requests to read the next row in the data file.
 
 
 type: long
@@ -24956,7 +24957,7 @@ type: long
 *`mysql.status.innodb.buffer_pool.bytes.data`*::
 +
 --
-The total number of bytes in the InnoDB buffer pool containing data. 
+The total number of bytes in the InnoDB buffer pool containing data.
 
 
 type: long
@@ -28214,7 +28215,7 @@ format: bytes
 *`redis.info.memory.used.lua`*::
 +
 --
-Used memory by the Lua engine.        
+Used memory by the Lua engine.
 
 
 type: long
@@ -28226,7 +28227,7 @@ format: bytes
 *`redis.info.memory.used.dataset`*::
 +
 --
-The size in bytes of the dataset 
+The size in bytes of the dataset
 
 
 type: long
@@ -28471,7 +28472,7 @@ format: duration
 *`redis.info.persistence.rdb.copy_on_write.last_size`*::
 +
 --
-The size in bytes of copy-on-write allocations during the last RBD save operation                
+The size in bytes of copy-on-write allocations during the last RBD save operation
 
 
 type: long
@@ -28600,7 +28601,7 @@ format: bytes
 *`redis.info.persistence.aof.size.current`*::
 +
 --
-AOF current file size             
+AOF current file size
 
 
 type: long
@@ -28706,7 +28707,7 @@ format: bytes
 *`redis.info.replication.backlog.first_byte_offset`*::
 +
 --
-The master offset of the replication backlog buffer          
+The master offset of the replication backlog buffer
 
 
 type: long
@@ -30005,6 +30006,270 @@ type: float
 +
 --
 The number of write requests merged per second that were queued to the device.
+=======
+[[exported-fields-stan]]
+== Stan fields
+
+stan Module
+
+
+
+[float]
+== stan fields
+
+`stan` contains statistics that were read from Nats Streaming server (STAN)
+
+
+
+*`stan.server.id`*::
++
+--
+type: keyword
+
+The server ID
+
+
+--
+
+*`stan.server.time`*::
++
+--
+type: date
+
+Server time of metric creation
+
+
+--
+
+[float]
+== channels fields
+
+Contains stan / nats streaming/serverz endpoint metrics
+
+
+
+*`stan.channels.name`*::
++
+--
+type: keyword
+
+The name of the STAN streaming channel
+
+
+--
+
+*`stan.channels.msgs`*::
++
+--
+type: long
+
+The number of STAN streaming messages
+
+
+--
+
+*`stan.channels.bytes`*::
++
+--
+type: long
+
+The number of STAN bytes in the channel
+
+
+--
+
+*`stan.channels.first_seq`*::
++
+--
+type: long
+
+First sequence number stored in the channel
+
+
+--
+
+*`stan.channels.last_seq`*::
++
+--
+type: long
+
+Last sequence number stored in the channel
+
+
+--
+
+*`stan.channels.depth`*::
++
+--
+type: long
+
+Queue depth based upon current sequence number and highest reported subscriber sequence number
+
+
+--
+
+[float]
+== stats fields
+
+Contains only high-level stan / nats streaming server related metrics
+
+
+
+*`stan.stats.state`*::
++
+--
+type: keyword
+
+The cluster / streaming configuration state (STANDALONE, CLUSTERED)
+
+
+--
+
+*`stan.stats.role`*::
++
+--
+type: keyword
+
+If clustered, role of this node in the cluster (Leader, Follower, Candidate)
+
+
+--
+
+*`stan.stats.clients`*::
++
+--
+type: integer
+
+The number of STAN clients
+
+
+--
+
+*`stan.stats.subscriptions`*::
++
+--
+type: integer
+
+The number of STAN streaming subscriptions
+
+
+--
+
+*`stan.stats.channels`*::
++
+--
+type: integer
+
+The number of STAN channels
+
+
+--
+
+*`stan.stats.messages`*::
++
+--
+type: long
+
+Number of messages across all STAN queues
+
+
+--
+
+*`stan.stats.bytes`*::
++
+--
+type: long
+
+Number of bytes consumed across all STAN queues
+
+
+--
+
+[float]
+== subscriptions fields
+
+Contains stan / nats streaming/serverz endpoint subscription metrics
+
+
+
+*`stan.subscriptions.id`*::
++
+--
+type: keyword
+
+The name of the STAN channel subscription (client_id)
+
+
+--
+
+*`stan.subscriptions.channel`*::
++
+--
+type: keyword
+
+The name of the STAN channel the subscription is associated with
+
+
+--
+
+*`stan.subscriptions.queue`*::
++
+--
+type: keyword
+
+The name of the NATS queue that the STAN channel subscription is associated with, if any
+
+
+--
+
+*`stan.subscriptions.last_sent`*::
++
+--
+type: long
+
+Last known sequence number of the subscription that was acked
+
+
+--
+
+*`stan.subscriptions.pending`*::
++
+--
+type: long
+
+Number of pending messages from / to the subscriber
+
+
+--
+
+*`stan.subscriptions.offline`*::
++
+--
+type: bool
+
+Is the subscriber marked as offline?
+
+
+--
+
+*`stan.subscriptions.stalled`*::
++
+--
+type: bool
+
+Is the subscriber known to be stalled?
+
+
+--
+
+[[exported-fields-system]]
+== System fields
+
+System status metrics, like CPU and memory usage, that are collected from the operating system.
+
+
+
+[float]
 
 
 type: float
@@ -31842,7 +32107,7 @@ type: keyword
 *`system.raid.sync_action`*::
 +
 --
-Current sync action, if the RAID array is redundant 
+Current sync action, if the RAID array is redundant
 
 
 type: keyword
@@ -32265,7 +32530,7 @@ All TCP connections
 *`system.socket.summary.tcp.memory`*::
 +
 --
-Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
 
 
 type: integer
@@ -32411,7 +32676,7 @@ All UDP connections
 *`system.socket.summary.udp.memory`*::
 +
 --
-Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
 
 
 type: integer
