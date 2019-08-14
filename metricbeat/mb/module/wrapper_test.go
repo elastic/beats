@@ -259,14 +259,14 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 			}
 
 			done := make(chan struct{})
+			defer close(done)
+
 			output := m.Start(done)
 
 			event := <-output
 
 			hasPeriod, _ := event.Fields.HasKey("metricset.period")
 			assert.Equal(t, c.hasPeriod, hasPeriod, "has metricset.period in event %+v", event)
-
-			close(done)
 		})
 	}
 }
