@@ -67,7 +67,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return nil
 	}
-	eventsMapping(report, m.client.resourceConfig.metrics)
+	eventsMapping(report, m.client.resources.metrics)
 
 	return nil
 }

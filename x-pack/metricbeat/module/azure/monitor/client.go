@@ -20,7 +20,7 @@ import (
 type Client struct {
 	azureMonitorService AzureService
 	config              azure.Config
-	resourceConfig      ResourceConfiguration
+	resources      ResourceConfiguration
 	log                 *logp.Logger
 }
 
@@ -80,13 +80,13 @@ func NewClient(config azure.Config) (*Client, error) {
 		azureMonitorService: azureMonitorService,
 		config:              config,
 	}
-	client.resourceConfig.refreshInterval = config.RefreshListInterval
+	client.resources.refreshInterval = config.RefreshListInterval
 	return client, nil
 }
 
 // InitResources returns the list of resources and maps them.
 func (client *Client) InitResources() error {
-	if !client.resourceConfig.expired() {
+	if !client.resources.expired() {
 		return nil
 	}
 	var metrics []Metric
@@ -137,14 +137,14 @@ func (client *Client) InitResources() error {
 			}
 		}
 	}
-	client.resourceConfig.metrics = metrics
+	client.resources.metrics = metrics
 	return nil
 }
 
 // GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
 func (client *Client) GetMetricValues() error {
-	for i, metric := range client.resourceConfig.metrics {
-		client.resourceConfig.metrics[i].values = nil
+	for i, metric := range client.resources.metrics {
+		client.resources.metrics[i].values = nil
 		endTime := time.Now().UTC()
 		startTime := endTime.Add(client.config.Period * (-1))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
@@ -184,7 +184,7 @@ func (client *Client) GetMetricValues() error {
 					if mv.Count != nil {
 						val.count = mv.Count
 					}
-					client.resourceConfig.metrics[i].values = append(client.resourceConfig.metrics[i].values, val)
+					client.resources.metrics[i].values = append(client.resources.metrics[i].values, val)
 				}
 			}
 		}

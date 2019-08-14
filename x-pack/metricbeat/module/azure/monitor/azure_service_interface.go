@@ -9,6 +9,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
 )
 
+// AzureService interface for the azure monitor service and mock for testing
 type AzureService interface {
   GetResourceById(resourceID string) (resources.GenericResource, error)
   GetResourcesByResourceGroup(resourceGroup string, resourceType string) ([]resources.GenericResource, error)
