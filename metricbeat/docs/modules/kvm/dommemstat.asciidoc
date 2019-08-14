@@ -9,6 +9,7 @@ beta[]
 
 include::../../../module/kvm/dommemstat/_meta/docs.asciidoc[]
 
+This is a default metricset. If its host module is unconfigured, it will be enabled by default.
 
 ==== Fields
 

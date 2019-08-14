@@ -7,6 +7,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 include::../../../module/haproxy/info/_meta/docs.asciidoc[]
 
+This is a default metricset. If its host module is unconfigured, it will be enabled by default.
 
 ==== Fields
 
