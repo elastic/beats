@@ -65,6 +65,8 @@ type metricSetWrapper struct {
 	mb.MetricSet
 	module *Wrapper // Parent Module.
 	stats  *stats   // stats for this MetricSet.
+
+	periodic bool // Set to true if it is a periodic fetcher
 }
 
 // stats bundles common metricset stats.
@@ -208,6 +210,9 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 // begins a continuous timer scheduled loop to fetch data. To stop the loop the
 // done channel should be closed.
 func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter reporter) {
+	// Indicate that it has been started as periodic fetcher
+	msw.periodic = true
+
 	// Fetch immediately.
 	msw.fetch(ctx, reporter)
 
@@ -367,7 +372,7 @@ func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
 		event.Took = time.Since(r.start)
 	}
-	if r.msw.Module().Config().Period > 0 {
+	if r.msw.periodic {
 		event.Period = r.msw.Module().Config().Period
 	}
 

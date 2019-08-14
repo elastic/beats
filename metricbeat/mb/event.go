@@ -121,7 +121,6 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 //       "rtt": 115
 //     }
 func AddMetricSetInfo(module, metricset string, event *Event) {
-
 	if event.Namespace == "" {
 		event.Namespace = fmt.Sprintf("%s.%s", module, metricset)
 	}
