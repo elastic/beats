@@ -4,13 +4,13 @@
 # * @elastic/beats
 
 # libbeat
-/libbeat/ @elastic/beats
-/auditbeat/ @elastic/beats
-/packetbeat/ @elastic/beats
-/filebeat/ @elastic/beats
-/metricbeat/ @elastic/beats
-/journalbeat/ @elastic/beats
-/winlogbeat/ @elastic/beats
+# /libbeat/ @elastic/beats
+# /auditbeat/ @elastic/beats
+# /packetbeat/ @elastic/beats
+# /filebeat/ @elastic/beats
+# /metricbeat/ @elastic/beats
+# /journalbeat/ @elastic/beats
+# /winlogbeat/ @elastic/beats
 
 # Auditbeat
 /auditbeat/module/ @elastic/secops
