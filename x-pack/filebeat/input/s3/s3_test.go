@@ -35,8 +35,8 @@ const (
 func getConfigForTest() (config, string) {
 	awsConfig := awscommon.ConfigAWS{}
 	info := ""
-	queueUrl := os.Getenv("QUEUE_URL")
-	if queueUrl == "" {
+	queueURL := os.Getenv("QUEUE_URL")
+	if queueURL == "" {
 		info = "Skipping: $QUEUE_URL is not set in environment."
 	}
 
@@ -44,7 +44,7 @@ func getConfigForTest() (config, string) {
 	if profileName != "" {
 		awsConfig.ProfileName = profileName
 		config := config{
-			QueueURL:          queueUrl,
+			QueueURL:          queueURL,
 			AwsConfig:         awsConfig,
 			VisibilityTimeout: visibilityTimeout,
 		}
@@ -74,7 +74,7 @@ func getConfigForTest() (config, string) {
 		}
 	}
 	config := config{
-		QueueURL:          queueUrl,
+		QueueURL:          queueURL,
 		AwsConfig:         awsConfig,
 		VisibilityTimeout: visibilityTimeout,
 	}
