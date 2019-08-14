@@ -1,6 +1,24 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package tcp
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -9,10 +27,8 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/tcp"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -36,12 +52,15 @@ type Input struct {
 // NewInput creates a new TCP input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	cfgwarn.Experimental("TCP input type is used")
 
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +78,14 @@ func NewInput(
 		forwarder.Send(event)
 	}
 
-	server, err := tcp.New(&config.Config, cb)
+	splitFunc := tcp.SplitFunc([]byte(config.LineDelimiter))
+	if splitFunc == nil {
+		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
+	}
+
+	factory := tcp.SplitHandlerFactory(cb, splitFunc)
+
+	server, err := tcp.New(&config.Config, factory)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +95,7 @@ func NewInput(
 		started: false,
 		outlet:  out,
 		config:  &config,
-		log:     logp.NewLogger("tcp input").With(config.Config.Host),
+		log:     logp.NewLogger("tcp input").With("address", config.Config.Host),
 	}, nil
 }
 
@@ -104,14 +130,16 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
-func createEvent(raw []byte, metadata inputsource.NetworkMetadata) *util.Data {
-	data := util.NewData()
-	data.Event = beat.Event{
+func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
+	return beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
 			"message": string(raw),
-			"source":  metadata.RemoteAddr.String(),
+			"log": common.MapStr{
+				"source": common.MapStr{
+					"address": metadata.RemoteAddr.String(),
+				},
+			},
 		},
 	}
-	return data
 }

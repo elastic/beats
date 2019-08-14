@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -37,12 +37,14 @@ func init() {
 }
 
 type linuxSystem struct {
-	procFS procfs.FS
+	procFS procFS
 }
 
 func newLinuxSystem(hostFS string) linuxSystem {
+	mountPoint := filepath.Join(hostFS, procfs.DefaultMountPoint)
+	fs, _ := procfs.NewFS(mountPoint)
 	return linuxSystem{
-		procFS: procfs.FS(filepath.Join(hostFS, procfs.DefaultMountPoint)),
+		procFS: procFS{FS: fs, mountPoint: mountPoint},
 	}
 }
 
@@ -51,7 +53,7 @@ func (s linuxSystem) Host() (types.Host, error) {
 }
 
 type host struct {
-	procFS procfs.FS
+	procFS procFS
 	stat   procfs.Stat
 	info   types.HostInfo
 }
@@ -61,7 +63,7 @@ func (h *host) Info() types.HostInfo {
 }
 
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
-	content, err := ioutil.ReadFile(h.procFS.Path("meminfo"))
+	content, err := ioutil.ReadFile(h.procFS.path("meminfo"))
 	if err != nil {
 		return nil, err
 	}
@@ -69,26 +71,25 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	return parseMemInfo(content)
 }
 
-func (h *host) CPUTime() (*types.CPUTimes, error) {
+func (h *host) CPUTime() (types.CPUTimes, error) {
 	stat, err := h.procFS.NewStat()
 	if err != nil {
-		return nil, err
+		return types.CPUTimes{}, err
 	}
 
-	return &types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      time.Duration(stat.CPUTotal.User * float64(time.Second)),
-		System:    time.Duration(stat.CPUTotal.System * float64(time.Second)),
-		Idle:      time.Duration(stat.CPUTotal.Idle * float64(time.Second)),
-		IOWait:    time.Duration(stat.CPUTotal.Iowait * float64(time.Second)),
-		IRQ:       time.Duration(stat.CPUTotal.IRQ * float64(time.Second)),
-		Nice:      time.Duration(stat.CPUTotal.Nice * float64(time.Second)),
-		SoftIRQ:   time.Duration(stat.CPUTotal.SoftIRQ * float64(time.Second)),
-		Steal:     time.Duration(stat.CPUTotal.Steal * float64(time.Second)),
+	return types.CPUTimes{
+		User:    time.Duration(stat.CPUTotal.User * float64(time.Second)),
+		System:  time.Duration(stat.CPUTotal.System * float64(time.Second)),
+		Idle:    time.Duration(stat.CPUTotal.Idle * float64(time.Second)),
+		IOWait:  time.Duration(stat.CPUTotal.Iowait * float64(time.Second)),
+		IRQ:     time.Duration(stat.CPUTotal.IRQ * float64(time.Second)),
+		Nice:    time.Duration(stat.CPUTotal.Nice * float64(time.Second)),
+		SoftIRQ: time.Duration(stat.CPUTotal.SoftIRQ * float64(time.Second)),
+		Steal:   time.Duration(stat.CPUTotal.Steal * float64(time.Second)),
 	}, nil
 }
 
-func newHost(fs procfs.FS) (*host, error) {
+func newHost(fs procFS) (*host, error) {
 	stat, err := fs.NewStat()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read proc stat")
@@ -138,7 +139,7 @@ func (r *reader) architecture(h *host) {
 }
 
 func (r *reader) bootTime(h *host) {
-	v, err := bootTime(h.procFS)
+	v, err := bootTime(h.procFS.FS)
 	if r.addErr(err) {
 		return
 	}
@@ -196,4 +197,14 @@ func (r *reader) uniqueID(h *host) {
 		return
 	}
 	h.info.UniqueID = v
+}
+
+type procFS struct {
+	procfs.FS
+	mountPoint string
+}
+
+func (fs *procFS) path(p ...string) string {
+	elem := append([]string{fs.mountPoint}, p...)
+	return filepath.Join(elem...)
 }

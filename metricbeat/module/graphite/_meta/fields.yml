@@ -2,7 +2,7 @@
   title: "Graphite"
   description: >
     graphite Module
-  release: beta
+  release: ga
   fields:
     - name: graphite
       type: group

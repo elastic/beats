@@ -1,6 +1,24 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package beater
 
 import (
+	"io"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -47,10 +65,12 @@ func newEventLogger(
 func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 	api := e.source.Name()
 	return pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: e.eventMeta,
-		Meta:          nil, // TODO: configure modules/ES ingest pipeline?
-		Processor:     e.processors,
+		PublishMode: beat.GuaranteedSend,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: e.eventMeta,
+			Meta:          nil, // TODO: configure modules/ES ingest pipeline?
+			Processor:     e.processors,
+		},
 		ACKCount: func(n int) {
 			addPublished(api, n)
 			logp.Info("EventLog[%s] successfully published %d events", api, n)
@@ -62,6 +82,7 @@ func (e *eventLogger) run(
 	done <-chan struct{},
 	pipeline beat.Pipeline,
 	state checkpoint.EventLogState,
+	acker *eventACKer,
 ) {
 	api := e.source
 
@@ -99,7 +120,7 @@ func (e *eventLogger) run(
 
 	debugf("EventLog[%s] opened successfully", api.Name())
 
-	for {
+	for stop := false; !stop; {
 		select {
 		case <-done:
 			return
@@ -108,19 +129,23 @@ func (e *eventLogger) run(
 
 		// Read from the event.
 		records, err := api.Read()
-		if err != nil {
+		switch err {
+		case nil:
+		case io.EOF:
+			// Graceful stop.
+			stop = true
+		default:
 			logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
-			break
+			return
 		}
 
 		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
 		if len(records) == 0 {
-			// TODO: Consider implementing notifications using
-			// NotifyChangeEventLog instead of polling.
 			time.Sleep(time.Second)
 			continue
 		}
 
+		acker.Add(len(records))
 		for _, lr := range records {
 			client.Publish(lr.ToEvent())
 		}

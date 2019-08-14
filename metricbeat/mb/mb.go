@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 /*
 Package mb (short for Metricbeat) contains the public interfaces that are used
 to implement Modules and their associated MetricSets.
@@ -5,10 +22,14 @@ to implement Modules and their associated MetricSets.
 package mb
 
 import (
+	"context"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 const (
@@ -78,6 +99,7 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 // addition to this interface, all MetricSets must implement either
 // EventFetcher or EventsFetcher (but not both).
 type MetricSet interface {
+	ID() string     // Unique ID identifying a running MetricSet.
 	Name() string   // Name returns the name of the MetricSet.
 	Module() Module // Module returns the parent Module for the MetricSet.
 	Host() string   // Host returns a hostname or other module specific value
@@ -85,6 +107,8 @@ type MetricSet interface {
 	// metrics.
 	HostData() HostData                  // HostData returns the parsed host data.
 	Registration() MetricSetRegistration // Params used in registration.
+	Metrics() *monitoring.Registry       // MetricSet specific metrics
+	Logger() *logp.Logger                // MetricSet specific logger
 }
 
 // Closer is an optional interface that a MetricSet can implement in order to
@@ -178,6 +202,20 @@ type ReportingMetricSetV2 interface {
 	Fetch(r ReporterV2)
 }
 
+// ReportingMetricSetV2Error is a MetricSet that reports events or errors through the
+// ReporterV2 interface. Fetch is called periodically to collect events.
+type ReportingMetricSetV2Error interface {
+	MetricSet
+	Fetch(r ReporterV2) error
+}
+
+// ReportingMetricSetV2WithContext is a MetricSet that reports events or errors through the
+// ReporterV2 interface. Fetch is called periodically to collect events.
+type ReportingMetricSetV2WithContext interface {
+	MetricSet
+	Fetch(ctx context.Context, r ReporterV2) error
+}
+
 // PushMetricSetV2 is a MetricSet that pushes events (rather than pulling them
 // periodically via a Fetch callback). Run is invoked to start the event
 // subscription and it should block until the MetricSet is ready to stop or
@@ -185,6 +223,15 @@ type ReportingMetricSetV2 interface {
 type PushMetricSetV2 interface {
 	MetricSet
 	Run(r PushReporterV2)
+}
+
+// PushMetricSetV2WithContext is a MetricSet that pushes events (rather than pulling them
+// periodically via a Fetch callback). Run is invoked to start the event
+// subscription and it should block until the MetricSet is ready to stop or
+// the context is closed.
+type PushMetricSetV2WithContext interface {
+	MetricSet
+	Run(ctx context.Context, r ReporterV2)
 }
 
 // HostData contains values parsed from the 'host' configuration. Other
@@ -213,11 +260,14 @@ func (h HostData) GoString() string { return h.String() }
 // MetricSet interface requirements, leaving only the Fetch() method to be
 // implemented to have a complete MetricSet implementation.
 type BaseMetricSet struct {
+	id           string
 	name         string
 	module       Module
 	host         string
 	hostData     HostData
 	registration MetricSetRegistration
+	metrics      *monitoring.Registry
+	logger       *logp.Logger
 }
 
 func (b *BaseMetricSet) String() string {
@@ -231,10 +281,31 @@ func (b *BaseMetricSet) String() string {
 
 func (b *BaseMetricSet) GoString() string { return b.String() }
 
+// ID returns the unique ID of the MetricSet.
+func (b *BaseMetricSet) ID() string {
+	return b.id
+}
+
+// Metrics returns the metrics registry.
+func (b *BaseMetricSet) Metrics() *monitoring.Registry {
+	return b.metrics
+}
+
+// Logger returns the logger.
+func (b *BaseMetricSet) Logger() *logp.Logger {
+	return b.logger
+}
+
 // Name returns the name of the MetricSet. It should not include the name of
 // the module.
 func (b *BaseMetricSet) Name() string {
 	return b.name
+}
+
+// FullyQualifiedName returns the complete name of the MetricSet, including the
+// name of the module.
+func (b *BaseMetricSet) FullyQualifiedName() string {
+	return b.Module().Name() + "/" + b.Name()
 }
 
 // Module returns the parent Module for the MetricSet.
@@ -267,23 +338,53 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 // the metricset fetches not only the predefined fields but add alls raw data under
 // the raw namespace to the event.
 type ModuleConfig struct {
-	Hosts      []string      `config:"hosts"`
-	Period     time.Duration `config:"period"     validate:"positive"`
-	Timeout    time.Duration `config:"timeout"    validate:"positive"`
-	Module     string        `config:"module"     validate:"required"`
-	MetricSets []string      `config:"metricsets"`
-	Enabled    bool          `config:"enabled"`
-	Raw        bool          `config:"raw"`
+	Hosts       []string      `config:"hosts"`
+	Period      time.Duration `config:"period"     validate:"positive"`
+	Timeout     time.Duration `config:"timeout"    validate:"positive"`
+	Module      string        `config:"module"     validate:"required"`
+	MetricSets  []string      `config:"metricsets"`
+	Enabled     bool          `config:"enabled"`
+	Raw         bool          `config:"raw"`
+	Query       QueryParams   `config:"query"`
+	ServiceName string        `config:"service.name"`
 }
 
 func (c ModuleConfig) String() string {
 	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
-		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v}`,
+		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
 		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
-		c.Raw)
+		c.Raw, c.Query)
 }
 
 func (c ModuleConfig) GoString() string { return c.String() }
+
+// QueryParams is a convenient map[string]interface{} wrapper to implement the String interface which returns the
+// values in common query params format (key=value&key2=value2) which is the way that the url package expects this
+// params (without the initial '?')
+type QueryParams map[string]interface{}
+
+// String returns the values in common query params format (key=value&key2=value2) which is the way that the url
+// package expects this params (without the initial '?')
+func (q QueryParams) String() (s string) {
+	u := url.Values{}
+
+	for k, v := range q {
+		if values, ok := v.([]interface{}); ok {
+			for _, innerValue := range values {
+				u.Add(k, fmt.Sprintf("%v", innerValue))
+			}
+		} else {
+			//nil values in YAML shouldn't be stringified anyhow
+			if v == nil {
+				u.Add(k, "")
+			} else {
+				u.Add(k, fmt.Sprintf("%v", v))
+			}
+		}
+	}
+
+	return u.Encode()
+}
 
 // defaultModuleConfig contains the default values for ModuleConfig instances.
 var defaultModuleConfig = ModuleConfig{

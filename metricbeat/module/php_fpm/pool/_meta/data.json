@@ -1,19 +1,17 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "php_fpm.pool",
+        "duration": 115000,
+        "module": "php_fpm"
     },
     "metricset": {
-        "host": "phpfpm:81",
-        "module": "php_fpm",
-        "name": "pool",
-        "rtt": 115
+        "name": "pool"
     },
     "php_fpm": {
         "pool": {
             "connections": {
-                "accepted": 1,
+                "accepted": 18,
                 "listen_queue_len": 0,
                 "max_listen_queue": 0,
                 "queued": 0
@@ -28,8 +26,12 @@
                 "total": 2
             },
             "slow_requests": 0,
-            "start_since": 670,
-            "start_time": 1512631228
+            "start_since": 3589,
+            "start_time": 1551792028
         }
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "php_fpm"
     }
 }

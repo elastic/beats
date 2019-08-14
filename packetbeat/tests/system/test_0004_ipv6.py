@@ -15,5 +15,5 @@ class Test(BaseTest):
 
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])
-        assert all([o["client_ip"] == "::1" for o in objs])
-        assert all([o["ip"] == "::1" for o in objs])
+        assert all([o["client.ip"] == "::1" for o in objs])
+        assert all([o["server.ip"] == "::1" for o in objs])

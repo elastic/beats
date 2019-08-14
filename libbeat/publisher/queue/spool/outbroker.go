@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package spool
 
 import (
@@ -24,6 +41,7 @@ type outBroker struct {
 
 	// queue state
 	queue     *pq.Queue
+	reader    *pq.Reader
 	available uint // number of available events. getRequests are only accepted if available > 0
 	events    []publisher.Event
 	required  int
@@ -64,6 +82,23 @@ var ackChanPool = sync.Pool{
 var errRetry = errors.New("retry")
 
 func newOutBroker(ctx *spoolCtx, qu *pq.Queue, flushTimeout time.Duration) (*outBroker, error) {
+	reader := qu.Reader()
+
+	var (
+		avail uint
+		err   error
+	)
+	func() {
+		if err = reader.Begin(); err != nil {
+			return
+		}
+		defer reader.Done()
+		avail, err = reader.Available()
+	}()
+	if err != nil {
+		return nil, err
+	}
+
 	b := &outBroker{
 		ctx:   ctx,
 		state: nil,
@@ -79,7 +114,8 @@ func newOutBroker(ctx *spoolCtx, qu *pq.Queue, flushTimeout time.Duration) (*out
 
 		// queue state
 		queue:     qu,
-		available: qu.Reader().Available(),
+		reader:    reader,
+		available: avail,
 		events:    nil,
 		required:  0,
 		total:     0,
@@ -140,7 +176,7 @@ func (b *outBroker) ackLoop() {
 				log.Debugf("receive ACK of %v events\n", ackCh.total)
 				err := b.queue.ACK(uint(ackCh.total))
 				if err != nil {
-					log.Debug("ack failed with:", err)
+					log.Debugf("ack failed with: %+v", err)
 					time.Sleep(1 * time.Second)
 					continue
 				}
@@ -407,7 +443,14 @@ func (b *outBroker) collectEvents(
 	N int,
 ) ([]publisher.Event, int, error) {
 	log := b.ctx.logger
-	reader := b.queue.Reader()
+	reader := b.reader
+
+	// ensure all read operations happen within same transaction
+	err := reader.Begin()
+	if err != nil {
+		return nil, 0, err
+	}
+	defer reader.Done()
 
 	count := 0
 	for N > 0 {

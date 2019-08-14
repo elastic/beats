@@ -1,0 +1,3 @@
+This is the `ml_job` metricset of the Elasticsearch module. This metricset
+requires https://www.elastic.co/products/x-pack/machine-learning[Machine Learning]
+to be enabled.

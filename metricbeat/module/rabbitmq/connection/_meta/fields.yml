@@ -2,22 +2,28 @@
   type: group
   description: >
     connection
-  release: beta
+  release: ga
   fields:
     - name: name
       type: keyword
       description: >
         The name of the connection with non-ASCII characters escaped as in C.
     - name: vhost
-      type: keyword
+      type: alias
+      path: rabbitmq.vhost
+      migration: true
       description: >
         Virtual host name with non-ASCII characters escaped as in C.
     - name: user
-      type: keyword
+      type: alias
+      path: user.name
+      migration: true
       description: >
         User name.
     - name: node
-      type: keyword
+      type: alias
+      path: rabbitmq.node.name
+      migration: true
       description: >
         Node name.
     - name: channels
@@ -73,3 +79,7 @@
       type: long
       description: >
         Number of octets received on the connection.
+    - name: client_provided.name
+      type: keyword
+      description: >
+        User specified connection name.

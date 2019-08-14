@@ -1,33 +1,44 @@
 [role="xpack"]
 [[securing-beats]]
-== {beatname_uc} and {security}
+== Configure {beatname_uc} to use {security}
 
-If you want {beatname_uc} to connect to a cluster that has {security} enabled,
-there are extra configuration steps.
+[subs="attributes"]
+++++
+<titleabbrev>Use {security}</titleabbrev>
+++++
 
-To send data to a secured cluster through the `elasticsearch` output,
-{beatname_uc} needs to authenticate as a user who can manage index templates,
-monitor the cluster, create indices, and read, and write to the indices
-it creates. See <<beats-basic-auth>>.
+If you want {beatname_uc} to connect to a cluster that has
+{stack-ov}/elasticsearch-security.html[{security}] enabled, there are extra
+configuration steps:
 
-If encryption is enabled on the cluster, you also need to enable HTTPS in the
-{beatname_uc} configuration. See <<beats-tls>>.
+. <<feature-roles>>.
++
+You can use role-based access control to grant {beatname_uc} users access to
+secured resources. 
 
-In addition to configuring authentication credentials for the {beatname_uc}
-itself, you need to grant authorized users permission to access the indices it
-creates. See <<beats-user-access>>.
+. <<beats-basic-auth>>.
++
+To interact with a secured cluster, {beatname_uc} must either provide basic
+authentication credentials or present a client certificate.
 
-ifeval::["{beatname_lc}"!="apm-server"]
-If you plan to monitor {beatname_uc} in Kibana, you must also 
-<<beats-system-user,configure the `beats_system` built-in user>>.
-endif::[]
+. <<beats-tls>>.
++
+If encryption is enabled on the cluster, you need to enable HTTPS in the
+{beatname_uc} configuration.
+
+. <<beats-system-user>>.
++
+{beatname_uc} uses the +{beat_monitoring_user}+ user to send monitoring data to {es}. If
+you plan to monitor {beatname_uc} in {kib} and have not yet set up the
+password, set it up now.
 
 For more information about {security}, see
-{xpack-ref}/xpack-security.html[Securing {es} and {kib}].
+{xpack-ref}/elasticsearch-security.html[Securing the {stack}].
+
+include::users.asciidoc[]
 
 include::basic-auth.asciidoc[]
-include::user-access.asciidoc[]
+
 include::tls.asciidoc[]
-ifeval::["{beatname_lc}"!="apm-server"]
+
 include::beats-system.asciidoc[]
-endif::[]

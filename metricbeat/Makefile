@@ -1,7 +1,6 @@
 # Name can be overwritten, as Metricbeat is also a library
 BEAT_NAME?=metricbeat
 BEAT_TITLE?=Metricbeat
-BEAT_DESCRIPTION?=Metricbeat is a lightweight shipper for metrics.
 SYSTEM_TESTS?=true
 TEST_ENVIRONMENT?=true
 ES_BEATS?=..
@@ -10,39 +9,32 @@ ES_BEATS?=..
 GOX_OS=netbsd linux windows
 GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
 
+DOCS_BRANCH=$(shell grep doc-branch ../libbeat/docs/version.asciidoc | cut -c 14-)
 
 include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
-	@rm -rf _meta/kibana
-	@mkdir -p _meta/kibana
-	@-cp -r module/*/_meta/kibana _meta/
-
-# Collects all module and metricset fields
-.PHONY: fields
-fields: python-env
-	@mkdir -p _meta
-	@cp ${ES_BEATS}/metricbeat/_meta/fields.common.yml _meta/fields.generated.yml
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> _meta/fields.generated.yml
+	@rm -rf _meta/kibana.generated
+	@mkdir -p _meta/kibana.generated
+	@-cp -pr module/*/_meta/kibana/* _meta/kibana.generated
 
 # Collects all module docs
 .PHONY: collect-docs
-collect-docs: python-env
-	@rm -rf docs/modules
-	@mkdir -p docs/modules
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/metricbeat/scripts/docs_collector.py --beat ${BEAT_NAME}
+collect-docs:
+	mage CollectAll
 
 # Collects all module configs
 .PHONY: configs
 configs: python-env
+	@mkdir -p _meta
 	@cp ${ES_BEATS}/metricbeat/_meta/common.yml _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/setup.yml >> _meta/beat.yml
 	@cat ${ES_BEATS}/metricbeat/_meta/common.reference.yml > _meta/beat.reference.yml
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/config_collector.py --beat ${BEAT_NAME} --full $(PWD) >> _meta/beat.reference.yml
-	@rm -rf modules.d && mkdir -p modules.d
-	@for MODULE in `find module -maxdepth 1 -mindepth 1 -type d -exec basename {} \;`; do cp -a $(PWD)/module/$$MODULE/_meta/config.yml modules.d/$$MODULE.yml.disabled; done
+	@rm -rf modules.d
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/script/modules_collector.py --beat ${BEAT_NAME} --docs_branch=$(DOCS_BRANCH)
 	@chmod go-w modules.d/*
 	@# Enable system by default:
 	@if [ -f modules.d/system.yml.disabled ]; then mv modules.d/system.yml.disabled modules.d/system.yml; fi
@@ -53,20 +45,9 @@ imports: python-env
 	@mkdir -p include
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py ${BEAT_PATH}
 
-# This is called by the beats packer before building starts
-.PHONY: before-build
-before-build:
-ifeq ($(BEAT_NAME), metricbeat)
-	# disable the system/load metricset on windows
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/modules.d-win/system.yml
-	rm $(PREFIX)/modules.d-win/system.yml.bk
-	sed -i.bk 's/- load/#- load/' $(PREFIX)/metricbeat-win.reference.yml
-	rm $(PREFIX)/metricbeat-win.reference.yml.bk
-endif
-
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: fields collect-docs configs kibana imports
+collect: assets collect-docs configs kibana imports
 
 # Creates a new metricset. Requires the params MODULE and METRICSET
 .PHONY: create-metricset
@@ -89,3 +70,9 @@ test-module: ## @testing Tests the given module. Needs $MODULE as param an run-m
 test-module: python-env update metricbeat.test
 	go test -tags=integration ${BEAT_PATH}/module/${MODULE}/... -v
 	. ${PYTHON_ENV}/bin/activate && INTEGRATION_TESTS=1 nosetests tests/system/test_${MODULE}.py
+
+.PHONY: assets
+assets:
+	go run ${ES_BEATS}/metricbeat/scripts/assets/assets.go ${ES_BEATS}/metricbeat/module
+	mkdir -p include/fields
+	go run  ${ES_BEATS}/libbeat/scripts/cmd/global_fields/main.go -es_beats_path ${ES_BEATS} -beat_path ${PWD} | go run  ${ES_BEATS}/dev-tools/cmd/asset/asset.go -license ${LICENSE} -out ./include/fields/fields.go -pkg include -priority asset.LibbeatFieldsPri ${ES_BEATS}/libbeat/fields.yml $(BEAT_NAME)

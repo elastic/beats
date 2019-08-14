@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package txfile
 
 import (
@@ -361,20 +378,35 @@ func (f *freelist) RemoveRegion(removed region) {
 	f.avail -= total
 }
 
+func (f *freelist) LastRegion() region {
+	L := len(f.regions)
+	if L == 0 {
+		return region{}
+	}
+	return f.regions[L-1]
+}
+
 // (de-)serialization
 
 func readFreeList(
 	access func(PageID) []byte,
 	root PageID,
 	fn func(bool, region),
-) (idList, error) {
+) (idList, reason) {
+	const op = "txfile/read-freelist"
+
 	if root == 0 {
 		return nil, nil
 	}
 
 	rootPage := access(root)
 	if rootPage == nil {
-		return nil, errOutOfBounds
+		return nil, &Error{
+			op:    op,
+			kind:  InvalidMetaPage,
+			cause: raiseOutOfBounds(root),
+			msg:   "root page not in bounds",
+		}
 	}
 
 	var metaPages idList
@@ -382,7 +414,12 @@ func readFreeList(
 		metaPages.Add(pageID)
 		node, payload := castFreePage(access(pageID))
 		if node == nil {
-			return nil, errOutOfBounds
+			return nil, &Error{
+				op:    op,
+				kind:  InvalidMetaPage,
+				cause: raiseOutOfBounds(pageID),
+				msg:   "invalid freelist node page",
+			}
 		}
 
 		pageID = node.next.Get()
@@ -403,12 +440,12 @@ func writeFreeLists(
 	to regionList,
 	pageSize uint,
 	metaList, dataList regionList,
-	onPage func(id PageID, buf []byte) error,
-) error {
+	onPage func(id PageID, buf []byte) reason,
+) reason {
 	allocPages := to.PageIDs()
 	writer := newPagingWriter(allocPages, pageSize, 0, onPage)
 
-	var writeErr error
+	var writeErr reason
 	writeList := func(isMeta bool, lst regionList) {
 		if writeErr != nil {
 			return

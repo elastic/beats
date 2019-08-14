@@ -1,0 +1,239 @@
+[
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "action": "create"
+            },
+            "metrics": {
+                "etcd_debugging_store_writes_total": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "action": "set"
+            },
+            "metrics": {
+                "etcd_debugging_store_writes_total": 2
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "server_id": "8e9e05c52164694d"
+            },
+            "metrics": {
+                "etcd_server_id": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "server_version": "3.3.10"
+            },
+            "metrics": {
+                "etcd_server_version": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "action": "getRecursive"
+            },
+            "metrics": {
+                "etcd_debugging_store_reads_total": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "metrics": {
+                "etcd_debugging_mvcc_db_compaction_keys_total": 0,
+                "etcd_debugging_mvcc_db_total_size_in_bytes": 20480,
+                "etcd_debugging_mvcc_delete_total": 0,
+                "etcd_debugging_mvcc_events_total": 0,
+                "etcd_debugging_mvcc_keys_total": 0,
+                "etcd_debugging_mvcc_pending_events_total": 0,
+                "etcd_debugging_mvcc_put_total": 0,
+                "etcd_debugging_mvcc_range_total": 0,
+                "etcd_debugging_mvcc_slow_watcher_total": 0,
+                "etcd_debugging_mvcc_txn_total": 0,
+                "etcd_debugging_mvcc_watch_stream_total": 0,
+                "etcd_debugging_mvcc_watcher_total": 0,
+                "etcd_debugging_server_lease_expired_total": 0,
+                "etcd_debugging_store_expires_total": 0,
+                "etcd_debugging_store_watch_requests_total": 0,
+                "etcd_debugging_store_watchers": 0,
+                "etcd_grpc_proxy_cache_hits_total": 0,
+                "etcd_grpc_proxy_cache_keys_total": 0,
+                "etcd_grpc_proxy_cache_misses_total": 0,
+                "etcd_grpc_proxy_events_coalescing_total": 0,
+                "etcd_grpc_proxy_watchers_coalescing_total": 0,
+                "etcd_mvcc_db_total_size_in_bytes": 20480,
+                "etcd_mvcc_db_total_size_in_use_in_bytes": 16384,
+                "etcd_network_client_grpc_received_bytes_total": 0,
+                "etcd_network_client_grpc_sent_bytes_total": 0,
+                "etcd_server_has_leader": 1,
+                "etcd_server_health_failures": 0,
+                "etcd_server_health_success": 0,
+                "etcd_server_heartbeat_send_failures_total": 0,
+                "etcd_server_is_leader": 1,
+                "etcd_server_leader_changes_seen_total": 1,
+                "etcd_server_proposals_applied_total": 4,
+                "etcd_server_proposals_committed_total": 4,
+                "etcd_server_proposals_failed_total": 0,
+                "etcd_server_proposals_pending": 0,
+                "etcd_server_quota_backend_bytes": 2147483648,
+                "etcd_server_read_indexes_failed_total": 0,
+                "etcd_server_slow_apply_total": 0,
+                "etcd_server_slow_read_indexes_total": 0,
+                "go_goroutines": 76,
+                "go_memstats_alloc_bytes": 5187216,
+                "go_memstats_alloc_bytes_total": 5818832,
+                "go_memstats_buck_hash_sys_bytes": 1444537,
+                "go_memstats_frees_total": 5341,
+                "go_memstats_gc_cpu_fraction": 0.06982921260067133,
+                "go_memstats_gc_sys_bytes": 413696,
+                "go_memstats_heap_alloc_bytes": 5187216,
+                "go_memstats_heap_idle_bytes": 811008,
+                "go_memstats_heap_inuse_bytes": 6660096,
+                "go_memstats_heap_objects": 27762,
+                "go_memstats_heap_released_bytes": 0,
+                "go_memstats_heap_sys_bytes": 7471104,
+                "go_memstats_last_gc_time_seconds": 1553430281.4931297,
+                "go_memstats_lookups_total": 55,
+                "go_memstats_mallocs_total": 33103,
+                "go_memstats_mcache_inuse_bytes": 6944,
+                "go_memstats_mcache_sys_bytes": 16384,
+                "go_memstats_mspan_inuse_bytes": 58520,
+                "go_memstats_mspan_sys_bytes": 65536,
+                "go_memstats_next_gc_bytes": 8478800,
+                "go_memstats_other_sys_bytes": 1289791,
+                "go_memstats_stack_inuse_bytes": 1114112,
+                "go_memstats_stack_sys_bytes": 1114112,
+                "go_memstats_sys_bytes": 11815160,
+                "go_threads": 13
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "version": "go1.10.4"
+            },
+            "metrics": {
+                "go_info": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector"
+        },
+        "prometheus": {
+            "labels": {
+                "server_go_version": "go1.10.4"
+            },
+            "metrics": {
+                "etcd_server_go_version": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    }
+]

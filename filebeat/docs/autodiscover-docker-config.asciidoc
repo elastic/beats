@@ -7,16 +7,17 @@ filebeat.autodiscover:
     - type: docker
       templates:
         - condition:
-            equals:
+            contains:
               docker.container.image: redis
           config:
-            - type: docker
-              containers.ids:
-                - "${data.docker.container.id}"
+            - type: container
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
 This configuration launches a `docker` logs input for all containers running an image with `redis` in the name.
+`labels.dedot` defaults to be `true` for docker autodiscover, which means dots in docker labels are replaced with '_' by default.
 
 If you are using modules, you can override the default input and use the docker input instead.
 
@@ -27,13 +28,13 @@ filebeat.autodiscover:
     - type: docker
       templates:
         - condition:
-            equals:
-              docker.container.image: "redis"
+            contains:
+              docker.container.image: redis
           config:
             - module: redis
               log:
                 input:
-                  type: docker
-                  containers.ids:
-                    - "${data.docker.container.id}"
+                  type: container
+                  paths:
+                    - /var/lib/docker/containers/${data.docker.container.id}/*.log
 -------------------------------------------------------------------------------------

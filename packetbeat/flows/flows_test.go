@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package flows
@@ -114,7 +131,8 @@ func TestFlowsCounting(t *testing.T) {
 	t.Logf("event: %v", event)
 
 	source := event["source"].(common.MapStr)
-	dest := event["dest"].(common.MapStr)
+	dest := event["destination"].(common.MapStr)
+	network := event["network"].(common.MapStr)
 
 	// validate generated event
 	assert.Equal(t, net.HardwareAddr(mac1).String(), source["mac"])
@@ -123,9 +141,9 @@ func TestFlowsCounting(t *testing.T) {
 	assert.Equal(t, net.IP(ip2).String(), dest["ip"])
 	assert.Equal(t, uint16(256), source["port"])
 	assert.Equal(t, uint16(512), dest["port"])
-	assert.Equal(t, "tcp", event["transport"])
+	assert.Equal(t, "tcp", network["transport"])
 
-	stat := source["stats"].(map[string]interface{})
+	stat := source
 	assert.Equal(t, int64(-1), stat["int1"])
 	assert.Equal(t, nil, stat["int2"])
 	assert.Equal(t, uint64(1), stat["uint1"])
@@ -133,7 +151,7 @@ func TestFlowsCounting(t *testing.T) {
 	assert.Equal(t, 3.14, stat["float1"])
 	assert.Equal(t, nil, stat["float2"])
 
-	stat = dest["stats"].(map[string]interface{})
+	stat = dest
 	assert.Equal(t, nil, stat["int1"])
 	assert.Equal(t, int64(-1), stat["int2"])
 	assert.Equal(t, nil, stat["uint1"])

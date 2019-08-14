@@ -1,7 +1,25 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package logp
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // LogOption configures a Logger.
@@ -9,7 +27,8 @@ type LogOption = zap.Option
 
 // Logger logs messages to the configured output.
 type Logger struct {
-	sugar *zap.SugaredLogger
+	logger *zap.Logger
+	sugar  *zap.SugaredLogger
 }
 
 func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *Logger {
@@ -17,7 +36,7 @@ func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *L
 		WithOptions(zap.AddCallerSkip(1)).
 		WithOptions(options...).
 		Named(selector)
-	return &Logger{log.Sugar()}
+	return &Logger{log, log.Sugar()}
 }
 
 // NewLogger returns a new Logger labeled with the name of the selector. This
@@ -32,13 +51,15 @@ func NewLogger(selector string, options ...LogOption) *Logger {
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
 func (l *Logger) With(args ...interface{}) *Logger {
-	return &Logger{l.sugar.With(args...)}
+	sugar := l.sugar.With(args...)
+	return &Logger{sugar.Desugar(), sugar}
 }
 
 // Named adds a new path segment to the logger's name. Segments are joined by
 // periods.
 func (l *Logger) Named(name string) *Logger {
-	return &Logger{l.sugar.Named(name)}
+	logger := l.logger.Named(name)
+	return &Logger{logger, logger.Sugar()}
 }
 
 // Sprint
@@ -77,6 +98,11 @@ func (l *Logger) Panic(args ...interface{}) {
 // logger then panics.
 func (l *Logger) DPanic(args ...interface{}) {
 	l.sugar.DPanic(args...)
+}
+
+// IsDebug checks to see if the given logger is Debug enabled.
+func (l *Logger) IsDebug() bool {
+	return l.logger.Check(zapcore.DebugLevel, "") != nil
 }
 
 // Sprintf

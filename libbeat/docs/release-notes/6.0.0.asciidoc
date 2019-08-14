@@ -3,7 +3,7 @@
 
 The list below covers the changes during the 6.0.0-alpha1, -alpha2, -beta1, -beta2, -rc1 and -rc2 releases.
 
-Also read <<breaking-changes-6.0>> for more detail about changes that affect
+Also read {beats-ref-60}/breaking-changes-6.0.html[Breaking changes] for more detail about changes that affect
 upgrade.
 
 ==== Breaking changes
@@ -108,7 +108,7 @@ upgrade.
 - Fixed `cmd_set` and `cmd_get` being mixed in the Memcache module. {pull}5189[5189]
 - Added missing mongodb configuration file to the `modules.d` folder. {pull}4870[4870]
 - Fix wrong MySQL CRUD queries timelion visualization {pull}4857[4857]
-- Add new metrics to CPU metricsset {pull}4969[4969]
+- Add new metrics to CPU metricset {pull}4969[4969]
 - Fix issue affecting Windows services timing out at startup. {pull}4491[4491]
 - Fix incorrect docker.diskio.total metric calculation. {pull}4507[4507]
 - Vsphere module: used memory field corrected. {issue}4461[4461]

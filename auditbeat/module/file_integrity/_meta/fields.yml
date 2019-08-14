@@ -68,3 +68,7 @@
     - name: sha512_256
       type: keyword
       description: SHA512/256 hash of the file.
+
+    - name: xxh64
+      type: keyword
+      description: XX64 hash of the file.

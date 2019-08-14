@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -20,7 +20,12 @@ package types
 import "time"
 
 type Process interface {
+	CPUTimer
 	Info() (ProcessInfo, error)
+	Memory() (MemoryInfo, error)
+	User() (UserInfo, error)
+	Parent() (Process, error)
+	PID() int
 }
 
 type ProcessInfo struct {
@@ -33,33 +38,71 @@ type ProcessInfo struct {
 	StartTime time.Time `json:"start_time"`
 }
 
+// UserInfo contains information about the UID and GID
+// values of a process.
+type UserInfo struct {
+	// UID is the user ID.
+	// On Linux and Darwin (macOS) this is the real user ID.
+	// On Windows, this is the security identifier (SID) of the
+	// user account of the process access token.
+	UID string `json:"uid"`
+
+	// On Linux and Darwin (macOS) this is the effective user ID.
+	// On Windows, this is empty.
+	EUID string `json:"euid"`
+
+	// On Linux and Darwin (macOS) this is the saved user ID.
+	// On Windows, this is empty.
+	SUID string `json:"suid"`
+
+	// GID is the primary group ID.
+	// On Linux and Darwin (macOS) this is the real group ID.
+	// On Windows, this is the security identifier (SID) of the
+	// primary group of the process access token.
+	GID string `json:"gid"`
+
+	// On Linux and Darwin (macOS) this is the effective group ID.
+	// On Windows, this is empty.
+	EGID string `json:"egid"`
+
+	// On Linux and Darwin (macOS) this is the saved group ID.
+	// On Windows, this is empty.
+	SGID string `json:"sgid"`
+}
+
 type Environment interface {
 	Environment() (map[string]string, error)
 }
 
-type FileDescriptor interface {
-	FileDescriptors() ([]string, error)
-	FileDescriptorCount() (int, error)
+// OpenHandleEnumerator lists the open file handles.
+type OpenHandleEnumerator interface {
+	OpenHandles() ([]string, error)
+}
+
+// OpenHandleCount returns the number the open file handles.
+type OpenHandleCounter interface {
+	OpenHandleCount() (int, error)
 }
 
 type CPUTimer interface {
-	CPUTime() CPUTimes
-}
-
-type Memory interface {
-	Memory() MemoryInfo
+	// CPUTime returns a CPUTimes structure for
+	// the host or some process.
+	//
+	// The User and System fields are guaranteed
+	// to be populated for all platforms, and
+	// for both hosts and processes.
+	CPUTime() (CPUTimes, error)
 }
 
 type CPUTimes struct {
-	Timestamp time.Time     `json:"timestamp"` // Time at which samples were collected.
-	User      time.Duration `json:"user"`
-	System    time.Duration `json:"system"`
-	Idle      time.Duration `json:"idle,omitempty"`
-	IOWait    time.Duration `json:"iowait,omitempty"`
-	IRQ       time.Duration `json:"irq,omitempty"`
-	Nice      time.Duration `json:"nice,omitempty"`
-	SoftIRQ   time.Duration `json:"soft_irq,omitempty"`
-	Steal     time.Duration `json:"steal,omitempty"`
+	User    time.Duration `json:"user"`
+	System  time.Duration `json:"system"`
+	Idle    time.Duration `json:"idle,omitempty"`
+	IOWait  time.Duration `json:"iowait,omitempty"`
+	IRQ     time.Duration `json:"irq,omitempty"`
+	Nice    time.Duration `json:"nice,omitempty"`
+	SoftIRQ time.Duration `json:"soft_irq,omitempty"`
+	Steal   time.Duration `json:"steal,omitempty"`
 }
 
 func (cpu CPUTimes) Total() time.Duration {
@@ -68,10 +111,9 @@ func (cpu CPUTimes) Total() time.Duration {
 }
 
 type MemoryInfo struct {
-	Timestamp time.Time         `json:"timestamp"` // Time at which samples were collected.
-	Resident  uint64            `json:"resident_bytes"`
-	Virtual   uint64            `json:"virtual_bytes"`
-	Metrics   map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
+	Resident uint64            `json:"resident_bytes"`
+	Virtual  uint64            `json:"virtual_bytes"`
+	Metrics  map[string]uint64 `json:"raw,omitempty"` // Other memory related metrics.
 }
 
 type SeccompInfo struct {

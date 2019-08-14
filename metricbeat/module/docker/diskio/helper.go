@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package diskio
 
 import (
@@ -19,11 +36,28 @@ type BlkioStats struct {
 	servicedBytes BlkioRaw
 }
 
+// Add adds blkio stats
+func (s *BlkioStats) Add(o *BlkioStats) {
+	s.reads += o.reads
+	s.writes += o.writes
+	s.totals += o.totals
+
+	s.serviced.Add(&o.serviced)
+	s.servicedBytes.Add(&o.servicedBytes)
+}
+
 type BlkioRaw struct {
 	Time   time.Time
 	reads  uint64
 	writes uint64
 	totals uint64
+}
+
+// Add adds blkio raw stats
+func (s *BlkioRaw) Add(o *BlkioRaw) {
+	s.reads += o.reads
+	s.writes += o.writes
+	s.totals += o.totals
 }
 
 // BlkioService is a helper to collect and calculate disk I/O metrics
@@ -44,7 +78,17 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 	statsPerContainer := make(map[string]BlkioRaw)
 	for _, myRawStats := range rawStats {
 		stats := io.getBlkioStats(&myRawStats, dedot)
-		statsPerContainer[myRawStats.Container.ID] = stats.serviced
+		storageStats := io.getStorageStats(&myRawStats, dedot)
+		stats.Add(&storageStats)
+
+		oldStats, exist := io.lastStatsPerContainer[stats.Container.ID]
+		if exist {
+			stats.reads = io.getReadPs(&oldStats, &stats.serviced)
+			stats.writes = io.getWritePs(&oldStats, &stats.serviced)
+			stats.totals = io.getTotalPs(&oldStats, &stats.serviced)
+		}
+
+		statsPerContainer[stats.Container.ID] = stats.serviced
 		formattedStats = append(formattedStats, stats)
 	}
 
@@ -52,26 +96,41 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []
 	return formattedStats
 }
 
-func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
-	newBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IoServicedRecursive)
-	bytesBlkioStats := io.getNewStats(myRawStat.Stats.Read, myRawStat.Stats.BlkioStats.IoServiceBytesRecursive)
+// getStorageStats collects diskio metrics from StorageStats structure, that
+// is populated in Windows systems only
+func (io *BlkioService) getStorageStats(myRawStats *docker.Stat, dedot bool) BlkioStats {
+	return BlkioStats{
+		Time:      myRawStats.Stats.Read,
+		Container: docker.NewContainer(myRawStats.Container, dedot),
 
-	myBlkioStats := BlkioStats{
+		serviced: BlkioRaw{
+			reads:  myRawStats.Stats.StorageStats.ReadCountNormalized,
+			writes: myRawStats.Stats.StorageStats.WriteCountNormalized,
+			totals: myRawStats.Stats.StorageStats.ReadCountNormalized + myRawStats.Stats.StorageStats.WriteCountNormalized,
+		},
+
+		servicedBytes: BlkioRaw{
+			reads:  myRawStats.Stats.StorageStats.ReadSizeBytes,
+			writes: myRawStats.Stats.StorageStats.WriteSizeBytes,
+			totals: myRawStats.Stats.StorageStats.ReadSizeBytes + myRawStats.Stats.StorageStats.WriteSizeBytes,
+		},
+	}
+}
+
+// getBlkioStats collects diskio metrics from BlkioStats structures, that
+// are not populated in Windows
+func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
+	return BlkioStats{
 		Time:      myRawStat.Stats.Read,
 		Container: docker.NewContainer(myRawStat.Container, dedot),
 
-		serviced:      newBlkioStats,
-		servicedBytes: bytesBlkioStats,
+		serviced: io.getNewStats(
+			myRawStat.Stats.Read,
+			myRawStat.Stats.BlkioStats.IoServicedRecursive),
+		servicedBytes: io.getNewStats(
+			myRawStat.Stats.Read,
+			myRawStat.Stats.BlkioStats.IoServiceBytesRecursive),
 	}
-
-	oldBlkioStats, exist := io.lastStatsPerContainer[myRawStat.Container.ID]
-	if exist {
-		myBlkioStats.reads = io.getReadPs(&oldBlkioStats, &newBlkioStats)
-		myBlkioStats.writes = io.getWritePs(&oldBlkioStats, &newBlkioStats)
-		myBlkioStats.totals = io.getTotalPs(&oldBlkioStats, &newBlkioStats)
-	}
-
-	return myBlkioStats
 }
 
 func (io *BlkioService) getNewStats(time time.Time, blkioEntry []types.BlkioStatEntry) BlkioRaw {

@@ -9,8 +9,8 @@
 //// include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
-[[contributing-to-beats]]
-== Contributing to Beats
+["appendix",id="contributing-to-beats"]
+= Contributing to Beats
 
 The Beats are open source and we love to receive contributions from our
 community — you!

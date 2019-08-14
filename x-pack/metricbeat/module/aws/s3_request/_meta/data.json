@@ -1,0 +1,47 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "s3_request": {
+            "bucket": {
+                "name": "test-s3-ks-2"
+            },
+            "downloaded": {
+                "bytes": 123653
+            },
+            "errors": {
+                "4xx": 0,
+                "5xx": 0
+            },
+            "latency": {
+                "first_byte.ms": 7975,
+                "total_request.ms": 9005
+            },
+            "requests": {
+                "delete": 2,
+                "get": 80,
+                "head": 3,
+                "list": 37,
+                "put": 34,
+                "total": 156
+            },
+            "uploaded": {
+                "bytes": 2644
+            }
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "ap-southeast-1"
+    },
+    "event": {
+        "dataset": "aws.s3_request",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "s3_request"
+    },
+    "service": {
+        "type": "aws"
+    }
+}

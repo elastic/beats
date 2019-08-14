@@ -1,5 +1,5 @@
 {
-    "description": "Pipeline for parsing logstash logs in the plain format",
+    "description": "Pipeline for parsing logstash slowlogs in the plain format",
     "on_failure": [
         {
             "set": {
@@ -17,7 +17,7 @@
                     "LOGSTASH_LOGLEVEL": "INFO|ERROR|DEBUG|FATAL|WARN|TRACE"
                 },
                 "patterns": [
-                    "\\[%{TIMESTAMP_ISO8601:logstash.slowlog.timestamp}\\]\\[%{LOGSTASH_LOGLEVEL:logstash.slowlog.level}\\s?\\]\\[%{LOGSTASH_CLASS_MODULE:logstash.slowlog.module}\\] %{GREEDYDATA:logstash.slowlog.message}"
+                    "\\[%{TIMESTAMP_ISO8601:logstash.slowlog.timestamp}\\]\\[%{LOGSTASH_LOGLEVEL:log.level}\\s?\\]\\[%{LOGSTASH_CLASS_MODULE:logstash.slowlog.module}\\] %{GREEDYDATA:message}"
                 ]
             }
         },
@@ -31,32 +31,48 @@
         },
         {
             "grok": {
-                "field": "logstash.slowlog.message",
+                "field": "message",
                 "patterns": [
-                    "{:plugin_params=>%{GREEDYDATA:logstash.slowlog.plugin_params}, :took_in_nanos=>%{NUMBER:logstash.slowlog.took_in_nanos}, :took_in_millis=>%{NUMBER:logstash.slowlog.took_in_millis}, :event=>%{GREEDYDATA:logstash.slowlog.event}}"
+                    "{:plugin_params=>%{GREEDYDATA:logstash.slowlog.plugin_params}, :took_in_nanos=>%{NUMBER:event.duration}, :took_in_millis=>%{NUMBER:logstash.slowlog.took_in_millis}, :event=>%{GREEDYDATA:logstash.slowlog.event}}"
                 ]
-            }
-        },
-        {
-            "remove": {
-                "field": "message"
             }
         },
         {
             "rename": {
                 "field": "@timestamp",
-                "target_field": "read_timestamp"
+                "target_field": "event.created"
             }
         },
         {
-            "rename": {
+            "date": {
                 "field": "logstash.slowlog.timestamp",
-                "target_field": "@timestamp"
+                "target_field": "@timestamp",
+                "formats": [
+                  "ISO8601"
+              ],
+              "ignore_failure": true
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.event.timezone != null",
+                "field": "@timestamp",
+                "formats": ["ISO8601"],
+                "timezone": "{{ event.timezone }}",
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "message",
+                    "logstash.slowlog.timestamp"
+                ]
             }
         },
         {
             "convert": {
-                "field": "logstash.slowlog.took_in_nanos",
+                "field": "event.duration",
                 "type": "long"
             }
         },

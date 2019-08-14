@@ -1,0 +1,23 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"nats",
+        "name":"connections",
+        "rtt":44269
+    },
+    "nats":{
+        "server": {
+            "id": "bUAdpRFtMWddIBWw80Yd9D",
+            "time": "2018-12-28T12:33:53.026865597Z"
+        },
+        "connections":{
+            "total": 10
+        }
+    },
+    "type":"metricsets"
+}

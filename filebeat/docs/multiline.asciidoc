@@ -64,7 +64,7 @@ the pattern.
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
 
-*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multline-message.
+*`multiline.flush_pattern`*:: Specifies a regular expression, in which the current multiline will be flushed from memory, ending the multiline-message.
 
 *`multiline.max_lines`*:: The maximum number of lines that can be combined into one event. If
 the multiline message contains more than `max_lines`, any additional

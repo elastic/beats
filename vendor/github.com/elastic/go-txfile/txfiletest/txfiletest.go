@@ -1,13 +1,29 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package txfiletest provides utilities for testing on top of txfile.
 package txfiletest
 
 import (
-	"io/ioutil"
 	"os"
-	"path"
 
 	"github.com/elastic/go-txfile"
 	"github.com/elastic/go-txfile/internal/cleanup"
+	"github.com/elastic/go-txfile/internal/vfs/osfs/osfstest"
 )
 
 // TestFile wraps a txfile.File structure for testing.
@@ -69,7 +85,7 @@ func (f *TestFile) Open() {
 
 	tmp, err := txfile.Open(f.Path, os.ModePerm, f.opts)
 	if err != nil {
-		f.t.Fatal("reopen failed")
+		f.t.Fatal("open failed:", err)
 	}
 	f.File = tmp
 }
@@ -77,15 +93,5 @@ func (f *TestFile) Open() {
 // SetupPath creates a temporary directory for testing.
 // Use the teardown function to remove the directory again.
 func SetupPath(t testT, file string) (dir string, teardown func()) {
-	dir, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if file == "" {
-		file = "test.dat"
-	}
-	return path.Join(dir, file), func() {
-		os.RemoveAll(dir)
-	}
+	return osfstest.SetupPath(t, file)
 }

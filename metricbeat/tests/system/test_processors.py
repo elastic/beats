@@ -34,8 +34,8 @@ class Test(metricbeat.BaseTest):
         print(evt)
         print(evt.keys())
         self.assertItemsEqual(self.de_dot([
-            'beat', '@timestamp', 'system', 'metricset.module',
-            'metricset.rtt', 'metricset.name'
+            'agent', '@timestamp', 'system', 'metricset.module',
+            'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
         ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
@@ -188,7 +188,7 @@ class Test(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "include_fields": {"fields": ["system.process"]},
+                "include_fields": {"fields": ["system.process", "process"]},
             }, {
                 "drop_fields": {"fields": ["system.process.memory"]},
             }]
@@ -207,17 +207,17 @@ class Test(metricbeat.BaseTest):
         for key in [
             "system.process.cpu.start_time",
             "system.process.cpu.total.pct",
-            "system.process.name",
-            "system.process.pid",
+            "process.name",
+            "process.pid",
         ]:
-            assert key in output
+            assert key in output, "'%s' not found" % key
 
         for key in [
             "system.process.memory.size",
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key not in output
+            assert key not in output, "'%s' not expected but found" % key
 
     def test_contradictory_multiple_actions(self):
         """
@@ -270,7 +270,7 @@ class Test(metricbeat.BaseTest):
             }],
             processors=[{
                 "rename": {
-                    "fields": [{"from": "metricset.name", "to": "hello.world"}],
+                    "fields": [{"from": "event.dataset", "to": "hello.world"}],
                 },
             }]
         )
@@ -285,5 +285,5 @@ class Test(metricbeat.BaseTest):
         print(evt)
         print(evt.keys())
 
-        assert "name" not in output[0]["metricset"]
+        assert "dataset" not in output[0]["event"]
         assert "cpu" in output[0]["hello"]["world"]

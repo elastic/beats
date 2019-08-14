@@ -41,6 +41,10 @@ metricbeat.modules:
   metrics_path: {{ m.path }}
   {% endif -%}
 
+  {% if m.port -%}
+  port: {{ m.port }}
+  {% endif -%}
+
   {% if m.timeout -%}
   timeout: {{ m.timeout }}
   {% endif -%}

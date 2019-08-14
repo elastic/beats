@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package memory
 
 import (
@@ -6,11 +23,11 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/docker"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMemoryService_GetMemoryStats(t *testing.T) {
@@ -40,11 +57,17 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	memoryRawStats.Stats = memorystats
 
 	totalRSS := memorystats.MemoryStats.Stats["total_rss"]
-	expectedEvent := common.MapStr{
-		"_module": common.MapStr{
+	expectedRootFields := common.MapStr{
+		"container": common.MapStr{
+			"id":   containerID,
+			"name": "name1",
+			"image": common.MapStr{
+				"name": "image",
+			},
+			"runtime": "docker",
+		},
+		"docker": common.MapStr{
 			"container": common.MapStr{
-				"id":   containerID,
-				"name": "name1",
 				"labels": common.MapStr{
 					"label1": "val1",
 					"label2": common.MapStr{
@@ -53,6 +76,11 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 					},
 				},
 			},
+		},
+	}
+	expectedFields := common.MapStr{
+		"stats": map[string]uint64{
+			"total_rss": 5,
 		},
 		"fail": common.MapStr{
 			"count": memorystats.MemoryStats.Failcnt,
@@ -70,11 +98,15 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 	}
 	//WHEN
 	rawStats := memoryService.getMemoryStats(memoryRawStats, false)
-	event := eventMapping(&rawStats)
+	r := &mbtest.CapturingReporterV2{}
+	eventMapping(r, &rawStats)
+	events := r.GetEvents()
 	//THEN
-	assert.True(t, equalEvent(expectedEvent, event))
-	t.Logf(" expected : %v", expectedEvent)
-	t.Logf(" returned : %v", event)
+	assert.Empty(t, r.GetErrors())
+	assert.NotEmpty(t, events)
+	event := events[0]
+	assert.Equal(t, expectedRootFields, event.RootFields)
+	assert.Equal(t, expectedFields, event.MetricSetFields)
 }
 
 func getMemoryStats(read time.Time, number uint64) types.StatsJSON {

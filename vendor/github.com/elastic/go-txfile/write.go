@@ -1,9 +1,28 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package txfile
 
 import (
 	"io"
 	"sort"
 	"sync"
+
+	"github.com/elastic/go-txfile/internal/vfs"
 )
 
 type writer struct {
@@ -17,6 +36,8 @@ type writer struct {
 	scheduled0 [64]writeMsg
 	fsync      []syncMsg
 	fsync0     [8]syncMsg
+
+	syncMode SyncMode
 
 	pending   int // number of scheduled writes since last sync
 	published int // number of writes executed since last sync
@@ -32,20 +53,52 @@ type writeMsg struct {
 type syncMsg struct {
 	sync  *txWriteSync
 	count int // number of pages to process, before fsyncing
+	flags syncFlag
 }
 
 type txWriteSync struct {
-	err error
+	err reason
 	wg  sync.WaitGroup
 }
 
 type writable interface {
 	io.WriterAt
-	Sync() error
+	Sync(vfs.SyncFlag) error
 }
 
-func (w *writer) Init(target writable, pageSize uint) {
+// command as is consumer by the writers run loop
+type command struct {
+	n         int          // number of buffered write message to be consumed
+	fsync     *txWriteSync // set if fsync is to be executed after writing all messages
+	syncFlags syncFlag     // additional fsync flags
+}
+
+type syncFlag uint8
+
+const (
+	// On IO error, the writer will ignore any write/sync attempts, but return
+	// the first error encountered.
+	// Passing the syncResetErr notifies the writer that the current transaction
+	// is about to fail and all subsequent writes will belong to a new
+	// transaction. So to not stall any writes/operations forever, the writer
+	// will attempt write/sync any future requests, by resetting the internal
+	// error state to 'no error'.
+	syncResetErr syncFlag = 1 << iota
+
+	// syncDataOnly tells the writer that we don't care about metadata updates like
+	// access/modification timestamps (given the file size didn't change).
+	// Some filesystems profit from data only syncs, as meta data or journals
+	// don't need to be flushed, reducing the overall amount of on disk IO ops.
+	syncDataOnly
+)
+
+func (w *writer) Init(target writable, pageSize uint, syncMode SyncMode) {
+	if syncMode == SyncDefault {
+		syncMode = SyncData
+	}
+
 	w.target = target
+	w.syncMode = syncMode
 	w.pageSize = pageSize
 	w.cond = sync.NewCond(&w.mux)
 	w.scheduled = w.scheduled0[:0]
@@ -75,7 +128,7 @@ func (w *writer) Schedule(sync *txWriteSync, id PageID, buf []byte) {
 	w.cond.Signal()
 }
 
-func (w *writer) Sync(sync *txWriteSync) {
+func (w *writer) Sync(sync *txWriteSync, flags syncFlag) {
 	sync.Retain()
 	traceln("schedule sync")
 
@@ -84,103 +137,89 @@ func (w *writer) Sync(sync *txWriteSync) {
 	w.fsync = append(w.fsync, syncMsg{
 		sync:  sync,
 		count: w.pending,
+		flags: flags,
 	})
 	w.pending = 0
 
 	w.cond.Signal()
 }
 
-func (w *writer) Run() error {
+func (w *writer) Run() (bool, reason) {
 	var (
-		buf   [1024]writeMsg
-		n     int
-		err   error
-		fsync *txWriteSync
-		done  bool
+		err  reason
+		done bool
+		cmd  command
+		buf  [1024]writeMsg
 	)
 
-	traceln("start async writer")
-	defer traceln("stop async writer")
-
 	for {
-		n, fsync, done = w.nextCommand(buf[:])
+		cmd, done = w.nextCommand(buf[:])
 		if done {
-			break
+			return done, nil
 		}
 
-		traceln("writer message: ", n, fsync != nil, done)
+		traceln("writer message: ", cmd.n, cmd.fsync != nil, done)
 
-		// TODO: use vector IO if possible
-		msgs := buf[:n]
+		// TODO: use vector IO if possible (linux: pwritev)
+		msgs := buf[:cmd.n]
 		sort.Slice(msgs, func(i, j int) bool {
 			return msgs[i].id < msgs[j].id
 		})
-
 		for _, msg := range msgs {
-			if err != nil {
-				traceln("done error")
+			const op = "txfile/write-page"
 
-				msg.sync.err = err
-				msg.sync.wg.Done()
-				continue
-			}
-
-			off := uint64(msg.id) * uint64(w.pageSize)
-			tracef("write at(id=%v, off=%v, len=%v)\n", msg.id, off, len(msg.buf))
-
-			err = writeAt(w.target, msg.buf, int64(off))
-			if err != nil {
-				msg.sync.err = err
-			}
-
-			traceln("done send")
-			msg.sync.Release()
-		}
-
-		if fsync != nil {
 			if err == nil {
-				if err = w.target.Sync(); err != nil {
-					fsync.err = err
-				}
+				// execute actual write on the page it's file offset:
+				off := uint64(msg.id) * uint64(w.pageSize)
+				tracef("write at(id=%v, off=%v, len=%v)\n", msg.id, off, len(msg.buf))
+
+				err = writeAt(op, w.target, msg.buf, int64(off))
 			}
 
-			traceln("done fsync")
-			fsync.Release()
-		}
-
-		if err != nil {
-			break
-		}
-	}
-
-	if done {
-		return err
-	}
-
-	// file still active, but we're facing errors -> stop writing and propagate
-	// last error to all transactions.
-	for {
-		n, fsync, done = w.nextCommand(buf[:])
-		if done {
-			break
-		}
-
-		traceln("ignoring writer message: ", n, fsync != nil, done)
-
-		for _, msg := range buf[:n] {
 			msg.sync.err = err
 			msg.sync.Release()
 		}
-		if fsync != nil {
+
+		// execute pending fsync:
+		if fsync := cmd.fsync; fsync != nil {
+			if err == nil {
+				err = w.execSync(cmd)
+			}
 			fsync.err = err
+
+			traceln("done fsync")
 			fsync.Release()
+
+			resetErr := cmd.syncFlags.Test(syncResetErr)
+			if resetErr {
+				err = nil
+			}
+		}
+	}
+}
+
+func (w *writer) execSync(cmd command) reason {
+	const op = "txfile/write-sync"
+
+	syncFlag := vfs.SyncAll
+	switch w.syncMode {
+	case SyncNone:
+		return nil
+
+	case SyncData:
+		if cmd.syncFlags.Test(syncDataOnly) {
+			syncFlag = vfs.SyncDataOnly
 		}
 	}
 
-	return err
+	if err := w.target.Sync(syncFlag); err != nil {
+		return errOp(op).causedBy(err)
+	}
+
+	return nil
 }
 
-func (w *writer) nextCommand(buf []writeMsg) (int, *txWriteSync, bool) {
+func (w *writer) nextCommand(buf []writeMsg) (command, bool) {
 	w.mux.Lock()
 	defer w.mux.Unlock()
 
@@ -189,7 +228,7 @@ func (w *writer) nextCommand(buf []writeMsg) (int, *txWriteSync, bool) {
 
 	for {
 		if w.done {
-			return 0, nil, true
+			return command{}, true
 		}
 
 		max := len(w.scheduled)
@@ -204,6 +243,7 @@ func (w *writer) nextCommand(buf []writeMsg) (int, *txWriteSync, bool) {
 
 		// Check if we need to fsync and adjust `max` number of pages of required.
 		var sync *txWriteSync
+		var syncFlags syncFlag
 		traceln("check fsync: ", len(w.fsync))
 
 		if len(w.fsync) > 0 {
@@ -214,7 +254,7 @@ func (w *writer) nextCommand(buf []writeMsg) (int, *txWriteSync, bool) {
 			traceln("outstanding:", outstanding)
 
 			if outstanding <= max { // -> fsync
-				max, sync = outstanding, msg.sync
+				max, sync, syncFlags = outstanding, msg.sync, msg.flags
 
 				// advance fsync state
 				w.fsync[0] = syncMsg{} // clear entry, so to potentially clean references from w.fsync0
@@ -242,7 +282,7 @@ func (w *writer) nextCommand(buf []writeMsg) (int, *txWriteSync, bool) {
 			w.published = 0
 		}
 
-		return n, sync, false
+		return command{n: n, fsync: sync, syncFlags: syncFlags}, false
 	}
 }
 
@@ -258,20 +298,25 @@ func (s *txWriteSync) Release() {
 	s.wg.Done()
 }
 
-func (s *txWriteSync) Wait() error {
+func (s *txWriteSync) Wait() reason {
 	s.wg.Wait()
 	return s.err
 }
 
-func writeAt(out io.WriterAt, buf []byte, off int64) error {
+func writeAt(op string, out io.WriterAt, buf []byte, off int64) reason {
 	for len(buf) > 0 {
 		n, err := out.WriteAt(buf, off)
 		if err != nil {
-			return err
+			return errOp(op).causedBy(err).
+				reportf("writing %v bytes to off=%v failed", len(buf), off)
 		}
 
 		off += int64(n)
 		buf = buf[n:]
 	}
 	return nil
+}
+
+func (f syncFlag) Test(other syncFlag) bool {
+	return (f & other) == other
 }

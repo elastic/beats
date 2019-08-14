@@ -3,25 +3,25 @@
   description: >
     Contains log file lines.
   fields:
-    - name: source
+
+    - name: log.file.path
       type: keyword
-      required: true
+      required: false
       description: >
         The file from which the line was read. This field contains the absolute path to the file.
         For example: `/var/log/system.log`.
 
-    - name: offset
+    - name: log.source.address
+      type: keyword
+      required: false
+      description: >
+        Source address from which the log event was read / sent from.
+
+    - name: log.offset
       type: long
       required: false
       description: >
         The file offset the reported line starts at.
-
-    - name: message
-      type: text
-      ignore_above: 0
-      required: true
-      description: >
-        The content of the line read from the log file.
 
     - name: stream
       type: keyword
@@ -29,31 +29,17 @@
       description: >
         Log stream when reading container logs, can be 'stdout' or 'stderr'
 
-    - name: prospector.type
-      required: true
-      description: >
-        The input type from which the event was generated. This field is set to the value specified
-        for the `type` option in the input section of the Filebeat config file. (DEPRECATED: see `input.type`)
-
     - name: input.type
       required: true
       description: >
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file.
 
-    - name: read_timestamp
+    - name: event.sequence
+      type: long
+      required: false
       description: >
-        In case the ingest pipeline parses the timestamp from the log contents, it stores
-        the original `@timestamp` (representing the time when the log line was read) in this
-        field.
-
-    - name: fileset.module
-      description: >
-        The Filebeat module that generated this event.
-
-    - name: fileset.name
-      description: >
-        The Filebeat fileset that generated this event.
+        The sequence number of this event.
 
     - name: syslog.facility
       type: long
@@ -85,14 +71,82 @@
       description: >
         The name of the program.
 
-    - name: process.pid
-      type: long
-      required: false
+    - name: log.flags
       description: >
-        The pid of the process.
+        This field contains the flags of the event.
 
-    - name: event.severity
-      type: long
-      required: false
+    - name: http.response.content_length
+      type: alias
+      path: http.response.body.bytes
+      migration: true
+
+    - name: user_agent
+      type: group
+      fields:
+      - name: os
+        type: group
+        fields:
+        - name: full_name
+          type: keyword
+
+    - name: fileset.name
+      type: keyword
       description: >
-        The severity of the event.
+        The Filebeat fileset that generated this event.
+
+    - name: fileset.module
+      type: alias
+      path: event.module
+      migration: true
+
+    - name: read_timestamp
+      type: alias
+      path: event.created
+      migration: true
+
+    - name: docker.attrs
+      type: object
+      object_type: keyword
+      description: >
+        docker.attrs contains labels and environment variables written by docker's JSON File logging driver.
+        These fields are only available when they are configured in the logging driver options.
+
+    - name: event.code
+      type: keyword
+      description: >
+        The code for the log message.
+
+    - name: icmp.code
+      type: keyword
+      description: >
+        ICMP code.
+
+    - name: icmp.type
+      type: keyword
+      description: >
+        ICMP type.
+
+    - name: igmp.type
+      type: keyword
+      description: >
+        IGMP type.
+
+    - name: source.as.number
+      type: long
+      description: >
+        Autonomous system number.
+
+    - name: destination.as.number
+      type: long
+      description: >
+        Autonomous system number.
+
+    - name: source.as.organization.name
+      type: keyword
+      description: >
+        Name of organization associated with the autonomous system.
+
+    - name: destination.as.organization.name
+      type: keyword
+      description: >
+        Name of organization associated with the autonomous system.

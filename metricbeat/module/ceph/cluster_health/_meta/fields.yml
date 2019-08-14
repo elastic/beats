@@ -2,7 +2,7 @@
   type: group
   description: >
     cluster_health
-  release: beta
+  release: ga
   fields:
     - name: overall_status
       type: keyword

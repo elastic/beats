@@ -1,0 +1,28 @@
+module_version: "1.0"
+
+var:
+  - name: paths
+    default:
+      - /var/log/cisco-asa.log
+  - name: tags
+    default: [cisco-asa]
+  - name: syslog_host
+    default: localhost
+  - name: syslog_port
+    default: 9001
+  - name: input
+    default: syslog
+  - name: log_level
+    default: 7
+    # if ES < 6.1.0, this flag switches to false automatically when evaluating the
+    # pipeline
+    min_elasticsearch_version:
+      version: 6.1.0
+      value: false
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

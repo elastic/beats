@@ -1,27 +1,33 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "system.filesystem",
+        "duration": 115000,
+        "module": "system"
+    },
     "metricset": {
-        "module": "system",
-        "name": "filesystem",
-        "rtt": 115
+        "name": "filesystem"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "filesystem": {
-            "available": 50085941248,
-            "device_name": "overlay",
-            "files": 4194304,
-            "free": 53538639872,
-            "free_files": 3862303,
-            "mount_point": "/",
-            "total": 67371577344,
-            "type": "overlay",
+            "available": 53067177984,
+            "device_name": "/dev/dm-5",
+            "files": 0,
+            "free": 54342492160,
+            "free_files": 0,
+            "mount_point": "/var/lib/lxd/storage-pools/default",
+            "total": 86301999104,
+            "type": "btrfs",
             "used": {
-                "bytes": 13832937472,
-                "pct": 0.2053
+                "bytes": 31959506944,
+                "pct": 0.3759
             }
         }
     }

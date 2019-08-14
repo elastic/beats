@@ -1,11 +1,9 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-php_fpm]]
 == PHP_FPM module
-
-beta[]
 
 This module periodically fetches metrics from https://php-fpm.org[PHP-FPM]
 servers.
@@ -50,14 +48,17 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: php_fpm
-  metricsets: ["pool"]
+  metricsets:
+  - pool
+  #- process
   enabled: true
   period: 10s
   status_path: "/status"
   hosts: ["localhost:8080"]
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
@@ -66,5 +67,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-php_fpm-pool,pool>>
 
+* <<metricbeat-metricset-php_fpm-process,process>>
+
 include::php_fpm/pool.asciidoc[]
+
+include::php_fpm/process.asciidoc[]
 

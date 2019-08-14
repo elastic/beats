@@ -1,19 +1,16 @@
-FROM golang:1.9.4
-MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
+FROM golang:1.12.7
 
-RUN set -x && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-         netcat python-pip virtualenv && \
-    apt-get clean
+RUN \
+    apt-get update \
+      && apt-get install -y --no-install-recommends \
+         netcat \
+         python-pip \
+         virtualenv \
+      && rm -rf /var/lib/apt/lists/*
 
+RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
+RUN pip install --upgrade docker-compose==1.23.2
 
-# Setup work environment
-ENV METRICBEAT_PATH /go/src/github.com/elastic/beats/metricbeat
-
-RUN mkdir -p $METRICBEAT_PATH/build/coverage
-WORKDIR $METRICBEAT_PATH
-
-# Add healthcheck for docker/healthcheck metricset to check during testing
+# Add healthcheck for the docker/healthcheck metricset to check during testing.
 HEALTHCHECK CMD exit 0

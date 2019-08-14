@@ -370,7 +370,19 @@ normalizations:
     primary: scontext
   object:
     primary: tcontext
+    secondary: tclass
   record_types: AVC
+  has_fields:
+  - seresult
+-
+  action: violated-apparmor-policy
+  object:
+    primary: operation
+    secondary: [requested_mask, denied_mask, capname]
+    what: policy
+  record_types: AVC
+  has_fields:
+  - apparmor
 -
   action: changed-group
   record_types: CHGRP_ID

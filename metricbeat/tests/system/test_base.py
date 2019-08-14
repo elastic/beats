@@ -1,7 +1,6 @@
 import re
 import sys
 import unittest
-import time
 import os
 import shutil
 from metricbeat import BaseTest
@@ -47,7 +46,7 @@ class Test(BaseTest):
             }],
             elasticsearch={"host": self.get_elasticsearch_url()},
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template"])
+        exit_code = self.run_beat(extra_args=["setup", "--template", "-E", "setup.template.overwrite=true"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
@@ -58,9 +57,7 @@ class Test(BaseTest):
         """
         Test that the dashboards can be loaded with `setup --dashboards`
         """
-
-        kibana_dir = os.path.join(self.beat_path, "_meta", "kibana")
-        shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
+        shutil.copytree(self.kibana_dir(), os.path.join(self.working_dir, "kibana"))
 
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
@@ -76,3 +73,37 @@ class Test(BaseTest):
 
         assert exit_code == 0
         assert self.log_contains("Kibana dashboards successfully loaded.")
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    def test_migration(self):
+        """
+        Test that the template loads when migration is enabled
+        """
+
+        es = Elasticsearch([self.get_elasticsearch_url()])
+        self.render_config_template(
+            modules=[{
+                "name": "apache",
+                "metricsets": ["status"],
+                "hosts": ["localhost"],
+            }],
+            elasticsearch={"host": self.get_elasticsearch_url()},
+        )
+        exit_code = self.run_beat(extra_args=["setup", "--template",
+                                              "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
+
+        assert exit_code == 0
+        assert self.log_contains('Loaded index template')
+        assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
+
+    def get_elasticsearch_url(self):
+        return "http://" + self.compose_host("elasticsearch")
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://" + self.compose_host("kibana")
+
+    def kibana_dir(self):
+        return os.path.join(self.beat_path, "_meta", "kibana.generated")

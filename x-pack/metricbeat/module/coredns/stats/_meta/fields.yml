@@ -1,0 +1,100 @@
+- name: stats
+  type: group
+  description: >
+    Contains statistics related to the coreDNS service
+  release: beta
+  fields:
+    - name: panic.count
+      type: long
+      description: >
+         Total number of panics
+    - name: dns.request.count
+      type: long
+      description: >
+         Total query count
+    - name: dns.request.duration.ns.bucket.*
+      type: object
+      object_type: long
+      description: >
+         Request duration histogram buckets in nanoseconds
+    - name: dns.request.duration.ns.sum
+      type: long
+      format: duration
+      description: >
+         Requests duration, sum of durations in nanoseconds
+    - name: dns.request.duration.ns.count
+      type: long
+      description: >
+         Requests duration, number of requests
+    - name: dns.request.size.bytes.bucket.*
+      type: object
+      object_type: long
+      description: >
+         Request Size histogram buckets
+    - name: dns.request.size.bytes.sum
+      type: long
+      description: >
+        Request Size histogram sum
+    - name: dns.request.size.bytes.count
+      type: long
+      description: >
+        Request Size histogram count
+    - name: dns.request.do.count
+      type: long
+      description: >
+         Number of queries that have the DO bit set
+    - name: dns.request.type.count
+      type: long
+      description: >
+          Counter of queries per zone and type
+    - name: type
+      type: keyword
+      description: >
+        Holds the query type of the request
+    - name: dns.response.rcode.count
+      type: long
+      description: >
+        Counter of responses per zone and rcode
+    - name: rcode
+      type: keyword
+      description: >
+        Holds the rcode of the response
+    - name: family
+      type: keyword
+      description: >
+        The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
+    - name: dns.response.size.bytes.bucket.*
+      type: object
+      object_type: long
+      description: >
+          Response Size histogram buckets
+    - name: dns.response.size.bytes.sum
+      type: long
+      description: >
+        Response Size histogram sum
+    - name: dns.response.size.bytes.count
+      type: long
+      description: >
+        Response Size histogram count
+    - name: server
+      type: keyword
+      description: >
+        The server responsible for the request
+    - name: zone
+      type: keyword
+      description: >
+        The zonename used for the request/response
+    - name: proto
+      type: keyword
+      description: >
+        The transport of the response ("udp" or "tcp")
+
+
+    - name: dns.cache.hits.count
+      type: long
+      description: >
+        Cache hits count for the cache plugin
+    - name: dns.cache.misses.count
+      type: long
+      description: >
+        Cache misses count for the cache plugin

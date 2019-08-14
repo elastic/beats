@@ -1,5 +1,7 @@
 - module: mysql
-  metricsets: ["status"]
+  metricsets:
+    - "status"
+  #  - "galera_status"
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"

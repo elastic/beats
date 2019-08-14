@@ -4,37 +4,43 @@
     Fields from the PostgreSQL log files.
   fields:
     - name: timestamp
+      deprecated: 7.3.0
       description: >
         The timestamp from the log line.
-    - name: timezone
-      description: >
-        The timezone of timestamp.
-    - name: thread_id
+    - name: core_id
       type: long
       description: >
-          Process id
-    - name: user
-      example: "admin"
-      description:
-        Name of user
+        Core id
     - name: database
       example: "mydb"
       description:
         Name of database
-    - name: level
-      example: "FATAL"
-      description:
-        The log level.
-    - name: duration
-      type: float
-      example: "30.0"
-      description:
-        Duration of a query.
     - name: query
       example: "SELECT * FROM users;"
       description:
         Query statement.
+
+    - name: error.code
+      type: long
+      description: Error code returned by Postgres (if any)
+
+    - name: timezone
+      type: alias
+      path: event.timezone
+      migration: true
+    - name: thread_id
+      type: alias
+      path: process.pid
+      migration: true
+    - name: user
+      type: alias
+      path: user.name
+      migration: true
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
     - name: message
-      type: text
-      description: >
-        The logged message.
+      type: alias
+      path: message
+      migration: true

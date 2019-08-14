@@ -1,0 +1,20 @@
+[
+    {
+        "@timestamp": "2019-01-01T01:00:27.000Z",
+        "cisco.asa.message_id": "999999",
+        "event.action": "firewall-rule",
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.severity": 7,
+        "event.timezone": "+00:00",
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 0,
+        "log.original": "This message is not filtered.",
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa"
+        ]
+    }
+]

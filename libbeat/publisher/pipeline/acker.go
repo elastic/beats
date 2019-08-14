@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pipeline
 
 import (
@@ -13,6 +30,7 @@ import (
 // All pipeline and client ACK handling support is provided by acker instances.
 type acker interface {
 	close()
+	wait()
 	addEvent(event beat.Event, published bool) bool
 	ackEvents(int)
 }
@@ -23,6 +41,7 @@ type emptyACK struct{}
 var nilACKer acker = (*emptyACK)(nil)
 
 func (*emptyACK) close()                             {}
+func (*emptyACK) wait()                              {}
 func (*emptyACK) addEvent(_ beat.Event, _ bool) bool { return true }
 func (*emptyACK) ackEvents(_ int)                    {}
 
@@ -45,12 +64,13 @@ type countACK struct {
 	fn       func(total, acked int)
 }
 
-func newCountACK(fn func(total, acked int)) *countACK {
-	a := &countACK{fn: fn}
+func newCountACK(pipeline *Pipeline, fn func(total, acked int)) *countACK {
+	a := &countACK{fn: fn, pipeline: pipeline}
 	return a
 }
 
 func (a *countACK) close()                             {}
+func (a *countACK) wait()                              {}
 func (a *countACK) addEvent(_ beat.Event, _ bool) bool { return true }
 func (a *countACK) ackEvents(n int) {
 	if a.pipeline.ackActive.Load() {
@@ -122,6 +142,12 @@ func (a *gapCountACK) ackLoop() {
 		case <-a.done:
 			closing = true
 			a.done = nil
+			if a.events.Load() == 0 {
+				// stop worker, if all events accounted for have been ACKed.
+				// If new events are added after this acker won't handle them, which may
+				// result in duplicates
+				return
+			}
 
 		case <-a.pipeline.ackDone:
 			return
@@ -129,12 +155,13 @@ func (a *gapCountACK) ackLoop() {
 		case n := <-acks:
 			empty := a.handleACK(n)
 			if empty && closing && a.events.Load() == 0 {
-				// stop worker, iff all events accounted for have been ACKed
+				// stop worker, if and only if all events accounted for have been ACKed
 				return
 			}
 
 		case <-drop:
 			// TODO: accumulate multiple drop events + flush count with timer
+			a.events.Sub(1)
 			a.fn(1, 0)
 		}
 	}
@@ -195,6 +222,8 @@ func (a *gapCountACK) close() {
 	// close client only, pipeline itself still can handle pending ACKs
 	close(a.done)
 }
+
+func (a *gapCountACK) wait() {}
 
 func (a *gapCountACK) addEvent(_ beat.Event, published bool) bool {
 	// if gapList is empty and event is being dropped, forward drop event to ack
@@ -289,9 +318,8 @@ func newBoundGapCountACK(
 	return a
 }
 
-func (a *boundGapCountACK) close() {
-	a.acker.close()
-}
+func (a *boundGapCountACK) close() { a.acker.close() }
+func (a *boundGapCountACK) wait()  { a.acker.wait() }
 
 func (a *boundGapCountACK) addEvent(event beat.Event, published bool) bool {
 	a.sema.inc()
@@ -334,12 +362,12 @@ func makeCountACK(pipeline *Pipeline, canDrop bool, sema *sema, fn func(int, int
 	if canDrop {
 		return newBoundGapCountACK(pipeline, sema, fn)
 	}
-	return newCountACK(fn)
+	return newCountACK(pipeline, fn)
 }
 
-func (a *eventDataACK) close() {
-	a.acker.close()
-}
+func (a *eventDataACK) close() { a.acker.close() }
+
+func (a *eventDataACK) wait() { a.acker.wait() }
 
 func (a *eventDataACK) addEvent(event beat.Event, published bool) bool {
 	a.mutex.Lock()
@@ -376,37 +404,57 @@ func (a *eventDataACK) onACK(total, acked int) {
 type waitACK struct {
 	acker acker
 
-	signal    chan struct{}
-	waitClose time.Duration
+	signalAll  chan struct{} // ack loop notifies `close` that all events have been acked
+	signalDone chan struct{} // shutdown handler telling `wait` that shutdown has been completed
+	waitClose  time.Duration
 
 	active atomic.Bool
 
 	// number of active events
 	events atomic.Uint64
+
+	afterClose func()
 }
 
-func newWaitACK(acker acker, timeout time.Duration) *waitACK {
+func newWaitACK(acker acker, timeout time.Duration, afterClose func()) *waitACK {
 	return &waitACK{
-		acker:     acker,
-		signal:    make(chan struct{}, 1),
-		waitClose: timeout,
-		active:    atomic.MakeBool(true),
+		acker:      acker,
+		signalAll:  make(chan struct{}, 1),
+		signalDone: make(chan struct{}),
+		waitClose:  timeout,
+		active:     atomic.MakeBool(true),
+		afterClose: afterClose,
 	}
 }
 
 func (a *waitACK) close() {
-	// TODO: wait for events
-
 	a.active.Store(false)
-	if a.events.Load() > 0 {
-		select {
-		case <-a.signal:
-		case <-time.After(a.waitClose):
-		}
+
+	if a.events.Load() == 0 {
+		a.finishClose()
+		return
 	}
 
-	// close the underlying acker upon exit
+	// start routine to propagate shutdown signals or timeouts to anyone
+	// being blocked in wait.
+	go func() {
+		defer a.finishClose()
+
+		select {
+		case <-a.signalAll:
+		case <-time.After(a.waitClose):
+		}
+	}()
+}
+
+func (a *waitACK) finishClose() {
 	a.acker.close()
+	a.afterClose()
+	close(a.signalDone)
+}
+
+func (a *waitACK) wait() {
+	<-a.signalDone
 }
 
 func (a *waitACK) addEvent(event beat.Event, published bool) bool {
@@ -430,6 +478,22 @@ func (a *waitACK) releaseEvents(n int) {
 
 	// send done signal, if close is waiting
 	if !a.active.Load() {
-		a.signal <- struct{}{}
+		a.signalAll <- struct{}{}
 	}
+}
+
+// closeACKer simply wraps any other acker. It calls a custom function after
+// the underlying acker has been closed.
+type closeACKer struct {
+	acker
+	afterClose func()
+}
+
+func newCloseACKer(a acker, fn func()) acker {
+	return &closeACKer{acker: a, afterClose: fn}
+}
+
+func (a closeACKer) close() {
+	a.acker.close()
+	a.afterClose()
 }

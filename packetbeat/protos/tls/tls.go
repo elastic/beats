@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package tls
 
 import (
@@ -8,6 +25,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
@@ -18,7 +36,7 @@ type stream struct {
 	applayer.Stream
 	parser       parser
 	tcptuple     *common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 }
 
 type tlsConnectionData struct {
@@ -35,6 +53,7 @@ type tlsPlugin struct {
 	ports                  []int
 	sendCertificates       bool
 	includeRawCertificates bool
+	fingerprints           []*FingerprintAlgorithm
 	transactionTimeout     time.Duration
 	results                protos.Reporter
 }
@@ -72,7 +91,9 @@ func New(
 }
 
 func (plugin *tlsPlugin) init(results protos.Reporter, config *tlsConfig) error {
-	plugin.setFromConfig(config)
+	if err := plugin.setFromConfig(config); err != nil {
+		return err
+	}
 
 	plugin.results = results
 	isDebug = logp.IsDebug("tls")
@@ -80,11 +101,19 @@ func (plugin *tlsPlugin) init(results protos.Reporter, config *tlsConfig) error 
 	return nil
 }
 
-func (plugin *tlsPlugin) setFromConfig(config *tlsConfig) {
+func (plugin *tlsPlugin) setFromConfig(config *tlsConfig) error {
 	plugin.ports = config.Ports
 	plugin.sendCertificates = config.SendCertificates
 	plugin.includeRawCertificates = config.IncludeRawCertificates
 	plugin.transactionTimeout = config.TransactionTimeout
+	for _, hashName := range config.Fingerprints {
+		algo, err := GetFingerprintAlgorithm(hashName)
+		if err != nil {
+			return err
+		}
+		plugin.fingerprints = append(plugin.fingerprints, algo)
+	}
+	return nil
 }
 
 func (plugin *tlsPlugin) GetPorts() []int {
@@ -144,7 +173,7 @@ func (plugin *tlsPlugin) doParse(
 	st := conn.streams[dir]
 	if st == nil {
 		st = newStream(tcptuple)
-		st.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+		st.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 		conn.streams[dir] = st
 	}
 
@@ -263,14 +292,14 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	} else {
 		serverHello = emptyHello
 	}
-	if cert, chain := getCerts(client.parser.certificates, plugin.includeRawCertificates); cert != nil {
+	if cert, chain := plugin.getCerts(client.parser.certificates); cert != nil {
 		tls["client_certificate"] = cert
 		if chain != nil {
 			tls["client_certificate_chain"] = chain
 		}
 	}
 	if plugin.sendCertificates {
-		if cert, chain := getCerts(server.parser.certificates, plugin.includeRawCertificates); cert != nil {
+		if cert, chain := plugin.getCerts(server.parser.certificates); cert != nil {
 			tls["server_certificate"] = cert
 			if chain != nil {
 				tls["server_certificate_chain"] = chain
@@ -318,62 +347,70 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if tcptuple == nil {
 		tcptuple = server.tcptuple
 	}
-	if tcptuple != nil {
-		src.IP = tcptuple.SrcIP.String()
-		src.Port = tcptuple.SrcPort
-		dst.IP = tcptuple.DstIP.String()
-		dst.Port = tcptuple.DstPort
+	cmdlineTuple := client.cmdlineTuple
+	if cmdlineTuple == nil {
+		cmdlineTuple = server.cmdlineTuple
 	}
-
-	if client.cmdlineTuple != nil {
-		src.Proc = string(client.cmdlineTuple.Src)
-		dst.Proc = string(client.cmdlineTuple.Dst)
-	} else if server.cmdlineTuple != nil {
-		src.Proc = string(server.cmdlineTuple.Dst)
-		dst.Proc = string(server.cmdlineTuple.Src)
+	if tcptuple != nil && cmdlineTuple != nil {
+		source, destination := common.MakeEndpointPair(tcptuple.BaseTuple, cmdlineTuple)
+		src, dst = &source, &destination
 	}
 
 	if len(fingerprints) > 0 {
 		tls["fingerprints"] = fingerprints
 	}
-	fields := common.MapStr{
-		"type":   "tls",
-		"status": status,
-		"tls":    tls,
-		"src":    src,
-		"dst":    dst,
+
+	// TLS version in use
+	if conn.handshakeCompleted > 1 {
+		var version string
+		if serverHello != nil {
+			var ok bool
+			if value, exists := serverHello.extensions.Parsed["supported_versions"]; exists {
+				version, ok = value.(string)
+			}
+			if !ok {
+				version = serverHello.version.String()
+			}
+		} else if clientHello != nil {
+			version = clientHello.version.String()
+		}
+		tls["version"] = version
 	}
-	// set "server" to SNI, if provided
+
+	evt, pbf := pb.NewBeatEvent(conn.startTime)
+	pbf.SetSource(src)
+	pbf.SetDestination(dst)
+	pbf.Event.Start = conn.startTime
+	pbf.Event.End = conn.endTime
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = "tls"
+
+	fields := evt.Fields
+	fields["type"] = pbf.Network.Protocol
+	fields["status"] = status
+	fields["tls"] = tls
+
+	// set "server.domain" to SNI, if provided
 	if value, ok := clientHello.extensions.Parsed["server_name_indication"]; ok {
 		if list, ok := value.([]string); ok && len(list) > 0 {
-			fields["server"] = list[0]
+			pbf.Destination.Domain = list[0]
 		}
 	}
 
-	// set "responsetime" if handshake completed
-	responseTime := int32(conn.endTime.Sub(conn.startTime) / time.Millisecond)
-	if responseTime >= 0 {
-		fields["responsetime"] = responseTime
-	}
-
-	timestamp := time.Now()
-	return beat.Event{
-		Timestamp: timestamp,
-		Fields:    fields,
-	}
+	return evt
 }
 
-func getCerts(certs []*x509.Certificate, includeRaw bool) (common.MapStr, []common.MapStr) {
+func (plugin *tlsPlugin) getCerts(certs []*x509.Certificate) (common.MapStr, []common.MapStr) {
 	if len(certs) == 0 {
 		return nil, nil
 	}
-	cert := certToMap(certs[0], includeRaw)
+	cert := certToMap(certs[0], plugin.includeRawCertificates, plugin.fingerprints)
 	if len(certs) == 1 {
 		return cert, nil
 	}
 	chain := make([]common.MapStr, len(certs)-1)
 	for idx := 1; idx < len(certs); idx++ {
-		chain[idx-1] = certToMap(certs[idx], includeRaw)
+		chain[idx-1] = certToMap(certs[idx], plugin.includeRawCertificates, plugin.fingerprints)
 	}
 	return cert, chain
 }

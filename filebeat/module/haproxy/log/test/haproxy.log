@@ -1,0 +1,1 @@
+Jul 30 09:03:52 localhost haproxy[32450]: 1.2.3.4:38862 [30/Jul/2018:09:03:52.726] incoming~ docs_microservice/docs 0/0/1/0/2 304 168 - - ---- 6/6/0/0/0 0/0 {docs.example.internal||} {|||} "GET /component---src-pages-index-js-4b15624544f97cf0bb8f.js HTTP/1.1"

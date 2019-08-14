@@ -1,0 +1,36 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-coredns]]
+[role="xpack"]
+
+:modulename: coredns
+:has-dashboards: true
+
+== Coredns Module
+
+This is a filebeat module for coredns. It supports both standalone coredns deployment and 
+coredns deployment in Kubernetes. 
+
+[float]
+=== Compatibility
+
+Although this module has been developed against Kubernetes v1.13.x, it is expected to work
+with other versions of Kubernetes.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard.
+
+[role="screenshot"]
+image::./images/kibana-coredns.jpg[]
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-coredns,exported fields>> section.
+

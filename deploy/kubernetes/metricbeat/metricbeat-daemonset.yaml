@@ -6,13 +6,11 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: metricbeat
-    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: metricbeat
-        kubernetes.io/cluster-service: "true"
     spec:
       serviceAccountName: metricbeat
       terminationGracePeriodSeconds: 30
@@ -39,10 +37,10 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
-        - name: POD_NAMESPACE
+        - name: NODE_NAME
           valueFrom:
             fieldRef:
-              fieldPath: metadata.namespace
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
         resources:
@@ -80,13 +78,12 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-config
+          name: metricbeat-daemonset-config
       - name: modules
         configMap:
           defaultMode: 0600
           name: metricbeat-daemonset-modules
-      # We set an `emptyDir` here to ensure the manifest will deploy correctly.
-      # It's recommended to change this to a `hostPath` folder, to ensure internal data
-      # files survive pod changes (ie: version upgrade)
       - name: data
-        emptyDir: {}
+        hostPath:
+          path: /var/lib/metricbeat-data
+          type: DirectoryOrCreate

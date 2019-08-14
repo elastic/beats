@@ -1,61 +1,71 @@
 {
-    "@timestamp": "2017-08-21T21:06:47.437Z",
-    "@metadata": {
-      "beat": "metricbeat",
-      "type": "doc"
-    },
-    "rabbitmq": {
-      "queue": {
-        "disk": {
-          "writes": {
-            "count": 0
-          },
-          "reads": {
-            "count": 0
-          }
-        },
-        "consumers": {
-          "count": 5,
-          "utilisation": {}
-        },
-        "auto_delete": false,
-        "memory": {
-          "bytes": 144392
-        },
-        "state": "running",
-        "messages": {
-          "total": {
-            "count": 0
-          },
-          "ready": {
-            "count": 0
-          },
-          "unacknowledged": {
-            "count": 0
-          },
-          "persistent": {
-            "count": 0
-          }
-        },
-        "durable": true,
-        "vhost": "/",
-        "arguments": {
-          "max_priority": 9
-        },
-        "exclusive": false,
-        "node": "rabbit@localhost",
-        "name": "myfancyqueue"
-      }
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "rabbitmq.queue",
+        "duration": 115000,
+        "module": "rabbitmq"
     },
     "metricset": {
-      "module": "rabbitmq",
-      "name": "queue",
-      "host": "localhost:15672",
-      "rtt": 6730
+        "name": "queue"
     },
-    "beat": {
-      "version": "7.0.0-alpha1",
-      "name": "name",
-      "hostname": "hostname"
+    "rabbitmq": {
+        "node": {
+            "name": "rabbit@localhost"
+        },
+        "queue": {
+            "arguments": {
+                "max_priority": 9
+            },
+            "auto_delete": false,
+            "consumers": {
+                "count": 3,
+                "utilisation": {
+                    "pct": 0
+                }
+            },
+            "disk": {
+                "reads": {
+                    "count": 212
+                },
+                "writes": {
+                    "count": 121
+                }
+            },
+            "durable": true,
+            "exclusive": false,
+            "memory": {
+                "bytes": 232720
+            },
+            "messages": {
+                "persistent": {
+                    "count": 73
+                },
+                "ready": {
+                    "count": 71,
+                    "details": {
+                        "rate": 0
+                    }
+                },
+                "total": {
+                    "count": 74,
+                    "details": {
+                        "rate": 2.2
+                    }
+                },
+                "unacknowledged": {
+                    "count": 3,
+                    "details": {
+                        "rate": 0.5
+                    }
+                }
+            },
+            "name": "queuenamehere",
+            "state": "running"
+        },
+        "vhost": "/"
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "rabbitmq"
     }
-  }
+}

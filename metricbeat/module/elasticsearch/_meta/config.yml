@@ -1,2 +1,8 @@
 - module: elasticsearch
-  hosts: ["localhost:9200"]
+  #metricsets:
+  #  - node
+  #  - node_stats
+  period: 10s
+  hosts: ["http://localhost:9200"]
+  #username: "user"
+  #password: "secret"

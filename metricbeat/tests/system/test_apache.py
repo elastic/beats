@@ -16,8 +16,8 @@ APACHE_STATUS_FIELDS = [
 
 APACHE_OLD_STATUS_FIELDS = [
     "hostname", "total_accesses", "total_kbytes",
-    "requests_per_sec", "bytes_per_sec",
-    "workers.busy", "workers.idle", "uptime",
+    "requests_per_sec", "bytes_per_sec", "bytes_per_request",
+    "workers.busy", "workers.idle", "uptime", "cpu",
     "connections", "scoreboard"
 ]
 
@@ -78,8 +78,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
         # There are more fields that could be checked.
 
     def get_hosts(self):
-        return ['http://' + os.getenv('APACHE_HOST', 'localhost') + ':' +
-                os.getenv('APACHE_PORT', '80')]
+        return ['http://' + self.compose_host()]
 
 
 class ApacheOldStatusTest(ApacheStatusTest):
@@ -91,7 +90,3 @@ class ApacheOldStatusTest(ApacheStatusTest):
         apache_status = evt["apache"]["status"]
         self.assertItemsEqual(
             self.de_dot(APACHE_OLD_STATUS_FIELDS), apache_status.keys())
-
-    def get_hosts(self):
-        return ['http://' + os.getenv('APACHE_OLD_HOST', 'localhost') + ':' +
-                os.getenv('APACHE_PORT', '80')]

@@ -1,0 +1,22 @@
+[role="xpack"]
+
+:modulename: envoyproxy
+:has-dashboards: true
+
+== Envoyproxy Module
+
+This is a filebeat module for Envoy proxy access log (https://www.envoyproxy.io/docs/envoy/v1.10.0/configuration/access_log). It supports both standalone deployment and Envoy proxy deployment in Kubernetes. 
+
+[float]
+=== Compatibility
+
+Although this module has been developed against Envoy proxy 1.10.0 and Kubernetes v1.13.x, it is expected to work
+with other versions of Envoy proxy and Kubernetes.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard.
+
+[role="screenshot"]
+image::./images/kibana-envoyproxy.jpg[]

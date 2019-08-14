@@ -2,7 +2,7 @@
   type: group
   description: >
     node_stats metrics.
-  release: beta
+  release: ga
   fields:
     - name: events
       type: group

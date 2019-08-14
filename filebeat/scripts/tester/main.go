@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package main
 
 import (
@@ -12,10 +29,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readfile"
+	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
 )
 
 type logReaderConfig struct {
@@ -114,12 +133,16 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 	}
 
 	var r reader.Reader
-	r, err = reader.NewEncode(f, enc, 4096)
+	r, err = readfile.NewEncodeReader(f, readfile.Config{
+		Codec:      enc,
+		BufferSize: 4096,
+		Terminator: readfile.LineFeed,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	r = reader.NewStripNewline(r)
+	r = readfile.NewStripNewline(r, readfile.LineFeed)
 
 	if conf.multiPattern != "" {
 		p, err := match.Compile(conf.multiPattern)
@@ -127,17 +150,17 @@ func getLogsFromFile(logfile string, conf *logReaderConfig) ([]string, error) {
 			return nil, err
 		}
 
-		c := reader.MultilineConfig{
+		c := multiline.Config{
 			Negate:  conf.multiNegate,
 			Match:   conf.matchMode,
 			Pattern: &p,
 		}
-		r, err = reader.NewMultiline(r, "\n", 1<<20, &c)
+		r, err = multiline.New(r, "\n", 1<<20, &c)
 		if err != nil {
 			return nil, err
 		}
 	}
-	r = reader.NewLimit(r, conf.maxBytes)
+	r = readfile.NewLimitReader(r, conf.maxBytes)
 
 	var logs []string
 	for {
@@ -245,7 +268,7 @@ func runSimulate(url string, pipeline map[string]interface{}, logs []string, ver
 	for _, s := range sources {
 		d := common.MapStr{
 			"_index":  "index",
-			"_type":   "doc",
+			"_type":   "_doc",
 			"_id":     "id",
 			"_source": s,
 		}

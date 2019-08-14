@@ -1,0 +1,87 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "ec2": {
+            "cpu": {
+                "credit_balance": 144,
+                "credit_usage": 0.005335,
+                "surplus_credit_balance": 0,
+                "surplus_credits_charged": 0,
+                "total": {
+                    "pct": 0.0989071038248902
+                }
+            },
+            "diskio": {
+                "read": {
+                    "bytes": 0,
+                    "count": 0
+                },
+                "write": {
+                    "bytes": 0,
+                    "count": 0
+                }
+            },
+            "instance": {
+                "core": {
+                    "count": 1
+                },
+                "image": {
+                    "id": "ami-05b3bcf7f311194b3"
+                },
+                "monitoring": {
+                    "state": "disabled"
+                },
+                "private": {
+                    "dns_name": "ip-172-31-10-23.ap-southeast-1.compute.internal",
+                    "ip": "172.31.10.23"
+                },
+                "public": {
+                    "dns_name": "ec2-18-136-198-93.ap-southeast-1.compute.amazonaws.com",
+                    "ip": "18.136.198.93"
+                },
+                "state": {
+                    "code": 16,
+                    "name": "running"
+                },
+                "threads_per_core": 1
+            },
+            "network": {
+                "in": {
+                    "bytes": 85.2,
+                    "packets": 1.4
+                },
+                "out": {
+                    "bytes": 108.8,
+                    "packets": 2
+                }
+            },
+            "status": {
+                "check_failed": 0,
+                "check_failed_instance": 0,
+                "check_failed_system": 0
+            }
+        }
+    },
+    "cloud": {
+        "availability_zone": "ap-southeast-1b",
+        "instance": {
+            "id": "i-0c68eeb552231a8d0"
+        },
+        "machine": {
+            "type": "t2.micro"
+        },
+        "provider": "aws",
+        "region": "ap-southeast-1"
+    },
+    "event": {
+        "dataset": "aws.ec2",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "ec2"
+    },
+    "service": {
+        "type": "aws"
+    }
+}

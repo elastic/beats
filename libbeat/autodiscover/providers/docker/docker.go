@@ -1,6 +1,28 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package docker
 
 import (
+	"errors"
+	"time"
+
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -20,17 +42,21 @@ func init() {
 type Provider struct {
 	config        *Config
 	bus           bus.Bus
+	uuid          uuid.UUID
 	builders      autodiscover.Builders
 	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
-	templates     *template.Mapper
+	templates     template.Mapper
 	stop          chan interface{}
 	startListener bus.Listener
 	stopListener  bus.Listener
+	stoppers      map[string]*time.Timer
+	stopTrigger   chan *dockerContainerMetadata
+	logger        *logp.Logger
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The docker autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
@@ -48,7 +74,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.HintsEnabled)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +94,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	return &Provider{
 		config:        config,
 		bus:           bus,
+		uuid:          uuid,
 		builders:      builders,
 		appenders:     appenders,
 		templates:     mapper,
@@ -75,6 +102,9 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		stop:          make(chan interface{}),
 		startListener: start,
 		stopListener:  stop,
+		stoppers:      make(map[string]*time.Timer),
+		stopTrigger:   make(chan *dockerContainerMetadata),
+		logger:        logp.NewLogger("docker"),
 	}, nil
 }
 
@@ -86,52 +116,160 @@ func (d *Provider) Start() {
 			case <-d.stop:
 				d.startListener.Stop()
 				d.stopListener.Stop()
+
+				// Stop all timers before closing the channel
+				for _, stopper := range d.stoppers {
+					stopper.Stop()
+				}
+				close(d.stopTrigger)
 				return
 
 			case event := <-d.startListener.Events():
-				d.emitContainer(event, "start")
+				d.startContainer(event)
 
 			case event := <-d.stopListener.Events():
-				d.emitContainer(event, "stop")
+				d.scheduleStopContainer(event)
+
+			case target := <-d.stopTrigger:
+				d.stopContainer(target.container, target.metadata)
 			}
 		}
 	}()
 }
 
-func (d *Provider) emitContainer(event bus.Event, flag string) {
+type dockerContainerMetadata struct {
+	container *docker.Container
+	metadata  *dockerMetadata
+}
+
+type dockerMetadata struct {
+	// Old selectors [Deprecated]
+	Docker common.MapStr
+
+	// New ECS-based selectors
+	Container common.MapStr
+
+	// Metadata used to enrich events, like ECS-based selectors but can
+	// have modifications like dedotting
+	Metadata common.MapStr
+}
+
+func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dockerMetadata) {
 	container, ok := event["container"].(*docker.Container)
 	if !ok {
-		logp.Err("Couldn't get a container from watcher event")
+		d.logger.Error(errors.New("Couldn't get a container from watcher event"))
+		return nil, nil
+	}
+
+	// Don't dedot selectors, dedot only metadata used for events enrichment
+	labelMap := common.MapStr{}
+	metaLabelMap := common.MapStr{}
+	for k, v := range container.Labels {
+		safemapstr.Put(labelMap, k, v)
+		if d.config.Dedot {
+			label := common.DeDot(k)
+			metaLabelMap.Put(label, v)
+		} else {
+			safemapstr.Put(metaLabelMap, k, v)
+		}
+	}
+
+	meta := &dockerMetadata{
+		Docker: common.MapStr{
+			"container": common.MapStr{
+				"id":     container.ID,
+				"name":   container.Name,
+				"image":  container.Image,
+				"labels": labelMap,
+			},
+		},
+		Container: common.MapStr{
+			"id":   container.ID,
+			"name": container.Name,
+			"image": common.MapStr{
+				"name": container.Image,
+			},
+			"labels": labelMap,
+		},
+		Metadata: common.MapStr{
+			"container": common.MapStr{
+				"id":   container.ID,
+				"name": container.Name,
+				"image": common.MapStr{
+					"name": container.Image,
+				},
+			},
+			"docker": common.MapStr{
+				"container": common.MapStr{
+					"labels": metaLabelMap,
+				},
+			},
+		},
+	}
+
+	return container, meta
+}
+
+func (d *Provider) startContainer(event bus.Event) {
+	container, meta := d.generateMetaDocker(event)
+	if container == nil || meta == nil {
 		return
 	}
 
+	if stopper, ok := d.stoppers[container.ID]; ok {
+		d.logger.Debugf("Container %s is restarting, aborting pending stop", container.ID)
+		stopper.Stop()
+		delete(d.stoppers, container.ID)
+		return
+	}
+
+	d.emitContainer(container, meta, "start")
+}
+
+func (d *Provider) scheduleStopContainer(event bus.Event) {
+	container, meta := d.generateMetaDocker(event)
+	if container == nil || meta == nil {
+		return
+	}
+
+	if d.config.CleanupTimeout <= 0 {
+		d.stopContainer(container, meta)
+		return
+	}
+
+	stopper := time.AfterFunc(d.config.CleanupTimeout, func() {
+		d.stopTrigger <- &dockerContainerMetadata{
+			container: container,
+			metadata:  meta,
+		}
+	})
+	d.stoppers[container.ID] = stopper
+}
+
+func (d *Provider) stopContainer(container *docker.Container, meta *dockerMetadata) {
+	if _, ok := d.stoppers[container.ID]; ok {
+		delete(d.stoppers, container.ID)
+	}
+
+	d.emitContainer(container, meta, "stop")
+}
+
+func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetadata, flag string) {
 	var host string
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
 	}
 
-	labelMap := common.MapStr{}
-	for k, v := range container.Labels {
-		safemapstr.Put(labelMap, k, v)
-	}
-
-	meta := common.MapStr{
-		"container": common.MapStr{
-			"id":     container.ID,
-			"name":   container.Name,
-			"image":  container.Image,
-			"labels": labelMap,
-		},
-	}
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
-			flag:     true,
-			"host":   host,
-			"docker": meta,
-			"meta": common.MapStr{
-				"docker": meta,
-			},
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"docker":    meta.Docker,
+			"container": meta.Container,
+			"meta":      meta.Metadata,
 		}
 
 		d.publish(event)
@@ -140,13 +278,14 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Emit container container and port information
 	for _, port := range container.Ports {
 		event := bus.Event{
-			flag:     true,
-			"host":   host,
-			"port":   port.PrivatePort,
-			"docker": meta,
-			"meta": common.MapStr{
-				"docker": meta,
-			},
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"port":      port.PrivatePort,
+			"docker":    meta.Docker,
+			"container": meta.Container,
+			"meta":      meta.Metadata,
 		}
 
 		d.publish(event)

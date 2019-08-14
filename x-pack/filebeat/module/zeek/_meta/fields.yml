@@ -1,0 +1,619 @@
+- key: zeek
+  title: Zeek
+  description: >
+    Module for handling logs produced by Zeek/Bro
+  fields:
+  - name: zeek
+    type: group
+    description: >
+      Fields from Zeek/Bro logs after normalization
+    fields:
+    - name: session_id
+      type: keyword
+      description: >
+        A unique identifier of the session 
+
+    - name: connection.local_orig
+      type: boolean
+      description: >
+        Indicates whether the session is originated locally
+
+    - name: connection.local_resp
+      type: boolean
+      description: >
+        Indicates whether the session is responded locally
+
+    - name: connection.missed_bytes
+      type: long
+      description: >
+        Missed bytes for the session
+
+    - name: connection.state
+      type: keyword
+      description: >
+        Flags indicating the state of the session
+
+    - name: connection.history
+      type: keyword
+      description: >
+        Flags indicating the history of the session
+
+    - name: connection.orig_l2_addr
+      type: keyword
+      description: >
+        Link-layer address of the originator, if available
+
+    - name: connection.resp_l2_addr
+      type: keyword
+      description: >
+        Link-layer address of the responder, if available
+
+    - name: connection.vlan
+      type: integer
+      description: >
+        VLAN identifier
+
+    - name: connection.inner_vlan
+      type: integer
+      description: >
+        VLAN identifier
+
+    - name: dns.trans_id
+      type: keyword
+      description: >
+        DNS transaction identifier
+
+    - name: dns.rtt
+      type: double
+      description: >
+        Round trip time for the query and response
+
+    - name: dns.query
+      type: keyword
+      description: >
+        The domain name that is the subject of the DNS query
+
+    - name: dns.qclass
+      type: long
+      description: >
+        The QCLASS value specifying the class of the query
+
+    - name: dns.qclass_name
+      type: keyword
+      description: >
+        A descriptive name for the class of the query
+
+    - name: dns.qtype
+      type: long
+      description: >
+        A QTYPE value specifying the type of the query
+
+    - name: dns.qtype_name
+      type: keyword
+      description: >
+        A descriptive name for the type of the query
+
+    - name: dns.rcode
+      type: long
+      description: >
+        The response code value in DNS response messages
+
+    - name: dns.rcode_name
+      type: keyword
+      description: >
+        A descriptive name for the response code value
+
+    - name: dns.AA
+      type: boolean
+      description: |
+        The Authoritative Answer bit for response messages specifies that the responding 
+        name server is an authority for the domain name in the question section
+
+    - name: dns.TC
+      type: boolean
+      description: >
+        The Truncation bit specifies that the message was truncated
+
+    - name: dns.RD
+      type: boolean
+      description: |
+        The Recursion Desired bit in a request message indicates that the client 
+        wants recursive service for this query
+
+    - name: dns.RA
+      type: boolean
+      description: |
+        The Recursion Available bit in a response message indicates that the name 
+        server supports recursive queries.
+
+    - name: dns.answers
+      type: keyword
+      description: >
+        The set of resource descriptions in the query answer
+
+    - name: dns.TTLs
+      type: double
+      description: >
+        The caching intervals of the associated RRs described by the answers field
+
+    - name: dns.rejected
+      type: boolean
+      description: >
+        Indicates whether the DNS query was rejected by the server
+    
+    - name: dns.total_answers
+      type: integer
+      description: >
+        The total number of resource records in the reply 
+
+    - name: dns.total_replies
+      type: integer
+      description: >
+        The total number of resource records in the reply message
+
+    - name: dns.saw_query
+      type: boolean
+      description: >
+        Whether the full DNS query has been seen
+
+    - name: dns.saw_reply
+      type: boolean
+      description: >
+        Whether the full DNS reply has been seen
+
+    - name: http.trans_depth
+      type: integer
+      description: >
+        Represents the pipelined depth into the connection of this request/response transaction
+    
+    - name: http.status_msg
+      type: keyword
+      description: >
+        Status message returned by the server
+    
+    - name: http.info_code
+      type: integer
+      description: >
+        Last seen 1xx informational reply code returned by the server.
+    
+    - name: http.info_msg
+      type: keyword
+      description: >
+        Last seen 1xx informational reply message returned by the server.
+
+    - name: http.tags
+      type: keyword
+      description: |
+        A set of indicators of various attributes discovered and related to a particular 
+        request/response pair.
+
+
+    - name: http.password
+      type: keyword
+      description: >
+        Password if basic-auth is performed for the request
+
+    - name: http.captured_password
+      type: boolean
+      description: >
+        Determines if the password will be captured for this request
+
+    - name: http.proxied
+      type: keyword
+      description: >
+        All of the headers that may indicate if the HTTP request was proxied
+
+    - name: http.range_request
+      type: boolean
+      description: >
+        Indicates if this request can assume 206 partial content in response
+
+    - name: http.client_header_names
+      type: keyword
+      description: |
+        The vector of HTTP header names sent by the client. No header values 
+        are included here, just the header names.
+
+    - name: http.server_header_names
+      type: keyword
+      description: |
+        The vector of HTTP header names sent by the server. No header values 
+        are included here, just the header names
+
+    - name: http.orig_fuids
+      type: keyword
+      description: >
+        An ordered vector of file unique IDs from the originator
+
+    - name: http.orig_mime_types
+      type: keyword
+      description: >
+        An ordered vector of mime types from the originator
+
+    - name: http.orig_filenames
+      type: keyword
+      description: >
+        An ordered vector of filenames from the originator
+
+    - name: http.resp_fuids
+      type: keyword
+      description: >
+        An ordered vector of file unique IDs from the responder
+
+    - name: http.resp_mime_types
+      type: keyword
+      description: >
+        An ordered vector of mime types from the responder
+
+    - name: http.resp_filenames
+      type: keyword
+      description: >
+        An ordered vector of filenames from the responder
+
+    - name: http.orig_mime_depth
+      type: integer
+      description: >
+        Current number of MIME entities in the HTTP request message body
+
+    - name: http.resp_mime_depth
+      type: integer
+      description: >
+        Current number of MIME entities in the HTTP response message body
+
+    - name: files.fuid
+      type: keyword
+      description: >
+        A file unique identifier
+
+    - name: files.tx_host
+      type: ip
+      description: >
+        The host that transferred the file
+
+    - name: files.rx_host
+      type: ip
+      description: >
+        The host that received the file
+
+    - name: files.session_ids
+      type: keyword
+      description: >
+        The sessions that have this file
+
+    - name: files.source 
+      type: keyword
+      description: |
+        An identification of the source of the file data. E.g. it may be a network protocol 
+        over which it was transferred, or a local file path which was read, or some other 
+        input source
+
+    - name: files.depth
+      type: long
+      description: |
+        A value to represent the depth of this file in relation to its source. In SMTP, it 
+        is the depth of the MIME attachment on the message. In HTTP, it is the depth of the 
+        request within the TCP connection
+
+    - name: files.analyzers
+      type: keyword
+      description: >
+        A set of analysis types done during the file analysis
+
+    - name: files.mime_type
+      type: keyword
+      description: >
+        Mime type of the file
+
+    - name: files.filename
+      type: keyword
+      description: >
+        Name of the file if available
+
+    - name: files.local_orig
+      type: boolean
+      description: |
+        If the source of this file is a network connection, this field indicates if the data 
+        originated from the local network or not
+
+    - name: files.is_orig
+      type: boolean
+      description: |
+        If the source of this file is a network connection, this field indicates if the file is 
+        being sent by the originator of the connection or the responder
+
+    - name: files.duration
+      type: double
+      description: >
+        The duration the file was analyzed for. Not the duration of the session.
+
+    - name: files.seen_bytes
+      type: long
+      description: >
+        Number of bytes provided to the file analysis engine for the file
+
+    - name: files.total_bytes
+      type: long
+      description: >
+        Total number of bytes that are supposed to comprise the full file
+
+    - name: files.missing_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were completely missed during the process 
+        of analysis
+
+    - name: files.overflow_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were not delivered to stream file analyzers. 
+        This could be overlapping bytes or bytes that couldn't be reassembled
+
+    - name: files.timedout
+      type: boolean
+      description: >
+        Whether the file analysis timed out at least once for the file
+
+    - name: files.parent_fuid
+      type: keyword
+      description: |
+        Identifier associated with a container file from which this one was extracted as part of 
+        the file analysis
+
+    - name: files.md5
+      type: keyword
+      description: >
+        An MD5 digest of the file contents
+
+    - name: files.sha1
+      type: keyword
+      description: >
+        A SHA1 digest of the file contents
+
+    - name: files.sha256
+      type: keyword
+      description: >
+        A SHA256 digest of the file contents.
+
+    - name: files.extracted
+      type: keyword
+      description: >
+        Local filename of extracted file
+
+    - name: files.extracted_cutoff
+      type: boolean
+      description: >
+        Indicate whether the file being extracted was cut off hence not extracted completely
+
+    - name: files.extracted_size
+      type: long
+      description: >
+        The number of bytes extracted to disk
+
+    - name: files.entropy
+      type: double
+      description: >
+        The information density of the contents of the file
+
+    - name: ssl.version
+      type: keyword
+      description: >
+        SSL/TLS version that was logged
+
+    - name: ssl.cipher
+      type: keyword
+      description: >
+        SSL/TLS cipher suite that was logged
+
+    - name: ssl.curve
+      type: keyword
+      description: >
+        Elliptic curve that was logged when using ECDH/ECDHE
+
+    - name: ssl.server_name
+      type: keyword
+      description: |
+        Value of the Server Name Indicator SSL/TLS extension. It indicates the server name 
+        that the client was requesting
+
+    - name: ssl.resumed
+      type: boolean
+      description: |
+        Flag to indicate if the session was resumed reusing the key material exchanged in an 
+        earlier connection
+
+    - name: ssl.next_protocol
+      type: keyword
+      description: >
+        Next protocol the server chose using the application layer next protocol extension
+
+    - name: ssl.established
+      type: boolean
+      description: >
+        Flag to indicate if this ssl session has been established successfully
+
+    - name: ssl.cert_chain
+      type: keyword
+      description: >
+        Chain of certificates offered by the server to validate its complete signing chain
+
+    - name: ssl.cert_chain_fuids
+      type: keyword
+      description: >
+        An ordered vector of certificate file identifiers for the certificates offered by the server
+
+    - name: ssl.client_cert_chain
+      type: keyword
+      description: >
+        Chain of certificates offered by the client to validate its complete signing chain
+
+    - name: ssl.client_cert_chain_fuids
+      type: keyword
+      description: >
+        An ordered vector of certificate file identifiers for the certificates offered by the client
+
+    - name: ssl.issuer
+      type: keyword
+      description: >
+        Subject of the signer of the X.509 certificate offered by the server
+
+    - name: ssl.client_issuer
+      type: keyword
+      description: >
+        Subject of the X.509 certificate offered by the client
+
+    - name: ssl.validation_status
+      type: keyword
+      description: >
+        Result of certificate validation for this connection
+
+    - name: ssl.validation_code
+      type: keyword
+      description: >
+        Result of certificate validation for this connection, given as OpenSSL validation code
+
+    - name: ssl.subject
+      type: keyword
+      description: >
+        Subject of the X.509 certificate offered by the server
+
+    - name: ssl.client_subject
+      type: keyword
+      description: >
+        Subject of the X.509 certificate offered by the client
+
+    - name: ssl.last_alert
+      type: keyword
+      description: >
+        Last alert that was seen during the connection
+
+    - name: notice.connection_id
+      type: keyword
+      description: >
+        Identifier of the related connection session
+
+    - name: notice.icmp_id
+      type: keyword
+      description: >
+        Identifier of the related ICMP session
+
+    - name: notice.file.id
+      type: keyword
+      description: >
+        An identifier associated with a single file that is related to this notice
+
+    - name: notice.file.parent_id
+      type: keyword
+      description: >
+        Identifier associated with a container file from which this one was extracted
+
+    - name: notice.file.source
+      type: keyword
+      description: |
+        An identification of the source of the file data. E.g. it may be a network protocol 
+        over which it was transferred, or a local file path which was read, or some other 
+        input source
+
+    - name: notice.file.mime_type
+      type: keyword
+      description: >
+        A mime type if the notice is related to a file
+
+    - name: notice.file.is_orig
+      type: boolean
+      description: |
+        If the source of this file is a network connection, this field indicates if the file is 
+        being sent by the originator of the connection or the responder
+
+    - name: notice.file.seen_bytes
+      type: long
+      description: >
+        Number of bytes provided to the file analysis engine for the file
+
+    - name: fnotice.file.total_bytes
+      type: long
+      description: >
+        Total number of bytes that are supposed to comprise the full file
+
+    - name: notice.file.missing_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were completely missed during the process 
+        of analysis
+
+    - name: notice.file.overflow_bytes
+      type: long
+      description: |
+        The number of bytes in the file stream that were not delivered to stream file analyzers. 
+        This could be overlapping bytes or bytes that couldn't be reassembled
+
+    - name: notice.fuid
+      type: keyword
+      description: >
+        A file unique ID if this notice is related to a file
+
+    - name: notice.note
+      type: keyword
+      description: >
+        The type of the notice
+
+    - name: notice.msg
+      type: keyword
+      description: >
+        The human readable message for the notice.
+
+    - name: notice.sub
+      type: keyword
+      description: >
+        The human readable sub-message
+
+    - name: notice.n
+      type: long
+      description: >
+        Associated count, or a status code
+
+    - name: notice.peer_name
+      type: keyword
+      description: >
+        Name of remote peer that raised this notice
+
+    - name: notice.peer_descr
+      type: text
+      description: >
+        Textual description for the peer that raised this notice
+
+    - name: notice.actions
+      type: keyword
+      description: >
+        The actions which have been applied to this notice
+
+    - name: notice.email_body_sections
+      type: text
+      description: |
+        By adding chunks of text into this element, other scripts can expand on notices 
+        that are being emailed
+
+    - name: notice.email_delay_tokens
+      type: keyword
+      description: |
+        Adding a string token to this set will cause the built-in emailing functionality 
+        to delay sending the email either the token has been removed or the email 
+        has been delayed for the specified time duration
+
+    - name: notice.identifier
+      type: keyword
+      description: >
+        This field is provided when a notice is generated for the purpose of deduplicating notices
+
+    - name: notice.suppress_for
+      type: double
+      description: >
+        This field indicates the length of time that this unique notice should be suppressed
+
+    - name: notice.dropped
+      type: boolean
+      description: >
+        Indicate if the source IP address was dropped and denied network access
+
+    
+
+

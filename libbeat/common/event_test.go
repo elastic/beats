@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package common
 
 import (
@@ -5,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -180,77 +198,90 @@ func TestConvertNestedStruct(t *testing.T) {
 func TestNormalizeValue(t *testing.T) {
 	logp.TestingSetup()
 
+	type testCase struct{ in, out interface{} }
+
+	runTests := func(check func(t *testing.T, a, b interface{}), tests map[string]testCase) {
+		for name, test := range tests {
+			test := test
+			t.Run(name, func(t *testing.T) {
+				out, err := normalizeValue(test.in)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+				check(t, test.out, out)
+			})
+		}
+	}
+
+	checkEq := func(t *testing.T, a, b interface{}) {
+		assert.Equal(t, a, b)
+	}
+
+	checkDelta := func(t *testing.T, a, b interface{}) {
+		assert.InDelta(t, a, float64(b.(Float)), 0.000001)
+	}
+
 	var nilStringPtr *string
+	var nilTimePtr *time.Time
 	someString := "foo"
+	uuidValue, err := uuid.NewV1()
+	if err != nil {
+		t.Fatalf("error while generating uuid: %v", err)
+	}
 
 	type mybool bool
 	type myint int32
 	type myuint uint8
+	type myuint64 uint64
 
-	var tests = []struct {
-		in  interface{}
-		out interface{}
-	}{
-		{nil, nil},
-		{&someString, someString},   // Pointers are dereferenced.
-		{nilStringPtr, nil},         // Nil pointers are dropped.
-		{NetString("test"), "test"}, // It honors the TextMarshaler contract.
-		{true, true},
-		{int8(8), int8(8)},
-		{uint8(8), uint8(8)},
-		{"hello", "hello"},
-		{map[string]interface{}{"foo": "bar"}, MapStr{"foo": "bar"}},
+	runTests(checkEq, map[string]testCase{
+		"nil":                               {nil, nil},
+		"pointers are dereferenced":         {&someString, someString},
+		"drop nil string pointer":           {nilStringPtr, nil},
+		"drop nil time pointer":             {nilTimePtr, nil},
+		"UUID supports TextMarshaller":      {uuidValue, uuidValue.String()},
+		"NetString supports TextMarshaller": {NetString("test"), "test"},
+		"bool value":                        {true, true},
+		"int8 value":                        {int8(8), int8(8)},
+		"uint8 value":                       {uint8(8), uint8(8)},
+		"uint64 masked":                     {uint64(1<<63 + 10), uint64(10)},
+		"string value":                      {"hello", "hello"},
+		"map to MapStr":                     {map[string]interface{}{"foo": "bar"}, MapStr{"foo": "bar"}},
 
 		// Other map types are converted using marshalUnmarshal which will lose
 		// type information for arrays which become []interface{} and numbers
 		// which all become float64.
-		{map[string]string{"foo": "bar"}, MapStr{"foo": "bar"}},
-		{map[string][]string{"list": {"foo", "bar"}}, MapStr{"list": []interface{}{"foo", "bar"}}},
+		"map[string]string to MapStr":   {map[string]string{"foo": "bar"}, MapStr{"foo": "bar"}},
+		"map[string][]string to MapStr": {map[string][]string{"list": {"foo", "bar"}}, MapStr{"list": []interface{}{"foo", "bar"}}},
 
-		{[]string{"foo", "bar"}, []string{"foo", "bar"}},
-		{[]bool{true, false}, []bool{true, false}},
-		{[]string{"foo", "bar"}, []string{"foo", "bar"}},
-		{[]int{10, 11}, []int{10, 11}},
-		{[]MapStr{{"foo": "bar"}}, []MapStr{{"foo": "bar"}}},
-		{[]map[string]interface{}{{"foo": "bar"}}, []MapStr{{"foo": "bar"}}},
+		"array of strings":       {[]string{"foo", "bar"}, []string{"foo", "bar"}},
+		"array of bools":         {[]bool{true, false}, []bool{true, false}},
+		"array of ints":          {[]int{10, 11}, []int{10, 11}},
+		"array of uint64 ok":     {[]uint64{1, 2, 3}, []uint64{1, 2, 3}},
+		"array of uint64 masked": {[]uint64{1<<63 + 1, 1<<63 + 2, 1<<63 + 3}, []uint64{1, 2, 3}},
+		"array of MapStr":        {[]MapStr{{"foo": "bar"}}, []MapStr{{"foo": "bar"}}},
+		"array of map to MapStr": {[]map[string]interface{}{{"foo": "bar"}}, []MapStr{{"foo": "bar"}}},
 
 		// Wrapper types are converted to primitives using reflection.
-		{mybool(true), true},
-		{myint(32), int64(32)},
-		{myuint(8), uint64(8)},
+		"custom bool type":          {mybool(true), true},
+		"custom int type":           {myint(32), int64(32)},
+		"custom uint type":          {myuint(8), uint64(8)},
+		"custom uint64 type ok":     {myuint64(23), uint64(23)},
+		"custom uint64 type masked": {myuint64(1<<63 + 42), uint64(42)},
 
 		// Slices of wrapper types are converted to an []interface{} of primitives.
-		{[]mybool{true, false}, []interface{}{true, false}},
-		{[]myint{32}, []interface{}{int64(32)}},
-		{[]myuint{8}, []interface{}{uint64(8)}},
-	}
+		"array of custom bool type":     {[]mybool{true, false}, []interface{}{true, false}},
+		"array of custom int type":      {[]myint{32}, []interface{}{int64(32)}},
+		"array of custom uint type":     {[]myuint{8}, []interface{}{uint64(8)}},
+		"array of custom uint64 ok":     {[]myuint64{64}, []interface{}{uint64(64)}},
+		"array of custom uint64 masked": {[]myuint64{1<<63 + 64}, []interface{}{uint64(64)}},
+	})
 
-	for i, test := range tests {
-		out, err := normalizeValue(test.in)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		assert.Equal(t, test.out, out, "Test case %v", i)
-	}
-
-	var floatTests = []struct {
-		in  interface{}
-		out interface{}
-	}{
-		{float32(1), float64(1)},
-		{float64(1), float64(1)},
-	}
-
-	for i, test := range floatTests {
-		out, err := normalizeValue(test.in)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-		assert.InDelta(t, test.out, float64(out.(Float)), 0.000001, "(approximate) Test case %v", i)
-	}
+	runTests(checkDelta, map[string]testCase{
+		"float32 value": {float32(1), float64(1)},
+		"float64 value": {float64(1), float64(1)},
+	})
 }
 
 func TestNormalizeMapError(t *testing.T) {

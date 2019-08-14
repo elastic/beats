@@ -1,36 +1,45 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "type":"metricsets",
-    "beat":{
-        "hostname":"localhost",
-        "name":"localhost",
-        "version": "6.0.0-alpha1"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"kafka",
-        "name":"consumergroup",
-        "rtt":269
-    },
-    "kafka":{
-        "consumergroup":{
-            "id": "group",
-            "topic": "test",
-            "partition": 0,
-            "client": {
-              "host": "127.0.0.1",
-              "id": "client0",
-              "member_id": "client0-d20b677a-5740-433e-a7f8-fbdab1f0f150"
-            },
+    "kafka": {
+        "broker": {
+            "address": "172.18.0.2:9092",
+            "id": 0
+        },
+        "consumergroup": {
             "broker": {
-                "address": "kafka0:9092",
+                "address": "172.18.0.2:9092",
                 "id": 0
             },
-            "error": {
-              "code": 0
+            "client": {
+                "host": "172.18.0.1",
+                "id": "sarama",
+                "member_id": "sarama-fcb5a5db-0474-4f3a-a5af-29e2f14549c5"
             },
+            "error": {
+                "code": 0
+            },
+            "id": "test-group",
             "meta": "",
-            "offset": 0
+            "offset": -1,
+            "partition": 0,
+            "topic": "metricbeat-test"
+        },
+        "partition": {
+            "id": 0,
+            "topic_id": "0-metricbeat-test"
+        },
+        "topic": {
+            "name": "metricbeat-test"
         }
+    },
+    "metricset": {
+        "host": "kafka:9092",
+        "module": "kafka",
+        "name": "consumergroup",
+        "rtt": 115
     }
 }

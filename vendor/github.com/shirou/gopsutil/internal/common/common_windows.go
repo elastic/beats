@@ -47,10 +47,10 @@ const (
 )
 
 var (
-	Modkernel32 = windows.NewLazyDLL("kernel32.dll")
-	ModNt       = windows.NewLazyDLL("ntdll.dll")
-	ModPdh      = windows.NewLazyDLL("pdh.dll")
-	ModPsapi    = windows.NewLazyDLL("psapi.dll")
+	Modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
+	ModNt       = windows.NewLazySystemDLL("ntdll.dll")
+	ModPdh      = windows.NewLazySystemDLL("pdh.dll")
+	ModPsapi    = windows.NewLazySystemDLL("psapi.dll")
 
 	ProcGetSystemTimes           = Modkernel32.NewProc("GetSystemTimes")
 	ProcNtQuerySystemInformation = ModNt.NewProc("NtQuerySystemInformation")
@@ -115,6 +115,12 @@ func CreateCounter(query windows.Handle, pname, cname string) (*CounterInfo, err
 
 // WMIQueryWithContext - wraps wmi.Query with a timed-out context to avoid hanging
 func WMIQueryWithContext(ctx context.Context, query string, dst interface{}, connectServerArgs ...interface{}) error {
+	if _, ok := ctx.Deadline(); !ok {
+		ctxTimeout, cancel := context.WithTimeout(ctx, Timeout)
+		defer cancel()
+		ctx = ctxTimeout
+	}
+
 	errChan := make(chan error, 1)
 	go func() {
 		errChan <- wmi.Query(query, dst, connectServerArgs...)

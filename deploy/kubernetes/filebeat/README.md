@@ -8,7 +8,7 @@ By deploying filebeat as a [DaemonSet](https://kubernetes.io/docs/concepts/workl
 we ensure we get a running filebeat daemon on each node of the cluster.
 
 Docker logs host folder (`/var/lib/docker/containers`) is mounted on the
-filebeat container. Filebeat will start a prospector for these files and start
+filebeat container. Filebeat will start an input for these files and start
 harvesting them as they appear.
 
 Everything is deployed under `kube-system` namespace, you can change that by

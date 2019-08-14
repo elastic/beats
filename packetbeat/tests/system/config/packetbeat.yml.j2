@@ -27,6 +27,9 @@ packetbeat.protocols:
 {% if icmp_send_request %}  send_request: true{%- endif %}
 {% if icmp_send_response %}  send_response: true{%- endif %}
 
+- type: dhcpv4
+  ports: [{{ dhcp_ports|default([67, 68])|join(", ") }}]
+
 - type: dns
   ports: [{{ dns_ports|default([53])|join(", ") }}]
 {% if dns_include_authorities %}  include_authorities: true{%- endif %}
@@ -124,6 +127,9 @@ packetbeat.protocols:
 {%- endif %}
 {% if thrift_send_request %}  send_request: true{%- endif %}
 {% if thrift_send_response %}  send_response: true{%- endif %}
+
+- type: tls
+  ports: [{{ tls_ports|default([443])|join(", ") }}]
 
 - type: mongodb
   ports: [{{ mongodb_ports|default([27017])|join(", ") }}]

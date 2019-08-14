@@ -1,18 +1,38 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package txfile
 
 import (
-	"fmt"
 	"sync"
+	"time"
 
 	"github.com/elastic/go-txfile/internal/cleanup"
+	"github.com/elastic/go-txfile/internal/invariant"
 )
 
 // Tx provides access to pages in a File.
 // A transaction MUST always be closed, so to guarantee locks being released as
 // well.
 type Tx struct {
-	flags     txFlags
-	file      *File
+	flags txFlags
+	file  *File
+	txid  uint // internal correlation id
+
 	lock      sync.Locker
 	writeSync *txWriteSync
 	rootID    PageID
@@ -26,6 +46,16 @@ type Tx struct {
 
 	// scheduled WAL updates
 	wal txWalState
+
+	// transaction stats
+	tsStart     time.Time
+	accessStats txAccessStats
+}
+
+type txAccessStats struct {
+	New    uint
+	Read   uint
+	Update uint
 }
 
 // TxOptions adds some per transaction options user can set.
@@ -58,8 +88,9 @@ type txFlags struct {
 	checkpoint bool // mark wal checkpoint has been applied
 }
 
-func newTx(file *File, lock sync.Locker, settings TxOptions) *Tx {
+func newTx(file *File, id uint64, lock sync.Locker, settings TxOptions) *Tx {
 	meta := file.getMetaPage()
+	invariant.Check(meta != nil, "file meta is not set")
 
 	rootID := meta.root.Get()
 	dataEndMarker := meta.dataEndMarker.Get()
@@ -87,6 +118,96 @@ func newTx(file *File, lock sync.Locker, settings TxOptions) *Tx {
 	}
 
 	return tx
+}
+
+func (tx *Tx) onBegin() {
+	o := tx.file.observer
+	if o == nil {
+		return
+	}
+
+	tx.tsStart = time.Now()
+	o.OnTxBegin(tx.flags.readonly)
+}
+
+// onClose is called when a readonly transaction is closed.
+func (tx *Tx) onClose() {
+	o := tx.file.observer
+	if o == nil {
+		return
+	}
+
+	accessed := tx.accessStats.Read
+	o.OnTxClose(tx.file.stats, TxStats{
+		Readonly: true,
+		Duration: time.Since(tx.tsStart),
+		Total:    accessed,
+		Accessed: accessed,
+	})
+}
+
+// onRollback is called when a writable transaction is closed or rolled back without commit.
+func (tx *Tx) onRollback() {
+	o := tx.file.observer
+	if o == nil {
+		return
+	}
+
+	read := tx.accessStats.Read
+	updated := tx.accessStats.Update
+	new := tx.accessStats.New
+
+	o.OnTxClose(tx.file.stats, TxStats{
+		Readonly:  false,
+		Commit:    false,
+		Duration:  time.Since(tx.tsStart),
+		Total:     read + updated + new,
+		Accessed:  read,
+		Updated:   updated,
+		Written:   updated + new,
+		Allocated: tx.alloc.stats.data.alloc,
+		Freed:     tx.alloc.stats.data.freed,
+	})
+}
+
+// onCommit is called after a writable transaction did succeed.
+func (tx *Tx) onCommit() {
+	allocStats := &tx.alloc.stats
+
+	fileStats := &tx.file.stats
+	fileStats.Size = uint64(tx.file.sizeEstimate)
+	fileStats.MetaArea = tx.file.allocator.metaTotal
+	fileStats.MetaAllocated = tx.file.allocator.metaTotal - tx.file.allocator.meta.freelist.Avail()
+	fileStats.DataAllocated += allocStats.data.alloc - allocStats.data.freed - allocStats.toMeta
+
+	o := tx.file.observer
+	if o == nil {
+		return
+	}
+
+	read := tx.accessStats.Read
+	updated := tx.accessStats.Update
+	new := tx.accessStats.New
+
+	o.OnTxClose(tx.file.stats, TxStats{
+		Readonly:  false,
+		Commit:    true,
+		Duration:  time.Since(tx.tsStart),
+		Total:     read + updated + new,
+		Accessed:  read,
+		Allocated: allocStats.data.alloc - allocStats.toMeta,
+		Freed:     allocStats.data.freed,
+		Written:   updated + new,
+		Updated:   updated,
+	})
+}
+
+// onAccess is called when a the memory page pointer is requested.
+func (tx *Tx) onAccess() {
+	tx.accessStats.Read++
+}
+
+func (tx *Tx) onWALTransfer(n int) { // number of wal pages copied  into data area
 }
 
 // Writable returns true if the transaction supports file modifications.
@@ -133,15 +254,24 @@ func (tx *Tx) RootPage() (*Page, error) {
 	if tx.rootID < 2 {
 		return nil, nil
 	}
-	return tx.Page(tx.rootID)
+	return tx.getPage("txfile/tx-access-root", tx.rootID)
 }
 
 // Rollback rolls back and closes the current transaction.  Rollback returns an
 // error if the transaction has already been closed by Close, Rollback or
 // Commit.
 func (tx *Tx) Rollback() error {
+	const op = "txfile/tx-rollback"
+
 	tracef("rollback transaction: %p\n", tx)
-	return tx.finishWith(tx.rollbackChanges)
+	err := tx.finishWith(func() reason {
+		tx.rollbackChanges()
+		return nil
+	})
+	if err != nil {
+		return tx.errWrap(op, err).of(TxRollbackFail)
+	}
+	return nil
 }
 
 // Commit commits the current transaction to file. The commit step needs to
@@ -149,8 +279,14 @@ func (tx *Tx) Rollback() error {
 // Returns an error if the transaction has already been closed by Close,
 // Rollback or Commit.
 func (tx *Tx) Commit() error {
+	const op = "txfile/tx-commit"
+
 	tracef("commit transaction: %p\n", tx)
-	return tx.finishWith(tx.commitChanges)
+	err := tx.finishWith(tx.commitChanges)
+	if err != nil {
+		return tx.errWrap(op, err).of(TxCommitFail)
+	}
+	return nil
 }
 
 // Close closes the transaction, releasing any locks held by the transaction.
@@ -172,11 +308,22 @@ func (tx *Tx) Commit() error {
 //     return tx.Commit()
 //
 func (tx *Tx) Close() error {
+	const op = "txfile/tx-close"
+
 	tracef("close transaction: %p\n", tx)
 	if !tx.flags.active {
 		return nil
 	}
-	return tx.finishWith(tx.rollbackChanges)
+
+	err := tx.finishWith(func() reason {
+		tx.rollbackChanges()
+		return nil
+	})
+	if err != nil {
+		return tx.errWrap(op, err).of(TxRollbackFail)
+	}
+
+	return nil
 }
 
 // CheckpointWAL copies all overwrite pages contents into the original pages.
@@ -188,15 +335,16 @@ func (tx *Tx) Close() error {
 // the end of a transaction, right before committing, so to reduce writes if
 // contents is to be overwritten anyways.
 func (tx *Tx) CheckpointWAL() error {
-	if err := tx.canWrite(); err != nil {
+	if err := tx.canWrite("txfile/tx-checkpoint"); err != nil {
 		return err
 	}
-	return tx.doCheckpointWAL()
+	tx.doCheckpointWAL()
+	return nil
 }
 
-func (tx *Tx) doCheckpointWAL() error {
+func (tx *Tx) doCheckpointWAL() {
 	if tx.flags.checkpoint {
-		return nil
+		return
 	}
 
 	// collect page ids that would have an old WAL page
@@ -217,7 +365,7 @@ func (tx *Tx) doCheckpointWAL() error {
 	}
 
 	if len(ids) == 0 {
-		return nil
+		return
 	}
 
 	// XXX: Some OS/filesystems might lock up when writing to file
@@ -229,7 +377,7 @@ func (tx *Tx) doCheckpointWAL() error {
 	for i := range ids {
 		id, walID := ids[i], walIDS[i]
 
-		contents := tx.file.mmapedPage(walID)
+		contents := tx.access(walID)
 		if contents == nil {
 			panic("invalid WAL mapping")
 		}
@@ -244,20 +392,22 @@ func (tx *Tx) doCheckpointWAL() error {
 		tx.freeWALID(id, walID)
 	}
 
+	tx.onWALTransfer(len(ids))
 	tx.flags.checkpoint = true
-	return nil
 }
 
-func (tx *Tx) finishWith(fn func() error) error {
+func (tx *Tx) finishWith(fn func() reason) reason {
 	if !tx.flags.active {
-		return errTxFinished
+		return errOf(TxFinished).report("transaction is already closed")
 	}
 	defer tx.close()
 
-	if !tx.flags.readonly {
-		return fn()
+	if tx.flags.readonly {
+		tx.onClose()
+		return nil
 	}
-	return nil
+
+	return fn()
 }
 
 func (tx *Tx) close() {
@@ -270,17 +420,19 @@ func (tx *Tx) close() {
 	tx.lock.Unlock()
 }
 
-func (tx *Tx) commitChanges() error {
+func (tx *Tx) commitChanges() reason {
 	commitOK := false
-	defer cleanup.IfNot(&commitOK, cleanup.IgnoreError(tx.rollbackChanges))
+	defer cleanup.IfNot(&commitOK, tx.rollbackChanges)
 
 	err := tx.tryCommitChanges()
-	if commitOK = err == nil; !commitOK {
+	commitOK = err == nil
+	if !commitOK {
 		return err
 	}
 
 	traceMetaPage(tx.file.getMetaPage())
-	return err
+	tx.onCommit()
+	return nil
 }
 
 // tryCommitChanges attempts to write flush all pages written and update the
@@ -307,14 +459,10 @@ func (tx *Tx) commitChanges() error {
 // 7. fsync
 // 8. update internal structures
 // 9. release locks
-func (tx *Tx) tryCommitChanges() error {
-	pending, exclusive := tx.file.locks.Pending(), tx.file.locks.Exclusive()
+func (tx *Tx) tryCommitChanges() reason {
+	const op = "txfile/tx-commit"
 
-	var newMetaBuf metaBuf
-	newMeta := newMetaBuf.cast()
-	*newMeta = *tx.file.getMetaPage()        // init new meta header from current active meta header
-	newMeta.txid.Set(1 + newMeta.txid.Get()) // inc txid
-	newMeta.root.Set(tx.rootID)              // update data root
+	pending, exclusive := tx.file.locks.Pending(), tx.file.locks.Exclusive()
 
 	// give concurrent read transactions a chance to complete, but don't allow
 	// for new read transactions to start while executing the commit
@@ -323,11 +471,20 @@ func (tx *Tx) tryCommitChanges() error {
 
 	// On function exit wait on writer to finish outstanding operations, in case
 	// we have to return early on error. On success, this is basically a no-op.
-	defer tx.writeSync.Wait()
+	txWriteComplete := false
+	defer cleanup.IfNot(&txWriteComplete, func() {
+		err := tx.writeSync.Wait()
+
+		// if wait fails, enforce an fsync with error reset flag.
+		if err != nil {
+			tx.file.writer.Sync(tx.writeSync, syncDataOnly|syncResetErr)
+			tx.writeSync.Wait()
+		}
+	})
 
 	// Flush pages.
-	if err := tx.Flush(); err != nil {
-		return fmt.Errorf("dirty pages flushing failed with %v", err)
+	if err := tx.flushPages(op); err != nil {
+		return tx.err(op).report("failed to flush dirty pages")
 	}
 
 	// 1. finish Tx state updates and free file pages used to hold meta pages
@@ -336,44 +493,19 @@ func (tx *Tx) tryCommitChanges() error {
 		return err
 	}
 
-	var csAlloc allocCommitState
-	tx.file.allocator.fileCommitPrepare(&csAlloc, &tx.alloc)
+	csAlloc := tx.commitPrepareAlloc()
 
-	// 2. allocate new file pages for new meta data to be written
-	if err := tx.file.wal.fileCommitAlloc(tx, &csWAL); err != nil {
-		return err
-	}
-	csAlloc.updated = csAlloc.updated || len(csWAL.allocRegions) > 0
-
-	if err := tx.file.allocator.fileCommitAlloc(&csAlloc); err != nil {
-		return err
-	}
-
-	// 3. serialize page mappings and new freelist
-	err = tx.file.wal.fileCommitSerialize(&csWAL, uint(tx.PageSize()), tx.scheduleWrite)
+	// 2. - 5. Commit changes to file
+	metaID, err := tx.tryCommitChangesToFile(&csWAL, &csAlloc)
 	if err != nil {
 		return err
 	}
-
-	err = tx.file.allocator.fileCommitSerialize(&csAlloc, tx.scheduleWrite)
-	if err != nil {
-		return err
-	}
-
-	// 4. sync all new contents and metadata before updating the ondisk meta page.
-	tx.file.writer.Sync(tx.writeSync)
-
-	// 5. finalize on-disk transaction be writing new meta page.
-	tx.file.wal.fileCommitMeta(newMeta, &csWAL)
-	tx.file.allocator.fileCommitMeta(newMeta, &csAlloc)
-	newMeta.Finalize()
-	metaID := 1 - tx.file.metaActive
-	tx.file.writer.Schedule(tx.writeSync, PageID(metaID), newMetaBuf[:])
-	tx.file.writer.Sync(tx.writeSync)
 
 	// 6. wait for all pages beeing written and synced,
 	//    before updating in memory state.
-	if err := tx.writeSync.Wait(); err != nil {
+	err = tx.writeSync.Wait()
+	txWriteComplete = true
+	if err != nil {
 		return err
 	}
 
@@ -396,16 +528,37 @@ func (tx *Tx) tryCommitChanges() error {
 	// Switch the files active meta page to meta page being written.
 	tx.file.metaActive = metaID
 
-	// check + apply mmap update. If we fail here, the file and internal
-	// state is already updated + valid.
+	// Compare required file size with the real file size and the mmaped region.
+	// If the expected file size of the last transaction is < the real file size,
+	// we can truncate the file and update the mmaped region.
+	// If the expected file size is > the mmaped region, we need to update the mmaped file region.
+	// If we fail here, the file and internal state is already updated + valid.
 	// But mmap failed on us -> fatal error
 	endMarker := tx.file.allocator.data.endMarker
 	if metaEnd := tx.file.allocator.meta.endMarker; metaEnd > endMarker {
 		endMarker = metaEnd
 	}
-	fileSize := uint(endMarker) * tx.file.allocator.pageSize
-	if int(fileSize) > len(tx.file.mapped) {
+
+	// Compute maximum expected file size of current transaction
+	// and update the memory mapping if required.
+	expectedMMapSize := int64(uint(endMarker) * tx.file.allocator.pageSize)
+	maxSize := int64(tx.file.allocator.maxSize)
+	pageSize := tx.file.allocator.pageSize
+	requiredFileSz, truncate := checkTruncate(&tx.alloc, tx.file.size, expectedMMapSize, maxSize, pageSize)
+	if truncate {
+		err = tx.file.truncate(requiredFileSz)
+	} else if int(expectedMMapSize) > len(tx.file.mapped) {
 		err = tx.file.mmapUpdate()
+	} else {
+		sz := expectedMMapSize
+		if sz < tx.file.size {
+			sz = tx.file.size
+		}
+
+		tx.file.sizeEstimate = sz
+	}
+	if err != nil {
+		return err
 	}
 
 	traceln("tx stats:")
@@ -420,27 +573,143 @@ func (tx *Tx) tryCommitChanges() error {
 	return nil
 }
 
-func (tx *Tx) commitPrepareWAL() (walCommitState, error) {
+func (tx *Tx) tryCommitChangesToFile(
+	csWAL *walCommitState,
+	csAlloc *allocCommitState,
+) (metaID int, err reason) {
+	newMetaBuf := tx.prepareMetaBuffer()
+	newMeta := newMetaBuf.cast()
+	newMeta.root.Set(tx.rootID) // update data root
+
+	// 2. allocate new file pages for new meta data to be written
+	if err := tx.file.wal.fileCommitAlloc(tx, csWAL); err != nil {
+		return metaID, err
+	}
+	csAlloc.updated = csAlloc.updated || len(csWAL.allocRegions) > 0
+
+	if err := tx.file.allocator.fileCommitAlloc(csAlloc); err != nil {
+		return metaID, err
+	}
+
+	// 3. serialize page mappings and new freelist
+	err = tx.file.wal.fileCommitSerialize(csWAL, uint(tx.PageSize()), tx.scheduleCommitMetaWrite)
+	if err != nil {
+		return metaID, err
+	}
+
+	err = tx.file.allocator.fileCommitSerialize(csAlloc, tx.scheduleCommitMetaWrite)
+	if err != nil {
+		return metaID, err
+	}
+
+	// 4. sync all new contents and metadata before updating the ondisk meta page.
+	tx.file.writer.Sync(tx.writeSync, syncDataOnly)
+
+	// 5. finalize on-disk transaction by writing new meta page.
+	tx.file.wal.fileCommitMeta(newMeta, csWAL)
+	tx.file.allocator.fileCommitMeta(newMeta, csAlloc)
+	metaID = tx.syncNewMeta(&newMetaBuf)
+
+	// 6. wait for all pages beeing written and synced,
+	//    before updating in memory state.
+	return metaID, nil
+}
+
+func checkTruncate(
+	st *txAllocState,
+	sz, mmapSz, maxSz int64,
+	pageSize uint,
+) (int64, bool) {
+	if maxSz <= 0 { // file is unbounded, no truncate required
+		return 0, false
+	}
+
+	expectedFileSz := mmapSz
+	if expectedFileSz < maxSz {
+		expectedFileSz = maxSz
+	}
+
+	if expectedFileSz >= sz {
+		// Required size still surpasses the last known file size -> do not
+		// truncate.
+		return 0, false
+	}
+
+	lastEnd := st.data.endMarker
+	if metaEnd := st.meta.endMarker; metaEnd > lastEnd {
+		lastEnd = metaEnd
+	}
+
+	lastExpectedFileSz := int64(uint(lastEnd) * pageSize)
+	if lastExpectedFileSz < maxSz {
+		lastExpectedFileSz = maxSz
+	}
+
+	// Compute minimum required file size for the last two active transactions (maximum).
+	if lastExpectedFileSz > expectedFileSz {
+		expectedFileSz = lastExpectedFileSz
+	}
+
+	return expectedFileSz, expectedFileSz < sz
+}
+
+func (tx *Tx) prepareMetaBuffer() (buf metaBuf) {
+	meta := buf.cast()
+	*meta = *tx.file.getMetaPage()
+	meta.txid.Set(1 + meta.txid.Get())
+	return
+}
+
+func (tx *Tx) syncNewMeta(buf *metaBuf) int {
+	meta := buf.cast()
+	meta.Finalize()
+
+	metaID := 1 - tx.file.metaActive
+	tx.file.writer.Schedule(tx.writeSync, PageID(metaID), (*buf)[:])
+	tx.file.writer.Sync(tx.writeSync, syncDataOnly|syncResetErr)
+	return metaID
+}
+
+func (tx *Tx) commitPrepareWAL() (walCommitState, reason) {
 	var st walCommitState
 
 	tx.file.wal.fileCommitPrepare(&st, &tx.wal)
 	if st.checkpoint {
-		if err := tx.doCheckpointWAL(); err != nil {
-			return st, err
-		}
+		tx.doCheckpointWAL()
 	}
 
 	if st.updated {
-		tx.metaAllocator().FreeRegions(&tx.alloc, tx.file.wal.metaPages)
+		tx.freeMetaRegions(tx.file.wal.metaPages)
 	}
 	return st, nil
 }
 
+func (tx *Tx) commitPrepareAlloc() (state allocCommitState) {
+	tx.file.allocator.fileCommitPrepare(&state, &tx.alloc, false)
+	if state.updated {
+		tx.freeMetaRegions(tx.file.allocator.freelistPages)
+	}
+	return state
+}
+
+func (tx *Tx) freeMetaRegions(rl regionList) {
+	tx.metaAllocator().FreeRegions(&tx.alloc, rl)
+}
+
 func (tx *Tx) access(id PageID) []byte {
+	tx.onAccess()
 	return tx.file.mmapedPage(id)
 }
 
-func (tx *Tx) scheduleWrite(id PageID, buf []byte) error {
+// scheduleCommitMetaWrite is used to schedule a page write for the file meta
+// data like free list or page mappings. scheduleCommitMetaWrite must only be
+// used during file updates in the commit phase.
+func (tx *Tx) scheduleCommitMetaWrite(id PageID, buf []byte) reason {
+	tx.accessStats.New++
+	return tx.scheduleWrite(id, buf)
+}
+
+func (tx *Tx) scheduleWrite(id PageID, buf []byte) reason {
 	tx.file.writer.Schedule(tx.writeSync, id, buf)
 	return nil
 }
@@ -461,12 +730,15 @@ func (tx *Tx) scheduleWrite(id PageID, buf []byte) error {
 //      =>
 //        - Truncate file only if pages in overflow area have been allocated.
 //        - If maxSize == 0, truncate file to old end marker.
-func (tx *Tx) rollbackChanges() error {
+func (tx *Tx) rollbackChanges() {
+	tracef("rollback changes in transaction: %p\n", tx)
+	tx.onRollback()
+
 	tx.file.allocator.Rollback(&tx.alloc)
 
 	maxPages := tx.file.allocator.maxPages
 	if maxPages == 0 {
-		return nil
+		return
 	}
 
 	// compute endmarker from before running the last transaction
@@ -477,16 +749,20 @@ func (tx *Tx) rollbackChanges() error {
 
 	sz, err := tx.file.file.Size()
 	if err != nil {
-		// getting file size failed. State is valid, but we can not truncate :/
-		return err
+		// getting file size failed. State is valid, but we can not truncate
+		// ¯\_(ツ)_/¯
+		return
 	}
 
 	truncateSz := uint(endMarker) * tx.file.allocator.pageSize
 	if uint(sz) > uint(truncateSz) {
-		return tx.file.file.Truncate(int64(truncateSz))
+		// ignore truncate error, as truncating a memory mapped file might not be
+		// supported by all OSes/filesystems.
+		err := tx.file.file.Truncate(int64(truncateSz))
+		if err != nil {
+			traceln("rollback file truncate failed with:", err)
+		}
 	}
-
-	return nil
 }
 
 // Page accesses a page by ID. Accessed pages are cached. Retrieving a page
@@ -494,6 +770,11 @@ func (tx *Tx) rollbackChanges() error {
 // Returns an error if the id is known to be invalid or the page has already
 // been freed.
 func (tx *Tx) Page(id PageID) (*Page, error) {
+	const op = "txfile/tx-access-page"
+	return tx.getPage(op, id)
+}
+
+func (tx *Tx) getPage(op string, id PageID) (*Page, error) {
 	inBounds := id >= 2
 	if tx.flags.readonly {
 		inBounds = inBounds && id < tx.dataEndID
@@ -501,11 +782,12 @@ func (tx *Tx) Page(id PageID) (*Page, error) {
 		inBounds = inBounds && id < tx.file.allocator.data.endMarker
 	}
 	if !inBounds {
-		return nil, errOutOfBounds
+		return nil, tx.errWrap(op, raiseOutOfBounds(id))
 	}
 
 	if tx.alloc.data.freed.Has(id) || tx.alloc.meta.freed.Has(id) {
-		return nil, errFreedPage
+		return nil, tx.err(op).of(InvalidOp).
+			report("trying to access an already freed page")
 	}
 
 	if p := tx.pages[id]; p != nil {
@@ -526,18 +808,22 @@ func (tx *Tx) Page(id PageID) (*Page, error) {
 // new contents.
 // Returns an error if the transaction is readonly or no more space is available.
 func (tx *Tx) Alloc() (page *Page, err error) {
-	if err := tx.canWrite(); err != nil {
+	const op = "txfile/tx-alloc-page"
+
+	if err := tx.canWrite(op); err != nil {
 		return nil, err
 	}
 
-	err = tx.allocPagesWith(1, func(p *Page) { page = p })
-	return
+	err = tx.allocPagesWith(op, 1, func(p *Page) { page = p })
+	return page, err
 }
 
 // AllocN allocates n potentially non-contious, yet empty pages.
 // Returns an error if the transaction is readonly or no more space is available.
 func (tx *Tx) AllocN(n int) (pages []*Page, err error) {
-	if err := tx.canWrite(); err != nil {
+	const op = "txfile/tx-alloc-pages"
+
+	if err := tx.canWrite(op); err != nil {
 		return nil, err
 	}
 
@@ -546,12 +832,13 @@ func (tx *Tx) AllocN(n int) (pages []*Page, err error) {
 	}
 
 	pages, i := make([]*Page, n), 0
-	err = tx.allocPagesWith(n, func(page *Page) {
+	err = tx.allocPagesWith(op, n, func(page *Page) {
 		pages[i], i = page, i+1
 	})
 	if err != nil {
 		return nil, err
 	}
+
 	return pages, nil
 }
 
@@ -567,7 +854,7 @@ func (tx *Tx) walAllocator() *walAllocator {
 	return tx.file.allocator.WALPageAllocator()
 }
 
-func (tx *Tx) allocPagesWith(n int, fn func(*Page)) error {
+func (tx *Tx) allocPagesWith(op string, n int, fn func(*Page)) reason {
 	count := tx.dataAllocator().AllocRegionsWith(&tx.alloc, uint(n), func(reg region) {
 		reg.EachPage(func(id PageID) {
 			page := newPage(tx, id)
@@ -577,8 +864,9 @@ func (tx *Tx) allocPagesWith(n int, fn func(*Page)) error {
 		})
 	})
 	if count == 0 {
-		return errOutOfMemory
+		return tx.err(op).of(OutOfMemory).reportf("not enough memory to allocate %v data page(s)", n)
 	}
+
 	return nil
 }
 
@@ -601,24 +889,56 @@ func (tx *Tx) freeWALID(id, walID PageID) {
 
 // Flush flushes all dirty pages within the transaction.
 func (tx *Tx) Flush() error {
-	if err := tx.canWrite(); err != nil {
+	return tx.flushPages("txfile/tx-flush")
+}
+
+func (tx *Tx) flushPages(op string) reason {
+	if err := tx.canWrite(op); err != nil {
 		return err
 	}
 
 	for _, page := range tx.pages {
-		if err := page.doFlush(); err != nil {
+		if err := page.doFlush("txfile/page-flush"); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (tx *Tx) canWrite() error {
+func (tx *Tx) canRead(op string) *Error {
 	if !tx.flags.active {
-		return errTxFinished
-	}
-	if tx.flags.readonly {
-		return errTxReadonly
+		return tx.err(op).of(TxFinished).report("no read operation on finished transactions allowed")
 	}
 	return nil
+}
+
+func (tx *Tx) canWrite(op string) *Error {
+	var kind ErrKind
+	var msg string
+
+	if !tx.flags.active {
+		kind, msg = TxFinished, "no write operation on finished transactions allowed"
+	}
+	if tx.flags.readonly {
+		kind, msg = TxReadOnly, "no write operation on read only transaction allowed"
+	}
+
+	if kind != NoError {
+		return tx.err(op).of(kind).report(msg)
+	}
+	return nil
+}
+
+func (tx *Tx) err(op string) *Error {
+	return &Error{op: op, ctx: tx.errCtx()}
+}
+
+func (tx *Tx) errWrap(op string, cause error) *Error {
+	return tx.err(op).causedBy(cause)
+}
+
+func (tx *Tx) errCtx() errorCtx {
+	ctx := tx.file.errCtx()
+	ctx.txid, ctx.isTx = tx.txid, true
+	return ctx
 }

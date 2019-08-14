@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package spool
 
 import (
@@ -27,6 +44,7 @@ type inBroker struct {
 
 	// queue state
 	queue        *pq.Queue
+	writer       *pq.Writer
 	clientStates clientStates
 
 	// Event contents, that still needs to be send to the queue. An event is
@@ -66,6 +84,11 @@ func newInBroker(
 		return nil, err
 	}
 
+	writer, err := qu.Writer()
+	if err != nil {
+		return nil, err
+	}
+
 	b := &inBroker{
 		ctx:     ctx,
 		eventer: eventer,
@@ -80,6 +103,7 @@ func newInBroker(
 
 		// queue state
 		queue:          qu,
+		writer:         writer,
 		clientStates:   clientStates{},
 		pending:        nil,
 		bufferedEvents: 0,
@@ -103,6 +127,9 @@ func (b *inBroker) Producer(cfg queue.ProducerConfig) queue.Producer {
 // run in the same go-routine as the Flush was executed from.
 // Only the (*inBroker).eventLoop triggers a flush.
 func (b *inBroker) onFlush(n uint) {
+	log := b.ctx.logger
+	log.Debug("inbroker: onFlush ", n)
+
 	if n == 0 {
 		return
 	}
@@ -197,6 +224,7 @@ func (b *inBroker) eventLoop() {
 
 	// notify ackLoop to stop only after eventLoop has finished (after last flush)
 	defer close(b.ackDone)
+	defer b.eventloopShutdown()
 
 	for {
 		ok := b.state(b)
@@ -204,23 +232,24 @@ func (b *inBroker) eventLoop() {
 			break
 		}
 	}
+}
 
+func (b *inBroker) eventloopShutdown() {
 	// try to flush events/buffers on shutdown.
 	if b.bufferedEvents == 0 {
 		return
 	}
 
-	// try to append pending events
+	// Try to flush pending events.
+	w := b.writer
 	for len(b.pending) > 0 {
-		n, err := b.queue.Writer().Write(b.pending)
+		n, err := w.Write(b.pending)
 		b.pending = b.pending[n:]
 		if err != nil {
 			return
 		}
 	}
-
-	// final flush
-	b.queue.Writer().Flush()
+	w.Flush()
 }
 
 // stateEmpty is the brokers active state if the write buffer is empty and the
@@ -353,7 +382,7 @@ func (b *inBroker) stateWithTimer() bool {
 		b.handleCancel(&req)
 
 	case <-b.timer.C:
-		log.Debug("inbroker (stateWithTimer): flush timeout")
+		log.Debug("inbroker (stateWithTimer): flush timeout", b.bufferedEvents)
 
 		b.timer.Stop(true)
 
@@ -368,7 +397,7 @@ func (b *inBroker) stateWithTimer() bool {
 
 		if b.bufferedEvents > 0 {
 			// flush did not push all events? Restart timer.
-			log.Debug("  inbroker (stateWithTimer): start flush timer")
+			log.Debug("  inbroker (stateWithTimer): start flush timer", b.bufferedEvents)
 			b.timer.Start()
 			break
 		}
@@ -393,8 +422,8 @@ func (b *inBroker) stateWithTimer() bool {
 // ignored in the future.
 //
 // stateBlocked transitions:
-//   -> stateEmpty if flush was successfull and write buffer is empty
-//   -> stateWithTimer if flush was successfull, but we still have some pending events
+//   -> stateEmpty if flush was successful and write buffer is empty
+//   -> stateWithTimer if flush was successful, but we still have some pending events
 //   -> stateBlocked if flush failed (still not enough space)
 func (b *inBroker) stateBlocked() bool {
 	log := b.ctx.logger
@@ -425,7 +454,7 @@ func (b *inBroker) stateBlocked() bool {
 			b.pending = nil
 			err := b.writeEvent(tmp)
 			if err != nil || len(b.pending) > 0 {
-				log.Debug("writing pending event failed: ", err)
+				log.Debugf("writing pending event failed: %+v", err)
 				break
 			}
 		}
@@ -486,7 +515,7 @@ func (b *inBroker) addEvent(buf []byte, st clientState) error {
 	log.Debug("  add event -> active:", count)
 
 	err := b.writeEvent(buf)
-	log.Debug("  inbroker write ->", err, b.bufferedEvents)
+	log.Debugf("  inbroker write -> events=%v, err=%+v ", b.bufferedEvents, err)
 
 	return err
 }
@@ -495,28 +524,27 @@ func (b *inBroker) writeEvent(buf []byte) error {
 	log := b.ctx.logger
 
 	// append event to queue
-	queueWriter := b.queue.Writer()
-	n, err := queueWriter.Write(buf)
+	w := b.writer
+	n, err := w.Write(buf)
 	buf = buf[n:]
 	if len(buf) > 0 {
 		b.pending = buf
 	} else if err == nil {
 		log.Debug("writer: finalize event in buffer")
-		err = queueWriter.Next()
+		err = w.Next()
 	}
 
 	if err != nil {
-		log := b.ctx.logger
-		log.Debugf("appending event content to write buffer failed with %v", err)
+		log.Debugf("Appending event content to write buffer failed with %+v", err)
 	}
 	return err
 }
 
 func (b *inBroker) flushBuffer() error {
-	err := b.queue.Writer().Flush()
+	err := b.writer.Flush()
 	if err != nil {
 		log := b.ctx.logger
-		log.Debugf("spool flush failed with: %v", err)
+		log.Errorf("Spool flush failed with: %+v", err)
 	}
 	return err
 }

@@ -1,8 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package common
 
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 // In order for the IpPortTuple and the TcpTuple to be used as
@@ -15,10 +33,15 @@ const MaxIPPortTupleRawSize = 16 + 16 + 2 + 2
 
 type HashableIPPortTuple [MaxIPPortTupleRawSize]byte
 
-type IPPortTuple struct {
-	IPLength         int
+type BaseTuple struct {
 	SrcIP, DstIP     net.IP
 	SrcPort, DstPort uint16
+}
+
+type IPPortTuple struct {
+	BaseTuple
+
+	IPLength int
 
 	raw    HashableIPPortTuple // Src_ip:Src_port:Dst_ip:Dst_port
 	revRaw HashableIPPortTuple // Dst_ip:Dst_port:Src_ip:Src_port
@@ -29,17 +52,19 @@ func NewIPPortTuple(ipLength int, srcIP net.IP, srcPort uint16,
 
 	tuple := IPPortTuple{
 		IPLength: ipLength,
-		SrcIP:    srcIP,
-		DstIP:    dstIP,
-		SrcPort:  srcPort,
-		DstPort:  dstPort,
+		BaseTuple: BaseTuple{
+			SrcIP:   srcIP,
+			DstIP:   dstIP,
+			SrcPort: srcPort,
+			DstPort: dstPort,
+		},
 	}
-	tuple.ComputeHashebles()
+	tuple.ComputeHashables()
 
 	return tuple
 }
 
-func (t *IPPortTuple) ComputeHashebles() {
+func (t *IPPortTuple) ComputeHashables() {
 	copy(t.raw[0:16], t.SrcIP)
 	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.raw[18:34], t.DstIP)
@@ -76,10 +101,10 @@ const MaxTCPTupleRawSize = 16 + 16 + 2 + 2 + 4
 type HashableTCPTuple [MaxTCPTupleRawSize]byte
 
 type TCPTuple struct {
-	IPLength         int
-	SrcIP, DstIP     net.IP
-	SrcPort, DstPort uint16
-	StreamID         uint32
+	BaseTuple
+	IPLength int
+
+	StreamID uint32
 
 	raw HashableTCPTuple // Src_ip:Src_port:Dst_ip:Dst_port:stream_id
 }
@@ -87,18 +112,20 @@ type TCPTuple struct {
 func TCPTupleFromIPPort(t *IPPortTuple, streamID uint32) TCPTuple {
 	tuple := TCPTuple{
 		IPLength: t.IPLength,
-		SrcIP:    t.SrcIP,
-		DstIP:    t.DstIP,
-		SrcPort:  t.SrcPort,
-		DstPort:  t.DstPort,
+		BaseTuple: BaseTuple{
+			SrcIP:   t.SrcIP,
+			DstIP:   t.DstIP,
+			SrcPort: t.SrcPort,
+			DstPort: t.DstPort,
+		},
 		StreamID: streamID,
 	}
-	tuple.ComputeHashebles()
+	tuple.ComputeHashables()
 
 	return tuple
 }
 
-func (t *TCPTuple) ComputeHashebles() {
+func (t *TCPTuple) ComputeHashables() {
 	copy(t.raw[0:16], t.SrcIP)
 	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
 	copy(t.raw[18:34], t.DstIP)
@@ -129,7 +156,31 @@ func (t *TCPTuple) Hashable() HashableTCPTuple {
 	return t.raw
 }
 
-// Source and destination process names, as found by the proc module.
-type CmdlineTuple struct {
-	Src, Dst []byte
+// ProcessTuple contains the source and destination process names, as found by
+// the proc module.
+type ProcessTuple struct {
+	Src, Dst Process
+}
+
+// Process contains process information.
+type Process struct {
+	PID       int       // Process ID.
+	PPID      int       // Parent process ID.
+	Name      string    // Name of process (or alias given by cmdline_grep config).
+	Args      []string  // Process arguments.
+	Exe       string    // Absolute path to exe.
+	CWD       string    // Current working directory.
+	StartTime time.Time // Start time of process.
+}
+
+// Reverse returns a copy of the receiver with the source and destination fields
+// swapped.
+func (c *ProcessTuple) Reverse() ProcessTuple {
+	if c == nil {
+		return ProcessTuple{}
+	}
+	return ProcessTuple{
+		Src: c.Dst,
+		Dst: c.Src,
+	}
 }

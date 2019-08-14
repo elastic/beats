@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package cluster_status
 
 import (
@@ -33,9 +50,13 @@ func TestFetchEventContents(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	event := events[0]
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
@@ -79,23 +100,23 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 2872860672, pgInfo["used_bytes"])
 
 	//check pg_state info
-	pg_stateInfo := events[1]["pg_state"].(common.MapStr)
-	assert.EqualValues(t, "active+undersized+degraded", pg_stateInfo["state_name"])
-	assert.EqualValues(t, 109, pg_stateInfo["count"])
-	assert.EqualValues(t, 813, pg_stateInfo["version"])
+	pgStateInfo := events[1].MetricSetFields["pg_state"].(common.MapStr)
+	assert.EqualValues(t, "active+undersized+degraded", pgStateInfo["state_name"])
+	assert.EqualValues(t, 109, pgStateInfo["count"])
+	assert.EqualValues(t, 813, pgStateInfo["version"])
 
-	pg_stateInfo = events[2]["pg_state"].(common.MapStr)
-	assert.EqualValues(t, "undersized+degraded+peered", pg_stateInfo["state_name"])
-	assert.EqualValues(t, 101, pg_stateInfo["count"])
-	assert.EqualValues(t, 813, pg_stateInfo["version"])
+	pgStateInfo = events[2].MetricSetFields["pg_state"].(common.MapStr)
+	assert.EqualValues(t, "undersized+degraded+peered", pgStateInfo["state_name"])
+	assert.EqualValues(t, 101, pgStateInfo["count"])
+	assert.EqualValues(t, 813, pgStateInfo["version"])
 
-	pg_stateInfo = events[3]["pg_state"].(common.MapStr)
-	assert.EqualValues(t, "active+remapped", pg_stateInfo["state_name"])
-	assert.EqualValues(t, 55, pg_stateInfo["count"])
-	assert.EqualValues(t, 813, pg_stateInfo["version"])
+	pgStateInfo = events[3].MetricSetFields["pg_state"].(common.MapStr)
+	assert.EqualValues(t, "active+remapped", pgStateInfo["state_name"])
+	assert.EqualValues(t, 55, pgStateInfo["count"])
+	assert.EqualValues(t, 813, pgStateInfo["version"])
 
-	pg_stateInfo = events[4]["pg_state"].(common.MapStr)
-	assert.EqualValues(t, "active+undersized+degraded+remapped", pg_stateInfo["state_name"])
-	assert.EqualValues(t, 55, pg_stateInfo["count"])
-	assert.EqualValues(t, 813, pg_stateInfo["version"])
+	pgStateInfo = events[4].MetricSetFields["pg_state"].(common.MapStr)
+	assert.EqualValues(t, "active+undersized+degraded+remapped", pgStateInfo["state_name"])
+	assert.EqualValues(t, 55, pgStateInfo["count"])
+	assert.EqualValues(t, 813, pgStateInfo["version"])
 }

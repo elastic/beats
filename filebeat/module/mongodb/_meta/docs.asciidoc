@@ -1,4 +1,5 @@
 :modulename: mongodb
+:has-dashboards: true
 
 == MongoDB module
 
@@ -41,7 +42,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "mongodb.log.var.paths=[/path/to/log/mongodb/*.log*]"
+-M "mongodb.log.var.paths=[/path/to/log/mongodb/*.log*]"
 -----
 
 
@@ -54,3 +55,9 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

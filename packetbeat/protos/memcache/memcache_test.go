@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package memcache
@@ -31,10 +48,10 @@ func (mct *memcacheTest) onTransaction(t *transaction) {
 
 func (mct *memcacheTest) genTransaction(requ, resp *message) *transaction {
 	if requ != nil {
-		requ.CmdlineTuple = &common.CmdlineTuple{}
+		requ.CmdlineTuple = &common.ProcessTuple{}
 	}
 	if resp != nil {
-		resp.CmdlineTuple = &common.CmdlineTuple{}
+		resp.CmdlineTuple = &common.ProcessTuple{}
 	}
 
 	t := newTransaction(requ, resp)
@@ -67,7 +84,7 @@ func makeTransactionEvent(t *testing.T, trans *transaction) common.MapStr {
 	return event.Fields
 }
 
-func Test_TryMergeUnmergeableRespnses(t *testing.T) {
+func Test_TryMergeUnmergeableResponses(t *testing.T) {
 	mct := newMemcacheTest(defaultConfig)
 	msg1 := textParseNoFail(t, "STORED\r\n")
 	msg2 := textParseNoFail(t, "0\r\n")

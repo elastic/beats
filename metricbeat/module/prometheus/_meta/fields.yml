@@ -1,12 +1,20 @@
 - key: prometheus
   title: "Prometheus"
   description: >
-    Stats collected from Prometheus.
+    Stats scraped from a Prometheus endpoint.
   short_config: false
-  release: beta
-  settings: ["ssl"]
+  release: ga
+  settings: ["ssl", "http"]
   fields:
-    - name: prometheus
-      type: group
+    # Order is important here, labels will match first, the rest are double
+    - name: prometheus.labels.*
+      type: object
+      object_type: keyword
       description: >
-      fields:
+        Prometheus metric labels
+    - name: prometheus.metrics.*
+      type: object
+      object_type: double
+      object_type_mapping_type: "*"
+      description: >
+        Prometheus metric

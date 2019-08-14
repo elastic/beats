@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package hints
 
 import (
@@ -10,7 +27,6 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -22,20 +38,19 @@ const (
 	multiline    = "multiline"
 	includeLines = "include_lines"
 	excludeLines = "exclude_lines"
+	processors   = "processors"
 )
 
 // validModuleNames to sanitize user input
-var validModuleNames = regexp.MustCompile("[^a-zA-Z0-9]+")
+var validModuleNames = regexp.MustCompile("[^a-zA-Z0-9\\_\\-]+")
 
 type logHints struct {
-	Key      string
-	Config   *common.Config
-	Registry *fileset.ModuleRegistry
+	config   *config
+	registry *fileset.ModuleRegistry
 }
 
 // NewLogHints builds a log hints builder
 func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
-	cfgwarn.Beta("The hints builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
@@ -48,26 +63,50 @@ func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, err
 	}
 
-	return &logHints{config.Key, config.Config, moduleRegistry}, nil
+	return &logHints{&config, moduleRegistry}, nil
 }
 
 // Create config based on input hints in the bus event
 func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
-	// Clone original config
-	config, _ := common.NewConfigFrom(l.Config)
-	host, _ := event["host"].(string)
-	if host == "" {
-		return []*common.Config{}
-	}
-
 	var hints common.MapStr
 	hIface, ok := event["hints"]
 	if ok {
 		hints, _ = hIface.(common.MapStr)
 	}
 
-	if builder.IsNoOp(hints, l.Key) == true {
-		return []*common.Config{config}
+	inputConfig := l.getInputs(hints)
+
+	// If default config is disabled return nothing unless it's explicty enabled
+	if !l.config.DefaultConfig.Enabled() && !builder.IsEnabled(hints, l.config.Key) {
+		logp.Debug("hints.builder", "default config is disabled: %+v", event)
+		return []*common.Config{}
+	}
+
+	// If explicty disabled, return nothing
+	if builder.IsDisabled(hints, l.config.Key) {
+		logp.Debug("hints.builder", "logs disabled by hint: %+v", event)
+		return []*common.Config{}
+	}
+
+	// Clone original config, enable it if disabled
+	config, _ := common.NewConfigFrom(l.config.DefaultConfig)
+	config.Remove("enabled", -1)
+
+	host, _ := event["host"].(string)
+	if host == "" {
+		return []*common.Config{}
+	}
+
+	if inputConfig != nil {
+		configs := []*common.Config{}
+		for _, cfg := range inputConfig {
+			if config, err := common.NewConfigFrom(cfg); err == nil {
+				configs = append(configs, config)
+			}
+		}
+		logp.Debug("hints.builder", "generated config %+v", configs)
+		// Apply information in event to the template to generate the final config
+		return template.ApplyConfigTemplate(event, configs)
 	}
 
 	tempCfg := common.MapStr{}
@@ -80,6 +119,10 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 	}
 	if elines := l.getExcludeLines(hints); len(elines) != 0 {
 		tempCfg.Put(excludeLines, elines)
+	}
+
+	if procs := l.getProcessors(hints); len(procs) != 0 {
+		tempCfg.Put(processors, procs)
 	}
 
 	// Merge config template with the configs from the annotations
@@ -106,7 +149,6 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		}
 		config, _ = common.NewConfigFrom(moduleConf)
 	}
-
 	logp.Debug("hints.builder", "generated config %+v", config)
 
 	// Apply information in event to the template to generate the final config
@@ -114,21 +156,29 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 }
 
 func (l *logHints) getMultiline(hints common.MapStr) common.MapStr {
-	return builder.GetHintMapStr(hints, l.Key, multiline)
+	return builder.GetHintMapStr(hints, l.config.Key, multiline)
 }
 
 func (l *logHints) getIncludeLines(hints common.MapStr) []string {
-	return builder.GetHintAsList(hints, l.Key, includeLines)
+	return builder.GetHintAsList(hints, l.config.Key, includeLines)
 }
 
 func (l *logHints) getExcludeLines(hints common.MapStr) []string {
-	return builder.GetHintAsList(hints, l.Key, excludeLines)
+	return builder.GetHintAsList(hints, l.config.Key, excludeLines)
 }
 
 func (l *logHints) getModule(hints common.MapStr) string {
-	module := builder.GetHintString(hints, l.Key, "module")
+	module := builder.GetHintString(hints, l.config.Key, "module")
 	// for security, strip module name
 	return validModuleNames.ReplaceAllString(module, "")
+}
+
+func (l *logHints) getInputs(hints common.MapStr) []common.MapStr {
+	return builder.GetHintAsConfigs(hints, l.config.Key)
+}
+
+func (l *logHints) getProcessors(hints common.MapStr) []common.MapStr {
+	return builder.GetProcessors(hints, l.config.Key)
 }
 
 type filesetConfig struct {
@@ -141,9 +191,9 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 	var configured bool
 	filesets := make(map[string]*filesetConfig)
 
-	moduleFilesets, err := l.Registry.ModuleFilesets(module)
+	moduleFilesets, err := l.registry.ModuleFilesets(module)
 	if err != nil {
-		logp.Err("Error retrieving module filesets", err)
+		logp.Err("Error retrieving module filesets: %+v", err)
 		return nil
 	}
 
@@ -152,7 +202,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 	}
 
 	// If a single fileset is given, pass all streams to it
-	fileset := builder.GetHintString(hints, l.Key, "fileset")
+	fileset := builder.GetHintString(hints, l.config.Key, "fileset")
 	if fileset != "" {
 		if conf, ok := filesets[fileset]; ok {
 			conf.Enabled = true
@@ -162,7 +212,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 
 	// If fileset is defined per stream, return all of them
 	for _, stream := range []string{"all", "stdout", "stderr"} {
-		fileset := builder.GetHintString(hints, l.Key, "fileset."+stream)
+		fileset := builder.GetHintString(hints, l.config.Key, "fileset."+stream)
 		if fileset != "" {
 			if conf, ok := filesets[fileset]; ok {
 				conf.Enabled = true
@@ -172,7 +222,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 		}
 	}
 
-	// No fileseat defined, return defaults for the module, all streams to all filesets
+	// No fileset defined, return defaults for the module, all streams to all filesets
 	if !configured {
 		for _, conf := range filesets {
 			conf.Enabled = true

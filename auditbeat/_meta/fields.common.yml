@@ -3,71 +3,11 @@
   description: >
     Contains common fields available in all event types.
   fields:
-  - name: event.module
-    description: >
-      The name of the module that generated the event.
-
-  - name: event.action
-    type: keyword
-    example: logged-in
-    description: >
-      Action describes the change that triggered the event.
-
-      For the file integrity module the possible values are:
-      attributes_modified, created, deleted, updated, moved, and config_change.
 
   - name: file
     type: group
     description: File attributes.
     fields:
-    - name: path
-      type: text
-      description: The path to the file.
-      multi_fields:
-      - name: raw
-        type: keyword
-        description: >
-          The path to the file. This is a non-analyzed field that is useful
-          for aggregations.
-
-    - name: target_path
-      type: keyword
-      description: The target path for symlinks.
-
-    - name: type
-      type: keyword
-      description: The file type (file, dir, or symlink).
-
-    - name: device
-      type: keyword
-      description: The device.
-
-    - name: inode
-      type: keyword
-      description: The inode representing the file in the filesystem.
-
-    - name: uid
-      type: keyword
-      description: >
-        The user ID (UID) or security identifier (SID) of the file owner.
-
-    - name: owner
-      type: keyword
-      description: The file owner's username.
-
-    - name: gid
-      type: keyword
-      description: The primary group ID (GID) of the file.
-
-    - name: group
-      type: keyword
-      description: The primary group name of the file.
-
-    - name: mode
-      type: keyword
-      example: 0640
-      description: The mode of the file in octal representation.
-
     - name: setuid
       type: boolean
       example: true
@@ -78,20 +18,8 @@
       example: true
       description: Set if the file has the `setgid` bit set. Omitted otherwise.
 
-    - name: size
-      type: long
-      description: The file size in bytes (field is only added when `type` is `file`).
-
-    - name: mtime
-      type: date
-      description: The last modified time of the file (time when content was modified).
-
-    - name: ctime
-      type: date
-      description: The last change time of the file (time when metadata was changed).
-
     - name: origin
-      type: text
+      type: keyword
       description: >
           An array of strings describing a possible external origin for
           this file. For example, the URL it was downloaded from. Only
@@ -121,3 +49,82 @@
         type: keyword
         example: s0
         description: The object's SELinux level.
+
+  - name: user
+    type: group
+    description: User information.
+    fields:
+
+    - name: audit
+      type: group
+      description: Audit user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Audit user ID.
+      - name: name
+        type: keyword
+        description: Audit user name.
+
+    - name: effective
+      type: group
+      description: Effective user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Effective user ID.
+      - name: name
+        type: keyword
+        description: Effective user name.
+      - name: group
+        type: group
+        description: Effective group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Effective group ID.
+        - name: name
+          type: keyword
+          description: Effective group name.
+
+    - name: filesystem
+      type: group
+      description: Filesystem user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Filesystem user ID.
+      - name: name
+        type: keyword
+        description: Filesystem user name.
+      - name: group
+        type: group
+        description: Filesystem group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Filesystem group ID.
+        - name: name
+          type: keyword
+          description: Filesystem group name.
+
+    - name: saved
+      type: group
+      description: Saved user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Saved user ID.
+      - name: name
+        type: keyword
+        description: Saved user name.
+      - name: group
+        type: group
+        description: Saved group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Saved group ID.
+        - name: name
+          type: keyword
+          description: Saved group name.

@@ -20,4 +20,4 @@ package windows
 
 // Use "GOOS=windows go generate -v -x" to generate the sources.
 // Add -trace to enable debug prints around syscalls.
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -systemdll=false -output zsyscall_windows.go kernel32.go version.go
+//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -systemdll=false -output zsyscall_windows.go kernel32.go version.go psapi.go ntdll.go

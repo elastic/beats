@@ -1,0 +1,12 @@
+version: '2.3'
+services:
+  beat:
+    build: ../../auditbeat
+    working_dir: /go/src/github.com/elastic/beats/x-pack/auditbeat
+    volumes:
+      - ${PWD}/../..:/go/src/github.com/elastic/beats/
+    command: make
+    privileged: true
+    pid: host
+    cap_add:
+      - AUDIT_CONTROL

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
@@ -7,8 +24,7 @@ import (
 	"strconv"
 	"strings"
 	"sync/atomic"
-
-	uuid "github.com/satori/go.uuid"
+	"time"
 
 	"github.com/elastic/go-ucfg/internal/parse"
 )
@@ -169,8 +185,10 @@ func newSplice(ctx context, m *Meta, s varEvaler) *cfgDynamic {
 }
 
 func newDyn(ctx context, m *Meta, val dynValue) *cfgDynamic {
-	id := string(atomic.AddInt32(&spliceSeq, 1)) + uuid.NewV4().String()
-	return &cfgDynamic{cfgPrimitive{ctx, m}, cacheID(id), val}
+	seq := atomic.AddInt32(&spliceSeq, 1)
+	dyn := &cfgDynamic{cfgPrimitive: cfgPrimitive{ctx, m}, dyn: val}
+	dyn.id = cacheID(fmt.Sprintf("%8X-%4X-%p", time.Now().Unix(), seq, dyn))
+	return dyn
 }
 
 func (p *cfgPrimitive) Context() context                { return p.ctx }
@@ -359,7 +377,7 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 	case len(fields) > 0 && len(arr) == 0:
 		m := make(map[string]interface{})
 		for k, v := range fields {
-			opts.activeFields = NewFieldSet(parentFields)
+			opts.activeFields = newFieldSet(parentFields)
 			var err error
 			if m[k], err = v.reify(opts); err != nil {
 				return nil, err
@@ -369,7 +387,7 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 	case len(fields) == 0 && len(arr) > 0:
 		m := make([]interface{}, len(arr))
 		for i, v := range arr {
-			opts.activeFields = NewFieldSet(parentFields)
+			opts.activeFields = newFieldSet(parentFields)
 			var err error
 			if m[i], err = v.reify(opts); err != nil {
 				return nil, err
@@ -379,14 +397,14 @@ func (c cfgSub) reify(opts *options) (interface{}, error) {
 	default:
 		m := make(map[string]interface{})
 		for k, v := range fields {
-			opts.activeFields = NewFieldSet(parentFields)
+			opts.activeFields = newFieldSet(parentFields)
 			var err error
 			if m[k], err = v.reify(opts); err != nil {
 				return nil, err
 			}
 		}
 		for i, v := range arr {
-			opts.activeFields = NewFieldSet(parentFields)
+			opts.activeFields = newFieldSet(parentFields)
 			var err error
 			m[fmt.Sprintf("%d", i)], err = v.reify(opts)
 			if err != nil {
@@ -536,6 +554,10 @@ func (s spliceDynValue) String() string {
 }
 
 func parseValue(p *cfgPrimitive, opts *options, str string) (value, error) {
+	if opts.noParse {
+		return nil, raiseNoParse(p.ctx, p.meta())
+	}
+
 	ifc, err := parse.Value(str)
 	if err != nil {
 		return nil, err

@@ -12,100 +12,148 @@ env:
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
-    - DOCKER_COMPOSE_VERSION=1.11.1
-    - GO_VERSION="$(cat .go-version)"
-    - TRAVIS_ETCD_VERSION=v3.2.8
+    - DOCKER_COMPOSE_VERSION=1.21.0
+    - TRAVIS_GO_VERSION=$(cat .go-version)
+    # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
+    - TRAVIS_MINIKUBE_VERSION=v0.25.2
 
 jobs:
   include:
     # General checks
     - os: linux
       env: TARGETS="check"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: check
 
     # Filebeat
     - os: linux
       env: TARGETS="-C filebeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/filebeat testsuite"
+      go: $(GO_VERSION)
       stage: test
 
     # Heartbeat
     - os: linux
       env: TARGETS="-C heartbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
 
     # Auditbeat
     - os: linux
       env: TARGETS="-C auditbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C auditbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       env: TARGETS="-C auditbeat crosscompile"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/auditbeat testsuite"
+      go: $TRAVIS_GO_VERSION
       stage: test
 
     # Libbeat
     - os: linux
       env: TARGETS="-C libbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       env: TARGETS="-C libbeat crosscompile"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       env: STRESS_TEST_OPTIONS="-timeout=20m -race -v -parallel 1" TARGETS="-C libbeat stress-tests"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/libbeat testsuite"
+      go: $TRAVIS_GO_VERSION
       stage: test
 
     # Metricbeat
     - os: linux
-      env: TARGETS="-C metricbeat testsuite"
-      go: $GO_VERSION
+      env: TARGETS="-C metricbeat unit-tests coverage-report"
+      go: $TRAVIS_GO_VERSION
       stage: test
+    - os: linux
+      env: TARGETS="-C metricbeat integration-tests-environment coverage-report"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C metricbeat update system-tests-environment coverage-report"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       env: TARGETS="-C metricbeat crosscompile"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/metricbeat testsuite"
+      go: $TRAVIS_GO_VERSION
       stage: test
 
     # Packetbeat
     - os: linux
       env: TARGETS="-C packetbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
 
     # Winlogbeat
     - os: linux
       env: TARGETS="-C winlogbeat crosscompile"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
+    # Functionbeat
+    - os: linux
+      env: TARGETS="-C x-pack/functionbeat testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: osx
+      env: TARGETS="TEST_ENVIRONMENT=0 -C x-pack/functionbeat testsuite"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
+    # Journalbeat
+    - os: linux
+      env: TARGETS="-C journalbeat testsuite"
+      go: $TRAVIS_GO_VERSION
       stage: test
 
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
       env: TARGETS="-C generator/beat test"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
+    # Docs
+    - os: linux
+      env: TARGETS="docs"
+      go: $TRAVIS_GO_VERSION
       stage: test
 
     # Kubernetes
@@ -113,26 +161,38 @@ jobs:
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
-        - TRAVIS_KUBE_VERSION=v1.6.11
+        - TRAVIS_K8S_VERSION=v1.8.0
       stage: test
     - os: linux
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
-        - TRAVIS_KUBE_VERSION=v1.7.7
+        - TRAVIS_K8S_VERSION=v1.9.4
       stage: test
     - os: linux
       install: deploy/kubernetes/.travis/setup.sh
       env:
         - TARGETS="-C deploy/kubernetes test"
-        - TRAVIS_KUBE_VERSION=v1.8.0
+        - TRAVIS_K8S_VERSION=v1.10.0
       stage: test
+    # TODO include 1.11 once minikube supports it
+    #- os: linux
+    #  install: deploy/kubernetes/.travis/setup.sh
+    #  env:
+    #    - TARGETS="-C deploy/kubernetes test"
+    #    - TRAVIS_K8S_VERSION=v1.11.0
+    #  stage: test
 
 addons:
   apt:
+    update: true
     packages:
       - python-virtualenv
       - libpcap-dev
+      - xsltproc
+      - libxml2-utils
+      - libsystemd-journal-dev
+      - librpm-dev
 
 before_install:
   - python --version
@@ -143,6 +203,8 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+  - if [ $TRAVIS_OS_NAME = osx ]; then pip install virtualenv; fi
+
 
 # Skips installations step
 install: true

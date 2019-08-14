@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package file_integrity
 
 import (
@@ -16,6 +33,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/OneOfOne/xxhash"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
@@ -39,7 +57,7 @@ func (s Source) String() string {
 func (s Source) MarshalText() ([]byte, error) { return []byte(s.String()), nil }
 
 const (
-	// SourceScan identifies events triggerd by a file system scan.
+	// SourceScan identifies events triggered by a file system scan.
 	SourceScan Source = iota
 	// SourceFSNotify identifies events triggered by a notification from the
 	// file system.
@@ -231,8 +249,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 				file["uid"] = info.SID
 			}
 		} else {
-			file["uid"] = info.UID
-			file["gid"] = info.GID
+			file["uid"] = strconv.Itoa(int(info.UID))
+			file["gid"] = strconv.Itoa(int(info.GID))
 			file["mode"] = fmt.Sprintf("%#04o", uint32(info.Mode))
 		}
 
@@ -377,6 +395,8 @@ func hashFile(name string, hashType ...HashType) (map[HashType]Digest, error) {
 			hashes = append(hashes, sha512.New512_224())
 		case SHA512_256:
 			hashes = append(hashes, sha512.New512_256())
+		case XXH64:
+			hashes = append(hashes, xxhash.New64())
 		default:
 			return nil, errors.Errorf("unknown hash type '%v'", name)
 		}

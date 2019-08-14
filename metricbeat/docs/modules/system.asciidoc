@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-system]]
@@ -10,6 +10,8 @@ always applies to the local server, the `hosts` config option is not needed.
 
 The default metricsets are `cpu`, `load`, `memory`, `network`, `process` and
 `process_summary`.
+
+Note that certain metricsets may access `/proc` to gather process information, and the resulting `ptrace_may_access()` call by the kernel to check for permissions can be blocked by https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor and other LSM software], even though the system module doesn't use `ptrace` directly.
 
 [float]
 === Dashboard
@@ -31,16 +33,17 @@ metricbeat.modules:
 - module: system
   metricsets:
     - cpu             # CPU usage
-    - filesystem      # File system usage for each mountpoint
-    - fsstat          # File system summary metrics
     - load            # CPU load averages
     - memory          # Memory usage
     - network         # Network IO
     - process         # Per process metrics
     - process_summary # Process summary
     - uptime          # System Uptime
+    - socket_summary  # Socket summary
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
+    #- filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
     #- raid           # Raid
     #- socket         # Sockets and connection info (linux only)
   enabled: true
@@ -113,6 +116,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-diskio,diskio>>
 
+* <<metricbeat-metricset-system-entropy,entropy>>
+
 * <<metricbeat-metricset-system-filesystem,filesystem>>
 
 * <<metricbeat-metricset-system-fsstat,fsstat>>
@@ -131,6 +136,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-system-socket,socket>>
 
+* <<metricbeat-metricset-system-socket_summary,socket_summary>>
+
 * <<metricbeat-metricset-system-uptime,uptime>>
 
 include::system/core.asciidoc[]
@@ -138,6 +145,8 @@ include::system/core.asciidoc[]
 include::system/cpu.asciidoc[]
 
 include::system/diskio.asciidoc[]
+
+include::system/entropy.asciidoc[]
 
 include::system/filesystem.asciidoc[]
 
@@ -156,6 +165,8 @@ include::system/process_summary.asciidoc[]
 include::system/raid.asciidoc[]
 
 include::system/socket.asciidoc[]
+
+include::system/socket_summary.asciidoc[]
 
 include::system/uptime.asciidoc[]
 

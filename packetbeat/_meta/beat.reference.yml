@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: any
+packetbeat.interfaces.device: {{ call .device .GOOS }}
 
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's
@@ -124,6 +124,10 @@ packetbeat.protocols:
   # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
 
+- type: dhcpv4
+  # Configure the DHCP for IPv4 ports.
+  ports: [67, 68]
+
 - type: dns
   # Enable DNS monitoring. Default: true
   #enabled: true
@@ -190,6 +194,10 @@ packetbeat.protocols:
   # The list of content types for which Packetbeat includes the full HTTP
   # response payload.
   #include_response_body_for: []
+
+  # Whether the body of a request must be decoded when a content-encoding
+  # or transfer-encoding has been applied.
+  #decode_body: true
 
   # If the Cookie or Set-Cookie headers are sent, this option controls whether
   # they are split into individual values.
@@ -271,7 +279,7 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
-  ports: [3306]
+  ports: [3306,3307]
 
   # If this option is enabled, the raw message of the request (`request` field)
   # is sent to Elasticsearch. The default is false.
@@ -324,6 +332,15 @@ packetbeat.protocols:
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
+
+  # Max size for per-session message queue. This places a limit on the memory
+  # that can be used to buffer requests and responses for correlation.
+  #queue_max_bytes: 1048576
+
+  # Max number of messages for per-session message queue. This limits the number
+  # of requests or responses that can be buffered for correlation. Set a value
+  # large enough to allow for pipelining.
+  #queue_max_messages: 20000
 
 - type: thrift
   # Enable thrift monitoring. Default: true
@@ -436,7 +453,18 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
-  ports: [443]
+  ports:
+    - 443   # HTTPS
+    - 993   # IMAPS
+    - 995   # POP3S
+    - 5223  # XMPP over SSL
+    - 8443
+    - 8883  # Secure MQTT
+    - 9243  # Elasticsearch
+
+  # List of hash algorithms to use to calculate certificates' fingerprints.
+  # Valid values are `sha1`, `sha256` and `md5`.
+  #fingerprints: [sha1]
 
   # If this option is enabled, the client and server certificates and
   # certificate chains are sent to Elasticsearch. The default is true.
@@ -448,30 +476,14 @@ packetbeat.protocols:
 
 #=========================== Monitored processes ==============================
 
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-#packetbeat.procs:
-#  enabled: false
-#  monitored:
-#    - process: mysqld
-#      cmdline_grep: mysqld
-#
-#    - process: pgsql
-#      cmdline_grep: postgres
-#
-#    - process: nginx
-#      cmdline_grep: nginx
-#
-#    - process: app
-#      cmdline_grep: gunicorn
+# Packetbeat can enrich events with information about the process associated
+# the socket that sent or received the packet if Packetbeat is monitoring
+# traffic from the host machine. By default process enrichment is disabled.
+# This feature works on Linux and Windows.
+packetbeat.procs.enabled: false
 
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#packetbeat.ignore_outgoing: true
+# If you want to ignore transactions created by the server on which the shipper
+# is installed you can enable this option. This option is useful to remove
+# duplicates if shippers are installed on multiple servers. Default value is
+# false.
+packetbeat.ignore_outgoing: false

@@ -1,11 +1,22 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-jolokia]]
 == Jolokia module
 
-This is the Jolokia module.
+This module collects metrics from
+https://jolokia.org/reference/html/agents.html[Jolokia agents] running on a
+target JMX server or dedicated proxy server. The default metricset is `jmx`.
+
+To collect metrics, {beatname_uc} communicates with a Jolokia HTTP/REST
+endpoint that exposes the JMX metrics over HTTP/REST/JSON.
+
+[float]
+=== Compatibility
+
+The Jolokia module is tested with Jolokia 1.5.0. It should work with version
+1.2.2 and later.
 
 
 
@@ -19,31 +30,38 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: jolokia
-  metricsets: ["jmx"]
+  #metricsets: ["jmx"]
   period: 10s
   hosts: ["localhost"]
   namespace: "metrics"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
   jmx.mappings:
-    - mbean: 'java.lang:type=Runtime'
-      attributes:
-        - attr: Uptime
-          field: uptime
-    - mbean: 'java.lang:type=Memory'
-      attributes:
-        - attr: HeapMemoryUsage
-          field: memory.heap_usage
-        - attr: NonHeapMemoryUsage
-          field: memory.non_heap_usage
+    #- mbean: 'java.lang:type=Runtime'
+    #  attributes:
+    #    - attr: Uptime
+    #      field: uptime
+    #- mbean: 'java.lang:type=Memory'
+    #  attributes:
+    #    - attr: HeapMemoryUsage
+    #      field: memory.heap_usage
+    #    - attr: NonHeapMemoryUsage
+    #      field: memory.non_heap_usage
     # GC Metrics - this depends on what is available on your JVM
-    # - mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
-    #   attributes:
-    #     - attr: CollectionTime
-    #       field: gc.cms_collection_time
-    #     - attr: CollectionCount
-    #       field: gc.cms_collection_count
+    #- mbean: 'java.lang:type=GarbageCollector,name=ConcurrentMarkSweep'
+    #  attributes:
+    #    - attr: CollectionTime
+    #      field: gc.cms_collection_time
+    #    - attr: CollectionCount
+    #      field: gc.cms_collection_count
+
+  jmx.application:
+  jmx.instance:
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

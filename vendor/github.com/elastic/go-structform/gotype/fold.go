@@ -1,9 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package gotype
 
 import (
 	"reflect"
 
-	"github.com/elastic/go-structform"
+	structform "github.com/elastic/go-structform"
 )
 
 type foldFn func(c *foldContext, v interface{}) error
@@ -29,16 +46,16 @@ type foldContext struct {
 	opts    options
 }
 
-func Fold(v interface{}, vs structform.Visitor, opts ...Option) error {
+func Fold(v interface{}, vs structform.Visitor, opts ...FoldOption) error {
 	if it, err := NewIterator(vs, opts...); err == nil {
 		return it.Fold(v)
 	}
 	return nil
 }
 
-func NewIterator(vs structform.Visitor, opts ...Option) (*Iterator, error) {
+func NewIterator(vs structform.Visitor, opts ...FoldOption) (*Iterator, error) {
 	reg := newTypeFoldRegistry()
-	O, err := applyOpts(opts)
+	O, err := applyFoldOpts(opts)
 	if err != nil {
 		return nil, err
 	}

@@ -1,40 +1,49 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "rabbitmq.connection",
+        "duration": 115000,
+        "module": "rabbitmq"
     },
     "metricset": {
-        "host": "localhost:15672",
-        "module": "rabbitmq",
-        "name": "connection",
-        "rtt": 115
+        "name": "connection"
     },
     "rabbitmq": {
         "connection": {
-            "channel_max": 0,
-            "channels": 1,
-            "frame_max": 4096,
-            "host": "127.0.0.1",
-            "name": "127.0.0.1:42256 -\u003e 127.0.0.1:5672",
-            "node": "rabbit@lake",
+            "channel_max": 65535,
+            "channels": 8,
+            "client_provided": {
+                "name": "Connection1"
+            },
+            "frame_max": 131072,
+            "host": "::1",
+            "name": "[::1]:60938 -\u003e [::1]:5672",
             "octet_count": {
-                "received": 1025,
-                "sent": 1056
+                "received": 3764,
+                "sent": 3840
             },
             "packet_count": {
                 "pending": 0,
-                "received": 50,
-                "sent": 49
+                "received": 376,
+                "sent": 376
             },
             "peer": {
-                "host": "127.0.0.1",
-                "port": 42256
+                "host": "::1",
+                "port": 60938
             },
             "port": 5672,
-            "type": "network",
-            "user": "guest",
-            "vhost": "/"
-        }
+            "type": "network"
+        },
+        "node": {
+            "name": "nodename"
+        },
+        "vhost": "/"
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "rabbitmq"
+    },
+    "user": {
+        "name": "guest"
     }
 }

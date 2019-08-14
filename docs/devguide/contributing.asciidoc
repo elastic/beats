@@ -24,10 +24,14 @@ order to assure our users of the origin and continuing existence of the code.
 You only need to sign the CLA once.
 
 . Send a pull request! Push your changes to your fork of the repository and
-https://help.github.com/articles/using-pull-requests[submit a pull request]. In
-the pull request, describe what your changes do and mention any bugs/issues
-related to the pull request. Please also add a changelog entry to
-https://github.com/elastic/beats/blob/master/CHANGELOG.asciidoc[CHANGELOG.asciidoc].
+https://help.github.com/articles/using-pull-requests[submit a pull request] using our
+<<pr-review,pull request guidelines>>. New PRs go to the master branch. The Beats
+core team will backport your PR if it is necessary.
+
+
+In the pull request, describe what your changes do and mention
+any bugs/issues related to the pull request. Please also add a changelog entry to
+https://github.com/elastic/beats/blob/master/CHANGELOG.next.asciidoc[CHANGELOG.next.asciidoc].
 
 [float]
 [[adding-new-beat]]
@@ -44,20 +48,22 @@ Beats].
 [[setting-up-dev-environment]]
 === Setting Up Your Dev Environment
 
-The Beats are Go programs, so install the latest version of
-http://golang.org/[golang] if you don't have it already. The current Go version
-used for development is Golang {go-version}.
+The Beats are Go programs, so install the {go-version} version of
+http://golang.org/[Go] which is being used for Beats development.
 
-The location where you clone is important. Please clone under the source
-directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
-simply set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
+After https://golang.org/doc/install[installing Go], set the
+https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
+your workspace location, and make sure `$GOPATH/bin` is in your PATH.
+
+The location where you clone is important. Make a directory structure under
+`GOPATH` that matches the URL used for Elastic repositories, then clone the
+beats repository under the new directory:
 
 [source,shell]
---------------------------------------------------------------------------------
+----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
-cd ${GOPATH}/src/github.com/elastic
-git clone https://github.com/elastic/beats.git
---------------------------------------------------------------------------------
+git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beats
+----------------------------------------------------------------------
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
@@ -84,21 +90,49 @@ recommend that you install it.
 === Update scripts
 
 The Beats use a variety of scripts based on Python to generate configuration files
-and documentation. The command used for this is:
+and documentation. The primary command used for this is:
 
 [source,shell]
 --------------------------------------------------------------------------------
 make update
 --------------------------------------------------------------------------------
 
-This command has the following dependencies:
+Another command properly formats go source files and adds a copyright header:
+
+[source,shell]
+--------------------------------------------------------------------------------
+make fmt
+--------------------------------------------------------------------------------
+
+These commands have the following dependencies:
 
 * Python >= {python}
 * https://virtualenv.pypa.io/en/latest/[virtualenv] for Python
 
 Virtualenv can be installed with the command `easy_install virtualenv` or `pip
 install virtualenv`. More details can be found
-https://virtualenv.pypa.io/en/latest/installation.html[here].
+https://virtualenv.pypa.io/en/latest/installation.html[here]. Both of these commands should be run before submitting a PR. You can view all the available make targets with `make help`.
+
+
+[float]
+[[build-target-env-vars]]
+=== Selecting Build Targets
+
+Beats is built using the `make release` target. By default, make will select from a limited number of preset build targets:
+
+- darwin/amd64
+- linux/386
+- linux/amd64
+- windows/386
+- windows/amd64
+
+You can change build targets using the `PLATFORMS` environment variable. Targets set with the `PLATFORMS` variable can either be a GOOS value, or a GOOS/arch pair.
+For example, `linux` and `linux/amd64` are both valid targets. You can select multiple targets, and the `PLATFORMS` list is space delimited, for example `darwin windows` will build on all supported darwin and windows architectures.
+In addition, you can add or remove from the list of build targets by prepending `+` or `-` to a given target. For example: `+bsd` or `-darwin`.
+
+You can find the complete list of supported build targets with `go tool dist list`.
+
+
 
 [float]
 [[running-testsuite]]
@@ -147,4 +181,4 @@ In most cases `govendor fetch your/dependency@version +out` will get the job don
 
 To keep up to date with changes to the official Beats for community developers,
 follow the developer changelog
-https://github.com/elastic/beats/blob/master/CHANGELOG-developer.md[here].
+https://github.com/elastic/beats/blob/master/CHANGELOG-developer.next.asciidoc[here].

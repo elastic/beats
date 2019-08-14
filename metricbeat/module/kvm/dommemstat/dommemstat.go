@@ -1,17 +1,36 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dommemstat
 
 import (
-	"errors"
 	"net"
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+
+	"github.com/pkg/errors"
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 const (
@@ -47,8 +66,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The kvm dommemstat metricset is experimental.")
-
+	cfgwarn.Beta("The kvm dommemstat metricset is beta.")
 	u, err := url.Parse(base.HostData().URI)
 	if err != nil {
 		return nil, err
@@ -64,8 +82,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(report mb.ReporterV2) {
-
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	var (
 		c   net.Conn
 		err error
@@ -84,34 +101,47 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 		c, err = net.DialTimeout(u.Scheme, address, m.Timeout)
 		if err != nil {
-			report.Error(err)
+			return errors.Wrapf(err, "cannot connect to %v", u)
 		}
 	}
 
 	defer c.Close()
 
 	l := libvirt.New(c)
-	if err := l.Connect(); err != nil {
-		report.Error(err)
+	if err = l.Connect(); err != nil {
+		return errors.Wrap(err, "error connecting to libvirtd")
 	}
+	defer func() {
+		if err = l.Disconnect(); err != nil {
+			msg := errors.Wrap(err, "failed to disconnect")
+			report.Error(msg)
+			m.Logger().Error(msg)
+		}
+	}()
 
 	domains, err := l.Domains()
 	if err != nil {
-		report.Error(err)
+		return errors.Wrap(err, "error listing domains")
 	}
 
 	for _, d := range domains {
 		gotDomainMemoryStats, err := l.DomainMemoryStats(d, maximumStats, flags)
 		if err != nil {
-			report.Error(err)
+			msg := errors.Wrapf(err, "error fetching memory stats for domain %s", d.Name)
+			report.Error(msg)
+			m.Logger().Error(msg)
+			continue
 		}
 
 		if len(gotDomainMemoryStats) == 0 {
-			report.Error(errors.New("no domain memory stats found"))
+			msg := errors.Errorf("no memory stats for domain %s", d.Name)
+			report.Error(msg)
+			m.Logger().Error(msg)
+			continue
 		}
 
 		for i := range gotDomainMemoryStats {
-			report.Event(mb.Event{
+			reported := report.Event(mb.Event{
 				MetricSetFields: common.MapStr{
 					"id":   d.ID,
 					"name": d.Name,
@@ -121,12 +151,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 					},
 				},
 			})
+			if !reported {
+				return errors.New("metricset has closed")
+			}
 		}
 	}
 
-	if err := l.Disconnect(); err != nil {
-		report.Error(errors.New("failed to disconnect"))
-	}
+	return nil
 }
 
 func getDomainMemoryStatName(tag int32) string {
@@ -145,7 +176,7 @@ func getDomainMemoryStatName(tag int32) string {
 	case 5:
 		return "available"
 	case 6:
-		return "actualballon"
+		return "actualballoon"
 	case 7:
 		return "rss"
 	case 8:

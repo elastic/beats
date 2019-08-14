@@ -1,0 +1,54 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "mssql.transaction_log",
+        "duration": 115000,
+        "module": "mssql"
+    },
+    "metricset": {
+        "name": "transaction_log"
+    },
+    "mssql": {
+        "database": {
+            "id": 1,
+            "name": "master"
+        },
+        "transaction_log": {
+            "space_usage": {
+                "since_last_backup": {
+                    "bytes": 135168
+                },
+                "total": {
+                    "bytes": 2088960
+                },
+                "used": {
+                    "bytes": 622592,
+                    "pct": 29.80392074584961
+                }
+            },
+            "stats": {
+                "active_size": {
+                    "bytes": 135167.737856
+                },
+                "backup_time": "1900-01-01T00:00:00Z",
+                "recovery_size": {
+                    "bytes": 0.128906
+                },
+                "since_last_checkpoint": {
+                    "bytes": 135167.737856
+                },
+                "total_size": {
+                    "bytes": 2088959.475712
+                }
+            }
+        }
+    },
+    "service": {
+        "address": "172.26.0.2",
+        "type": "mssql"
+    }
+}

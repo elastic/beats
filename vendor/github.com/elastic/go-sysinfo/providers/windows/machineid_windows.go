@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -35,6 +35,7 @@ func getMachineGUID() (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
 	}
+	defer k.Close()
 
 	guid, _, err := k.GetStringValue(name)
 	if err != nil {

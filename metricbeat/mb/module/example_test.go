@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package module_test
@@ -47,7 +64,7 @@ func ExampleWrapper() {
 	go func() {
 		defer wg.Done()
 		for event := range output {
-			event.Fields.Put("metricset.rtt", 111)
+			event.Fields.Put("event.duration", 111)
 
 			output, err := encodeEvent(event)
 			if err == nil {
@@ -69,20 +86,26 @@ func ExampleWrapper() {
 	// {
 	//   "@metadata": {
 	//     "beat": "noindex",
-	//     "type": "doc",
+	//     "type": "_doc",
 	//     "version": "1.2.3"
 	//   },
 	//   "@timestamp": "2016-05-10T23:27:58.485Z",
+	//   "event": {
+	//     "dataset": "fake.eventfetcher",
+	//     "duration": 111,
+	//     "module": "fake"
+	//   },
 	//   "fake": {
 	//     "eventfetcher": {
 	//       "metric": 1
 	//     }
 	//   },
 	//   "metricset": {
-	//     "module": "fake",
 	//     "name": "eventfetcher",
-	//     "period": 10000000,
-	//     "rtt": 111
+	//     "period": 10000000
+	//   },
+	//   "service": {
+	//     "type": "fake"
 	//   }
 	// }
 }
@@ -131,7 +154,7 @@ func ExampleRunner() {
 }
 
 func encodeEvent(event beat.Event) (string, error) {
-	output, err := json.New(false, "1.2.3").Encode("noindex", &event)
+	output, err := json.New("1.2.3", json.Config{}).Encode("noindex", &event)
 	if err != nil {
 		return "", nil
 	}

@@ -1,84 +1,24 @@
 [
     {
-        "_index": "filebeat-2017.04.04",
-        "_type": "log",
-        "_id": "AVs5obub2BrA1a1-fVkV",
-        "_score": null,
-        "_source": {
-            "@timestamp": "2017-04-04T15:42:27.138Z",
-            "offset": 63,
-            "beat": {
-                "hostname": "blerims-mbp.int.netways.de",
-                "name": "blerims-mbp.int.netways.de",
-                "version": "5.3.0"
-            },
-            "prospector": {
-                "type": "log"
-            },
-            "input": {
-                "type": "log"
-            },
-            "icinga": {
-                "startup": {
-                    "severity": "information",
-                    "message": "Icinga application loader (version: r2.6.3-1)",
-                    "facility": "cli"
-                }
-            },
-            "source": "/usr/local/icinga2/var/log/icinga2/startup.log",
-            "fileset": {
-                "module": "icinga",
-                "name": "startup"
-            }
-        },
-        "fields": {
-            "@timestamp": [
-                1491320547138
-            ]
-        },
-        "sort": [
-            1491320547138
-        ]
+        "event.dataset": "icinga.startup",
+        "event.module": "icinga",
+        "fileset.name": "startup",
+        "icinga.startup.facility": "cli",
+        "input.type": "log",
+        "log.level": "information",
+        "log.offset": 0,
+        "message": "Icinga application loader (version: r2.6.3-1)",
+        "service.type": "icinga"
     },
     {
-        "_index": "filebeat-2017.04.04",
-        "_type": "log",
-        "_id": "AVs5obub2BrA1a1-fVkW",
-        "_score": null,
-        "_source": {
-            "@timestamp": "2017-04-04T15:42:27.138Z",
-            "offset": 111,
-            "beat": {
-                "hostname": "blerims-mbp.int.netways.de",
-                "name": "blerims-mbp.int.netways.de",
-                "version": "5.3.0"
-            },
-            "prospector": {
-                "type": "log"
-            },
-            "input": {
-                "type": "log"
-            },
-            "icinga": {
-                "startup": {
-                    "severity": "information",
-                    "message": "Loading configuration file(s).",
-                    "facility": "cli"
-                }
-            },
-            "source": "/usr/local/icinga2/var/log/icinga2/startup.log",
-            "fileset": {
-                "module": "icinga",
-                "name": "startup"
-            }
-        },
-        "fields": {
-            "@timestamp": [
-                1491320547138
-            ]
-        },
-        "sort": [
-            1491320547138
-        ]
+        "event.dataset": "icinga.startup",
+        "event.module": "icinga",
+        "fileset.name": "startup",
+        "icinga.startup.facility": "cli",
+        "input.type": "log",
+        "log.level": "information",
+        "log.offset": 63,
+        "message": "Loading configuration file(s).",
+        "service.type": "icinga"
     }
 ]

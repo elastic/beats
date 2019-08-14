@@ -127,15 +127,15 @@ def main():
         # get the github username from the remote where we pushed
         remote_url = check_output("git remote get-url {}".format(remote),
                                   shell=True)
-        remote_user = re.search("github.com:(.+)/beats", remote_url).group(1)
+        remote_user = re.search("github.com[:/](.+)/beats", remote_url).group(1)
 
         # create PR
         request = session.post(base + "/pulls", json=dict(
-            title="Cherry-pick #{} to {}: {}".format(args.pr_number, args.to_branch, original_pr["title"]),
+            title="Cherry-pick #{} to {}: {}".format(args.pr_number, args.to_branch, original_pr["title"].encode('utf-8')),
             head=remote_user + ":" + tmp_branch,
             base=args.to_branch,
             body="Cherry-pick of PR #{} to {} branch. Original message: \n\n{}"
-            .format(args.pr_number, args.to_branch, original_pr["body"])
+            .format(args.pr_number, args.to_branch, original_pr["body"].encode('utf-8'))
         ))
         if request.status_code > 299:
             print("Creating PR failed: {}".format(request.json()))

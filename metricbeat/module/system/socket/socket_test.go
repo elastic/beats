@@ -1,31 +1,79 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build linux
 
 package socket
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/libbeat/common"
+	sock "github.com/elastic/beats/metricbeat/helper/socket"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
+	directionIs := func(direction string) func(e common.MapStr) bool {
+		return func(e common.MapStr) bool {
+			v, err := e.GetValue("network.direction")
+			return err == nil && v == direction
+		}
+	}
+
+	dataFiles := []struct {
+		direction string
+		path      string
+	}{
+		{sock.ListeningName, "."},
+		{sock.InboundName, "./_meta/data_inbound.json"},
+		{sock.OutboundName, "./_meta/data_outbound.json"},
+	}
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+
 	ln, err := net.Listen("tcp", ":0")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer ln.Close()
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
+	for _, df := range dataFiles {
+		c, err := net.Dial("tcp", ln.Addr().String())
+		if err != nil {
+			t.Fatal(err)
+		}
+		c.Close()
 
-	if err = mbtest.WriteEvents(f, t); err != nil {
-		t.Fatal("write", err)
+		t.Run(fmt.Sprintf("direction:%s", df.direction), func(t *testing.T) {
+			err = mbtest.WriteEventsReporterV2ErrorCond(f, t, df.path, directionIs(df.direction))
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		})
 	}
 }
 
@@ -43,15 +91,27 @@ func TestFetch(t *testing.T) {
 		t.Fatal("failed to get port from addr", addr)
 	}
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if err != nil {
-		t.Fatal("fetch", err)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
 	}
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "socket").Fields.StringToPrint())
 
 	var found bool
-	for _, evt := range events {
-		port, ok := getRequiredValue("local.port", evt, t).(int)
+	for _, event := range events {
+		root := event.BeatEvent("system", "socket").Fields
+
+		s, err := root.GetValue("system.socket")
+		require.NoError(t, err)
+
+		fields, ok := s.(common.MapStr)
+		require.True(t, ok)
+
+		port, ok := getRequiredValue(t, "local.port", fields).(int)
 		if !ok {
 			t.Fatal("local.port is not an int")
 		}
@@ -59,27 +119,28 @@ func TestFetch(t *testing.T) {
 			continue
 		}
 
-		pid, ok := getRequiredValue("process.pid", evt, t).(int)
+		pid, ok := getRequiredValue(t, "process.pid", root).(int)
 		if !ok {
-			t.Fatal("proess.pid is not a int")
+			t.Fatal("process.pid is not a int")
 		}
 		assert.Equal(t, os.Getpid(), pid)
 
-		uid, ok := getRequiredValue("user.id", evt, t).(uint32)
+		uid, ok := getRequiredValue(t, "user.id", root).(string)
 		if !ok {
-			t.Fatal("user.id is not an uint32")
+			t.Fatal("user.id is not a string")
 		}
-		assert.EqualValues(t, os.Geteuid(), uid)
+		assert.EqualValues(t, strconv.Itoa(os.Geteuid()), uid)
 
-		dir, ok := getRequiredValue("direction", evt, t).(string)
+		dir, ok := getRequiredValue(t, "network.direction", root).(string)
 		if !ok {
 			t.Fatal("direction is not a string")
 		}
 		assert.Equal(t, "listening", dir)
 
-		_ = getRequiredValue("process.cmdline", evt, t).(string)
-		_ = getRequiredValue("process.command", evt, t).(string)
-		_ = getRequiredValue("process.exe", evt, t).(string)
+		_ = getRequiredValue(t, "process.cmdline", fields).(string)
+		_ = getRequiredValue(t, "process.name", root).(string)
+		_ = getRequiredValue(t, "process.executable", root).(string)
+		_ = getRequiredValue(t, "process.args", root).([]string)
 
 		found = true
 		break
@@ -88,10 +149,10 @@ func TestFetch(t *testing.T) {
 	assert.True(t, found, "listener not found")
 }
 
-func getRequiredValue(key string, m common.MapStr, t testing.TB) interface{} {
+func getRequiredValue(t testing.TB, key string, m common.MapStr) interface{} {
 	v, err := m.GetValue(key)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal(errors.Wrapf(err, "failed to get value for key '%s'", key))
 	}
 	if v == nil {
 		t.Fatalf("key %v not found in %v", key, m)

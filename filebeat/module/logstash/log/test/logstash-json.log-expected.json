@@ -1,0 +1,60 @@
+[
+    {
+        "@timestamp": "2019-01-07T21:25:21.871Z",
+        "event.dataset": "logstash.log",
+        "event.module": "logstash",
+        "event.timezone": "+00:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 0,
+        "logstash.log.log_event.count": 1,
+        "logstash.log.log_event.running_pipelines": [
+            {
+                "metaClass": {
+                    "metaClass": {
+                        "metaClass": {
+                            "non_running_pipelines": [],
+                            "running_pipelines": "[:main]"
+                        }
+                    }
+                }
+            }
+        ],
+        "logstash.log.module": "logstash.agent",
+        "logstash.log.thread": "Ruby-0-Thread-1: /Users/mat/work/elastic/releases/6.5.1/logstash/lib/bootstrap/environment.rb:6",
+        "message": "Pipelines running",
+        "service.type": "logstash"
+    },
+    {
+        "@timestamp": "2019-01-07T21:25:22.538Z",
+        "event.dataset": "logstash.log",
+        "event.module": "logstash",
+        "event.timezone": "+00:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 357,
+        "logstash.log.log_event.pipeline_id": "main",
+        "logstash.log.log_event.thread": "#<Thread:0x7d16ffef run>",
+        "logstash.log.module": "logstash.pipeline",
+        "logstash.log.thread": "[main]>worker7",
+        "message": "Pipeline has terminated",
+        "service.type": "logstash"
+    },
+    {
+        "@timestamp": "2019-01-07T21:25:22.594Z",
+        "event.dataset": "logstash.log",
+        "event.module": "logstash",
+        "event.timezone": "+00:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.offset": 566,
+        "logstash.log.log_event.port": 9600,
+        "logstash.log.module": "logstash.agent",
+        "logstash.log.thread": "Api Webserver",
+        "message": "Successfully started Logstash API endpoint",
+        "service.type": "logstash"
+    }
+]

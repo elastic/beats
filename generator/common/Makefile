@@ -11,23 +11,35 @@ PREPARE_COMMAND?=
 test: prepare-test
 	. ${PYTHON_ENV}/bin/activate; \
 	export GOPATH=${PWD}/build ; \
-	export PATH=${PATH}:${PWD}/build/bin; \
+	export PATH=$${GOPATH}/bin:${PATH}; \
 	cd ${BEAT_PATH} ; \
 	$(MAKE) copy-vendor || exit 1  ; \
 	${PREPARE_COMMAND} \
-	$(MAKE) check || exit 1 ; \
+	$(MAKE) git-init || exit 1 ; \
 	$(MAKE) update || exit 1 ; \
+	git config user.email "beats-jenkins@test.com" || exit 1 ; \
+	git config user.name "beats-jenkins" || exit 1 ; \
+	$(MAKE) git-add || exit 1 ; \
+	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
 	$(MAKE) || exit 1 ; \
 	$(MAKE) unit
 
+.PHONY: prepare-test
 prepare-test:: python-env
 	# Makes sure to use current version of beats for testing
-	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
-	rsync -a --exclude=build ${PWD}/../../* ${BUILD_DIR}/src/github.com/elastic/beats/
+	rm -fr ${BUILD_DIR}/src/github.com/elastic/beats/
+	git clone -s ${PWD}/../../ ${BUILD_DIR}/src/github.com/elastic/beats/
 
+	rm -fr ${BEAT_PATH}
 	mkdir -p ${BEAT_PATH}
 	export GOPATH=${PWD}/build ; \
-	. ${PYTHON_ENV}/bin/activate && python ${PWD}/build/src/github.com/elastic/beats/script/generate.py --type=${BEAT_TYPE} --project_name=Testbeat --github_name=ruflin --beat_path=beatpath/testbeat --full_name="Nicolas Ruflin"
+	. ${PYTHON_ENV}/bin/activate && \
+	  python ${PWD}/build/src/github.com/elastic/beats/script/generate.py \
+	    --type=${BEAT_TYPE} \
+	    --project_name=Testbeat \
+	    --github_name=ruflin \
+	    --beat_path=beatpath/testbeat \
+	    --full_name="Nicolas Ruflin"
 
 # Runs test build for the created beat
 .PHONY: test-build

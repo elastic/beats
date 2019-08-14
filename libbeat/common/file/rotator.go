@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package file
 
 import (
@@ -5,6 +22,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -13,18 +31,54 @@ import (
 // greater will result in an error.
 const MaxBackupsLimit = 1024
 
+// rotateReason is the reason why file rotation occurred.
+type rotateReason uint32
+
+const (
+	rotateReasonInitializing rotateReason = iota + 1
+	rotateReasonFileSize
+	rotateReasonManualTrigger
+	rotateReasonTimeInterval
+)
+
+func (rr rotateReason) String() string {
+	switch rr {
+	case rotateReasonInitializing:
+		return "initializing"
+	case rotateReasonFileSize:
+		return "file size"
+	case rotateReasonManualTrigger:
+		return "manual trigger"
+	case rotateReasonTimeInterval:
+		return "time interval"
+	default:
+		return "unknown"
+	}
+}
+
 // Rotator is a io.WriteCloser that automatically rotates the file it is
-// writing to when it reaches a maximum size. It also purges the oldest rotated
-// files when the maximum number of backups is reached.
+// writing to when it reaches a maximum size and optionally on a time interval
+// basis. It also purges the oldest rotated files when the maximum number of
+// backups is reached.
 type Rotator struct {
-	filename     string
-	maxSizeBytes uint
-	maxBackups   uint
-	permissions  os.FileMode
+	filename        string
+	maxSizeBytes    uint
+	maxBackups      uint
+	permissions     os.FileMode
+	log             Logger // Optional Logger (may be nil).
+	interval        time.Duration
+	rotateOnStartup bool
+	intervalRotator *intervalRotator // Optional, may be nil
+	redirectStderr  bool
 
 	file  *os.File
 	size  uint
 	mutex sync.Mutex
+}
+
+// Logger allows the rotator to write debug information.
+type Logger interface {
+	Debugw(msg string, keysAndValues ...interface{}) // Debug
 }
 
 // RotatorOption is a configuration option for Rotator.
@@ -55,13 +109,47 @@ func Permissions(m os.FileMode) RotatorOption {
 	}
 }
 
+// WithLogger injects a logger implementation for logging debug information.
+// If no logger is injected then the no logging will occur.
+func WithLogger(l Logger) RotatorOption {
+	return func(r *Rotator) {
+		r.log = l
+	}
+}
+
+// Interval sets the time interval for log rotation in addition to log
+// rotation by size. The default is 0 for disabled.
+func Interval(d time.Duration) RotatorOption {
+	return func(r *Rotator) {
+		r.interval = d
+	}
+}
+
+// RotateOnStartup immediately rotates files on startup rather than appending to
+// the existing file. The default is true.
+func RotateOnStartup(b bool) RotatorOption {
+	return func(r *Rotator) {
+		r.rotateOnStartup = b
+	}
+}
+
+// RedirectStderr causes all writes to standard error to be redirected
+// to this rotator.
+func RedirectStderr(redirect bool) RotatorOption {
+	return func(r *Rotator) {
+		r.redirectStderr = redirect
+	}
+}
+
 // NewFileRotator returns a new Rotator.
 func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error) {
 	r := &Rotator{
-		filename:     filename,
-		maxSizeBytes: 10 * 1024 * 1024, // 10 MiB
-		maxBackups:   7,
-		permissions:  0600,
+		filename:        filename,
+		maxSizeBytes:    10 * 1024 * 1024, // 10 MiB
+		maxBackups:      7,
+		permissions:     0600,
+		interval:        0,
+		rotateOnStartup: true,
 	}
 
 	for _, opt := range options {
@@ -76,6 +164,21 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 	}
 	if r.permissions > os.ModePerm {
 		return nil, errors.Errorf("file rotator permissions mask of %o is invalid", r.permissions)
+	}
+	var err error
+	r.intervalRotator, err = newIntervalRotator(r.interval)
+	if err != nil {
+		return nil, err
+	}
+
+	if r.log != nil {
+		r.log.Debugw("Initialized file rotator",
+			"filename", r.filename,
+			"max_size_bytes", r.maxSizeBytes,
+			"max_backups", r.maxBackups,
+			"permissions", r.permissions,
+			"interval", r.interval,
+		)
 	}
 
 	return r, nil
@@ -98,8 +201,15 @@ func (r *Rotator) Write(data []byte) (int, error) {
 		if err := r.openNew(); err != nil {
 			return 0, err
 		}
+	} else if r.intervalRotator != nil && r.intervalRotator.NewInterval() {
+		if err := r.rotate(rotateReasonTimeInterval); err != nil {
+			return 0, err
+		}
+		if err := r.openFile(); err != nil {
+			return 0, err
+		}
 	} else if r.size+dataLen > r.maxSizeBytes {
-		if err := r.rotate(); err != nil {
+		if err := r.rotate(rotateReasonFileSize); err != nil {
 			return 0, err
 		}
 		if err := r.openFile(); err != nil {
@@ -128,7 +238,7 @@ func (r *Rotator) Sync() error {
 func (r *Rotator) Rotate() error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
-	return r.rotate()
+	return r.rotate(rotateReasonManualTrigger)
 }
 
 // Close closes the currently open file.
@@ -160,6 +270,8 @@ func (r *Rotator) dirMode() os.FileMode {
 	return os.FileMode(mode)
 }
 
+// openNew opens r's log file for the first time, creating it if it doesn't
+// exist, and performing an initial rotation if r.rotateOnStartup is set.
 func (r *Rotator) openNew() error {
 	err := os.MkdirAll(r.dir(), r.dirMode())
 	if err != nil {
@@ -168,7 +280,12 @@ func (r *Rotator) openNew() error {
 
 	_, err = os.Stat(r.filename)
 	if err == nil {
-		if err = r.rotate(); err != nil {
+		if !r.rotateOnStartup {
+			// If the file exists and rotateOnStartup is false, then we just want to
+			// append to the existing file.
+			return r.appendToFile()
+		}
+		if err = r.rotate(rotateReasonInitializing); err != nil {
 			return err
 		}
 	}
@@ -186,7 +303,24 @@ func (r *Rotator) openFile() error {
 	if err != nil {
 		return errors.Wrap(err, "failed to open new file")
 	}
+	if r.redirectStderr {
+		RedirectStandardError(r.file)
+	}
+	return nil
+}
 
+// appendToFile opens an existing log file for appending. Unlike openFile it
+// does not call MkdirAll because it is an error for the file to not already
+// exist.
+func (r *Rotator) appendToFile() error {
+	var err error
+	r.file, err = os.OpenFile(r.filename, os.O_WRONLY|os.O_APPEND, r.permissions)
+	if err != nil {
+		return errors.Wrap(err, "failed to append to existing file")
+	}
+	if r.redirectStderr {
+		RedirectStandardError(r.file)
+	}
 	return nil
 }
 
@@ -201,6 +335,43 @@ func (r *Rotator) closeFile() error {
 }
 
 func (r *Rotator) purgeOldBackups() error {
+	if r.intervalRotator != nil {
+		return r.purgeOldIntervalBackups()
+	}
+	return r.purgeOldSizedBackups()
+}
+
+func (r *Rotator) purgeOldIntervalBackups() error {
+	files, err := filepath.Glob(r.filename + "*")
+	if err != nil {
+		return errors.Wrap(err, "failed to list existing logs during rotation")
+	}
+
+	if len(files) > int(r.maxBackups) {
+
+		// sort log filenames numerically
+		r.intervalRotator.SortIntervalLogs(files)
+
+		for i := len(files) - int(r.maxBackups) - 1; i >= 0; i-- {
+			f := files[i]
+			_, err := os.Stat(f)
+			switch {
+			case err == nil:
+				if err = os.Remove(f); err != nil {
+					return errors.Wrapf(err, "failed to delete %v during rotation", f)
+				}
+			case os.IsNotExist(err):
+				return errors.Wrapf(err, "failed to delete non-existent %v during rotation", f)
+			default:
+				return errors.Wrapf(err, "failed on %v during rotation", f)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *Rotator) purgeOldSizedBackups() error {
 	for i := r.maxBackups; i < MaxBackupsLimit; i++ {
 		name := r.backupName(i + 1)
 
@@ -220,11 +391,67 @@ func (r *Rotator) purgeOldBackups() error {
 	return nil
 }
 
-func (r *Rotator) rotate() error {
+func (r *Rotator) rotate(reason rotateReason) error {
 	if err := r.closeFile(); err != nil {
 		return errors.Wrap(err, "error file closing current file")
 	}
 
+	var err error
+	if r.intervalRotator != nil {
+		// Interval and size rotation use different filename patterns, so we use
+		// rotateByInterval if interval rotation is enabled, even if this specific
+		// rotation is triggered by size.
+		err = r.rotateByInterval(reason)
+	} else {
+		err = r.rotateBySize(reason)
+	}
+	if err != nil {
+		return errors.Wrap(err, "failed to rotate backups")
+	}
+
+	return r.purgeOldBackups()
+}
+
+func (r *Rotator) rotateByInterval(reason rotateReason) error {
+	fi, err := os.Stat(r.filename)
+	if os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return errors.Wrap(err, "failed to rotate backups")
+	}
+
+	logPrefix := r.intervalRotator.LogPrefix(r.filename, fi.ModTime())
+	files, err := filepath.Glob(logPrefix + "*")
+	if err != nil {
+		return errors.Wrap(err, "failed to list logs during rotation")
+	}
+
+	var targetFilename string
+	if len(files) == 0 {
+		targetFilename = logPrefix + "1"
+	} else {
+		r.intervalRotator.SortIntervalLogs(files)
+		lastLogIndex, _, err := IntervalLogIndex(files[len(files)-1])
+		if err != nil {
+			return errors.Wrap(err, "failed to locate last log index during rotation")
+		}
+		targetFilename = logPrefix + strconv.Itoa(int(lastLogIndex)+1)
+	}
+
+	if err := os.Rename(r.filename, targetFilename); err != nil {
+		return errors.Wrap(err, "failed to rotate backups")
+	}
+
+	if r.log != nil {
+		r.log.Debugw("Rotating file", "filename", r.filename, "reason", reason)
+	}
+
+	r.intervalRotator.Rotate()
+
+	return nil
+}
+
+func (r *Rotator) rotateBySize(reason rotateReason) error {
 	for i := r.maxBackups + 1; i > 0; i-- {
 		old := r.backupName(i - 1)
 		older := r.backupName(i)
@@ -240,8 +467,12 @@ func (r *Rotator) rotate() error {
 		}
 		if err := os.Rename(old, older); err != nil {
 			return errors.Wrap(err, "failed to rotate backups")
+		} else if i == 1 {
+			// Log when rotation of the main file occurs.
+			if r.log != nil {
+				r.log.Debugw("Rotating file", "filename", old, "reason", reason)
+			}
 		}
 	}
-
-	return r.purgeOldBackups()
+	return nil
 }

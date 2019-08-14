@@ -14,6 +14,51 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.7.0]
+
+### Added
+- Add (*Config).Has. #127
+- Add (*Config).Remove. #126
+
+### Removed
+- Remove CI and support for go versions <1.10. #128
+
+## [0.6.5]
+
+### Added
+- Added a NOOP Resolver that will return the key wrapped in the field reference syntax. #122
+
+## [0.6.4]
+
+### Fixed
+- Do not treat $ as escape char in plain strings/regexes #120
+
+## [0.6.3]
+
+### Changed
+- Remove UUID lib and use pseudo-random IDs instead. #118
+
+## [0.6.2]
+
+### Changed
+- New UUID lib: github.com/gofrs/uuid. #116
+
+### Fixed
+- Fix escape character not removed from escaped string #115
+
+## [0.6.1]
+
+### Fixed
+- Ignore flag keys with missing values. #111
+
+## [0.6.0]
+
+### Added
+- Add *Config merging options merge, append, prepend, replace. #107
+
+### Fixed
+- Fix: do not treat ucfg.Config (or castable type) as Unpacker. #106
+
 ## [0.5.1]
 
 ### Fixed
@@ -189,7 +234,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/elastic/go-ucfg/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/elastic/go-ucfg/compare/v0.6.5...v0.7.0
+[0.6.5]: https://github.com/elastic/go-ucfg/compare/v0.6.4...v0.6.5
+[0.6.4]: https://github.com/elastic/go-ucfg/compare/v0.6.3...v0.6.4
+[0.6.3]: https://github.com/elastic/go-ucfg/compare/v0.6.2...v0.6.3
+[0.6.2]: https://github.com/elastic/go-ucfg/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/elastic/go-ucfg/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/elastic/go-ucfg/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/elastic/go-ucfg/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/elastic/go-ucfg/compare/v0.4.6...v0.5.0
 [0.4.6]: https://github.com/elastic/go-ucfg/compare/v0.4.5...v0.4.6

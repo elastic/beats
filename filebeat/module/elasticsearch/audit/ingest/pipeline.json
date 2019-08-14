@@ -1,0 +1,73 @@
+{
+    "description": "Pipeline for parsing elasticsearch audit logs",
+    "processors": [
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "^%{CHAR:first_char}"
+                ],
+                "pattern_definitions": {
+                    "CHAR": "."
+                }
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char != '{'",
+                "name": "{< IngestPipeline "pipeline-plaintext" >}"
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char == '{'",
+                "name": "{< IngestPipeline "pipeline-json" >}"
+            }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.audit.@timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                "ignore_failure": true
+            }
+        },
+        {
+            "date": {
+                "if": "ctx.event.timezone != null",
+                "field": "@timestamp",
+                "formats": ["ISO8601"],
+                "timezone": "{{ event.timezone }}",
+                "on_failure": [{"append": {"field": "error.message", "value": "{{ _ingest.on_failure_message }}"}}]
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.audit.@timestamp"
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "first_char"
+                ]
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

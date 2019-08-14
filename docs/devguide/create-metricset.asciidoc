@@ -69,13 +69,13 @@ https://github.com/elastic/beats/blob/master/metricbeat/scripts/module/metricset
 include::../../metricbeat/scripts/module/metricset/metricset.go.tmpl[]
 ----
 
-The `package` clause and `import` declaration are part of the base structure of each Golang file. You should only
+The `package` clause and `import` declaration are part of the base structure of each Go file. You should only
 modify this part of the file if your implementation requires more imports.
 
 [float]
 ===== Initialisation
 
-The init method registers the metricset with the central registry. In Golang the `init()` function is called
+The init method registers the metricset with the central registry. In Go the `init()` function is called
 before the execution of all other code. This means the module will be automatically registered with the global registry.
 
 The `New` method, which is passed to `AddMetricSet`, will be called after the setup of the module and before starting to fetch data. You normally don't need to change this part of the file.
@@ -144,48 +144,42 @@ time new data is retrieved. If more than one host is defined, `Fetch` is
 called once for each host. The frequency of calling `Fetch` is based on the `period`
 defined in the configuration file.
 
-`Fetch` must return a `common.MapStr` object, which is then sent to Elasticsearch.
-If an error happens, the error must be returned and then is sent instead
-to Elasticsearch. This means that Metricbeat always sends an event, even on failure.
-You must make sure that the error message helps to identify the actual error.
+`Fetch` must publish the event using the `mb.ReporterV2.Event` method. If an error
+happens, `Fetch` can return an error, or if `Event` is being called in a loop,
+published using the `mb.ReporterV2.Error` method. This means
+that Metricbeat always sends an event, even on failure. You must make sure that the
+error message helps to identify the actual error.
 
 The following example shows a metricset `Fetch` method with a counter that is
 incremented for each `Fetch` call:
 
 [source,go]
 ----
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
-	event := common.MapStr{
-		"counter": m.counter,
-	}
+	report.Event(mb.Event{
+		MetricSetFields: common.MapStr{
+			"counter": m.counter,
+		}
+	})
 	m.counter++
 
-	return event, nil
+	return nil
 }
 ----
 
-`Fetch` must return a `common.MapStr`, which will be translated to the JSON content.
-The JSON output will be identical to the naming and structure you use in
-`common.MapStr`. For more details about `MapStr` and its functions, see the
+The JSON output derived from the reported event will be identical to the naming and
+structure you use in `common.MapStr`. For more details about `MapStr` and its functions, see the
 https://godoc.org/github.com/elastic/beats/libbeat/common#MapStr[MapStr API docs].
 
 
 [float]
 ===== Multi Fetching
-Metricbeat has two different `Fetch` interfaces. One of the interfaces, which you saw in the
-previous example, fetches a single event. In some cases, every fetch returns a list of events.
-Instead of using an array inside a JSON document, we recommend that you create a list of events.
 
-For this kind of data, you can use the following `Fetch` interface:
-
-[source,go]
-----
-(m *MetricSet) Fetch() ([]common.MapStr, error)
-----
-
-The only difference between this and the previous example is that the second example returns `[]common.MapStr`.
-Metricbeat will add the same timestamp to all the events in the list to make it possible to correlate the events.
+`Event` can be called multiple times inside of the `Fetch` method for metricsets that might expose multiple events.
+`Event` returns a bool that indicates if the metricset is already closed and no further events can be processed, 
+in which case `Fetch` should return immediately. If there is an error while processing one of many events, 
+it can be published using the `mb.ReporterV2.Error` method, as opposed to returning an error value.
 
 [float]
 ===== Parsing and Normalizing Fields
@@ -226,7 +220,7 @@ common.MapStr{
 }
 ----
 
-You can use the following code to make the transformations:
+You can use the schema package to transform the data, and optionally mark some fields in a schema as required or not. For example:
 
 [source,go]
 ----
@@ -234,6 +228,36 @@ import (
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
+
+var (
+	schema = s.Schema{
+		"test_string": c.Str("testString", s.Required), <1>
+		"test_int":    c.Int("testInt"), <2>
+		"test_bool":   c.Bool("testBool", s.Optional), <3>
+		"test_float":  c.Float("testFloat"),
+		"test_obj": s.Object{
+			"test_obj_string": c.Str("testObjString", s.IgnoreAllErrors), <4>
+		},
+	}
+)
+
+func eventMapping(input map[string]interface{}) common.MapStr {
+	return schema.Apply(input) <5>
+}
+----
+<1> Marks a field as required.
+<2> If a field has no schema option set, it is equivalent to `Required`.
+<3> Marks the field as optional.
+<4> Ignore any value conversion error
+<5> By default, `Apply` will fail and return an error if any required field is missing. Using the optional second argument, you can specify how `Apply` handles different fields of the  schema. The possible values are:
+- `AllRequired` is the default behavior. Returns an error if any required field is missing, including fields that are required because no schema option is set.
+- `FailOnRequired`  will fail if a field explicitly marked as `required` is missing.
+- `NotFoundKeys(cb func([]string))` takes a callback function that will be called with a list of missing keys, allowing for finer-grained error handling.
+
+In the above example, note that it is possible to create the schema object once
+and apply it to all events. You can also use `ApplyTo` to add additional data to an existing `MapStr` object:
+[source,go]
+----
 
 var (
 	schema = s.Schema{
@@ -245,15 +269,28 @@ var (
 			"test_obj_string": c.Str("testObjString"),
 		},
 	}
+
+	additionalSchema = s.Schema{
+		"second_string": c.Str("secondString"),
+		"second_int": ": c.Int("secondInt"),
+	}
 )
 
-func eventMapping(input map[string]interface{}) common.MapStr {
-	return schema.Apply(input)
-}
-----
+	data, err := schema.Apply(input)
+	if err != nil {
+		return err
+	}
 
-In the above example, note that it is possible to create the schema object once
-and apply it to all events.
+	if m.parseMoreData{
+		_, err := additionalSchema.ApplyTo(data, input)
+		if len(err) > 0 { <1>
+			return err.Err()
+		}
+	}
+
+----
+<1> `ApplyTo` returns a raw MultiError object, making it suitable for finer-grained error handling.
+
 
 [float]
 ==== Configuration File
@@ -273,7 +310,7 @@ NOTE: Make sure that you run `make collect` after updating the config file
 so that your changes are also applied to the global configuration file and the docs.
 
 For more details about the Metricbeat configuration file, see the topic about
-{metricbeat}/configuration-metricbeat.html[Modules] in the Metricbeat
+{metricbeat-ref}/configuration-metricbeat.html[Modules] in the Metricbeat
 documentation.
 
 

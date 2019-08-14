@@ -1,0 +1,131 @@
+{
+    "description": "Pipeline for parsing HAProxy http, tcp and default logs. Requires the geoip plugin.",
+    "processors": [
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "%{HAPROXY_DATE:haproxy.request_date} %{IPORHOST:haproxy.source} %{PROG:process.name}(?:\\[%{POSINT:process.pid:long}\\])?: %{GREEDYDATA} %{IPORHOST:source.address}:%{POSINT:source.port:long} %{WORD} %{IPORHOST:destination.ip}:%{POSINT:destination.port:long} \\(%{WORD:haproxy.frontend_name}/%{WORD:haproxy.mode}\\)",
+
+                    "(%{NOTSPACE:process.name}\\[%{NUMBER:process.pid:long}\\]: )?%{IP:source.address}:%{NUMBER:source.port:long} \\[%{NOTSPACE:haproxy.request_date}\\] %{NOTSPACE:haproxy.frontend_name} %{NOTSPACE:haproxy.backend_name}/%{NOTSPACE:haproxy.server_name} %{NUMBER:haproxy.http.request.time_wait_ms:long}/%{NUMBER:haproxy.total_waiting_time_ms:long}/%{NUMBER:haproxy.connection_wait_time_ms:long}/%{NUMBER:haproxy.http.request.time_wait_without_data_ms:long}/%{NUMBER:temp.duration:long} %{NUMBER:http.response.status_code:long} %{NUMBER:haproxy.bytes_read:long} %{NOTSPACE:haproxy.http.request.captured_cookie} %{NOTSPACE:haproxy.http.response.captured_cookie} %{NOTSPACE:haproxy.termination_state} %{NUMBER:haproxy.connections.active:long}/%{NUMBER:haproxy.connections.frontend:long}/%{NUMBER:haproxy.connections.backend:long}/%{NUMBER:haproxy.connections.server:long}/%{NUMBER:haproxy.connections.retries:long} %{NUMBER:haproxy.server_queue:long}/%{NUMBER:haproxy.backend_queue:long} (\\{%{DATA:haproxy.http.request.captured_headers}\\} \\{%{DATA:haproxy.http.response.captured_headers}\\} |\\{%{DATA}\\} )?\"%{GREEDYDATA:haproxy.http.request.raw_request_line}\"",
+
+                    "(%{NOTSPACE:process.name}\\[%{NUMBER:process.pid:long}\\]: )?%{IP:source.address}:%{NUMBER:source.port:long} \\[%{NOTSPACE:haproxy.request_date}\\] %{NOTSPACE:haproxy.frontend_name}/%{NOTSPACE:haproxy.bind_name} %{GREEDYDATA:haproxy.error_message}",
+
+                    "%{HAPROXY_DATE} %{IPORHOST:haproxy.source} (%{NOTSPACE:process.name}\\[%{NUMBER:process.pid:long}\\]: )?%{IP:source.address}:%{NUMBER:source.port:long} \\[%{NOTSPACE:haproxy.request_date}\\] %{NOTSPACE:haproxy.frontend_name} %{NOTSPACE:haproxy.backend_name}/%{NOTSPACE:haproxy.server_name} %{NUMBER:haproxy.total_waiting_time_ms:long}/%{NUMBER:haproxy.connection_wait_time_ms:long}/%{NUMBER:temp.duration:long} %{NUMBER:haproxy.bytes_read:long} %{NOTSPACE:haproxy.termination_state} %{NUMBER:haproxy.connections.active:long}/%{NUMBER:haproxy.connections.frontend:long}/%{NUMBER:haproxy.connections.backend:long}/%{NUMBER:haproxy.connections.server:long}/%{NUMBER:haproxy.connections.retries:long} %{NUMBER:haproxy.server_queue:long}/%{NUMBER:haproxy.backend_queue:long}"
+                ],
+                "ignore_missing": false,
+                "pattern_definitions": {
+                    "HAPROXY_DATE": "(%{MONTHDAY}[/-]%{MONTH}[/-]%{YEAR}:%{HOUR}:%{MINUTE}:%{SECOND})|%{SYSLOGTIMESTAMP}"
+                }
+            }
+        },
+        {
+            "date": {
+                "field": "haproxy.request_date",
+                "target_field": "@timestamp",
+                "formats": [
+                    "dd/MMM/yyyy:HH:mm:ss.SSS",
+                    "MMM dd HH:mm:ss"
+                ]
+            }
+        },
+        {
+            "remove": {
+                "field": "haproxy.request_date"
+            }
+        },
+        {
+            "remove": {
+                "field": "message"
+            }
+        },
+        {
+            "grok": {
+                "field": "source.address",
+                "ignore_failure": true,
+                "patterns": [
+                    "^%{IP:source.ip}$"
+                ]
+            }
+        },
+        {
+            "geoip": {
+                "field": "source.ip",
+                "target_field": "source.geo",
+                "ignore_missing": true
+            }
+        },
+        {
+            "geoip": {
+                "database_file": "GeoLite2-ASN.mmdb",
+                "field": "source.ip",
+                "target_field": "source.as",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.asn",
+                "target_field": "source.as.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.as.organization_name",
+                "target_field": "source.as.organization.name",
+                "ignore_missing": true
+            }
+        },
+        {
+            "split": {
+                "field": "haproxy.http.request.captured_headers",
+                "separator": "\\|",
+                "ignore_failure": true
+            }
+        },
+        {
+            "split": {
+                "field": "haproxy.http.response.captured_headers",
+                "separator": "\\|",
+                "ignore_failure": true
+            }
+        },
+
+        {
+            "script": {
+                "lang": "painless",
+                "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+                "params": { "scale": 1000000 },
+                "if": "ctx.temp?.duration != null"
+            }
+        },
+        {
+            "remove": {
+                "field": "temp.duration",
+                "ignore_missing": true
+            }
+        },
+
+        {
+            "convert": {
+                "field": "haproxy.bytes_read",
+                "target_field": "http.response.bytes",
+                "type": "long",
+                "if": "ctx.containsKey('http')"
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

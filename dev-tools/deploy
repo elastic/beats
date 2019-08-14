@@ -16,9 +16,9 @@ def main():
     check_call("make clean", shell=True)
     print("Done building Docker images.")
     if args.no_snapshot:
-        check_call("make SNAPSHOT=no package-all", shell=True)
+        check_call("make release", shell=True)
     else:
-        check_call("make SNAPSHOT=yes package-all", shell=True)
+        check_call("make snapshot", shell=True)
     print("All done")
 
 if __name__ == "__main__":

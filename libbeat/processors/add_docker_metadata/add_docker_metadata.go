@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package add_docker_metadata
 
 import (
@@ -9,6 +26,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/gosigar/cgroup"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
@@ -16,12 +35,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/processors/actions"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 const (
 	processorName         = "add_docker_metadata"
-	dockerContainerIDKey  = "docker.container.id"
+	dockerContainerIDKey  = "container.id"
 	cgroupCacheExpiration = 5 * time.Minute
 )
 
@@ -30,7 +48,7 @@ const (
 var processCgroupPaths = cgroup.ProcessCgroupPaths
 
 func init() {
-	processors.RegisterPlugin(processorName, newDockerMetadataProcessor)
+	processors.RegisterPlugin(processorName, New)
 }
 
 type addDockerMetadata struct {
@@ -42,9 +60,11 @@ type addDockerMetadata struct {
 	pidFields []string      // Field names that contain PIDs.
 	cgroups   *common.Cache // Cache of PID (int) to cgropus (map[string]string).
 	hostFS    string        // Directory where /proc is found
+	dedot     bool          // If set to true, replace dots in labels with `_`.
 }
 
-func newDockerMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_docker_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	return buildDockerMetadataProcessor(cfg, docker.NewWatcher)
 }
 
@@ -67,10 +87,10 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 	var sourceProcessor processors.Processor
 	if config.MatchSource {
 		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
-			"field":     "source",
-			"separator": "/",
+			"field":     "log.file.path",
+			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,
-			"target":    "docker.container.id",
+			"target":    dockerContainerIDKey,
 		})
 		sourceProcessor, err = actions.NewExtractField(procConf)
 		if err != nil {
@@ -85,6 +105,7 @@ func buildDockerMetadataProcessor(cfg *common.Config, watcherConstructor docker.
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		hostFS:          config.HostFS,
+		dedot:           config.DeDot,
 	}, nil
 }
 
@@ -102,10 +123,10 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	var cid string
 	var err error
-
-	// Extract CID from the filepath contained in the "source" field.
+	// Extract CID from the filepath contained in the "log.file.path" field.
 	if d.sourceProcessor != nil {
-		if event.Fields["source"] != nil {
+		lfp, _ := event.Fields.GetValue("log.file.path")
+		if lfp != nil {
 			event, err = d.sourceProcessor.Run(event)
 			if err != nil {
 				d.log.Debugf("Error while extracting container ID from source path: %v", err)
@@ -148,23 +169,24 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	container := d.watcher.Container(cid)
 	if container != nil {
 		meta := common.MapStr{}
-		metaIface, ok := event.Fields["docker"]
-		if ok {
-			meta = metaIface.(common.MapStr)
-		}
 
 		if len(container.Labels) > 0 {
 			labels := common.MapStr{}
 			for k, v := range container.Labels {
-				safemapstr.Put(labels, k, v)
+				if d.dedot {
+					label := common.DeDot(k)
+					labels.Put(label, v)
+				} else {
+					safemapstr.Put(labels, k, v)
+				}
 			}
 			meta.Put("container.labels", labels)
 		}
 
 		meta.Put("container.id", container.ID)
-		meta.Put("container.image", container.Image)
+		meta.Put("container.image.name", container.Image)
 		meta.Put("container.name", container.Name)
-		event.Fields["docker"] = meta
+		event.Fields.DeepUpdate(meta.Clone())
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
 	}

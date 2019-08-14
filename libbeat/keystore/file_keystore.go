@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package keystore
 
 import (
@@ -51,7 +68,7 @@ type serializableSecureString struct {
 
 // NewFileKeystore returns an new File based keystore or an error, currently users cannot set their
 // own password on the keystore, the default password will be an empty string. When the keystore
-// is initialied the secrets are automatically loaded into memory.
+// is initialized the secrets are automatically loaded into memory.
 func NewFileKeystore(keystoreFile string) (Keystore, error) {
 	return NewFileKeystoreWithPassword(keystoreFile, NewSecureString([]byte("")))
 }
@@ -168,7 +185,7 @@ func (k *FileKeystore) IsPersisted() bool {
 	return true
 }
 
-// doSave lock/unlocking of the ressource need to be done by the caller.
+// doSave lock/unlocking of the resource need to be done by the caller.
 func (k *FileKeystore) doSave(override bool) error {
 	if k.dirty == false {
 		return nil
@@ -217,41 +234,53 @@ func (k *FileKeystore) doSave(override bool) error {
 	return nil
 }
 
-func (k *FileKeystore) load() error {
-	k.Lock()
-	defer k.Unlock()
-
+func (k *FileKeystore) loadRaw() ([]byte, error) {
 	f, err := os.OpenFile(k.Path, os.O_RDONLY, filePermission)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil
+			return nil, nil
 		}
-		return err
+		return nil, err
 	}
 	defer f.Close()
 
 	if common.IsStrictPerms() {
 		if err := k.checkPermissions(k.Path); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	raw, err := ioutil.ReadAll(f)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	v := raw[0:len(version)]
 	if !bytes.Equal(v, version) {
-		return fmt.Errorf("keystore format doesn't match expected version: '%s' got '%s'", version, v)
+		return nil, fmt.Errorf("keystore format doesn't match expected version: '%s' got '%s'", version, v)
 	}
 
-	base64Content := raw[len(version):]
-	if len(base64Content) == 0 {
-		return fmt.Errorf("corrupt or empty keystore")
+	if len(raw) <= len(version) {
+		return nil, fmt.Errorf("corrupt or empty keystore")
 	}
 
-	base64Decoder := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(base64Content))
+	return raw, nil
+}
+
+func (k *FileKeystore) load() error {
+	k.Lock()
+	defer k.Unlock()
+
+	raw, err := k.loadRaw()
+	if err != nil {
+		return err
+	}
+
+	if len(raw) == 0 {
+		return nil
+	}
+
+	base64Decoder := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(raw[len(version):]))
 	plaintext, err := k.decrypt(base64Decoder)
 	if err != nil {
 		return fmt.Errorf("could not decrypt the keystore: %v", err)
@@ -360,7 +389,7 @@ func (k *FileKeystore) checkPermissions(f string) error {
 	perm := info.Mode().Perm()
 
 	if fileUID != 0 && euid != fileUID {
-		return fmt.Errorf(`config file ("%v") must be owned by the beat user `+
+		return fmt.Errorf(`config file ("%v") must be owned by the user identifier `+
 			`(uid=%v) or root`, f, euid)
 	}
 
@@ -377,6 +406,13 @@ func (k *FileKeystore) checkPermissions(f string) error {
 	}
 
 	return nil
+}
+
+// Package returns the bytes of the encrypted keystore.
+func (k *FileKeystore) Package() ([]byte, error) {
+	k.Lock()
+	defer k.Unlock()
+	return k.loadRaw()
 }
 
 func (k *FileKeystore) hashPassword(password, salt []byte) []byte {

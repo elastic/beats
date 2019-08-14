@@ -1,0 +1,45 @@
+--
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+service {beatname_lc} start
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} -e
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} -e
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} -e
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > Start-Service {beatname_lc}
+----
+
+If the module is configured correctly, you'll see
+`INFO Harvester started` messages for each file specified in the config.
+
+NOTE: Depending on how you've installed {beatname_uc}, you might see errors
+related to file ownership or permissions when you try to run {beatname_uc}
+modules. See {beats-ref}/config-file-permissions.html[Config File Ownership and
+Permissions] in the _Beats Platform Reference_ for more information.
+
+--

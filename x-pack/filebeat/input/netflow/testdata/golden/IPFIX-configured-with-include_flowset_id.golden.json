@@ -1,0 +1,254 @@
+{
+  "test_name": "IPFIX configured with include_flowset_id",
+  "events": [
+    {
+      "Timestamp": "2016-11-11T12:09:19Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.0.1",
+          "locality": "private",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-11-11T12:09:19Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "8wXIKNz6u_8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.0.0.1",
+          "destination_transport_port": 443,
+          "egress_interface": 2147483651,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-11-11T12:09:19Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "exporting_process_id": 3,
+          "flow_end_microseconds": "2016-11-11T12:09:19.000127768Z",
+          "flow_id": 14460661,
+          "flow_start_microseconds": "2016-11-11T12:09:19.000127768Z",
+          "ingress_interface": 8,
+          "ip_version": 4,
+          "netscaler_aaa_username": "",
+          "netscaler_app_name_app_id": 240189440,
+          "netscaler_app_unit_name_app_id": 0,
+          "netscaler_connection_chain_hop_count": 1,
+          "netscaler_connection_chain_id": "AODtHJyoAwDvtCVYhIUGAA==",
+          "netscaler_connection_id": 14460661,
+          "netscaler_flow_flags": 84025344,
+          "netscaler_http_content_type": "",
+          "netscaler_http_domain_name": "",
+          "netscaler_http_req_authorization": "",
+          "netscaler_http_req_cookie": "",
+          "netscaler_http_req_host": "",
+          "netscaler_http_req_method": "",
+          "netscaler_http_req_referer": "",
+          "netscaler_http_req_url": "",
+          "netscaler_http_req_user_agent": "",
+          "netscaler_http_req_via": "",
+          "netscaler_http_req_xforwarded_for": "",
+          "netscaler_http_res_forw_fb": 17163184441650,
+          "netscaler_http_res_forw_lb": 0,
+          "netscaler_transaction_id": 1068114973,
+          "netscaler_unknown330": 0,
+          "observation_point_id": 167954698,
+          "octet_delta_count": 40,
+          "packet_delta_count": 1,
+          "padding_octets": "AAA=",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 51053,
+          "tcp_control_bits": 16,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 40,
+          "community_id": "1:vKHRCBsu01Bj9xGu84I60+x4kGg=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 1,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 51053
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-11-11T12:09:19Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 51053
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-11-11T12:09:19Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "8wXIKNz6u_8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 51053,
+          "egress_interface": 6,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-11-11T12:09:19Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "exporting_process_id": 3,
+          "flow_end_microseconds": "2016-11-11T12:09:19.00009951Z",
+          "flow_id": 14460662,
+          "flow_start_microseconds": "2016-11-11T12:09:19.00009951Z",
+          "ingress_interface": 2147483651,
+          "ip_version": 4,
+          "netscaler_app_name_app_id": 240189440,
+          "netscaler_connection_chain_hop_count": 1,
+          "netscaler_connection_chain_id": "AODtHJyoAwDvtCVYhIUGAA==",
+          "netscaler_connection_id": 14460661,
+          "netscaler_flow_flags": 1157636096,
+          "netscaler_round_trip_time": 83,
+          "netscaler_transaction_id": 1068114973,
+          "netscaler_unknown329": 0,
+          "netscaler_unknown331": 0,
+          "netscaler_unknown332": 0,
+          "observation_point_id": 167954698,
+          "octet_delta_count": 1525,
+          "packet_delta_count": 2,
+          "padding_octets": "AAA=",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.0.0.1",
+          "source_transport_port": 443,
+          "tcp_control_bits": 24,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 1525,
+          "community_id": "1:vKHRCBsu01Bj9xGu84I60+x4kGg=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 2,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "10.0.0.1",
+          "locality": "private",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2016-11-11T12:09:19Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "10.0.0.1",
+          "locality": "private",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-11-11T12:09:19Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "8wXIKNz6u_8",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "10.0.0.1",
+          "destination_transport_port": 443,
+          "egress_interface": 2147483651,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 0,
+            "timestamp": "2016-11-11T12:09:19Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "exporting_process_id": 3,
+          "flow_end_microseconds": "2016-11-11T12:09:19.000128468Z",
+          "flow_id": 14460661,
+          "flow_start_microseconds": "2016-11-11T12:09:19.000128468Z",
+          "ingress_interface": 8,
+          "ip_version": 4,
+          "netscaler_aaa_username": "",
+          "netscaler_app_name_app_id": 240189440,
+          "netscaler_app_unit_name_app_id": 239927296,
+          "netscaler_connection_chain_hop_count": 1,
+          "netscaler_connection_chain_id": "AODtHJyoAwDvtCVYWWsIAA==",
+          "netscaler_connection_id": 14460661,
+          "netscaler_flow_flags": 84025344,
+          "netscaler_http_content_type": "",
+          "netscaler_http_domain_name": "www.kobo.com",
+          "netscaler_http_req_authorization": "",
+          "netscaler_http_req_cookie": "beer=123456789abcdefghijklmnopqrstuvw; AnotherCookie=1234567890abcdefghijklmnopqr; Shameless.Plug=Thankyou.Rakuten.Kobo.Inc.For.Allowing.me.time.to.work.on.this.and.contribute.back.to.the.community; Padding=aaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbccccccccccccccddddddddddddddddddddddeeeeeeeeeeeeeeeeeeeeeffffffffffffffffffffffgggggggggggggggggggggggghhhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkkklllllllllllllllmmmmmmmmmm; more=less; GJquote=There.is.no.spoon; GarrySays=Nice!!; LastPadding=aaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbcccccccccccccccccccdddddddddddeeeeeeee",
+          "netscaler_http_req_host": "www.kobo.com",
+          "netscaler_http_req_method": "GET",
+          "netscaler_http_req_referer": "http://www.kobo.com/is-the-best-ebook-company-in-the-world",
+          "netscaler_http_req_url": "/aa/bb/ccccc/ddddddddddddddddddddddddd",
+          "netscaler_http_req_user_agent": "Mozilla/5.0 (Commodore 64;  kobo.com) Gecko/20100101 Firefox/75.0",
+          "netscaler_http_req_via": "1.1 akamai.net(ghost) (AkamaiGHost)",
+          "netscaler_http_req_xforwarded_for": "11.222.33.255",
+          "netscaler_http_res_forw_fb": 0,
+          "netscaler_http_res_forw_lb": 0,
+          "netscaler_transaction_id": 1068114985,
+          "netscaler_unknown330": 0,
+          "observation_point_id": 167954698,
+          "octet_delta_count": 1541,
+          "packet_delta_count": 2,
+          "padding_octets": "AAA=",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 51053,
+          "tcp_control_bits": 24,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 1541,
+          "community_id": "1:vKHRCBsu01Bj9xGu84I60+x4kGg=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 2,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.0.1",
+          "locality": "private",
+          "port": 51053
+        }
+      },
+      "Private": null
+    }
+  ]
+}

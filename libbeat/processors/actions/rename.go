@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package actions
 
 import (
@@ -7,9 +24,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/checks"
 )
 
 type renameFields struct {
@@ -29,13 +46,12 @@ type fromTo struct {
 
 func init() {
 	processors.RegisterPlugin("rename",
-		configChecked(newRenameFields,
-			requireFields("fields")))
+		checks.ConfigChecked(NewRenameFields,
+			checks.RequireFields("fields")))
 }
 
-func newRenameFields(c *common.Config) (processors.Processor, error) {
-
-	cfgwarn.Beta("Beta rename processor is used.")
+// NewRenameFields returns a new rename processor.
+func NewRenameFields(c *common.Config) (processors.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -60,10 +76,14 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	for _, field := range f.config.Fields {
 		err := f.renameField(field.From, field.To, event.Fields)
-		if err != nil && f.config.FailOnError {
-			logp.Debug("rename", "Failed to rename fields, revert to old event: %s", err)
-			event.Fields = backup
-			return event, err
+		if err != nil {
+			errMsg := fmt.Errorf("Failed to rename fields in processor: %s", err)
+			logp.Debug("rename", errMsg.Error())
+			if f.config.FailOnError {
+				event.Fields = backup
+				event.PutValue("error.message", errMsg.Error())
+				return event, err
+			}
 		}
 	}
 
@@ -83,7 +103,7 @@ func (f *renameFields) renameField(from string, to string, fields common.MapStr)
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", to, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
 	}
 
 	// Deletion must happen first to support cases where a becomes a.b
@@ -94,7 +114,7 @@ func (f *renameFields) renameField(from string, to string, fields common.MapStr)
 
 	_, err = fields.Put(to, value)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %+v", to, value, err)
+		return fmt.Errorf("could not put value: %s: %v, %v", to, value, err)
 	}
 	return nil
 }

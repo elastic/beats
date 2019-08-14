@@ -3,7 +3,7 @@
   description: >
     HTTP module
   release: ga
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: http
       type: group
@@ -14,24 +14,16 @@
           description: >
               HTTP request information
           fields:
-            - name: header
+            - name: headers
               type: object
               description: >
                 The HTTP headers sent
-            - name: method
-              type: keyword
-              description: >
-                The HTTP method used
-            - name: body
-              type: keyword
-              description: >
-                The HTTP payload sent
         - name: response
           type: group
           description: >
               HTTP response information
           fields:
-            - name: header
+            - name: headers
               type: object
               description: >
                 The HTTP headers received
@@ -45,7 +37,3 @@
               example: Not found
               description: >
                 The HTTP status phrase
-            - name: body
-              type: keyword
-              description: >
-                The HTTP payload received

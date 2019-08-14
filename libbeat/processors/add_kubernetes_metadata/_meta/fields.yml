@@ -13,6 +13,11 @@
           description: >
             Kubernetes pod name
 
+        - name: pod.uid
+          type: keyword
+          description: >
+            Kubernetes Pod UID
+
         - name: namespace
           type: keyword
           description: >
@@ -32,6 +37,21 @@
           type: object
           description: >
             Kubernetes annotations map
+
+        - name: replicaset.name
+          type: keyword
+          description: >
+            Kubernetes replicaset name
+
+        - name: deployment.name
+          type: keyword
+          description: >
+            Kubernetes deployment name
+
+        - name: statefulset.name
+          type: keyword
+          description: >
+            Kubernetes statefulset name
 
         - name: container.name
           type: keyword

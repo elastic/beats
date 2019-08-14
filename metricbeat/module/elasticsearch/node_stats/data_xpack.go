@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package node_stats
 
 import (
@@ -5,23 +22,21 @@ import (
 
 	"time"
 
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
-	sourceNodeXpack = s.Schema{
-		"host":              c.Str("host"),
-		"transport_address": c.Str("transport_address"),
-		"ip":                c.Str("ip"),
-		"name":              c.Str("name"),
-	}
-
 	schemaXpack = s.Schema{
+		"name":              c.Str("name"),
+		"transport_address": c.Str("transport_address"),
 		"indices": c.Dict("indices", s.Schema{
 			"docs": c.Dict("docs", s.Schema{
 				"count": c.Int("count"),
@@ -71,10 +86,10 @@ var (
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
 				"load_average": c.Dict("load_average", s.Schema{
-					"1m":  c.Float("1m"),
-					"5m":  c.Float("5m"),
-					"15m": c.Float("15m"),
-				}),
+					"1m":  c.Float("1m", s.Optional),
+					"5m":  c.Float("5m", s.Optional),
+					"15m": c.Float("15m", s.Optional),
+				}, c.DictOptional), // No load average reported by ES on Windows
 			}),
 			"cgroup": c.Dict("cgroup", s.Schema{
 				"cpuacct": c.Dict("cpuacct", s.Schema{
@@ -97,7 +112,7 @@ var (
 					"limit_in_bytes": c.Str("limit_in_bytes"),
 					"usage_in_bytes": c.Str("usage_in_bytes"),
 				}),
-			}),
+			}, c.DictOptional),
 		}),
 		"process": c.Dict("process", s.Schema{
 			"open_file_descriptors": c.Int("open_file_descriptors"),
@@ -126,95 +141,101 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk": c.Dict("bulk", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"generic": c.Dict("generic", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"get": c.Dict("get", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"index": c.Dict("index", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"management": c.Dict("management", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"search": c.Dict("search", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"watcher": c.Dict("watcher", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
+			"bulk":       c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"index":      c.Dict("index", threadPoolStatsSchema, c.DictOptional),
+			"write":      c.Dict("write", threadPoolStatsSchema),
+			"generic":    c.Dict("generic", threadPoolStatsSchema),
+			"get":        c.Dict("get", threadPoolStatsSchema),
+			"management": c.Dict("management", threadPoolStatsSchema),
+			"search":     c.Dict("search", threadPoolStatsSchema),
+			"watcher":    c.Dict("watcher", threadPoolStatsSchema, c.DictOptional),
 		}),
 		"fs": c.Dict("fs", s.Schema{
-			"summary": c.Dict("total", s.Schema{
+			"total": c.Dict("total", s.Schema{
 				"total_in_bytes":     c.Int("total_in_bytes"),
 				"free_in_bytes":      c.Int("free_in_bytes"),
 				"available_in_bytes": c.Int("available_in_bytes"),
 			}),
+			"io_stats": c.Dict("io_stats", s.Schema{
+				"total": c.Dict("total", s.Schema{
+					"operations":       c.Int("operations"),
+					"read_kilobytes":   c.Int("read_kilobytes"),
+					"read_operations":  c.Int("read_operations"),
+					"write_kilobytes":  c.Int("write_kilobytes"),
+					"write_operations": c.Int("write_operations"),
+				}, c.DictOptional),
+			}, c.DictOptional),
 		}),
+	}
+
+	threadPoolStatsSchema = s.Schema{
+		"threads":  c.Int("threads"),
+		"queue":    c.Int("queue"),
+		"rejected": c.Int("rejected"),
 	}
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
 	}{}
 
-	json.Unmarshal(content, &nodesStruct)
+	err := json.Unmarshal(content, &nodesStruct)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
+	}
 
 	// Normally the nodeStruct should only contain one node. But if _local is removed
 	// from the path and Metricbeat is not installed on the same machine as the node
 	// it will provid the data for multiple nodes. This will mean the detection of the
 	// master node will not be accurate anymore as often in these cases a proxy is in front
 	// of ES and it's not know if the request will be routed to the same node as before.
+	var errs multierror.Errors
 	for nodeID, node := range nodesStruct.Nodes {
-		clusterID, err := elasticsearch.GetClusterID(m.http, m.HostData().SanitizedURI, nodeID)
+		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
 		if err != nil {
-			logp.Err("could not fetch cluster id: %s", err)
+			errs = append(errs, errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 			continue
 		}
 
-		isMaster, _ := elasticsearch.IsMaster(m.http, m.HostData().SanitizedURI)
-
 		event := mb.Event{}
-		// Build source_node object
-		sourceNode, _ := sourceNodeXpack.Apply(node)
-		sourceNode["uuid"] = nodeID
 
-		nodeData, _ := schemaXpack.Apply(node)
+		nodeData, err := schemaXpack.Apply(node)
+		if err != nil {
+			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
+			continue
+		}
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
+		mlockall, err := elasticsearch.IsMLockAllEnabled(m.HTTP, m.HTTP.GetURI(), nodeID)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		nodeData["mlockall"] = mlockall
+
+		// Build source_node object
+		sourceNode := common.MapStr{
+			"uuid":              nodeID,
+			"name":              nodeData["name"],
+			"transport_address": nodeData["transport_address"],
+		}
+		nodeData.Delete("name")
+		nodeData.Delete("transport_address")
+
 		event.RootFields = common.MapStr{
 			"timestamp":    time.Now(),
-			"cluster_uuid": clusterID,
+			"cluster_uuid": info.ClusterID,
 			"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 			"type":         "node_stats",
-			"source_node":  sourceNode,
 			"node_stats":   nodeData,
+			"source_node":  sourceNode,
 		}
 
-		// Hard coded index prefix for monitoring, no detection done for ES version at the moment
-		// It has an additonal md in the name to make it clear the data is coming from metricbeat
-		event.Index = ".monitoring-es-6-mb"
+		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		r.Event(event)
 	}
+	return errs.Err()
 }

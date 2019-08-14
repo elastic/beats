@@ -1,11 +1,32 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package builder
 
 import (
+	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // GetContainerID returns the id of a container
@@ -51,6 +72,48 @@ func GetHintAsList(hints common.MapStr, key, config string) []string {
 	return nil
 }
 
+// GetProcessors gets processor definitions from the hints and returns a list of configs as a MapStr
+func GetProcessors(hints common.MapStr, key string) []common.MapStr {
+	return GetConfigs(hints, key, "processors")
+}
+
+// GetConfigs takes in a key and returns a list of configs as a slice of MapStr
+func GetConfigs(hints common.MapStr, key, name string) []common.MapStr {
+	raw := GetHintMapStr(hints, key, name)
+	if raw == nil {
+		return nil
+	}
+
+	var words, nums []string
+
+	for key := range raw {
+		if _, err := strconv.Atoi(key); err != nil {
+			words = append(words, key)
+			continue
+		} else {
+			nums = append(nums, key)
+		}
+	}
+
+	sort.Strings(nums)
+
+	var configs []common.MapStr
+	for _, key := range nums {
+		rawCfg, _ := raw[key]
+		if config, ok := rawCfg.(common.MapStr); ok {
+			configs = append(configs, config)
+		}
+	}
+
+	for _, word := range words {
+		configs = append(configs, common.MapStr{
+			word: raw[word],
+		})
+	}
+
+	return configs
+}
+
 func getStringAsList(input string) []string {
 	if input == "" {
 		return []string{}
@@ -64,11 +127,54 @@ func getStringAsList(input string) []string {
 	return list
 }
 
-// IsNoOp is a big red button to prevent spinning up Runners in case of issues.
-func IsNoOp(hints common.MapStr, key string) bool {
+// GetHintAsConfigs can read a hint in the form of a stringified JSON and return a common.MapStr
+func GetHintAsConfigs(hints common.MapStr, key string) []common.MapStr {
+	if str := GetHintString(hints, key, "raw"); str != "" {
+		// check if it is a single config
+		if str[0] != '[' {
+			cfg := common.MapStr{}
+			if err := json.Unmarshal([]byte(str), &cfg); err != nil {
+				logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+				return nil
+			}
+			return []common.MapStr{cfg}
+		}
+
+		cfg := []common.MapStr{}
+		if err := json.Unmarshal([]byte(str), &cfg); err != nil {
+			logp.Debug("autodiscover.builder", "unable to unmarshal json due to error: %v", err)
+			return nil
+		}
+		return cfg
+	}
+	return nil
+}
+
+// IsEnabled will return true when 'enabled' is **explicity** set to true
+func IsEnabled(hints common.MapStr, key string) bool {
+	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
+		enabled, _ := strconv.ParseBool(value.(string))
+		return enabled
+	}
+
+	return false
+}
+
+// IsDisabled will return true when 'enabled' key is **explicity** set to false
+func IsDisabled(hints common.MapStr, key string) bool {
+	if value, err := hints.GetValue(fmt.Sprintf("%s.enabled", key)); err == nil {
+		enabled, err := strconv.ParseBool(value.(string))
+		if err == nil {
+			logp.Debug("autodiscover.builder", "error parsing 'enabled' hint from: %+v", hints)
+			return !enabled
+		}
+	}
+
+	// keep reading disable (deprecated) for backwards compatibility
 	if value, err := hints.GetValue(fmt.Sprintf("%s.disable", key)); err == nil {
-		noop, _ := strconv.ParseBool(value.(string))
-		return noop
+		cfgwarn.Deprecate("8.0.0", "disable hint is deprecated. Use `enabled: false` instead.")
+		disabled, _ := strconv.ParseBool(value.(string))
+		return disabled
 	}
 
 	return false

@@ -1,42 +1,20 @@
 [
     {
-        "_id": "ylwS3V8BAiQJCIBNBJ_P",
-        "_index": "filebeat-7.0.0-alpha1-2017.11.21",
-        "_score": 1.0,
-        "_source": {
-            "@timestamp": "2017-10-30T09:57:58,243",
-            "beat": {
-                "hostname": "sashimi",
-                "name": "sashimi",
-                "version": "7.0.0-alpha1"
-            },
-            "fileset": {
-                "module": "logstash",
-                "name": "slowlog"
-            },
-            "logstash": {
-                "slowlog": {
-                    "event": "\"{\\\"@version\\\":\\\"1\\\",\\\"@timestamp\\\":\\\"2017-10-30T13:57:55.130Z\\\",\\\"host\\\":\\\"sashimi\\\",\\\"sequence\\\":0,\\\"message\\\":\\\"Hello world!\\\"}\"",
-                    "level": "WARN",
-                    "message": "event processing time {:plugin_params=>{\"time\"=>3, \"id\"=>\"e4e12a4e3082615c5427079bf4250dbfa338ebac10f8ea9912d7b98a14f56b8c\"}, :took_in_nanos=>3027675106, :took_in_millis=>3027, :event=>\"{\\\"@version\\\":\\\"1\\\",\\\"@timestamp\\\":\\\"2017-10-30T13:57:55.130Z\\\",\\\"host\\\":\\\"sashimi\\\",\\\"sequence\\\":0,\\\"message\\\":\\\"Hello world!\\\"}\"}",
-                    "module": "slowlog.logstash.filters.sleep",
-                    "plugin_name": "sleep",
-                    "plugin_params": "{\"time\"=>3, \"id\"=>\"e4e12a4e3082615c5427079bf4250dbfa338ebac10f8ea9912d7b98a14f56b8c\"}",
-                    "plugin_type": "filters",
-                    "took_in_millis": 3027,
-                    "took_in_nanos": 3027675106
-                }
-            },
-            "offset": 383,
-            "prospector": {
-                "type": "log"
-            },
-            "input": {
-                "type": "log"
-            },
-            "read_timestamp": "2017-11-21T05:34:25.435Z",
-            "source": "/Users/ph/go/src/github.com/elastic/beats/filebeat/module/logstash/slowlog/test/slowlog-plain.log"
-        },
-        "_type": "doc"
+        "@timestamp": "2017-10-30T09:57:58.243Z",
+        "event.dataset": "logstash.slowlog",
+        "event.duration": 3027675106,
+        "event.module": "logstash",
+        "event.timezone": "+00:00",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 0,
+        "logstash.slowlog.event": "\"{\\\"@version\\\":\\\"1\\\",\\\"@timestamp\\\":\\\"2017-10-30T13:57:55.130Z\\\",\\\"host\\\":\\\"sashimi\\\",\\\"sequence\\\":0,\\\"message\\\":\\\"Hello world!\\\"}\"",
+        "logstash.slowlog.module": "slowlog.logstash.filters.sleep",
+        "logstash.slowlog.plugin_name": "sleep",
+        "logstash.slowlog.plugin_params": "{\"time\"=>3, \"id\"=>\"e4e12a4e3082615c5427079bf4250dbfa338ebac10f8ea9912d7b98a14f56b8c\"}",
+        "logstash.slowlog.plugin_type": "filters",
+        "logstash.slowlog.took_in_millis": 3027,
+        "service.type": "logstash"
     }
 ]

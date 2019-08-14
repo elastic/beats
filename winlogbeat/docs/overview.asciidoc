@@ -5,7 +5,7 @@
 ++++
 
 Winlogbeat ships Windows event logs to Elasticsearch or Logstash. You can
-install it as a Windows service on Windows XP or later.
+install it as a Windows service.
 
 Winlogbeat reads from one or more event logs using Windows APIs, filters the
 events based on user-configured criteria, then sends the event data to the
@@ -22,7 +22,4 @@ For example, you can capture events such as:
 * security events
 * system events
 
-Winlogbeat is a https://www.elastic.co/products/beats[Beat], and it is based on
-the libbeat framework. General information about libbeat and how to
-set up Elasticsearch, Logstash, and Kibana are covered in the
-{libbeat}/index.html[Beats Platform Reference].
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]

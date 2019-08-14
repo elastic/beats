@@ -1,0 +1,44 @@
+- key: sysmon
+  title: "Sysmon module"
+  description: >
+    These are the event fields specific to the Sysmon module.
+  release: beta
+  fields:
+
+    - name: sysmon.dns.status
+      type: keyword
+      description: Windows status code returned for the DNS query.
+
+    # These dns.* fields are anticipated to be added to ECS.
+    - name: dns.question.name
+      type: keyword
+      description: >
+        The name being queried.
+
+    - name: dns.answers
+      type: object
+      description: >
+        An array containing a dictionary about each answer section returned by
+        the server.
+
+    - name: dns.answers.type
+      type: keyword
+      description: The type of data contained in this resource record.
+      example: CNAME
+
+    - name: dns.answers.data
+      type: keyword
+      short: The data describing the resource.
+
+    - name: dns.answers_count
+      type: long
+      description: >
+        The number of resource records contained in the `dns.answers` field.
+      example: 3
+
+    - name: dns.grouped.ip
+      type: ip
+      description: >
+        Array containing all IPs seen in `dns.answers.data`.
+
+

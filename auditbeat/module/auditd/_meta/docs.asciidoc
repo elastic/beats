@@ -62,6 +62,55 @@ from listening to audit messages:
 systemctl mask systemd-journald-audit.socket
 -----
 
+[float]
+=== Inspect the kernel audit system status
+
+{beatname_uc} provides useful commands to query the state of the audit system
+in the Linux kernel.
+
+* See the list of installed audit rules:
++
+[source,shell]
+-----
+auditbeat show auditd-rules
+-----
++
+Prints the list of loaded rules, similar to `auditctl -l`:
++
+[source,shell]
+-----
+-a never,exit -S all -F pid=26253
+-a always,exit -F arch=b32 -S all -F key=32bit-abi
+-a always,exit -F arch=b64 -S execve,execveat -F key=exec
+-a always,exit -F arch=b64 -S connect,accept,bind -F key=external-access
+-w /etc/group -p wa -k identity
+-w /etc/passwd -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EACCES -F key=access
+-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EPERM -F key=access
+-----
+
+* See the status of the audit system:
++
+[source,shell]
+-----
+auditbeat show auditd-status
+-----
++
+Prints the status of the kernel audit system, similar to `auditctl -s`:
++
+[source,shell]
+-----
+enabled 1
+failure 0
+pid 0
+rate_limit 0
+backlog_limit 8192
+lost 14407
+backlog 0
+backlog_wait_time 0
+features 0xf
+-----
 
 [float]
 === Configuration options
@@ -74,10 +123,11 @@ following example shows all configuration options with their default values.
 - module: auditd
   resolve_ids: true
   failure_mode: silent
-  backlog_limit: 8196
+  backlog_limit: 8192
   rate_limit: 0
   include_raw_message: false
   include_warnings: false
+  backpressure_strategy: auto
 ----
 
 *`socket_type`*:: This optional setting controls the type of
@@ -120,21 +170,48 @@ audit ruleset.
 
 *`include_raw_message`*:: This boolean setting causes {beatname_uc} to
 include each of the raw messages that contributed to the event in the document
-as a field called `messages`. The default value is false. This setting is
+as a field called `event.original`. The default value is false. This setting is
 primarily used for development and debugging purposes.
 
 *`include_warnings`*:: This boolean setting causes {beatname_uc} to
 include as warnings any issues that were encountered while parsing the raw
-messages. The default value is false. When this setting is enabled the raw
-messages will be included in the event regardless of the
-`include_raw_message` config setting. This setting is primarily used for
-development and debugging purposes.
+messages. The messages are written to the `error.message` field. The default
+value is false. When this setting is enabled the raw messages will be included
+in the event regardless of the `include_raw_message` config setting. This
+setting is primarily used for development and debugging purposes.
 
 *`audit_rules`*:: A string containing the audit rules that should be
 installed to the kernel. There should be one rule per line. Comments can be
 embedded in the string using `#` as a prefix. The format for rules is the same
 used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
 (`-w`) and syscall rules (`-a` or `-A`).
+
+*`audit_rule_files`*:: A list of files to load audit rules from. This files are
+loaded after the rules declared in `audit_rules` are loaded. Wildcards are
+supported and will expand in lexicographical order. The format is the same as
+that of the `audit_rules` field.
+
+*`backpressure_strategy`*:: Specifies the strategy that {beatname_uc} uses to
+prevent backpressure from propagating to the kernel and impacting audited
+processes.
++
+--
+The possible values are:
+
+- `auto` (default): {beatname_uc} uses the `kernel` strategy, if supported, or
+falls back to the `userspace` strategy.
+- `kernel`: {beatname_uc} sets the `backlog_wait_time` in the kernel's
+audit framework to 0. This causes events to be discarded in the kernel if
+the audit backlog queue fills to capacity. Requires a 3.14 kernel or
+newer.
+- `userspace`: {beatname_uc} drops events when there is backpressure
+from the publishing pipeline. If no `rate_limit` is set, {beatname_uc} sets a rate
+limit of 5000. Users should test their setup and adjust the `rate_limit`
+option accordingly.
+- `both`: {beatname_uc} uses the `kernel` and `userspace` strategies at the same
+time.
+- `none`: No backpressure mitigation measures are enabled.
+--
 
 [float]
 === Audit rules

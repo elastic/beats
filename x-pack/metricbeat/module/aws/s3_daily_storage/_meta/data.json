@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "s3_daily_storage": {
+            "bucket": {
+                "name": "test-s3-ks-2",
+                "size": {
+                    "bytes": 256
+                }
+            },
+            "number_of_objects": 8
+        }
+    },
+    "cloud": {
+        "provider": "aws",
+        "region": "ap-southeast-1"
+    },
+    "event": {
+        "dataset": "aws.s3_daily_storage",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "s3_daily_storage"
+    },
+    "service": {
+        "type": "aws"
+    }
+}

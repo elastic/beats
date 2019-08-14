@@ -1,0 +1,504 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Approximate data size [Metricbeat Zookeeper] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Approximate data size",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.approximate_data_size",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Approximate data size [Metricbeat Zookeeper] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-30T13:29:19.163Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Latency [Metricbeat Zookeeper] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "ms,ms,2",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Latency",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.latency.avg",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Latency [Metricbeat Zookeeper] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-30T13:29:05.974Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Alive Connections [Metricbeat Zookeeper] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "0,0.[00]",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Alive connections",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.num_alive_connections",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Alive Connections [Metricbeat Zookeeper] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-30T13:28:52.034Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_min": "0",
+                "axis_position": "left",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0.1",
+                "formatter": "percent",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Used file descriptors",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.open_file_descriptor_count",
+                    "id": "b92e4550-231a-11e9-9e57-679640dc0c7c",
+                    "metric_agg": "avg",
+                    "type": "avg"
+                  },
+                  {
+                    "field": "zookeeper.mntr.max_file_descriptor_count",
+                    "id": "918d0c60-231b-11e9-9e57-679640dc0c7c",
+                    "type": "avg"
+                  },
+                  {
+                    "id": "7e4d11e0-231b-11e9-9e57-679640dc0c7c",
+                    "script": "params.a/params.b",
+                    "type": "math",
+                    "variables": [
+                      {
+                        "field": "b92e4550-231a-11e9-9e57-679640dc0c7c",
+                        "id": "81c03fa0-231b-11e9-9e57-679640dc0c7c",
+                        "name": "a"
+                      },
+                      {
+                        "field": "918d0c60-231b-11e9-9e57-679640dc0c7c",
+                        "id": "8a3af6c0-231b-11e9-9e57-679640dc0c7c",
+                        "name": "b"
+                      }
+                    ]
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 1,
+                "split_mode": "everything",
+                "stacked": "none",
+                "value_template": "{{value}}"
+              },
+              {
+                "axis_min": "0",
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(0,98,177,1)",
+                "fill": "0",
+                "formatter": "0,0.[00]",
+                "id": "dffaffe0-23cc-11e9-b1ff-37c851471450",
+                "label": "Open file descriptors",
+                "line_width": "1",
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.open_file_descriptor_count",
+                    "id": "dffaffe1-23cc-11e9-b1ff-37c851471450",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 1,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-30T13:28:22.583Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_min": "0",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "0,0.[00]",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Packets received",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.packets.received",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  },
+                  {
+                    "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "id": "34949540-231c-11e9-9707-f128cdaa3bf2",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": "0",
+                "separate_axis": 0,
+                "split_filters": [
+                  {
+                    "color": "#68BC00",
+                    "id": "5811d190-231c-11e9-9707-f128cdaa3bf2"
+                  }
+                ],
+                "split_mode": "terms",
+                "stacked": "none"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(115,216,255,1)",
+                "fill": "0",
+                "formatter": "0,0.[00]",
+                "id": "753b2e60-231c-11e9-9707-f128cdaa3bf2",
+                "label": "Packets sent",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.packets.sent",
+                    "id": "753b2e61-231c-11e9-9707-f128cdaa3bf2",
+                    "type": "avg"
+                  },
+                  {
+                    "field": "753b2e61-231c-11e9-9707-f128cdaa3bf2",
+                    "id": "7ed33c60-231c-11e9-9707-f128cdaa3bf2",
+                    "type": "derivative",
+                    "unit": ""
+                  }
+                ],
+                "point_size": "0",
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
+          "type": "metrics"
+        }
+      },
+      "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
+      "type": "visualization",
+      "updated_at": "2019-01-30T13:26:42.583Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 15,
+              "x": 0,
+              "y": 15
+            },
+            "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4-ecs",
+            "panelIndex": "1",
+            "title": "Approximate data size",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 17,
+              "x": 15,
+              "y": 15
+            },
+            "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4-ecs",
+            "panelIndex": "2",
+            "title": "Latency",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "3",
+              "w": 16,
+              "x": 32,
+              "y": 15
+            },
+            "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4-ecs",
+            "panelIndex": "3",
+            "title": "Alive Connections",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 25,
+              "x": 23,
+              "y": 0
+            },
+            "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
+            "panelIndex": "4",
+            "title": "Used file descriptors",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 23,
+              "x": 0,
+              "y": 0
+            },
+            "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
+            "panelIndex": "5",
+            "title": "Packets received / sent",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Zookeeper] Overview ECS",
+        "version": 1
+      },
+      "id": "467207a0-231e-11e9-bb66-8baac426dfd4-ecs",
+      "type": "dashboard",
+      "updated_at": "2019-01-30T13:34:01.235Z",
+      "version": 6
+    }
+  ],
+  "version": "7.0.0-alpha2"
+}

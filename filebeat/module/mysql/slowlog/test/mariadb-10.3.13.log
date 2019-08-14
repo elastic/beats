@@ -1,0 +1,18 @@
+/usr/sbin/mysqld, Version: 10.3.13-MariaDB-1:10.3.13+maria~bionic-log (mariadb.org binary distribution). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time		    Id Command	Argument
+# Time: 190324 16:03:00
+# User@Host: root[root] @ localhost []
+# Thread_id: 37  Schema: employees  QC_hit: No
+# Query_time: 2.461578  Lock_time: 0.000196  Rows_sent: 10  Rows_examined: 3145718
+# Rows_affected: 0  Bytes_sent: 319
+# Tmp_tables: 1  Tmp_disk_tables: 0  Tmp_table_sizes: 4026528
+# Full_scan: Yes  Full_join: No  Tmp_table: Yes  Tmp_table_on_disk: No
+# Filesort: Yes  Filesort_on_disk: No  Merge_passes: 0  Priority_queue: Yes
+use employees;
+SET timestamp=1553443380;
+SELECT last_name, MAX(salary) AS salary FROM employees
+    INNER JOIN salaries ON employees.emp_no = salaries.emp_no
+    GROUP BY last_name
+    ORDER BY salary DESC
+    LIMIT 10;

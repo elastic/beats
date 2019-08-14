@@ -1,15 +1,3 @@
-//////////////////////////////////////////////////////////////////////////
-//// This content is shared by all Elastic Beats. Make sure you keep the
-//// descriptions here generic enough to work for all Beats that include
-//// this file. When using cross references, make sure that the cross
-//// references resolve correctly for any files that include this one.
-//// Use the appropriate variables defined in the index.asciidoc file to
-//// resolve Beat names: beatname_uc and beatname_lc.
-//// Use the following include to pull this content into a doc file:
-//// include::../../libbeat/docs/monitoring/configuring.asciidoc[]
-//// Make sure this content appears below a level 2 heading.
-//////////////////////////////////////////////////////////////////////////
-
 [role="xpack"]
 [[monitoring]]
 = Monitoring {beatname_uc}
@@ -17,56 +5,30 @@
 [partintro]
 --
 
-NOTE: {monitoring} for {beatname_uc} requires {es} 6.2 or later.
+You can use the {stack} {monitor-features} to gain insight into the health of
+{beatname_uc} agents running in your environment. 
 
-{monitoring} enables you to easily monitor {beatname_uc} from {kib}. For more
-information, see
-{xpack-ref}/xpack-monitoring.html[Monitoring the Elastic Stack] and
-{kibana-ref}/beats-page.html[Beats Monitoring Metrics].
+To monitor {beatname_uc}, make sure monitoring is enabled on your {es} cluster,
+then configure the method used to collect {beatname_uc} metrics. You
+ifndef::serverless[]
+can use one of following methods:
+endif::[]
+ifdef::serverless[]
+can use the following method:
+endif::[]
 
-To configure {beatname_uc} to collect and send monitoring metrics:
+* <<monitoring-internal-collection,Internal collection>>
+ifndef::serverless[]
+* <<monitoring-metricbeat-collection, {metricbeat} collection>>
+endif::[]
 
-. Create a user that has appropriate authority to send system-level monitoring
-data to {es}. For example, you can use the built-in `beats_system` user or
-assign the built-in `beats_system` role to another user. For more
-information, see
-{xpack-ref}/setting-up-authentication.html[Setting Up User Authentication] and
-{xpack-ref}/built-in-roles.html[Built-in Roles].
-
-. Add the `xpack.monitoring` settings in the {beatname_uc} configuration file.
-If you configured {es} output and you want to use the same {es} production
-cluster and credentials, you can specify the following minimal configuration
-options:
-+
---
-[source, yml]
---------------------
-xpack.monitoring:
-  enabled: true
-  elasticsearch:
---------------------
-
-Otherwise, you must specify additional configuration options. For example:
-
-[source, yml]
---------------------
-xpack.monitoring:
-  enabled: true
-  elasticsearch:
-    hosts: ["https://example.com:9200", "https://example2.com:9200"]
-    username: beats_system
-    password: beatspassword
---------------------
+To learn about monitoring in general, see 
+{stack-ov}/xpack-monitoring.html[Monitoring the {stack}]. 
 
 --
 
-. {kibana-ref}/monitoring-xpack-kibana.html[Configure monitoring in {kib}].
+include::monitoring-internal-collection.asciidoc[]
 
-. To verify your monitoring configuration, point your web browser at your {kib}
-host, and select Monitoring from the side navigation. Metrics reported from
-{beatname_uc} should be visible in the Beats section. When {security} is enabled,
-to view the monitoring dashboards you must log in to {kib} as a user who has the
-`kibana_user` and `monitoring_user` roles.
---
-
-include::shared-monitor-config.asciidoc[]
+ifndef::serverless[]
+include::monitoring-metricbeat.asciidoc[]
+endif::[]

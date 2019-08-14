@@ -1,6 +1,24 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package syslog
 
 import (
+	"math"
 	"time"
 )
 
@@ -22,6 +40,22 @@ var month = map[string]time.Month{
 	"Dec": time.December,
 }
 
+var monthIndexed = []time.Month{
+	0,
+	time.January,
+	time.February,
+	time.March,
+	time.April,
+	time.May,
+	time.June,
+	time.July,
+	time.August,
+	time.September,
+	time.October,
+	time.November,
+	time.December,
+}
+
 // event is a parsed syslog event, validation of the format is done at the parser level.
 type event struct {
 	message    string
@@ -35,7 +69,9 @@ type event struct {
 	minute     int
 	second     int
 	nanosecond int
+	year       int
 	loc        *time.Location
+	sequence   int
 }
 
 // newEvent() return a new event.
@@ -48,7 +84,47 @@ func newEvent() *event {
 		hour:     -1,
 		minute:   -1,
 		second:   -1,
+		year:     time.Now().Year(),
+		sequence: -1,
 	}
+}
+
+// SetTimeZone set the timezone offset from the string.
+func (s *event) SetTimeZone(b []byte) {
+	// We assume that we are in utc and ignore any other bytes after.
+	// This can be followed by others bytes +00, +00:00 or +0000.
+	if b[0] == 'Z' || b[0] == 'z' {
+		s.loc = time.UTC
+		return
+	}
+
+	d := 1
+	if b[0] == '-' {
+		d = -1
+	}
+
+	// +00 +00:00 or +0000
+	// Use second value directly and don't use unecessary time.Duration.
+	// Time.FixedZone accepts number of seconds.
+	var h, m int
+	switch len(b[1:]) {
+	case 2:
+		h = 3600 * bytesToInt(skipLeadZero(b[1:]))
+		s.loc = time.FixedZone("", d*h)
+	case 4:
+		h = 3600 * bytesToInt(skipLeadZero(b[1:3]))
+		m = 60 * bytesToInt(skipLeadZero(b[3:5]))
+		s.loc = time.FixedZone("", d*(h+m))
+	case 5:
+		h = 3600 * bytesToInt(skipLeadZero(b[1:3]))
+		m = 60 * bytesToInt(skipLeadZero(b[4:6]))
+		s.loc = time.FixedZone("", d*(h+m))
+	}
+}
+
+// SetMonthNumeric sets the month with a number.
+func (s *event) SetMonthNumeric(b []byte) {
+	s.month = monthIndexed[bytesToInt(skipLeadZero(b))]
 }
 
 // SetMonth sets the month.
@@ -110,9 +186,14 @@ func (s *event) Second() int {
 	return s.second
 }
 
+// SetYear sets the current year.
+func (s *event) SetYear(b []byte) {
+	s.year = bytesToInt(b)
+}
+
 // Year returns the current year, since syslog events don't include that.
 func (s *event) Year() int {
-	return time.Now().Year()
+	return s.year
 }
 
 // SetMessage sets the message.
@@ -137,7 +218,7 @@ func (s *event) Priority() int {
 
 // HasPriority returns if the priority was in original event.
 func (s *event) HasPriority() bool {
-	return s.priority > 0
+	return s.priority >= 0
 }
 
 // Severity returns the severity, will return -1 if priority is not set.
@@ -190,9 +271,26 @@ func (s *event) HasPid() bool {
 	return s.pid > 0
 }
 
+// SetSequence set the sequence number for this event.
+func (s *event) SetSequence(b []byte) {
+	s.sequence = bytesToInt(b)
+}
+
+// Sequence returns the sequence number of the event when defined,
+// otherwise return -1.
+func (s *event) Sequence() int {
+	return s.sequence
+}
+
 // SetNanoSecond sets the nanosecond.
 func (s *event) SetNanosecond(b []byte) {
-	s.nanosecond = bytesToInt(skipLeadZero(b))
+	// We assume that we receive a byte array representing a nanosecond, this might not be
+	// always the case, so we have to pad it.
+	if len(b) < 9 {
+		s.nanosecond = bytesToInt(skipLeadZero(b)) * int(math.Pow10((9 - len(b))))
+	} else {
+		s.nanosecond = bytesToInt(skipLeadZero(b))
+	}
 }
 
 // NanoSecond returns the nanosecond.
@@ -202,6 +300,13 @@ func (s *event) Nanosecond() int {
 
 // Timestamp return the timestamp in UTC.
 func (s *event) Timestamp(timezone *time.Location) time.Time {
+	var t *time.Location
+	if s.loc == nil {
+		t = timezone
+	} else {
+		t = s.loc
+	}
+
 	return time.Date(
 		s.Year(),
 		s.Month(),
@@ -210,7 +315,7 @@ func (s *event) Timestamp(timezone *time.Location) time.Time {
 		s.Minute(),
 		s.Second(),
 		s.Nanosecond(),
-		timezone,
+		t,
 	).UTC()
 }
 

@@ -1,0 +1,50 @@
+[
+    {
+        "@timestamp": 1547687130000,
+        "destination.address": "17.253.5.203",
+        "destination.as.number": 6185,
+        "destination.as.organization.name": "Apple Inc.",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "17.253.5.203",
+        "destination.port": 80,
+        "event.dataset": "zeek.http",
+        "event.id": "CCNp8v1SNzY7v9d1Ih",
+        "event.module": "zeek",
+        "fileset.name": "http",
+        "http.request.body.bytes": 0,
+        "http.request.method": "GET",
+        "http.response.body.bytes": 3735,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.community_id": "1:dtBPRfpKEZyg1iOHss95buwv+cw=",
+        "network.transport": "tcp",
+        "service.type": "zeek",
+        "source.address": "10.178.98.102",
+        "source.ip": "10.178.98.102",
+        "source.port": 62995,
+        "tags": [
+            "zeek.http"
+        ],
+        "url.domain": "ocsp.apple.com",
+        "url.original": "/ocsp04-aaica02/ME4wTKADAgEAMEUwQzBBMAkGBSsOAwIaBQAEFNqvF+Za6oA4ceFRLsAWwEInjUhJBBQx6napI3Sl39T97qDBpp7GEQ4R7AIIUP1IOZZ86ns=",
+        "url.port": "80",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "com.apple.trustd/2.0",
+        "zeek.http.resp_fuids": [
+            "F5zuip1tSwASjNAHy7"
+        ],
+        "zeek.http.resp_mime_types": [
+            "application/ocsp-response"
+        ],
+        "zeek.http.status_msg": "OK",
+        "zeek.http.tags": [],
+        "zeek.http.trans_depth": 1,
+        "zeek.session_id": "CCNp8v1SNzY7v9d1Ih"
+    }
+]

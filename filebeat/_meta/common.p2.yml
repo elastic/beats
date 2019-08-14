@@ -39,7 +39,7 @@ filebeat.inputs:
 
   ### Multiline options
 
-  # Mutiline can be used for log messages spanning multiple lines. This is common
+  # Multiline can be used for log messages spanning multiple lines. This is common
   # for Java Stack Traces or C-Line Continuation
 
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
@@ -69,6 +69,6 @@ filebeat.config.modules:
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
-  index.number_of_shards: 3
+  index.number_of_shards: 1
   #index.codec: best_compression
   #_source.enabled: false

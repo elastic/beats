@@ -1,21 +1,41 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package cfgfile
 
 import (
+	"fmt"
 	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
 var (
+	// DefaultDynamicConfig provides default behavior for a Runner.
 	DefaultDynamicConfig = DynamicConfig{
 		Reload: Reload{
 			Period:  10 * time.Second,
@@ -39,23 +59,46 @@ type DynamicConfig struct {
 	Reload Reload `config:"reload"`
 }
 
+// Reload defines reload behavior and frequency
 type Reload struct {
 	Period  time.Duration `config:"period"`
 	Enabled bool          `config:"enabled"`
 }
 
+// RunnerFactory is used for creating of new Runners
 type RunnerFactory interface {
-	Create(config *common.Config, meta *common.MapStrPointer) (Runner, error)
+	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
 }
 
+// ConfigChecker is usually combined with a RunnerFactory for implementations that can check a config
+// without a pipeline and metadata.
+type ConfigChecker interface {
+	CheckConfig(config *common.Config) error
+}
+
+// CheckableRunnerFactory is the union of RunnerFactory and ConfigChecker.
+type CheckableRunnerFactory interface {
+	RunnerFactory
+	ConfigChecker
+}
+
+// Runner is a simple interface providing a simple way to
+// Start and Stop Reloader
 type Runner interface {
+	// We include fmt.Stringer here because we do log debug messages that must print
+	// something for the given Runner. We need Runner implementers to consciously implement a
+	// String() method because the default behavior of `%s` is to print everything recursively
+	// in a struct, which could cause a race that would cause the race detector to fail.
+	// This is something that could be anticipated for the Runner interface specifically, because
+	// most runners will use a goroutine that modifies internal state.
+	fmt.Stringer
 	Start()
 	Stop()
 }
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	registry *Registry
+	pipeline beat.Pipeline
 	config   DynamicConfig
 	path     string
 	done     chan struct{}
@@ -63,7 +106,7 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(cfg *common.Config) *Reloader {
+func NewReloader(pipeline beat.Pipeline, cfg *common.Config) *Reloader {
 	config := DefaultDynamicConfig
 	cfg.Unpack(&config)
 
@@ -73,7 +116,7 @@ func NewReloader(cfg *common.Config) *Reloader {
 	}
 
 	return &Reloader{
-		registry: NewRegistry(),
+		pipeline: pipeline,
 		config:   config,
 		path:     path,
 		done:     make(chan struct{}),
@@ -106,10 +149,16 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 	// Initialize modules
 	for _, c := range configs {
 		// Only add configs to startList which are enabled
-		if !c.Enabled() {
+		if !c.Config.Enabled() {
 			continue
 		}
-		_, err := runnerFactory.Create(c, nil)
+
+		if checker, ok := runnerFactory.(ConfigChecker); ok {
+			err = checker.CheckConfig(c.Config)
+		} else {
+			_, err = runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
+		}
+
 		if err != nil {
 			return err
 		}
@@ -121,11 +170,13 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	logp.Info("Config reloader started")
 
+	list := NewRunnerList("reload", runnerFactory, rl.pipeline)
+
 	rl.wg.Add(1)
 	defer rl.wg.Done()
 
 	// Stop all running modules when method finishes
-	defer rl.stopRunners(rl.registry.CopyList())
+	defer list.Stop()
 
 	gw := NewGlobWatcher(rl.path)
 
@@ -141,8 +192,8 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 		case <-rl.done:
 			logp.Info("Dynamic config reloader stopped")
 			return
-		case <-time.After(rl.config.Reload.Period):
 
+		case <-time.After(rl.config.Reload.Period):
 			debugf("Scan for new config files")
 			configReloads.Add(1)
 
@@ -164,49 +215,10 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 			debugf("Number of module configs found: %v", len(configs))
 
-			startList := map[uint64]Runner{}
-			stopList := rl.registry.CopyList()
-
-			for _, c := range configs {
-
-				// Only add configs to startList which are enabled
-				if !c.Enabled() {
-					continue
-				}
-
-				rawCfg := map[string]interface{}{}
-				err := c.Unpack(rawCfg)
-
-				if err != nil {
-					logp.Err("Unable to unpack config file due to error: %v", err)
-					continue
-				}
-
-				hash, err := hashstructure.Hash(rawCfg, nil)
-				if err != nil {
-					// Make sure the next run also updates because some runners were not properly loaded
-					overwriteUpdate = true
-					debugf("Unable to generate hash for config file %v due to error: %v", c, err)
-					continue
-				}
-
-				debugf("Remove module from stoplist: %v", hash)
-				delete(stopList, hash)
-
-				// As module already exist, it must be removed from the stop list and not started
-				if !rl.registry.Has(hash) {
-					debugf("Add module to startlist: %v", hash)
-					runner, err := runnerFactory.Create(c, nil)
-					if err != nil {
-						logp.Err("Unable to create runner due to error: %v", err)
-						continue
-					}
-					startList[hash] = runner
-				}
+			if err := list.Reload(configs); err != nil {
+				// Make sure the next run also updates because some runners were not properly loaded
+				overwriteUpdate = true
 			}
-
-			rl.stopRunners(stopList)
-			rl.startRunners(startList)
 		}
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
@@ -221,70 +233,59 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	}
 }
 
-func (rl *Reloader) loadConfigs(files []string) ([]*common.Config, error) {
+// Load loads configuration files once.
+func (rl *Reloader) Load(runnerFactory RunnerFactory) {
+	list := NewRunnerList("load", runnerFactory, rl.pipeline)
+
+	rl.wg.Add(1)
+	defer rl.wg.Done()
+
+	// Stop all running modules when method finishes
+	defer list.Stop()
+
+	gw := NewGlobWatcher(rl.path)
+
+	debugf("Scan for config files")
+	files, _, err := gw.Scan()
+	if err != nil {
+		logp.Err("Error fetching new config files: %v", err)
+	}
+
 	// Load all config objects
-	configs := []*common.Config{}
+	configs, _ := rl.loadConfigs(files)
+
+	debugf("Number of module configs found: %v", len(configs))
+
+	if err := list.Reload(configs); err != nil {
+		logp.Err("Error loading configuration files: %+v", err)
+		return
+	}
+
+	logp.Info("Loading of config files completed.")
+}
+
+func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error) {
+	// Load all config objects
+	result := []*reload.ConfigWithMeta{}
 	var errs multierror.Errors
 	for _, file := range files {
-		c, err := LoadList(file)
+		configs, err := LoadList(file)
 		if err != nil {
 			errs = append(errs, err)
-			logp.Err("Error loading config: %s", err)
+			logp.Err("Error loading config from file '%s', error %v", file, err)
 			continue
 		}
 
-		configs = append(configs, c...)
+		for _, c := range configs {
+			result = append(result, &reload.ConfigWithMeta{Config: c})
+		}
 	}
 
-	return configs, errs.Err()
+	return result, errs.Err()
 }
 
 // Stop stops the reloader and waits for all modules to properly stop
 func (rl *Reloader) Stop() {
 	close(rl.done)
 	rl.wg.Wait()
-}
-
-func (rl *Reloader) startRunners(list map[uint64]Runner) {
-	if len(list) == 0 {
-		return
-	}
-
-	logp.Info("Starting %v runners ...", len(list))
-	for id, runner := range list {
-		runner.Start()
-		rl.registry.Add(id, runner)
-
-		moduleStarts.Add(1)
-		moduleRunning.Add(1)
-		debugf("New runner started: %v", id)
-	}
-}
-
-func (rl *Reloader) stopRunners(list map[uint64]Runner) {
-	if len(list) == 0 {
-		return
-	}
-
-	logp.Info("Stopping %v runners ...", len(list))
-
-	wg := sync.WaitGroup{}
-	for hash, runner := range list {
-		wg.Add(1)
-
-		// Stop modules in parallel
-		go func(h uint64, run Runner) {
-			defer func() {
-				moduleStops.Add(1)
-				moduleRunning.Add(-1)
-				debugf("Runner stopped: %v", h)
-				wg.Done()
-			}()
-
-			run.Stop()
-			rl.registry.Remove(h)
-		}(hash, runner)
-	}
-
-	wg.Wait()
 }

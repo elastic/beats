@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package syslog
 
 import (
@@ -11,7 +28,6 @@ import (
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/filebeat/inputsource"
-	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -20,12 +36,13 @@ import (
 
 // Parser is generated from a ragel state machine using the following command:
 //go:generate ragel -Z -G2 parser.rl -o parser.go
+//go:generate go fmt parser.go
 
 // Severity and Facility are derived from the priority, theses are the human readable terms
 // defined in https://tools.ietf.org/html/rfc3164#section-4.1.1.
 //
 // Example:
-// 2 => "Critial"
+// 2 => "Critical"
 type mapper []string
 
 var (
@@ -88,14 +105,18 @@ type Input struct {
 // NewInput creates a new syslog input
 func NewInput(
 	cfg *common.Config,
-	outlet channel.Factory,
+	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	cfgwarn.Experimental("Syslog input type is used")
 
 	log := logp.NewLogger("syslog")
 
-	out, err := outlet(cfg, context.DynamicFields)
+	out, err := outlet.ConnectWith(cfg, beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			DynamicFields: context.DynamicFields,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -110,11 +131,21 @@ func NewInput(
 		ev := newEvent()
 		Parse(data, ev)
 		if !ev.IsValid() {
-			log.Errorw("can't not parse event as syslog rfc3164", "message", string(data))
+			log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
+			// On error revert to the raw bytes content, we need a better way to communicate this kind of
+			// error upstream this should be a global effort.
+			forwarder.Send(beat.Event{
+				Timestamp: time.Now(),
+				Meta: common.MapStr{
+					"truncated": metadata.Truncated,
+				},
+				Fields: common.MapStr{
+					"message": string(data),
+				},
+			})
+		} else {
+			forwarder.Send(createEvent(ev, metadata, time.Local, log))
 		}
-		event := createEvent(ev, metadata, time.Local, log)
-		d := &util.Data{Event: *event}
-		forwarder.Send(d)
 	}
 
 	server, err := factory(cb, config.Protocol)
@@ -141,6 +172,7 @@ func (p *Input) Run() {
 		err := p.server.Start()
 		if err != nil {
 			p.log.Error("Error starting the server", "error", err)
+			return
 		}
 		p.started = true
 	}
@@ -152,6 +184,10 @@ func (p *Input) Stop() {
 	p.Lock()
 	defer p.Unlock()
 
+	if !p.started {
+		return
+	}
+
 	p.log.Info("Stopping Syslog input")
 	p.server.Stop()
 	p.started = false
@@ -162,10 +198,14 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
-func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) *beat.Event {
+func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
-		"source":  metadata.RemoteAddr.String(),
+		"log": common.MapStr{
+			"source": common.MapStr{
+				"address": metadata.RemoteAddr.String(),
+			},
+		},
 	}
 
 	syslog := common.MapStr{}
@@ -206,9 +246,15 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 
 	f["syslog"] = syslog
 	f["event"] = event
-	f["process"] = process
+	if len(process) > 0 {
+		f["process"] = process
+	}
 
-	return &beat.Event{
+	if ev.Sequence() != -1 {
+		f["event.sequence"] = ev.Sequence()
+	}
+
+	return beat.Event{
 		Timestamp: ev.Timestamp(timezone),
 		Meta: common.MapStr{
 			"truncated": metadata.Truncated,

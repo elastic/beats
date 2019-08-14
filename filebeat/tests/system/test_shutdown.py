@@ -64,8 +64,13 @@ class Test(BaseTest):
 
         # we allow for a potential race in the harvester shutdown here.
         # In some cases the registry offset might match the penultimate offset.
-        assert (offset == outputs[-1]["offset"] or
-                offset == outputs[-2]["offset"])
+
+        eol_offset = 1
+        if os.name == "nt":
+            eol_offset += 1
+
+        assert (offset == (outputs[-1]["log.offset"] + eol_offset + len(outputs[-1]["message"])) or
+                offset == (outputs[-2]["log.offset"] + eol_offset + len(outputs[-2]["message"])))
 
     def test_shutdown_wait_timeout(self):
         """

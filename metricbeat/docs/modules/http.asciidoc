@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-http]]
@@ -13,7 +13,7 @@ This module is inspired by the Logstash https://www.elastic.co/guide/en/logstash
 
 This is often necessary in security restricted network setups, where Logstash is not able to reach all servers. Instead the server to be monitored itself has Metricbeat installed and can send the data or a collector server has Metricbeat installed which is deployed in the secured network environment and can reach all servers to be monitored.
 
-NOTE: As the HTTP mertricsets also fetch headers, this can lead to lots of fields in Elasticsearch in case there are many different headers. If this is the case for you and you don't need the headers, we recommend to use processors to filter out the header field.
+NOTE: As the HTTP metricsets also fetch headers, this can lead to lots of fields in Elasticsearch in case there are many different headers. If this is the case for you and you don't need the headers, we recommend to use processors to filter out the header field.
 
 
 [float]
@@ -26,31 +26,36 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: http
-  metricsets: ["json"]
+  #metricsets:
+  #  - json
   period: 10s
   hosts: ["localhost:80"]
   namespace: "json_namespace"
   path: "/"
   #body: ""
   #method: "GET"
+  #username: "user"
+  #password: "secret"
   #request.enabled: false
   #response.enabled: false
   #json.is_array: false
   #dedot.enabled: false
 
 - module: http
-  metricsets: ["server"]
+  #metricsets:
+  #  - server
   host: "localhost"
   port: "8080"
   enabled: false
-#  paths:
-#    - path: "/foo"
-#      namespace: "foo"
-#      fields: # added to the the response in root. overwrites existing fields
-#        key: "value"
+  #paths:
+  #  - path: "/foo"
+  #    namespace: "foo"
+  #    fields: # added to the the response in root. overwrites existing fields
+  #      key: "value"
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

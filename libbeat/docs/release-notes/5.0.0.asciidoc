@@ -15,7 +15,7 @@ The list below covers changes between 1.x to 5.0.0 releases.
 - Remove deprecated `host` option from elasticsearch, logstash and redis outputs. {pull}1474[1474]
 - All configuration settings under `shipper:` are moved to be top level configuration settings. I.e.
   `shipper.name:` becomes `name:` in the configuration file. {pull}1570[1570]
-- The `topology_expire` option of the Elasticserach output was removed. {pull}1907[1907]
+- The `topology_expire` option of the Elasticsearch output was removed. {pull}1907[1907]
 - The Elasticsearch template is now loaded by default. {pull}1993[1993]
 - The Redis output `index` setting is renamed to `key`. `index` still works but it's deprecated. {pull}2077[2077]
 - The undocumented file output `index` setting was removed. Use `filename` instead. {pull}2077[2077]

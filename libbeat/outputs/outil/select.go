@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package outil
 
 import (
@@ -6,7 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/conditions"
 )
 
 type Selector struct {
@@ -39,7 +56,7 @@ type listSelector struct {
 
 type condSelector struct {
 	s    SelectorExpr
-	cond *processors.Condition
+	cond conditions.Condition
 }
 
 type constSelector struct {
@@ -184,7 +201,7 @@ func ConcatSelectorExpr(s ...SelectorExpr) SelectorExpr {
 
 func ConditionalSelectorExpr(
 	s SelectorExpr,
-	cond *processors.Condition,
+	cond conditions.Condition,
 ) SelectorExpr {
 	return &condSelector{s, cond}
 }
@@ -236,19 +253,19 @@ func buildSingle(cfg *common.Config, key string) (SelectorExpr, error) {
 	}
 
 	// 4. extract conditional
-	var cond *processors.Condition
+	var cond conditions.Condition
 	if cfg.HasField("when") {
 		sub, err := cfg.Child("when", -1)
 		if err != nil {
 			return nil, err
 		}
 
-		condConfig := processors.ConditionConfig{}
+		condConfig := conditions.Config{}
 		if err := sub.Unpack(&condConfig); err != nil {
 			return nil, err
 		}
 
-		tmp, err := processors.NewCondition(&condConfig)
+		tmp, err := conditions.NewCondition(&condConfig)
 		if err != nil {
 			return nil, err
 		}

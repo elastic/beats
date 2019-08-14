@@ -1,0 +1,110 @@
+- name: gc
+  type: group
+  description: >
+    GC fileset fields.
+  fields:
+    - name: phase
+      type: group
+      description: >
+        Fields specific to GC phase.
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            Name of the GC collection phase.
+        - name: duration_sec
+          type: float
+          description: >
+            Collection phase duration according to the Java virtual machine.
+        - name: scrub_symbol_table_time_sec
+          type: float
+          description: >
+             Pause time in seconds cleaning up symbol tables.
+        - name: scrub_string_table_time_sec
+          type: float
+          description: >
+            Pause time in seconds cleaning up string tables.
+        - name: weak_refs_processing_time_sec
+          type: float
+          description: >
+            Time spent processing weak references in seconds.
+        - name: parallel_rescan_time_sec
+          type: float
+          description: >
+            Time spent in seconds marking live objects while application is stopped.
+        - name: class_unload_time_sec
+          type: float
+          description: >
+            Time spent unloading unused classes in seconds.
+        - name: cpu_time
+          type: group
+          description: >
+            Process CPU time spent performing collections.
+          fields:
+            - name: user_sec
+              type: float
+              description: >
+                CPU time spent outside the kernel.
+            - name: sys_sec
+              type: float
+              description: >
+                CPU time spent inside the kernel. 
+            - name: real_sec
+              type: float
+              description: >
+                Total elapsed CPU time spent to complete the collection from start to finish.
+    - name: jvm_runtime_sec
+      type: float
+      description: >
+        The time from JVM start up in seconds, as a floating point number.
+    - name: threads_total_stop_time_sec
+      type: float
+      description: >
+        Garbage collection threads total stop time seconds.
+    - name: stopping_threads_time_sec
+      type: float
+      description: >
+        Time took to stop threads seconds.
+    - name: tags
+      type: keyword
+      description: >
+        GC logging tags.
+    - name: heap
+      type: group
+      description: >
+        Heap allocation and total size.
+      fields:
+        - name: size_kb
+          type: integer
+          description: >
+            Total heap size in kilobytes.
+        - name: used_kb
+          type: integer
+          description: >
+            Used heap in kilobytes.
+    - name: old_gen
+      type: group
+      description: >
+        Old generation occupancy and total size.
+      fields:
+        - name: size_kb
+          type: integer
+          description: >
+            Total size of old generation in kilobytes.
+        - name: used_kb
+          type: integer
+          description: >
+            Old generation occupancy in kilobytes.
+    - name: young_gen
+      type: group
+      description: >
+        Young generation occupancy and total size.
+      fields:
+        - name: size_kb
+          type: integer
+          description: >
+            Total size of young generation in kilobytes.
+        - name: used_kb
+          type: integer
+          description: >
+            Young generation occupancy in kilobytes.

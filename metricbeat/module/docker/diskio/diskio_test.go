@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package diskio
 
 import (
@@ -205,7 +222,7 @@ func setTime(index int) {
 	newBlkioRaw[index].Time = oldBlkioRaw[index].Time.Add(time.Duration(2000000000))
 }
 
-func TestGetBlkioStats(t *testing.T) {
+func TestGetBlkioStatsList(t *testing.T) {
 	start := time.Now()
 	later := start.Add(10 * time.Second)
 
@@ -215,7 +232,7 @@ func TestGetBlkioStats(t *testing.T) {
 		},
 	}
 
-	dockerStats := &docker.Stat{
+	dockerStats := []docker.Stat{{
 		Container: &types.Container{
 			ID:    "cebada",
 			Names: []string{"test"},
@@ -241,9 +258,49 @@ func TestGetBlkioStats(t *testing.T) {
 				},
 			},
 		}},
+	}}
+
+	statsList := blkioService.getBlkioStatsList(dockerStats, true)
+	stats := statsList[0]
+	assert.Equal(t, float64(5), stats.reads)
+	assert.Equal(t, float64(10), stats.writes)
+	assert.Equal(t, float64(15), stats.totals)
+	assert.Equal(t,
+		BlkioRaw{Time: later, reads: 150, writes: 300, totals: 450},
+		stats.serviced)
+	assert.Equal(t,
+		BlkioRaw{Time: later, reads: 1500, writes: 3000, totals: 4500},
+		stats.servicedBytes)
+}
+
+func TestGetBlkioStatsListWindows(t *testing.T) {
+	start := time.Now()
+	later := start.Add(10 * time.Second)
+
+	blkioService := BlkioService{
+		map[string]BlkioRaw{
+			"cebada": {Time: start, reads: 100, writes: 200, totals: 300},
+		},
 	}
 
-	stats := blkioService.getBlkioStats(dockerStats, true)
+	dockerStats := []docker.Stat{{
+		Container: &types.Container{
+			ID:    "cebada",
+			Names: []string{"test"},
+		},
+		Stats: types.StatsJSON{Stats: types.Stats{
+			Read: later,
+			StorageStats: types.StorageStats{
+				ReadCountNormalized:  150,
+				WriteCountNormalized: 300,
+				ReadSizeBytes:        1500,
+				WriteSizeBytes:       3000,
+			},
+		}},
+	}}
+
+	statsList := blkioService.getBlkioStatsList(dockerStats, true)
+	stats := statsList[0]
 	assert.Equal(t, float64(5), stats.reads)
 	assert.Equal(t, float64(10), stats.writes)
 	assert.Equal(t, float64(15), stats.totals)

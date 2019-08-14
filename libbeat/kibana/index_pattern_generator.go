@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package kibana
 
 import (
@@ -8,51 +25,38 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/mapping"
 )
 
 type IndexPatternGenerator struct {
-	indexName      string
-	beatVersion    string
-	fieldsYaml     string
-	version        common.Version
-	targetDir      string
-	targetFilename string
+	indexName   string
+	beatVersion string
+	fields      []byte
+	version     common.Version
+	migration   bool
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName, beatDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName string, fields []byte, beatVersion string, version common.Version, migration bool) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
 
-	fieldsYaml := filepath.Join(beatDir, "fields.yml")
-	if _, err := os.Stat(fieldsYaml); err != nil {
-		return nil, err
-	}
-
 	return &IndexPatternGenerator{
-		indexName:      indexName,
-		fieldsYaml:     fieldsYaml,
-		beatVersion:    beatVersion,
-		version:        version,
-		targetDir:      createTargetDir(beatDir, version),
-		targetFilename: beatName + ".json",
+		indexName:   indexName + "-*",
+		fields:      fields,
+		beatVersion: beatVersion,
+		version:     version,
+		migration:   migration,
 	}, nil
 }
 
-// Create the Index-Pattern for Kibana for 5.x and default.
-func (i *IndexPatternGenerator) Generate() (string, error) {
+// Generate creates the Index-Pattern for Kibana.
+func (i *IndexPatternGenerator) Generate() (common.MapStr, error) {
 	idxPattern, err := i.generate()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	if i.version.Major >= 6 {
-		idxPattern = i.generateMinVersion6(idxPattern)
-	}
-
-	file := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file, idxPattern)
-
-	return file, err
+	return i.generatePattern(idxPattern), nil
 }
 
 func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
@@ -74,14 +78,14 @@ func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
 	return indexPattern, nil
 }
 
-func (i *IndexPatternGenerator) generateMinVersion6(attrs common.MapStr) common.MapStr {
+func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapStr {
 	out := common.MapStr{
 		"version": i.beatVersion,
 		"objects": []common.MapStr{
 			common.MapStr{
 				"type":       "index-pattern",
 				"id":         i.indexName,
-				"version":    1,
+				"version":    "1",
 				"attributes": attrs,
 			},
 		},
@@ -91,7 +95,7 @@ func (i *IndexPatternGenerator) generateMinVersion6(attrs common.MapStr) common.
 }
 
 func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
-	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fieldsYaml)
+	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fields)
 	if err != nil {
 		return err
 	}
@@ -107,11 +111,11 @@ func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
 }
 
 func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) error {
-	fields, err := common.LoadFieldsYaml(i.fieldsYaml)
+	fields, err := mapping.LoadFields(i.fields)
 	if err != nil {
 		return err
 	}
-	transformer, err := newFieldsTransformer(&i.version, fields)
+	transformer, err := newFieldsTransformer(&i.version, fields, i.migration)
 	if err != nil {
 		return err
 	}
@@ -152,17 +156,13 @@ func dumpToFile(f string, pattern common.MapStr) error {
 }
 
 func createTargetDir(baseDir string, version common.Version) string {
-	targetDir := filepath.Join(baseDir, "_meta", "kibana", getVersionPath(version), "index-pattern")
+	targetDir := filepath.Join(baseDir, getVersionPath(version), "index-pattern")
 	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
-		os.MkdirAll(targetDir, 0777)
+		os.MkdirAll(targetDir, 0755)
 	}
 	return targetDir
 }
 
 func getVersionPath(version common.Version) string {
-	versionPath := "6"
-	if version.Major == 5 {
-		versionPath = "5"
-	}
-	return versionPath
+	return "7"
 }

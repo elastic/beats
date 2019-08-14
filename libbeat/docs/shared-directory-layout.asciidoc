@@ -24,15 +24,16 @@ The directory layout of an installation is as follows:
 | logs   | The location for the logs created by {beatname_uc}. | {path.home}/logs | path.logs
 |=======================================================================
 
-You can change these settings by using CLI flags or setting <<configuration-path,path options>> in the configuration
-file.
+ifndef::serverless[]
+You can change these settings by using CLI flags or setting
+<<configuration-path,path options>> in the configuration file.
+endif::serverless[]
 
 ==== Default paths
 
 {beatname_uc} uses the following default paths unless you explicitly change them.
 
-ifeval::["{beatname_lc}"!="winlogbeat"]
-
+ifdef::deb_os,rpm_os[]
 [float]
 ===== deb and rpm
 [cols="<h,<,<m",options="header",]
@@ -50,6 +51,9 @@ the systemd unit file.  Make sure that you start the {beatname_uc} service by us
 the preferred operating system method (init scripts or `systemctl`).
 Otherwise the paths might be set incorrectly.
 
+endif::deb_os,rpm_os[]
+
+ifdef::docker_platform[]
 [float]
 ===== docker
 [cols="<h,<,<m",options="header",]
@@ -62,10 +66,11 @@ Otherwise the paths might be set incorrectly.
 | logs   | The location for the logs created by {beatname_uc}. | /usr/share/{beatname_lc}/logs
 |=======================================================================
 
-endif::[]
+endif::docker_platform[]
 
+ifdef::mac_os,win_os[]
 [float]
-===== zip, tar.gz, and tgz
+===== zip, tar.gz, or tgz
 [cols="<h,<,<m",options="header",]
 |=======================================================================
 | Type   | Description | Location
@@ -74,26 +79,44 @@ endif::[]
 | config | The location for configuration files. | {extract.path}
 | data   | The location for persistent data files. | {extract.path}/data
 | logs   | The location for the logs created by {beatname_uc}. | {extract.path}/logs
+ifdef::serverless[]
+| pkg    | The location for the binary uploaded to your serverless provider. | {extract.path}/pkg
+endif::serverless[]
 |=======================================================================
 
-For the zip, tar.gz and tgz distributions, these paths are based on the location of the
-extracted binary file. This means that if you start {beatname_uc} with the following simple command,
-all paths are set correctly:
+For the zip, tar.gz, or tgz distributions, these paths are based on the location
+of the extracted binary file. This means that if you start {beatname_uc} with
+the following simple command, all paths are set correctly:
 
-ifeval::["{beatname_lc}"!="winlogbeat"]
+endif::mac_os,win_os[]
 
-["source","sh",subs="attributes,callouts"]
+ifndef::win_only[]
+
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 ./{beatname_lc}
-------------------------------------------------------------------------------
+----------------------------------------------------------------------
 
-endif::[]
+endif::win_only[]
 
-ifeval::["{beatname_lc}"=="winlogbeat"]
+ifdef::mac_os[]
+===== brew
+[cols="<h,<,<m",options="header",]
+|=======================================================================
+| Type   | Description | Location
+| home   | Home of the {beatname_uc} installation. | /usr/local/var/homebrew/linked/{beatname_lc}-full
+| bin    | The location for the binary files. | /usr/local/var/homebrew/linked/{beatname_lc}-full/bin
+| config | The location for configuration files. | /usr/local/etc/{beatname_lc}
+| data   | The location for persistent data files. | /usr/local/var/lib/{beatname_lc}
+| logs   | The location for the logs created by {beatname_uc}. | /usr/local/var/log/{beatname_lc}
+|=======================================================================
+endif::mac_os[]
 
-["source","sh",subs="attributes,callouts"]
+ifdef::win_only[]
+
+["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 Start-Service {beatname_lc}
 ----------------------------------------------------------------------
 
-endif::[]
+endif::win_only[]

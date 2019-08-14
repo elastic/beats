@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package autodiscover
 
 import (
@@ -7,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Builder provides an interface by which configs can be built from provider metadata
@@ -41,7 +57,7 @@ func (r *registry) AddBuilder(name string, builder BuilderConstructor) error {
 	}
 
 	r.builders[name] = builder
-	logp.Debug(debugK, "Builder registered: %s", name)
+	r.logger.Debugf("Builder registered: %s", name)
 	return nil
 }
 
@@ -54,7 +70,7 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 	return r.builders[name]
 }
 
-// BuildBuilder reads provider configuration and instatiate one
+// BuildBuilder reads provider configuration and instantiate one
 func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
@@ -70,9 +86,9 @@ func (r *registry) BuildBuilder(c *common.Config) (Builder, error) {
 	return builder(c)
 }
 
-// GetConfig creates configs for all builders initalized.
+// GetConfig creates configs for all builders initialized.
 func (b Builders) GetConfig(event bus.Event) []*common.Config {
-	var configs []*common.Config
+	configs := []*common.Config{}
 
 	for _, builder := range b {
 		if config := builder.CreateConfig(event); config != nil {
@@ -83,21 +99,18 @@ func (b Builders) GetConfig(event bus.Event) []*common.Config {
 	return configs
 }
 
-// NewBuilders instances the given list of builders. If hintsEnabled is true it will
-// just enable the hints builder
-func NewBuilders(bConfigs []*common.Config, hintsEnabled bool) (Builders, error) {
+// NewBuilders instances the given list of builders. hintsCfg holds `hints` settings
+// for simplified mode (single 'hints' builder)
+func NewBuilders(bConfigs []*common.Config, hintsCfg *common.Config) (Builders, error) {
 	var builders Builders
-	if hintsEnabled {
+	if hintsCfg.Enabled() {
 		if len(bConfigs) > 0 {
 			return nil, errors.New("hints.enabled is incompatible with manually defining builders")
 		}
 
-		hints, err := common.NewConfigFrom(map[string]string{"type": "hints"})
-		if err != nil {
-			return nil, err
-		}
-
-		bConfigs = append(bConfigs, hints)
+		// pass rest of hints settings to the builder
+		hintsCfg.SetString("type", -1, "hints")
+		bConfigs = append(bConfigs, hintsCfg)
 	}
 
 	for _, bcfg := range bConfigs {

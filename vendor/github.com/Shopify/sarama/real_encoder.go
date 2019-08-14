@@ -35,9 +35,21 @@ func (re *realEncoder) putInt64(in int64) {
 	re.off += 8
 }
 
+func (re *realEncoder) putVarint(in int64) {
+	re.off += binary.PutVarint(re.raw[re.off:], in)
+}
+
 func (re *realEncoder) putArrayLength(in int) error {
 	re.putInt32(int32(in))
 	return nil
+}
+
+func (re *realEncoder) putBool(in bool) {
+	if in {
+		re.putInt8(1)
+		return
+	}
+	re.putInt8(0)
 }
 
 // collection
@@ -54,9 +66,16 @@ func (re *realEncoder) putBytes(in []byte) error {
 		return nil
 	}
 	re.putInt32(int32(len(in)))
-	copy(re.raw[re.off:], in)
-	re.off += len(in)
-	return nil
+	return re.putRawBytes(in)
+}
+
+func (re *realEncoder) putVarintBytes(in []byte) error {
+	if in == nil {
+		re.putVarint(-1)
+		return nil
+	}
+	re.putVarint(int64(len(in)))
+	return re.putRawBytes(in)
 }
 
 func (re *realEncoder) putString(in string) error {
@@ -64,6 +83,14 @@ func (re *realEncoder) putString(in string) error {
 	copy(re.raw[re.off:], in)
 	re.off += len(in)
 	return nil
+}
+
+func (re *realEncoder) putNullableString(in *string) error {
+	if in == nil {
+		re.putInt16(-1)
+		return nil
+	}
+	return re.putString(*in)
 }
 
 func (re *realEncoder) putStringArray(in []string) error {

@@ -48,8 +48,7 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
-                         "state", "username", "cgroup", "cwd"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
@@ -366,18 +365,16 @@ class Test(metricbeat.BaseTest):
         """
         Test system/process output.
         """
-        if not sys.platform.startswith("linux") and "cgroup" in SYSTEM_PROCESS_FIELDS:
-            SYSTEM_PROCESS_FIELDS.remove("cgroup")
-
-        if not sys.platform.startswith("linux") and "cwd" in SYSTEM_PROCESS_FIELDS:
-            SYSTEM_PROCESS_FIELDS.remove("cwd")
-
         self.render_config_template(modules=[{
             "name": "system",
             "metricsets": ["process"],
             "period": "5s",
             "extras": {
-                "process.env.whitelist": ["PATH"]
+                "process.env.whitelist": ["PATH"],
+                "process.include_cpu_ticks": True,
+
+                # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
+                "process.include_per_cpu": False,
             }
         }])
         proc = self.start_beat()
@@ -391,6 +388,7 @@ class Test(metricbeat.BaseTest):
         found_cmdline = False
         found_env = False
         found_fd = False
+        found_cwd = not sys.platform.startswith("linux")
         for evt in output:
             process = evt["system"]["process"]
 
@@ -402,12 +400,16 @@ class Test(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
 
             # Remove optional keys.
+            process.pop("cgroup", None)
             cmdline = process.pop("cmdline", None)
             if cmdline is not None:
                 found_cmdline = True
             fd = process.pop("fd", None)
             if fd is not None:
                 found_fd = True
+            cwd = process.pop("cwd", None)
+            if cwd is not None:
+                found_cwd = True
 
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
@@ -439,11 +441,48 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output()[0]
 
-        assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
+        assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
-        self.check_username(output["system.process.username"])
+        self.check_username(output["user.name"])
+
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
+    def test_socket_summary(self):
+        """
+        Test system/socket_summary output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["socket_summary"],
+            "period": "5s",
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+
+            summary = evt["system"]["socket"]["summary"]
+            a = summary["all"]
+            tcp = summary["tcp"]
+            udp = summary["udp"]
+
+            assert isinstance(a["count"], int)
+            assert isinstance(a["listening"], int)
+
+            assert isinstance(tcp["all"]["count"], int)
+            assert isinstance(tcp["all"]["listening"], int)
+            assert isinstance(tcp["all"]["established"], int)
+            assert isinstance(tcp["all"]["close_wait"], int)
+            assert isinstance(tcp["all"]["time_wait"], int)
+
+            assert isinstance(udp["all"]["count"], int)
 
     def check_username(self, observed, expected=None):
         if expected == None:

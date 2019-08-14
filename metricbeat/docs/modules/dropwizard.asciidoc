@@ -1,14 +1,16 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-dropwizard]]
 == Dropwizard module
 
-beta[]
-
 This is the http://dropwizard.io[Dropwizard] module. The default metricset is `collector`.
 
+[float]
+=== Compability
+
+The Dropwizard module is tested with dropwizard metrics 3.1.0.
 
 
 [float]
@@ -29,7 +31,8 @@ metricbeat.modules:
   enabled: true
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

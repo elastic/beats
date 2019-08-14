@@ -27,3 +27,12 @@ Specify the characters used to split the incoming events. The default is '\n'.
 ==== `timeout`
 
 The number of seconds of inactivity before a remote connection is closed. The default is `300s`.
+
+[float]
+[id="{beatname_lc}-input-{type}-tcp-ssl"]
+===== `ssl`
+
+Configuration options for SSL parameters like the certificate, key and the certificate authorities
+to use.
+
+See <<configuration-ssl>> for more information.

@@ -1,5 +1,6 @@
-import os
 import argparse
+import datetime
+import os
 
 # Creates a new beat or metricbeat based on the given parameters
 
@@ -97,7 +98,8 @@ def replace_variables(content):
         .replace("{beat}", beat) \
         .replace("{Beat}", beat.capitalize()) \
         .replace("{beat_path}", beat_path) \
-        .replace("{full_name}", full_name)
+        .replace("{full_name}", full_name) \
+        .replace("{year}", str(datetime.datetime.now().year))
 
 
 def get_parser():
@@ -108,7 +110,7 @@ def get_parser():
     parser.add_argument("--github_name", help="Github name")
     parser.add_argument("--beat_path", help="Beat path")
     parser.add_argument("--full_name", help="Full name")
-    parser.add_argument("--type", help="Beat type", default="beat")
+    parser.add_argument("--type", help="Beat type", default="beat", choices=["beat", "metricbeat"])
 
     return parser
 

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
@@ -12,7 +29,7 @@ import (
 // and pointers as necessary.
 //
 // Unpack supports the options: PathSep, StructTag, ValidatorTag, Env, Resolve,
-// ResolveEnv.
+// ResolveEnv, ReplaceValues, AppendValues, PrependValues.
 //
 // When unpacking into a value, Unpack first will try to call Unpack if the
 // value implements the Unpacker interface. Otherwise, Unpack tries to convert
@@ -61,7 +78,12 @@ import (
 //  If the tag sets the `,ignore` flag, the field will not be overwritten.
 //  If the tag sets the `,inline` or `,squash` flag, Unpack will apply the current
 //  configuration namespace to the fields.
-//
+//  If the tag option `replace` is configured, arrays and *ucfg.Config
+//  convertible fields are replaced by the new values.
+//  If the tag options `append` or `prepend` is used, arrays will be merged by
+//  appending/prepending the new array contents.
+//  The struct tag options `replace`, `append`, and `prepend` overwrites the
+//  global value merging strategy (e.g. ReplaceValues, AppendValues, ...) for all sub-fields.
 //
 // Fields available in a struct or a map, but not in the Config object, will not
 // be touched. Default values should be set in the target value before calling Unpack.
@@ -167,7 +189,7 @@ func reifyMap(opts *options, to reflect.Value, from *Config) Error {
 		to.Set(reflect.MakeMap(to.Type()))
 	}
 	for k, value := range fields {
-		opts.activeFields = NewFieldSet(parentFields)
+		opts.activeFields = newFieldSet(parentFields)
 		key := reflect.ValueOf(k)
 
 		old := to.MapIndex(key)
@@ -219,7 +241,15 @@ func reifyStruct(opts *options, orig reflect.Value, cfg *Config) Error {
 				continue
 			}
 
-			opts.activeFields = NewFieldSet(parentFields)
+			// create new context, overwriting configValueHandling for all sub-operations
+			if tagOpts.cfgHandling != opts.configValueHandling {
+				tmp := &options{}
+				*tmp = *opts
+				tmp.configValueHandling = tagOpts.cfgHandling
+				opts = tmp
+			}
+
+			opts.activeFields = newFieldSet(parentFields)
 
 			vField := to.Field(i)
 			validators, err := parseValidatorTags(stField.Tag.Get(opts.validatorTag))
@@ -382,14 +412,6 @@ func reifyMergeValue(
 
 	baseType := chaseTypePointers(old.Type())
 
-	if v, ok := valueIsUnpacker(old); ok {
-		err := unpackWith(opts.opts, v, val)
-		if err != nil {
-			return reflect.Value{}, err
-		}
-		return old, nil
-	}
-
 	if tConfig.ConvertibleTo(baseType) {
 		sub, err := val.toConfig(opts.opts)
 		if err != nil {
@@ -420,7 +442,15 @@ func reifyMergeValue(
 		}
 
 		// old != value -> merge value into old
-		return oldValue, mergeConfig(opts.opts, subOld, sub)
+		return oldValue, mergeFieldConfig(opts, subOld, sub)
+	}
+
+	if v, ok := valueIsUnpacker(old); ok {
+		err := unpackWith(opts.opts, v, val)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return old, nil
 	}
 
 	switch baseType.Kind() {
@@ -442,10 +472,14 @@ func reifyMergeValue(
 		return reifyArray(opts, old, baseType, val)
 
 	case reflect.Slice:
-		return reifySlice(opts, baseType, val)
+		return reifySliceMerge(opts, old, baseType, val)
 	}
 
 	return reifyPrimitive(opts, val, t, baseType)
+}
+
+func mergeFieldConfig(opts fieldOptions, to, from *Config) Error {
+	return mergeConfig(opts.opts, to, from)
 }
 
 func reifyArray(
@@ -462,11 +496,20 @@ func reifyArray(
 		ctx := val.Context()
 		return reflect.Value{}, raiseArraySize(ctx, val.meta(), len(arr), tTo.Len())
 	}
-	return reifyDoArray(opts, to, tTo.Elem(), val, arr)
+	return reifyDoArray(opts, to, tTo.Elem(), 0, val, arr)
 }
 
 func reifySlice(
 	opts fieldOptions,
+	tTo reflect.Type,
+	val value,
+) (reflect.Value, Error) {
+	return reifySliceMerge(opts, reflect.Value{}, tTo, val)
+}
+
+func reifySliceMerge(
+	opts fieldOptions,
+	old reflect.Value,
 	tTo reflect.Type,
 	val value,
 ) (reflect.Value, Error) {
@@ -475,22 +518,58 @@ func reifySlice(
 		return reflect.Value{}, err
 	}
 
-	to := reflect.MakeSlice(tTo, len(arr), len(arr))
-	return reifyDoArray(opts, to, tTo.Elem(), val, arr)
+	arrMergeCfg := opts.configHandling()
+
+	l := len(arr)
+	start := 0
+	cpyStart := 0
+
+	withOld := old.IsValid() && !old.IsNil()
+	if withOld {
+		ol := old.Len()
+
+		switch arrMergeCfg {
+		case cfgReplaceValue:
+			// do nothing
+
+		case cfgArrAppend:
+			l += ol
+			start = ol
+
+		case cfgArrPrepend:
+			cpyStart = l
+			l += ol
+
+		default:
+			if l < ol {
+				l = ol
+			}
+		}
+	}
+	tmp := reflect.MakeSlice(tTo, l, l)
+
+	if withOld {
+		reflect.Copy(tmp.Slice(cpyStart, tmp.Len()), old)
+	}
+	return reifyDoArray(opts, tmp, tTo.Elem(), start, val, arr)
 }
 
 func reifyDoArray(
 	opts fieldOptions,
 	to reflect.Value, elemT reflect.Type,
+	start int,
 	val value,
 	arr []value,
 ) (reflect.Value, Error) {
-	for i, from := range arr {
-		v, err := reifyValue(opts, elemT, from)
+	idx := start
+	for _, from := range arr {
+		to.Index(idx)
+		v, err := reifyMergeValue(opts, to.Index(idx), from)
 		if err != nil {
 			return reflect.Value{}, err
 		}
-		to.Index(i).Set(v)
+		to.Index(idx).Set(v)
+		idx++
 	}
 
 	if err := runValidators(to.Interface(), opts.validators); err != nil {
@@ -577,7 +656,7 @@ func doReifyPrimitive(
 	}
 
 	previous := opts.opts.activeFields
-	opts.opts.activeFields = NewFieldSet(previous)
+	opts.opts.activeFields = newFieldSet(previous)
 	valT, err := val.typ(opts.opts)
 	if err != nil {
 		ctx := val.Context()

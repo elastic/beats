@@ -1,0 +1,337 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+                "title": "Logs Severity [Filebeat Logstash] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "field": "log.level", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "right", 
+                        "type": "pie"
+                    }, 
+                    "title": "Logs Severity [Filebeat Logstash] ECS", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+                "title": "logs over time [Filebeat Logstash] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customInterval": "2h", 
+                                "extended_bounds": {}, 
+                                "field": "@timestamp", 
+                                "interval": "auto", 
+                                "min_doc_count": 1
+                            }, 
+                            "schema": "segment", 
+                            "type": "date_histogram"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "3", 
+                            "params": {
+                                "field": "log.level", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "group", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTimeMarker": false, 
+                        "addTooltip": true, 
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1", 
+                                "labels": {
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "position": "bottom", 
+                                "scale": {
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {}, 
+                                "type": "category"
+                            }
+                        ], 
+                        "grid": {
+                            "categoryLines": false, 
+                            "style": {
+                                "color": "#eee"
+                            }
+                        }, 
+                        "legendPosition": "right", 
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1", 
+                                    "label": "Count"
+                                }, 
+                                "drawLinesBetweenPoints": true, 
+                                "mode": "stacked", 
+                                "show": "true", 
+                                "showCircles": true, 
+                                "type": "histogram", 
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ], 
+                        "times": [], 
+                        "type": "histogram", 
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1", 
+                                "labels": {
+                                    "filter": false, 
+                                    "rotate": 0, 
+                                    "show": true, 
+                                    "truncate": 100
+                                }, 
+                                "name": "LeftAxis-1", 
+                                "position": "left", 
+                                "scale": {
+                                    "mode": "normal", 
+                                    "type": "linear"
+                                }, 
+                                "show": true, 
+                                "style": {}, 
+                                "title": {
+                                    "text": "Count"
+                                }, 
+                                "type": "value"
+                            }
+                        ]
+                    }, 
+                    "title": "logs over time [Filebeat Logstash] ECS", 
+                    "type": "histogram"
+                }
+            }, 
+            "id": "e90b7240-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+            "type": "visualization", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "log.level", 
+                    "logstash.log.module", 
+                    "message", 
+                    "source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "event.module", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "logstash", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "logstash"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "event.module": {
+                                            "query": "logstash", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }, 
+                            {
+                                "$state": {
+                                    "store": "appState"
+                                }, 
+                                "meta": {
+                                    "alias": null, 
+                                    "disabled": false, 
+                                    "index": "filebeat-*", 
+                                    "key": "fileset.name", 
+                                    "negate": false, 
+                                    "params": {
+                                        "query": "log", 
+                                        "type": "phrase"
+                                    }, 
+                                    "type": "phrase", 
+                                    "value": "log"
+                                }, 
+                                "query": {
+                                    "match": {
+                                        "fileset.name": {
+                                            "query": "log", 
+                                            "type": "phrase"
+                                        }
+                                    }
+                                }
+                            }
+                        ], 
+                        "highlightAll": true, 
+                        "index": "filebeat-*", 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "logs [Filebeat Logstash] ECS", 
+                "version": 1
+            }, 
+            "id": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+            "type": "search", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "col": 7, 
+                        "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6-ecs", 
+                        "panelIndex": 2, 
+                        "row": 1, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "id": "e90b7240-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+                        "panelIndex": 3, 
+                        "row": 1, 
+                        "size_x": 6, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 1, 
+                        "columns": [
+                            "log.level", 
+                            "logstash.log.module", 
+                            "message", 
+                            "source"
+                        ], 
+                        "id": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+                        "panelIndex": 4, 
+                        "row": 4, 
+                        "size_x": 12, 
+                        "size_y": 10, 
+                        "sort": [
+                            "@timestamp", 
+                            "desc"
+                        ], 
+                        "type": "search"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "Logstash Logs [Filebeat Logstash] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1
+            }, 
+            "id": "Filebeat-Logstash-Log-Dashboard-ecs", 
+            "type": "dashboard", 
+            "version": 1
+        }
+    ], 
+    "version": "6.0.0"
+}

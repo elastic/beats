@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -47,9 +47,10 @@ var (
 	versionRegexp = regexp.MustCompile(versionGrok)
 )
 
+// familyMap contains a mapping of family -> []platforms.
 var familyMap = map[string][]string{
-	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "amazon"},
-	"debian": {"debian", "ubuntu"},
+	"redhat": {"redhat", "fedora", "centos", "scientific", "oraclelinux", "amzn", "rhel"},
+	"debian": {"debian", "ubuntu", "raspbian"},
 	"suse":   {"suse", "sles", "opensuse"},
 }
 

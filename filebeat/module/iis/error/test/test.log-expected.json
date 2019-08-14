@@ -1,183 +1,109 @@
 [
-  {
-    "_index": "filebeat-6.1.3-alpha1-2018.01.20",
-    "_type": "doc",
-    "_id": "cL-VFGEBcLJksy_1Pk15",
-    "_score": 1,
-    "_source": {
-      "iis": {
-        "error": {
-          "queue_name": "-",
-          "response_code": "503",
-          "remote_ip": "172.31.77.6",
-          "method": "GET",
-          "server_ip": "172.31.77.6",
-          "remote_port": "2094",
-          "http_version": "1.1",
-          "server_port": "80",
-          "reason_phrase": "ConnLimit",
-          "url": "/qos/1kbfile.txt"
-        }
-      },
-      "@timestamp": "2018-01-01T08:09:10.000Z",
-      "offset": 291,
-      "beat": {
-        "hostname": "MACHINE-NAME",
-        "name": "MACHINE-NAME",
-        "version": "6.1.3-alpha1"
-      },
-      "prospector": {
-        "type": "log"
-      },
-      "read_timestamp": "2018-01-20T17:19:39.229Z",
-      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log",      
-      "fileset": {
-        "module": "iis",
-        "name": "error"
-      }
+    {
+        "@timestamp": "2018-01-01T08:09:10.000Z",
+        "destination.address": "172.31.77.6",
+        "destination.ip": "172.31.77.6",
+        "destination.port": 80,
+        "event.dataset": "iis.error",
+        "event.module": "iis",
+        "fileset.name": "error",
+        "http.request.method": "GET",
+        "http.response.status_code": 503,
+        "http.version": "1.1",
+        "iis.error.queue_name": "-",
+        "iis.error.reason_phrase": "ConnLimit",
+        "input.type": "log",
+        "log.offset": 186,
+        "service.type": "iis",
+        "source.address": "172.31.77.6",
+        "source.ip": "172.31.77.6",
+        "source.port": 2094,
+        "url.original": "/qos/1kbfile.txt"
+    },
+    {
+        "@timestamp": "2018-01-01T09:10:11.000Z",
+        "destination.address": "127.0.0.1",
+        "destination.ip": "127.0.0.1",
+        "destination.port": 80,
+        "event.dataset": "iis.error",
+        "event.module": "iis",
+        "fileset.name": "error",
+        "http.request.method": "GET",
+        "http.response.status_code": 400,
+        "http.version": "1.1",
+        "iis.error.queue_name": "-",
+        "iis.error.reason_phrase": "Hostname",
+        "input.type": "log",
+        "log.offset": 286,
+        "service.type": "iis",
+        "source.address": "85.181.35.98",
+        "source.as.number": 6805,
+        "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Berlin",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "DE",
+        "source.geo.location.lat": 52.4908,
+        "source.geo.location.lon": 13.3275,
+        "source.geo.region_iso_code": "DE-BE",
+        "source.geo.region_name": "Land Berlin",
+        "source.ip": "85.181.35.98",
+        "source.port": 2780,
+        "url.original": "/ThisIsMyUrl.htm"
+    },
+    {
+        "@timestamp": "2018-01-01T10:11:12.000Z",
+        "destination.address": "127.0.0.1",
+        "destination.ip": "127.0.0.1",
+        "destination.port": 80,
+        "event.dataset": "iis.error",
+        "event.module": "iis",
+        "fileset.name": "error",
+        "http.request.method": "GET",
+        "http.response.status_code": 505,
+        "http.version": "2.0",
+        "iis.error.queue_name": "-",
+        "iis.error.reason_phrase": "Version_N/S",
+        "input.type": "log",
+        "log.offset": 384,
+        "service.type": "iis",
+        "source.address": "85.181.35.98",
+        "source.as.number": 6805,
+        "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Berlin",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "DE",
+        "source.geo.location.lat": 52.4908,
+        "source.geo.location.lon": 13.3275,
+        "source.geo.region_iso_code": "DE-BE",
+        "source.geo.region_name": "Land Berlin",
+        "source.ip": "85.181.35.98",
+        "source.port": 2894,
+        "url.original": "/"
+    },
+    {
+        "@timestamp": "2018-01-01T11:12:13.000Z",
+        "destination.address": "127.0.0.1",
+        "destination.ip": "127.0.0.1",
+        "destination.port": 80,
+        "event.dataset": "iis.error",
+        "event.module": "iis",
+        "fileset.name": "error",
+        "iis.error.queue_name": "-",
+        "iis.error.reason_phrase": "Timer_MinBytesPerSecond",
+        "input.type": "log",
+        "log.offset": 470,
+        "service.type": "iis",
+        "source.address": "85.181.35.98",
+        "source.as.number": 6805,
+        "source.as.organization.name": "Telefonica Germany",
+        "source.geo.city_name": "Berlin",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "DE",
+        "source.geo.location.lat": 52.4908,
+        "source.geo.location.lon": 13.3275,
+        "source.geo.region_iso_code": "DE-BE",
+        "source.geo.region_name": "Land Berlin",
+        "source.ip": "85.181.35.98",
+        "source.port": 64388
     }
-  },
-  {
-    "_index": "filebeat-6.1.3-alpha1-2018.01.20",
-    "_type": "doc",
-    "_id": "cb-VFGEBcLJksy_1Pk15",
-    "_version": 1,
-    "_score": null,
-    "_source": {
-      "iis": {
-        "error": {
-          "queue_name": "-",
-          "response_code": "400",
-          "remote_ip": "85.181.35.98",
-          "geoip": {
-            "continent_name": "Europe",
-            "city_name": "Berlin",
-            "location": {
-              "lat": 52.5167,
-              "lon": 13.4
-            },
-            "region_name": "Land Berlin",
-            "country_iso_code": "DE"
-          },
-          "method": "GET",
-          "server_ip": "127.0.0.1",
-          "remote_port": "2780",
-          "http_version": "1.1",
-          "server_port": "80",
-          "reason_phrase": "Hostname",
-          "url": "/ThisIsMyUrl.htm"
-        }
-      },
-      "@timestamp": "2018-01-01T09:10:11.000Z",
-      "offset": 390,
-      "beat": {
-        "hostname": "MACHINE-NAME",
-        "name": "MACHINE-NAME",
-        "version": "6.1.3-alpha1"
-      },
-      "prospector": {
-        "type": "log"
-      },
-      "read_timestamp": "2018-01-20T17:19:39.229Z",
-      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log",      
-      "fileset": {
-        "module": "iis",
-        "name": "error"
-      }
-    }
-  },
-  {
-    "_index": "filebeat-6.1.3-alpha1-2018.01.20",
-    "_type": "doc",
-    "_id": "cr-VFGEBcLJksy_1Pk15",
-    "_version": 1,
-    "_score": null,
-    "_source": {
-      "iis": {
-        "error": {
-          "queue_name": "-",
-          "response_code": "505",
-          "remote_ip": "85.181.35.98",
-          "geoip": {
-            "continent_name": "Europe",
-            "city_name": "Berlin",
-            "location": {
-              "lat": 52.5167,
-              "lon": 13.4
-            },
-            "region_name": "Land Berlin",
-            "country_iso_code": "DE"
-          },
-          "method": "GET",
-          "server_ip": "127.0.0.1",
-          "remote_port": "2894",
-          "http_version": "2.0",
-          "server_port": "80",
-          "reason_phrase": "Version_N/S",
-          "url": "/"
-        }
-      },
-      "@timestamp": "2018-01-01T10:11:12.000Z",
-      "offset": 477,
-      "beat": {
-        "hostname": "MACHINE-NAME",
-        "name": "MACHINE-NAME",
-        "version": "6.1.3-alpha1"
-      },
-      "prospector": {
-        "type": "log"
-      },
-      "read_timestamp": "2018-01-20T17:19:39.229Z",
-      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log",
-      "fileset": {
-        "module": "iis",
-        "name": "error"
-      }
-    }
-  },
-  {
-    "_index": "filebeat-6.1.3-alpha1-2018.01.20",
-    "_type": "doc",
-    "_id": "c7-VFGEBcLJksy_1Pk15",
-    "_version": 1,
-    "_score": null,
-    "_source": {
-      "iis": {
-        "error": {
-          "queue_name": "-",
-          "remote_ip": "85.181.35.98",
-          "geoip": {
-            "continent_name": "Europe",
-            "city_name": "Berlin",
-            "location": {
-              "lat": 52.5167,
-              "lon": 13.4
-            },
-            "region_name": "Land Berlin",
-            "country_iso_code": "DE"
-          },
-          "server_ip": "127.0.0.1",
-          "remote_port": "64388",
-          "server_port": "80",
-          "reason_phrase": "Timer_MinBytesPerSecond"
-        }
-      },
-      "@timestamp": "2018-01-01T11:12:13.000Z",
-      "offset": 566,
-      "beat": {
-        "hostname": "MACHINE-NAME",
-        "name": "MACHINE-NAME",
-        "version": "6.1.3-alpha1"
-      },
-      "prospector": {
-        "type": "log"
-      },
-      "read_timestamp": "2018-01-20T17:19:39.229Z",
-      "source": "/go/src/github.com/elastic/beats/filebeat/module/iis/error/test/test.log",
-      "fileset": {
-        "module": "iis",
-        "name": "error"
-      }
-    }
-  }
 ]

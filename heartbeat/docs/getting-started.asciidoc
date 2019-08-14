@@ -1,18 +1,7 @@
 [[heartbeat-getting-started]]
 == Getting Started With Heartbeat
 
-To get started with your own Heartbeat setup, install and configure these
-related products:
-
- * Elasticsearch for storage and indexing the data.
- * Kibana for the UI.
- * Logstash (optional) for inserting data into Elasticsearch.
-
-See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack]
-for more information.
-
-After installing the Elastic Stack, read the following topics to learn how to
-install, configure, and run Heartbeat:
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 * <<heartbeat-installation>>
 * <<heartbeat-configuration>>
@@ -33,7 +22,7 @@ monitor are running.
 
 //TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc.
 
-include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -92,24 +81,30 @@ tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
+include::{libbeat-dir}/docs/shared-brew-install.asciidoc[]
 
-[[docker]]
-*docker:*
+[[linux]]
+*linux:*
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of {beatname_uc} has not yet been released.
+Version {version} of {beatname_uc} has not yet been released.
 
 endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-["source", "shell", subs="attributes"]
+["source","sh",subs="attributes"]
 ------------------------------------------------
-docker pull {dockerimage}
+curl -L -O {downloads}/heartbeat/heartbeat-{version}-linux-x86_64.tar.gz
+tar xzvf heartbeat-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
-
 endif::[]
+
+[[docker]]
+*docker:*
+
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[win]]
 *win:*
@@ -130,8 +125,7 @@ https://www.elastic.co/downloads/beats/heartbeat[downloads page].
 . Rename the +heartbeat-<version>-windows+ directory to +Heartbeat+.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell.
+and select *Run As Administrator*).
 
 . From the PowerShell prompt, run the following commands to install Heartbeat as
 a Windows service:
@@ -157,7 +151,7 @@ options, see <<configuring-howto-heartbeat>>.
 [[heartbeat-configuration]]
 === Step 2: Configure Heartbeat
 
-include::../../libbeat/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
 
 Heartbeat provides monitors to check the status of hosts at set intervals.
 You configure each monitor individually. Heartbeat currently provides monitors
@@ -204,38 +198,25 @@ was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 See <<configuring-howto-heartbeat>> for a full description of each
 configuration option.
 
-. If you are sending output directly to Elasticsearch (and not using Logstash),
-set the IP address and port where Heartbeat can find the Elasticsearch
-installation:
-+
-[source,yaml]
-----------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["192.168.1.42:9200"]
-----------------------------------------------------------------------
-+
-If you are sending output to Logstash, make sure you
-<<logstash-output,Configure the Logstash output>> instead.
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
-include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-include::../../libbeat/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
-include::../../libbeat/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 [[heartbeat-template]]
 === Step 3: Load the index template in Elasticsearch
 
-:allplatforms:
-include::../../libbeat/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-:allplatforms:
-include::../../libbeat/docs/dashboards.asciidoc[]
+Dashboards for Heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 
 [[heartbeat-starting]]
 === Step 5: Start Heartbeat
@@ -248,31 +229,28 @@ NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
 specify command line flags (see <<command-line-options>>). To specify flags,
 start Heartbeat in the foreground.
 
-*deb:*
+*deb and rpm:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo service {beatname_lc}-elastic start
 ----------------------------------------------------------------------
 
-*rpm:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc}-elastic start
-----------------------------------------------------------------------
-
-*mac:*
+*mac and linux:*
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
 sudo chown root heartbeat.yml <1>
-sudo ./heartbeat -e -c heartbeat.yml -d "publish"
+sudo ./heartbeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership of the
-configuration file, or run Heartbeat with `-strict.perms=false` specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+configuration file, or run Heartbeat with `--strict.perms=false` specified. See
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
+
+:requires-sudo:
+include::{libbeat-dir}/docs/shared-brew-run.asciidoc[]
+:requires-sudo!:
 
 *win:*
 
@@ -290,12 +268,14 @@ events to your defined output.
 === Step 6: View the sample Kibana dashboards
 
 To make it easier for you to visualize the status of your services, we have
-created example {beatname_uc} dashboards. You loaded the dashboards earlier when
-you ran the `setup` command.
+created example {beatname_uc} dashboards in the
+https://github.com/elastic/uptime-contrib[uptime-contrib] github repository. If
+you loaded them earlier, open them now.
 
-include::../../libbeat/docs/opendashboards.asciidoc[]
+include::{libbeat-dir}/docs/opendashboards.asciidoc[]
 
 The dashboards are provided as examples. We recommend that you
 {kibana-ref}/dashboard.html[customize] them to meet your needs.
 
-image:./images/heartbeat-statistics.png[Heartbeat statistics]
+[role="screenshot"]
+image::./images/heartbeat-statistics.png[Heartbeat statistics]

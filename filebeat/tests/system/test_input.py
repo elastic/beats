@@ -540,7 +540,7 @@ class Test(BaseTest):
 
         # check that not all harvesters were started
         self.wait_until(
-            lambda: self.log_contains("Harvester limit reached"))
+            lambda: self.log_contains("harvester limit reached"))
 
         self.wait_until(lambda: self.output_lines() > 0)
 
@@ -563,7 +563,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/test.log",
             input_processors=[{
                 "drop_fields": {
-                    "fields": ["offset"],
+                    "fields": ["log.offset"],
                 },
             }]
         )
@@ -588,7 +588,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/test.log",
             input_processors=[{
                 "include_fields": {
-                    "fields": ["offset"],
+                    "fields": ["log.offset"],
                 },
             }]
         )
@@ -603,7 +603,7 @@ class Test(BaseTest):
             required_fields=["@timestamp"],
         )[0]
         assert "message" not in output
-        assert "offset" in output
+        assert "log.offset" in output
 
     def test_restart_recursive_glob(self):
         """

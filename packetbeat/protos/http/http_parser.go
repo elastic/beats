@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package http
 
 import (
@@ -25,7 +42,7 @@ type message struct {
 
 	isRequest    bool
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	//Request Info
@@ -36,12 +53,15 @@ type message struct {
 	realIP       common.NetString
 
 	// Http Headers
-	contentLength    int
-	contentType      common.NetString
-	transferEncoding common.NetString
-	isChunked        bool
-	headers          map[string]common.NetString
-	size             uint64
+	contentLength int
+	contentType   common.NetString
+	host          common.NetString
+	referer       common.NetString
+	userAgent     common.NetString
+	encodings     []string
+	isChunked     bool
+	headers       map[string]common.NetString
+	size          uint64
 
 	rawHeaders []byte
 
@@ -53,7 +73,9 @@ type message struct {
 	saveBody bool
 	body     []byte
 
-	notes []string
+	notes          []string
+	packetLossReq  bool
+	packetLossResp bool
 
 	next *message
 }
@@ -61,6 +83,13 @@ type message struct {
 type version struct {
 	major uint8
 	minor uint8
+}
+
+func (v version) String() string {
+	if v.major == 1 && v.minor == 1 {
+		return "1.1"
+	}
+	return fmt.Sprintf("%d.%d", v.major, v.minor)
 }
 
 type parser struct {
@@ -77,7 +106,7 @@ type parserConfig struct {
 }
 
 var (
-	transferEncodingChunked = []byte("chunked")
+	transferEncodingChunked = "chunked"
 
 	constCRLF = []byte("\r\n")
 
@@ -88,7 +117,11 @@ var (
 	nameContentLength    = []byte("content-length")
 	nameContentType      = []byte("content-type")
 	nameTransferEncoding = []byte("transfer-encoding")
+	nameContentEncoding  = []byte("content-encoding")
 	nameConnection       = []byte("connection")
+	nameHost             = []byte("host")
+	nameReferer          = []byte("referer")
+	nameUserAgent        = []byte("user-agent")
 )
 
 func newParser(config *parserConfig) *parser {
@@ -181,9 +214,10 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		m.method = common.NetString(fline[:afterMethodIdx])
 		m.requestURI = common.NetString(fline[afterMethodIdx+1 : afterRequestURIIdx])
 
-		if bytes.Equal(fline[afterRequestURIIdx+1:afterRequestURIIdx+len(constHTTPVersion)+1], constHTTPVersion) {
+		versionIdx := afterRequestURIIdx + len(constHTTPVersion) + 1
+		if len(fline) > versionIdx && bytes.Equal(fline[afterRequestURIIdx+1:versionIdx], constHTTPVersion) {
 			m.isRequest = true
-			version = fline[afterRequestURIIdx+len(constHTTPVersion)+1:]
+			version = fline[versionIdx:]
 		} else {
 			if isDebug {
 				debugf("Couldn't understand HTTP version: %s", fline)
@@ -348,14 +382,35 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			} else if bytes.Equal(headerName, nameContentType) {
 				m.contentType = headerVal
 			} else if bytes.Equal(headerName, nameTransferEncoding) {
-				m.isChunked = bytes.Equal(common.NetString(headerVal), transferEncodingChunked)
+				encodings := parseCommaSeparatedList(headerVal)
+				// 'chunked' can only appear at the end
+				if n := len(encodings); n > 0 && encodings[n-1] == transferEncodingChunked {
+					m.isChunked = true
+					encodings = encodings[:n-1]
+				}
+				if len(encodings) > 0 {
+					// Append at the end of encodings. If a content-encoding
+					// header is also present, it was applied by sender before
+					// transfer-encoding.
+					m.encodings = append(m.encodings, encodings...)
+				}
+			} else if bytes.Equal(headerName, nameContentEncoding) {
+				encodings := parseCommaSeparatedList(headerVal)
+				// Append at the beginning of m.encodings, as Content-Encoding
+				// is supposed to be applied before Transfer-Encoding.
+				m.encodings = append(encodings, m.encodings...)
 			} else if bytes.Equal(headerName, nameConnection) {
 				m.connection = headerVal
-			}
-			if len(config.realIPHeader) > 0 && bytes.Equal(headerName, []byte(config.realIPHeader)) {
+			} else if len(config.realIPHeader) > 0 && bytes.Equal(headerName, []byte(config.realIPHeader)) {
 				if ips := bytes.SplitN(headerVal, []byte{','}, 2); len(ips) > 0 {
 					m.realIP = trim(ips[0])
 				}
+			} else if bytes.Equal(headerName, nameHost) {
+				m.host = headerVal
+			} else if bytes.Equal(headerName, nameReferer) {
+				m.referer = headerVal
+			} else if bytes.Equal(headerName, nameUserAgent) {
+				m.userAgent = headerVal
 			}
 
 			if config.sendHeaders {
@@ -382,6 +437,15 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 	}
 
 	return true, false, len(data)
+}
+
+func parseCommaSeparatedList(s common.NetString) (list []string) {
+	values := bytes.Split(s, []byte(","))
+	list = make([]string, len(values))
+	for idx := range values {
+		list[idx] = string(bytes.ToLower(bytes.Trim(values[idx], " ")))
+	}
+	return list
 }
 
 func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
@@ -558,16 +622,8 @@ func (m *message) headersReceived() bool {
 }
 
 func (m *message) getEndpoints() (src *common.Endpoint, dst *common.Endpoint) {
-	src = &common.Endpoint{
-		IP:   m.tcpTuple.SrcIP.String(),
-		Port: m.tcpTuple.SrcPort,
-		Proc: string(m.cmdlineTuple.Src),
-	}
-	dst = &common.Endpoint{
-		IP:   m.tcpTuple.DstIP.String(),
-		Port: m.tcpTuple.DstPort,
-		Proc: string(m.cmdlineTuple.Dst),
-	}
+	source, destination := common.MakeEndpointPair(m.tcpTuple.BaseTuple, m.cmdlineTuple)
+	src, dst = &source, &destination
 	if m.direction == tcp.TCPDirectionReverse {
 		src, dst = dst, src
 	}

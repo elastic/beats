@@ -1,6 +1,24 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package module
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -106,9 +124,17 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 	wg.Add(len(mw.metricSets))
 	for _, msw := range mw.metricSets {
 		go func(msw *metricSetWrapper) {
+			metricsPath := msw.ID()
+			registry := monitoring.GetNamespace("dataset").GetRegistry()
+
+			defer registry.Remove(metricsPath)
 			defer releaseStats(msw.stats)
 			defer wg.Done()
 			defer msw.close()
+
+			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
+			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time{}.String())
+
 			msw.run(done, out)
 		}(msw)
 	}
@@ -166,9 +192,11 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
+	case mb.PushMetricSetV2WithContext:
+		ms.Run(&channelContext{done}, reporter.V2())
 	case mb.EventFetcher, mb.EventsFetcher,
-		mb.ReportingMetricSet, mb.ReportingMetricSetV2:
-		msw.startPeriodicFetching(reporter)
+		mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
 		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
@@ -179,9 +207,9 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 // startPeriodicFetching performs an immediate fetch for the MetricSet then it
 // begins a continuous timer scheduled loop to fetch data. To stop the loop the
 // done channel should be closed.
-func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
+func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter reporter) {
 	// Fetch immediately.
-	msw.fetch(reporter)
+	msw.fetch(ctx, reporter)
 
 	// Start timer for future fetches.
 	t := time.NewTicker(msw.Module().Config().Period)
@@ -191,7 +219,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 		case <-reporter.V2().Done():
 			return
 		case <-t.C:
-			msw.fetch(reporter)
+			msw.fetch(ctx, reporter)
 		}
 	}
 }
@@ -199,7 +227,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 // fetch invokes the appropriate Fetch method for the MetricSet and publishes
 // the result using the publisher client. This method will recover from panics
 // and log a stack track if one occurs.
-func (msw *metricSetWrapper) fetch(reporter reporter) {
+func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
 	case mb.EventFetcher:
 		msw.singleEventFetch(fetcher, reporter)
@@ -211,6 +239,20 @@ func (msw *metricSetWrapper) fetch(reporter reporter) {
 	case mb.ReportingMetricSetV2:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V2())
+	case mb.ReportingMetricSetV2Error:
+		reporter.StartFetchTimer()
+		err := fetcher.Fetch(reporter.V2())
+		if err != nil {
+			reporter.V2().Error(err)
+			logp.Info("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		}
+	case mb.ReportingMetricSetV2WithContext:
+		reporter.StartFetchTimer()
+		err := fetcher.Fetch(ctx, reporter.V2())
+		if err != nil {
+			reporter.V2().Error(err)
+			logp.Info("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
@@ -280,6 +322,23 @@ func (r *eventReporter) V1() mb.PushReporter {
 	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
 }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
+
+// channelContext implements context.Context by wrapping a channel
+type channelContext struct {
+	done <-chan struct{}
+}
+
+func (r *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (r *channelContext) Done() <-chan struct{}       { return r.done }
+func (r *channelContext) Err() error {
+	select {
+	case <-r.done:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+func (r *channelContext) Value(key interface{}) interface{} { return nil }
 
 // reporterV1 wraps V2 to provide a v1 interface.
 type reporterV1 struct {

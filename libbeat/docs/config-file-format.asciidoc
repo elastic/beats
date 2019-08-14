@@ -77,11 +77,11 @@ For example this setting:
 
 output:
   elasticsearch:
-    index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'
+    index: 'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}'
 
 ------------------------------------------------------------------------------
 
-gets collapsed into `output.elasticsearch.index: 'beat-%{[beat.version]}-%{+yyyy.MM.dd}'`. The
+gets collapsed into +output.elasticsearch.index: \'beat-%{[{beat_version_key}]}-%{+yyyy.MM.dd}\'+. The
 full name of a setting is based on all parent structures involved.
 
 Lists create numeric names starting with 0.
@@ -231,7 +231,7 @@ For example the filebeat registry file defaults to:
 filebeat.registry: $\{path.data}/registry
 ------------------------------------------------------------------------------
 
-With `path.data` being an implicit config setting, that is overwritable from
+With `path.data` being an implicit config setting, that is overridable from
 command line, as well as in the configuration file.
 
 Example referencing `es.host` in `output.elasticsearch.hosts`:
@@ -324,7 +324,7 @@ to the same ownership and file permission checks.
 ==== Disabling strict permission checks
 
 You can disable strict permission checks from the command line by using
-`-strict.perms=false`, but we strongly encourage you to leave the checks enabled.
+`--strict.perms=false`, but we strongly encourage you to leave the checks enabled.
 
 [[config-file-format-cli]]
 === Command line arguments
@@ -378,5 +378,4 @@ output.console:
 [[config-file-format-tips]]
 === YAML tips and gotchas
 
-:allplatforms:
 include::yaml.asciidoc[]

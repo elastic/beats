@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -21,6 +21,7 @@ import (
 	"bufio"
 	"bytes"
 	"io/ioutil"
+	"os"
 
 	"github.com/pkg/errors"
 )
@@ -31,6 +32,10 @@ const procOneCgroup = "/proc/1/cgroup"
 func IsContainerized() (bool, error) {
 	data, err := ioutil.ReadFile(procOneCgroup)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+
 		return false, errors.Wrap(err, "failed to read process cgroups")
 	}
 
@@ -41,14 +46,13 @@ func isContainerizedCgroup(data []byte) (bool, error) {
 	s := bufio.NewScanner(bytes.NewReader(data))
 	for n := 0; s.Scan(); n++ {
 		line := s.Bytes()
-		if len(line) == 0 || line[len(line)-1] == '/' {
-			continue
-		}
 
-		if bytes.HasSuffix(line, []byte("init.scope")) {
-			return false, nil
+		// Following a suggestion on Stack Overflow on how to detect
+		// being inside a container: https://stackoverflow.com/a/20012536/235203
+		if bytes.Contains(line, []byte("docker")) || bytes.Contains(line, []byte("lxc")) {
+			return true, nil
 		}
 	}
 
-	return true, s.Err()
+	return false, s.Err()
 }

@@ -1,6 +1,8 @@
 = Winlogbeat Reference
 
-include::../../libbeat/docs/version.asciidoc[]
+:libbeat-dir: ../../libbeat
+
+include::{libbeat-dir}/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
@@ -12,12 +14,16 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
 :has_ml_jobs: yes
+:has_registry:
+:ignores_max_retries:
+:has_script_processor:
+:has_timestamp_processor:
+:win_os:
+:win_only:
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
-
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
@@ -27,14 +33,17 @@ include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
 
+include::./modules.asciidoc[]
+
 include::./fields.asciidoc[]
 
-include::../../libbeat/docs/monitoring/monitoring-beats.asciidoc[]
+include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
 
-include::./securing-winlogbeat.asciidoc[]
-
-include::../../libbeat/docs/security/securing-beats.asciidoc[]
+include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
+
+include::{libbeat-dir}/docs/contributing-to-beats.asciidoc[]
+

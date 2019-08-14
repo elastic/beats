@@ -1,48 +1,50 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package connection
 
 import (
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/rabbitmq/mtest"
 
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
 
 func TestFetchEventContents(t *testing.T) {
-	absPath, err := filepath.Abs("../_meta/testdata/")
-
-	response, err := ioutil.ReadFile(absPath + "/connection_sample_response.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
-	}))
+	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
-	config := map[string]interface{}{
-		"module":     "rabbitmq",
-		"metricsets": []string{"connection"},
-		"hosts":      []string{server.URL},
-	}
+	reporter := &mbtest.CapturingReporterV2{}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	event := events[0]
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	metricSet.Fetch(reporter)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+
+	ee, _ := e.Fields.GetValue("rabbitmq.connection")
+	event := ee.(common.MapStr)
 
 	assert.EqualValues(t, "[::1]:60938 -> [::1]:5672", event["name"])
-	assert.EqualValues(t, "/", event["vhost"])
-	assert.EqualValues(t, "guest", event["user"])
-	assert.EqualValues(t, "nodename", event["node"])
 	assert.EqualValues(t, 8, event["channels"])
 	assert.EqualValues(t, 65535, event["channel_max"])
 	assert.EqualValues(t, 131072, event["frame_max"])
@@ -63,4 +65,16 @@ func TestFetchEventContents(t *testing.T) {
 	peer := event["peer"].(common.MapStr)
 	assert.EqualValues(t, "::1", peer["host"])
 	assert.EqualValues(t, 60938, peer["port"])
+}
+
+func getConfig(url string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "rabbitmq",
+		"metricsets": []string{"connection"},
+		"hosts":      []string{url},
+	}
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "rabbitmq", "connection")
 }

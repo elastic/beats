@@ -227,7 +227,7 @@ connection <0.23893.109>, channel 3 - soft error:
         # Check that first 60 chars are sent
         assert True == self.log_contains("cluster.metadata", "output/filebeat")
 
-        # Checks that chars aferwards are not sent
+        # Checks that chars afterwards are not sent
         assert False == self.log_contains("Zach", "output/filebeat")
 
         # Check that output file has the same number of lines as the log file

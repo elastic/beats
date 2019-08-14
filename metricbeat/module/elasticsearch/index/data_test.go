@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package index
@@ -17,23 +34,8 @@ var info = elasticsearch.Info{
 	ClusterName: "helloworld",
 }
 
-func TestIndex(t *testing.T) {
-	versions := []string{
-		"175", "201", "240", "512", "623",
-	}
-
-	_, err := ioutil.ReadFile("./_meta/test/output.json")
-	assert.NoError(t, err)
-
-	for _, v := range versions {
-		input, err := ioutil.ReadFile("./_meta/test/stats." + v + ".json")
-		assert.NoError(t, err)
-
-		reporter := &mbtest.CapturingReporterV2{}
-		eventsMapping(reporter, info, input)
-		assert.True(t, len(reporter.GetEvents()) >= 1)
-		assert.Equal(t, 0, len(reporter.GetErrors()))
-	}
+func TestMapper(t *testing.T) {
+	elasticsearch.TestMapperWithInfo(t, "../index/_meta/test/stats.*.json", eventsMapping)
 }
 
 func TestEmpty(t *testing.T) {

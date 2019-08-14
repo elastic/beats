@@ -1,0 +1,73 @@
+{
+  "test_name": "Netflow 9 field layer2segmentid",
+  "events": [
+    {
+      "Timestamp": "2018-01-16T09:45:02Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "80.82.237.40",
+          "locality": "public",
+          "port": 445
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-01-16T09:45:02Z",
+          "duration": 0,
+          "end": "2018-01-16T09:44:47Z",
+          "kind": "event",
+          "start": "2018-01-16T09:44:47Z"
+        },
+        "flow": {
+          "id": "tS3zN7t_rFg",
+          "locality": "public"
+        },
+        "netflow": {
+          "destination_ipv4_address": "80.82.237.40",
+          "destination_transport_port": 445,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 262144,
+            "timestamp": "2018-01-16T09:45:02Z",
+            "uptime_millis": 5584000,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "flow_end_sys_up_time": 5569000,
+          "flow_start_sys_up_time": 5569000,
+          "ingress_interface": 7,
+          "ingress_vrfid": 0,
+          "ip_class_of_service": 0,
+          "layer2_segment_id": 0,
+          "octet_delta_count": 52,
+          "packet_delta_count": 1,
+          "padding_octets": "AAA=",
+          "protocol_identifier": 6,
+          "sampler_id": 98,
+          "source_ipv4_address": "192.168.200.136",
+          "source_transport_port": 61926,
+          "type": "netflow_flow",
+          "vlan_id": 3174
+        },
+        "network": {
+          "bytes": 52,
+          "community_id": "1:V19XLX+69Hp20cyrswTBva1s5MM=",
+          "direction": "inbound",
+          "iana_number": 6,
+          "packets": 1,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.200.136",
+          "locality": "private",
+          "port": 61926
+        }
+      },
+      "Private": null
+    }
+  ]
+}

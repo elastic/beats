@@ -12,9 +12,9 @@ For a quite simple example have a look at [redis.go](./protos/redis/redis.go) an
 
 # Create a test dataset
 
-Test suites are based on [pcap files](./tests/pcaps), that are dumps from traffic sniffing tools. For example this command listens to all traffic from a mongodb server running in a docker container and writes the result to a file:
+Test suites are based on [pcap files](./tests/system/pcaps), that are dumps from traffic sniffing tools. For example this command listens to all traffic from a mongodb server running in a docker container and writes the result to a file:
 
-    tcpdump -s 0 port 27017 -i docker0 -w tests/pcaps/mongodb_find.pcap
+    tcpdump -s 0 port 27017 -i docker0 -w tests/system/pcaps/mongodb_find.pcap
 
 # Nosetests
 

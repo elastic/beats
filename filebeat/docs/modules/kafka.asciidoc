@@ -4,6 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-kafka]]
 :modulename: kafka
+:has-dashboards: true
 
 == Kafka module
 
@@ -15,7 +16,7 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-The +{modulename}+ module was tested with logs from versions 2.11.
+The +{modulename}+ module was tested with logs from versions 0.9, 1.1.0 and 2.0.0.
 
 include::../include/running-modules.asciidoc[]
 
@@ -49,7 +50,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "kafka.log.var.paths=[/path/to/logs/controller.log*, /path/to/logs/server.log*, /path/to/logs/state-change.log*, /path/to/logs/kafka-*.log*]"
+-M "kafka.log.var.paths=[/path/to/logs/controller.log*, /path/to/logs/server.log*, /path/to/logs/state-change.log*, /path/to/logs/kafka-*.log*]"
 -----
 
 
@@ -62,6 +63,14 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
 
 
 [float]

@@ -1,9 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package parse
 
 import (
 	"fmt"
 	"net"
 	"net/url"
+	p "path"
 	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -14,10 +32,12 @@ import (
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
 // that are URLs.
 type URLHostParserBuilder struct {
-	PathConfigKey string
-	DefaultPath   string
-	DefaultScheme string
-	QueryParams   string
+	PathConfigKey   string
+	DefaultPath     string
+	DefaultUsername string
+	DefaultPassword string
+	DefaultScheme   string
+	QueryParams     string
 }
 
 // Build returns a new HostParser function whose behavior is influenced by the
@@ -30,13 +50,25 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			return mb.HostData{}, err
 		}
 
-		var user, pass, path string
+		query, ok := conf["query"]
+		if ok {
+			queryMap, ok := query.(map[string]interface{})
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'query' config for module %v is not a map", module.Name())
+			}
+
+			b.QueryParams = mb.QueryParams(queryMap).String()
+		}
+
+		var user, pass, path, basePath string
 		t, ok := conf["username"]
 		if ok {
 			user, ok = t.(string)
 			if !ok {
 				return mb.HostData{}, errors.Errorf("'username' config for module %v is not a string", module.Name())
 			}
+		} else {
+			user = b.DefaultUsername
 		}
 		t, ok = conf["password"]
 		if ok {
@@ -44,6 +76,8 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 			if !ok {
 				return mb.HostData{}, errors.Errorf("'password' config for module %v is not a string", module.Name())
 			}
+		} else {
+			pass = b.DefaultPassword
 		}
 		t, ok = conf[b.PathConfigKey]
 		if ok {
@@ -54,8 +88,23 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		} else {
 			path = b.DefaultPath
 		}
+		// Normalize path
+		path = strings.Trim(path, "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, path, b.QueryParams)
+		t, ok = conf["basepath"]
+		if ok {
+			basePath, ok = t.(string)
+			if !ok {
+				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
+			}
+		}
+		// Normalize basepath
+		basePath = strings.Trim(basePath, "/")
+
+		// Combine paths and normalize
+		fullPath := strings.Trim(p.Join(basePath, path), "/")
+
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
 	}
 }
 
@@ -119,7 +168,7 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 		pass = defaultPass
 	}
 
-	if userIsSet && passIsSet {
+	if passIsSet {
 		u.User = url.UserPassword(user, pass)
 	} else if userIsSet {
 		u.User = url.User(user)
@@ -169,18 +218,27 @@ func getURL(rawURL, scheme, username, password, path, query string) (*url.URL, e
 		u.Path = path
 	}
 
-	// Add the query params to existing query parameters overwriting any
-	// keys that already exist.
+	//Adds the query params in the url
+	u, err = SetQueryParams(u, query)
+	return u, err
+}
+
+// SetQueryParams adds the query params to existing query parameters overwriting any
+// keys that already exist.
+func SetQueryParams(u *url.URL, query string) (*url.URL, error) {
 	q := u.Query()
 	params, err := url.ParseQuery(query)
+	if err != nil {
+		return u, err
+	}
 	for key, values := range params {
 		for _, v := range values {
 			q.Set(key, v)
 		}
 	}
 	u.RawQuery = q.Encode()
-
 	return u, nil
+
 }
 
 // redactURLCredentials returns the URL as a string with the username and

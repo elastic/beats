@@ -1,0 +1,77 @@
+{
+  "test_name": "IPFIX vIPtela with VPN id",
+  "events": [
+    {
+      "Timestamp": "2017-11-21T14:32:15Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.21.27",
+          "locality": "private",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-11-21T14:32:15Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "dO-Anbp9xpw",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.21.27",
+          "destination_transport_port": 443,
+          "egress_interface": 3,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 2887138561,
+            "timestamp": "2017-11-21T14:32:15Z",
+            "uptime_millis": 0,
+            "version": 10
+          },
+          "flow_end_reason": 3,
+          "flow_end_seconds": "2017-11-21T14:32:15Z",
+          "flow_start_seconds": "2017-11-21T14:32:15Z",
+          "icmp_type_code_ipv4": 0,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_diff_serv_code_point": 12,
+          "ip_next_hop_ipv4_address": "10.0.0.1",
+          "ip_precedence": 1,
+          "maximum_ip_total_length": 277,
+          "minimum_ip_total_length": 70,
+          "octet_delta_count": 775,
+          "octet_total_count": 775,
+          "packet_delta_count": 8,
+          "packet_total_count": 8,
+          "padding_octets": "AAAAAAAAAA==",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.113.7.54",
+          "source_transport_port": 41717,
+          "tcp_control_bits": 16,
+          "type": "netflow_flow",
+          "viptela_vpn_id": 100
+        },
+        "network": {
+          "bytes": 775,
+          "community_id": "1:uhU0lSQQ+LoAMve6GxHC0M3nIes=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "packets": 8,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "10.113.7.54",
+          "locality": "private",
+          "port": 41717
+        }
+      },
+      "Private": null
+    }
+  ]
+}

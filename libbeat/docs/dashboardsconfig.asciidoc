@@ -40,9 +40,14 @@ You can specify the following options in the `setup.dashboards` section of the
 ==== `setup.dashboards.enabled`
 
 If this option is set to true, {beatname_uc} loads the sample Kibana dashboards
-automatically on startup. If no other options are set, the dashboard are loaded
-from the local `kibana` directory in the home path of the installation.
+from the local `kibana` directory in the home path of the {beatname_uc} installation.
 
+NOTE: When dashboard loading is enabled, {beatname_uc} overwrites any existing
+dashboards that match the names of the dashboards you are loading. This happens
+every time {beatname_uc} starts. 
+
+If no other options are set, the dashboard are loaded
+from the local `kibana` directory in the home path of the {beatname_uc} installation.
 To load dashboards from a different location, you can configure one of the
 following options: <<directory-option,`setup.dashboards.directory`>>,
 <<url-option,`setup.dashboards.url`>>, or
@@ -97,7 +102,7 @@ NOTE: This setting only works for Kibana 6.0 and newer.
 [float]
 ==== `setup.dashboards.always_kibana`
 
-Force loading of dashboards using the Kibana API without querying Elasticsearch for the version
+Force loading of dashboards using the Kibana API without querying Elasticsearch for the version.
 The default is `false`.
 
 [float]

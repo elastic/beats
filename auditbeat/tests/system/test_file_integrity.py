@@ -1,10 +1,6 @@
-import sys
-import os
-import shutil
 import time
 import unittest
 from auditbeat import *
-from beat.beat import INTEGRATION_TESTS
 
 
 # Escapes a path to match what's printed in the logs
@@ -111,6 +107,8 @@ class Test(BaseTest):
             self.wait_log_contains("\"deleted\"")
             self.wait_log_contains("\"path\": \"{0}\"".format(escape_path(subdir)), ignore_case=True)
             self.wait_output(3)
+            self.wait_until(lambda: any(
+                'file.path' in obj and obj['file.path'].lower() == subdir.lower() for obj in self.read_output()))
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -132,6 +130,7 @@ class Test(BaseTest):
             # assert file inside subdir is not reported
             assert self.log_contains(file3) is False
 
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/7731")
     def test_recursive(self):
         """
         file_integrity monitors watched directories (recursive).
@@ -157,18 +156,24 @@ class Test(BaseTest):
             self.wait_log_contains(escape_path(dirs[0]), max_timeout=30, ignore_case=True)
             self.wait_log_contains("\"recursive\": true")
 
+            # auditbeat_test/subdir/
             subdir = os.path.join(dirs[0], "subdir")
             os.mkdir(subdir)
+            # auditbeat_test/subdir/file.txt
             file1 = os.path.join(subdir, "file.txt")
             self.create_file(file1, "hello world!")
 
+            # auditbeat_test/subdir/other/
             subdir2 = os.path.join(subdir, "other")
             os.mkdir(subdir2)
+            # auditbeat_test/subdir/other/more.txt
             file2 = os.path.join(subdir2, "more.txt")
             self.create_file(file2, "")
 
             self.wait_log_contains("\"path\": \"{0}\"".format(escape_path(file2)), ignore_case=True)
             self.wait_output(4)
+            self.wait_until(lambda: any(
+                'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()

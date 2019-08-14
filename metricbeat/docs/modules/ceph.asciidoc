@@ -1,14 +1,17 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-ceph]]
 == Ceph module
 
-beta[]
-
 The Ceph module collects metrics by submitting HTTP GET requests to
 the http://docs.ceph.com/docs/master/man/8/ceph-rest-api/[ceph-rest-api]. The default metricsets are `cluster_disk`, `cluster_health`, `monitor_health`, `pool_disk`, `osd_tree`.
+
+[float]
+=== Compatibility
+
+The Ceph module is tested with Ceph Jewel (10.2.10).
 
 
 [float]
@@ -27,7 +30,8 @@ metricbeat.modules:
   enabled: true
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

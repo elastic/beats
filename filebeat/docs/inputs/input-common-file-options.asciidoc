@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-//// This content is shared by Filebeat inputs that use the prospector
+//// This content is shared by Filebeat inputs that use the input
 //// to process files on disk (includes options for managing physical files)
 //// If you add IDs to sections, make sure you use attributes to create
 //// unique IDs for each input that includes this file. Use the format:
@@ -77,7 +77,11 @@ certain criteria or time. Closing the harvester means closing the file handler.
 If a file is updated after the harvester is closed, the file will be picked up
 again after `scan_frequency` has elapsed. However, if the file is moved or
 deleted while the harvester is closed, {beatname_uc} will not be able to pick up
-the file again, and any data that the harvester hasn't read will be lost.
+the file again, and any data that the harvester hasn't read will be lost. 
+The `close_*` settings are applied synchronously when {beatname_uc} attempts 
+to read from a file, meaning that if {beatname_uc} is in a blocked state
+due to blocked output, full queue or other issue, a file that would 
+otherwise be closed remains open until {beatname_uc} once again attempts to read from the file.
 
 
 [float]
@@ -94,7 +98,7 @@ harvester is started and the latest changes will be picked up after
 We recommended that you set `close_inactive` to a value that is larger than the
 least frequent updates to your log files. For example, if your log files get
 updated every few seconds, you can safely set `close_inactive` to `1m`. If there
-are log files with very different update rates, you can use multiple 
+are log files with very different update rates, you can use multiple
 configurations with different values.
 
 Setting `close_inactive` to a lower value means that file handles are closed
@@ -227,6 +231,13 @@ from inode reuse on Linux. For more information, see <<inode-reuse-issue>>.
 NOTE: Every time a file is renamed, the file state is updated and the counter
 for `clean_inactive` starts at 0 again.
 
+TIP: During testing, you might notice that the registry contains state entries
+that should be removed based on the `clean_inactive` setting. This happens
+because {beatname_uc} doesn't remove the entries until it opens the registry
+again to read a different file. If you are testing the `clean_inactive` setting,
+make sure {beatname_uc} is configured to read from more than one file, or the
+file state will never be removed from the registry. 
+
 [float]
 [id="{beatname_lc}-input-{type}-clean-removed"]
 ===== `clean_removed`
@@ -348,9 +359,10 @@ specifying 10s for `max_backoff` means that, at the worst, a new line could be
 added to the log file if {beatname_uc} has backed off multiple times. The
 default is 10s.
 
-Requirement: max_backoff should always be set to `max_backoff <=
-scan_frequency`. In case `max_backoff` should be bigger, it is recommended to
-close the file handler instead let the {beatname_uc} pick up the file again.
+Requirement: Set `max_backoff` to be greater than or equal to `backoff` and
+less than or equal to `scan_frequency` (`backoff <= max_backoff <= scan_frequency`).
+If `max_backoff` needs to be higher, it is recommended to close the file handler
+instead and let {beatname_uc} pick up the file again.
 
 [float]
 ===== `backoff_factor`

@@ -1,10 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dialchain
 
 import (
 	"net"
 
 	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -18,7 +35,7 @@ import (
 //    }
 //  }
 func SOCKS5Layer(config *transport.ProxyConfig) Layer {
-	return func(event common.MapStr, next transport.Dialer) (transport.Dialer, error) {
+	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
 		dialer, err := transport.ProxyDialer(config, startTimerAfterDial(&timer, next))
@@ -31,7 +48,7 @@ func SOCKS5Layer(config *transport.ProxyConfig) Layer {
 			// TODO: add proxy url to event?
 
 			timer.stop()
-			event.Put("socks5.rtt.connect", look.RTT(timer.duration()))
+			event.Fields.Put("socks5.rtt.connect", look.RTT(timer.duration()))
 			return conn, nil
 		}), nil
 	}

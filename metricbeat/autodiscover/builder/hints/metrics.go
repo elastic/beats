@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package hints
 
 import (
@@ -10,7 +27,6 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -39,7 +55,6 @@ type metricHints struct {
 
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *common.Config) (autodiscover.Builder, error) {
-	cfgwarn.Beta("The hints builder is beta")
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
@@ -65,26 +80,46 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 		return config
 	}
 
+	modulesConfig := m.getModules(hints)
+	if modulesConfig != nil {
+		configs := []*common.Config{}
+		for _, cfg := range modulesConfig {
+			if config, err := common.NewConfigFrom(cfg); err == nil {
+				configs = append(configs, config)
+			}
+		}
+		logp.Debug("hints.builder", "generated config %+v", configs)
+		// Apply information in event to the template to generate the final config
+		return template.ApplyConfigTemplate(event, configs)
+
+	}
+
 	mod := m.getModule(hints)
 	if mod == "" {
 		return config
 	}
 
-	hsts := m.getHostsWithPort(hints, port)
+	hosts, ok := m.getHostsWithPort(hints, port)
+	if !ok {
+		return config
+	}
+
 	ns := m.getNamespace(hints)
 	msets := m.getMetricSets(hints, mod)
 	tout := m.getTimeout(hints)
 	ival := m.getPeriod(hints)
 	sslConf := m.getSSLConfig(hints)
+	procs := m.getProcessors(hints)
 
 	moduleConfig := common.MapStr{
 		"module":     mod,
 		"metricsets": msets,
-		"hosts":      hsts,
+		"hosts":      hosts,
 		"timeout":    tout,
 		"period":     ival,
 		"enabled":    true,
 		"ssl":        sslConf,
+		"processors": procs,
 	}
 
 	if ns != "" {
@@ -98,14 +133,13 @@ func (m *metricHints) CreateConfig(event bus.Event) []*common.Config {
 	if err != nil {
 		logp.Debug("hints.builder", "config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %v", *cfg)
+	logp.Debug("hints.builder", "generated config: +%v", *cfg)
 	config = append(config, cfg)
 
 	// Apply information in event to the template to generate the final config
 	// This especially helps in a scenario where endpoints are configured as:
 	// co.elastic.metrics/hosts= "${data.host}:9090"
-	config = template.ApplyConfigTemplate(event, config)
-	return config
+	return template.ApplyConfigTemplate(event, config)
 }
 
 func (m *metricHints) getModule(hints common.MapStr) string {
@@ -129,7 +163,7 @@ func (m *metricHints) getMetricSets(hints common.MapStr, module string) []string
 	return msets
 }
 
-func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) []string {
+func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) ([]string, bool) {
 	var result []string
 	thosts := builder.GetHintAsList(hints, m.Key, hosts)
 
@@ -143,7 +177,12 @@ func (m *metricHints) getHostsWithPort(hints common.MapStr, port int) []string {
 		}
 	}
 
-	return result
+	if len(thosts) > 0 && len(result) == 0 {
+		logp.Debug("hints.builder", "no hosts selected for port %d with hints: %+v", port, thosts)
+		return nil, false
+	}
+
+	return result, true
 }
 
 func (m *metricHints) getNamespace(hints common.MapStr) string {
@@ -167,4 +206,13 @@ func (m *metricHints) getTimeout(hints common.MapStr) string {
 
 func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
+}
+
+func (m *metricHints) getModules(hints common.MapStr) []common.MapStr {
+	return builder.GetHintAsConfigs(hints, m.Key)
+}
+
+func (m *metricHints) getProcessors(hints common.MapStr) []common.MapStr {
+	return builder.GetProcessors(hints, m.Key)
+
 }

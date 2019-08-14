@@ -7,7 +7,7 @@
 
 Heartbeat is a lightweight daemon that you install on a remote server
 to periodically check the status of your services and determine whether they are
-available. Unlike {metricbeat}/index.html[Metricbeat], which only tells you if
+available. Unlike {metricbeat-ref}/index.html[Metricbeat], which only tells you if
 your servers are up or down, Heartbeat tells you whether your services are
 reachable.
 
@@ -36,3 +36,5 @@ this monitor to verify that the service returns the expected response, such as a
 specific status code, response header, or content.
 
 The `tcp` and `http` monitors both support SSL/TLS and some proxy settings.
+
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]

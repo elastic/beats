@@ -11,7 +11,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
-:has_ml_jobs: yes
+:has_ml_jobs:
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
 
@@ -19,16 +19,16 @@ include::./overview.asciidoc[]
 
 include::./communitybeats.asciidoc[]
 
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
-
 include::./gettingstarted.asciidoc[]
-
-include::./installing-beats.asciidoc[]
-
-include::./breaking.asciidoc[]
-
-include::./upgrading.asciidoc[]
 
 include::./config-file-format.asciidoc[]
 
+include::./upgrading.asciidoc[]
+
+include::./highlights.asciidoc[]
+
+include::./breaking.asciidoc[]
+
 include::./release.asciidoc[]
+
+include::../../libbeat/docs/contributing-to-beats.asciidoc[]

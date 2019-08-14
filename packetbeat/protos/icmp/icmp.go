@@ -1,15 +1,33 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package icmp
 
 import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/ecs/code/go/ecs"
 
 	"github.com/elastic/beats/packetbeat/flows"
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/tsg/gopacket/layers"
@@ -77,7 +95,7 @@ func (icmp *icmpPlugin) init(results protos.Reporter, config *icmpConfig) error 
 	var err error
 	icmp.localIps, err = common.LocalIPAddrs()
 	if err != nil {
-		logp.Err("icmp", "Error getting local IP addresses: %s", err)
+		logp.Err("Error getting local IP addresses: %+v", err)
 		icmp.localIps = []net.IP{}
 	}
 	logp.Debug("icmp", "Local IP addresses: %s", icmp.localIps)
@@ -266,82 +284,63 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 
 	logp.Debug("icmp", "Publishing transaction. %s", &trans.tuple)
 
-	fields := common.MapStr{}
-
-	// common fields - group "env"
-	fields["client_ip"] = trans.tuple.srcIP
-	fields["ip"] = trans.tuple.dstIP
+	evt, pbf := pb.NewBeatEvent(trans.ts)
+	pbf.Source = &ecs.Source{IP: trans.tuple.srcIP.String()}
+	pbf.Destination = &ecs.Destination{IP: trans.tuple.dstIP.String()}
+	pbf.Event.Dataset = "icmp"
+	pbf.Error.Message = trans.notes
 
 	// common fields - group "event"
-	fields["type"] = "icmp"            // protocol name
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
 	fields["path"] = trans.tuple.dstIP // what is requested (dst ip)
 	if trans.HasError() {
 		fields["status"] = common.ERROR_STATUS
 	} else {
 		fields["status"] = common.OK_STATUS
 	}
-	if len(trans.notes) > 0 {
-		fields["notes"] = trans.notes
-	}
 
-	// common fields - group "measurements"
-	responsetime, hasResponseTime := trans.ResponseTimeMillis()
-	if hasResponseTime {
-		fields["responsetime"] = responsetime
+	icmpEvent := common.MapStr{
+		"version": trans.tuple.icmpVersion,
 	}
-	switch icmp.direction(trans) {
-	case directionFromInside:
-		if trans.request != nil {
-			fields["bytes_out"] = trans.request.length
-		}
-		if trans.response != nil {
-			fields["bytes_in"] = trans.response.length
-		}
-	case directionFromOutside:
-		if trans.request != nil {
-			fields["bytes_in"] = trans.request.length
-		}
-		if trans.response != nil {
-			fields["bytes_out"] = trans.response.length
-		}
-	}
-
-	// event fields - group "icmp"
-	icmpEvent := common.MapStr{}
 	fields["icmp"] = icmpEvent
 
-	icmpEvent["version"] = trans.tuple.icmpVersion
+	pbf.Network.Transport = pbf.Event.Dataset
+	if trans.tuple.icmpVersion == 6 {
+		pbf.Network.Transport = "ipv6-icmp"
+	}
 
 	if trans.request != nil {
-		request := common.MapStr{}
+		pbf.Event.Start = trans.request.ts
+		pbf.Source.Bytes = int64(trans.request.length)
+
+		request := common.MapStr{
+			"message": humanReadable(&trans.tuple, trans.request),
+			"type":    trans.request.Type,
+			"code":    trans.request.code,
+		}
 		icmpEvent["request"] = request
 
-		request["message"] = humanReadable(&trans.tuple, trans.request)
-		request["type"] = trans.request.Type
-		request["code"] = trans.request.code
-
-		// TODO: Add more info. The IPv4/IPv6 payload could be interesting.
-		// if icmp.SendRequest {
-		//     request["payload"] = ""
-		// }
+		pbf.ICMPType = trans.request.Type
+		pbf.ICMPCode = trans.request.code
 	}
 
 	if trans.response != nil {
-		response := common.MapStr{}
+		pbf.Event.End = trans.response.ts
+		pbf.Destination.Bytes = int64(trans.response.length)
+
+		response := common.MapStr{
+			"message": humanReadable(&trans.tuple, trans.response),
+			"type":    trans.response.Type,
+			"code":    trans.response.code,
+		}
 		icmpEvent["response"] = response
 
-		response["message"] = humanReadable(&trans.tuple, trans.response)
-		response["type"] = trans.response.Type
-		response["code"] = trans.response.code
-
-		// TODO: Add more info. The IPv4/IPv6 payload could be interesting.
-		// if icmp.SendResponse {
-		//     response["payload"] = ""
-		// }
+		if trans.request == nil {
+			pbf.ICMPType = trans.response.Type
+			pbf.ICMPCode = trans.response.code
+		}
 	}
 
-	icmp.results(beat.Event{
-		Timestamp: trans.ts,
-		Fields:    fields,
-	})
+	icmp.results(evt)
 }

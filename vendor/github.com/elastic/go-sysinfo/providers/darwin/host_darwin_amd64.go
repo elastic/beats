@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -49,25 +49,24 @@ func (h *host) Info() types.HostInfo {
 	return h.info
 }
 
-func (h *host) CPUTime() (*types.CPUTimes, error) {
+func (h *host) CPUTime() (types.CPUTimes, error) {
 	cpu, err := getHostCPULoadInfo()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get host CPU usage")
+		return types.CPUTimes{}, errors.Wrap(err, "failed to get host CPU usage")
 	}
 
 	ticksPerSecond := time.Duration(getClockTicks())
 
-	return &types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      time.Duration(cpu.User) * time.Second / ticksPerSecond,
-		System:    time.Duration(cpu.System) * time.Second / ticksPerSecond,
-		Idle:      time.Duration(cpu.Idle) * time.Second / ticksPerSecond,
-		Nice:      time.Duration(cpu.Nice) * time.Second / ticksPerSecond,
+	return types.CPUTimes{
+		User:   time.Duration(cpu.User) * time.Second / ticksPerSecond,
+		System: time.Duration(cpu.System) * time.Second / ticksPerSecond,
+		Idle:   time.Duration(cpu.Idle) * time.Second / ticksPerSecond,
+		Nice:   time.Duration(cpu.Nice) * time.Second / ticksPerSecond,
 	}, nil
 }
 
 func (h *host) Memory() (*types.HostMemoryInfo, error) {
-	mem := &types.HostMemoryInfo{Timestamp: time.Now()}
+	var mem types.HostMemoryInfo
 
 	// Total physical memory.
 	if err := sysctlByName("hw.memsize", &mem.Total); err != nil {
@@ -127,7 +126,7 @@ func (h *host) Memory() (*types.HostMemoryInfo, error) {
 	mem.VirtualUsed = swap.Used
 	mem.VirtualFree = swap.Available
 
-	return mem, nil
+	return &mem, nil
 }
 
 func newHost() (*host, error) {
@@ -219,5 +218,9 @@ func (r *reader) time(h *host) {
 }
 
 func (r *reader) uniqueID(h *host) {
-	// TODO: call gethostuuid(uuid [16]byte, timespec)
+	v, err := MachineID()
+	if r.addErr(err) {
+		return
+	}
+	h.info.UniqueID = v
 }

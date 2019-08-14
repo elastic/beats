@@ -2,25 +2,32 @@ import os
 import metricbeat
 import unittest
 from nose.plugins.attrib import attr
+from parameterized import parameterized
 
 
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['jolokia']
 
+    @parameterized.expand([
+        'java.lang:name=PS MarkSweep,type=GarbageCollector',
+        'java.lang:type=GarbageCollector,name=PS MarkSweep',
+        'java.lang:name=*,type=GarbageCollector',
+        'java.lang:type=GarbageCollector,name=*',
+    ])
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_jmx(self):
+    def test_jmx(self, mbean):
         """
         jolokia jmx  metricset test
         """
 
         additional_content = """
   jmx.mappings:
-    - mbean: 'java.lang:type=Runtime'
+    - mbean: '%s'
       attributes:
-         - attr: Uptime
-           field: uptime
-"""
+         - attr: CollectionCount
+           field: gc.collection_count
+""" % (mbean)
 
         self.render_config_template(modules=[{
             "name": "jolokia",
@@ -40,8 +47,4 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
         print(evt)
 
-        assert evt["jolokia"]["test"]["uptime"] > 0
-
-    def get_hosts(self):
-        return [os.getenv('JOLOKIA_HOST', 'localhost') + ':' +
-                os.getenv('JOLOKIA_PORT', '8778')]
+        assert evt["jolokia"]["test"]["gc"]["collection_count"] >= 0

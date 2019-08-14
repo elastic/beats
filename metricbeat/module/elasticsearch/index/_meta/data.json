@@ -6,25 +6,25 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "AI8XrG4wTLKQg3lbRGgQYQ",
-            "name": "docker-cluster"
+            "id": "UziYVLPkTTmCzccc6102Bg",
+            "name": "elasticsearch"
         },
         "index": {
-            "name": ".monitoring-es-6-2018.04.22",
+            "name": "filebeat-7.0.0-alpha1-2018.05.09",
             "total": {
                 "docs": {
-                    "count": 241933,
-                    "deleted": 525
+                    "count": 1,
+                    "deleted": 0
                 },
                 "segments": {
-                    "count": 16,
+                    "count": 1,
                     "memory": {
-                        "bytes": 565573
+                        "bytes": 6983
                     }
                 },
                 "store": {
                     "size": {
-                        "bytes": 135541290
+                        "bytes": 19326
                     }
                 }
             }

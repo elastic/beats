@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package prometheus
 
 import (
@@ -19,6 +36,8 @@ type Prometheus interface {
 	GetFamilies() ([]*dto.MetricFamily, error)
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapStr, error)
+
+	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2)
 }
 
 type prometheus struct {
@@ -74,8 +93,11 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 
 // MetricsMapping defines mapping settings for Prometheus metrics, to be used with `GetProcessedMetrics`
 type MetricsMapping struct {
-	// Metrics translates from from prometheus metric name to Metricbeat fields
+	// Metrics translates from prometheus metric name to Metricbeat fields
 	Metrics map[string]MetricMap
+
+	// Namespace for metrics managed by this mapping
+	Namespace string
 
 	// Labels translate from prometheus label names to Metricbeat fields
 	Labels map[string]LabelMap
@@ -91,6 +113,7 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 	}
 
 	eventsMap := map[string]common.MapStr{}
+	infoMetrics := []*infoMetricData{}
 	for _, family := range families {
 		for _, metric := range family.GetMetric() {
 			m, ok := mapping.Metrics[family.GetName()]
@@ -108,26 +131,44 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 				continue
 			}
 
+			// Apply extra options
+			allLabels := getLabels(metric)
+			for _, option := range m.GetOptions() {
+				field, value, allLabels = option.Process(field, value, allLabels)
+			}
+
 			// Convert labels
 			labels := common.MapStr{}
 			keyLabels := common.MapStr{}
-			for k, v := range getLabels(metric) {
+			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
-						keyLabels[l.GetField()] = v
+						keyLabels.Put(l.GetField(), v)
 					} else {
-						labels[l.GetField()] = v
+						labels.Put(l.GetField(), v)
 					}
 				}
 			}
 
-			event := getEvent(eventsMap, keyLabels)
-			// Empty field means we ignore the metric but still process its labels
-			if field != "" {
-				event[field] = value
+			// Keep a info document if it's an infoMetric
+			if _, ok = m.(*infoMetric); ok {
+				labels.DeepUpdate(keyLabels)
+				infoMetrics = append(infoMetrics, &infoMetricData{
+					Labels: keyLabels,
+					Meta:   labels,
+				})
+				continue
 			}
 
-			event.Update(labels)
+			if field != "" {
+				event := getEvent(eventsMap, keyLabels)
+				update := common.MapStr{}
+				update.Put(field, value)
+				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
+				event.DeepUpdate(update)
+
+				event.DeepUpdate(labels)
+			}
 		}
 	}
 
@@ -138,10 +179,51 @@ func (p *prometheus) GetProcessedMetrics(mapping *MetricsMapping) ([]common.MapS
 		for k, v := range mapping.ExtraFields {
 			event[k] = v
 		}
-
 		events = append(events, event)
+
 	}
+
+	// fill info from infoMetrics
+	for _, info := range infoMetrics {
+		for _, event := range events {
+			found := true
+			for k, v := range info.Labels.Flatten() {
+				value, err := event.GetValue(k)
+				if err != nil || v != value {
+					found = false
+					break
+				}
+			}
+
+			// fill info from this metric
+			if found {
+				event.DeepUpdate(info.Meta)
+			}
+		}
+	}
+
 	return events, nil
+
+}
+
+// infoMetricData keeps data about an infoMetric
+type infoMetricData struct {
+	Labels common.MapStr
+	Meta   common.MapStr
+}
+
+func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) {
+	events, err := p.GetProcessedMetrics(mapping)
+	if err != nil {
+		r.Error(err)
+		return
+	}
+	for _, event := range events {
+		r.Event(mb.Event{
+			MetricSetFields: event,
+			Namespace:       mapping.Namespace,
+		})
+	}
 }
 
 func getEvent(m map[string]common.MapStr, labels common.MapStr) common.MapStr {
@@ -158,7 +240,7 @@ func getLabels(metric *dto.Metric) common.MapStr {
 	labels := common.MapStr{}
 	for _, label := range metric.GetLabel() {
 		if label.GetName() != "" && label.GetValue() != "" {
-			labels[label.GetName()] = label.GetValue()
+			labels.Put(label.GetName(), label.GetValue())
 		}
 	}
 	return labels

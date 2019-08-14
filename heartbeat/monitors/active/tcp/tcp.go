@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package tcp
 
 import (
@@ -6,13 +23,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
 )
 
 func init() {
@@ -28,17 +46,17 @@ type connURL struct {
 }
 
 func create(
-	info monitors.Info,
+	name string,
 	cfg *common.Config,
-) ([]monitors.Job, error) {
+) (jobs []jobs.Job, endpoints int, err error) {
 	config := DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	defaultScheme := "tcp"
@@ -46,17 +64,15 @@ func create(
 		defaultScheme = "ssl"
 	}
 
-	endpoints, err := collectHosts(&config, defaultScheme)
+	schemeHosts, err := collectHosts(&config, defaultScheme)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	typ := config.Name
 	timeout := config.Timeout
 	validator := makeValidateConn(&config)
 
-	var jobs []monitors.Job
-	for scheme, eps := range endpoints {
+	for scheme, eps := range schemeHosts {
 		schemeTLS := tls
 		if scheme == "tcp" || scheme == "plain" {
 			schemeTLS = nil
@@ -68,20 +84,26 @@ func create(
 			TLS:     schemeTLS,
 		})
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
-		epJobs, err := dialchain.MakeDialerJobs(db, typ, scheme, eps, config.Mode,
-			func(dialer transport.Dialer, addr string) (common.MapStr, error) {
-				return pingHost(dialer, addr, timeout, validator)
+		epJobs, err := dialchain.MakeDialerJobs(db, scheme, eps, config.Mode,
+			func(event *beat.Event, dialer transport.Dialer, addr string) error {
+				return pingHost(event, dialer, addr, timeout, validator)
 			})
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		jobs = append(jobs, epJobs...)
 	}
-	return jobs, nil
+
+	numHosts := 0
+	for _, hosts := range schemeHosts {
+		numHosts += len(hosts)
+	}
+
+	return jobs, numHosts, nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.Endpoint, error) {

@@ -1,30 +1,30 @@
 {
-  "@timestamp": "2017-05-10T16:46:37.821Z",
-  "beat": {
-    "hostname": "X1",
-    "name": "X1",
-    "version": "6.0.0-alpha1"
-  },
-  "kubernetes": {
-    "namespace": "jenkins",
-    "statefulset": {
-      "name": "wise-lynx-jenkins-1616735317",
-      "created": 123454,
-      "replicas": {
-        "desired": 1,
-        "observed": 1,
-      },
-      "generation": {
-        "desired": 1,
-        "observed": 1,
-      }
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.statefulset",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "namespace": "custom",
+        "statefulset": {
+            "created": 1511999697,
+            "generation": {
+                "desired": 5,
+                "observed": 3
+            },
+            "name": "mysql",
+            "replicas": {
+                "desired": 6,
+                "observed": 3
+            }
+        }
+    },
+    "metricset": {
+        "name": "state_statefulset"
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
     }
-  },
-  "metricset": {
-    "host": "192.168.99.100:18080",
-    "module": "kubernetes",
-    "name": "state_statefulset",
-    "namespace": "statefulset",
-    "rtt": 6719
-  }
 }

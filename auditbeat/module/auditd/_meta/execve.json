@@ -11,6 +11,7 @@
             "syscall": "execve",
             "tty": "pts0"
         },
+        "message_type": "syscall",
         "paths": [
             {
                 "dev": "08:01",
@@ -53,8 +54,7 @@
     "event": {
         "action": "executed",
         "category": "audit-rule",
-        "module": "auditd",
-        "type": "syscall"
+        "module": "auditd"
     },
     "file": {
         "device": "00:00",
@@ -71,25 +71,44 @@
             "uname",
             "-a"
         ],
-        "cwd": "/home/andrew_kroh",
-        "exe": "/bin/uname",
+        "executable": "/bin/uname",
         "name": "uname",
-        "pid": "10043",
-        "ppid": "10027",
-        "title": "uname -a"
+        "pid": 10043,
+        "ppid": 10027,
+        "title": "uname -a",
+        "working_directory": "/home/andrew_kroh"
+    },
+    "service": {
+        "type": "auditd"
     },
     "tags": [
         "user_commands"
     ],
     "user": {
-        "auid": "1001",
-        "egid": "1002",
-        "euid": "1001",
-        "fsgid": "1002",
-        "fsuid": "1001",
-        "gid": "1002",
-        "sgid": "1002",
-        "suid": "1001",
-        "uid": "1001"
+        "audit": {
+            "id": "1001"
+        },
+        "effective": {
+            "group": {
+                "id": "1002"
+            },
+            "id": "1001"
+        },
+        "filesystem": {
+            "group": {
+                "id": "1002"
+            },
+            "id": "1001"
+        },
+        "group": {
+            "id": "1002"
+        },
+        "id": "1001",
+        "saved": {
+            "group": {
+                "id": "1002"
+            },
+            "id": "1001"
+        }
     }
 }

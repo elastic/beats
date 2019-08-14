@@ -1,0 +1,54 @@
+[
+    {
+        "@timestamp": "2018-04-23T16:40:13.737Z",
+        "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "event.module": "elasticsearch",
+        "event.timezone": "+00:00",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 0,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "service.type": "elasticsearch"
+    },
+    {
+        "@timestamp": "2018-04-23T16:40:13.862Z",
+        "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "event.module": "elasticsearch",
+        "event.timezone": "+00:00",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 137,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "service.type": "elasticsearch"
+    },
+    {
+        "@timestamp": "2018-04-23T16:40:14.792Z",
+        "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "event.module": "elasticsearch",
+        "event.timezone": "+00:00",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 274,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "service.type": "elasticsearch"
+    },
+    {
+        "@timestamp": "2018-04-23T16:40:15.127Z",
+        "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
+        "event.dataset": "elasticsearch.deprecation",
+        "event.module": "elasticsearch",
+        "event.timezone": "+00:00",
+        "fileset.name": "deprecation",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 411,
+        "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "service.type": "elasticsearch"
+    }
+]

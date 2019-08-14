@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build darwin freebsd linux openbsd windows
 
 package filesystem
@@ -17,11 +34,13 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
+// Config stores the metricset-local config
 type Config struct {
 	IgnoreTypes []string `config:"filesystem.ignore_types"`
 }
 
-type FileSystemStat struct {
+// FSStat contains filesystem metrics
+type FSStat struct {
 	sigar.FileSystemUsage
 	DevName     string  `json:"device_name"`
 	Mount       string  `json:"mount_point"`
@@ -30,6 +49,7 @@ type FileSystemStat struct {
 	ctime       time.Time
 }
 
+// GetFileSystemList retreves overall filesystem stats
 func GetFileSystemList() ([]sigar.FileSystem, error) {
 	fss := sigar.FileSystemList{}
 	if err := fss.Get(); err != nil {
@@ -89,7 +109,8 @@ func filterFileSystemList(fsList []sigar.FileSystem) []sigar.FileSystem {
 	return filtered
 }
 
-func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
+// GetFileSystemStat retreves stats for a single filesystem
+func GetFileSystemStat(fs sigar.FileSystem) (*FSStat, error) {
 	stat := sigar.FileSystemUsage{}
 	if err := stat.Get(fs.DirName); err != nil {
 		return nil, err
@@ -102,7 +123,7 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
 		t = fs.SysTypeName
 	}
 
-	filesystem := FileSystemStat{
+	filesystem := FSStat{
 		FileSystemUsage: stat,
 		DevName:         fs.DevName,
 		Mount:           fs.DirName,
@@ -112,7 +133,8 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
 	return &filesystem, nil
 }
 
-func AddFileSystemUsedPercentage(f *FileSystemStat) {
+// AddFileSystemUsedPercentage adds usage data to the filesystem struct
+func AddFileSystemUsedPercentage(f *FSStat) {
 	if f.Total == 0 {
 		return
 	}
@@ -121,7 +143,8 @@ func AddFileSystemUsedPercentage(f *FileSystemStat) {
 	f.UsedPercent = common.Round(perc, common.DefaultDecimalPlacesCount)
 }
 
-func GetFilesystemEvent(fsStat *FileSystemStat) common.MapStr {
+// GetFilesystemEvent turns a stat struct into a MapStr
+func GetFilesystemEvent(fsStat *FSStat) common.MapStr {
 	return common.MapStr{
 		"type":        fsStat.SysTypeName,
 		"device_name": fsStat.DevName,

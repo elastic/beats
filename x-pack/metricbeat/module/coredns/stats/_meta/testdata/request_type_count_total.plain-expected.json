@@ -1,0 +1,30 @@
+[
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "type": {
+                            "count": 440
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "A",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    }
+]

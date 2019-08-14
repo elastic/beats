@@ -1,12 +1,13 @@
 # This is the latest released environment.
 
-version: '2.1'
+version: '2.3'
 services:
   elasticsearch:
-    # TODO: For 6.3 remove "-platinum".
-    image: docker.elastic.co/elasticsearch/elasticsearch-platinum:6.2.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      retries: 300
+      interval: 1s
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "network.host="
@@ -15,15 +16,18 @@ services:
       - "xpack.security.enabled=false"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.2.4
+    image: docker.elastic.co/logstash/logstash:7.2.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
+      retries: 300
+      interval: 1s
     volumes:
-    - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
-    - ./docker/logstash/pki:/etc/pki:ro
+      - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.2.4
+    image: docker.elastic.co/kibana/kibana:7.2.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601"]
-      retries: 6
+      retries: 300
+      interval: 1s

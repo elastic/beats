@@ -1,0 +1,44 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+processors:
+  - drop_fields:
+      fields: ["json.Z","json.auth","json.addl"]
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.dns"
+
+        - from: "zeek.dns.id.orig_h"
+          to: "source.address"
+
+        - from: "zeek.dns.id.orig_p"
+          to: "source.port"
+
+        - from: "zeek.dns.id.resp_h"
+          to: "destination.address"
+
+        - from: "zeek.dns.id.resp_p"
+          to: "destination.port"
+
+        - from: "zeek.dns.proto"
+          to: "network.transport"
+
+        - from: "zeek.dns.uid"
+          to: "zeek.session_id"
+          
+      ignore_missing: true
+      fail_on_error: false
+{{ if .community_id }}
+  - community_id:
+      fields:
+        source_ip: source.address
+        destination_ip: destination.address
+{{ end }}

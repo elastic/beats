@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-mysql]]
@@ -35,8 +35,9 @@ precedence over those specified in the `username` and `password` config options.
 [float]
 === Compatibility
 
-The mysql MetricSets were tested with mysql 5.7.12 and are expected to work with
-all versions >= 5.7.0.
+The mysql MetricSets were tested with MySQL and Percona 5.7 and 8.0 and are expected
+to work with all versions >= 5.7.0.
+It is also tested with MariaDB 10.2, 10.3 and 10.4.
 
 [float]
 === Dashboard
@@ -56,7 +57,9 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: mysql
-  metricsets: ["status"]
+  metricsets:
+    - "status"
+  #  - "galera_status"
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -79,7 +82,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-mysql-galera_status,galera_status>>
+
 * <<metricbeat-metricset-mysql-status,status>>
+
+include::mysql/galera_status.asciidoc[]
 
 include::mysql/status.asciidoc[]
 

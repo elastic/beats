@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "destination": {
+        "ip": "10.0.2.15",
+        "port": 22
+    },
+    "event": {
+        "action": "socket_closed",
+        "dataset": "socket",
+        "kind": "event",
+        "module": "system"
+    },
+    "message": "Inbound socket (10.0.2.2:55270 -\u003e 10.0.2.15:22) CLOSED by process sshd (PID: 22799) and user root (UID: 0)",
+    "network": {
+        "community_id": "1:IXrg9Y06W7zrkqBlE30jpC/mzjo=",
+        "direction": "inbound",
+        "transport": "tcp",
+        "type": "ipv4"
+    },
+    "process": {
+        "name": "sshd",
+        "pid": 22799
+    },
+    "service": {
+        "type": "system"
+    },
+    "socket": {
+        "entity_id": "fIj66YRoGyoe8dML"
+    },
+    "source": {
+        "ip": "10.0.2.2",
+        "port": 55270
+    },
+    "user": {
+        "id": 0,
+        "name": "root"
+    }
+}

@@ -1,14 +1,17 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-couchbase]]
 == Couchbase module
 
-beta[]
-
 This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
 servers. The default metricsets are `bucket`, `cluster`, `node`.
+
+[float]
+=== Compatibility
+
+The Couchbase module is tested with Couchbase 4.5.1.
 
 
 [float]
@@ -27,7 +30,8 @@ metricbeat.modules:
   enabled: true
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

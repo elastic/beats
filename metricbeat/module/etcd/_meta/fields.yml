@@ -2,11 +2,17 @@
   title: "Etcd"
   description: >
     etcd Module
-  release: beta
-  settings: ["ssl"]
+  release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: etcd
       type: group
       description: >
         `etcd` contains statistics that were read from Etcd
       fields:
+        - name: api_version
+          type: keyword
+          description: >
+            Etcd API version for metrics retrieval
+
+

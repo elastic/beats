@@ -1,0 +1,10 @@
+- key: suricata
+  title: Suricata
+  description: >
+    Module for handling the EVE JSON logs produced by Suricata.
+  fields:
+    - name: suricata
+      type: group
+      description: >
+        Fields from the Suricata EVE log file.
+      fields:

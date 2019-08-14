@@ -3,7 +3,7 @@
 == Load the Elasticsearch index template
 
 The `setup.template` section of the +{beatname_lc}.yml+ config file specifies
-the {elasticsearch}/indices-templates.html[index template] to use for setting
+the {ref}/indices-templates.html[index template] to use for setting
 mappings in Elasticsearch. If template loading is enabled (the default),
 {beatname_uc} loads the index template automatically after successfully
 connecting to Elasticsearch.
@@ -24,18 +24,18 @@ you must <<load-template-manually,load the template manually>>.
 
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given
-name, so the final name is +{beatname_lc}-%\{[beat.version]\}+.
+name, so the final name is +{beatname_lc}-%\{[{beat_version_key}]\}+.
 
 // Maintainers: a backslash character is required to escape curly braces and
 // asterisks in inline code examples that contain asciidoc attributes. You'll
 // note that a backslash does not appear before the asterisk
-// in +{beatname_lc}-%\{[beat.version]\}-*+. This is intentional and formats
+// in +{beatname_lc}-%\{[{beat_version_key}]\}-*+. This is intentional and formats
 // the example as expected.
 
 *`setup.template.pattern`*:: The template pattern to apply to the default index
 settings. The default pattern is +{beat_default_index_prefix}-\*+. The {beatname_uc} version is always
 included in the pattern, so the final pattern is
-+{beat_default_index_prefix}-%\{[beat.version]\}-*+. The wildcard character `-*` is used to
++{beat_default_index_prefix}-%\{[{beat_version_key}]\}-*+. The wildcard character `-*` is used to
 match all daily indices.
 +
 Example:
@@ -55,7 +55,7 @@ is false.
 
 *`setup.template.settings`*:: A dictionary of settings to place into the `settings.index` dictionary of the
 Elasticsearch template. For more details about the available Elasticsearch mapping options, please
-see the Elasticsearch {elasticsearch}/mapping.html[mapping reference].
+see the Elasticsearch {ref}/mapping.html[mapping reference].
 +
 Example:
 +
@@ -69,8 +69,13 @@ setup.template.settings:
   index.number_of_replicas: 1
 ----------------------------------------------------------------------
 
+NOTE: If you want to use {stack-ov}/xpack-ccr.html[{ccr}] to replicate {beatname_uc}
+indices to another cluster, you will need to add additional template settings to
+{stack-ov}/ccr-requirements.html#ccr-overview-beats[enable soft deletes] on the
+underlying indices.
+
 *`setup.template.settings._source`*:: A dictionary of settings for the `_source` field. For the available settings,
-please see the Elasticsearch {elasticsearch}/mapping-source-field.html[reference].
+please see the Elasticsearch {ref}/mapping-source-field.html[reference].
 +
 Example:
 +
@@ -82,8 +87,52 @@ setup.template.overwrite: false
 setup.template.settings:
   _source.enabled: false
 ----------------------------------------------------------------------
-ifeval::["{beatname_lc}"!="apm-server"]
-*`setup.template.append_fields`*:: A list of of fields to be added to the template and Kibana index pattern. experimental[]
 
-NOTE: With append_fields only new fields can be added an no existing one overwritten or changed. This is especially useful if data is collected through the http/json metricset where the data structure is not known in advance. Changing the config of append_fields means the template has to be overwritten and only applies to new indices. If there are 2 Beats with different append_fields configs the last one writing the template will win. Any changes will also have an affect on the Kibana Index pattern.
+ifeval::["{beatname_lc}"!="apm-server"]
+*`setup.template.append_fields`* experimental[]:: A list of fields to be added
+to the template and {kib} index pattern. This setting adds new fields. It does
+not overwrite or change existing fields. 
++
+This setting is useful when your data contains fields that {beatname_uc} doesn't
+know about in advance. 
+ifeval::["{beatname_lc}"=="metricbeat"]
+For example, you might want to append fields to the template when you're using
+a metricset, such as the <<metricbeat-metricset-http-json>>, and the full data
+structure is not known in advance. 
+endif::[]
++
+If `append_fields` is specified along with `overwrite: true`, {beatname_uc}
+overwrites the existing template and applies the new template when creating new
+indices. Existing indices are not affected. If you're running multiple
+instances of {beatname_uc} with different `append_fields` settings, the last one
+writing the template takes precedence.
++
+Any changes to this setting also affect the {kib} index pattern.
++
+Example config:
++
+[source,yaml]
+----
+setup.template.overwrite: true
+setup.template.append_fields:
+- name: test.name
+  type: keyword
+- name: test.hostname
+  type: long
+----
+
+*`setup.template.json.enabled`*:: Set to `true` to load a
+JSON-based template file. Specify the path to your {es} index template file and
+set the name of the template. 
++
+["source","yaml",subs="attributes"]
+----------------------------------------------------------------------
+setup.template.json.enabled: true
+setup.template.json.path: "template.json"
+setup.template.json.name: "template-name
+----------------------------------------------------------------------
+
+NOTE: If the JSON template is used, the `fields.yml` is skipped for the template
+generation.
+
 endif::[]

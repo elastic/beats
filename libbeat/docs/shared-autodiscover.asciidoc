@@ -12,13 +12,19 @@ config file. To enable autodiscover, you specify a list of providers.
 === Providers
 
 Autodiscover providers work by watching for events on the system and translating those events into internal autodiscover
-events with a common format. When you configure the provider, you can use fields from the autodiscover event to set
-conditions that, when met, launch specific configurations.
+events with a common format. When you configure the provider, you can optionally use fields from the autodiscover event
+to set conditions that, when met, launch specific configurations.
+
+On start, {beatname_uc} will scan existing containers and launch the proper configs for them. Then it will watch for new
+start/stop events. This ensures you don't need to worry about state, but only define your desired configs.
 
 [float]
 ===== Docker
 
-The Docker autodiscover provider watches for Docker containers to start and stop. These are the available fields on every
+The Docker autodiscover provider watches for Docker containers to start and stop.
+
+
+These are the available fields during within config templating. The `docker.*` fields will be available on each emitted event.
 event:
 
   * host
@@ -62,14 +68,60 @@ For example, with the example event, "`${data.port}`" resolves to `6379`.
 
 include::../../{beatname_lc}/docs/autodiscover-docker-config.asciidoc[]
 
+
+ifeval::["{beatname_lc}"=="filebeat"]
+[WARNING]
+=======================================
+When using autodiscover, you have to be careful when defining config templates, especially if they are
+reading from places holding information for several containers. For instance, under this file structure:
+
+`/mnt/logs/<container_id>/*.log`
+
+You can define a config template like this:
+
+**Wrong settings**:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+autodiscover.providers:
+  - type: docker
+    templates:
+      - condition.contains:
+          docker.container.image: nginx
+        config:
+          - type: log
+            paths:
+              - "/mnt/logs/*/*.log"
+-------------------------------------------------------------------------------------
+
+That would read all the files under the given path several times (one per nginx container). What you really
+want is to scope your template to the container that matched the autodiscover condition. Good settings:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+autodiscover.providers:
+  - type: docker
+    templates:
+      - condition.contains:
+          docker.container.image: nginx
+        config:
+          - type: log
+            paths:
+              - "/mnt/logs/${data.docker.container.id}/*.log"
+-------------------------------------------------------------------------------------
+
+=======================================
+endif::[]
+
 [float]
 ===== Kubernetes
 
-The Kubernetes autodiscover provider watches for Kubernetes pods to start, update, and stop. These are the available fields on every
-event:
+The Kubernetes autodiscover provider watches for Kubernetes pods to start, update, and stop.
+
+These are the available fields during within config templating. The `kubernetes.*` fields will be available on each emitted event.
 
   * host
-  * port
+  * port (if exposed)
   * kubernetes.container.id
   * kubernetes.container.image
   * kubernetes.container.name
@@ -77,9 +129,22 @@ event:
   * kubernetes.namespace
   * kubernetes.node.name
   * kubernetes.pod.name
+  * kubernetes.pod.uid
 
 If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
 are added to the event.
+
+If the `include_labels` config is added to the provider config, then the list of labels present in the config
+will be added to the event.
+
+If the `exclude_labels` config is added to the provider config, then the list of labels present in the config
+will be excluded from the event.
+
+if the `labels.dedot` config is set to be `true` in the provider config, then `.` in labels will be replaced with `_`.
+
+if the `annotations.dedot` config is set to be `true` in the provider config, then `.` in annotations will be replaced
+with `_`.
+
 
 For example:
 
@@ -112,12 +177,136 @@ For example:
 The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
 contain variables from the autodiscover event. They can be accessed under data namespace.
 
+The `kubernetes` autodiscover provider has the following configuration settings:
+
+`host`:: (Optional) Identify the node where {beatname_lc} is running in case it
+  cannot be accurately detected, as when running {beatname_lc} in host network
+  mode.
+`namespace`:: (Optional) Select the namespace from which to collect the
+  metadata. If it is not set, the processor collects metadata from all
+  namespaces. It is unset by default.
+`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
+  client.
+
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 
+[float]
+===== Manually Defining Ports with Kubernetes
+
+Declare exposed ports in your pod spec if possible. Otherwise, you will need to use
+multiple templates with complex filtering rules. The {port} variable will not be
+present, and you will need to hardcode ports. Example: `{data.host}:1234`
+
+When ports are not declared, Autodiscover generates a config using your provided
+template once per pod, and once per container. These generated configs are
+de-duplicated after they are generated. If the generated configs for multiple
+containers are identical, they will be merged into one config.
+
+Pods share an identical host. If only the `{data.host}` variable is interpolated,
+then one config will be generated per host. The configs will be identical.
+After they are de-duplicated, only one will be used.
+
+ifdef::autodiscoverJolokia[]
+[float]
+===== Jolokia
+
+The Jolokia autodiscover provider uses Jolokia Discovery to find agents running
+in your host or your network.
+
+Jolokia Discovery mechanism is supported by any Jolokia agent since version
+1.2.0, it is enabled by default when Jolokia is included in the application as
+a JVM agent, but disabled in other cases as the OSGI or WAR (Java EE) agents.
+In any case, this feature is controlled with two properties:
+
+  * `discoveryEnabled`, to enable the feature
+  * `discoveryAgentUrl`, if set, this is the URL announced by the agent when
+    being discovered, setting this parameter implicitly enables the feature
+
+There are multiple ways of setting these properties, and they can vary from
+application to application, please refer to the documentation of your
+application to find the more suitable way to set them in your case.
+
+Jolokia Discovery is based on UDP multicast requests. Agents join the multicast
+group 239.192.48.84, port 24884, and discovery is done by sending queries to
+this group. You have to take into account that UDP traffic between Metricbeat
+and the Jolokia agents has to be allowed. Also notice that this multicast
+address is in the 239.0.0.0/8 range, that is reserved for private use within an
+organization, so it can only be used in private networks.
+
+These are the available fields during within config templating. The `jolokia.*` fields will be available on each emitted event.
+
+  * jolokia.agent.id
+  * jolokia.agent.version
+  * jolokia.secured
+  * jolokia.server.product
+  * jolokia.server.vendor
+  * jolokia.server.version
+  * jolokia.url
+
+The configuration of this provider consists in a set of network interfaces, as
+well as a set of templates as in other providers. The network interfaces will be
+the ones used for discovery probes, they have these settings:
+
+`name`:: the name of the interface (e.g. `br0`), it can contain a wildcard
+  as suffix to apply the same settings to multiple network interfaces of
+  the same type (e.g. `br*`).
+`interval`:: time between probes (defaults to 10s)
+ `grace_period`:: time since the last reply to consider an instance stopped
+  (defaults to 30s)
+`probe_timeout`:: max time to wait for responses since a probe is sent
+  (defaults to 1s)
+
+include::../../{beatname_lc}/docs/autodiscover-jolokia-config.asciidoc[]
+endif::autodiscoverJolokia[]
+
+ifdef::autodiscoverAWSELB[]
+[float]
+===== Amazon ELBs
+
+*Note: This provider is experimental*
+
+The Amazon ELB autodiscover provider discovers https://aws.amazon.com/elasticloadbalancing/[ELBs] and their listeners. This is useful when you don't want to connect
+directly to a service, but rather to the ELB fronting a pool of services.
+
+This provider will yield one config block per ELB Listener. So, if you have one ELB exposing both ports 80 and 443, it
+will generate two configs, one for each port. Keep in mind that the beat will de-duplicate configs. So, if the generated
+configs are the same only one will actually run.
+
+This provider will load AWS credentials using the standard AWS environment variables and shared credentials files see https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html[Best Practices for Managing AWS Access Keys] for more information. If you do not wish to use these, you may explicitly set the `access_key_id` and `secret_access_key` variables.
+
+These are the available fields during within config templating. The `elb_listener.*` fields will be available on each emitted event.
+
+  * host
+  * port
+  * elb_listener.listener_arn
+  * elb_listener.load_balancer_arn
+  * elb_listener.protocol
+  * elb_listener.type
+  * elb_listener.scheme
+  * elb_listener.availability_zones
+  * elb_listener.created
+  * elb_listener.state
+  * elb_listener.ip_address_type
+  * elb_listener.security_groups
+  * elb_listener.vpc_id
+  * elb_listener.ssl_policy
+
+include::../../{beatname_lc}/docs/autodiscover-aws-elb-config.asciidoc[]
+
+This autodiscover provider takes our standard <<aws-credentials-config,AWS credentials options>>.
+
+[id="aws-credentials-config"]
+include::../../x-pack/libbeat/docs/aws-credentials-config.asciidoc[]
+
+endif::autodiscoverAWSELB[]
+
+
+ifdef::autodiscoverHints[]
 [[configuration-autodiscover-hints]]
 === Hints based autodiscover
 
 include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
+endif::autodiscoverHints[]
 
 [[configuration-autodiscover-advanced]]
 === Advanced usage
@@ -150,16 +339,16 @@ applied if there is no condition provided.
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
-metricbeat.autodiscover:
+{beatname_lc}.autodiscover:
   providers:
     - type: kubernetes
       templates:
         ...
-  appenders:
-    - type: config
-      condition.equals:
-        kubernetes.labels.app: "prometheus"
-      config:
-        fields:
-          type: monitoring
+      appenders:
+        - type: config
+          condition.equals:
+            kubernetes.namespace: "prometheus"
+          config:
+            fields:
+              type: monitoring
 -------------------------------------------------------------------------------------

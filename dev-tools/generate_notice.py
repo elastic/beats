@@ -7,6 +7,8 @@ import argparse
 import json
 import csv
 import re
+import pdb
+import copy
 
 
 def read_file(filename):
@@ -59,7 +61,8 @@ def gather_dependencies(vendor_dirs, overrides=None):
                     print("WARNING: No version information found for: {}".format(lib_path))
                     lib = {"path": lib_path}
                 else:
-                    lib = lib_search[0]
+                    lib = copy.deepcopy(lib_search[0])
+
                 lib["license_file"] = os.path.join(root, filename)
 
                 lib["license_contents"] = read_file(lib["license_file"])
@@ -79,7 +82,15 @@ def gather_dependencies(vendor_dirs, overrides=None):
             # don't walk down into another vendor dir
             if "vendor" in dirs:
                 dirs.remove("vendor")
+
     return dependencies
+
+
+# Allow to skip files that could match the `LICENSE` pattern but does not have any license information.
+SKIP_FILES = [
+    # AWS lambda go defines that some part of the code is APLv2 and other on a MIT Modified license.
+    "./vendor/github.com/aws/aws-lambda-go/LICENSE-SUMMARY"
+]
 
 
 def get_licenses(folder):
@@ -88,9 +99,11 @@ def get_licenses(folder):
     """
     licenses = []
     for filename in sorted(os.listdir(folder)):
-        if filename.startswith("LICENSE") and "docs" not in filename:
+        if filename.startswith("LICENSE") and "docs" not in filename and os.path.join(folder, filename) not in SKIP_FILES:
             licenses.append(filename)
         elif filename.startswith("APLv2"):  # gorhill/cronexpr
+            licenses.append(filename)
+        elif filename in ("COPYING",):  # BurntSushi/toml
             licenses.append(filename)
     return licenses
 
@@ -101,10 +114,14 @@ def has_license(folder):
 
     There are two cases accepted:
         * The folder contains a LICENSE
+        * The parent folder contains a LICENSE
         * The folder only contains subdirectories AND all these
           subdirectories contain a LICENSE
     """
+
     if len(get_licenses(folder)) > 0:
+        return True, ""
+    elif len(get_licenses(os.path.join(folder, os.pardir))) > 0:  # For go.opencensus.io.
         return True, ""
 
     for subdir in os.listdir(folder):
@@ -233,6 +250,27 @@ copies or substantial portions of the Software.
     re.sub(r"\s+", " ", """Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
 copyright notice and this permission notice appear in all copies."""),
+    re.sub(r"\s+", " ", """Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+    """),
+    re.sub(r"\s+", " ", """Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    """),
 ]
 
 BSD_LICENSE_CONTENTS = [
@@ -270,6 +308,10 @@ MPL_LICENSE_TITLES = [
     "Mozilla Public License, version 2.0"
 ]
 
+UNIVERSAL_PERMISSIVE_LICENSE_TITLES = [
+    "The Universal Permissive License (UPL), Version 1.0"
+]
+
 
 # return SPDX identifiers from https://spdx.org/licenses/
 def detect_license_summary(content):
@@ -294,6 +336,8 @@ def detect_license_summary(content):
         return "CC-BY-SA-4.0"
     if any(sentence in content[0:3000] for sentence in LGPL_3_LICENSE_TITLE):
         return "LGPL-3.0"
+    if any(sentence in content[0:1500] for sentence in UNIVERSAL_PERMISSIVE_LICENSE_TITLES):
+        return "UPL-1.0"
 
     return "UNKNOWN"
 
@@ -305,6 +349,7 @@ ACCEPTED_LICENSES = [
     "BSD-3-Clause",
     "BSD-2-Clause",
     "MPL-2.0",
+    "UPL-1.0",
 ]
 SKIP_NOTICE = []
 

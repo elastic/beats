@@ -1,0 +1,33 @@
+version: '2.3'
+services:
+  beat:
+    build: ${PWD}/.
+    depends_on:
+    - proxy_dep
+    env_file:
+    - ${PWD}/build/test.env
+    environment:
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    working_dir: /go/src/github.com/elastic/beats/heartbeat
+    volumes:
+    - ${PWD}/..:/go/src/github.com/elastic/beats/
+    # We launch docker containers to test docker autodiscover:
+    - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      redis:         { condition: service_healthy }
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+
+  redis:
+    build: ${PWD}/tests/docker_support/redis

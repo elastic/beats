@@ -1,13 +1,23 @@
+# Module: system
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-system.html
+
 - module: system
+  period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - process
+    - process_summary
+    - socket_summary
+    #- entropy
+    #- core
+    #- diskio
+    #- socket
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
-
-#- module: system
-#  metricsets:
-#    - core
-#    - diskio
-#    - socket
 
 - module: system
   period: 1m

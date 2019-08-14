@@ -10,7 +10,7 @@ var:
       - c:/Windows/System32/LogFiles/HTTPERR/*.log
 
 ingest_pipeline: ingest/default.json
-prospector: config/iis-error.yml
+input: config/iis-error.yml
 
 requires.processors:
 - name: geoip

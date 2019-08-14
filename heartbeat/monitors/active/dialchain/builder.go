@@ -1,13 +1,32 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package dialchain
 
 import (
 	"fmt"
 	"net"
-	"strconv"
+	"net/url"
 	"time"
 
 	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -79,7 +98,7 @@ func (b *Builder) AddLayer(l Layer) {
 // Build create a new dialer, that will always use the constant address, no matter
 // which address is used to connect using the dialer.
 // The dialer chain will add per layer information to the given event.
-func (b *Builder) Build(addr string, event common.MapStr) (transport.Dialer, error) {
+func (b *Builder) Build(addr string, event *beat.Event) (transport.Dialer, error) {
 	// clone template, as multiple instance of a dialer can exist at the same time
 	dchain := b.template.Clone()
 
@@ -93,18 +112,16 @@ func (b *Builder) Build(addr string, event common.MapStr) (transport.Dialer, err
 
 // Run executes the given function with a new dialer instance.
 func (b *Builder) Run(
+	event *beat.Event,
 	addr string,
-	fn func(transport.Dialer) (common.MapStr, error),
-) (common.MapStr, error) {
-	event := common.MapStr{}
+	fn func(*beat.Event, transport.Dialer) error,
+) error {
 	dialer, err := b.Build(addr, event)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	results, err := fn(dialer)
-	event.DeepUpdate(results)
-	return event, err
+	return fn(event, dialer)
 }
 
 // MakeDialerJobs creates a set of monitoring jobs. The jobs behavior depends
@@ -114,83 +131,67 @@ func (b *Builder) Run(
 // correctly resolved endpoint.
 func MakeDialerJobs(
 	b *Builder,
-	typ, scheme string,
+	scheme string,
 	endpoints []Endpoint,
 	mode monitors.IPSettings,
-	fn func(dialer transport.Dialer, addr string) (common.MapStr, error),
-) ([]monitors.Job, error) {
-	var jobs []monitors.Job
+	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
+) ([]jobs.Job, error) {
+	var jobs []jobs.Job
 	for _, endpoint := range endpoints {
-		endpointJobs, err := makeEndpointJobs(b, typ, scheme, endpoint, mode, fn)
-		if err != nil {
-			return nil, err
+		for _, port := range endpoint.Ports {
+			endpointURL, err := url.Parse(fmt.Sprintf("%s://%s:%d", scheme, endpoint.Host, port))
+			if err != nil {
+				return nil, err
+			}
+			endpointJob, err := makeEndpointJob(b, endpointURL, mode, fn)
+			if err != nil {
+				return nil, err
+			}
+			jobs = append(jobs, wrappers.WithURLField(endpointURL, endpointJob))
 		}
-		jobs = append(jobs, endpointJobs...)
+
 	}
 
 	return jobs, nil
 }
 
-func makeEndpointJobs(
+func makeEndpointJob(
 	b *Builder,
-	typ, scheme string,
-	endpoint Endpoint,
+	endpointURL *url.URL,
 	mode monitors.IPSettings,
-	fn func(transport.Dialer, string) (common.MapStr, error),
-) ([]monitors.Job, error) {
-
-	fields := common.MapStr{
-		"monitor": common.MapStr{
-			"host":   endpoint.Host,
-			"scheme": scheme,
-		},
-	}
+	fn func(*beat.Event, transport.Dialer, string) error,
+) (jobs.Job, error) {
 
 	// Check if SOCKS5 is configured, with relying on the socks5 proxy
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
 	if b.resolveViaSocks5 {
-		jobs := make([]monitors.Job, len(endpoint.Ports))
-		for i, port := range endpoint.Ports {
-			jobName := jobName(typ, scheme, endpoint.Host, []uint16{port})
-			address := net.JoinHostPort(endpoint.Host, strconv.Itoa(int(port)))
-			settings := monitors.MakeJobSetting(jobName).WithFields(fields)
-			jobs[i] = monitors.MakeSimpleJob(settings, func() (common.MapStr, error) {
-				return b.Run(address, func(dialer transport.Dialer) (common.MapStr, error) {
-					return fn(dialer, address)
+		return wrappers.WithURLField(endpointURL,
+			jobs.MakeSimpleJob(func(event *beat.Event) error {
+				hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
+				return b.Run(event, hostPort, func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, hostPort)
 				})
-			})
-		}
-		return jobs, nil
+			})), nil
 	}
 
 	// Create job that first resolves one or multiple IP (depending on
 	// config.Mode) in order to create one continuation Task per IP.
-	jobName := jobName(typ, scheme, endpoint.Host, endpoint.Ports)
-	settings := monitors.MakeHostJobSettings(jobName, endpoint.Host, mode).WithFields(fields)
+	settings := monitors.MakeHostJobSettings(endpointURL.Hostname(), mode)
+
 	job, err := monitors.MakeByHostJob(settings,
-		monitors.MakePingAllIPPortFactory(endpoint.Ports,
-			func(ip *net.IPAddr, port uint16) (common.MapStr, error) {
+		monitors.MakePingIPFactory(
+			func(event *beat.Event, ip *net.IPAddr) error {
 				// use address from resolved IP
-				portStr := strconv.Itoa(int(port))
-				ipAddr := net.JoinHostPort(ip.String(), portStr)
-				hostAddr := net.JoinHostPort(endpoint.Host, portStr)
-				return b.Run(ipAddr, func(dialer transport.Dialer) (common.MapStr, error) {
-					return fn(dialer, hostAddr)
-				})
+				ipPort := net.JoinHostPort(ip.String(), endpointURL.Port())
+				cb := func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, ipPort)
+				}
+				err := b.Run(event, ipPort, cb)
+				return err
 			}))
 	if err != nil {
 		return nil, err
 	}
-	return []monitors.Job{job}, nil
-}
-
-func jobName(typ, jobType, host string, ports []uint16) string {
-	var h string
-	if len(ports) == 1 {
-		h = fmt.Sprintf("%v:%v", host, ports[0])
-	} else {
-		h = fmt.Sprintf("%v:%v", host, ports)
-	}
-	return fmt.Sprintf("%v-%v@%v", typ, jobType, h)
+	return job, nil
 }

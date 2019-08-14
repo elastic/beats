@@ -124,6 +124,10 @@ packetbeat.protocols:
   # This option indicates which Operator/Operators will be ignored.
   #ignored_ops: ["SUPPORTED","OPTIONS"]
 
+- type: dhcpv4
+  # Configure the DHCP for IPv4 ports.
+  ports: [67, 68]
+
 - type: dns
   # Enable DNS monitoring. Default: true
   #enabled: true
@@ -190,6 +194,10 @@ packetbeat.protocols:
   # The list of content types for which Packetbeat includes the full HTTP
   # response payload.
   #include_response_body_for: []
+
+  # Whether the body of a request must be decoded when a content-encoding
+  # or transfer-encoding has been applied.
+  #decode_body: true
 
   # If the Cookie or Set-Cookie headers are sent, this option controls whether
   # they are split into individual values.
@@ -271,7 +279,7 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
-  ports: [3306]
+  ports: [3306,3307]
 
   # If this option is enabled, the raw message of the request (`request` field)
   # is sent to Elasticsearch. The default is false.
@@ -324,6 +332,15 @@ packetbeat.protocols:
   # Transaction timeout. Expired transactions will no longer be correlated to
   # incoming responses, but sent to Elasticsearch immediately.
   #transaction_timeout: 10s
+
+  # Max size for per-session message queue. This places a limit on the memory
+  # that can be used to buffer requests and responses for correlation.
+  #queue_max_bytes: 1048576
+
+  # Max number of messages for per-session message queue. This limits the number
+  # of requests or responses that can be buffered for correlation. Set a value
+  # large enough to allow for pipelining.
+  #queue_max_messages: 20000
 
 - type: thrift
   # Enable thrift monitoring. Default: true
@@ -436,7 +453,18 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
-  ports: [443]
+  ports:
+    - 443   # HTTPS
+    - 993   # IMAPS
+    - 995   # POP3S
+    - 5223  # XMPP over SSL
+    - 8443
+    - 8883  # Secure MQTT
+    - 9243  # Elasticsearch
+
+  # List of hash algorithms to use to calculate certificates' fingerprints.
+  # Valid values are `sha1`, `sha256` and `md5`.
+  #fingerprints: [sha1]
 
   # If this option is enabled, the client and server certificates and
   # certificate chains are sent to Elasticsearch. The default is true.
@@ -448,33 +476,17 @@ packetbeat.protocols:
 
 #=========================== Monitored processes ==============================
 
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-#packetbeat.procs:
-#  enabled: false
-#  monitored:
-#    - process: mysqld
-#      cmdline_grep: mysqld
-#
-#    - process: pgsql
-#      cmdline_grep: postgres
-#
-#    - process: nginx
-#      cmdline_grep: nginx
-#
-#    - process: app
-#      cmdline_grep: gunicorn
+# Packetbeat can enrich events with information about the process associated
+# the socket that sent or received the packet if Packetbeat is monitoring
+# traffic from the host machine. By default process enrichment is disabled.
+# This feature works on Linux and Windows.
+packetbeat.procs.enabled: false
 
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#packetbeat.ignore_outgoing: true
+# If you want to ignore transactions created by the server on which the shipper
+# is installed you can enable this option. This option is useful to remove
+# duplicates if shippers are installed on multiple servers. Default value is
+# false.
+packetbeat.ignore_outgoing: false
 
 #================================ General ======================================
 
@@ -560,7 +572,7 @@ packetbeat.protocols:
       # Sets the write buffer size.
       #buffer_size: 1MiB
 
-      # Maximum duration after which events are flushed, if the write buffer
+      # Maximum duration after which events are flushed if the write buffer
       # is not full yet. The default value is 1s.
       #flush.timeout: 1s
 
@@ -574,7 +586,7 @@ packetbeat.protocols:
       #codec: cbor
     #read:
       # Reader flush timeout, waiting for more events to become available, so
-      # to fill a complete batch, as required by the outputs.
+      # to fill a complete batch as required by the outputs.
       # If flush_timeout is 0, all available events are forwarded to the
       # outputs immediately.
       # The default value is 0s.
@@ -593,8 +605,8 @@ packetbeat.protocols:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, and
-# add_cloud_metadata.
+# The supported processors are drop_fields, drop_event, include_fields,
+# decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
 # contain CPU load percentages, but remove the fields that contain CPU ticks
@@ -622,6 +634,14 @@ packetbeat.protocols:
 #       - from: "a"
 #         to: "b"
 #
+# The following example tokenizes the string into fields:
+#
+#processors:
+#- dissect:
+#    tokenizer: "%{key1} - %{key2}"
+#    field: "message"
+#    target_prefix: "dissect"
+#
 # The following example enriches each event with metadata from the cloud
 # provider about the host machine. It works on EC2, GCE, DigitalOcean,
 # Tencent Cloud, and Alibaba Cloud.
@@ -648,6 +668,7 @@ packetbeat.protocols:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -660,11 +681,78 @@ packetbeat.protocols:
 #
 #processors:
 #- add_docker_metadata: ~
-#- add_host_metadata: ~
+#
+# The following example enriches each event with host metadata.
+#
+#processors:
+#- add_host_metadata:
+#   netinfo.enabled: false
+#
+# The following example enriches each event with process metadata using
+# process IDs included in the event.
+#
+#processors:
+#- add_process_metadata:
+#    match_pids: ["system.process.ppid"]
+#    target: system.process.parent
+#
+# The following example decodes fields containing JSON strings
+# and replaces the strings with valid JSON objects.
+#
+#processors:
+#- decode_json_fields:
+#    fields: ["field1", "field2", ...]
+#    process_array: false
+#    max_depth: 1
+#    target: ""
+#    overwrite_keys: false
+#
+#processors:
+#- decompress_gzip_field:
+#    from: "field1"
+#    to: "field2"
+#    ignore_missing: false
+#    fail_on_error: true
+#
+# The following example copies the value of message to message_copied
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: message_copied
+#    fail_on_error: true
+#    ignore_missing: false
+#
+# The following example truncates the value of message to 1024 bytes
+#
+#processors:
+#- truncate_fields:
+#    fields:
+#      - message
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
+#
+# The following example preserves the raw message under event.original
+#
+#processors:
+#- copy_fields:
+#    fields:
+#        - from: message
+#          to: event.original
+#    fail_on_error: false
+#    ignore_missing: true
+#- truncate_fields:
+#    fields:
+#      - event.original
+#    max_bytes: 1024
+#    fail_on_error: false
+#    ignore_missing: true
 
 #============================= Elastic Cloud ==================================
 
-# These settings simplify using packetbeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Packetbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -693,12 +781,15 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 0
 
+  # Configure escaping HTML symbols in strings.
+  #escape_html: false
+
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -709,20 +800,25 @@ output.elasticsearch:
   # Optional index name. The default is "packetbeat" plus date
   # and generates [packetbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "packetbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: "/elasticsearch"
 
   # Custom HTTP headers to add to each request
   #headers:
   #  X-My-Header: Contents of the header
 
-  # Proxy server url
+  # Proxy server URL
   #proxy_url: http://proxy:3128
+
+  # Whether to disable proxy settings for outgoing connections. If true, this
+  # takes precedence over both the proxy_url field and any environment settings
+  # (HTTP_PROXY, HTTPS_PROXY). The default is false.
+  #proxy_disable: false
 
   # The number of times a particular Elasticsearch index operation is attempted. If
   # the indexing operation doesn't succeed after this many retries, the events are
@@ -733,45 +829,54 @@ output.elasticsearch:
   # The default is 50.
   #bulk_max_size: 50
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # The number of seconds to wait before trying to reconnect to Elasticsearch
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Elasticsearch after a network error. The default is 60s.
+  #backoff.max: 60s
+
+  # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
+  # and certificates will be accepted. In this mode, SSL-based connections are
   # susceptible to man-in-the-middle attacks. Use only for testing. Default is
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
-
 
 #----------------------------- Logstash output ---------------------------------
 #output.logstash:
@@ -787,6 +892,9 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
+  # Configure escaping HTML symbols in strings.
+  #escape_html: false
+
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
   # disable this feature.
@@ -794,10 +902,10 @@ output.elasticsearch:
   # Not yet supported for async connections (i.e. with the "pipelining" option set)
   #ttl: 30s
 
-  # Optional load balance the events between the Logstash hosts. Default is false.
+  # Optionally load-balance events between Logstash hosts. Default is false.
   #loadbalance: false
 
-  # Number of batches to be sent asynchronously to logstash while processing
+  # Number of batches to be sent asynchronously to Logstash while processing
   # new batches.
   #pipelining: 2
 
@@ -805,6 +913,17 @@ output.elasticsearch:
   # transaction.  The number of events to be sent increases up to `bulk_max_size`
   # if no error is encountered.
   #slow_start: false
+
+  # The number of seconds to wait before trying to reconnect to Logstash
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Logstash after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # Optional index name. The default index name is set to packetbeat
   # in all lowercase.
@@ -816,7 +935,7 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
@@ -825,7 +944,7 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
@@ -836,7 +955,7 @@ output.elasticsearch:
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
   # Optional passphrase for decrypting the Certificate Key.
@@ -845,19 +964,34 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
 
+  # The number of times to retry publishing an event after a publishing failure.
+  # After the specified number of retries, the events are typically dropped.
+  # Some Beats, such as Filebeat and Winlogbeat, ignore the max_retries setting
+  # and retry until all events are published.  Set max_retries to a value less
+  # than 0 to retry until all events are published. The default is 3.
+  #max_retries: 3
+
+  # The maximum number of events to bulk in a single Logstash request. The
+  # default is 2048.
+  #bulk_max_size: 2048
+
+  # The number of seconds to wait for responses from the Logstash server before
+  # timing out. The default is 30s.
+  #timeout: 30s
+
 #------------------------------- Kafka output ----------------------------------
 #output.kafka:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # The list of Kafka broker addresses from where to fetch the cluster metadata.
+  # The list of Kafka broker addresses from which to fetch the cluster metadata.
   # The cluster metadata contain the actual Kafka brokers events are published
   # to.
   #hosts: ["localhost:9092"]
@@ -866,7 +1000,7 @@ output.elasticsearch:
   # using any event field. To set the topic from document type use `%{[type]}`.
   #topic: beats
 
-  # The Kafka event key setting. Use format string to create unique event key.
+  # The Kafka event key setting. Use format string to create a unique event key.
   # By default no event key will be generated.
   #key: ''
 
@@ -887,28 +1021,38 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version packetbeat is assumed to run against. Defaults to the oldest
-  # supported stable version (currently version 0.8.2.0)
-  #version: 0.8.2
+  # Kafka version Packetbeat is assumed to run against. Defaults to the "1.0.0".
+  #version: '1.0.0'
 
-  # Metadata update configuration. Metadata do contain leader information
-  # deciding which broker to use when publishing.
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty-print JSON event
+    #pretty: false
+
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
+
+  # Metadata update configuration. Metadata contains leader information
+  # used to decide which broker to use when publishing.
   #metadata:
     # Max metadata request retry attempts when cluster is in middle of leader
     # election. Defaults to 3 retries.
     #retry.max: 3
 
-    # Waiting time between retries during leader elections. Default is 250ms.
+    # Wait time between retries during leader elections. Default is 250ms.
     #retry.backoff: 250ms
 
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
 
+    # Strategy for fetching the topics metadata from the broker. Default is false.
+    #full: false
+
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
 
   # The number of times to retry publishing an event after a publishing failure.
-  # After the specified number of retries, the events are typically dropped.
+  # After the specified number of retries, events are typically dropped.
   # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
   # all events are published.  Set max_retries to a value less than 0 to retry
   # until all events are published. The default is 3.
@@ -917,6 +1061,10 @@ output.elasticsearch:
   # The maximum number of events to bulk in a single Kafka request. The default
   # is 2048.
   #bulk_max_size: 2048
+
+  # Duration to wait before sending bulk Kafka request. 0 is no delay. The default
+  # is 0.
+  #bulk_flush_frequency: 0s
 
   # The number of seconds to wait for responses from the Kafka brokers before
   # timing out. The default is 30s.
@@ -937,6 +1085,10 @@ output.elasticsearch:
   # default is gzip.
   #compression: gzip
 
+  # Set the compression level. Currently only gzip provides a compression level
+  # between 0 and 9. The default value is chosen by the compression algorithm.
+  #compression_level: 4
+
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
   # or less than the broker's message.max.bytes.
@@ -952,7 +1104,7 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
   #ssl.enabled: true
 
   # Optional SSL configuration options. SSL is off by default.
@@ -965,7 +1117,7 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
@@ -981,7 +1133,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -993,20 +1145,24 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # The list of Redis servers to connect to. If load balancing is enabled, the
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty print json event
+    #pretty: false
+
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
+
+  # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
-
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
   # default is packetbeat.
   #key: packetbeat
 
-  # The password to authenticate with. The default is no authentication.
+  # The password to authenticate to Redis with. The default is no authentication.
   #password:
 
   # The Redis database number where the events are published. The default is 0.
@@ -1039,6 +1195,17 @@ output.elasticsearch:
   # all events are published. Set max_retries to a value less than 0 to retry
   # until all events are published. The default is 3.
   #max_retries: 3
+
+  # The number of seconds to wait before trying to reconnect to Redis
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Redis after a network error. The default is 60s.
+  #backoff.max: 60s
 
   # The maximum number of events to bulk in a single Redis request or pipeline.
   # The default is 2048.
@@ -1094,6 +1261,14 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty-print JSON event
+    #pretty: false
+
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
+
   # Path to the directory where to save the generated files. The option is
   # mandatory.
   #path: "/tmp/packetbeat"
@@ -1103,7 +1278,7 @@ output.elasticsearch:
   #filename: packetbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every packetbeat restart, the files are rotated. The default value is 10240
+  # every Packetbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -1115,37 +1290,41 @@ output.elasticsearch:
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
 
-
 #----------------------------- Console output ---------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # Pretty print json event
-  #pretty: false
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty-print JSON event
+    #pretty: false
+
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
 
 #================================= Paths ======================================
 
-# The home path for the packetbeat installation. This is the default base path
+# The home path for the Packetbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the packetbeat installation. This is the default
+# The configuration path for the Packetbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the packetbeat installation. This is the default base path
-# for all the files in which packetbeat needs to store its data. If not set by a
+# The data path for the Packetbeat installation. This is the default base path
+# for all the files in which Packetbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a packetbeat installation. This is the default location for
+# The logs path for a Packetbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1208,17 +1387,33 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "packetbeat-%{[beat.version]}"
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.name: "packetbeat-%{[beat.version]}"
+# Template name. By default the template name is "packetbeat-%{[agent.version]}"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.name: "packetbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
-#setup.template.pattern: "packetbeat-%{[beat.version]}-*"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.pattern: "packetbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
+
+# A list of fields to be added to the template and Kibana index pattern. Also
+# specify setup.template.overwrite: true to overwrite the existing template.
+# This setting is experimental.
+#setup.template.append_fields:
+#- name: field_name
+#  type: field_type
+
+# Enable JSON template loading. If this is enabled, the fields.yml is ignored.
+#setup.template.json.enabled: false
+
+# Path to the JSON template file
+#setup.template.json.path: "${path.config}/template.json"
+
+# Name under which the template is stored in Elasticsearch
+#setup.template.json.name: ""
 
 # Overwrite existing template
 #setup.template.overwrite: false
@@ -1239,6 +1434,41 @@ setup.template.settings:
   #_source:
     #enabled: false
 
+#============================== Setup ILM =====================================
+
+# Configure index lifecycle management (ILM). These settings create a write
+# alias and add additional settings to the index template. When ILM is enabled,
+# output.elasticsearch.index is ignored, and the write alias is used to set the
+# index name.
+
+# Enable ILM support. Valid values are true, false, and auto. When set to auto
+# (the default), the Beat uses index lifecycle management when it connects to a
+# cluster that supports ILM; otherwise, it creates daily indices.
+#setup.ilm.enabled: auto
+
+# Set the prefix used in the index lifecycle write alias name. The default alias
+# name is 'packetbeat-%{[agent.version]}'. 
+#setup.ilm.rollover_alias: "packetbeat"
+
+# Set the rollover index pattern. The default is "%{now/d}-000001".
+#setup.ilm.pattern: "{now/d}-000001"
+
+# Set the lifecycle policy name. The default policy name is
+# 'packetbeat-%{[agent.version]}'.
+#setup.ilm.policy_name: "mypolicy"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+#setup.ilm.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is false. If
+# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.ilm.check_exists: false
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.ilm.overwrite: false
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -1256,7 +1486,7 @@ setup.kibana:
   #username: "elastic"
   #password: "changeme"
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: ""
 
   # Use SSL settings for HTTPS. Default is true.
@@ -1268,27 +1498,27 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
 
@@ -1306,13 +1536,16 @@ setup.kibana:
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
+# Send all logging output to stderr. The default is false.
+#logging.to_stderr: false
+
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: false
 
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, packetbeat periodically logs its internal metrics that have changed
+# If enabled, Packetbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1343,24 +1576,37 @@ logging.files:
   # Must be a valid Unix-style file permissions mask expressed in octal notation.
   #permissions: 0600
 
-# Set to true to log messages in json format.
+  # Enable log file rotation on time intervals in addition to size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # Unix epoch. Defaults to disabled.
+  #interval: 0
+
+  # Rotate existing logs on startup rather than appending to the existing
+  # file. Defaults to true.
+  # rotateonstartup: true
+
+# Set to true to log messages in JSON format.
 #logging.json: false
 
 
-#============================== Xpack Monitoring =====================================
-# packetbeat can export internal metrics to a central Elasticsearch monitoring cluster.
-# This requires xpack monitoring to be enabled in Elasticsearch.
-# The reporting is disabled by default.
+#============================== Xpack Monitoring ===============================
+# Packetbeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#xpack.monitoring.enabled: false
+#monitoring.enabled: false
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well. Any setting that is not set is
-# automatically inherited from the Elasticsearch output configuration, so if you
-# have the Elasticsearch output configured, you can simply uncomment the
-# following line, and leave the rest commented out.
-#xpack.monitoring.elasticsearch:
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
@@ -1376,7 +1622,7 @@ logging.files:
   #username: "beats_system"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -1397,7 +1643,18 @@ logging.files:
   # The default is 50.
   #bulk_max_size: 50
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # The number of seconds to wait before trying to reconnect to Elasticsearch
+  # after a network error. After waiting backoff.init seconds, the Beat
+  # tries to reconnect. If the attempt fails, the backoff timer is increased
+  # exponentially up to backoff.max. After a successful connection, the backoff
+  # timer is reset. The default is 1s.
+  #backoff.init: 1s
+
+  # The maximum number of seconds to wait before attempting to connect to
+  # Elasticsearch after a network error. The default is 60s.
+  #backoff.max: 60s
+
+  # Configure HTTP request timeout before failing an request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -1409,32 +1666,35 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  #metrics.period: 10s
+  #state.period: 1m
 
 #================================ HTTP Endpoint ======================================
 # Each beat can expose internal metrics through a HTTP endpoint. For security
@@ -1450,3 +1710,13 @@ logging.files:
 
 # Port on which the HTTP endpoint will bind. Default is 5066.
 #http.port: 5066
+
+#============================= Process Security ================================
+
+# Enable or disable seccomp system call filtering on Linux. Default is enabled.
+#seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable 6.7 migration aliases
+#migration.6_to_7.enabled: false

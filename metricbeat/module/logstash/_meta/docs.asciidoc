@@ -1,3 +1,8 @@
 This is the Logstash module.
 
 The default metricsets are `node` and `node_stats`.
+
+[float]
+=== Compability
+
+The logstash module is tested with logstash 6.3.

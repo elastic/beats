@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package cmd
 
 import (
@@ -7,10 +24,10 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 func init() {
@@ -35,40 +52,32 @@ type BeatsRootCmd struct {
 	KeystoreCmd   *cobra.Command
 }
 
-// GenRootCmd returns the root command to use for your beat. It takes
-// beat name as parameter, and also run command, which will be called if no args are
-// given (for backwards compatibility)
-func GenRootCmd(name, version string, beatCreator beat.Creator) *BeatsRootCmd {
-	return GenRootCmdWithRunFlags(name, version, beatCreator, nil)
-}
+// GenRootCmdWithSettings returns the root command to use for your beat. It take the
+// run command, which will be called if no args are given (for backwards compatibility),
+// and beat settings
+func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
+	if settings.IndexPrefix == "" {
+		settings.IndexPrefix = settings.Name
+	}
 
-// GenRootCmdWithRunFlags returns the root command to use for your beat. It takes
-// beat name as parameter, and also run command, which will be called if no args are
-// given (for backwards compatibility). runFlags parameter must the flagset used by
-// run command
-func GenRootCmdWithRunFlags(name, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
-	return GenRootCmdWithIndexPrefixWithRunFlags(name, name, version, beatCreator, runFlags)
-}
-
-func GenRootCmdWithIndexPrefixWithRunFlags(name, indexPrefix, version string, beatCreator beat.Creator, runFlags *pflag.FlagSet) *BeatsRootCmd {
 	rootCmd := &BeatsRootCmd{}
-	rootCmd.Use = name
+	rootCmd.Use = settings.Name
 
 	// Due to a dependence upon the beat name, the default config file path
-	err := cfgfile.ChangeDefaultCfgfileFlag(name)
+	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 	if err != nil {
 		panic(fmt.Errorf("failed to set default config file path: %v", err))
 	}
 
 	// must be updated prior to CLI flag handling.
 
-	rootCmd.RunCmd = genRunCmd(name, indexPrefix, version, beatCreator, runFlags)
-	rootCmd.SetupCmd = genSetupCmd(name, indexPrefix, version, beatCreator)
-	rootCmd.VersionCmd = genVersionCmd(name, version)
-	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
-	rootCmd.ExportCmd = genExportCmd(name, indexPrefix, version)
-	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
-	rootCmd.KeystoreCmd = genKeystoreCmd(name, indexPrefix, version, beatCreator, runFlags)
+	rootCmd.RunCmd = genRunCmd(settings, beatCreator)
+	rootCmd.ExportCmd = genExportCmd(settings)
+	rootCmd.TestCmd = genTestCmd(settings, beatCreator)
+	rootCmd.SetupCmd = genSetupCmd(settings, beatCreator)
+	rootCmd.KeystoreCmd = genKeystoreCmd(settings)
+	rootCmd.VersionCmd = GenVersionCmd(settings)
+	rootCmd.CompletionCmd = genCompletionCmd(settings, rootCmd)
 
 	// Root command is an alias for run
 	rootCmd.Run = rootCmd.RunCmd.Run

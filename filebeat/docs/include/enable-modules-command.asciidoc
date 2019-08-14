@@ -1,0 +1,37 @@
+--
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} modules enable {modulename}
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} modules enable {modulename}
+----
+
+*brew:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} modules enable {modulename}
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} modules enable {modulename}
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe modules enable {modulename}
+----
+
+--

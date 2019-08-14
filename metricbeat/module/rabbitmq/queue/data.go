@@ -1,12 +1,32 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package queue
 
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 var (
@@ -24,18 +44,27 @@ var (
 		"consumers": s.Object{
 			"count": c.Int("consumers"),
 			"utilisation": s.Object{
-				"pct": c.Int("consumer_utilisation", s.Optional),
+				"pct": c.Int("consumer_utilisation", s.IgnoreAllErrors),
 			},
 		},
 		"messages": s.Object{
 			"total": s.Object{
 				"count": c.Int("messages"),
+				"details": c.Dict("messages_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"ready": s.Object{
 				"count": c.Int("messages_ready"),
+				"details": c.Dict("messages_ready_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"unacknowledged": s.Object{
 				"count": c.Int("messages_unacknowledged"),
+				"details": c.Dict("messages_unacknowledged_details", s.Schema{
+					"rate": c.Float("rate"),
+				}),
 			},
 			"persistent": s.Object{
 				"count": c.Int("messages_persistent"),
@@ -55,25 +84,48 @@ var (
 	}
 )
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte, r mb.ReporterV2, m *MetricSet) error {
 	var queues []map[string]interface{}
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
-		logp.Err("Error: ", err)
+		return errors.Wrap(err, "error in mapping")
 	}
-
-	events := []common.MapStr{}
-	errors := s.NewErrors()
 
 	for _, queue := range queues {
-		event, errs := eventMapping(queue)
-		events = append(events, event)
-		errors.AddErrors(errs)
+		evt, err := eventMapping(queue)
+		if err != nil {
+			m.Logger().Errorf("error in mapping: %s", err)
+			r.Error(err)
+			continue
+		}
+		if !r.Event(evt) {
+			return nil
+		}
 	}
 
-	return events, errors
+	return nil
 }
 
-func eventMapping(queue map[string]interface{}) (common.MapStr, *s.Errors) {
-	return schema.Apply(queue)
+func eventMapping(queue map[string]interface{}) (mb.Event, error) {
+	fields, err := schema.Apply(queue)
+	if err != nil {
+		return mb.Event{}, errors.Wrap(err, "error applying schema")
+	}
+
+	moduleFields := common.MapStr{}
+	if v, err := fields.GetValue("vhost"); err == nil {
+		moduleFields.Put("vhost", v)
+		fields.Delete("vhost")
+	}
+
+	if v, err := fields.GetValue("node"); err == nil {
+		moduleFields.Put("node.name", v)
+		fields.Delete("node")
+	}
+
+	event := mb.Event{
+		MetricSetFields: fields,
+		ModuleFields:    moduleFields,
+	}
+	return event, nil
 }

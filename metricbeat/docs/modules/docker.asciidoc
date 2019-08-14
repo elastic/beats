@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-docker]]
@@ -7,7 +7,12 @@ This file is generated! See scripts/docs_collector.py
 
 This module fetches metrics from https://www.docker.com/[Docker] containers. The default metricsets are: `container`, `cpu`, `diskio`, `healthcheck`, `info`, `memory` and `network`. The `image` metricset is not enabled by default.
 
-The Docker module is currently not tested on Windows.
+[float]
+=== Compability
+
+The Docker module is currently tested on Linux and Mac with the community
+edition engine, versions 1.11 and 17.09.0-ce. It is not tested on Windows,
+but it should also work there.
 
 [float]
 === Module-specific configuration notes
@@ -33,6 +38,7 @@ metricbeat.modules:
     - "container"
     - "cpu"
     - "diskio"
+    - "event"
     - "healthcheck"
     - "info"
     #- "image"
@@ -42,8 +48,11 @@ metricbeat.modules:
   period: 10s
   enabled: true
 
-  # Replace dots in labels with `_`. Set to false to keep dots
-  labels.dedot: true
+  # If set to true, replace dots in labels with `_`.
+  #labels.dedot: false
+
+  # If set to true, collects metrics per core.
+  #cpu.cores: true
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
@@ -63,6 +72,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-diskio,diskio>>
 
+* <<metricbeat-metricset-docker-event,event>>
+
 * <<metricbeat-metricset-docker-healthcheck,healthcheck>>
 
 * <<metricbeat-metricset-docker-image,image>>
@@ -78,6 +89,8 @@ include::docker/container.asciidoc[]
 include::docker/cpu.asciidoc[]
 
 include::docker/diskio.asciidoc[]
+
+include::docker/event.asciidoc[]
 
 include::docker/healthcheck.asciidoc[]
 

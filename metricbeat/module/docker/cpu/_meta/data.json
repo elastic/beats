@@ -1,67 +1,84 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "container": {
+        "id": "cc78e58acfda4501105dc4de8e3ae218f2da616213e6e3af168c40103829302a",
+        "image": {
+            "name": "metricbeat_elasticsearch"
+        },
+        "name": "metricbeat_elasticsearch_1_df866b3a7b3d",
+        "runtime": "docker"
+    },
     "docker": {
         "container": {
-            "id": "bbdcbc751e7eda7a50e773b4a5d8c2800af664f835ef9c0ad6bbb9c160c50d83",
             "labels": {
-                "build-date": "20170911",
-                "com_docker_compose_config-hash": "371e477ae73fd44b19bcbcf0d4feaf4de9adfb69137a8f16d09cff749724ca99",
+                "com_docker_compose_config-hash": "e3e0a2c6e5d1afb741bc8b1ecb09cda0395886b7a3e5084a9fd110be46d70f78",
                 "com_docker_compose_container-number": "1",
                 "com_docker_compose_oneoff": "False",
                 "com_docker_compose_project": "metricbeat",
                 "com_docker_compose_service": "elasticsearch",
-                "com_docker_compose_version": "1.21.0",
-                "license": "GPLv2",
-                "maintainer": "Elastic Docker Team \u003cdocker@elastic.co\u003e",
-                "name": "CentOS Base Image",
-                "vendor": "CentOS"
-            },
-            "name": "metricbeat_elasticsearch_1"
+                "com_docker_compose_slug": "df866b3a7b3d50c0802350cbe58ee5b34fa32b7f6ba7fe9e48cde2c12dd0201d",
+                "com_docker_compose_version": "1.23.1",
+                "license": "Elastic License",
+                "org_label-schema_build-date": "20181006",
+                "org_label-schema_license": "GPLv2",
+                "org_label-schema_name": "elasticsearch",
+                "org_label-schema_schema-version": "1.0",
+                "org_label-schema_url": "https://www.elastic.co/products/elasticsearch",
+                "org_label-schema_vcs-url": "https://github.com/elastic/elasticsearch-docker",
+                "org_label-schema_vendor": "Elastic",
+                "org_label-schema_version": "6.5.1"
+            }
         },
         "cpu": {
             "core": {
                 "0": {
-                    "pct": 0.01012583677581864,
-                    "ticks": 9528454911
+                    "pct": 0.03263313721518987,
+                    "ticks": 38346196894
                 },
                 "1": {
-                    "pct": 0.0069975889168765746,
-                    "ticks": 11916812270
+                    "pct": 0.014317838987341772,
+                    "ticks": 37143007802
                 },
                 "2": {
-                    "pct": 0.001329603022670025,
-                    "ticks": 10894346015
+                    "pct": 0.0028625296202531647,
+                    "ticks": 37194678570
                 },
                 "3": {
-                    "pct": 0.0018390015113350126,
-                    "ticks": 10847487614
+                    "pct": 0.005687502784810126,
+                    "ticks": 39335551141
                 }
             },
             "kernel": {
-                "pct": 0.010075566750629723,
-                "ticks": 1960000000
+                "pct": 0.010126582278481013,
+                "ticks": 10560000000
             },
             "system": {
                 "pct": 4,
-                "ticks": 1092479570000000
+                "ticks": 5566563680000000
             },
             "total": {
-                "pct": 0.02029203022670025
+                "pct": 0.05550100860759494
             },
             "user": {
-                "pct": 0.010075566750629723,
-                "ticks": 40960000000
+                "pct": 0.05063291139240506,
+                "ticks": 139520000000
             }
         }
     },
+    "event": {
+        "dataset": "docker.cpu",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "/var/run/docker.sock",
-        "module": "docker",
-        "name": "cpu",
-        "rtt": 115
+        "name": "cpu"
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
     }
 }

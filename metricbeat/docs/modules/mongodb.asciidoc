@@ -1,5 +1,5 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-mongodb]]
@@ -66,7 +66,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: mongodb
-  metricsets: ["dbstats", "status"]
+  metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
   period: 10s
   enabled: true
 
@@ -77,12 +77,29 @@ metricbeat.modules:
   # password configuration options.
   hosts: ["localhost:27017"]
 
+  # Optional SSL. By default is off.
+  #ssl.enabled: true
+
+  # Mode of verification of server certificate ('none' or 'full')
+  #ssl.verification_mode: 'full'
+
+  # List of root certificates for TLS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
   # Username to use when connecting to MongoDB. Empty by default.
   #username: user
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets
@@ -93,11 +110,19 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-mongodb-dbstats,dbstats>>
 
+* <<metricbeat-metricset-mongodb-metrics,metrics>>
+
+* <<metricbeat-metricset-mongodb-replstatus,replstatus>>
+
 * <<metricbeat-metricset-mongodb-status,status>>
 
 include::mongodb/collstats.asciidoc[]
 
 include::mongodb/dbstats.asciidoc[]
+
+include::mongodb/metrics.asciidoc[]
+
+include::mongodb/replstatus.asciidoc[]
 
 include::mongodb/status.asciidoc[]
 

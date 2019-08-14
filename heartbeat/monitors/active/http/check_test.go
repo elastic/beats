@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package http
 
 import (
@@ -7,7 +24,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/libbeat/conditions"
 )
 
 func TestCheckBody(t *testing.T) {
@@ -107,4 +129,70 @@ func TestCheckBody(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCheckJson(t *testing.T) {
+	fooBazEqualsBar := common.MustNewConfigFrom(map[string]interface{}{"equals": map[string]interface{}{"foo": map[string]interface{}{"baz": "bar"}}})
+	fooBazEqualsBarConf := &conditions.Config{}
+	err := fooBazEqualsBar.Unpack(fooBazEqualsBarConf)
+	require.NoError(t, err)
+
+	fooBazEqualsBarDesc := "foo.baz equals bar"
+
+	var tests = []struct {
+		description string
+		body        string
+		condDesc    string
+		condConf    *conditions.Config
+		result      bool
+	}{
+		{
+			"positive match",
+			"{\"foo\": {\"baz\": \"bar\"}}",
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			true,
+		},
+		{
+			"Negative match",
+			"{\"foo\": 123}",
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			false,
+		},
+		{
+			"unparseable",
+			`notjson`,
+			fooBazEqualsBarDesc,
+			fooBazEqualsBarConf,
+			false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintln(w, test.body)
+			}))
+			defer ts.Close()
+
+			res, err := http.Get(ts.URL)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
+			require.NoError(t, err)
+			checkRes := checker(res)
+
+			if result := checkRes == nil; result != test.result {
+				if test.result {
+					t.Fatalf("Expected condition: '%s' to match body: %s. got: %s", test.condDesc, test.body, checkRes)
+				} else {
+					t.Fatalf("Did not expect condition: '%s' to match body: %s. got: %s", test.condDesc, test.body, checkRes)
+				}
+			}
+		})
+	}
+
 }

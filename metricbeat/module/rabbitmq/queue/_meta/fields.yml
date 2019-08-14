@@ -2,14 +2,16 @@
   type: group
   description: >
     queue
-  release: beta
+  release: ga
   fields:
     - name: name
       type: keyword
       description: >
         The name of the queue with non-ASCII characters escaped as in C.
     - name: vhost
-      type: keyword
+      type: alias
+      path: rabbitmq.vhost
+      migration: true
       description: >
         Virtual host name with non-ASCII characters escaped as in C.
     - name: durable
@@ -25,7 +27,9 @@
       description: >
         Whether the queue is exclusive (i.e. has owner_pid).
     - name: node
-      type: keyword
+      type: alias
+      path: rabbitmq.node.name
+      migration: true
       description: >
         Node name.
     - name: state
@@ -49,14 +53,26 @@
       type: long
       description: >
         Sum of ready and unacknowledged messages (queue depth).
+    - name: messages.total.details.rate
+      type: float
+      description: >
+        How much the queue depth has changed per second in the most recent sampling interval.
     - name: messages.ready.count
       type: long
       description: >
         Number of messages ready to be delivered to clients.
+    - name: messages.ready.details.rate
+      type: float
+      description: >
+        How much the count of messages ready has changed per second in the most recent sampling interval.
     - name: messages.unacknowledged.count
       type: long
       description: >
         Number of messages delivered to clients but not yet acknowledged.
+    - name: messages.unacknowledged.details.rate
+      type: float
+      description: >
+        How much the count of unacknowledged messages has changed per second in the most recent sampling interval.
     - name: messages.persistent.count
       type: long
       description: >

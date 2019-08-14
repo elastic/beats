@@ -16,7 +16,7 @@ class Test(metricbeat.BaseTest):
         """
         self.render_config_template(modules=[{
             "name": "prometheus",
-            "metricsets": ["stats"],
+            "metricsets": ["collector"],
             "hosts": self.get_hosts(),
             "period": "5s"
         }])
@@ -26,13 +26,8 @@ class Test(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
         evt = output[0]
 
         self.assertItemsEqual(self.de_dot(PROMETHEUS_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return ["http://" + os.getenv('PROMETHEUS_HOST', 'localhost') + ':' +
-                os.getenv('PROMETHEUS_PORT', '9090')]

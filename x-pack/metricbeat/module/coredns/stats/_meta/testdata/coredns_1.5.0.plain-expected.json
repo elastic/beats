@@ -1,0 +1,829 @@
+[
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 129,
+                                    "0": 0,
+                                    "100": 129,
+                                    "1023": 129,
+                                    "16000": 129,
+                                    "200": 129,
+                                    "2047": 129,
+                                    "300": 129,
+                                    "32000": 129,
+                                    "400": 129,
+                                    "4095": 129,
+                                    "48000": 129,
+                                    "511": 129,
+                                    "64000": 129,
+                                    "8291": 129
+                                },
+                                "count": 129,
+                                "sum": 6574
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 129,
+                                    "0": 0,
+                                    "100": 49,
+                                    "1023": 129,
+                                    "16000": 129,
+                                    "200": 73,
+                                    "2047": 129,
+                                    "300": 129,
+                                    "32000": 129,
+                                    "400": 129,
+                                    "4095": 129,
+                                    "48000": 129,
+                                    "511": 129,
+                                    "64000": 129,
+                                    "8291": 129
+                                },
+                                "count": 129,
+                                "sum": 22227
+                            }
+                        }
+                    }
+                },
+                "proto": "udp",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "response": {
+                        "rcode": {
+                            "count": 42
+                        }
+                    }
+                },
+                "rcode": "NXDOMAIN",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 37,
+                                    "0": 0,
+                                    "100": 37,
+                                    "1023": 37,
+                                    "16000": 37,
+                                    "200": 37,
+                                    "2047": 37,
+                                    "300": 37,
+                                    "32000": 37,
+                                    "400": 37,
+                                    "4095": 37,
+                                    "48000": 37,
+                                    "511": 37,
+                                    "64000": 37,
+                                    "8291": 37
+                                },
+                                "count": 37,
+                                "sum": 2180
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 37,
+                                    "0": 27,
+                                    "100": 37,
+                                    "1023": 37,
+                                    "16000": 37,
+                                    "200": 37,
+                                    "2047": 37,
+                                    "300": 37,
+                                    "32000": 37,
+                                    "400": 37,
+                                    "4095": 37,
+                                    "48000": 37,
+                                    "511": 37,
+                                    "64000": 37,
+                                    "8291": 37
+                                },
+                                "count": 37,
+                                "sum": 680
+                            }
+                        }
+                    }
+                },
+                "proto": "tcp",
+                "server": "dns://:53",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "panic": {
+                    "count": 0
+                }
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "response": {
+                        "rcode": {
+                            "count": 2009
+                        }
+                    }
+                },
+                "rcode": "NOERROR",
+                "server": "dns://:53",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "do": {
+                            "count": 1525
+                        },
+                        "duration": {
+                            "ns": {
+                                "bucket": {
+                                    "+Inf": 2009,
+                                    "1000000": 2007,
+                                    "1024000000": 2009,
+                                    "128000000": 2009,
+                                    "16000000": 2009,
+                                    "2000000": 2008,
+                                    "2048000000": 2009,
+                                    "250000": 1740,
+                                    "256000000": 2009,
+                                    "32000000": 2009,
+                                    "4000000": 2009,
+                                    "4096000000": 2009,
+                                    "500000": 2006,
+                                    "512000000": 2009,
+                                    "64000000": 2009,
+                                    "8000000": 2009,
+                                    "8192000000": 2009
+                                },
+                                "count": 2009,
+                                "sum": 288933052.0000002
+                            }
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 1972,
+                                    "0": 0,
+                                    "100": 1972,
+                                    "1023": 1972,
+                                    "16000": 1972,
+                                    "200": 1972,
+                                    "2047": 1972,
+                                    "300": 1972,
+                                    "32000": 1972,
+                                    "400": 1972,
+                                    "4095": 1972,
+                                    "48000": 1972,
+                                    "511": 1972,
+                                    "64000": 1972,
+                                    "8291": 1972
+                                },
+                                "count": 1972,
+                                "sum": 114442
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 1972,
+                                    "0": 98,
+                                    "100": 1972,
+                                    "1023": 1972,
+                                    "16000": 1972,
+                                    "200": 1972,
+                                    "2047": 1972,
+                                    "300": 1972,
+                                    "32000": 1972,
+                                    "400": 1972,
+                                    "4095": 1972,
+                                    "48000": 1972,
+                                    "511": 1972,
+                                    "64000": 1972,
+                                    "8291": 1972
+                                },
+                                "count": 1972,
+                                "sum": 127432
+                            }
+                        }
+                    }
+                },
+                "proto": "udp",
+                "server": "dns://:53",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 83,
+                                    "0": 0,
+                                    "100": 83,
+                                    "1023": 83,
+                                    "16000": 83,
+                                    "200": 83,
+                                    "2047": 83,
+                                    "300": 83,
+                                    "32000": 83,
+                                    "400": 83,
+                                    "4095": 83,
+                                    "48000": 83,
+                                    "511": 83,
+                                    "64000": 83,
+                                    "8291": 83
+                                },
+                                "count": 83,
+                                "sum": 4551
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 83,
+                                    "0": 0,
+                                    "100": 27,
+                                    "1023": 83,
+                                    "16000": 83,
+                                    "200": 63,
+                                    "2047": 83,
+                                    "300": 83,
+                                    "32000": 83,
+                                    "400": 83,
+                                    "4095": 83,
+                                    "48000": 83,
+                                    "511": 83,
+                                    "64000": 83,
+                                    "8291": 83
+                                },
+                                "count": 83,
+                                "sum": 12437
+                            }
+                        }
+                    }
+                },
+                "proto": "tcp",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "cache": {
+                        "hits": {
+                            "count": 323
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "success"
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "type": {
+                            "count": 104
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "MX",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "type": {
+                            "count": 89
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "A",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "type": {
+                            "count": 1912
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "A",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "count": 37
+                    }
+                },
+                "family": "1",
+                "proto": "tcp",
+                "server": "dns://:53",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "response": {
+                        "rcode": {
+                            "count": 170
+                        }
+                    }
+                },
+                "rcode": "NOERROR",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "type": {
+                            "count": 12
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "SOA",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "duration": {
+                            "ns": {
+                                "bucket": {
+                                    "+Inf": 212,
+                                    "1000000": 0,
+                                    "1024000000": 212,
+                                    "128000000": 203,
+                                    "16000000": 152,
+                                    "2000000": 0,
+                                    "2048000000": 212,
+                                    "250000": 0,
+                                    "256000000": 212,
+                                    "32000000": 168,
+                                    "4000000": 0,
+                                    "4096000000": 212,
+                                    "500000": 0,
+                                    "512000000": 212,
+                                    "64000000": 194,
+                                    "8000000": 47,
+                                    "8192000000": 212
+                                },
+                                "count": 212,
+                                "sum": 5474046607.000003
+                            }
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "count": 129
+                    }
+                },
+                "family": "1",
+                "proto": "udp",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "count": 1972
+                    }
+                },
+                "family": "1",
+                "proto": "udp",
+                "server": "dns://:53",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "type": {
+                            "count": 19
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "SOA",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "type": {
+                            "count": 85
+                        }
+                    }
+                },
+                "server": "dns://:53",
+                "type": "MX",
+                "zone": "my.domain.elastic."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "cache": {
+                        "misses": {
+                            "count": 1686
+                        }
+                    }
+                },
+                "server": "dns://:53"
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "count": 83
+                    }
+                },
+                "family": "1",
+                "proto": "tcp",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    }
+]

@@ -1,19 +1,33 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 /*
 Package postgresql is Metricbeat module for PostgreSQL server.
 */
 package postgresql
 
 import (
-	"database/sql"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/lib/pq"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -25,6 +39,7 @@ func init() {
 	}
 }
 
+//NewModule returns a new instance of the module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := struct {
@@ -37,6 +52,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
+//ParseURL is the postgres host parser
 func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 	c := struct {
 		Username string `config:"username"`
@@ -83,39 +99,4 @@ func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 	}
 
 	return h, nil
-}
-
-func QueryStats(db *sql.DB, query string) ([]map[string]interface{}, error) {
-	rows, err := db.Query(query)
-	if err != nil {
-		return nil, err
-	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return nil, errors.Wrap(err, "scanning columns")
-	}
-	vals := make([][]byte, len(columns))
-	valPointers := make([]interface{}, len(columns))
-	for i := range vals {
-		valPointers[i] = &vals[i]
-	}
-
-	results := []map[string]interface{}{}
-
-	for rows.Next() {
-		err = rows.Scan(valPointers...)
-		if err != nil {
-			return nil, errors.Wrap(err, "scanning row")
-		}
-
-		result := map[string]interface{}{}
-		for i, col := range columns {
-			result[col] = string(vals[i])
-		}
-
-		logp.Debug("postgresql", "Result: %v", result)
-		results = append(results, result)
-	}
-	return results, nil
 }

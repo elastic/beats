@@ -1,5 +1,3 @@
-=== munin node MetricSet
-
 This is the node metricset of the module munin.
 
 [float]
@@ -13,31 +11,40 @@ and sends them as events to Elastic.
 - module: munin
   metricsets: ["node"]
   hosts: ["localhost:4949"]
-  node.namespace: node
+  munin.plugins: ["cpu", "swap"]
 ---
 
-All metrics exposed by a single munin node will be sent in a single event,
-grouped by munin items, e.g:
+Metrics exposed by a single munin node will be sent in an event per plugin.
+
+For example with the previous configuration two events are sent like the
+following ones.
 
 [source,json]
 ---
 "munin": {
-  "node": {
-    "swap": {
-      "swap_in": 198609,
-      "swap_out": 612629
-    },
-    "cpu": {
-      "softirq": 680,
-      "guest": 0,
-      "user": 158212,
-      "iowait": 71095,
-      "irq": 1,
-      "system": 35906,
-      "idle": 1185709,
-      "steal": 0,
-      "nice": 1633
-    }
+  "plugin": {
+    "name": "swap"
+  },
+  "metrics": {
+    "swap_in": 198609,
+    "swap_out": 612629
+  }
+}
+
+"munin": {
+  "plugin": {
+    "name": "cpu"
+  }
+  "metrics": {
+    "softirq": 680,
+    "guest": 0,
+    "user": 158212,
+    "iowait": 71095,
+    "irq": 1,
+    "system": 35906,
+    "idle": 1185709,
+    "steal": 0,
+    "nice": 1633
   }
 }
 ---

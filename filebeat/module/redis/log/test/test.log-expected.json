@@ -1,136 +1,44 @@
 [
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.06.02",
-    "_type" : "doc",
-    "_id" : "AVxl1DGcOMOtQBaTiyoi",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-05-30T10:05:20.000Z",
-      "offset" : 165,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "event" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-06-01T22:43:37.024Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/redis/log/test/test.log",
-      "fileset" : {
-        "module" : "redis",
-        "name" : "log"
-      },
-      "redis" : {
-        "log" : {
-          "level" : "debug",
-          "message" : "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects."
-        }
-      }
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 0,
+        "message": "Saving the final RDB snapshot before exiting.",
+        "process.pid": 98738,
+        "redis.log.role": "master",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "debug",
+        "log.offset": 76,
+        "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects.",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 165,
+        "message": "The server is now ready to accept connections on port 6379\"",
+        "service.type": "redis"
+    },
+    {
+        "event.dataset": "redis.log",
+        "event.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 250,
+        "message": "Received SIGINT scheduling shutdown...",
+        "process.pid": 5092,
+        "service.type": "redis"
     }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.06.02",
-    "_type" : "doc",
-    "_id" : "AVxl1DGcOMOtQBaTiyoh",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-05-30T12:23:52.442Z",
-      "offset" : 76,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "event" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-06-01T22:43:37.024Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/redis/log/test/test.log",
-      "fileset" : {
-        "module" : "redis",
-        "name" : "log"
-      },
-      "redis" : {
-        "log" : {
-          "role" : "master",
-          "level" : "notice",
-          "pid" : "98738",
-          "message" : "Saving the final RDB snapshot before exiting."
-        }
-      }
-    }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.06.02",
-    "_type" : "doc",
-    "_id" : "AVxl1DGcOMOtQBaTiyoj",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-05-31T04:32:08.000Z",
-      "offset" : 250,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "event" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-06-01T22:43:37.024Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/redis/log/test/test.log",
-      "fileset" : {
-        "module" : "redis",
-        "name" : "log"
-      },
-      "redis" : {
-        "log" : {
-          "level" : "notice",
-          "message" : "The server is now ready to accept connections on port 6379\""
-        }
-      }
-    }
-  },
-  {
-    "_index" : "filebeat-6.0.0-alpha2-2017.06.02",
-    "_type" : "doc",
-    "_id" : "AVxl1DGcOMOtQBaTiyok",
-    "_score" : 1.0,
-    "_source" : {
-      "@timestamp" : "2017-05-30T10:56:31.232Z",
-      "offset" : 322,
-      "beat" : {
-        "hostname" : "a-mac-with-esc-key-2.local",
-        "name" : "a-mac-with-esc-key-2.local",
-        "version" : "6.0.0-alpha2"
-      },
-      "prospector" : {
-        "type" : "log"
-      },
-      "event" : {
-        "type" : "log"
-      },
-      "read_timestamp" : "2017-06-01T22:43:37.024Z",
-      "source" : "/Users/tsg/src/github.com/elastic/beats/filebeat/module/redis/log/test/test.log",
-      "fileset" : {
-        "module" : "redis",
-        "name" : "log"
-      },
-      "redis" : {
-        "log" : {
-          "pid" : "5092",
-          "message" : "Received SIGINT scheduling shutdown..."
-        }
-      }
-    }
-  }
 ]

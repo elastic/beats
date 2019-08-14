@@ -1,15 +1,22 @@
 ////
-This file is generated! See scripts/docs_collector.py
+This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-kibana]]
 == Kibana module
 
-beta[]
+There are two modules that collect metrics about {kib}: 
 
-The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
+* The Kibana module tracks only the high-level metrics. The default metricset in
+this module is `status`.
+* The Kibana X-Pack module enables you to monitor more Kibana metrics with our
+{stack-ov}/xpack-monitoring.html[monitoring] feature. The default metricset in
+this module is `stats`.
 
-The default metricset is `status`.
+[float]
+=== Compatibility
+
+The Kibana module is tested with Kibana 6.3.
 
 
 [float]
@@ -25,17 +32,27 @@ metricbeat.modules:
   metricsets: ["status"]
   period: 10s
   hosts: ["localhost:5601"]
-  enabled: default
+  basepath: ""
+  enabled: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kibana-stats,stats>>
+
 * <<metricbeat-metricset-kibana-status,status>>
+
+include::kibana/stats.asciidoc[]
 
 include::kibana/status.asciidoc[]
 

@@ -1,18 +1,24 @@
-version: '2.1'
+version: '2.3'
 services:
   beat:
     build: ${PWD}/.
     depends_on:
       - proxy_dep
-    env_file:
-      - ${PWD}/build/test.env
     working_dir: /go/src/github.com/elastic/beats/auditbeat
     environment:
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - ES_USER=beats
+      - ES_PASS=testing
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
     command: make
+    privileged: true
+    pid: host
+    cap_add:
+      - AUDIT_CONTROL
 
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369

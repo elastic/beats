@@ -1,0 +1,205 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }
+                    }
+                }, 
+                "savedSearchId": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs", 
+                "title": "Logs Severity [Filebeat MongoDB] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1, 
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true, 
+                            "id": "1", 
+                            "params": {}, 
+                            "schema": "metric", 
+                            "type": "count"
+                        }, 
+                        {
+                            "enabled": true, 
+                            "id": "2", 
+                            "params": {
+                                "customLabel": "Log severity", 
+                                "field": "log.level", 
+                                "order": "desc", 
+                                "orderBy": "1", 
+                                "size": 5
+                            }, 
+                            "schema": "segment", 
+                            "type": "terms"
+                        }
+                    ], 
+                    "params": {
+                        "addLegend": true, 
+                        "addTooltip": true, 
+                        "isDonut": true, 
+                        "legendPosition": "right", 
+                        "type": "pie"
+                    }, 
+                    "title": "Logs Severity [Filebeat MongoDB] ECS", 
+                    "type": "pie"
+                }
+            }, 
+            "id": "0fef5710-0a82-11e8-bffe-ff7d4f68cf94-ecs", 
+            "type": "visualization", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "mongodb.log.timestamp", 
+                    "log.level", 
+                    "mongodb.log.component", 
+                    "mongodb.log.context", 
+                    "message"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "index": "filebeat-*", 
+                        "query": {
+                            "language": "kuery",
+                            "query": "log.level: F or log.level: W"
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "Error logs [Filebeat MongoDB] ECS", 
+                "version": 1
+            }, 
+            "id": "e49fe000-0a7e-11e8-bffe-ff7d4f68cf94-ecs", 
+            "type": "search", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "mongodb.log.timestamp", 
+                    "log.level", 
+                    "mongodb.log.component", 
+                    "mongodb.log.context", 
+                    "message"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "index": "filebeat-*", 
+                        "query": {
+                            "language": "kuery",
+                            "query": "log.level: *"
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "sort": [
+                    "mongodb.log.timestamp", 
+                    "asc"
+                ], 
+                "title": "All logs [Filebeat MongoDB] ECS", 
+                "version": 1
+            }, 
+            "id": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs", 
+            "type": "search", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "Filebeat MongoDB module overview", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [], 
+                        "highlightAll": true, 
+                        "query": {
+                            "language": "kuery",
+                            "query": ""
+                        }, 
+                        "version": true
+                    }
+                }, 
+                "optionsJSON": {
+                    "darkTheme": false
+                }, 
+                "panelsJSON": [
+                    {
+                        "col": 1, 
+                        "id": "0fef5710-0a82-11e8-bffe-ff7d4f68cf94-ecs", 
+                        "panelIndex": 1, 
+                        "row": 1, 
+                        "size_x": 4, 
+                        "size_y": 3, 
+                        "type": "visualization"
+                    }, 
+                    {
+                        "col": 5, 
+                        "columns": [
+                            "mongodb.log.timestamp", 
+                            "log.level", 
+                            "mongodb.log.component", 
+                            "mongodb.log.context", 
+                            "message"
+                        ], 
+                        "id": "e49fe000-0a7e-11e8-bffe-ff7d4f68cf94-ecs", 
+                        "panelIndex": 2, 
+                        "row": 1, 
+                        "size_x": 8, 
+                        "size_y": 3, 
+                        "sort": [
+                            "@timestamp", 
+                            "desc"
+                        ], 
+                        "type": "search"
+                    }, 
+                    {
+                        "col": 1, 
+                        "columns": [
+                            "mongodb.log.timestamp", 
+                            "log.level", 
+                            "mongodb.log.component", 
+                            "mongodb.log.context", 
+                            "message"
+                        ], 
+                        "id": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs", 
+                        "panelIndex": 3, 
+                        "row": 4, 
+                        "size_x": 12, 
+                        "size_y": 6, 
+                        "sort": [
+                            "mongodb.log.timestamp", 
+                            "asc"
+                        ], 
+                        "type": "search"
+                    }
+                ], 
+                "timeRestore": false, 
+                "title": "Overview [Filebeat MongoDB] ECS", 
+                "uiStateJSON": {}, 
+                "version": 1
+            }, 
+            "id": "abcf35b0-0a82-11e8-bffe-ff7d4f68cf94-ecs", 
+            "type": "dashboard", 
+            "version": 2
+        }
+    ], 
+    "version": "6.0.0"
+}

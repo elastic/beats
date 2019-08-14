@@ -4,5 +4,9 @@
   period: 10s
   hosts: ["localhost:15672"]
 
+  # Management path prefix, if `management.path_prefix` is set in RabbitMQ
+  # configuration, it has to be set to the same value.
+  #management_path_prefix: ""
+
   #username: guest
   #password: guest

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build windows
 
 package service
@@ -117,13 +134,15 @@ var errorNames = map[uint32]string{
 }
 
 type ServiceStatus struct {
-	DisplayName  string
-	ServiceName  string
-	CurrentState string
-	StartType    ServiceStartType
-	PID          uint32 // ID of the associated process.
-	Uptime       time.Duration
-	ExitCode     uint32 // Exit code for stopped services.
+	DisplayName      string
+	ServiceName      string
+	CurrentState     string
+	StartType        ServiceStartType
+	PID              uint32 // ID of the associated process.
+	Uptime           time.Duration
+	ExitCode         uint32 // Exit code for stopped services.
+	ServiceStartName string
+	BinaryPathName   string
 }
 
 type ServiceReader struct {
@@ -356,6 +375,21 @@ func getAdditionalServiceInfo(serviceHandle ServiceHandle, service *ServiceStatu
 		}
 		serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
 		service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
+		serviceStartNameOffset := uintptr(unsafe.Pointer(serviceQueryConfig.LpServiceStartName)) - (uintptr)(unsafe.Pointer(&buffer[0]))
+		binaryPathNameOffset := uintptr(unsafe.Pointer(serviceQueryConfig.LpBinaryPathName)) - (uintptr)(unsafe.Pointer(&buffer[0]))
+
+		strBuf := new(bytes.Buffer)
+		if err := sys.UTF16ToUTF8Bytes(buffer[serviceStartNameOffset:], strBuf); err != nil {
+			return err
+		}
+		service.ServiceStartName = strBuf.String()
+
+		strBuf.Reset()
+		if err := sys.UTF16ToUTF8Bytes(buffer[binaryPathNameOffset:], strBuf); err != nil {
+			return err
+		}
+		service.BinaryPathName = strBuf.String()
+
 		break
 	}
 
@@ -459,6 +493,8 @@ func (reader *ServiceReader) Read() ([]common.MapStr, error) {
 			"name":         service.ServiceName,
 			"state":        service.CurrentState,
 			"start_type":   service.StartType.String(),
+			"start_name":   service.ServiceStartName,
+			"path_name":    service.BinaryPathName,
 		}
 
 		if service.CurrentState == "Stopped" {
@@ -528,7 +564,7 @@ func getMachineGUID() (string, error) {
 	const path = `SOFTWARE\Microsoft\Cryptography`
 	const name = "MachineGuid"
 
-	k, err := registry.OpenKey(key, path, registry.READ)
+	k, err := registry.OpenKey(key, path, registry.READ|registry.WOW64_64KEY)
 	if err != nil {
 		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
 	}

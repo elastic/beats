@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package tls
 
 import (
@@ -7,12 +24,12 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/hex"
-	"encoding/pem"
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/common/x509util"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -460,24 +477,22 @@ func parseServerHello(buffer bufferView) *helloMessage {
 	return &result
 }
 
-func parseCertificates(buffer bufferView) []*x509.Certificate {
+func parseCertificates(buffer bufferView) (certs []*x509.Certificate) {
 	var totalLen uint32
 	if !buffer.read24Net(0, &totalLen) || int(totalLen+3) != buffer.length() {
 		return nil
 	}
-
-	var certs []*x509.Certificate
 
 	for pos, limit := 3, int(totalLen)+3; pos+3 <= limit; {
 		var certLen uint32
 		if !buffer.read24Net(pos, &certLen) || pos+3+int(certLen) > limit {
 			return nil
 		}
-		cert := buffer.readBytes(pos+3, int(certLen))
-		if len(cert) != int(certLen) {
+		raw := buffer.readBytes(pos+3, int(certLen))
+		if len(raw) != int(certLen) {
 			return nil
 		}
-		parsed, err := x509.ParseCertificate(cert)
+		parsed, err := x509.ParseCertificate(raw)
 		if err != nil {
 			return nil
 		}
@@ -526,7 +541,9 @@ func getKeySize(key interface{}) int {
 	return 0
 }
 
-func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
+// certToMap takes an x509 cert and converts it into a map. If includeRaw is set
+// to true a PEM encoded copy of the cert is encoded into the map as well.
+func certToMap(cert *x509.Certificate, includeRaw bool, hashes []*FingerprintAlgorithm) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
@@ -549,11 +566,14 @@ func certToMap(cert *x509.Certificate, includeRaw bool) common.MapStr {
 		certMap["alternative_names"] = san
 	}
 	if includeRaw {
-		block := pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: cert.Raw,
+		certMap["raw"] = x509util.CertToPEMString(cert)
+	}
+	if len(hashes) > 0 {
+		fingerprints := common.MapStr{}
+		for _, hash := range hashes {
+			fingerprints[hash.name] = hash.algo.Hash(cert.Raw)
 		}
-		certMap["raw"] = string(pem.EncodeToMemory(&block))
+		certMap["fingerprint"] = fingerprints
 	}
 	return certMap
 }

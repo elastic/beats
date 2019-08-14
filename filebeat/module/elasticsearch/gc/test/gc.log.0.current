@@ -1,0 +1,702 @@
+2018-06-11 01:51:14 GC log file created /var/log/elasticsearch/gc.log.4
+OpenJDK 64-Bit Server VM (25.171-b11) for linux-amd64 JRE (1.8.0_171-8u171-b11-0ubuntu0.16.04.1-b11), built on Apr 27 2018 17:19:03 by "buildd" with gcc 5.4.0 20160609
+Memory: 4k page, physical 4045212k(144384k free), swap 0k(0k free)
+CommandLine flags: -XX:+AlwaysPreTouch -XX:CICompilerCount=2 -XX:CMSInitiatingOccupancyFraction=75 -XX:GCLogFileSize=67108864 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/lib/elasticsearch -XX:InitialHeapSize=1073741824 -XX:MaxHeapSize=1073741824 -XX:MaxNewSize=174456832 -XX:MaxTenuringThreshold=6 -XX:MinHeapDeltaBytes=196608 -XX:NewSize=174456832 -XX:NumberOfGCLogFiles=32 -XX:OldPLABSize=16 -XX:OldSize=899284992 -XX:-OmitStackTraceInFastThrow -XX:+PrintGC -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintTenuringDistribution -XX:ThreadStackSize=1024 -XX:+UseCMSInitiatingOccupancyOnly -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+UseGCLogFileRotation -XX:+UseParNewGC 
+2018-06-11T01:51:14.078+0000: 1396021.448: [GC (Allocation Failure) 2018-06-11T01:51:14.078+0000: 1396021.448: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   10248128 bytes,   10248128 total
+- age   2:     203616 bytes,   10451744 total
+- age   3:     393016 bytes,   10844760 total
+- age   4:     166936 bytes,   11011696 total
+: 146846K->12312K(153344K), 0.0079246 secs] 520756K->386222K(1031552K), 0.0080233 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:10.104+0000: 1396137.475: Total time for which application threads were stopped: 0.0114333 seconds, Stopping threads took: 0.0025299 seconds
+2018-06-11T01:53:10.667+0000: 1396138.037: [GC (Allocation Failure) 2018-06-11T01:53:10.667+0000: 1396138.037: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   11664760 bytes,   11664760 total
+- age   2:     700928 bytes,   12365688 total
+: 152245K->13854K(153344K), 0.0096113 secs] 559490K->422091K(1031552K), 0.0097213 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:10.677+0000: 1396138.047: Total time for which application threads were stopped: 0.0104320 seconds, Stopping threads took: 0.0001033 seconds
+2018-06-11T01:53:11.316+0000: 1396138.686: Total time for which application threads were stopped: 0.0007117 seconds, Stopping threads took: 0.0000980 seconds
+2018-06-11T01:53:11.374+0000: 1396138.744: [GC (Allocation Failure) 2018-06-11T01:53:11.374+0000: 1396138.745: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1047768 bytes,    1047768 total
+: 149770K->10442K(153344K), 0.0076426 secs] 558007K->419864K(1031552K), 0.0077342 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds
+2018-06-11T01:53:14.354+0000: 1396141.724: [GC (Allocation Failure) 2018-06-11T01:53:14.354+0000: 1396141.724: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16527112 bytes,   16527112 total
+- age   2:     350088 bytes,   16877200 total
+: 146762K->16814K(153344K), 0.0080806 secs] 556184K->426236K(1031552K), 0.0081906 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:14.362+0000: 1396141.732: Total time for which application threads were stopped: 0.0088543 seconds, Stopping threads took: 0.0000700 seconds
+2018-06-11T01:53:15.398+0000: 1396142.768: [GC (Allocation Failure) 2018-06-11T01:53:15.398+0000: 1396142.768: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16316024 bytes,   16316024 total
+: 152892K->17024K(153344K), 0.0105851 secs] 562314K->428999K(1031552K), 0.0107022 secs] [Times: user=0.03 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:15.409+0000: 1396142.779: Total time for which application threads were stopped: 0.0113722 seconds, Stopping threads took: 0.0000666 seconds
+2018-06-11T01:53:16.452+0000: 1396143.822: [GC (Allocation Failure) 2018-06-11T01:53:16.452+0000: 1396143.822: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:    9884608 bytes,    9884608 total
+: 153344K->15215K(153344K), 0.0086695 secs] 565319K->428184K(1031552K), 0.0087786 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:16.461+0000: 1396143.831: Total time for which application threads were stopped: 0.0094948 seconds, Stopping threads took: 0.0000675 seconds
+2018-06-11T01:53:30.492+0000: 1396157.862: [GC (Allocation Failure) 2018-06-11T01:53:30.492+0000: 1396157.862: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   13777304 bytes,   13777304 total
+: 151535K->16565K(153344K), 0.0094948 secs] 564504K->430156K(1031552K), 0.0096468 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:30.502+0000: 1396157.872: Total time for which application threads were stopped: 0.0103680 seconds, Stopping threads took: 0.0000676 seconds
+2018-06-11T01:53:30.532+0000: 1396157.903: Total time for which application threads were stopped: 0.0023381 seconds, Stopping threads took: 0.0018442 seconds
+2018-06-11T01:53:30.609+0000: 1396157.979: [GC (Allocation Failure) 2018-06-11T01:53:30.609+0000: 1396157.979: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     935120 bytes,     935120 total
+: 152885K->12851K(153344K), 0.0062231 secs] 566476K->427024K(1031552K), 0.0063132 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2018-06-11T01:53:30.615+0000: 1396157.986: Total time for which application threads were stopped: 0.0069449 seconds, Stopping threads took: 0.0000677 seconds
+2018-06-11T01:53:31.569+0000: 1396158.939: [GC (Allocation Failure) 2018-06-11T01:53:31.569+0000: 1396158.940: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     654664 bytes,     654664 total
+- age   2:     489432 bytes,    1144096 total
+: 149171K->3384K(153344K), 0.0054071 secs] 563344K->417556K(1031552K), 0.0054905 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2018-06-11T01:53:31.575+0000: 1396158.945: Total time for which application threads were stopped: 0.0061053 seconds, Stopping threads took: 0.0000670 seconds
+2018-06-11T01:53:34.616+0000: 1396161.986: [GC (Allocation Failure) 2018-06-11T01:53:34.616+0000: 1396161.986: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    5516200 bytes,    5516200 total
+- age   2:     564072 bytes,    6080272 total
+- age   3:     299440 bytes,    6379712 total
+: 139704K->6752K(153344K), 0.0078117 secs] 553876K->420924K(1031552K), 0.0079319 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:34.624+0000: 1396161.994: Total time for which application threads were stopped: 0.0125793 seconds, Stopping threads took: 0.0040416 seconds
+2018-06-11T01:53:35.648+0000: 1396163.019: Total time for which application threads were stopped: 0.0029444 seconds, Stopping threads took: 0.0024233 seconds
+2018-06-11T01:53:35.663+0000: 1396163.033: [GC (Allocation Failure) 2018-06-11T01:53:35.663+0000: 1396163.033: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6074336 bytes,    6074336 total
+- age   2:     562104 bytes,    6636440 total
+- age   3:     552544 bytes,    7188984 total
+- age   4:     297680 bytes,    7486664 total
+: 143072K->9908K(153344K), 0.0077336 secs] 557244K->424080K(1031552K), 0.0078278 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:35.671+0000: 1396163.041: Total time for which application threads were stopped: 0.0085427 seconds, Stopping threads took: 0.0001110 seconds
+2018-06-11T01:53:36.696+0000: 1396164.067: [GC (Allocation Failure) 2018-06-11T01:53:36.696+0000: 1396164.067: [ParNew
+Desired survivor size 8716288 bytes, new threshold 4 (max 6)
+- age   1:    7496632 bytes,    7496632 total
+- age   2:     449792 bytes,    7946424 total
+- age   3:     361584 bytes,    8308008 total
+- age   4:     412560 bytes,    8720568 total
+- age   5:     153232 bytes,    8873800 total
+: 145769K->13443K(153344K), 0.0080071 secs] 559942K->427616K(1031552K), 0.0081196 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:36.705+0000: 1396164.075: Total time for which application threads were stopped: 0.0088041 seconds, Stopping threads took: 0.0000675 seconds
+2018-06-11T01:53:36.712+0000: 1396164.083: Total time for which application threads were stopped: 0.0020710 seconds, Stopping threads took: 0.0016211 seconds
+2018-06-11T01:53:48.350+0000: 1396175.720: [GC (Allocation Failure) 2018-06-11T01:53:48.350+0000: 1396175.720: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     760104 bytes,     760104 total
+- age   2:     491312 bytes,    1251416 total
+- age   3:     203088 bytes,    1454504 total
+- age   4:     170808 bytes,    1625312 total
+: 149763K->8179K(153344K), 0.0072052 secs] 563936K->422621K(1031552K), 0.0073072 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:48.357+0000: 1396175.727: Total time for which application threads were stopped: 0.0079737 seconds, Stopping threads took: 0.0000680 seconds
+2018-06-11T01:53:50.765+0000: 1396178.135: [GC (Allocation Failure) 2018-06-11T01:53:50.765+0000: 1396178.135: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    3685904 bytes,    3685904 total
+- age   2:     507832 bytes,    4193736 total
+- age   3:     465392 bytes,    4659128 total
+- age   4:     196712 bytes,    4855840 total
+- age   5:     170544 bytes,    5026384 total
+: 144205K->5856K(153344K), 0.0076602 secs] 558647K->420298K(1031552K), 0.0077774 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2018-06-11T01:53:50.773+0000: 1396178.143: Total time for which application threads were stopped: 0.0084666 seconds, Stopping threads took: 0.0000651 seconds
+2018-06-11T01:53:53.762+0000: 1396181.133: [GC (Allocation Failure) 2018-06-11T01:53:53.763+0000: 1396181.133: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6512008 bytes,    6512008 total
+- age   2:     390856 bytes,    6902864 total
+- age   3:     475928 bytes,    7378792 total
+- age   4:     460800 bytes,    7839592 total
+- age   5:     196216 bytes,    8035808 total
+- age   6:     170008 bytes,    8205816 total
+: 142159K->10667K(153344K), 0.0080252 secs] 556601K->425109K(1031552K), 0.0081350 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:53.771+0000: 1396181.141: Total time for which application threads were stopped: 0.0087847 seconds, Stopping threads took: 0.0000687 seconds
+2018-06-11T01:53:54.541+0000: 1396181.911: [GC (Allocation Failure) 2018-06-11T01:53:54.541+0000: 1396181.911: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    5349328 bytes,    5349328 total
+- age   2:     638664 bytes,    5987992 total
+- age   3:     348832 bytes,    6336824 total
+- age   4:     432976 bytes,    6769800 total
+- age   5:     460768 bytes,    7230568 total
+- age   6:     196120 bytes,    7426688 total
+: 146987K->10615K(153344K), 0.0083347 secs] 561429K->425223K(1031552K), 0.0084628 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:54.550+0000: 1396181.920: Total time for which application threads were stopped: 0.0091169 seconds, Stopping threads took: 0.0000599 seconds
+2018-06-11T01:53:55.888+0000: 1396183.259: [GC (Allocation Failure) 2018-06-11T01:53:55.888+0000: 1396183.259: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   13159696 bytes,   13159696 total
+- age   2:     558200 bytes,   13717896 total
+- age   3:     616816 bytes,   14334712 total
+- age   4:     328072 bytes,   14662784 total
+- age   5:     432432 bytes,   15095216 total
+- age   6:     460704 bytes,   15555920 total
+: 146593K->17024K(153344K), 0.0102004 secs] 561202K->431824K(1031552K), 0.0103091 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:53:55.899+0000: 1396183.269: Total time for which application threads were stopped: 0.0110014 seconds, Stopping threads took: 0.0000864 seconds
+2018-06-11T01:53:55.926+0000: 1396183.297: Total time for which application threads were stopped: 0.0006541 seconds, Stopping threads took: 0.0000989 seconds
+2018-06-11T01:53:55.985+0000: 1396183.355: [GC (Allocation Failure) 2018-06-11T01:53:55.985+0000: 1396183.355: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     903984 bytes,     903984 total
+: 153344K->13195K(153344K), 0.0103466 secs] 568144K->430880K(1031552K), 0.0104425 secs] [Times: user=0.02 sys=0.01, real=0.00 secs] 
+2018-06-11T01:53:55.995+0000: 1396183.365: Total time for which application threads were stopped: 0.0111467 seconds, Stopping threads took: 0.0001058 seconds
+2018-06-11T01:54:10.955+0000: 1396198.325: [GC (Allocation Failure) 2018-06-11T01:54:10.955+0000: 1396198.325: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16450472 bytes,   16450472 total
+- age   2:     234000 bytes,   16684472 total
+: 149515K->17024K(153344K), 0.0102173 secs] 567200K->436618K(1031552K), 0.0103403 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
+2018-06-11T01:54:10.966+0000: 1396198.336: Total time for which application threads were stopped: 0.0110354 seconds, Stopping threads took: 0.0000706 seconds
+2018-06-11T01:54:10.987+0000: 1396198.357: Total time for which application threads were stopped: 0.0005585 seconds, Stopping threads took: 0.0000699 seconds
+2018-06-11T01:54:12.010+0000: 1396199.380: [GC (Allocation Failure) 2018-06-11T01:54:12.010+0000: 1396199.380: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    7853552 bytes,    7853552 total
+: 153344K->13086K(153344K), 0.0090495 secs] 572938K->433906K(1031552K), 0.0091835 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:12.019+0000: 1396199.389: Total time for which application threads were stopped: 0.0098759 seconds, Stopping threads took: 0.0000764 seconds
+2018-06-11T01:54:12.028+0000: 1396199.399: Total time for which application threads were stopped: 0.0036973 seconds, Stopping threads took: 0.0032132 seconds
+2018-06-11T01:54:14.047+0000: 1396201.417: [GC (Allocation Failure) 2018-06-11T01:54:14.047+0000: 1396201.417: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   15991664 bytes,   15991664 total
+- age   2:     392496 bytes,   16384160 total
+: 149406K->17024K(153344K), 0.0089253 secs] 570226K->438738K(1031552K), 0.0090443 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:14.056+0000: 1396201.427: Total time for which application threads were stopped: 0.0097482 seconds, Stopping threads took: 0.0000773 seconds
+2018-06-11T01:54:15.095+0000: 1396202.466: [GC (Allocation Failure) 2018-06-11T01:54:15.096+0000: 1396202.466: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    7042008 bytes,    7042008 total
+: 153344K->13537K(153344K), 0.0089133 secs] 575058K->436368K(1031552K), 0.0090303 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
+2018-06-11T01:54:15.105+0000: 1396202.475: Total time for which application threads were stopped: 0.0097214 seconds, Stopping threads took: 0.0000708 seconds
+2018-06-11T01:54:16.144+0000: 1396203.515: Total time for which application threads were stopped: 0.0010909 seconds, Stopping threads took: 0.0005842 seconds
+2018-06-11T01:54:16.146+0000: 1396203.517: [GC (Allocation Failure) 2018-06-11T01:54:16.147+0000: 1396203.517: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6421072 bytes,    6421072 total
+- age   2:     657624 bytes,    7078696 total
+: 149857K->11926K(153344K), 0.0070647 secs] 572688K->434758K(1031552K), 0.0071520 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2018-06-11T01:54:16.154+0000: 1396203.524: Total time for which application threads were stopped: 0.0077097 seconds, Stopping threads took: 0.0000800 seconds
+2018-06-11T01:54:30.085+0000: 1396217.455: [GC (Allocation Failure) 2018-06-11T01:54:30.085+0000: 1396217.455: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   10685952 bytes,   10685952 total
+- age   2:     305792 bytes,   10991744 total
+- age   3:     375456 bytes,   11367200 total
+: 148245K->14290K(153344K), 0.0082666 secs] 571077K->437122K(1031552K), 0.0083861 secs] [Times: user=0.02 sys=0.00, real=0.00 secs] 
+2018-06-11T01:54:30.094+0000: 1396217.464: Total time for which application threads were stopped: 0.0090744 seconds, Stopping threads took: 0.0000623 seconds
+2018-06-11T01:54:30.672+0000: 1396218.042: [GC (Allocation Failure) 2018-06-11T01:54:30.672+0000: 1396218.042: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   13233080 bytes,   13233080 total
+: 150610K->17024K(153344K), 0.0102153 secs] 573442K->442734K(1031552K), 0.0103380 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:30.683+0000: 1396218.053: Total time for which application threads were stopped: 0.0150033 seconds, Stopping threads took: 0.0040390 seconds
+2018-06-11T01:54:32.248+0000: 1396219.619: [GC (Allocation Failure) 2018-06-11T01:54:32.248+0000: 1396219.619: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    4196936 bytes,    4196936 total
+: 153099K->12028K(153344K), 0.0070319 secs] 578810K->438434K(1031552K), 0.0071514 secs] [Times: user=0.02 sys=0.00, real=0.00 secs] 
+2018-06-11T01:54:32.256+0000: 1396219.626: Total time for which application threads were stopped: 0.0078303 seconds, Stopping threads took: 0.0000726 seconds
+2018-06-11T01:54:34.292+0000: 1396221.663: [GC (Allocation Failure) 2018-06-11T01:54:34.293+0000: 1396221.663: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    5818112 bytes,    5818112 total
+- age   2:     708288 bytes,    6526400 total
+: 148348K->8063K(153344K), 0.0068706 secs] 574754K->434469K(1031552K), 0.0069933 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:34.300+0000: 1396221.670: Total time for which application threads were stopped: 0.0076690 seconds, Stopping threads took: 0.0000634 seconds
+2018-06-11T01:54:34.308+0000: 1396221.679: Total time for which application threads were stopped: 0.0006315 seconds, Stopping threads took: 0.0001226 seconds
+2018-06-11T01:54:35.312+0000: 1396222.682: [GC (Allocation Failure) 2018-06-11T01:54:35.312+0000: 1396222.682: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16216032 bytes,   16216032 total
+- age   2:     506192 bytes,   16722224 total
+- age   3:     644592 bytes,   17366816 total
+: 144035K->17024K(153344K), 0.0104515 secs] 570440K->443943K(1031552K), 0.0105716 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:35.323+0000: 1396222.693: Total time for which application threads were stopped: 0.0112841 seconds, Stopping threads took: 0.0000699 seconds
+2018-06-11T01:54:36.365+0000: 1396223.735: [GC (Allocation Failure) 2018-06-11T01:54:36.365+0000: 1396223.735: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   13089832 bytes,   13089832 total
+: 153344K->17024K(153344K), 0.0104376 secs] 580263K->445683K(1031552K), 0.0105614 secs] [Times: user=0.02 sys=0.00, real=0.00 secs] 
+2018-06-11T01:54:36.375+0000: 1396223.745: Total time for which application threads were stopped: 0.0113359 seconds, Stopping threads took: 0.0000986 seconds
+2018-06-11T01:54:45.416+0000: 1396232.787: Total time for which application threads were stopped: 0.0023225 seconds, Stopping threads took: 0.0017871 seconds
+2018-06-11T01:54:50.126+0000: 1396237.496: [GC (Allocation Failure) 2018-06-11T01:54:50.126+0000: 1396237.496: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14453000 bytes,   14453000 total
+: 153344K->17024K(153344K), 0.0116218 secs] 582003K->448797K(1031552K), 0.0117426 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:50.138+0000: 1396237.508: Total time for which application threads were stopped: 0.0124409 seconds, Stopping threads took: 0.0000752 seconds
+2018-06-11T01:54:50.419+0000: 1396237.789: Total time for which application threads were stopped: 0.0009882 seconds, Stopping threads took: 0.0001095 seconds
+2018-06-11T01:54:50.451+0000: 1396237.821: [GC (Allocation Failure) 2018-06-11T01:54:50.451+0000: 1396237.821: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1131120 bytes,    1131120 total
+: 153039K->13867K(153344K), 0.0069407 secs] 584813K->446446K(1031552K), 0.0070407 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:50.458+0000: 1396237.828: Total time for which application threads were stopped: 0.0077138 seconds, Stopping threads took: 0.0000694 seconds
+2018-06-11T01:54:51.471+0000: 1396238.841: [GC (Allocation Failure) 2018-06-11T01:54:51.471+0000: 1396238.841: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6231216 bytes,    6231216 total
+- age   2:     438248 bytes,    6669464 total
+: 150187K->9185K(153344K), 0.0063207 secs] 582766K->441763K(1031552K), 0.0064210 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:51.478+0000: 1396238.848: Total time for which application threads were stopped: 0.0070812 seconds, Stopping threads took: 0.0000685 seconds
+2018-06-11T01:54:53.819+0000: 1396241.189: [GC (Allocation Failure) 2018-06-11T01:54:53.819+0000: 1396241.189: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14630336 bytes,   14630336 total
+- age   2:     500680 bytes,   15131016 total
+- age   3:     396608 bytes,   15527624 total
+: 145505K->17024K(153344K), 0.0102882 secs] 578083K->452769K(1031552K), 0.0103973 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:53.830+0000: 1396241.200: Total time for which application threads were stopped: 0.0110752 seconds, Stopping threads took: 0.0000674 seconds
+2018-06-11T01:54:54.533+0000: 1396241.903: Total time for which application threads were stopped: 0.0006116 seconds, Stopping threads took: 0.0001030 seconds
+2018-06-11T01:54:54.573+0000: 1396241.943: [GC (Allocation Failure) 2018-06-11T01:54:54.573+0000: 1396241.943: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1236840 bytes,    1236840 total
+: 153342K->12823K(153344K), 0.0090848 secs] 589088K->450718K(1031552K), 0.0091883 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:54.582+0000: 1396241.953: Total time for which application threads were stopped: 0.0098408 seconds, Stopping threads took: 0.0000695 seconds
+2018-06-11T01:54:55.573+0000: 1396242.943: [GC (Allocation Failure) 2018-06-11T01:54:55.573+0000: 1396242.943: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   10288048 bytes,   10288048 total
+- age   2:     689264 bytes,   10977312 total
+: 149143K->12013K(153344K), 0.0079875 secs] 587038K->449908K(1031552K), 0.0080961 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:55.581+0000: 1396242.951: Total time for which application threads were stopped: 0.0087758 seconds, Stopping threads took: 0.0000764 seconds
+2018-06-11T01:54:56.619+0000: 1396243.989: [GC (Allocation Failure) 2018-06-11T01:54:56.619+0000: 1396243.989: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    3091912 bytes,    3091912 total
+: 148333K->8898K(153344K), 0.0080223 secs] 586228K->447743K(1031552K), 0.0081177 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:54:56.627+0000: 1396243.998: Total time for which application threads were stopped: 0.0087676 seconds, Stopping threads took: 0.0000716 seconds
+2018-06-11T01:55:10.663+0000: 1396258.033: [GC (Allocation Failure) 2018-06-11T01:55:10.663+0000: 1396258.033: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16257352 bytes,   16257352 total
+- age   2:     732304 bytes,   16989656 total
+: 145204K->17024K(153344K), 0.0099206 secs] 584049K->455928K(1031552K), 0.0100273 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:10.673+0000: 1396258.043: Total time for which application threads were stopped: 0.0107555 seconds, Stopping threads took: 0.0001136 seconds
+2018-06-11T01:55:10.696+0000: 1396258.066: Total time for which application threads were stopped: 0.0006063 seconds, Stopping threads took: 0.0000997 seconds
+2018-06-11T01:55:11.700+0000: 1396259.070: [GC (Allocation Failure) 2018-06-11T01:55:11.700+0000: 1396259.070: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    7517784 bytes,    7517784 total
+: 153095K->13188K(153344K), 0.0107917 secs] 592000K->458651K(1031552K), 0.0109119 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:11.711+0000: 1396259.081: Total time for which application threads were stopped: 0.0116374 seconds, Stopping threads took: 0.0000760 seconds
+2018-06-11T01:55:14.749+0000: 1396262.119: [GC (Allocation Failure) 2018-06-11T01:55:14.749+0000: 1396262.119: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14787864 bytes,   14787864 total
+- age   2:     454984 bytes,   15242848 total
+: 149508K->17024K(153344K), 0.0098032 secs] 594971K->463020K(1031552K), 0.0099105 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:14.759+0000: 1396262.129: Total time for which application threads were stopped: 0.0106458 seconds, Stopping threads took: 0.0000709 seconds
+2018-06-11T01:55:15.796+0000: 1396263.167: [GC (Allocation Failure) 2018-06-11T01:55:15.797+0000: 1396263.167: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   11838312 bytes,   11838312 total
+: 153344K->17024K(153344K), 0.0106097 secs] 599340K->466789K(1031552K), 0.0107417 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:15.807+0000: 1396263.178: Total time for which application threads were stopped: 0.0114510 seconds, Stopping threads took: 0.0000946 seconds
+2018-06-11T01:55:16.848+0000: 1396264.218: Total time for which application threads were stopped: 0.0006560 seconds, Stopping threads took: 0.0000968 seconds
+2018-06-11T01:55:16.850+0000: 1396264.220: [GC (Allocation Failure) 2018-06-11T01:55:16.850+0000: 1396264.220: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6560992 bytes,    6560992 total
+: 153253K->11839K(153344K), 0.0076250 secs] 603018K->462499K(1031552K), 0.0077081 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:16.858+0000: 1396264.228: Total time for which application threads were stopped: 0.0082671 seconds, Stopping threads took: 0.0000977 seconds
+2018-06-11T01:55:30.121+0000: 1396277.491: [GC (Allocation Failure) 2018-06-11T01:55:30.121+0000: 1396277.491: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16829392 bytes,   16829392 total
+- age   2:     409384 bytes,   17238776 total
+: 148159K->17024K(153344K), 0.0089878 secs] 598819K->467691K(1031552K), 0.0091146 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:30.130+0000: 1396277.500: Total time for which application threads were stopped: 0.0098154 seconds, Stopping threads took: 0.0000904 seconds
+2018-06-11T01:55:30.889+0000: 1396278.259: Total time for which application threads were stopped: 0.0005507 seconds, Stopping threads took: 0.0000711 seconds
+2018-06-11T01:55:31.502+0000: 1396278.872: [GC (Allocation Failure) 2018-06-11T01:55:31.502+0000: 1396278.872: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   10894352 bytes,   10894352 total
+: 153344K->13966K(153344K), 0.0090380 secs] 604011K->465663K(1031552K), 0.0091515 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:31.511+0000: 1396278.881: Total time for which application threads were stopped: 0.0098225 seconds, Stopping threads took: 0.0000707 seconds
+2018-06-11T01:55:31.941+0000: 1396279.311: Total time for which application threads were stopped: 0.0006292 seconds, Stopping threads took: 0.0000885 seconds
+2018-06-11T01:55:32.036+0000: 1396279.406: [GC (Allocation Failure) 2018-06-11T01:55:32.036+0000: 1396279.406: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     745200 bytes,     745200 total
+: 150286K->11470K(153344K), 0.0057031 secs] 601983K->463738K(1031552K), 0.0058190 secs] [Times: user=0.01 sys=0.01, real=0.01 secs] 
+2018-06-11T01:55:32.042+0000: 1396279.412: Total time for which application threads were stopped: 0.0064785 seconds, Stopping threads took: 0.0000740 seconds
+2018-06-11T01:55:33.991+0000: 1396281.361: [GC (Allocation Failure) 2018-06-11T01:55:33.991+0000: 1396281.361: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1599552 bytes,    1599552 total
+- age   2:     219920 bytes,    1819472 total
+: 147790K->3004K(153344K), 0.0060475 secs] 600058K->455272K(1031552K), 0.0061323 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:33.997+0000: 1396281.367: Total time for which application threads were stopped: 0.0067745 seconds, Stopping threads took: 0.0000801 seconds
+2018-06-11T01:55:36.017+0000: 1396283.387: [GC (Allocation Failure) 2018-06-11T01:55:36.017+0000: 1396283.387: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14608464 bytes,   14608464 total
+- age   2:     693296 bytes,   15301760 total
+- age   3:     195720 bytes,   15497480 total
+: 139324K->16299K(153344K), 0.0098049 secs] 591592K->468567K(1031552K), 0.0099298 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:36.027+0000: 1396283.397: Total time for which application threads were stopped: 0.0106180 seconds, Stopping threads took: 0.0000725 seconds
+2018-06-11T01:55:36.061+0000: 1396283.431: Total time for which application threads were stopped: 0.0039548 seconds, Stopping threads took: 0.0034265 seconds
+2018-06-11T01:55:36.134+0000: 1396283.504: [GC (Allocation Failure) 2018-06-11T01:55:36.134+0000: 1396283.505: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:    8730040 bytes,    8730040 total
+: 152619K->17024K(153344K), 0.0098317 secs] 604887K->470652K(1031552K), 0.0099528 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
+2018-06-11T01:55:36.144+0000: 1396283.515: Total time for which application threads were stopped: 0.0106286 seconds, Stopping threads took: 0.0000720 seconds
+2018-06-11T01:55:50.099+0000: 1396297.469: [GC (Allocation Failure) 2018-06-11T01:55:50.099+0000: 1396297.469: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    8228312 bytes,    8228312 total
+: 153344K->9184K(153344K), 0.0084821 secs] 606972K->463300K(1031552K), 0.0085936 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:50.107+0000: 1396297.477: Total time for which application threads were stopped: 0.0092589 seconds, Stopping threads took: 0.0000639 seconds
+2018-06-11T01:55:51.139+0000: 1396298.509: Total time for which application threads were stopped: 0.0005723 seconds, Stopping threads took: 0.0000715 seconds
+2018-06-11T01:55:51.151+0000: 1396298.521: [GC (Allocation Failure) 2018-06-11T01:55:51.151+0000: 1396298.521: [ParNew
+Desired survivor size 8716288 bytes, new threshold 2 (max 6)
+- age   1:    8354096 bytes,    8354096 total
+- age   2:     754968 bytes,    9109064 total
+: 145504K->11336K(153344K), 0.0077746 secs] 599620K->465451K(1031552K), 0.0078743 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:51.159+0000: 1396298.529: Total time for which application threads were stopped: 0.0085399 seconds, Stopping threads took: 0.0000680 seconds
+2018-06-11T01:55:54.194+0000: 1396301.564: [GC (Allocation Failure) 2018-06-11T01:55:54.194+0000: 1396301.564: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14310952 bytes,   14310952 total
+- age   2:     430560 bytes,   14741512 total
+: 147293K->17024K(153344K), 0.0101495 secs] 601409K->471835K(1031552K), 0.0102937 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
+2018-06-11T01:55:54.204+0000: 1396301.574: Total time for which application threads were stopped: 0.0109681 seconds, Stopping threads took: 0.0000718 seconds
+2018-06-11T01:55:54.212+0000: 1396301.583: Total time for which application threads were stopped: 0.0022113 seconds, Stopping threads took: 0.0017056 seconds
+2018-06-11T01:55:54.272+0000: 1396301.643: [GC (Allocation Failure) 2018-06-11T01:55:54.272+0000: 1396301.643: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     788880 bytes,     788880 total
+: 153344K->12937K(153344K), 0.0066668 secs] 608155K->468737K(1031552K), 0.0067531 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:54.279+0000: 1396301.649: Total time for which application threads were stopped: 0.0074449 seconds, Stopping threads took: 0.0000729 seconds
+2018-06-11T01:55:55.270+0000: 1396302.640: [GC (Allocation Failure) 2018-06-11T01:55:55.270+0000: 1396302.640: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:    9879936 bytes,    9879936 total
+- age   2:     328584 bytes,   10208520 total
+: 149257K->11825K(153344K), 0.0077361 secs] 605057K->467625K(1031552K), 0.0078429 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:55.278+0000: 1396302.648: Total time for which application threads were stopped: 0.0085001 seconds, Stopping threads took: 0.0000667 seconds
+2018-06-11T01:55:56.320+0000: 1396303.690: [GC (Allocation Failure) 2018-06-11T01:55:56.320+0000: 1396303.690: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    2565728 bytes,    2565728 total
+: 148031K->8321K(153344K), 0.0076918 secs] 603831K->465090K(1031552K), 0.0078302 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:55:56.328+0000: 1396303.698: Total time for which application threads were stopped: 0.0084951 seconds, Stopping threads took: 0.0000684 seconds
+2018-06-11T01:56:10.346+0000: 1396317.716: Total time for which application threads were stopped: 0.0006233 seconds, Stopping threads took: 0.0000971 seconds
+2018-06-11T01:56:10.347+0000: 1396317.718: [GC (Allocation Failure) 2018-06-11T01:56:10.347+0000: 1396317.718: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6141280 bytes,    6141280 total
+- age   2:     593080 bytes,    6734360 total
+: 144641K->8120K(153344K), 0.0076719 secs] 601410K->464889K(1031552K), 0.0077650 secs] [Times: user=0.02 sys=0.00, real=0.00 secs] 
+2018-06-11T01:56:10.355+0000: 1396317.725: Total time for which application threads were stopped: 0.0081514 seconds, Stopping threads took: 0.0000529 seconds
+2018-06-11T01:56:11.372+0000: 1396318.743: [GC (Allocation Failure) 2018-06-11T01:56:11.372+0000: 1396318.743: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   15646296 bytes,   15646296 total
+- age   2:     605768 bytes,   16252064 total
+- age   3:     542536 bytes,   16794600 total
+: 144440K->17024K(153344K), 0.0097768 secs] 601209K->474043K(1031552K), 0.0098951 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:11.382+0000: 1396318.753: Total time for which application threads were stopped: 0.0106376 seconds, Stopping threads took: 0.0001009 seconds
+2018-06-11T01:56:11.421+0000: 1396318.791: Total time for which application threads were stopped: 0.0024761 seconds, Stopping threads took: 0.0019427 seconds
+2018-06-11T01:56:11.469+0000: 1396318.839: [GC (Allocation Failure) 2018-06-11T01:56:11.469+0000: 1396318.839: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1255208 bytes,    1255208 total
+: 153338K->13703K(153344K), 0.0088436 secs] 610358K->472339K(1031552K), 0.0089272 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:11.478+0000: 1396318.848: Total time for which application threads were stopped: 0.0095749 seconds, Stopping threads took: 0.0000695 seconds
+2018-06-11T01:56:14.448+0000: 1396321.818: [GC (Allocation Failure) 2018-06-11T01:56:14.448+0000: 1396321.818: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   15123352 bytes,   15123352 total
+- age   2:     580232 bytes,   15703584 total
+: 150023K->16450K(153344K), 0.0085074 secs] 608659K->475086K(1031552K), 0.0086228 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:14.456+0000: 1396321.827: Total time for which application threads were stopped: 0.0093019 seconds, Stopping threads took: 0.0000689 seconds
+2018-06-11T01:56:15.493+0000: 1396322.863: [GC (Allocation Failure) 2018-06-11T01:56:15.493+0000: 1396322.864: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   15455936 bytes,   15455936 total
+: 152606K->17024K(153344K), 0.0109047 secs] 611242K->477156K(1031552K), 0.0110240 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
+2018-06-11T01:56:15.504+0000: 1396322.875: Total time for which application threads were stopped: 0.0116867 seconds, Stopping threads took: 0.0000712 seconds
+2018-06-11T01:56:16.545+0000: 1396323.915: [GC (Allocation Failure) 2018-06-11T01:56:16.545+0000: 1396323.915: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   10021200 bytes,   10021200 total
+: 153344K->17024K(153344K), 0.0081333 secs] 613476K->478152K(1031552K), 0.0082506 secs] [Times: user=0.02 sys=0.00, real=0.00 secs] 
+2018-06-11T01:56:16.553+0000: 1396323.923: Total time for which application threads were stopped: 0.0089475 seconds, Stopping threads took: 0.0000680 seconds
+2018-06-11T01:56:25.583+0000: 1396332.953: Total time for which application threads were stopped: 0.0006212 seconds, Stopping threads took: 0.0000976 seconds
+2018-06-11T01:56:30.584+0000: 1396337.954: [GC (Allocation Failure) 2018-06-11T01:56:30.584+0000: 1396337.954: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14322752 bytes,   14322752 total
+: 153344K->17024K(153344K), 0.0108893 secs] 614472K->479949K(1031552K), 0.0110204 secs] [Times: user=0.03 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:30.595+0000: 1396337.965: Total time for which application threads were stopped: 0.0117186 seconds, Stopping threads took: 0.0000800 seconds
+2018-06-11T01:56:31.634+0000: 1396339.004: [GC (Allocation Failure) 2018-06-11T01:56:31.634+0000: 1396339.004: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14505832 bytes,   14505832 total
+: 152959K->17024K(153344K), 0.0098766 secs] 615885K->481064K(1031552K), 0.0099943 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
+2018-06-11T01:56:31.644+0000: 1396339.014: Total time for which application threads were stopped: 0.0106796 seconds, Stopping threads took: 0.0000800 seconds
+2018-06-11T01:56:31.656+0000: 1396339.026: Total time for which application threads were stopped: 0.0045695 seconds, Stopping threads took: 0.0040606 seconds
+2018-06-11T01:56:31.735+0000: 1396339.105: [GC (Allocation Failure) 2018-06-11T01:56:31.735+0000: 1396339.105: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     916512 bytes,     916512 total
+: 153340K->13701K(153344K), 0.0062068 secs] 617380K->478315K(1031552K), 0.0062932 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:31.741+0000: 1396339.112: Total time for which application threads were stopped: 0.0069524 seconds, Stopping threads took: 0.0000694 seconds
+2018-06-11T01:56:34.712+0000: 1396342.082: [GC (Allocation Failure) 2018-06-11T01:56:34.712+0000: 1396342.082: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6080392 bytes,    6080392 total
+- age   2:     317528 bytes,    6397920 total
+: 150021K->7186K(153344K), 0.0074600 secs] 614635K->471800K(1031552K), 0.0075589 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:34.719+0000: 1396342.090: Total time for which application threads were stopped: 0.0081912 seconds, Stopping threads took: 0.0000647 seconds
+2018-06-11T01:56:35.754+0000: 1396343.124: Total time for which application threads were stopped: 0.0006306 seconds, Stopping threads took: 0.0000893 seconds
+2018-06-11T01:56:35.756+0000: 1396343.126: [GC (Allocation Failure) 2018-06-11T01:56:35.756+0000: 1396343.126: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    5775568 bytes,    5775568 total
+- age   2:     705216 bytes,    6480784 total
+- age   3:     288896 bytes,    6769680 total
+: 143506K->11168K(153344K), 0.0071027 secs] 608120K->475782K(1031552K), 0.0071875 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2018-06-11T01:56:35.763+0000: 1396343.133: Total time for which application threads were stopped: 0.0076961 seconds, Stopping threads took: 0.0000698 seconds
+2018-06-11T01:56:36.784+0000: 1396344.154: [GC (Allocation Failure) 2018-06-11T01:56:36.784+0000: 1396344.154: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:    9125960 bytes,    9125960 total
+- age   2:     556336 bytes,    9682296 total
+- age   3:     665016 bytes,   10347312 total
+- age   4:     286320 bytes,   10633632 total
+: 147346K->11625K(153344K), 0.0088003 secs] 611960K->476239K(1031552K), 0.0089164 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2018-06-11T01:56:36.793+0000: 1396344.163: Total time for which application threads were stopped: 0.0096328 seconds, Stopping threads took: 0.0000688 seconds
+2018-06-11T01:56:36.816+0000: 1396344.187: Total time for which application threads were stopped: 0.0024212 seconds, Stopping threads took: 0.0019128 seconds
+2018-06-11T01:56:50.072+0000: 1396357.442: [GC (Allocation Failure) 2018-06-11T01:56:50.072+0000: 1396357.442: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1373672 bytes,    1373672 total
+: 147945K->8757K(153344K), 0.0084696 secs] 612559K->474901K(1031552K), 0.0085748 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:50.080+0000: 1396357.451: Total time for which application threads were stopped: 0.0092434 seconds, Stopping threads took: 0.0000641 seconds
+2018-06-11T01:56:50.831+0000: 1396358.201: Total time for which application threads were stopped: 0.0005738 seconds, Stopping threads took: 0.0000768 seconds
+2018-06-11T01:56:50.857+0000: 1396358.228: [GC (Allocation Failure) 2018-06-11T01:56:50.858+0000: 1396358.228: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     750144 bytes,     750144 total
+- age   2:     877768 bytes,    1627912 total
+: 145077K->2440K(153344K), 0.0061629 secs] 611221K->468584K(1031552K), 0.0062477 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+2018-06-11T01:56:50.864+0000: 1396358.234: Total time for which application threads were stopped: 0.0068838 seconds, Stopping threads took: 0.0000705 seconds
+2018-06-11T01:56:53.898+0000: 1396361.268: [GC (Allocation Failure) 2018-06-11T01:56:53.898+0000: 1396361.268: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16060200 bytes,   16060200 total
+- age   2:     343456 bytes,   16403656 total
+- age   3:     480744 bytes,   16884400 total
+: 138760K->17024K(153344K), 0.0097393 secs] 604904K->483501K(1031552K), 0.0098581 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:53.908+0000: 1396361.278: Total time for which application threads were stopped: 0.0105379 seconds, Stopping threads took: 0.0000737 seconds
+2018-06-11T01:56:54.973+0000: 1396362.343: [GC (Allocation Failure) 2018-06-11T01:56:54.973+0000: 1396362.343: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     779272 bytes,     779272 total
+: 153344K->12817K(153344K), 0.0078103 secs] 619821K->480619K(1031552K), 0.0079112 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:56:54.981+0000: 1396362.351: Total time for which application threads were stopped: 0.0085470 seconds, Stopping threads took: 0.0000644 seconds
+2018-06-11T01:56:55.988+0000: 1396363.358: [GC (Allocation Failure) 2018-06-11T01:56:55.988+0000: 1396363.358: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1056568 bytes,    1056568 total
+- age   2:     689456 bytes,    1746024 total
+: 148709K->3346K(153344K), 0.0058737 secs] 616512K->471149K(1031552K), 0.0059768 secs] [Times: user=0.01 sys=0.01, real=0.00 secs] 
+2018-06-11T01:56:55.994+0000: 1396363.364: Total time for which application threads were stopped: 0.0067013 seconds, Stopping threads took: 0.0000904 seconds
+2018-06-11T01:57:08.342+0000: 1396375.713: [GC (Allocation Failure) 2018-06-11T01:57:08.343+0000: 1396375.713: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     999064 bytes,     999064 total
+- age   2:     458768 bytes,    1457832 total
+- age   3:     595976 bytes,    2053808 total
+: 139651K->2952K(153344K), 0.0072104 secs] 607454K->470755K(1031552K), 0.0073100 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:08.350+0000: 1396375.720: Total time for which application threads were stopped: 0.0079643 seconds, Stopping threads took: 0.0000717 seconds
+2018-06-11T01:57:11.026+0000: 1396378.396: Total time for which application threads were stopped: 0.0005983 seconds, Stopping threads took: 0.0000656 seconds
+2018-06-11T01:57:11.032+0000: 1396378.402: Total time for which application threads were stopped: 0.0003869 seconds, Stopping threads took: 0.0000781 seconds
+2018-06-11T01:57:11.051+0000: 1396378.421: [GC (Allocation Failure) 2018-06-11T01:57:11.051+0000: 1396378.421: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    5293232 bytes,    5293232 total
+- age   2:     721760 bytes,    6014992 total
+- age   3:     451992 bytes,    6466984 total
+- age   4:     595912 bytes,    7062896 total
+: 139272K->7492K(153344K), 0.0081421 secs] 607075K->475295K(1031552K), 0.0082407 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:11.059+0000: 1396378.430: Total time for which application threads were stopped: 0.0090029 seconds, Stopping threads took: 0.0001299 seconds
+2018-06-11T01:57:11.064+0000: 1396378.434: Total time for which application threads were stopped: 0.0006703 seconds, Stopping threads took: 0.0001073 seconds
+2018-06-11T01:57:14.090+0000: 1396381.460: [GC (Allocation Failure) 2018-06-11T01:57:14.090+0000: 1396381.460: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   16365120 bytes,   16365120 total
+- age   2:     203840 bytes,   16568960 total
+- age   3:     507008 bytes,   17075968 total
+- age   4:     147128 bytes,   17223096 total
+- age   5:     158216 bytes,   17381312 total
+: 143812K->17024K(153344K), 0.0116770 secs] 611615K->486281K(1031552K), 0.0118176 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:14.102+0000: 1396381.472: Total time for which application threads were stopped: 0.0125015 seconds, Stopping threads took: 0.0000705 seconds
+2018-06-11T01:57:15.140+0000: 1396382.510: [GC (Allocation Failure) 2018-06-11T01:57:15.140+0000: 1396382.510: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    8715600 bytes,    8715600 total
+: 152865K->14140K(153344K), 0.0114714 secs] 622123K->484993K(1031552K), 0.0115834 secs] [Times: user=0.01 sys=0.01, real=0.01 secs] 
+2018-06-11T01:57:15.151+0000: 1396382.522: Total time for which application threads were stopped: 0.0122567 seconds, Stopping threads took: 0.0000680 seconds
+2018-06-11T01:57:15.160+0000: 1396382.531: Total time for which application threads were stopped: 0.0017674 seconds, Stopping threads took: 0.0012513 seconds
+2018-06-11T01:57:15.171+0000: 1396382.542: Total time for which application threads were stopped: 0.0006051 seconds, Stopping threads took: 0.0001081 seconds
+2018-06-11T01:57:15.252+0000: 1396382.623: [GC (Allocation Failure) 2018-06-11T01:57:15.253+0000: 1396382.623: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   13699072 bytes,   13699072 total
+- age   2:     643688 bytes,   14342760 total
+: 149975K->17024K(153344K), 0.0099967 secs] 620829K->492670K(1031552K), 0.0101187 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:15.263+0000: 1396382.633: Total time for which application threads were stopped: 0.0123727 seconds, Stopping threads took: 0.0016139 seconds
+2018-06-11T01:57:16.201+0000: 1396383.571: [GC (Allocation Failure) 2018-06-11T01:57:16.201+0000: 1396383.571: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     681384 bytes,     681384 total
+: 153014K->12984K(153344K), 0.0080241 secs] 628660K->494106K(1031552K), 0.0081178 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:16.209+0000: 1396383.579: Total time for which application threads were stopped: 0.0088232 seconds, Stopping threads took: 0.0000772 seconds
+2018-06-11T01:57:30.244+0000: 1396397.615: [GC (Allocation Failure) 2018-06-11T01:57:30.244+0000: 1396397.615: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:    9704664 bytes,    9704664 total
+- age   2:     576024 bytes,   10280688 total
+: 148796K->11798K(153344K), 0.0085902 secs] 629919K->492920K(1031552K), 0.0087039 secs] [Times: user=0.02 sys=0.00, real=0.00 secs] 
+2018-06-11T01:57:30.253+0000: 1396397.623: Total time for which application threads were stopped: 0.0094302 seconds, Stopping threads took: 0.0000775 seconds
+2018-06-11T01:57:31.291+0000: 1396398.662: [GC (Allocation Failure) 2018-06-11T01:57:31.291+0000: 1396398.662: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:    9565128 bytes,    9565128 total
+: 148108K->12558K(153344K), 0.0093612 secs] 629230K->495020K(1031552K), 0.0094714 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:31.301+0000: 1396398.671: Total time for which application threads were stopped: 0.0101807 seconds, Stopping threads took: 0.0000960 seconds
+2018-06-11T01:57:34.337+0000: 1396401.708: [GC (Allocation Failure) 2018-06-11T01:57:34.338+0000: 1396401.708: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   15784072 bytes,   15784072 total
+: 148878K->17024K(153344K), 0.0089264 secs] 631340K->500016K(1031552K), 0.0090554 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:34.347+0000: 1396401.717: Total time for which application threads were stopped: 0.0097517 seconds, Stopping threads took: 0.0000688 seconds
+2018-06-11T01:57:35.381+0000: 1396402.751: [GC (Allocation Failure) 2018-06-11T01:57:35.381+0000: 1396402.751: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   15852872 bytes,   15852872 total
+: 153344K->17024K(153344K), 0.0105199 secs] 636336K->501854K(1031552K), 0.0106424 secs] [Times: user=0.03 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:35.391+0000: 1396402.761: Total time for which application threads were stopped: 0.0113333 seconds, Stopping threads took: 0.0001089 seconds
+2018-06-11T01:57:36.434+0000: 1396403.804: [GC (Allocation Failure) 2018-06-11T01:57:36.434+0000: 1396403.804: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    4318984 bytes,    4318984 total
+: 153344K->15069K(153344K), 0.0075881 secs] 638174K->500989K(1031552K), 0.0076848 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:36.442+0000: 1396403.812: Total time for which application threads were stopped: 0.0083644 seconds, Stopping threads took: 0.0000655 seconds
+2018-06-11T01:57:50.471+0000: 1396417.841: Total time for which application threads were stopped: 0.0006363 seconds, Stopping threads took: 0.0001023 seconds
+2018-06-11T01:57:50.473+0000: 1396417.843: [GC (Allocation Failure) 2018-06-11T01:57:50.473+0000: 1396417.843: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   12072192 bytes,   12072192 total
+- age   2:     577040 bytes,   12649232 total
+: 151014K->14465K(153344K), 0.0090737 secs] 636933K->500385K(1031552K), 0.0091687 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:50.482+0000: 1396417.853: Total time for which application threads were stopped: 0.0097108 seconds, Stopping threads took: 0.0000641 seconds
+2018-06-11T01:57:50.620+0000: 1396417.990: [GC (Allocation Failure) 2018-06-11T01:57:50.620+0000: 1396417.990: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6749912 bytes,    6749912 total
+: 150785K->15705K(153344K), 0.0089645 secs] 636705K->502973K(1031552K), 0.0090665 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:50.629+0000: 1396418.000: Total time for which application threads were stopped: 0.0097291 seconds, Stopping threads took: 0.0000640 seconds
+2018-06-11T01:57:51.536+0000: 1396418.907: Total time for which application threads were stopped: 0.0035568 seconds, Stopping threads took: 0.0030535 seconds
+2018-06-11T01:57:51.558+0000: 1396418.928: [GC (Allocation Failure) 2018-06-11T01:57:51.558+0000: 1396418.928: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1247304 bytes,    1247304 total
+- age   2:     323856 bytes,    1571160 total
+: 151899K->5089K(153344K), 0.0058322 secs] 639168K->492357K(1031552K), 0.0059181 secs] [Times: user=0.01 sys=0.01, real=0.00 secs] 
+2018-06-11T01:57:51.564+0000: 1396418.934: Total time for which application threads were stopped: 0.0065629 seconds, Stopping threads took: 0.0000660 seconds
+2018-06-11T01:57:54.570+0000: 1396421.940: [GC (Allocation Failure) 2018-06-11T01:57:54.570+0000: 1396421.940: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   11721808 bytes,   11721808 total
+- age   2:     556040 bytes,   12277848 total
+- age   3:     162344 bytes,   12440192 total
+: 140959K->13247K(153344K), 0.0086511 secs] 628227K->500515K(1031552K), 0.0087564 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:54.579+0000: 1396421.949: Total time for which application threads were stopped: 0.0094275 seconds, Stopping threads took: 0.0000606 seconds
+2018-06-11T01:57:54.602+0000: 1396421.972: Total time for which application threads were stopped: 0.0005954 seconds, Stopping threads took: 0.0001018 seconds
+2018-06-11T01:57:55.201+0000: 1396422.571: [GC (Allocation Failure) 2018-06-11T01:57:55.201+0000: 1396422.571: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:    9537584 bytes,    9537584 total
+: 149536K->14288K(153344K), 0.0086502 secs] 636804K->502791K(1031552K), 0.0087592 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:55.210+0000: 1396422.580: Total time for which application threads were stopped: 0.0094157 seconds, Stopping threads took: 0.0000636 seconds
+2018-06-11T01:57:55.648+0000: 1396423.019: Total time for which application threads were stopped: 0.0011619 seconds, Stopping threads took: 0.0006644 seconds
+2018-06-11T01:57:56.073+0000: 1396423.443: [GC (Allocation Failure) 2018-06-11T01:57:56.073+0000: 1396423.443: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     830112 bytes,     830112 total
+: 150608K->9366K(153344K), 0.0059195 secs] 639111K->498211K(1031552K), 0.0060120 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:57:56.079+0000: 1396423.449: Total time for which application threads were stopped: 0.0066444 seconds, Stopping threads took: 0.0000721 seconds
+2018-06-11T01:58:10.077+0000: 1396437.447: [GC (Allocation Failure) 2018-06-11T01:58:10.077+0000: 1396437.447: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    4903920 bytes,    4903920 total
+- age   2:     640024 bytes,    5543944 total
+: 145686K->6234K(153344K), 0.0075211 secs] 634531K->495078K(1031552K), 0.0076206 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:10.084+0000: 1396437.455: Total time for which application threads were stopped: 0.0109712 seconds, Stopping threads took: 0.0027583 seconds
+2018-06-11T01:58:10.707+0000: 1396438.078: [GC (Allocation Failure) 2018-06-11T01:58:10.707+0000: 1396438.078: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   11257728 bytes,   11257728 total
+- age   2:    1409592 bytes,   12667320 total
+- age   3:     634512 bytes,   13301832 total
+: 142554K->16309K(153344K), 0.0091008 secs] 631398K->505154K(1031552K), 0.0092166 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:10.717+0000: 1396438.087: Total time for which application threads were stopped: 0.0099104 seconds, Stopping threads took: 0.0000937 seconds
+2018-06-11T01:58:14.585+0000: 1396441.955: [GC (Allocation Failure) 2018-06-11T01:58:14.585+0000: 1396441.955: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   12487384 bytes,   12487384 total
+: 152629K->17024K(153344K), 0.0121932 secs] 641474K->512358K(1031552K), 0.0123238 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:14.597+0000: 1396441.967: Total time for which application threads were stopped: 0.0129638 seconds, Stopping threads took: 0.0000603 seconds
+2018-06-11T01:58:15.794+0000: 1396443.164: [GC (Allocation Failure) 2018-06-11T01:58:15.794+0000: 1396443.164: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   17261816 bytes,   17261816 total
+: 153099K->17024K(153344K), 0.0099750 secs] 648434K->513321K(1031552K), 0.0100887 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:15.804+0000: 1396443.174: Total time for which application threads were stopped: 0.0107554 seconds, Stopping threads took: 0.0000698 seconds
+2018-06-11T01:58:16.842+0000: 1396444.212: [GC (Allocation Failure) 2018-06-11T01:58:16.842+0000: 1396444.212: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   13437776 bytes,   13437776 total
+: 153344K->17024K(153344K), 0.0084257 secs] 649641K->513776K(1031552K), 0.0085361 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:16.851+0000: 1396444.221: Total time for which application threads were stopped: 0.0092395 seconds, Stopping threads took: 0.0000713 seconds
+2018-06-11T01:58:16.859+0000: 1396444.229: Total time for which application threads were stopped: 0.0006172 seconds, Stopping threads took: 0.0000907 seconds
+2018-06-11T01:58:16.918+0000: 1396444.289: [GC (Allocation Failure) 2018-06-11T01:58:16.918+0000: 1396444.289: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     910728 bytes,     910728 total
+: 153344K->13744K(153344K), 0.0058693 secs] 650096K->511050K(1031552K), 0.0059643 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:16.924+0000: 1396444.295: Total time for which application threads were stopped: 0.0066195 seconds, Stopping threads took: 0.0000674 seconds
+2018-06-11T01:58:30.896+0000: 1396458.266: Total time for which application threads were stopped: 0.0006041 seconds, Stopping threads took: 0.0000618 seconds
+2018-06-11T01:58:30.910+0000: 1396458.280: Total time for which application threads were stopped: 0.0005638 seconds, Stopping threads took: 0.0000720 seconds
+2018-06-11T01:58:30.916+0000: 1396458.286: [GC (Allocation Failure) 2018-06-11T01:58:30.916+0000: 1396458.286: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    6504616 bytes,    6504616 total
+- age   2:     321664 bytes,    6826280 total
+: 150064K->9007K(153344K), 0.0071293 secs] 647370K->506313K(1031552K), 0.0072223 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:30.923+0000: 1396458.293: Total time for which application threads were stopped: 0.0077680 seconds, Stopping threads took: 0.0000895 seconds
+2018-06-11T01:58:30.924+0000: 1396458.294: Total time for which application threads were stopped: 0.0005147 seconds, Stopping threads took: 0.0000864 seconds
+2018-06-11T01:58:31.943+0000: 1396459.313: [GC (Allocation Failure) 2018-06-11T01:58:31.943+0000: 1396459.313: [ParNew
+Desired survivor size 8716288 bytes, new threshold 2 (max 6)
+- age   1:    8562728 bytes,    8562728 total
+- age   2:     790592 bytes,    9353320 total
+- age   3:     271096 bytes,    9624416 total
+: 145327K->11800K(153344K), 0.0076890 secs] 642633K->509106K(1031552K), 0.0077968 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:31.950+0000: 1396459.321: Total time for which application threads were stopped: 0.0085143 seconds, Stopping threads took: 0.0000777 seconds
+2018-06-11T01:58:31.977+0000: 1396459.347: Total time for which application threads were stopped: 0.0026845 seconds, Stopping threads took: 0.0017894 seconds
+2018-06-11T01:58:33.983+0000: 1396461.353: [GC (Allocation Failure) 2018-06-11T01:58:33.983+0000: 1396461.353: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   14391440 bytes,   14391440 total
+- age   2:      27248 bytes,   14418688 total
+: 147807K->17024K(153344K), 0.0110354 secs] 645113K->518844K(1031552K), 0.0111540 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:33.994+0000: 1396461.365: Total time for which application threads were stopped: 0.0118252 seconds, Stopping threads took: 0.0000716 seconds
+2018-06-11T01:58:35.031+0000: 1396462.401: [GC (Allocation Failure) 2018-06-11T01:58:35.031+0000: 1396462.401: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    5812992 bytes,    5812992 total
+: 153344K->12691K(153344K), 0.0083933 secs] 655164K->515576K(1031552K), 0.0084997 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:35.039+0000: 1396462.409: Total time for which application threads were stopped: 0.0091567 seconds, Stopping threads took: 0.0000676 seconds
+2018-06-11T01:58:36.074+0000: 1396463.444: [GC (Allocation Failure) 2018-06-11T01:58:36.074+0000: 1396463.444: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    7635304 bytes,    7635304 total
+- age   2:     668824 bytes,    8304128 total
+: 149011K->10603K(153344K), 0.0074096 secs] 651896K->513488K(1031552K), 0.0075124 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:36.082+0000: 1396463.452: Total time for which application threads were stopped: 0.0082722 seconds, Stopping threads took: 0.0001133 seconds
+2018-06-11T01:58:40.559+0000: 1396467.929: [GC (Allocation Failure) 2018-06-11T01:58:40.559+0000: 1396467.929: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:     858576 bytes,     858576 total
+- age   2:     465968 bytes,    1324544 total
+- age   3:     543072 bytes,    1867616 total
+: 146923K->7407K(153344K), 0.0069103 secs] 649808K->510292K(1031552K), 0.0070135 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:40.566+0000: 1396467.936: Total time for which application threads were stopped: 0.0076917 seconds, Stopping threads took: 0.0000951 seconds
+2018-06-11T01:58:50.154+0000: 1396477.524: [GC (Allocation Failure) 2018-06-11T01:58:50.154+0000: 1396477.524: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    5237560 bytes,    5237560 total
+- age   2:     674024 bytes,    5911584 total
+- age   3:     457488 bytes,    6369072 total
+- age   4:     540400 bytes,    6909472 total
+: 143563K->8077K(153344K), 0.0082105 secs] 646448K->510962K(1031552K), 0.0083111 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:50.162+0000: 1396477.532: Total time for which application threads were stopped: 0.0089872 seconds, Stopping threads took: 0.0000677 seconds
+2018-06-11T01:58:51.200+0000: 1396478.570: [GC (Allocation Failure) 2018-06-11T01:58:51.200+0000: 1396478.570: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    4649064 bytes,    4649064 total
+- age   2:     509184 bytes,    5158248 total
+- age   3:     645376 bytes,    5803624 total
+- age   4:     457456 bytes,    6261080 total
+- age   5:     538480 bytes,    6799560 total
+: 144397K->11275K(153344K), 0.0082846 secs] 647282K->514160K(1031552K), 0.0083900 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T01:58:51.208+0000: 1396478.578: Total time for which application threads were stopped: 0.0090778 seconds, Stopping threads took: 0.0000795 seconds
+2018-06-11T01:58:54.239+0000: 1396481.609: Total time for which application threads were stopped: 0.0006243 seconds, Stopping threads took: 0.0000909 seconds
+2018-06-11T01:58:54.243+0000: 1396481.613: [GC (Allocation Failure) 2018-06-11T01:58:54.243+0000: 1396481.613: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   10747664 bytes,   10747664 total
+- age   2:     502056 bytes,   11249720 total
+- age   3:     465688 bytes,   11715408 total
+- age   4:     635816 bytes,   12351224 total
+- age   5:     457024 bytes,   12808248 total
+- age   6:     538032 bytes,   13346280 total
+: 147595K->13648K(153344K), 0.0095226 secs] 650480K->516533K(1031552K), 0.0096197 secs] [Times: user=0.01 sys=0.00, real=0.01 secs] 
+2018-06-11T02:00:11.023+0000: 1396558.393: Total time for which application threads were stopped: 0.0127240 seconds, Stopping threads took: 0.0000691 seconds
+2018-06-11T02:00:11.036+0000: 1396558.407: Total time for which application threads were stopped: 0.0023815 seconds, Stopping threads took: 0.0018780 seconds
+2018-06-11T02:00:11.097+0000: 1396558.467: [GC (Allocation Failure) 2018-06-11T02:00:11.097+0000: 1396558.467: [ParNew
+Desired survivor size 8716288 bytes, new threshold 6 (max 6)
+- age   1:    1142528 bytes,    1142528 total
+: 153138K->12252K(153344K), 0.0077785 secs] 680068K->540560K(1031552K), 0.0078609 secs] [Times: user=0.02 sys=0.00, real=0.01 secs] 
+2018-06-11T02:00:11.105+0000: 1396558.475: Total time for which application threads were stopped: 0.0085331 seconds, Stopping threads took: 0.0000801 seconds
+2018-06-11T02:00:14.091+0000: 1396561.462: [GC (Allocation Failure) 2018-06-11T02:00:14.091+0000: 1396561.462: [ParNew
+Desired survivor size 8716288 bytes, new threshold 1 (max 6)
+- age   1:   11312016 bytes,   11312016 total
+2018-06-12T19:36:14.761+0000: 99.404: [GC (CMS Initial Mark) [1 CMS-initial-mark: 87423K(87424K)] 103696K(126720K), 0.0090294 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]
+2018-06-12T19:36:14.770+0000: 99.413: Total time for which application threads were stopped: 0.0093158 seconds, Stopping threads took: 0.0000633 seconds
+2018-06-12T19:36:14.770+0000: 99.413: [CMS-concurrent-mark-start]
+2018-06-12T19:36:14.859+0000: 99.503: [CMS-concurrent-mark: 0.089/0.089 secs] [Times: user=0.09 sys=0.00, real=0.09 secs]
+2018-06-12T19:36:14.859+0000: 99.503: [CMS-concurrent-preclean-start]
+2018-06-12T19:36:14.861+0000: 99.505: [CMS-concurrent-preclean: 0.002/0.002 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+2018-06-12T19:36:14.861+0000: 99.505: [CMS-concurrent-abortable-preclean-start]
+2018-06-12T19:36:14.861+0000: 99.505: [CMS-concurrent-abortable-preclean: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+2018-06-12T19:36:14.862+0000: 99.505: [GC (CMS Final Remark) [YG occupancy: 16272 K (39296 K)]2018-06-12T19:36:14.862+0000: 99.505: [Rescan (parallel) , 0.0098034 secs]2018-06-12T19:36:14.872+0000: 99.515: [weak refs processing, 0.0002425 secs]2018-06-12T19:36:14.872+0000: 99.515: [class unloading, 0.0129300 secs]2018-06-12T19:36:14.885+0000: 99.528: [scrub symbol table, 0.0160416 secs]2018-06-12T19:36:14.901+0000: 99.544: [scrub string table, 0.0009964 secs][1 CMS-remark: 87423K(87424K)] 103696K(126720K), 0.0404047 secs] [Times: user=0.05 sys=0.00, real=0.04 secs]
+2018-06-12T19:36:14.902+0000: 99.546: Total time for which application threads were stopped: 0.0406230 seconds, Stopping threads took: 0.0000402 seconds
+2018-06-12T19:36:14.902+0000: 99.546: [CMS-concurrent-sweep-start]
+2018-06-12T19:36:14.929+0000: 99.573: [CMS-concurrent-sweep: 0.027/0.027 secs] [Times: user=0.03 sys=0.00, real=0.03 secs]
+2018-06-12T19:36:14.929+0000: 99.573: [CMS-concurrent-reset-start]
+2018-06-12T19:36:14.930+0000: 99.573: [CMS-concurrent-reset: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+2018-06-12T19:36:15.749+0000: 100.393: Total time for which application threads were stopped: 0.0002630 seconds, Stopping threads took: 0.0000831 seconds
+2018-06-12T19:36:15.751+0000: 100.395: Total time for which application threads were stopped: 0.0001511 seconds, Stopping threads took: 0.0000524 seconds
+2018-06-12T19:36:15.753+0000: 100.396: Total time for which application threads were stopped: 0.0001362 seconds, Stopping threads took: 0.0000503 seconds
+2018-06-12T19:36:15.754+0000: 100.397: Total time for which application threads were stopped: 0.0001313 seconds, Stopping threads took: 0.0000488 seconds
+2018-06-12T19:36:16.754+0000: 101.398: Total time for which application threads were stopped: 0.0002159 seconds, Stopping threads took: 0.0000777 seconds
+2018-06-12T19:36:16.930+0000: 101.573: [GC (CMS Initial Mark) [1 CMS-initial-mark: 87423K(87424K)] 106940K(126720K), 0.0090374 secs] [Times: user=0.02 sys=0.00, real=0.01 secs]
+2018-06-12T19:36:16.939+0000: 101.582: Total time for which application threads were stopped: 0.0093302 seconds, Stopping threads took: 0.0000585 seconds
+2018-06-12T19:36:16.939+0000: 101.582: [CMS-concurrent-mark-start]
+2018-06-12T19:36:17.027+0000: 101.671: [CMS-concurrent-mark: 0.089/0.089 secs] [Times: user=0.09 sys=0.00, real=0.09 secs]
+2018-06-12T19:36:17.028+0000: 101.671: [CMS-concurrent-preclean-start]
+2018-06-12T19:36:17.030+0000: 101.673: [CMS-concurrent-preclean: 0.002/0.002 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+2018-06-12T19:36:17.030+0000: 101.673: [CMS-concurrent-abortable-preclean-start]
+2018-06-12T19:36:17.030+0000: 101.673: [CMS-concurrent-abortable-preclean: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+2018-06-12T19:36:17.030+0000: 101.673: [GC (CMS Final Remark) [YG occupancy: 19516 K (39296 K)]2018-06-12T19:36:17.030+0000: 101.673: [Rescan (parallel) , 0.0099186 secs]2018-06-12T19:36:17.040+0000: 101.683: [weak refs processing, 0.0002308 secs]2018-06-12T19:36:17.040+0000: 101.684: [class unloading, 0.0127845 secs]2018-06-12T19:36:17.053+0000: 101.696: [scrub symbol table, 0.0162614 secs]2018-06-12T19:36:17.069+0000: 101.713: [scrub string table, 0.0010035 secs][1 CMS-remark: 87423K(87424K)] 106940K(126720K), 0.0406054 secs] [Times: user=0.05 sys=0.00, real=0.04 secs]
+2018-06-12T19:36:17.071+0000: 101.714: Total time for which application threads were stopped: 0.0408231 seconds, Stopping threads took: 0.0000414 seconds

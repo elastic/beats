@@ -1,0 +1,227 @@
+[id="{beatname_lc}-getting-started"]
+[role="xpack"]
+== Getting Started With {beatname_uc}
+
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
+
+* <<{beatname_lc}-installation>>
+* <<{beatname_lc}-configuration>>
+* <<{beatname_lc}-template>>
+* <<{beatname_lc}-deploying>>
+* <<view-kibana-dashboards>>
+
+[id="{beatname_lc}-installation"]
+[role="xpack"]
+=== Step 1: Download the {beatname_uc} package
+
+The {beatname_uc} package contains the command line tools, configuration file,
+and binary code required to run {beatname_uc} in your serverless environment. 
+
+To download and extract the package, use the commands that work with your
+system.
+
+[[linux]]
+*linux:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+[[mac]]
+*mac:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
+[[win]]
+*win:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+. Download the {beatname_uc} Windows zip file from the
+https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
+
+. Extract the contents of the zip file. 
+
+endif::[]
+
+[id="{beatname_lc}-configuration"]
+[role="xpack"]
+=== Step 2: Configure {beatname_uc}
+
+Before deploying {beatname_uc} to your serverless environment, you need to
+specify details about the functions that you want to deploy, including the
+function name, type, and triggers that will cause the function to execute.
+You also need to specify connection details for your {es} cluster. 
+
+You specify settings in the  +{beatname_lc}.yml+ configuration file. This file
+is located in the archive that you extracted earlier.
+
+TIP: See the
+{beats-ref}/config-file-format.html[Config File Format] section of the
+_Beats Platform Reference_ for more about the structure of the config file.
+
+The following example configures a function called `cloudwatch` that collects
+events from CloudWatch Logs and forwards the events to {es}.
+
+["source","sh",subs="attributes"]
+-------------------------------------------------------------------------------------
+{beatname_lc}.provider.aws.endpoint: "s3.amazonaws.com"
+{beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
+{beatname_lc}.provider.aws.functions:
+  - name: cloudwatch
+    enabled: true
+    type: cloudwatch_logs
+    description: "lambda function for cloudwatch logs"
+    triggers:
+      - log_group_name: /aws/lambda/my-lambda-function
+output.elasticsearch:
+  cloud.id: "MyESDeployment:SomeLongString=="
+  cloud.auth: "elastic:SomeLongString"
+-------------------------------------------------------------------------------------
+
+To configure {beatname_uc}:
+
+. Specify a unique name for the S3 bucket to which the functions will be
+uploaded. For example:
++
+["source","sh",subs="attributes"]
+----
+{beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
+----
+
+. Define the functions that you want to deploy. For each function, you must
+specify:
++
+[horizontal]
+`name`:: A unique name for the Lambda function.  
+`type`:: The type of service to monitor. For this release, the supported types
+are:
+* `cloudwatch_logs` to collect data from CloudWatch logs
+* `sqs` to collect messages from Amazon Simple Queue Service (SQS)
+`triggers`:: The triggers that will cause the function to execute. If `type`
+is `cloudwatch_logs` logs, specify a list of log groups. If `type` is `sqs`,
+specify a list of Amazon Resource Names (ARNs). 
++
+When a message is sent to the specified log group or queue, the Lambda function
+executes and sends message events to the output configured for {beatname_uc}.
++
+The following example configures a function called `sqs` that collects data
+from Amazon SQS:
++
+["source","sh",subs="attributes"]
+----
+- name: sqs
+  enabled: true
+  type: sqs
+  triggers:
+    - event_source_arn: arn:aws:sqs:us-east-1:123456789012:myevents
+----
+
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
+
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
+
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
+
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
+
+[id="{beatname_lc}-template"]
+[role="xpack"]
+=== Step 3: Load the index template in Elasticsearch
+
+:allplatforms:
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
+
+[id="{beatname_lc}-deploying"]
+[role="xpack"]
+=== Step 4: Deploy {beatname_uc} code to your serverless environment
+
+Before deploying functions to your serverless environment, make sure your user
+has the credentials required by your cloud service provider. For example, if you
+are deploying an AWS Lambda function, you can set environment variables that
+contain your credentials:
+
+*linux and mac*:
+
+[source, shell]
+----
+export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
+export AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
+export AWS_DEFAULT_REGION=us-east-1
+----
+
+*win*:
+
+[source, shell]
+----
+set AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMNOPUSER
+set AWS_SECRET_ACCESS_KEY=EXAMPLE567890devgHIJKMLOPNQRSTUVZ1234KEY
+set AWS_DEFAULT_REGION=us-east-1
+----
+
+Set `AWS_DEFAULT_REGION` to the region where your services are running.
+
+After setting credentials, run the `deploy` command to deploy the function.
+The following command deploys a function called `cloudwatch`: 
+
+*linux and mac:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+./{beatname_lc} -v -e -d "*" deploy cloudwatch
+----------------------------------------------------------------------
+
+*win:*
+
+["source","sh",subs="attributes"]
+----------------------------------------------------------------------
+.{backslash}{beatname_lc}.exe -v -e -d "*" deploy cloudwatch
+----------------------------------------------------------------------
+
+{beatname_uc} is now deployed in your serverless environment and ready to send
+log events to the configured output.
+
+TIP: If you change the configuration after deploying the function, use
+the <<update-command,`update` command>> to update your deployment.
+
+[[view-kibana-dashboards]]
+[role="xpack"]
+=== Step 5: View your data in Kibana
+
+There are currently no example dashboards available for {beatname_uc}.
+
+To learn how to view and explore your data, see the
+_{kibana-ref}/index.html[{kib} User Guide]_.
+

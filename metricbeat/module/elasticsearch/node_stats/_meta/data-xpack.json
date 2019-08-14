@@ -27,7 +27,7 @@
     },
     "indices": {
         "fs": {
-            "summary": {
+            "total": {
                 "free_in_bytes": 20373749760,
                 "available_in_bytes": 20111605760,
                 "total_in_bytes": 249779191808

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package log harvests different inputs for new information. Currently
 // two harvester types exist:
 //
@@ -12,7 +29,6 @@
 package log
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -20,7 +36,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -31,10 +47,13 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/debug"
+	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readfile"
+	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
 var (
@@ -79,7 +98,7 @@ type Harvester struct {
 
 	// event/state publishing
 	outletFactory OutletFactory
-	publishState  func(*util.Data) bool
+	publishState  func(file.State) bool
 
 	onTerminate func()
 }
@@ -89,9 +108,14 @@ func NewHarvester(
 	config *common.Config,
 	state file.State,
 	states *file.States,
-	publishState func(*util.Data) bool,
+	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
+
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
 
 	h := &Harvester{
 		config:        defaultConfig,
@@ -100,7 +124,7 @@ func NewHarvester(
 		publishState:  publishState,
 		done:          make(chan struct{}),
 		stopWg:        &sync.WaitGroup{},
-		id:            uuid.NewV4(),
+		id:            id,
 		outletFactory: outletFactory,
 	}
 
@@ -128,9 +152,7 @@ func (h *Harvester) open() error {
 	switch h.config.Type {
 	case harvester.StdinType:
 		return h.openStdin()
-	case harvester.LogType:
-		return h.openFile()
-	case harvester.DockerType:
+	case harvester.LogType, harvester.DockerType, harvester.ContainerType:
 		return h.openFile()
 	default:
 		return fmt.Errorf("Invalid harvester type: %+v", h.config)
@@ -156,6 +178,8 @@ func (h *Harvester) Setup() error {
 		}
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
+
+	logp.Debug("harvester", "Harvester setup successful. Line terminator: %d", h.config.LineTerminator)
 
 	return nil
 }
@@ -206,7 +230,6 @@ func (h *Harvester) Run() error {
 	// Closes reader after timeout or when done channel is closed
 	// This routine is also responsible to properly stop the reader
 	go func(source string) {
-
 		closeTimeout := make(<-chan time.Time)
 		// starts close_timeout timer
 		if h.config.CloseTimeout > 0 {
@@ -251,70 +274,25 @@ func (h *Harvester) Run() error {
 				logp.Info("End of file reached: %s. Closing because close_eof is enabled.", h.state.Source)
 			case ErrInactive:
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
+			case reader.ErrLineUnparsable:
+				logp.Info("Skipping unparsable line in file: %v", h.state.Source)
+				//line unparsable, go to next line
+				continue
 			default:
 				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
 			}
 			return nil
 		}
 
-		// Strip UTF-8 BOM if beginning of file
-		// As all BOMS are converted to UTF-8 it is enough to only remove this one
-		if h.state.Offset == 0 {
-			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
-		}
-
 		// Get copy of state to work on
 		// This is important in case sending is not successful so on shutdown
 		// the old offset is reported
 		state := h.getState()
+		startingOffset := state.Offset
 		state.Offset += int64(message.Bytes)
 
-		// Create state event
-		data := util.NewData()
-		if h.source.HasState() {
-			data.SetState(state)
-		}
-
-		text := string(message.Content)
-
-		// Check if data should be added to event. Only export non empty events.
-		if !message.IsEmpty() && h.shouldExportLine(text) {
-			fields := common.MapStr{
-				"source": state.Source,
-				"offset": state.Offset, // Offset here is the offset before the starting char.
-			}
-			fields.DeepUpdate(message.Fields)
-
-			// Check if json fields exist
-			var jsonFields common.MapStr
-			if f, ok := fields["json"]; ok {
-				jsonFields = f.(common.MapStr)
-			}
-
-			data.Event = beat.Event{
-				Timestamp: message.Ts,
-			}
-
-			if h.config.JSON != nil && len(jsonFields) > 0 {
-				ts := reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
-				if !ts.IsZero() {
-					// there was a `@timestamp` key in the event, so overwrite
-					// the resulting timestamp
-					data.Event.Timestamp = ts
-				}
-			} else if &text != nil {
-				if fields == nil {
-					fields = common.MapStr{}
-				}
-				fields["message"] = text
-			}
-
-			data.Event.Fields = fields
-		}
-
-		// Always send event to update state, also if lines was skipped
 		// Stop harvester in case of an error
-		if !h.sendEvent(data, forwarder) {
+		if !h.onMessage(forwarder, state, message, startingOffset) {
 			return nil
 		}
 
@@ -339,14 +317,70 @@ func (h *Harvester) Stop() {
 	h.stopLock.Unlock()
 }
 
-// sendEvent sends event to the spooler channel
-// Return false if event was not sent
-func (h *Harvester) sendEvent(data *util.Data, forwarder *harvester.Forwarder) bool {
+// onMessage processes a new message read from the reader.
+// This results in a state update and possibly an event would be send.
+// A state update first updates the in memory state held by the prospector,
+// and finally sends the file.State indirectly to the registrar.
+// The events Private field is used to forward the file state update.
+//
+// onMessage returns 'false' if it was interrupted in the process of sending the event.
+// This normally signals a harvester shutdown.
+func (h *Harvester) onMessage(
+	forwarder *harvester.Forwarder,
+	state file.State,
+	message reader.Message,
+	messageOffset int64,
+) bool {
 	if h.source.HasState() {
-		h.states.Update(data.GetState())
+		h.states.Update(state)
 	}
 
-	err := forwarder.Send(data)
+	text := string(message.Content)
+	if message.IsEmpty() || !h.shouldExportLine(text) {
+		// No data or event is filtered out -> send empty event with state update
+		// only. The call can fail on filebeat shutdown.
+		// The event will be filtered out, but forwarded to the registry as is.
+		err := forwarder.Send(beat.Event{Private: state})
+		return err == nil
+	}
+
+	fields := common.MapStr{
+		"log": common.MapStr{
+			"offset": messageOffset, // Offset here is the offset before the starting char.
+			"file": common.MapStr{
+				"path": state.Source,
+			},
+		},
+	}
+	fields.DeepUpdate(message.Fields)
+
+	// Check if json fields exist
+	var jsonFields common.MapStr
+	if f, ok := fields["json"]; ok {
+		jsonFields = f.(common.MapStr)
+	}
+
+	timestamp := message.Ts
+
+	if h.config.JSON != nil && len(jsonFields) > 0 {
+		ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+		if !ts.IsZero() {
+			// there was a `@timestamp` key in the event, so overwrite
+			// the resulting timestamp
+			timestamp = ts
+		}
+	} else if &text != nil {
+		if fields == nil {
+			fields = common.MapStr{}
+		}
+		fields["message"] = text
+	}
+
+	err := forwarder.Send(beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+		Private:   state,
+	})
 	return err == nil
 }
 
@@ -360,12 +394,10 @@ func (h *Harvester) SendStateUpdate() {
 		return
 	}
 
+	h.publishState(h.state)
+
 	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
 	h.states.Update(h.state)
-
-	d := util.NewData()
-	d.SetState(h.state)
-	h.publishState(d)
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -528,28 +560,37 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = reader.NewEncode(h.log, h.encoding, h.config.BufferSize)
+	reader, err := debug.AppendReaders(h.log)
 	if err != nil {
 		return nil, err
 	}
 
-	if h.config.DockerJSON != "" {
+	r, err = readfile.NewEncodeReader(reader, readfile.Config{
+		Codec:      h.encoding,
+		BufferSize: h.config.BufferSize,
+		Terminator: h.config.LineTerminator,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = reader.NewDockerJSON(r, h.config.DockerJSON)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.Format, h.config.DockerJSON.CRIFlags)
 	}
 
 	if h.config.JSON != nil {
-		r = reader.NewJSON(r, h.config.JSON)
+		r = readjson.NewJSONReader(r, h.config.JSON)
 	}
 
-	r = reader.NewStripNewline(r)
+	r = readfile.NewStripNewline(r, h.config.LineTerminator)
 
 	if h.config.Multiline != nil {
-		r, err = reader.NewMultiline(r, "\n", h.config.MaxBytes, h.config.Multiline)
+		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return reader.NewLimit(r, h.config.MaxBytes), nil
+	return readfile.NewLimitReader(r, h.config.MaxBytes), nil
 }
