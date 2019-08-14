@@ -309,10 +309,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
 		}
 
-		var clusterUUID string
-		if clusterUUID != "" {
-			clusterUUID = clusterUUID
-		} else {
+		if clusterUUID == "" {
 			clusterUUID = getClusterUUID()
 		}
 		if clusterUUID != "" {
