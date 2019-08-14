@@ -22,6 +22,8 @@ package main
 import (
 	"context"
 
+	"github.com/magefile/mage/mg"
+
 	devtools "github.com/elastic/beats/dev-tools/mage"
 )
 
@@ -57,4 +59,9 @@ func GoTestIntegration(ctx context.Context) error {
 // Config generates example and reference configuration for libbeat.
 func Config() error {
 	return devtools.Config(devtools.ShortConfigType|devtools.ReferenceConfigType, devtools.ConfigFileParams{}, ".")
+}
+
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(devtools.Format, devtools.Check)
 }
