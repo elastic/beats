@@ -9,7 +9,7 @@ beta[]
 
 include::../../../../x-pack/metricbeat/module/aws/s3_request/_meta/docs.asciidoc[]
 
-This is a default metricset. If its host module is unconfigured, it will be enabled by default.
+
 
 ==== Fields
 

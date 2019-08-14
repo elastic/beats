@@ -11,7 +11,7 @@ This file is generated! See scripts/mage/docs_collector.go
 {{end -}}
 include::../../../{{.Mod.Path | basePath}}/{{.Mod.Base}}/{{.Metricset.Title}}/_meta/docs.asciidoc[]
 
-{{if .Metricset.IsDefault}}This is a default metricset. If its host module is unconfigured, it will be enabled by default.{{end}}
+{{if .Metricset.IsDefault}}This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.{{end}}
 
 ==== Fields
 

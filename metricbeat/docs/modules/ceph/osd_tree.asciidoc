@@ -7,7 +7,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 include::../../../module/ceph/osd_tree/_meta/docs.asciidoc[]
 
-This is a default metricset. If its host module is unconfigured, it will be enabled by default.
+This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
 ==== Fields
 
