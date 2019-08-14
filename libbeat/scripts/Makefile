@@ -122,7 +122,6 @@ endif
 
 .PHONY: check
 check: check-headers mage ## @build Checks project and source code if everything is according to standard
-	@go vet ${GOPACKAGES}
 	@mage check
 
 .PHONY: $(.OVER)check-headers
