@@ -47,6 +47,11 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(devtools.Format, Update, devtools.Check)
+}
+
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {

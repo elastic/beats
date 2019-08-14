@@ -144,3 +144,8 @@ func customizePackaging() {
 func Config() error {
 	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
 }
+
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(devtools.Format, Update, devtools.Check)
+}
