@@ -94,7 +94,8 @@
             "module": "etcd"
         },
         "metricset": {
-            "name": "metrics"
+            "name": "metrics",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",

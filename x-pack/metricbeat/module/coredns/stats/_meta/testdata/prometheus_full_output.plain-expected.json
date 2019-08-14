@@ -4,82 +4,6 @@
             "stats": {
                 "dns": {
                     "request": {
-                        "count": 440
-                    }
-                },
-                "family": "1",
-                "proto": "udp",
-                "server": "dns://:53",
-                "zone": "."
-            }
-        },
-        "event": {
-            "dataset": "coredns.stats",
-            "duration": 115000,
-            "module": "coredns"
-        },
-        "metricset": {
-            "name": "stats"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "coredns"
-        }
-    },
-    {
-        "coredns": {
-            "stats": {
-                "panic": {
-                    "count": 0
-                }
-            }
-        },
-        "event": {
-            "dataset": "coredns.stats",
-            "duration": 115000,
-            "module": "coredns"
-        },
-        "metricset": {
-            "name": "stats"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "coredns"
-        }
-    },
-    {
-        "coredns": {
-            "stats": {
-                "dns": {
-                    "request": {
-                        "type": {
-                            "count": 440
-                        }
-                    }
-                },
-                "server": "dns://:53",
-                "type": "A",
-                "zone": "."
-            }
-        },
-        "event": {
-            "dataset": "coredns.stats",
-            "duration": 115000,
-            "module": "coredns"
-        },
-        "metricset": {
-            "name": "stats"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "coredns"
-        }
-    },
-    {
-        "coredns": {
-            "stats": {
-                "dns": {
-                    "request": {
                         "do": {
                             "count": 113
                         },
@@ -120,7 +44,37 @@
             "module": "coredns"
         },
         "metricset": {
-            "name": "stats"
+            "name": "stats",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "response": {
+                        "rcode": {
+                            "count": 440
+                        }
+                    }
+                },
+                "rcode": "NOERROR",
+                "server": "dns://:53",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -193,7 +147,8 @@
             "module": "coredns"
         },
         "metricset": {
-            "name": "stats"
+            "name": "stats",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -204,13 +159,41 @@
         "coredns": {
             "stats": {
                 "dns": {
-                    "response": {
-                        "rcode": {
+                    "request": {
+                        "type": {
                             "count": 440
                         }
                     }
                 },
-                "rcode": "NOERROR",
+                "server": "dns://:53",
+                "type": "A",
+                "zone": "."
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "dns": {
+                    "request": {
+                        "count": 440
+                    }
+                },
+                "family": "1",
+                "proto": "udp",
                 "server": "dns://:53",
                 "zone": "."
             }
@@ -221,7 +204,30 @@
             "module": "coredns"
         },
         "metricset": {
-            "name": "stats"
+            "name": "stats",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "coredns"
+        }
+    },
+    {
+        "coredns": {
+            "stats": {
+                "panic": {
+                    "count": 0
+                }
+            }
+        },
+        "event": {
+            "dataset": "coredns.stats",
+            "duration": 115000,
+            "module": "coredns"
+        },
+        "metricset": {
+            "name": "stats",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",

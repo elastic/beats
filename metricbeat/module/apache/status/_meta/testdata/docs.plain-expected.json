@@ -19,7 +19,7 @@
                     "system": 0.2,
                     "user": 0.16
                 },
-                "hostname": "127.0.0.1:34545",
+                "hostname": "127.0.0.1:33063",
                 "load": {
                     "1": 2,
                     "15": 1.91,
@@ -58,7 +58,8 @@
             "module": "apache"
         },
         "metricset": {
-            "name": "status"
+            "name": "status",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",

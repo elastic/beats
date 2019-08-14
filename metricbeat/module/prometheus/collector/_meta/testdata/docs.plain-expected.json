@@ -6,7 +6,8 @@
             "module": "prometheus"
         },
         "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000000
         },
         "prometheus": {
             "labels": {

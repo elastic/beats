@@ -9,53 +9,6 @@
             "node": {
                 "cpu": {
                     "allocatable": {
-                        "cores": 3
-                    },
-                    "capacity": {
-                        "cores": 4
-                    }
-                },
-                "memory": {
-                    "allocatable": {
-                        "bytes": 3097786880
-                    },
-                    "capacity": {
-                        "bytes": 4097786880
-                    }
-                },
-                "name": "minikube-test",
-                "pod": {
-                    "allocatable": {
-                        "total": 210
-                    },
-                    "capacity": {
-                        "total": 310
-                    }
-                },
-                "status": {
-                    "ready": "true",
-                    "unschedulable": true
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_node"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.node",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "node": {
-                "cpu": {
-                    "allocatable": {
                         "cores": 2
                     },
                     "capacity": {
@@ -86,7 +39,56 @@
             }
         },
         "metricset": {
-            "name": "state_node"
+            "name": "state_node",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "cpu": {
+                    "allocatable": {
+                        "cores": 3
+                    },
+                    "capacity": {
+                        "cores": 4
+                    }
+                },
+                "memory": {
+                    "allocatable": {
+                        "bytes": 3097786880
+                    },
+                    "capacity": {
+                        "bytes": 4097786880
+                    }
+                },
+                "name": "minikube-test",
+                "pod": {
+                    "allocatable": {
+                        "total": 210
+                    },
+                    "capacity": {
+                        "total": 310
+                    }
+                },
+                "status": {
+                    "ready": "true",
+                    "unschedulable": true
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",

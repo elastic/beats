@@ -6,7 +6,8 @@
         "module": "traefik"
     },
     "metricset": {
-        "name": "health"
+        "name": "health",
+        "period": 10000000
     },
     "service": {
         "address": "127.0.0.1:55555",

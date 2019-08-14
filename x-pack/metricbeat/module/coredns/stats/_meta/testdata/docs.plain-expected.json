@@ -65,7 +65,8 @@
             "module": "coredns"
         },
         "metricset": {
-            "name": "stats"
+            "name": "stats",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",

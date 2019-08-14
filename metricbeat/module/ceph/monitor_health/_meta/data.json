@@ -38,7 +38,8 @@
         "module": "ceph"
     },
     "metricset": {
-        "name": "monitor_health"
+        "name": "monitor_health",
+        "period": 10000000
     },
     "service": {
         "address": "127.0.0.1:55555",

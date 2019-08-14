@@ -11,7 +11,8 @@
             }
         },
         "metricset": {
-            "name": "json"
+            "name": "json",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",

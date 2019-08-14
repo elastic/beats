@@ -12,8 +12,8 @@
             },
             "pod": {
                 "host_ip": "192.168.99.100",
-                "ip": "172.17.0.3",
-                "name": "kube-state-metrics-1303537707-7ncd1",
+                "ip": "172.17.0.2",
+                "name": "tiller-deploy-3067024529-9lpmb",
                 "status": {
                     "phase": "running",
                     "ready": "true",
@@ -22,7 +22,8 @@
             }
         },
         "metricset": {
-            "name": "state_pod"
+            "name": "state_pod",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -52,7 +53,8 @@
             }
         },
         "metricset": {
-            "name": "state_pod"
+            "name": "state_pod",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -72,8 +74,8 @@
             },
             "pod": {
                 "host_ip": "192.168.99.100",
-                "ip": "172.17.0.2",
-                "name": "tiller-deploy-3067024529-9lpmb",
+                "ip": "172.17.0.3",
+                "name": "kube-state-metrics-1303537707-7ncd1",
                 "status": {
                     "phase": "running",
                     "ready": "true",
@@ -82,151 +84,8 @@
             }
         },
         "metricset": {
-            "name": "state_pod"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "node": {
-                "name": "minikube"
-            },
-            "pod": {
-                "host_ip": "192.168.99.100",
-                "ip": "172.17.0.5",
-                "name": "kubernetes-dashboard-vw0l6",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "node": {
-                "name": "minikube"
-            },
-            "pod": {
-                "host_ip": "192.168.99.100",
-                "ip": "172.17.0.6",
-                "name": "kube-dns-v20-5g5cb",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "pod": {
-                "name": "kube-state-metrics-1303537707-mnzbp",
-                "status": {
-                    "phase": "pending",
-                    "scheduled": "false"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "node": {
-                "name": "minikube"
-            },
-            "pod": {
-                "host_ip": "192.168.99.100",
-                "ip": "192.168.99.100",
-                "name": "kube-addon-manager-minikube",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "test",
-            "node": {
-                "name": "minikube-test"
-            },
-            "pod": {
-                "host_ip": "192.168.99.200",
-                "ip": "172.17.0.5",
-                "name": "jumpy-owl-redis-3481028193-s78x9",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "scheduled": "false"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod"
+            "name": "state_pod",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -256,7 +115,157 @@
             }
         },
         "metricset": {
-            "name": "state_pod"
+            "name": "state_pod",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "test",
+            "node": {
+                "name": "minikube-test"
+            },
+            "pod": {
+                "host_ip": "192.168.99.200",
+                "ip": "172.17.0.5",
+                "name": "jumpy-owl-redis-3481028193-s78x9",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "scheduled": "false"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "node": {
+                "name": "minikube"
+            },
+            "pod": {
+                "host_ip": "192.168.99.100",
+                "ip": "192.168.99.100",
+                "name": "kube-addon-manager-minikube",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "pod": {
+                "name": "kube-state-metrics-1303537707-mnzbp",
+                "status": {
+                    "phase": "pending",
+                    "scheduled": "false"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "node": {
+                "name": "minikube"
+            },
+            "pod": {
+                "host_ip": "192.168.99.100",
+                "ip": "172.17.0.5",
+                "name": "kubernetes-dashboard-vw0l6",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "node": {
+                "name": "minikube"
+            },
+            "pod": {
+                "host_ip": "192.168.99.100",
+                "ip": "172.17.0.6",
+                "name": "kube-dns-v20-5g5cb",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",

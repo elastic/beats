@@ -2,6 +2,39 @@
     {
         "dropwizard": {
             "testnamespace": {
+                "my_counter": {
+                    "count": 1
+                },
+                "my_meter": {
+                    "count": 0,
+                    "m15_rate": 0,
+                    "m1_rate": 0,
+                    "m5_rate": 0,
+                    "mean_rate": 0,
+                    "units": "events/second"
+                },
+                "tags": {
+                    "this": "that"
+                }
+            }
+        },
+        "event": {
+            "dataset": "dropwizard.testnamespace",
+            "duration": 115000,
+            "module": "dropwizard"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "dropwizard"
+        }
+    },
+    {
+        "dropwizard": {
+            "testnamespace": {
                 "my_gauge": {},
                 "my_histogram": {
                     "count": 0,
@@ -43,39 +76,8 @@
             "module": "dropwizard"
         },
         "metricset": {
-            "name": "collector"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "dropwizard"
-        }
-    },
-    {
-        "dropwizard": {
-            "testnamespace": {
-                "my_counter": {
-                    "count": 1
-                },
-                "my_meter": {
-                    "count": 0,
-                    "m15_rate": 0,
-                    "m1_rate": 0,
-                    "m5_rate": 0,
-                    "mean_rate": 0,
-                    "units": "events/second"
-                },
-                "tags": {
-                    "this": "that"
-                }
-            }
-        },
-        "event": {
-            "dataset": "dropwizard.testnamespace",
-            "duration": 115000,
-            "module": "dropwizard"
-        },
-        "metricset": {
-            "name": "collector"
+            "name": "collector",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
