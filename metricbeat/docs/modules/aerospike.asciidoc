@@ -16,7 +16,7 @@ The Aerospike metricsets were tested with Aerospike 3.9 and are expected to work
 [float]
 === Dashboard
 
-The Couchbase module comes with a predefined dashboard for Couchbase cluster, node, bucket specific stats. For example:
+The Aerospike module comes with a predefined dashboard for Aerospike namespace, node specific stats. For example:
 
 image::./images/metricbeat-aerospike-overview.png[]
 
