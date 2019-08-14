@@ -26,11 +26,11 @@
       description: >
         Number of pending messages from / to the subscriber
     - name: offline
-      type: bool
+      type: boolean
       description: >
         Is the subscriber marked as offline?
     - name: stalled
-      type: bool
+      type: boolean
       description: >
         Is the subscriber known to be stalled?
     
