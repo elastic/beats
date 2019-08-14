@@ -1,0 +1,319 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package s3
+
+import (
+	"context"
+	"os"
+	"path/filepath"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/filebeat/channel"
+	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	awscommon "github.com/elastic/beats/x-pack/libbeat/common/aws"
+)
+
+const (
+	fileName          = "sample1.txt"
+	fileDir           = "./ftest/" + fileName
+	visibilityTimeout = 300 * time.Second
+)
+
+// GetConfigForTest function gets aws credentials for integration tests.
+func getConfigForTest() (config, string) {
+	awsConfig := awscommon.ConfigAWS{}
+	info := ""
+	queueUrl := os.Getenv("QUEUE_URL")
+	if queueUrl == "" {
+		info = "Skipping: $QUEUE_URL is not set in environment."
+	}
+
+	profileName := os.Getenv("AWS_PROFILE_NAME")
+	if profileName != "" {
+		awsConfig.ProfileName = profileName
+		config := config{
+			QueueURL:          queueUrl,
+			AwsConfig:         awsConfig,
+			VisibilityTimeout: visibilityTimeout,
+		}
+		return config, info
+	}
+
+	accessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
+	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	sessionToken := os.Getenv("AWS_SESSION_TOKEN")
+	defaultRegion := os.Getenv("AWS_REGION")
+	if defaultRegion == "" {
+		defaultRegion = "us-west-1"
+	}
+
+	if accessKeyID == "" {
+		info = "Skipping: $AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty"
+	} else if secretAccessKey == "" {
+		info = "Skipping: $AWS_SECRET_ACCESS_KEY not set or set to empty"
+	} else {
+		awsConfig = awscommon.ConfigAWS{
+			AccessKeyID:     accessKeyID,
+			SecretAccessKey: secretAccessKey,
+		}
+
+		if sessionToken != "" {
+			awsConfig.SessionToken = sessionToken
+		}
+	}
+	config := config{
+		QueueURL:          queueUrl,
+		AwsConfig:         awsConfig,
+		VisibilityTimeout: visibilityTimeout,
+	}
+	return config, info
+}
+
+func testSetup(t *testing.T) context.CancelFunc {
+	t.Helper()
+	_, cancel := context.WithCancel(context.Background())
+	return cancel
+}
+
+func uploadSampleLogFile(t *testing.T, awsConfig awssdk.Config, bucketName string) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	file, err := os.Open(fileDir)
+	if err != nil {
+		t.Fatalf("Failed to open file %v", fileDir)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	svcS3 := s3.New(awsConfig)
+	s3PutObjectInput := s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(filepath.Base(fileDir)),
+		Body:   file,
+	}
+	req := svcS3.PutObjectRequest(&s3PutObjectInput)
+	output, err := req.Send(ctx)
+	if err != nil {
+		t.Fatalf("failed to put object into s3 bucket: %v", output)
+	}
+}
+
+func collectOldMessages(t *testing.T, awsConfig awssdk.Config, queueURL string, visibilityTimeout int64, svcSQS *sqs.Client) []string {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// receive messages from sqs
+	req := svcSQS.ReceiveMessageRequest(
+		&sqs.ReceiveMessageInput{
+			QueueUrl:              &queueURL,
+			MessageAttributeNames: []string{"All"},
+			MaxNumberOfMessages:   &maxNumberOfMessage,
+			VisibilityTimeout:     &visibilityTimeout,
+			WaitTimeSeconds:       &waitTimeSecond,
+		})
+
+	output, err := req.Send(ctx)
+	if err != nil {
+		t.Fatalf("failed to receive message from SQS: %v", output)
+	}
+
+	var oldMessageHandles []string
+	for _, message := range output.Messages {
+		oldMessageHandles = append(oldMessageHandles, *message.ReceiptHandle)
+	}
+
+	return oldMessageHandles
+}
+
+func (input *s3Input) deleteAllMessages(t *testing.T, awsConfig awssdk.Config, queueURL string, visibilityTimeout int64, svcSQS *sqs.Client) error {
+	var messageReceiptHandles []string
+	init := true
+	for init || len(messageReceiptHandles) > 0 {
+		init = false
+		messageReceiptHandles = collectOldMessages(t, awsConfig, queueURL, visibilityTimeout, svcSQS)
+		for _, receiptHandle := range messageReceiptHandles {
+			err := input.deleteMessage(queueURL, receiptHandle, svcSQS)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func defaultTestConfig() *common.Config {
+	return common.MustNewConfigFrom(map[string]interface{}{
+		"queue_url": os.Getenv("QUEUE_URL"),
+	})
+}
+
+func runTest(t *testing.T, cfg *common.Config, run func(input *s3Input, out *stubOutleter, t *testing.T)) {
+	clientCancel := testSetup(t)
+	defer clientCancel()
+
+	// Simulate input.Context from Filebeat input runner.
+	inputCtx := newInputContext()
+	defer close(inputCtx.Done)
+
+	// Stub outlet for receiving events generated by the input.
+	eventOutlet := newStubOutlet()
+	defer eventOutlet.Close()
+
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+		return eventOutlet, nil
+	})
+
+	in, err := NewInput(cfg, connector, inputCtx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s3Input := in.(*s3Input)
+	defer s3Input.Stop()
+
+	run(s3Input, eventOutlet, t)
+}
+
+func newInputContext() input.Context {
+	return input.Context{
+		Done: make(chan struct{}),
+	}
+}
+
+type stubOutleter struct {
+	sync.Mutex
+	cond   *sync.Cond
+	done   bool
+	Events []beat.Event
+}
+
+func newStubOutlet() *stubOutleter {
+	o := &stubOutleter{}
+	o.cond = sync.NewCond(o)
+	return o
+}
+
+func (o *stubOutleter) waitForEvents(numEvents int) ([]beat.Event, bool) {
+	o.Lock()
+	defer o.Unlock()
+
+	for len(o.Events) < numEvents && !o.done {
+		o.cond.Wait()
+	}
+
+	size := numEvents
+	if size >= len(o.Events) {
+		size = len(o.Events)
+	}
+
+	out := make([]beat.Event, size)
+	copy(out, o.Events)
+	return out, len(out) == numEvents
+}
+
+func (o *stubOutleter) Close() error {
+	o.Lock()
+	defer o.Unlock()
+	o.done = true
+	return nil
+}
+
+func (o *stubOutleter) Done() <-chan struct{} { return nil }
+
+func (o *stubOutleter) OnEvent(event beat.Event) bool {
+	o.Lock()
+	defer o.Unlock()
+	o.Events = append(o.Events, event)
+	o.cond.Broadcast()
+	return !o.done
+}
+
+func TestS3Input(t *testing.T) {
+	cfg := defaultTestConfig()
+
+	runTest(t, cfg, func(input *s3Input, out *stubOutleter, t *testing.T) {
+		config, info := getConfigForTest()
+		if info != "" {
+			t.Skipf("failed to get config for test: %v", info)
+		}
+
+		awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
+		if err != nil {
+
+		}
+		s3BucketRegion := os.Getenv("S3_BUCKET_REGION")
+		if s3BucketRegion == "" {
+			t.Log("S3_BUCKET_REGION is not set, default to us-west-1")
+			s3BucketRegion = "us-west-1"
+		}
+		awsConfig.Region = s3BucketRegion
+		input.awsConfig = awsConfig.Copy()
+		svcSQS := sqs.New(awsConfig)
+
+		// remove old messages from SQS
+		err = input.deleteAllMessages(t, awsConfig, config.QueueURL, int64(config.VisibilityTimeout.Seconds()), svcSQS)
+		if err != nil {
+			t.Fatalf("failed to delete message: %v", err.Error())
+		}
+
+		// upload a sample log file for testing
+		s3BucketNameEnv := os.Getenv("S3_BUCKET_NAME")
+		if s3BucketNameEnv == "" {
+			t.Fatal("failed to get S3_BUCKET_NAME")
+		}
+		uploadSampleLogFile(t, awsConfig, s3BucketNameEnv)
+		time.Sleep(30 * time.Second)
+
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			input.Run()
+		}()
+
+		time.AfterFunc(10*time.Second, func() { out.Close() })
+		events, ok := out.waitForEvents(2)
+		if !ok {
+			t.Fatalf("Expected 2 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		// check events
+		for i, event := range events {
+			bucketName, err := event.GetValue("aws.s3.bucket.name")
+			assert.NoError(t, err)
+			assert.Equal(t, s3BucketNameEnv, bucketName)
+
+			objectKey, err := event.GetValue("aws.s3.object.key")
+			assert.NoError(t, err)
+			assert.Equal(t, fileName, objectKey)
+
+			message, err := event.GetValue("message")
+			assert.NoError(t, err)
+			switch i {
+			case 0:
+				assert.Equal(t, "logline1\n", message)
+			case 1:
+				assert.Equal(t, "logline2\n", message)
+			}
+		}
+
+		// delete messages from the queue
+		err = input.deleteAllMessages(t, awsConfig, config.QueueURL, int64(config.VisibilityTimeout.Seconds()), svcSQS)
+		if err != nil {
+			t.Fatalf("failed to delete message: %v", err.Error())
+		}
+	})
+}
