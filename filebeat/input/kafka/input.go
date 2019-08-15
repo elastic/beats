@@ -101,21 +101,14 @@ func NewInput(
 	return input, nil
 }
 
-func (input *kafkaInput) runConsumerGroup(context context.Context) {
+func (input *kafkaInput) runConsumerGroup(
+	context context.Context, consumerGroup sarama.ConsumerGroup,
+) {
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
 	}
 
-	// Create a consumer group and make sure it's closed before we return.
-	consumerGroup, err :=
-		sarama.NewConsumerGroup(
-			input.config.Hosts, input.config.GroupID, input.saramaConfig)
-	if err != nil {
-		input.log.Errorw(
-			"Error initializing kafka consumer group", "error", err)
-		return
-	}
 	input.saramaWaitGroup.Add(1)
 	defer func() {
 		consumerGroup.Close()
@@ -129,7 +122,7 @@ func (input *kafkaInput) runConsumerGroup(context context.Context) {
 		}
 	}()
 
-	err = consumerGroup.Consume(context, input.config.Topics, handler)
+	err := consumerGroup.Consume(context, input.config.Topics, handler)
 	if err != nil {
 		input.log.Errorw("Kafka consume error", "error", err)
 	}
@@ -151,13 +144,24 @@ func (input *kafkaInput) Run() {
 				8*input.config.ConnectBackoff)
 
 			for context.Err() == nil {
-				// Try to start the consumer group event loop: create a consumer
-				// group client (wbich connects to the kafka cluster) and call
-				// Consume (which starts an asynchronous consumer).
-				input.runConsumerGroup(context)
+				// Connect to Kafka with a new consumer group.
+				consumerGroup, err := sarama.NewConsumerGroup(
+					input.config.Hosts, input.config.GroupID, input.saramaConfig)
+				if err != nil {
+					input.log.Errorw(
+						"Error initializing kafka consumer group", "error", err)
+					backoff.Wait()
+					continue
+				}
+				// We've successfully connected, reset the backoff timer.
+				backoff.Reset()
 
-				// If runConsumerGroup returns, we wait for the backoff interval.
-				backoff.Wait()
+				// We have a connected consumer group now, try to start the main event
+				// loop by calling Consume (which starts an asynchronous consumer).
+				// In an ideal run, this function never returns until shutdown; if it
+				// does, it means the errors have been logged and the consumer group
+				// has been closed, so we try creating a new one in the next iteration.
+				input.runConsumerGroup(context, consumerGroup)
 			}
 		}()
 	})
