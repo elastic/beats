@@ -7862,6 +7862,67 @@ type: keyword
 
 --
 
+
+*`kafka.topic`*::
++
+--
+Kafka topic
+
+
+type: keyword
+
+--
+
+*`kafka.partition`*::
++
+--
+Kafka partition number
+
+
+type: long
+
+--
+
+*`kafka.offset`*::
++
+--
+Kafka offset of this message
+
+
+type: long
+
+--
+
+*`kafka.key`*::
++
+--
+Kafka key, corresponding to the Kafka value stored in the message
+
+
+type: keyword
+
+--
+
+*`kafka.block_timestamp`*::
++
+--
+Kafka outer (compressed) block timestamp
+
+
+type: date
+
+--
+
+*`kafka.headers`*::
++
+--
+An array of Kafka header strings for this message, in the form "<key>: <value>".
+
+
+type: array
+
+--
+
 [[exported-fields-logstash]]
 == logstash fields
 
