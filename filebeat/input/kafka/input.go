@@ -101,10 +101,7 @@ func NewInput(
 	return input, nil
 }
 
-func (input *kafkaInput) runConsumerGroup() {
-	// Sarama uses standard go contexts to control cancellation, so we need
-	// to wrap our input context channel in that interface.
-	context := doneChannelContext(input.context.Done)
+func (input *kafkaInput) runConsumerGroup(context context.Context) {
 	handler := &groupHandler{
 		version: input.config.Version,
 		outlet:  input.outlet,
@@ -142,6 +139,9 @@ func (input *kafkaInput) runConsumerGroup() {
 func (input *kafkaInput) Run() {
 	input.runOnce.Do(func() {
 		go func() {
+			// Sarama uses standard go contexts to control cancellation, so we need
+			// to wrap our input context channel in that interface.
+			context := doneChannelContext(input.context.Done)
 
 			// If the consumer fails to connect, we use exponential backoff with
 			// jitter up to 8 * the initial backoff interval.
@@ -149,20 +149,15 @@ func (input *kafkaInput) Run() {
 				input.context.Done,
 				input.config.ConnectBackoff,
 				8*input.config.ConnectBackoff)
-			for {
+
+			for context.Err() == nil {
 				// Try to start the consumer group event loop: create a consumer
 				// group client (wbich connects to the kafka cluster) and call
 				// Consume (which starts an asynchronous consumer).
-				input.runConsumerGroup()
+				input.runConsumerGroup(context)
 
 				// If runConsumerGroup returns, we wait for the backoff interval.
 				backoff.Wait()
-
-				// Check the Done channel before we try again.
-				select {
-				case <-input.context.Done:
-					return
-				}
 			}
 		}()
 	})

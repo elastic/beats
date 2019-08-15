@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// + build integration
+// +build integration
 
 package kafka
 
@@ -123,9 +123,10 @@ func TestInput(t *testing.T) {
 
 	// Setup the input config
 	config := common.MustNewConfigFrom(common.MapStr{
-		"hosts":    getTestKafkaHost(),
-		"topics":   []string{testTopic},
-		"group_id": "filebeat",
+		"hosts":      getTestKafkaHost(),
+		"topics":     []string{testTopic},
+		"group_id":   "filebeat",
+		"wait_close": 0,
 	})
 
 	// Route input events through our capturer instead of sending through ES.
