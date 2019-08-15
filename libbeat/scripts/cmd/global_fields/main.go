@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/libbeat/generator/fields"
+	"github.com/elastic/beats/libbeat/mapping"
 )
 
 func main() {
@@ -92,6 +93,12 @@ func main() {
 	err = fields.Generate(esBeatsPath, beatPath, fieldsFiles, output)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot generate global fields.yml file for %s: %+v\n", name, err)
+		os.Exit(3)
+	}
+
+	_, err = mapping.LoadFieldsYaml(output)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Generated global fields.yml file for %s is invalid: %+v\n", name, err)
 		os.Exit(3)
 	}
 
