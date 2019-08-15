@@ -1,4 +1,5 @@
 #!/usr/bin/env groovy
+
 pipeline {
   agent none
   environment {
@@ -22,11 +23,6 @@ pipeline {
     stage('Initializing'){
       agent { label 'linux && immutable' }
       options { skipDefaultCheckout() }
-      environment {
-        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
-        HOME = "${env.WORKSPACE}"
-        GOPATH = "${env.WORKSPACE}"
-      }
       stages {
         stage('Checkout') {
           steps {
@@ -45,10 +41,9 @@ pipeline {
         changeRequest()
       }
       steps {
-        log(level: 'INFO', text: 'Launching Async ITs')
         build(job: env.PIPELINE, propagate: false, wait: false,
               parameters: [string(name: 'GO_VERSION', value: "${env.GO_VERSION}"),
-                           string(name: 'MODULE', value: 'all'),
+                           string(name: 'FEATURE', value: 'all'),
                            string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_NAME),
                            string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
                            string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
