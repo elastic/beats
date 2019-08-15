@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
 - Fix unexpected stops on docker autodiscover when a container is restarted before `cleanup_timeout`. {issue}12962[12962] {pull}13127[13127]
 - Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
+- Fix some incorrect types and formats in field.yml files. {pull}13188[13188]
 - Load DLLs only from Windows system directory. {pull}13234[13234]
 
 *Auditbeat*
