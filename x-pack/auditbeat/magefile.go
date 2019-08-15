@@ -17,9 +17,14 @@ import (
 
 	auditbeat "github.com/elastic/beats/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	common "github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
 	devtools.BeatLicense = "Elastic License"
 	devtools.Platforms = devtools.Platforms.Filter("!linux/ppc64 !linux/mips64")
@@ -58,11 +63,6 @@ func BuildGoDaemon() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -123,16 +123,6 @@ func ExportDashboard() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
-}
-
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).

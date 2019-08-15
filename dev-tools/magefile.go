@@ -20,12 +20,6 @@
 package main
 
 import (
-	"github.com/magefile/mage/mg"
-
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/common"
 )
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, devtools.Check)
-}

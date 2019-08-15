@@ -29,9 +29,14 @@ import (
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	heartbeat "github.com/elastic/beats/heartbeat/scripts/mage"
+
+	// mage:import
+	common "github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Ping remote services for availability and log " +
 		"results to Elasticsearch or send to Logstash."
 	devtools.BeatServiceName = "heartbeat-elastic"
@@ -66,11 +71,6 @@ func CrossBuildXPack() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -143,9 +143,4 @@ func customizePackaging() {
 // Config generates both the short/reference/docker configs.
 func Config() error {
 	return devtools.Config(devtools.AllConfigTypes, heartbeat.ConfigFileParams(), ".")
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }

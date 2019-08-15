@@ -30,9 +30,14 @@ import (
 	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	common "github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Journalbeat ships systemd journal entries to Elasticsearch or Logstash."
 
 	devtools.Platforms = devtools.Platforms.Filter("linux !linux/ppc64 !linux/mips64")
@@ -45,11 +50,6 @@ const (
 // Build builds the Beat binary.
 func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
@@ -79,11 +79,6 @@ func CrossBuildXPack() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon(devtools.ImageSelector(selectImage))
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
