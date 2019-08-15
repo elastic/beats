@@ -84,7 +84,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Central Management enroll under Windows {issue}12797[12797] {pull}12799[12799]
 - ILM: Use GET instead of HEAD when checking for alias to expose detailed error message. {pull}12886[12886]
 - Fix seccomp policy preventing some features to function properly on 32bit Linux systems. {issue}12990[12990] {pull}13008[13008]
+- Fix unexpected stops on docker autodiscover when a container is restarted before `cleanup_timeout`. {issue}12962[12962] {pull}13127[13127]
 - Fix install-service.ps1's ability to set Windows service's delay start configuration. {pull}13173[13173]
+- Load DLLs only from Windows system directory. {pull}13234[13234]
 
 *Auditbeat*
 
@@ -121,6 +123,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apply `max_message_size` to incoming message buffer. {pull}11966[11966]
 - Syslog input will now omit the `process` object from events if it is empty. {pull}12700[12700]
 - Fix multiline pattern in Postgres which was too permissive {issue}12078[12078] {pull}13069[13069]
+- Allow path variables to be used in files loaded from modules.d. {issue}13184[13184]
 
 *Heartbeat*
 

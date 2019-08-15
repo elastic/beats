@@ -171,7 +171,7 @@
             }
           }
         },
-        "title": "AWS S3 Daily Storage Bucket Size in Bytes",
+        "title": "S3 Daily Storage Bucket Size in Bytes [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -257,7 +257,7 @@
             }
           }
         },
-        "title": "AWS S3 Daily Storage Number of Objects",
+        "title": "S3 Daily Storage Number of Objects [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -335,7 +335,7 @@
             }
           }
         },
-        "title": "AWS S3 Request Latency Total Request in ms",
+        "title": "S3 Request Latency Total Request in ms [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -428,7 +428,7 @@
             }
           }
         },
-        "title": "AWS S3 Total Error 4xx",
+        "title": "S3 Total Error 4xx [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -503,7 +503,7 @@
             }
           }
         },
-        "title": "AWS S3 Total Error 5xx",
+        "title": "S3 Total Error 5xx [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -578,7 +578,7 @@
             }
           }
         },
-        "title": "AWS S3 Filters",
+        "title": "S3 Filters [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -645,7 +645,7 @@
             }
           }
         },
-        "title": "AWS S3 Total Requests",
+        "title": "S3 Total Requests [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
