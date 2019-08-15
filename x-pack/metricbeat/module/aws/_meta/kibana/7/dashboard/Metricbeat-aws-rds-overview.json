@@ -177,7 +177,7 @@
             }
           }
         },
-        "title": "Database Connections [AWS RDS]",
+        "title": "RDS Database Connections [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -227,7 +227,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Database Connections [AWS RDS]",
+          "title": "AWS RDS Database Connections",
           "type": "metrics"
         }
       },
@@ -252,7 +252,7 @@
             }
           }
         },
-        "title": "Insert Latency in Milliseconds [AWS RDS]",
+        "title": "RDS Insert Latency in Milliseconds [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -306,7 +306,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Insert Latency in Milliseconds [AWS RDS]",
+          "title": "AWS RDS Insert Latency in Milliseconds",
           "type": "metrics"
         }
       },
@@ -331,7 +331,7 @@
             }
           }
         },
-        "title": "Select Latency in Milliseconds [AWS RDS]",
+        "title": "RDS Select Latency in Milliseconds [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -385,7 +385,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Select Latency in Milliseconds [AWS RDS]",
+          "title": "AWS RDS Select Latency in Milliseconds",
           "type": "metrics"
         }
       },
@@ -410,7 +410,7 @@
             }
           }
         },
-        "title": "Transaction Blocked [AWS RDS]",
+        "title": "RDS Transaction Blocked [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -465,7 +465,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Transaction Blocked [AWS RDS]",
+          "title": "AWS RDS Transaction Blocked",
           "type": "metrics"
         }
       },
@@ -490,7 +490,7 @@
             }
           }
         },
-        "title": "AWS Region Filter",
+        "title": "Region Filter [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -548,7 +548,7 @@
             }
           }
         },
-        "title": "Insert Throughput in Count/Second [AWS RDS]",
+        "title": "RDS Insert Throughput in Count/Second [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -602,7 +602,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Insert Throughput in Count/Second [AWS RDS]",
+          "title": "AWS RDS Insert Throughput in Count/Second",
           "type": "metrics"
         }
       },
@@ -627,7 +627,7 @@
             }
           }
         },
-        "title": "Select Throughput in Count/Second [AWS RDS]",
+        "title": "RDS Select Throughput in Count/Second [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -681,7 +681,7 @@
             "time_field": "",
             "type": "timeseries"
           },
-          "title": "Select Throughput in Count/Second [AWS RDS]",
+          "title": "AWS RDS Select Throughput in Count/Second",
           "type": "metrics"
         }
       },

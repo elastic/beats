@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview of AWS EBS Metrics",
+        "description": "[Metricbeat AWS] Overview of EBS Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -855,7 +855,7 @@
             }
           }
         },
-        "title": "AWS Region Filter",
+        "title": "Region Filter [Metricbeat AWS]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -882,7 +882,7 @@
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "AWS Region Filter",
+          "title": "Region Filter [Metricbeat AWS]",
           "type": "input_control_vis"
         }
       },

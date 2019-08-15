@@ -59,6 +59,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-statsd>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
@@ -4797,7 +4798,7 @@ Percentage of time in kernel space.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4819,7 +4820,7 @@ Percentage of total CPU time in the system.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4841,7 +4842,7 @@ Percentage of time in user space.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4863,7 +4864,7 @@ Total CPU usage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -4875,7 +4876,7 @@ Percentage of CPU time in this core.
 
 type: object
 
-format: percentage
+format: percent
 
 --
 
@@ -5485,7 +5486,7 @@ Memory resident set size percentage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -5516,7 +5517,7 @@ Memory usage percentage.
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -12009,7 +12010,7 @@ Current throttle percentage for the server when slowstart is active, or no value
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14135,7 +14136,7 @@ CPU usage as a percentage of the total node allocatable CPU
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14147,7 +14148,7 @@ CPU usage as a percentage of the defined limit for the container (or total node 
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14263,7 +14264,7 @@ Memory usage as a percentage of the total node allocatable memory
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -14275,7 +14276,7 @@ Memory usage as a percentage of the defined limit for the container (or total no
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15252,7 +15253,7 @@ CPU usage as a percentage of the total node CPU
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15264,7 +15265,7 @@ CPU usage as a percentage of the defined limit for the pod containers (or total 
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15290,7 +15291,7 @@ Memory usage as a percentage of the total node allocatable memory
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -15302,7 +15303,7 @@ Memory usage as a percentage of the defined limit for the pod containers (or tot
 
 type: scaled_float
 
-format: percentage
+format: percent
 
 --
 
@@ -22951,8 +22952,6 @@ The date and time FPM has started.
 
 type: date
 
-format: epoch_second
-
 --
 
 [float]
@@ -22991,8 +22990,6 @@ The date and time the process has started
 
 
 type: date
-
-format: epoch_second
 
 --
 
@@ -24682,7 +24679,7 @@ Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately
 
 type: long
 
-format: percentage
+format: percent
 
 --
 
@@ -24956,11 +24953,12 @@ Redis memory stats.
 *`redis.info.memory.used.value`*::
 +
 --
+Total number of bytes allocated by Redis.
 
 
 type: long
 
-format: bytes Total number of bytes allocated by Redis.
+format: bytes
 
 --
 
@@ -26115,6 +26113,33 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-statsd]]
+== Statsd fields
+
+Statsd module
+
+
+
+*`statsd.*.count`*::
++
+--
+Statsd counters
+
+
+type: object
+
+--
+
+*`statsd.*.*`*::
++
+--
+Statsd metrics - release: beta
+
+
+type: object
 
 --
 
