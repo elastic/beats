@@ -111,7 +111,7 @@ func uploadSampleLogFile(t *testing.T, awsConfig awssdk.Config, bucketName strin
 	}
 }
 
-func collectOldMessages(t *testing.T, awsConfig awssdk.Config, queueURL string, visibilityTimeout int64, svcSQS *sqs.Client) []string {
+func collectOldMessages(t *testing.T, queueURL string, visibilityTimeout int64, svcSQS *sqs.Client) []string {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -143,7 +143,7 @@ func (input *s3Input) deleteAllMessages(t *testing.T, awsConfig awssdk.Config, q
 	init := true
 	for init || len(messageReceiptHandles) > 0 {
 		init = false
-		messageReceiptHandles = collectOldMessages(t, awsConfig, queueURL, visibilityTimeout, svcSQS)
+		messageReceiptHandles = collectOldMessages(t, queueURL, visibilityTimeout, svcSQS)
 		for _, receiptHandle := range messageReceiptHandles {
 			err := input.deleteMessage(queueURL, receiptHandle, svcSQS)
 			if err != nil {
@@ -178,7 +178,7 @@ func runTest(t *testing.T, cfg *common.Config, run func(input *s3Input, out *stu
 
 	in, err := NewInput(cfg, connector, inputCtx)
 	if err != nil {
-		t.Fatal(err)
+		t.Skipf("Skipping: %v", err)
 	}
 	s3Input := in.(*s3Input)
 	defer s3Input.Stop()
