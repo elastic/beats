@@ -310,13 +310,16 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 			meta.Put("cluster_uuid", clusterUUID)
 		}
 
-		if okToPublish {
-			r.client.Publish(beat.Event{
-				Timestamp: ts,
-				Fields:    fields,
-				Meta:      meta,
-			})
+		if !okToPublish {
+			log.Debug("not publishing monitoring event as cluster_uuid could not be determined yet")
+			return
 		}
+
+		r.client.Publish(beat.Event{
+			Timestamp: ts,
+			Fields:    fields,
+			Meta:      meta,
+		})
 	}
 }
 
