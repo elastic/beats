@@ -118,20 +118,20 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to process counter `%s` with value `%s`", m.name, m.value)
 		}
-		// inc/dec or set
-		if m.value[0] == '+' || m.value[0] == '-' {
-			c.Inc(v)
-		} else {
-			c.Clear()
-			c.Inc(v)
-		}
+		c.Inc(v)
 	case "g":
 		c := p.registry.GetOrNewGauge64(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
 			return errors.Wrapf(err, "failed to process gauge `%s` with value `%s`", m.name, m.value)
 		}
-		c.Update(v)
+
+		// inc/dec or set
+		if m.value[0] == '+' || m.value[0] == '-' {
+			c.Inc(v)
+		} else {
+			c.Set(v)
+		}
 	case "ms":
 		c := p.registry.GetOrNewTimer(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
