@@ -19,6 +19,7 @@ package match
 
 import (
 	"reflect"
+	"regexp"
 	"testing"
 )
 
@@ -208,6 +209,12 @@ func TestMatchers(t *testing.T) {
 				"- 2017-01-02 should not match",
 				"fail",
 			},
+		},
+		{
+			`(?i:case)`,
+			typeOf((*regexp.Regexp)(nil)),
+			[]string{"case", "Case", "CaSe", "cAsE"},
+			nil,
 		},
 	}
 
