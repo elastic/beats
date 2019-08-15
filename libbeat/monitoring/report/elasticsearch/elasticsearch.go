@@ -98,7 +98,8 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format: report.FormatXPackMonitoringBulk,
+		Format:      report.FormatXPackMonitoringBulk,
+		ClusterUUID: settings.ClusterUUID,
 	}
 
 	if settings.DefaultUsername != "" {
@@ -107,10 +108,6 @@ func defaultConfig(settings report.Settings) config {
 
 	if settings.Format != report.FormatUnknown {
 		c.Format = settings.Format
-	}
-
-	if settings.ClusterUUID != "" {
-		c.ClusterUUID = settings.ClusterUUID
 	}
 
 	return c
