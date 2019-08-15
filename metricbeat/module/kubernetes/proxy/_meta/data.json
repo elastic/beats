@@ -7,50 +7,19 @@
     },
     "kubernetes": {
         "proxy": {
-            "handler": "prometheus",
-            "http": {
+            "client": {
                 "request": {
-                    "duration": {
-                        "us": {
-                            "count": 5719,
-                            "percentile": {
-                                "50": 3724.635,
-                                "90": 6009.016,
-                                "99": 15081.009
-                            },
-                            "sum": 21201441.986
-                        }
-                    },
-                    "size": {
-                        "bytes": {
-                            "count": 5719,
-                            "percentile": {
-                                "50": 86,
-                                "90": 86,
-                                "99": 86
-                            },
-                            "sum": 491766
-                        }
-                    }
-                },
-                "response": {
-                    "size": {
-                        "bytes": {
-                            "count": 5719,
-                            "percentile": {
-                                "50": 2965,
-                                "90": 2970,
-                                "99": 2973
-                            },
-                            "sum": 16977903
-                        }
-                    }
+                    "count": 1
                 }
-            }
+            },
+            "code": "201",
+            "host": "192.168.205.10:6443",
+            "method": "POST"
         }
     },
     "metricset": {
-        "name": "proxy"
+        "name": "proxy",
+        "period": 10000000
     },
     "service": {
         "address": "127.0.0.1:55555",

@@ -7,44 +7,51 @@
         },
         "kubernetes": {
             "scheduler": {
-                "client": {
+                "handler": "prometheus",
+                "http": {
                     "request": {
-                        "count": 4631
+                        "duration": {
+                            "us": {
+                                "count": 4,
+                                "percentile": {
+                                    "50": 7644.523,
+                                    "90": 7644.523,
+                                    "99": 7644.523
+                                },
+                                "sum": 16210.005000000001
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "count": 4,
+                                "percentile": {
+                                    "50": 64,
+                                    "90": 64,
+                                    "99": 64
+                                },
+                                "sum": 256
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "count": 4,
+                                "percentile": {
+                                    "50": 48741,
+                                    "90": 48741,
+                                    "99": 48741
+                                },
+                                "sum": 184429
+                            }
+                        }
                     }
-                },
-                "code": "200",
-                "host": "localhost:8443",
-                "method": "PUT"
+                }
             }
         },
         "metricset": {
-            "name": "scheduler"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "client": {
-                    "request": {
-                        "count": 5165
-                    }
-                },
-                "code": "200",
-                "host": "localhost:8443",
-                "method": "GET"
-            }
-        },
-        "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -118,7 +125,8 @@
             }
         },
         "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -140,117 +148,8 @@
             }
         },
         "metricset": {
-            "name": "scheduler"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "handler": "prometheus",
-                "http": {
-                    "request": {
-                        "duration": {
-                            "us": {
-                                "count": 4,
-                                "percentile": {
-                                    "50": 7644.523,
-                                    "90": 7644.523,
-                                    "99": 7644.523
-                                },
-                                "sum": 16210.005000000001
-                            }
-                        },
-                        "size": {
-                            "bytes": {
-                                "count": 4,
-                                "percentile": {
-                                    "50": 64,
-                                    "90": 64,
-                                    "99": 64
-                                },
-                                "sum": 256
-                            }
-                        }
-                    },
-                    "response": {
-                        "size": {
-                            "bytes": {
-                                "count": 4,
-                                "percentile": {
-                                    "50": 48741,
-                                    "90": 48741,
-                                    "99": 48741
-                                },
-                                "sum": 184429
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "scheduler"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "result": "unschedulable",
-                "scheduling": {
-                    "pod": {
-                        "attempts": {
-                            "count": 154
-                        }
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "scheduler"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "client": {
-                    "request": {
-                        "count": 9
-                    }
-                },
-                "code": "201",
-                "host": "localhost:8443",
-                "method": "POST"
-            }
-        },
-        "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -276,7 +175,8 @@
             }
         },
         "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -291,50 +191,19 @@
         },
         "kubernetes": {
             "scheduler": {
-                "code": "200",
-                "handler": "prometheus",
-                "http": {
-                    "request": {
-                        "count": 4
-                    }
-                },
-                "method": "get"
-            }
-        },
-        "metricset": {
-            "name": "scheduler"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "operation": "predicate_evaluation",
+                "result": "unschedulable",
                 "scheduling": {
-                    "duration": {
-                        "seconds": {
-                            "count": 3,
-                            "percentile": {
-                                "50": 0.00004643,
-                                "90": 0.000058348,
-                                "99": 0.000058348
-                            },
-                            "sum": 0.003265988
+                    "pod": {
+                        "attempts": {
+                            "count": 154
                         }
                     }
                 }
             }
         },
         "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -351,16 +220,17 @@
             "scheduler": {
                 "client": {
                     "request": {
-                        "count": 92
+                        "count": 9
                     }
                 },
-                "code": "200",
+                "code": "201",
                 "host": "localhost:8443",
-                "method": "PATCH"
+                "method": "POST"
             }
         },
         "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -392,7 +262,95 @@
             }
         },
         "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "count": 92
+                    }
+                },
+                "code": "200",
+                "host": "localhost:8443",
+                "method": "PATCH"
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "operation": "predicate_evaluation",
+                "scheduling": {
+                    "duration": {
+                        "seconds": {
+                            "count": 3,
+                            "percentile": {
+                                "50": 0.00004643,
+                                "90": 0.000058348,
+                                "99": 0.000058348
+                            },
+                            "sum": 0.003265988
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "code": "200",
+                "handler": "prometheus",
+                "http": {
+                    "request": {
+                        "count": 4
+                    }
+                },
+                "method": "get"
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -418,7 +376,8 @@
             }
         },
         "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -450,7 +409,62 @@
             }
         },
         "metricset": {
-            "name": "scheduler"
+            "name": "scheduler",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "count": 4631
+                    }
+                },
+                "code": "200",
+                "host": "localhost:8443",
+                "method": "PUT"
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "count": 5165
+                    }
+                },
+                "code": "200",
+                "host": "localhost:8443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000000
         },
         "service": {
             "address": "127.0.0.1:55555",
