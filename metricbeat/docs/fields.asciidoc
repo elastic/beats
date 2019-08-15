@@ -59,6 +59,7 @@ grouped in the following categories:
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
+* <<exported-fields-statsd>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 * <<exported-fields-uwsgi>>
@@ -881,6 +882,12 @@ type: object
 --
 
 [float]
+=== ebs
+
+`ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
+
+
+[float]
 === ec2
 
 `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
@@ -1154,6 +1161,12 @@ The number of threads per CPU core.
 type: integer
 
 --
+
+[float]
+=== elb
+
+`elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
+
 
 [float]
 === rds
@@ -16061,6 +16074,94 @@ format: bytes
 --
 
 [float]
+=== cronjob
+
+kubernetes cronjob metrics
+
+
+
+*`kubernetes.cronjob.name`*::
++
+--
+Cronjob name
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.schedule`*::
++
+--
+Cronjob schedule
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.concurrency`*::
++
+--
+Concurrency policy
+
+type: keyword
+
+--
+
+*`kubernetes.cronjob.active.count`*::
++
+--
+Number of active pods for the cronjob
+
+type: long
+
+--
+
+*`kubernetes.cronjob.is_suspended`*::
++
+--
+Whether the cronjob is suspended
+
+type: boolean
+
+--
+
+*`kubernetes.cronjob.created.sec`*::
++
+--
+Epoch seconds since the cronjob was created
+
+type: double
+
+--
+
+*`kubernetes.cronjob.last_schedule.sec`*::
++
+--
+Epoch seconds for last cronjob run
+
+type: double
+
+--
+
+*`kubernetes.cronjob.next_schedule.sec`*::
++
+--
+Epoch seconds for next cronjob run
+
+type: double
+
+--
+
+*`kubernetes.cronjob.deadline.sec`*::
++
+--
+Deadline seconds after schedule for considering failed
+
+type: long
+
+--
+
+[float]
 === deployment
 
 kubernetes deployment metrics
@@ -26015,6 +26116,33 @@ type: long
 
 
 type: long
+
+--
+
+[[exported-fields-statsd]]
+== Statsd fields
+
+Statsd module
+
+
+
+*`statsd.*.count`*::
++
+--
+Statsd counters
+
+
+type: object
+
+--
+
+*`statsd.*.*`*::
++
+--
+Statsd metrics - release: beta
+
+
+type: object
 
 --
 

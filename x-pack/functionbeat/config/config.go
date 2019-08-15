@@ -14,29 +14,28 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// ConfigOverrides overrides the defaults provided by libbeat.
 var (
 	functionPattern = "^[A-Za-z][A-Za-z0-9\\-]{0,139}$"
 	functionRE      = regexp.MustCompile(functionPattern)
+	ConfigOverrides = common.MustNewConfigFrom(map[string]interface{}{
+		"path.data":              "/tmp",
+		"path.logs":              "/tmp/logs",
+		"logging.to_stderr":      true,
+		"logging.to_files":       false,
+		"setup.template.enabled": true,
+		"queue.mem": map[string]interface{}{
+			"events":           "${output.elasticsearch.bulk_max_size}",
+			"flush.min_events": 10,
+			"flush.timeout":    "0.01s",
+		},
+		"output.elasticsearch.bulk_max_size": 50,
+	})
 )
-
-// ConfigOverrides overrides the defaults provided by libbeat.
-var ConfigOverrides = common.MustNewConfigFrom(map[string]interface{}{
-	"path.data":              "/tmp",
-	"path.logs":              "/tmp/logs",
-	"logging.to_stderr":      true,
-	"logging.to_files":       false,
-	"setup.template.enabled": true,
-	"queue.mem": map[string]interface{}{
-		"events":           "${output.elasticsearch.bulk_max_size}",
-		"flush.min_events": 10,
-		"flush.timeout":    "0.01s",
-	},
-	"output.elasticsearch.bulk_max_size": 50,
-})
 
 // Config default configuration for Functionbeat.
 type Config struct {
-	Provider *common.ConfigNamespace `config:"provider" validate:"required"`
+	Provider *common.Config `config:"provider" validate:"required"`
 }
 
 // ProviderConfig is a generic configured used by providers.
