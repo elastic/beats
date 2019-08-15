@@ -126,12 +126,19 @@ func testIfDocsInDir(moduleDir string) bool {
 // compile and run the seprate go script to generate a list of default metricsets.
 // This is done so a compile-time issue in metricbeat doesn't break the docs build
 func getDefaultMetricsets() (map[string][]string, error) {
+
 	runpaths := []string{
 		mage.OSSBeatDir("scripts/msetlists/cmd/main.go"),
 		mage.XPackBeatDir("scripts/msetlists/main.go"),
 	}
 
 	var masterMap = make(map[string][]string)
+
+	//if we're dealing with a generated metricbeat, skip this.
+	if mage.BeatName != "metricbeat" {
+		return masterMap, nil
+	}
+
 	for _, dir := range runpaths {
 		rawMap, err := sh.OutCmd("go", "run", dir)()
 		if err != nil {
