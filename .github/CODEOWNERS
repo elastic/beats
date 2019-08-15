@@ -33,6 +33,7 @@
 /metricbeat/module/elasticsearch/ @elastic/stack-monitoring
 /metricbeat/module/kibana/ @elastic/stack-monitoring
 /metricbeat/module/logstash/ @elastic/stack-monitoring
+/metricbeat/module/beat/ @elastic/stack-monitoring
 /x-pack/metricbeat/module/ @elastic/infrastructure
 
 # Heartbeat
