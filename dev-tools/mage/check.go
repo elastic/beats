@@ -193,6 +193,9 @@ func GoVet() error {
 func CheckDashboardsFormat() error {
 	dashboardSubDir := "/_meta/kibana/"
 	dashboardFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
+		if strings.HasPrefix(path, "vendor") {
+			return false
+		}
 		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
 	})
 	if err != nil {
