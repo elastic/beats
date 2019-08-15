@@ -233,7 +233,8 @@ func TestGetMetricValues(t *testing.T) {
 			},
 		}
 		m := &AzureMockService{}
-		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
+		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
 		client.azureMonitorService = m
 		err := client.GetMetricValues()
 		assert.NotNil(t, err)

@@ -32,14 +32,16 @@ func filterMetrics(selectedRange []string, allRange []insights.MetricDefinition)
 // filterAggregations will filter out any unsupported aggregations based on the metrics selected
 func filterAggregations(selectedRange []string, metrics []insights.MetricDefinition) ([]string, []string) {
 	var unsupported []string
+	var difference []string
 	for _, metric := range metrics {
 		var supported []string
 		for _, agg := range *metric.SupportedAggregationTypes {
 			supported = append(supported, string(agg))
 		}
 		selectedRange, unsupported = intersections(supported, selectedRange)
+		difference = append(difference, unsupported...)
 	}
-	return selectedRange, unsupported
+	return selectedRange, difference
 }
 
 // stringInSlice is a helper method, will check if string is part of a slice
