@@ -28,9 +28,14 @@ import (
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 }
 
@@ -64,11 +69,6 @@ func CrossBuild() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -168,16 +168,6 @@ func Dashboards() error {
 // - ID:     Dashboard id
 func ExportDashboard() error {
 	return devtools.ExportDashboard()
-}
-
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
