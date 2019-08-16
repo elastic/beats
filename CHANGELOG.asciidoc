@@ -153,6 +153,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 - Add Kibana Dashboard for MISP module. {pull}14147[14147]
 - Add support for gzipped files in S3 input {pull}13980[13980]
 - Add Filebeat Azure Dashboards {pull}14127[14127]
+- Add support for space or time sync character before timestamp in syslog input. {pull}13278[13278] {issue}13269[13269]
 
 
 *Heartbeat*
