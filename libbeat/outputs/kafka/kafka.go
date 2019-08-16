@@ -57,7 +57,7 @@ func makeKafka(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
-) (outputs.Group, error) {
+) (outputs.IGroup, error) {
 	debugf("initialize kafka output")
 
 	config, err := readConfig(cfg)

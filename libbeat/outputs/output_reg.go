@@ -31,7 +31,7 @@ type Factory func(
 	im IndexManager,
 	beat beat.Info,
 	stats Observer,
-	cfg *common.Config) (Group, error)
+	cfg *common.Config) (IGroup, error)
 
 // IndexManager provides additional index related services to the outputs.
 type IndexManager interface {
@@ -47,12 +47,35 @@ type IndexSelector interface {
 	Select(event *beat.Event) (string, error)
 }
 
+type IGroup interface {
+	GetClients() []Client
+	GetRetry() int
+	GetBatchSize() int
+}
+
+type IClusterAware interface {
+	ClusterUUID() (string, error)
+}
+
 // Group configures and combines multiple clients into load-balanced group of clients
 // being managed by the publisher pipeline.
 type Group struct {
+	IGroup
 	Clients   []Client
 	BatchSize int
 	Retry     int
+}
+
+func (g Group) GetClients() []Client {
+	return g.Clients
+}
+
+func (g Group) GetRetry() int {
+	return g.Retry
+}
+
+func (g Group) GetBatchSize() int {
+	return g.BatchSize
 }
 
 // RegisterType registers a new output type.
@@ -75,7 +98,7 @@ func Load(
 	stats Observer,
 	name string,
 	config *common.Config,
-) (Group, error) {
+) (IGroup, error) {
 	factory := FindFactory(name)
 	if factory == nil {
 		return Group{}, fmt.Errorf("output type %v undefined", name)

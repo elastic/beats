@@ -43,7 +43,7 @@ type outputController struct {
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
 type outputGroup struct {
-	outGrp    outputs.Group
+	outGrp    outputs.IGroup
 	workQueue workQueue
 	outputs   []outputWorker
 
@@ -99,13 +99,13 @@ func (c *outputController) Close() error {
 	return nil
 }
 
-func (c *outputController) Get() outputs.Group {
+func (c *outputController) Get() outputs.IGroup {
 	return c.out.outGrp
 }
 
-func (c *outputController) Set(outGrp outputs.Group) {
+func (c *outputController) Set(outGrp outputs.IGroup) {
 	// create new outputGroup with shared work queue
-	clients := outGrp.Clients
+	clients := outGrp.GetClients()
 	queue := makeWorkQueue()
 	worker := make([]outputWorker, len(clients))
 	for i, client := range clients {
@@ -115,8 +115,8 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		outGrp:     outGrp,
 		workQueue:  queue,
 		outputs:    worker,
-		timeToLive: outGrp.Retry + 1,
-		batchSize:  outGrp.BatchSize,
+		timeToLive: outGrp.GetRetry() + 1,
+		batchSize:  outGrp.GetBatchSize(),
 	}
 
 	// update consumer and retryer
@@ -154,7 +154,7 @@ func makeWorkQueue() workQueue {
 // Reload the output
 func (c *outputController) Reload(
 	cfg *reload.ConfigWithMeta,
-	outFactory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
+	outFactory func(outputs.Observer, common.ConfigNamespace) (outputs.IGroup, error),
 ) error {
 	outCfg := common.ConfigNamespace{}
 	if cfg != nil {
@@ -163,7 +163,7 @@ func (c *outputController) Reload(
 		}
 	}
 
-	output, err := loadOutput(c.monitors, func(stats outputs.Observer) (string, outputs.Group, error) {
+	output, err := loadOutput(c.monitors, func(stats outputs.Observer) (string, outputs.IGroup, error) {
 		name := outCfg.Name()
 		out, err := outFactory(stats, outCfg)
 		return name, out, err

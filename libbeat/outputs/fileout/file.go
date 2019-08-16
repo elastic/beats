@@ -48,7 +48,7 @@ func makeFileout(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
-) (outputs.Group, error) {
+) (outputs.IGroup, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)

@@ -810,14 +810,14 @@ func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Re
 
 func (b *Beat) makeOutputFactory(
 	cfg common.ConfigNamespace,
-) func(outputs.Observer) (string, outputs.Group, error) {
-	return func(outStats outputs.Observer) (string, outputs.Group, error) {
+) func(outputs.Observer) (string, outputs.IGroup, error) {
+	return func(outStats outputs.Observer) (string, outputs.IGroup, error) {
 		out, err := b.createOutput(outStats, cfg)
 		return cfg.Name(), out, err
 	}
 }
 
-func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) (outputs.Group, error) {
+func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) (outputs.IGroup, error) {
 	if !cfg.IsSet() {
 		return outputs.Group{}, nil
 	}

@@ -53,7 +53,7 @@ func makeRedis(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
-) (outputs.Group, error) {
+) (outputs.IGroup, error) {
 
 	if !cfg.HasField("index") {
 		cfg.SetString("index", -1, beat.Beat)

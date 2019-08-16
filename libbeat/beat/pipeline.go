@@ -21,11 +21,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type Pipeline interface {
 	PipelineConnector
 	SetACKHandler(PipelineACKHandler) error
+	GetOutputGroup() outputs.Group // FIXME! Causes circular import
 }
 
 // PipelineConnector creates a publishing Client. This is typically backed by a Pipeline.

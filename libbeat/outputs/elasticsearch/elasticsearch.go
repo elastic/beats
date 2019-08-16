@@ -59,6 +59,15 @@ type callbacksRegistry struct {
 	mutex     sync.Mutex
 }
 
+type outputGroup struct {
+	outputs.Group
+}
+
+func (o outputGroup) ClusterUUID() (string, error) {
+	// TODO
+	return "", nil
+}
+
 // XXX: it would be fantastic to do this without a package global
 var connectCallbackRegistry = newCallbacksRegistry()
 
@@ -139,7 +148,7 @@ func makeES(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
-) (outputs.Group, error) {
+) (outputs.IGroup, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
@@ -213,7 +222,9 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+	o, err := outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+	es := outputGroup{o}
+	return es, err
 }
 
 func buildSelectors(

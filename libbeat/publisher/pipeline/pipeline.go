@@ -118,7 +118,7 @@ const (
 type OutputReloader interface {
 	Reload(
 		cfg *reload.ConfigWithMeta,
-		factory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
+		factory func(outputs.Observer, common.ConfigNamespace) (outputs.IGroup, error),
 	) error
 }
 
@@ -145,7 +145,7 @@ func New(
 	beat beat.Info,
 	monitors Monitors,
 	queueFactory queueFactory,
-	out outputs.Group,
+	out outputs.IGroup,
 	settings Settings,
 ) (*Pipeline, error) {
 	var err error
@@ -384,7 +384,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 }
 
 // GetOutputGroup returns the output being used by the pipeline
-func (p *Pipeline) GetOutputGroup() outputs.Group {
+func (p *Pipeline) GetOutputGroup() outputs.IGroup {
 	return p.output.Get()
 }
 

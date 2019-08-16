@@ -307,7 +307,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) 
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
 		}
 
-		clusterUUID := getClusterUUID()
+		clusterUUID := r.getClusterUUID()
 		if clusterUUID != "" {
 			meta.Put("cluster_uuid", clusterUUID)
 		}
@@ -388,18 +388,12 @@ func makeMeta(beat beat.Info) common.MapStr {
 	}
 }
 
-func getClusterUUID() string {
-	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-	outputsRegistry := stateRegistry.GetRegistry("outputs")
-	if outputsRegistry == nil {
-		return ""
-	}
+func (r *reporter) getClusterUUID() string {
+	outGrp := r.beatPublisher.GetOutputGroup()
 
-	elasticsearchRegistry := outputsRegistry.GetRegistry("elasticsearch")
-	if elasticsearchRegistry == nil {
-		return ""
+	if clusterAware, ok := outGrp.(outputs.IClusterAware); ok {
+		id, err := clusterAware.ClusterUUID()
+		return id
 	}
-
-	snapshot := monitoring.CollectFlatSnapshot(elasticsearchRegistry, monitoring.Full, false)
-	return snapshot.Strings["cluster_uuid"]
+	return ""
 }
