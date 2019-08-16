@@ -394,6 +394,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			Format:          reporterSettings.Format,
+			BeatPublisher:   b.Publisher,
 		}
 		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
 		if err != nil {

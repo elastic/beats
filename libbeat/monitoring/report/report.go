@@ -50,6 +50,7 @@ type config struct {
 type Settings struct {
 	DefaultUsername string
 	Format          Format
+	BeatPublisher   beat.Pipeline
 }
 
 type Reporter interface {

@@ -383,6 +383,11 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return client, nil
 }
 
+// GetOutputGroup returns the output being used by the pipeline
+func (p *Pipeline) GetOutputGroup() outputs.Group {
+	return p.output.Get()
+}
+
 func (p *Pipeline) registerSignalPropagation(c *client) {
 	p.guardStartSigPropagation.Do(func() {
 		p.sigNewClient = make(chan *client, 1)

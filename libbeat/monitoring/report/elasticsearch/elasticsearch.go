@@ -57,7 +57,8 @@ type reporter struct {
 	pipeline *pipeline.Pipeline
 	client   beat.Client
 
-	out []outputs.NetworkClient
+	out           []outputs.NetworkClient
+	beatPublisher beat.Pipeline
 }
 
 const selector = "monitoring"
@@ -209,14 +210,15 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	}
 
 	r := &reporter{
-		logger:     log,
-		done:       newStopper(),
-		beatMeta:   makeMeta(beat),
-		tags:       config.Tags,
-		checkRetry: checkRetry,
-		pipeline:   pipeline,
-		client:     pipeConn,
-		out:        clients,
+		logger:        log,
+		done:          newStopper(),
+		beatMeta:      makeMeta(beat),
+		tags:          config.Tags,
+		checkRetry:    checkRetry,
+		pipeline:      pipeline,
+		client:        pipeConn,
+		out:           clients,
+		beatPublisher: settings.BeatPublisher,
 	}
 	go r.initLoop(config)
 	return r, nil

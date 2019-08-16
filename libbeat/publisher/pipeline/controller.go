@@ -43,6 +43,7 @@ type outputController struct {
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
 type outputGroup struct {
+	outGrp    outputs.Group
 	workQueue workQueue
 	outputs   []outputWorker
 
@@ -98,6 +99,10 @@ func (c *outputController) Close() error {
 	return nil
 }
 
+func (c *outputController) Get() outputs.Group {
+	return c.out.outGrp
+}
+
 func (c *outputController) Set(outGrp outputs.Group) {
 	// create new outputGroup with shared work queue
 	clients := outGrp.Clients
@@ -107,6 +112,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		worker[i] = makeClientWorker(c.observer, queue, client)
 	}
 	grp := &outputGroup{
+		outGrp:     outGrp,
 		workQueue:  queue,
 		outputs:    worker,
 		timeToLive: outGrp.Retry + 1,
