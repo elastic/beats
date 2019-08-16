@@ -3757,7 +3757,7 @@ Kubernetes node name
 
 --
 
-*`kubernetes.labels`*::
+*`kubernetes.labels.*`*::
 +
 --
 type: object
@@ -3767,7 +3767,7 @@ Kubernetes labels map
 
 --
 
-*`kubernetes.annotations`*::
+*`kubernetes.annotations.*`*::
 +
 --
 type: object

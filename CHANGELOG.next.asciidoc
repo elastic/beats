@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.1.1...7.1[Check the HEAD diff]
 
 - Fixed a memory leak when using the add_process_metadata processor under Windows. {pull}12100[12100]
 - Fixed Beat ID being reported by GET / API. {pull}12180[12180]
+- Fix mapping for kubernetes.labels and kubernetes.annotations in add_kubernetes_metadata. {issue}12638[12638] {pull}13226[13226]
 
 *Auditbeat*
 
