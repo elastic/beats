@@ -397,7 +397,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of Zookeeper",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

@@ -17,6 +17,9 @@ import (
 
 	devtools "github.com/elastic/beats/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/metricbeat/scripts/mage"
+
+	// mage:import
+	"github.com/elastic/beats/dev-tools/mage/target/common"
 )
 
 const (
@@ -24,6 +27,8 @@ const (
 )
 
 func init() {
+	common.RegisterCheckDeps(Update)
+
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 	devtools.BeatLicense = "Elastic License"
 }
@@ -58,11 +63,6 @@ func BuildGoDaemon() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
-}
-
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return devtools.Clean()
 }
 
 // Package packages the Beat for distribution.
@@ -126,16 +126,6 @@ func Update() {
 	mg.SerialDeps(Fields, Dashboards, Config,
 		metricbeat.PrepareModulePackagingXPack,
 		devtools.GenerateModuleIncludeListGo)
-}
-
-// Fmt formats source code and adds file headers.
-func Fmt() {
-	mg.Deps(devtools.Format)
-}
-
-// Check runs fmt and update then returns an error if any modifications are found.
-func Check() {
-	mg.SerialDeps(devtools.Format, Update, devtools.Check)
 }
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
