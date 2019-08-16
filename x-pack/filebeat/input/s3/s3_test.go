@@ -6,11 +6,15 @@ package s3
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -87,7 +91,7 @@ func testSetup(t *testing.T) context.CancelFunc {
 	return cancel
 }
 
-func uploadSampleLogFile(t *testing.T, awsConfig awssdk.Config, bucketName string) {
+func uploadSampleLogFile(t *testing.T, bucketName string, svcS3 s3iface.ClientAPI) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -98,7 +102,6 @@ func uploadSampleLogFile(t *testing.T, awsConfig awssdk.Config, bucketName strin
 	}
 	defer file.Close()
 
-	svcS3 := s3.New(awsConfig)
 	s3PutObjectInput := s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(filepath.Base(fileDir)),
@@ -111,7 +114,7 @@ func uploadSampleLogFile(t *testing.T, awsConfig awssdk.Config, bucketName strin
 	}
 }
 
-func collectOldMessages(t *testing.T, queueURL string, visibilityTimeout int64, svcSQS *sqs.Client) []string {
+func collectOldMessages(t *testing.T, queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI) []string {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -138,7 +141,7 @@ func collectOldMessages(t *testing.T, queueURL string, visibilityTimeout int64, 
 	return oldMessageHandles
 }
 
-func (input *s3Input) deleteAllMessages(t *testing.T, awsConfig awssdk.Config, queueURL string, visibilityTimeout int64, svcSQS *sqs.Client) error {
+func (input *s3Input) deleteAllMessages(t *testing.T, awsConfig awssdk.Config, queueURL string, visibilityTimeout int64, svcSQS sqsiface.ClientAPI) error {
 	var messageReceiptHandles []string
 	init := true
 	for init || len(messageReceiptHandles) > 0 {
@@ -273,7 +276,9 @@ func TestS3Input(t *testing.T) {
 		if s3BucketNameEnv == "" {
 			t.Fatal("failed to get S3_BUCKET_NAME")
 		}
-		uploadSampleLogFile(t, awsConfig, s3BucketNameEnv)
+
+		svcS3 := s3.New(awsConfig)
+		uploadSampleLogFile(t, s3BucketNameEnv, svcS3)
 		time.Sleep(30 * time.Second)
 
 		wg := sync.WaitGroup{}
@@ -314,6 +319,87 @@ func TestS3Input(t *testing.T) {
 		err = input.deleteAllMessages(t, awsConfig, config.QueueURL, int64(config.VisibilityTimeout.Seconds()), svcSQS)
 		if err != nil {
 			t.Fatalf("failed to delete message: %v", err.Error())
+		}
+	})
+}
+
+// MockSQSClient struct is used for unit tests.
+type MockSQSClient struct {
+	sqsiface.ClientAPI
+}
+
+var (
+	sqsMessageTest = "{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"ap-southeast-1\"," +
+		"\"eventTime\":\"2019-06-21T16:16:54.629Z\",\"eventName\":\"ObjectCreated:Put\"," +
+		"\"s3\":{\"configurationId\":\"object-created-event\",\"bucket\":{\"name\":\"test-s3-ks-2\"," +
+		"\"arn\":\"arn:aws:s3:::test-s3-ks-2\"},\"object\":{\"key\":\"server-access-logging2019-06-21-16-16-54\"}}}]}"
+)
+
+func (m *MockSQSClient) ReceiveMessageRequest(input *sqs.ReceiveMessageInput) sqs.ReceiveMessageRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return sqs.ReceiveMessageRequest{
+		Request: &awssdk.Request{
+			Data: &sqs.ReceiveMessageOutput{
+				Messages: []sqs.Message{
+					{Body: awssdk.String(sqsMessageTest)},
+				},
+			},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func (m *MockSQSClient) DeleteMessageRequest(input *sqs.DeleteMessageInput) sqs.DeleteMessageRequest {
+	httpReq, _ := http.NewRequest("", "", nil)
+	return sqs.DeleteMessageRequest{
+		Request: &awssdk.Request{
+			Data:        &sqs.DeleteMessageOutput{},
+			HTTPRequest: httpReq,
+		},
+	}
+}
+
+func TestS3InputWithMock(t *testing.T) {
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"queue_url": "https://sqs.ap-southeast-1.amazonaws.com/123456/test",
+	})
+
+	runTest(t, cfg, func(input *s3Input, out *stubOutleter, t *testing.T) {
+		svcS3 := &MockS3Client{}
+		svcSQS := &MockSQSClient{}
+
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			input.run(svcSQS, svcS3, 300)
+		}()
+
+		time.AfterFunc(10*time.Second, func() { out.Close() })
+		events, ok := out.waitForEvents(2)
+		if !ok {
+			t.Fatalf("Expected 2 events, but got %d.", len(events))
+		}
+		input.Stop()
+
+		// check events
+		for i, event := range events {
+			bucketName, err := event.GetValue("aws.s3.bucket.name")
+			assert.NoError(t, err)
+			assert.Equal(t, "test-s3-ks-2", bucketName)
+
+			objectKey, err := event.GetValue("aws.s3.object.key")
+			assert.NoError(t, err)
+			assert.Equal(t, "server-access-logging2019-06-21-16-16-54", objectKey)
+
+			message, err := event.GetValue("message")
+			assert.NoError(t, err)
+			switch i {
+			case 0:
+				assert.Equal(t, s3LogString1, message)
+			case 1:
+				assert.Equal(t, s3LogString2, message)
+			}
 		}
 	})
 }

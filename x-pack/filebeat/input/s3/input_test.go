@@ -27,8 +27,8 @@ type MockS3Client struct {
 }
 
 var (
-	s3LogString1 = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/kaiyan.sheng@elastic.co 5141F REST.HEAD.OBJECT Screen1.png \n"
-	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/kaiyan.sheng@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png \n"
+	s3LogString1 = "36c1f test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5141F REST.HEAD.OBJECT Screen1.png \n"
+	s3LogString2 = "28kdg test-s3-ks [20/Jun/2019] 1.2.3.4 arn:aws:iam::1234:user/test@elastic.co 5A070 REST.HEAD.OBJECT Screen2.png \n"
 	mockSvc      = &MockS3Client{}
 	info         = s3Info{
 		name:   "test-s3-ks",
